@@ -3,8 +3,12 @@ name: YaguBogu Android CI
 on:
   push:
     branches: [ "dev-an" ]
+    paths:
+      - 'android/**'
   pull_request:
     branches: [ "dev-an" ]
+    paths:
+      - 'android/**'
 
 jobs:
   build:
