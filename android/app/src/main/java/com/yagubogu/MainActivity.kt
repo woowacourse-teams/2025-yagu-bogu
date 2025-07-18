@@ -5,16 +5,52 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import com.yagubogu.databinding.ActivityMainBinding
+import com.yagubogu.presentation.challenge.ChallengeFragment
+import com.yagubogu.presentation.home.HomeFragment
+import com.yagubogu.presentation.record.RecordFragment
+import com.yagubogu.presentation.stats.StatsFragment
 
 class MainActivity : AppCompatActivity() {
+    private val binding: ActivityMainBinding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupView()
+        setupBottomNavigationView()
+    }
+
+    private fun setupView() {
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun setupBottomNavigationView() {
+        binding.bnvNavigation.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.item_home -> replaceFragment(HomeFragment::class.java)
+                R.id.item_stats -> replaceFragment(StatsFragment::class.java)
+                R.id.item_record -> replaceFragment(RecordFragment::class.java)
+                R.id.item_challenge -> replaceFragment(ChallengeFragment::class.java)
+                else -> false
+            }
+        }
+    }
+
+    private fun replaceFragment(fragment: Class<out Fragment>): Boolean {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(binding.fcvFragment.id, fragment, null)
+        }
+        return true
     }
 }
