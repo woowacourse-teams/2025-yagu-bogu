@@ -22,6 +22,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupView()
         setupBottomNavigationView()
+        if (savedInstanceState == null) {
+            binding.bnvNavigation.selectedItemId = R.id.item_home
+        }
     }
 
     private fun setupView() {
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigationView() {
+        binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.item_home -> replaceFragment(HomeFragment::class.java)
