@@ -15,7 +15,7 @@ jobs:
     secrets: inherit
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     defaults:
       run:
