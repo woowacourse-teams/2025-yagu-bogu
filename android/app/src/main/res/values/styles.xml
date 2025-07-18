@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Pretendard -->
+    <style name="TextView.Pretendard.Light">
+        <item name="android:fontFamily">@font/pretendard_light</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Pretendard.Regular">
+        <item name="android:fontFamily">@font/pretendard_regular</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Pretendard.Medium">
+        <item name="android:fontFamily">@font/pretendard_medium</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Pretendard.SemiBold">
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Pretendard.Bold">
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- Esamanru -->
+    <style name="TextView.Esamanru.Light">
+        <item name="android:fontFamily">@font/esamanru_light</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Esamanru.Medium">
+        <item name="android:fontFamily">@font/esamanru_medium</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Esamanru.Bold">
+        <item name="android:fontFamily">@font/esamanru_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+</resources>
