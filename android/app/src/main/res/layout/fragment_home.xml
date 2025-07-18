@@ -34,22 +34,31 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.cardview.widget.CardView
             android:id="@+id/btn_check_in"
-            style="@style/TextView.Pretendard.Bold.20"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/btn_check_in"
-            android:paddingVertical="12dp"
-            android:text="@string/home_check_in"
-            android:textColor="@color/white"
-            app:icon="@drawable/ic_marker_pin"
-            app:iconGravity="textStart"
-            app:iconSize="24dp"
-            app:iconTint="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            android:backgroundTint="@color/primary500"
+            app:cardCornerRadius="100dp"
+            app:cardElevation="8dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/TextView.Pretendard.Bold.20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/primary500"
+                android:paddingVertical="12dp"
+                android:text="@string/home_check_in"
+                android:textColor="@color/white"
+                app:icon="@drawable/ic_marker_pin"
+                app:iconGravity="textStart"
+                app:iconSize="24dp"
+                app:iconTint="@color/white"
+                app:rippleColor="@android:color/transparent" />
+        </androidx.cardview.widget.CardView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_my_team"
