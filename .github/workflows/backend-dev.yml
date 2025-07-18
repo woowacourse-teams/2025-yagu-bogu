@@ -22,12 +22,10 @@ jobs:
         working-directory: backend
 
     steps:
-      - name: SSH로 EC2에 접속하기
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            sudo fuser -k -n tcp 80 || true
-            sudo nohup java -jar /home/ubuntu/backend-build.jar > /home/ubuntu/output.log 2>&1 &
+      - name: 80포트 프로세스 종료
+        run: |
+          sudo fuser -k -n tcp 80 || true
+
+      - name: 서버 실행
+        run: |
+          sudo nohup java -jar /home/ubuntu/backend-build.jar > /home/ubuntu/output.log 2>&1 &

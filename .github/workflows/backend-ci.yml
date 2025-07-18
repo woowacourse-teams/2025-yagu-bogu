@@ -9,12 +9,6 @@ on:
         required: true
       DB_PASSWORD:
         required: true
-      SERVER_IP:
-        required: true
-      SSH_USER:
-        required: true
-      SSH_PRIVATE_KEY:
-        required: true
 
 jobs:
   build:
@@ -54,12 +48,3 @@ jobs:
 
       - name: Rename jar
         run: mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) ./backend-build.jar
-
-      - name: SCP로 EC2에 빌드된 파일 전송하기
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ./backend-build.jar
-          target: /home/ubuntu
