@@ -1,0 +1,33 @@
+name: YaguBogu Backend dev
+
+# 0. workflow 실행 트리거
+on:
+  push:
+    branches: [ "dev" ]
+    path:
+      - 'backend/**'
+  workflow_dispatch:
+
+# 1. 배포
+jobs:
+  build:
+    uses: backend-ci.yml
+    secrets: inherit
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: SSH로 EC2에 접속하기
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo fuser -k -n tcp 80 || true
+            sudo nohup java -jar ./backend-build.jar > ./output.log 2>&1 &
