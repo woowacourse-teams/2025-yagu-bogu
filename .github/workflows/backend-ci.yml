@@ -1,25 +1,15 @@
 name: Backend CI
 
-on:
-  workflow_call:
-    secrets:
-      APPLICATION_YML:
-        required: true
-      TEST_APPLICATION_YML:
-        required: true
-      SERVER_IP:
-        required: false
-      SSH_USER:
-        required: false
-      SSH_PRIVATE_KEY:
-        required: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,13 +19,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
-
-      - name: Set application.yml
-        run: |
-          mkdir -p src/main/resources
-          mkdir -p src/test/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
-          echo "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
 
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -50,8 +33,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
-        run: ./gradlew clean build
+      - name: Build (prod profile)
+        run: ./gradlew clean build -Dspring.profiles.active=prod
 
       - name: Rename jar
         run: mv ./build/libs/*SNAPSHOT.jar ./backend-build.jar
