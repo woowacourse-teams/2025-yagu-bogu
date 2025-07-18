@@ -1,5 +1,21 @@
 name: Backend CI
 
+on:
+  workflow_call:
+    secrets:
+      DB_URL:
+        required: true
+      DB_USERNAME:
+        required: true
+      DB_PASSWORD:
+        required: true
+      SERVER_IP:
+        required: true
+      SSH_USER:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,8 +49,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build (prod profile)
-        run: ./gradlew clean build -Dspring.profiles.active=prod
+      - name: Build
+        run: ./gradlew clean build
 
       - name: Rename jar
-        run: mv ./build/libs/*SNAPSHOT.jar ./backend-build.jar
+        run: mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) ./backend-build.jar
+
+      - name: SCP로 EC2에 빌드된 파일 전송하기
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ./backend-build.jar
+          target: /home/ubuntu
