@@ -67,7 +67,8 @@ jobs:
             -Dspring.datasource.username="$DB_USERNAME" \
             -Dspring.datasource.password="$DB_PASSWORD" \
             -Dspring.profiles.active=prod \
+            -Dserver.port=80 \
             -jar ./backend-build.jar >> output.log 2>&1 &
-  
+      
           sleep 5
           pgrep -f backend-build.jar || (echo "서버 실행 실패" && exit 1)
