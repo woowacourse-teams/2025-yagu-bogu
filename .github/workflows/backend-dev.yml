@@ -17,15 +17,13 @@ jobs:
   deploy:
     runs-on: self-hosted
     needs: build
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
-      - name: 80포트 프로세스 종료
+      - name: Kill existing process on port 80
         run: |
           sudo fuser -k -n tcp 80 || true
 
-      - name: 서버 실행
+      - name: Start server
         run: |
-          sudo nohup java -jar /home/ubuntu/backend-build.jar > /home/ubuntu/output.log 2>&1 &
+          cd /home/ubuntu/deploy
+          sudo nohup java -jar ./backend-build.jar >> output.log 2>&1 &
