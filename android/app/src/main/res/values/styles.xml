@@ -30,8 +30,8 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="TextView.Pretendard.SemiBold.18" parent="TextView.Pretendard.SemiBold">
-        <item name="android:textSize">18sp</item>
+    <style name="TextView.Pretendard.SemiBold.16" parent="TextView.Pretendard.SemiBold">
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="TextView.Pretendard.Bold" parent="TextView.Pretendard">
