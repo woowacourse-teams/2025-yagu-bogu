@@ -11,7 +11,9 @@ on:
 # 1. 배포
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on:
+      - self-hosted
+      - develop
     defaults:
       run:
         working-directory: backend
