@@ -1,0 +1,29 @@
+name: YaguBogu Backend dev
+
+# 0. workflow 실행 트리거
+on:
+  push:
+    branches: [ "dev" ]
+    path:
+      - 'backend/**'
+  workflow_dispatch:
+
+# 1. 배포
+jobs:
+  build:
+    uses: ./.github/workflows/backend-ci.yml
+    secrets: inherit
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Kill existing process on port 80
+        run: |
+          sudo fuser -k -n tcp 80 || true
+
+      - name: Start server
+        run: |
+          cd /home/ubuntu/deploy
+          sudo nohup java -jar ./backend-build.jar >> output.log 2>&1 &
