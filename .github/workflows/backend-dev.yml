@@ -1,0 +1,73 @@
+name: YaguBogu Backend dev
+
+# 0. workflow 실행 트리거
+on:
+  push:
+    branches: [ "dev" ]
+    path:
+      - 'backend/**'
+  workflow_dispatch:
+
+# 1. 배포
+jobs:
+  build:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build (prod profile)
+        run: ./gradlew clean build
+
+      - name: Rename and move jar to /home/ubuntu/deploy
+        run: |
+          mkdir -p /home/ubuntu/deploy
+          mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) /home/ubuntu/deploy/backend-build.jar
+
+  # dev.yml의 deploy job 일부
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - name: Kill existing process on port 80
+        run: |
+          sudo fuser -k -n tcp 80 || true
+
+      - name: Start server
+        run: |
+          cd /home/ubuntu/deploy
+          sudo nohup java \
+            -Dspring.datasource.url="$DB_URL" \
+            -Dspring.datasource.username="$DB_USERNAME" \
+            -Dspring.datasource.password="$DB_PASSWORD" \
+            -Dspring.profiles.active=prod \
+            -jar ./backend-build.jar >> output.log 2>&1 &
+  
+          sleep 5
+          pgrep -f backend-build.jar || (echo "서버 실행 실패" && exit 1)
