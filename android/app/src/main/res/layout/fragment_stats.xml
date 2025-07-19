@@ -25,20 +25,7 @@
             app:tabIndicatorGravity="stretch"
             app:tabMode="fixed"
             app:tabRippleColor="@null"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextAppearance="@style/TextView.Pretendard.SemiBold.18"
-            app:tabTextColor="@color/primary700">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_stats_my_stats" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_stats_stadium_stats" />
-        </com.google.android.material.tabs.TabLayout>
+            app:tabTextColor="@color/primary700" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fcv_stats_fragment"
