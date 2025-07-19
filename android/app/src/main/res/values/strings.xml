@@ -12,4 +12,6 @@
     <string name="home_winning_percentage">승률</string>
     <string name="home_recent_attendance_record">최근 직관 기록</string>
     <string name="home_empty_attendance_record_description">직관 기록이 없습니다.\n직관의 추억을 기록해 주세요!</string>
+    <string name="home_location_permission_denied_message">인증을 하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
+    <string name="home_location_fetch_failed_message">위치를 가져오는 데 실패했습니다.</string>
 </resources>
