@@ -43,8 +43,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
-        run: ./gradlew clean build
+      - name: Build (prod profile)
+        run: ./gradlew clean build -Dspring.profiles.active=prod
 
-      - name: Rename jar
-        run: mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) ./backend-build.jar
+      - name: Rename and move jar to /home/ubuntu/deploy
+        run: |
+          mkdir -p /home/ubuntu/deploy
+          mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) /home/ubuntu/deploy/backend-build.jar
