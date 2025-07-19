@@ -59,9 +59,9 @@ class StatsFragment : Fragment() {
             tabLayout.addTab(tab)
         }
 
-        for (i in 0 until tabLayout.tabCount) {
-            val tab = tabLayout.getTabAt(i)
-            val isSelected = i == 0
+        repeat(tabLayout.tabCount) { index: Int ->
+            val tab = tabLayout.getTabAt(index)
+            val isSelected = index == 0
             updateTabText(tab, selected = isSelected)
         }
     }
