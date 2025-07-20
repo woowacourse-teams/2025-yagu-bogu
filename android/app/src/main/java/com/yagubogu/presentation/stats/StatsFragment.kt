@@ -35,6 +35,10 @@ class StatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupTabs()
         setupTabLayoutListener()
+    }
+
+    override fun onStart() {
+        super.onStart()
         replaceFragment(MyStatsFragment::class.java)
     }
 
