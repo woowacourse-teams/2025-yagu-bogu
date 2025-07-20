@@ -107,7 +107,7 @@ class HomeFragment : Fragment() {
                 Log.d("HomeFragment", "위도: $currentLatitude, 경도: $currentLongitude")
             },
             onFailure = { exception: Exception ->
-                Log.e("HomeFragment", "위치 가져오기 실패", exception)
+                Log.e("HomeFragment", "위치 불러오기 실패", exception)
                 showSnackbar(R.string.home_location_fetch_failed_message)
             },
         )
@@ -128,6 +128,7 @@ class HomeFragment : Fragment() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
             setBackgroundTint(Color.DKGRAY)
             setTextColor(context.getColor(R.color.white))
+            setAnchorView(R.id.bnv_navigation)
             show()
         }
     }
