@@ -2,9 +2,12 @@ package com.yagubogu.presentation.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,6 +18,8 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -38,7 +43,19 @@ class HomeFragment : Fragment() {
             if (granted) {
                 fetchLocationAndCheckIn()
             } else {
-                showSnackbar(R.string.home_location_permission_denied_message)
+                val shouldShowRationale =
+                    permissions.keys.any { permission ->
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(),
+                            permission,
+                        )
+                    }
+
+                if (shouldShowRationale) {
+                    showSnackbar(R.string.home_location_permission_denied_message)
+                } else {
+                    showPermissionDeniedDialog()
+                }
             }
         }
 
@@ -131,5 +148,24 @@ class HomeFragment : Fragment() {
             setAnchorView(R.id.bnv_navigation)
             show()
         }
+    }
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog
+            .Builder(requireContext())
+            .setTitle(R.string.permission_dialog_location_title)
+            .setMessage(R.string.permission_dialog_location_description)
+            .setPositiveButton(R.string.permission_dialog_open_settings) { _, _ ->
+                openAppSettings()
+            }.setNegativeButton(R.string.all_cancel, null)
+            .show()
+    }
+
+    private fun openAppSettings() {
+        val intent =
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", requireContext().packageName, null)
+            }
+        startActivity(intent)
     }
 }
