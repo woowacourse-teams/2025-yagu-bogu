@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.google.android.material.tabs.TabLayout
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStatsBinding
-import com.yagubogu.databinding.TabStatsBinding
+import com.yagubogu.databinding.ViewTabStatsBinding
 import com.yagubogu.presentation.stats.my.MyStatsFragment
 import com.yagubogu.presentation.stats.stadium.StadiumListFragment
 
@@ -45,25 +44,24 @@ class StatsFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        val tabTitles = listOf(R.string.tab_stats_my_stats, R.string.tab_stats_stadium_stats)
+        binding.tabStats.removeAllTabs()
 
-        val tabLayout = binding.tabStats
-        tabLayout.removeAllTabs()
+        StatsTab.entries.forEachIndexed { index: Int, statsTab: StatsTab ->
+            val tab = createTab(statsTab.titleResId)
+            binding.tabStats.addTab(tab)
 
-        tabTitles.forEach { titleResId: Int ->
-            val tab = tabLayout.newTab()
-            val tabView = TabStatsBinding.inflate(layoutInflater)
-            val textView = tabView.tabText
-            textView.setText(titleResId)
-            tab.customView = textView
-            tabLayout.addTab(tab)
+            val isSelected = index == StatsTab.MY_STATS.ordinal
+            updateTabText(tab, isSelected)
         }
+    }
 
-        repeat(tabLayout.tabCount) { index: Int ->
-            val tab = tabLayout.getTabAt(index)
-            val isSelected = index == 0
-            updateTabText(tab, selected = isSelected)
-        }
+    private fun createTab(titleResId: Int): TabLayout.Tab {
+        val tab = binding.tabStats.newTab()
+        val viewTabStatsBinding = ViewTabStatsBinding.inflate(layoutInflater)
+        val textView = viewTabStatsBinding.tvTabText
+        textView.setText(titleResId)
+        tab.customView = textView
+        return tab
     }
 
     private fun setupTabLayoutListener() {
@@ -72,8 +70,8 @@ class StatsFragment : Fragment() {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     updateTabText(tab, true)
                     when (tab?.position) {
-                        0 -> replaceFragment(MyStatsFragment::class.java)
-                        1 -> replaceFragment(StadiumListFragment::class.java)
+                        StatsTab.MY_STATS.ordinal -> replaceFragment(MyStatsFragment::class.java)
+                        StatsTab.STADIUM_STATS.ordinal -> replaceFragment(StadiumListFragment::class.java)
                     }
                 }
 
@@ -98,11 +96,11 @@ class StatsFragment : Fragment() {
         selected: Boolean,
     ) {
         val spSize = if (selected) 18f else 16f
-        val textColorRes = if (selected) R.color.white else R.color.primary700
+        val textColorResId = if (selected) R.color.white else R.color.primary700
 
         (tab?.customView as? TextView)?.apply {
             textSize = spSize
-            setTextColor(ContextCompat.getColor(context, textColorRes))
+            setTextColor(context.getColor(textColorResId))
         }
     }
 }
