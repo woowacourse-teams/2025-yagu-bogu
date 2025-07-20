@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.home
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.annotation.StringRes
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -32,6 +34,7 @@ class HomeFragment : Fragment() {
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { permissions ->
             val granted = permissions.any { it.value }
+            @SuppressLint("MissingPermission")
             if (granted) {
                 fetchLocationAndCheckIn()
             } else {
@@ -86,6 +89,7 @@ class HomeFragment : Fragment() {
 
     private fun setupBindings() {
         binding.btnCheckIn.setOnClickListener {
+            @SuppressLint("MissingPermission")
             if (locationProvider.isLocationPermissionGranted()) {
                 fetchLocationAndCheckIn()
             } else {
@@ -94,6 +98,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun fetchLocationAndCheckIn() {
         locationProvider.fetchCurrentLocation(
             onSuccess = { location: Location ->
