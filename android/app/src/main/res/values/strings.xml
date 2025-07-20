@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">야구보구</string>
 
+    <string name="all_settings">설정</string>
+
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
     <string name="bottom_navigation_record">기록</string>
     <string name="bottom_navigation_challenge">챌린지</string>
+
+    <string name="home_check_in">직관 인증하기</string>
+    <string name="home_my_team">우리 팀</string>
+    <string name="home_total_attendance">총 직관</string>
+    <string name="home_winning_percentage">승률</string>
+    <string name="home_recent_attendance_record">최근 직관 기록</string>
+    <string name="home_empty_attendance_record_description">직관 기록이 없습니다.\n직관의 추억을 기록해 주세요!</string>
 </resources>
