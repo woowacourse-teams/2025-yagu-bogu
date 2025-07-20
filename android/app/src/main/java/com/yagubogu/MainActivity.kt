@@ -22,9 +22,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupView()
         setupBottomNavigationView()
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
         }
+    }
+
+    fun setToolbarTitle(title: String) {
+        binding.tvToolbarTitle.text = title
     }
 
     private fun setupView() {
