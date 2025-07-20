@@ -1,10 +1,10 @@
 package com.yagubogu.presentation.home
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -14,11 +14,12 @@ class LocationProvider(
 ) {
     private val locationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    @SuppressLint("MissingPermission")
     fun fetchCurrentLocation(
         onSuccess: (Location) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
+        if (!isLocationPermissionGranted()) return
         locationClient
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { location: Location ->
