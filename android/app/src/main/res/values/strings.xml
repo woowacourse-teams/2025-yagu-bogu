@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">야구보구</string>
 
+    <string name="all_settings">설정</string>
+
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
     <string name="bottom_navigation_record">기록</string>
