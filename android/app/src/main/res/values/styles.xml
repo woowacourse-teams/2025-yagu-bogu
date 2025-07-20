@@ -39,6 +39,12 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Pretendard.Bold.20" parent="TextView.Pretendard">
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Esamanru -->
     <style name="TextView.Esamanru" parent="TextView" />
 
