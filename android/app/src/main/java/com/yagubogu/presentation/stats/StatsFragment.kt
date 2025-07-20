@@ -73,9 +73,9 @@ class StatsFragment : Fragment() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     updateTabText(tab, true)
-                    when (tab?.position) {
-                        StatsTab.MY_STATS.ordinal -> replaceFragment(MyStatsFragment::class.java)
-                        StatsTab.STADIUM_STATS.ordinal -> replaceFragment(StadiumListFragment::class.java)
+                    when (StatsTab.entries[tab?.position ?: 0]) {
+                        StatsTab.MY_STATS -> replaceFragment(MyStatsFragment::class.java)
+                        StatsTab.STADIUM_STATS -> replaceFragment(StadiumListFragment::class.java)
                     }
                 }
 
