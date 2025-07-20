@@ -11,7 +11,6 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.yagubogu.MainActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentHomeBinding
 
@@ -35,11 +34,6 @@ class HomeFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupMenu()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as MainActivity).setToolbarTitle(getString(R.string.app_name))
     }
 
     override fun onDestroyView() {

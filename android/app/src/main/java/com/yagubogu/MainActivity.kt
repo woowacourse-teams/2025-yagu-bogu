@@ -2,6 +2,7 @@ package com.yagubogu
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,10 +30,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setToolbarTitle(title: String) {
-        binding.tvToolbarTitle.text = title
-    }
-
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
@@ -47,20 +44,41 @@ class MainActivity : AppCompatActivity() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.item_home -> replaceFragment(HomeFragment::class.java)
-                R.id.item_stats -> replaceFragment(StatsFragment::class.java)
-                R.id.item_record -> replaceFragment(RecordFragment::class.java)
-                R.id.item_challenge -> replaceFragment(ChallengeFragment::class.java)
+                R.id.item_home ->
+                    replaceFragment(HomeFragment::class.java, R.string.app_name)
+
+                R.id.item_stats ->
+                    replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
+
+                R.id.item_record ->
+                    replaceFragment(RecordFragment::class.java, R.string.bottom_navigation_record)
+
+                R.id.item_challenge ->
+                    replaceFragment(
+                        ChallengeFragment::class.java,
+                        R.string.bottom_navigation_challenge,
+                    )
+
                 else -> false
             }
         }
     }
 
-    private fun replaceFragment(fragment: Class<out Fragment>): Boolean {
+    private fun replaceFragment(
+        fragment: Class<out Fragment>,
+        @StringRes titleResId: Int,
+    ): Boolean {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(binding.fcvFragment.id, fragment, null)
         }
+        setToolbarTitle(titleResId)
         return true
+    }
+
+    private fun setToolbarTitle(
+        @StringRes titleResId: Int,
+    ) {
+        binding.tvToolbarTitle.text = getString(titleResId)
     }
 }
