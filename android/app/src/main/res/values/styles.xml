@@ -16,6 +16,10 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Pretendard.Regular.12" parent="TextView.Pretendard.Regular">
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="TextView.Pretendard.Medium" parent="TextView.Pretendard">
         <item name="android:fontFamily">@font/pretendard_medium</item>
         <item name="android:textColor">@color/black</item>
@@ -39,6 +43,10 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Pretendard.Bold.20" parent="TextView.Pretendard.Bold">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Esamanru -->
     <style name="TextView.Esamanru" parent="TextView" />
 
@@ -50,6 +58,10 @@
     <style name="TextView.Esamanru.Medium" parent="TextView.Esamanru">
         <item name="android:fontFamily">@font/esamanru_medium</item>
         <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextView.Esamanru.Medium.24" parent="TextView.Esamanru.Medium">
+        <item name="android:textSize">24sp</item>
     </style>
 
     <style name="TextView.Esamanru.Bold" parent="TextView.Esamanru">
