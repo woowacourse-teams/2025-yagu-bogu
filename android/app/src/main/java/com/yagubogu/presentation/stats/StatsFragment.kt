@@ -58,7 +58,8 @@ class StatsFragment : Fragment() {
         ) { tab: TabLayout.Tab, position: Int ->
             val titleResId = StatsTab.entries[position].titleResId
             val customTab = createTab(titleResId)
-            updateTabText(customTab, position == StatsTab.MY_STATS.ordinal)
+            val isSelected = position == StatsTab.MY_STATS.ordinal
+            updateTabText(customTab, isSelected)
             tab.customView = customTab.customView
         }.attach()
     }
