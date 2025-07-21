@@ -64,8 +64,8 @@ class MyStatsFragment : Fragment() {
             setHoleColor(ContextCompat.getColor(requireContext(), android.R.color.white))
 
             description.isEnabled = false
-            isRotationEnabled = true
-            setTouchEnabled(true)
+            isRotationEnabled = false
+            setTouchEnabled(false)
 
             setDrawCenterText(true)
             centerText = createCenterText()
@@ -73,7 +73,7 @@ class MyStatsFragment : Fragment() {
 
             setDrawEntryLabels(false)
 
-            animateY(500)
+            animateY(1000)
         }
     }
 
