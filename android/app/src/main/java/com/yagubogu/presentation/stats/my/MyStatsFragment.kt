@@ -48,6 +48,7 @@ class MyStatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupChart()
         loadChartData()
+        bindWinDrawLostCount()
     }
 
     private fun setupChart() {
@@ -109,6 +110,12 @@ class MyStatsFragment : Fragment() {
 
         pieChart.data = data
         pieChart.invalidate()
+    }
+
+    private fun bindWinDrawLostCount() {
+        binding.tvWinCount.text = DUMMY_PIE_CHART_WIN_COUNT.toString()
+        binding.tvDrawCount.text = DUMMY_PIE_CHART_DRAW_COUNT.toString()
+        binding.tvLoseCount.text = DUMMY_PIE_CHART_LOSE_COUNT.toString()
     }
 
     override fun onDestroyView() {
