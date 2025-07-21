@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStatsBinding
 import com.yagubogu.databinding.ViewTabStatsBinding
@@ -33,30 +33,14 @@ class StatsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupTabs()
         setupTabLayoutListener()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        replaceFragment(MyStatsFragment::class.java)
+        setupFragmentStateAdapter()
+        setupTabLayoutMediator()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setupTabs() {
-        binding.tabStats.removeAllTabs()
-
-        StatsTab.entries.forEachIndexed { index: Int, statsTab: StatsTab ->
-            val tab = createTab(statsTab.titleResId)
-            binding.tabStats.addTab(tab)
-
-            val isSelected = index == StatsTab.MY_STATS.ordinal
-            updateTabText(tab, isSelected)
-        }
     }
 
     private fun createTab(titleResId: Int): TabLayout.Tab {
@@ -73,10 +57,6 @@ class StatsFragment : Fragment() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     updateTabText(tab, true)
-                    when (StatsTab.entries[tab?.position ?: 0]) {
-                        StatsTab.MY_STATS -> replaceFragment(MyStatsFragment::class.java)
-                        StatsTab.STADIUM_STATS -> replaceFragment(StadiumListFragment::class.java)
-                    }
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -86,13 +66,6 @@ class StatsFragment : Fragment() {
                 override fun onTabReselected(tab: TabLayout.Tab?) = Unit
             },
         )
-    }
-
-    private fun replaceFragment(fragment: Class<out Fragment>) {
-        childFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(binding.fcvStatsFragment.id, fragment, null)
-        }
     }
 
     private fun updateTabText(
@@ -106,6 +79,26 @@ class StatsFragment : Fragment() {
             textSize = spSize
             setTextColor(context.getColor(textColorResId))
         }
+    }
+
+    private fun setupFragmentStateAdapter() {
+        binding.vpStatsFragment.adapter =
+            StatsFragmentStateAdapter(
+                this,
+                listOf(MyStatsFragment(), StadiumListFragment()),
+            )
+    }
+
+    private fun setupTabLayoutMediator() {
+        TabLayoutMediator(
+            binding.tabStats,
+            binding.vpStatsFragment,
+        ) { tab: TabLayout.Tab, position: Int ->
+            val titleResId = StatsTab.entries[position].titleResId
+            val customTab = createTab(titleResId)
+            updateTabText(customTab, position == StatsTab.MY_STATS.ordinal)
+            tab.customView = customTab.customView
+        }.attach()
     }
 
     companion object {
