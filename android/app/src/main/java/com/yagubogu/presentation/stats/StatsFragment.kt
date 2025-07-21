@@ -99,12 +99,17 @@ class StatsFragment : Fragment() {
         tab: TabLayout.Tab?,
         selected: Boolean,
     ) {
-        val spSize = if (selected) 18f else 16f
+        val spSize = if (selected) SELECTED_TAB_TEXT_SIZE else UNSELECTED_TAB_TEXT_SIZE
         val textColorResId = if (selected) R.color.white else R.color.primary700
 
         (tab?.customView as? TextView)?.apply {
             textSize = spSize
             setTextColor(context.getColor(textColorResId))
         }
+    }
+
+    companion object {
+        private const val SELECTED_TAB_TEXT_SIZE = 18f
+        private const val UNSELECTED_TAB_TEXT_SIZE = 16f
     }
 }
