@@ -17,7 +17,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -25,6 +24,7 @@ import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -33,26 +33,15 @@ class HomeFragment : Fragment() {
 
     private val locationProvider by lazy { LocationProvider(requireContext()) }
     private val locationPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions(),
-        ) { permissions ->
-            val granted = permissions.any { it.value }
-            if (granted) {
-                fetchLocationAndCheckIn()
-            } else {
-                val shouldShowRationale =
-                    permissions.keys.any { permission ->
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            requireActivity(),
-                            permission,
-                        )
-                    }
-
-                if (shouldShowRationale) {
-                    showSnackbar(R.string.home_location_permission_denied_message)
-                } else {
-                    showPermissionDeniedDialog()
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val shouldShowRationale =
+                permissions.keys.any { permission: String ->
+                    PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
+            when {
+                permissions.any { it.value } -> fetchLocationAndCheckIn()
+                shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
+                else -> showPermissionDeniedDialog()
             }
         }
 
