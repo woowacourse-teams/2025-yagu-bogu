@@ -3,11 +3,10 @@ package com.yagubogu.presentation.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.yagubogu.presentation.util.PermissionUtil
 
 class LocationProvider(
     private val context: Context,
@@ -31,15 +30,7 @@ class LocationProvider(
 
     fun isLocationPermissionGranted(): Boolean = isFineLocationPermissionGranted() || isCoarseLocationPermissionGranted()
 
-    private fun isFineLocationPermissionGranted(): Boolean =
-        ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun isFineLocationPermissionGranted(): Boolean = PermissionUtil.isGranted(context, Manifest.permission.ACCESS_FINE_LOCATION)
 
-    private fun isCoarseLocationPermissionGranted(): Boolean =
-        ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun isCoarseLocationPermissionGranted(): Boolean = PermissionUtil.isGranted(context, Manifest.permission.ACCESS_COARSE_LOCATION)
 }
