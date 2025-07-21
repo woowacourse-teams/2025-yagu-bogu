@@ -1,13 +1,7 @@
 package com.yagubogu.presentation.stats.my
 
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.TextPaint
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
-import android.text.style.TypefaceSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +14,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentMyStatsBinding
+import com.yagubogu.presentation.stats.toStatsCenterSpannableString
 
 @Suppress("ktlint:standard:backing-property-naming")
 class MyStatsFragment : Fragment() {
@@ -65,7 +60,7 @@ class MyStatsFragment : Fragment() {
             description.isEnabled = false
             setDrawEntryLabels(false)
             setDrawCenterText(true)
-            centerText = createCenterText()
+            renderCenterText(75, 24)
             setCenterTextSize(PIE_CHART_INSIDE_TEXT_SIZE)
 
             isRotationEnabled = false
@@ -74,35 +69,26 @@ class MyStatsFragment : Fragment() {
         }
     }
 
-    private fun createCenterText(): SpannableString {
-        val centerText = SpannableString("75%\n24 경기")
-
-        centerText.apply {
-            setSpan(RelativeSizeSpan(PIE_CHART_INSIDE_TEXT_FIRST_LINE_WEIGHT), 0, 3, 0)
-            setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.primary500)),
-                0,
-                3,
-                0,
+    private fun renderCenterText(
+        winRate: Int,
+        totalGames: Int,
+    ) {
+        val rawCenterText =
+            getString(
+                R.string.stats_tab_my_stats_pie_chart_inside_text,
+                winRate,
+                totalGames,
             )
-            pretendardBold?.let { setSpan(CustomTypefaceSpan(it), 0, 3, 0) }
 
-            setSpan(
-                RelativeSizeSpan(PIE_CHART_INSIDE_TEXT_SECOND_LINE_WEIGHT),
-                4,
-                centerText.length,
-                0,
+        binding.pieChart.centerText =
+            rawCenterText.toStatsCenterSpannableString(
+                primaryColor = ContextCompat.getColor(requireContext(), R.color.primary500),
+                secondaryColor = ContextCompat.getColor(requireContext(), R.color.gray500),
+                firstLineSize = PIE_CHART_INSIDE_TEXT_FIRST_LINE_WEIGHT,
+                secondLineSize = PIE_CHART_INSIDE_TEXT_SECOND_LINE_WEIGHT,
+                firstTf = pretendardBold,
+                secondTf = pretendardRegular,
             )
-            setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.gray500)),
-                4,
-                centerText.length,
-                0,
-            )
-            pretendardRegular?.let { setSpan(CustomTypefaceSpan(it), 4, centerText.length, 0) }
-        }
-
-        return centerText
     }
 
     private fun loadChartData() {
@@ -122,18 +108,6 @@ class MyStatsFragment : Fragment() {
 
         pieChart.data = data
         pieChart.invalidate()
-    }
-
-    inner class CustomTypefaceSpan(
-        private val typeface: Typeface,
-    ) : TypefaceSpan("") {
-        override fun updateDrawState(ds: TextPaint) {
-            ds.typeface = typeface
-        }
-
-        override fun updateMeasureState(paint: TextPaint) {
-            paint.typeface = typeface
-        }
     }
 
     override fun onDestroyView() {

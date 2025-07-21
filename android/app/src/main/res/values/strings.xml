@@ -23,5 +23,6 @@
     <string name="home_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
+    <string name="stats_tab_my_stats_pie_chart_inside_text">%d%%\n%d 경기</string>
     <string name="stats_tab_stadium_stats">오늘의 구장 통계</string>
 </resources>
