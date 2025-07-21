@@ -14,10 +14,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -32,29 +33,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val locationProvider by lazy { LocationProvider(requireContext()) }
-    private val locationPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions(),
-        ) { permissions ->
-            val granted = permissions.any { it.value }
-            if (granted) {
-                fetchLocationAndCheckIn()
-            } else {
-                val shouldShowRationale =
-                    permissions.keys.any { permission ->
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            requireActivity(),
-                            permission,
-                        )
-                    }
-
-                if (shouldShowRationale) {
-                    showSnackbar(R.string.home_location_permission_denied_message)
-                } else {
-                    showPermissionDeniedDialog()
-                }
-            }
-        }
+    private val locationPermissionLauncher = createLocationPermissionLauncher()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -110,6 +89,20 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val isPermissionGranted = permissions.any { it.value }
+            val shouldShowRationale =
+                permissions.keys.any { permission: String ->
+                    PermissionUtil.shouldShowRationale(requireActivity(), permission)
+                }
+            when {
+                isPermissionGranted -> fetchLocationAndCheckIn()
+                shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
+                else -> showPermissionDeniedDialog()
+            }
+        }
 
     private fun fetchLocationAndCheckIn() {
         locationProvider.fetchCurrentLocation(
