@@ -34,12 +34,13 @@ class HomeFragment : Fragment() {
     private val locationProvider by lazy { LocationProvider(requireContext()) }
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val isPermissionGranted = permissions.any { it.value }
             val shouldShowRationale =
                 permissions.keys.any { permission: String ->
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                permissions.any { it.value } -> fetchLocationAndCheckIn()
+                isPermissionGranted -> fetchLocationAndCheckIn()
                 shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
                 else -> showPermissionDeniedDialog()
             }
