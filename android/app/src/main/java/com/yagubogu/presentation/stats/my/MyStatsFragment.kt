@@ -60,20 +60,17 @@ class MyStatsFragment : Fragment() {
 
             isDrawHoleEnabled = true
             setHoleColor(Color.TRANSPARENT)
-            holeRadius = 75f
-            setHoleColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
 
             description.isEnabled = false
-            isRotationEnabled = false
-            setTouchEnabled(false)
-
+            setDrawEntryLabels(false)
             setDrawCenterText(true)
             centerText = createCenterText()
-            setCenterTextSize(14f)
+            setCenterTextSize(PIE_CHART_INSIDE_TEXT_SIZE)
 
-            setDrawEntryLabels(false)
-
-            animateY(1000)
+            isRotationEnabled = false
+            setTouchEnabled(false)
+            animateY(PIE_CHART_ANIMATION_MILLISECOND)
         }
     }
 
@@ -81,7 +78,7 @@ class MyStatsFragment : Fragment() {
         val centerText = SpannableString("75%\n24 경기")
 
         centerText.apply {
-            setSpan(RelativeSizeSpan(2.8f), 0, 3, 0)
+            setSpan(RelativeSizeSpan(PIE_CHART_INSIDE_TEXT_FIRST_LINE_WEIGHT), 0, 3, 0)
             setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.primary500)),
                 0,
@@ -90,7 +87,12 @@ class MyStatsFragment : Fragment() {
             )
             pretendardBold?.let { setSpan(CustomTypefaceSpan(it), 0, 3, 0) }
 
-            setSpan(RelativeSizeSpan(1.2f), 4, centerText.length, 0)
+            setSpan(
+                RelativeSizeSpan(PIE_CHART_INSIDE_TEXT_SECOND_LINE_WEIGHT),
+                4,
+                centerText.length,
+                0,
+            )
             setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.gray500)),
                 4,
@@ -137,5 +139,13 @@ class MyStatsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val PIE_CHART_INSIDE_TEXT_SIZE = 14f
+        private const val PIE_CHART_INSIDE_TEXT_FIRST_LINE_WEIGHT = 2.8f
+        private const val PIE_CHART_INSIDE_TEXT_SECOND_LINE_WEIGHT = 1.2f
+        private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
+        private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
 }
