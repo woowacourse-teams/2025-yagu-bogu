@@ -15,6 +15,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentMyStatsBinding
 import com.yagubogu.presentation.stats.toStatsCenterSpannableString
+import kotlin.math.roundToInt
 
 @Suppress("ktlint:standard:backing-property-naming")
 class MyStatsFragment : Fragment() {
@@ -60,7 +61,7 @@ class MyStatsFragment : Fragment() {
             description.isEnabled = false
             setDrawEntryLabels(false)
             setDrawCenterText(true)
-            renderCenterText(75, 24)
+            renderCenterText(winRate, DUMMY_PIE_CHART_TOTAL_COUNT)
             setCenterTextSize(PIE_CHART_INSIDE_TEXT_SIZE)
 
             isRotationEnabled = false
@@ -93,8 +94,8 @@ class MyStatsFragment : Fragment() {
 
     private fun loadChartData() {
         val entries = ArrayList<PieEntry>()
-        entries.add(PieEntry(75f, "Win"))
-        entries.add(PieEntry(25f, "Etc"))
+        entries.add(PieEntry(winRate.toFloat(), "Win"))
+        entries.add(PieEntry(etcRate.toFloat(), "Etc"))
 
         val dataSet = PieDataSet(entries, "내 직관 승률")
 
@@ -116,6 +117,16 @@ class MyStatsFragment : Fragment() {
     }
 
     companion object {
+        private const val DUMMY_PIE_CHART_WIN_COUNT = 18
+        private const val DUMMY_PIE_CHART_DRAW_COUNT = 1
+        private const val DUMMY_PIE_CHART_LOSE_COUNT = 5
+        private const val DUMMY_PIE_CHART_TOTAL_COUNT =
+            DUMMY_PIE_CHART_WIN_COUNT + DUMMY_PIE_CHART_DRAW_COUNT + DUMMY_PIE_CHART_LOSE_COUNT
+        private val winRate: Int =
+            ((DUMMY_PIE_CHART_WIN_COUNT.toFloat() / DUMMY_PIE_CHART_TOTAL_COUNT) * 100)
+                .roundToInt()
+        private val etcRate: Int = 100 - winRate
+
         private const val PIE_CHART_INSIDE_TEXT_SIZE = 14f
         private const val PIE_CHART_INSIDE_TEXT_FIRST_LINE_WEIGHT = 2.8f
         private const val PIE_CHART_INSIDE_TEXT_SECOND_LINE_WEIGHT = 1.2f
