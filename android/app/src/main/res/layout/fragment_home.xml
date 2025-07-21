@@ -10,7 +10,7 @@
         tools:context=".presentation.home.HomeFragment">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/btn_check_in"
+            android:id="@+id/cv_check_in"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
@@ -21,6 +21,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_check_in"
                 style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -30,6 +31,7 @@
                 android:textColor="@color/white"
                 app:icon="@drawable/ic_marker_pin"
                 app:iconGravity="textStart"
+                app:iconPadding="8dp"
                 app:iconSize="24dp"
                 app:iconTint="@color/white"
                 app:rippleColor="@android:color/transparent" />
@@ -45,7 +47,7 @@
             android:paddingVertical="16dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_total_attendance"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_check_in">
+            app:layout_constraintTop_toBottomOf="@id/cv_check_in">
 
             <TextView
                 android:id="@+id/tv_team"
