@@ -33,52 +33,14 @@ class StatsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupTabLayoutListener()
         setupFragmentStateAdapter()
         setupTabLayoutMediator()
+        setupTabLayoutListener()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun createTab(titleResId: Int): TabLayout.Tab {
-        val tab = binding.tabStats.newTab()
-        val viewTabStatsBinding = ViewTabStatsBinding.inflate(layoutInflater)
-        val textView = viewTabStatsBinding.tvTabText
-        textView.setText(titleResId)
-        tab.customView = textView
-        return tab
-    }
-
-    private fun setupTabLayoutListener() {
-        binding.tabStats.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    updateTabText(tab, true)
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                    updateTabText(tab, false)
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
-            },
-        )
-    }
-
-    private fun updateTabText(
-        tab: TabLayout.Tab?,
-        selected: Boolean,
-    ) {
-        val spSize = if (selected) SELECTED_TAB_TEXT_SIZE else UNSELECTED_TAB_TEXT_SIZE
-        val textColorResId = if (selected) R.color.white else R.color.primary700
-
-        (tab?.customView as? TextView)?.apply {
-            textSize = spSize
-            setTextColor(context.getColor(textColorResId))
-        }
     }
 
     private fun setupFragmentStateAdapter() {
@@ -99,6 +61,44 @@ class StatsFragment : Fragment() {
             updateTabText(customTab, position == StatsTab.MY_STATS.ordinal)
             tab.customView = customTab.customView
         }.attach()
+    }
+
+    private fun setupTabLayoutListener() {
+        binding.tabStats.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    updateTabText(tab, true)
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                    updateTabText(tab, false)
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+            },
+        )
+    }
+
+    private fun createTab(titleResId: Int): TabLayout.Tab {
+        val tab = binding.tabStats.newTab()
+        val viewTabStatsBinding = ViewTabStatsBinding.inflate(layoutInflater)
+        val textView = viewTabStatsBinding.tvTabText
+        textView.setText(titleResId)
+        tab.customView = textView
+        return tab
+    }
+
+    private fun updateTabText(
+        tab: TabLayout.Tab?,
+        selected: Boolean,
+    ) {
+        val spSize = if (selected) SELECTED_TAB_TEXT_SIZE else UNSELECTED_TAB_TEXT_SIZE
+        val textColorResId = if (selected) R.color.white else R.color.primary700
+
+        (tab?.customView as? TextView)?.apply {
+            textSize = spSize
+            setTextColor(context.getColor(textColorResId))
+        }
     }
 
     companion object {
