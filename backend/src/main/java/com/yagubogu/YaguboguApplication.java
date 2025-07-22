@@ -9,5 +9,4 @@ public class YaguboguApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(YaguboguApplication.class, args);
 	}
-
 }
