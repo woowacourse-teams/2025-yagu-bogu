@@ -25,7 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
-import com.yagubogu.presentation.home.model.HomeUiEvent
+import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -82,7 +82,7 @@ class HomeFragment : Fragment() {
                     }
             },
             viewLifecycleOwner,
-            Lifecycle.State.RESUMED,
+            Lifecycle.State.STARTED,
         )
     }
 
@@ -97,12 +97,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.uiEvent.observe(viewLifecycleOwner) { value: HomeUiEvent ->
+        viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
-                    is HomeUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
-                    HomeUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
-                    HomeUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
+                    is CheckInUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
+                    CheckInUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
+                    CheckInUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
                 },
             )
         }
@@ -161,6 +161,7 @@ class HomeFragment : Fragment() {
             .setPositiveButton(R.string.permission_dialog_open_settings) { _, _ ->
                 openAppSettings()
             }.setNegativeButton(R.string.all_cancel, null)
+            .setCancelable(false)
             .show()
     }
 

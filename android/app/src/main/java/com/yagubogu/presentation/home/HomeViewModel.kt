@@ -5,32 +5,31 @@ import androidx.lifecycle.ViewModel
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.repository.LocationRepository
-import com.yagubogu.presentation.home.model.HomeUiEvent
+import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 
 class HomeViewModel(
     private val locationRepository: LocationRepository,
 ) : ViewModel() {
-    private val _uiEvent = MutableSingleLiveData<HomeUiEvent>()
-    val uiEvent: SingleLiveData<HomeUiEvent> get() = _uiEvent
+    private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
+    val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
     fun checkIn() {
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
                 val nearestStadiumWithDistance = getNearestStadiumWithDistance(currentCoordinate)
-                val nearestStadium = nearestStadiumWithDistance.first
-                val distance = nearestStadiumWithDistance.second
+                val (nearestStadium: Stadium, distance: Float) = nearestStadiumWithDistance
 
                 if (isNearEnough(distance)) {
-                    _uiEvent.setValue(HomeUiEvent.CheckInSuccess(nearestStadium))
+                    _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
                 } else {
-                    _uiEvent.setValue(HomeUiEvent.CheckInFailure)
+                    _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
                 }
             },
-            onFailure = { exception ->
+            onFailure = { exception: Exception ->
                 Log.e(TAG, "위치 불러오기 실패", exception)
-                _uiEvent.setValue(HomeUiEvent.LocationFetchFailed)
+                _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
     }
