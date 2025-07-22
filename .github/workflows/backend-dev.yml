@@ -68,7 +68,7 @@ jobs:
             -Dspring.datasource.url="$DB_URL" \
             -Dspring.datasource.username="$DB_USERNAME" \
             -Dspring.datasource.password="$DB_PASSWORD" \
-            -Dspring.profiles.active=prod \
+            -Dspring.profiles.active=dev \
             -Dserver.port=80 \
             -jar ./backend-build.jar >> output.log 2>&1 &
           sleep 5
