@@ -25,6 +25,10 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Pretendard.Medium.16" parent="TextView.Pretendard.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextView.Pretendard.SemiBold" parent="TextView.Pretendard">
         <item name="android:fontFamily">@font/pretendard_semibold</item>
         <item name="android:textColor">@color/black</item>
@@ -45,6 +49,14 @@
 
     <style name="TextView.Pretendard.Bold.20" parent="TextView.Pretendard.Bold">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextView.Pretendard.Bold.32" parent="TextView.Pretendard.Bold">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="TextView.Pretendard.Bold.40" parent="TextView.Pretendard.Bold">
+        <item name="android:textSize">40sp</item>
     </style>
 
     <!-- Esamanru -->

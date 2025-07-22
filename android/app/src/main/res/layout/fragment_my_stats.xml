@@ -40,11 +40,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView">
-
+                app:layout_constraintTop_toBottomOf="@id/textView">
             </com.github.mikephil.charting.charts.PieChart>
 
-            <LinearLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -56,24 +55,22 @@
 
                 <TextView
                     android:id="@+id/tv_win_rate"
-                    style="@style/TextView.Pretendard.Bold"
+                    style="@style/TextView.Pretendard.Bold.40"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary500"
-                    android:textSize="40sp"
                     android:includeFontPadding="false"
                     tools:text="58%" />
 
                 <TextView
                     android:id="@+id/tv_total_game_count"
-                    style="@style/TextView.Pretendard.Medium"
+                    style="@style/TextView.Pretendard.Medium.16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray500"
-                    android:textSize="16sp"
                     android:includeFontPadding="false"
                     tools:text="24 경기" />
-            </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_win_count"
@@ -81,30 +78,28 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:paddingTop="10dp"
-                app:layout_constraintEnd_toStartOf="@+id/constraint_draw_count"
+                app:layout_constraintEnd_toStartOf="@id/constraint_draw_count"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/pieChart">
+                app:layout_constraintTop_toBottomOf="@id/pieChart">
 
                 <TextView
                     android:id="@+id/tv_win_title"
-                    style="@style/TextView.Pretendard.Medium"
+                    style="@style/TextView.Pretendard.Medium.16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_tab_my_stats_pie_chart_win_title"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_win_count"
-                    style="@style/TextView.Pretendard.Bold"
+                    style="@style/TextView.Pretendard.Bold.32"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:textColor="@color/primary500"
-                    android:textSize="32sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_win_title"
@@ -117,32 +112,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:paddingTop="10dp"
-                app:layout_constraintEnd_toStartOf="@+id/constraint_lose_count"
-                app:layout_constraintStart_toEndOf="@+id/constraint_win_count"
-                app:layout_constraintTop_toBottomOf="@+id/pieChart">
+                app:layout_constraintEnd_toStartOf="@id/constraint_lose_count"
+                app:layout_constraintStart_toEndOf="@id/constraint_win_count"
+                app:layout_constraintTop_toBottomOf="@id/pieChart">
 
                 <TextView
                     android:id="@+id/tv_draw_title"
-                    style="@style/TextView.Pretendard.Medium"
+                    style="@style/TextView.Pretendard.Medium.16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_tab_my_stats_pie_chart_draw_title"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_draw_count"
-                    style="@style/TextView.Pretendard.Bold"
+                    style="@style/TextView.Pretendard.Bold.32"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:textColor="@color/gray400"
-                    android:textSize="32sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.505"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_draw_title"
                     tools:text="1" />
@@ -155,31 +147,28 @@
                 android:layout_marginTop="20dp"
                 android:paddingTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/constraint_draw_count"
-                app:layout_constraintTop_toBottomOf="@+id/pieChart">
+                app:layout_constraintStart_toEndOf="@id/constraint_draw_count"
+                app:layout_constraintTop_toBottomOf="@id/pieChart">
 
                 <TextView
                     android:id="@+id/tv_lose_title"
-                    style="@style/TextView.Pretendard.Medium"
+                    style="@style/TextView.Pretendard.Medium.16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_tab_my_stats_pie_chart_lose_title"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_lose_count"
-                    style="@style/TextView.Pretendard.Bold"
+                    style="@style/TextView.Pretendard.Bold.32"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:textColor="@color/figma_red"
-                    android:textSize="32sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.505"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_lose_title"
                     tools:text="5" />
