@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -64,17 +63,17 @@ class MyStatsFragment : Fragment() {
         entries.add(PieEntry(winRate.toFloat(), "Win"))
         entries.add(PieEntry(etcRate.toFloat(), "Etc"))
 
-        val dataSet = PieDataSet(entries, "내 직관 승률")
+        val myStatsChartDataSet = PieDataSet(entries, MY_ATTENDANCE_WIN_RATE_DESCRIPTION)
 
-        dataSet.colors =
+        myStatsChartDataSet.colors =
             listOf(
-                ContextCompat.getColor(requireContext(), R.color.primary500),
-                ContextCompat.getColor(requireContext(), R.color.gray300),
+                requireContext().getColor(R.color.primary500),
+                requireContext().getColor(R.color.gray300),
             )
-        val data = PieData(dataSet)
-        data.setDrawValues(false)
+        val pieData = PieData(myStatsChartDataSet)
+        pieData.setDrawValues(false)
 
-        pieChart.data = data
+        pieChart.data = pieData
         pieChart.invalidate()
     }
 
@@ -92,6 +91,7 @@ class MyStatsFragment : Fragment() {
     }
 
     companion object {
+        private const val MY_ATTENDANCE_WIN_RATE_DESCRIPTION = "내 직관 승률"
         private const val DUMMY_PIE_CHART_WIN_COUNT = 190
         private const val DUMMY_PIE_CHART_DRAW_COUNT = 10
         private const val DUMMY_PIE_CHART_LOSE_COUNT = 99
