@@ -24,4 +24,11 @@
 
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_stadium_stats">오늘의 구장 통계</string>
+    <string name="stats_pie_chart_winning_percentage">%d%%</string>
+
+    <string name="stats_my_pie_chart_title">직관 승률</string>
+    <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
+    <string name="stats_my_pie_chart_win">승리</string>
+    <string name="stats_my_pie_chart_draw">무승부</string>
+    <string name="stats_my_pie_chart_lose">패배</string>
 </resources>
