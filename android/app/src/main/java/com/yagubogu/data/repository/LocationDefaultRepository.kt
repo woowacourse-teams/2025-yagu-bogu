@@ -2,6 +2,7 @@ package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.domain.model.Coordinate
+import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.repository.LocationRepository
 
 class LocationDefaultRepository(
@@ -17,5 +18,5 @@ class LocationDefaultRepository(
     override fun getDistanceInMeters(
         coordinate: Coordinate,
         targetCoordinate: Coordinate,
-    ): Float = locationLocalDataSource.getDistanceInMeters(coordinate, targetCoordinate)
+    ): Distance = locationLocalDataSource.getDistanceInMeters(coordinate, targetCoordinate)
 }

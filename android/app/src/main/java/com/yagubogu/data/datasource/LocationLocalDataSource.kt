@@ -5,6 +5,7 @@ import android.location.Location
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.yagubogu.domain.model.Coordinate
+import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 
@@ -31,7 +32,7 @@ class LocationLocalDataSource(
     fun getDistanceInMeters(
         coordinate: Coordinate,
         targetCoordinate: Coordinate,
-    ): Float {
+    ): Distance {
         val results = FloatArray(RESULTS_ARRAY_SIZE)
         Location.distanceBetween(
             coordinate.latitude.value,
@@ -40,7 +41,7 @@ class LocationLocalDataSource(
             targetCoordinate.longitude.value,
             results,
         )
-        return results.first()
+        return Distance(results.first().toDouble())
     }
 
     companion object {

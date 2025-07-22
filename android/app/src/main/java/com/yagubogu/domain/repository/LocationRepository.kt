@@ -1,6 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Coordinate
+import com.yagubogu.domain.model.Distance
 
 interface LocationRepository {
     fun getCurrentCoordinate(
@@ -11,5 +12,5 @@ interface LocationRepository {
     fun getDistanceInMeters(
         coordinate: Coordinate,
         targetCoordinate: Coordinate,
-    ): Float
+    ): Distance
 }
