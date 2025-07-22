@@ -18,8 +18,6 @@ import kotlin.math.roundToInt
 class MyStatsFragment : Fragment() {
     private var _binding: FragmentMyStatsBinding? = null
     private val binding: FragmentMyStatsBinding get() = _binding!!
-    private val pieChart: PieChart
-        get() = binding.pieChart
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +39,7 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun setupChart() {
-        pieChart.apply {
+        binding.pieChart.apply {
             legend.isEnabled = false
 
             isDrawHoleEnabled = true
@@ -73,8 +71,8 @@ class MyStatsFragment : Fragment() {
         val pieData = PieData(myStatsChartDataSet)
         pieData.setDrawValues(false)
 
-        pieChart.data = pieData
-        pieChart.invalidate()
+        binding.pieChart.data = pieData
+        binding.pieChart.invalidate()
     }
 
     private fun bindPieChartTexts() {
