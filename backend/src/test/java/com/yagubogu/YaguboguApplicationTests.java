@@ -9,5 +9,4 @@ class YaguboguApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
