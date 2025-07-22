@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,26 +34,8 @@ public class CheckIn {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name = "content", nullable = true)
-    private String content;
-
-    @Column(name = "emotion", nullable = false)
-    private String emotion;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at", nullable = false)
-    private LocalDateTime modifiedAt;
-
-    public CheckIn(final Game game, final Member member, final String content, final String emotion,
-                   final LocalDateTime createdAt,
-                   final LocalDateTime modifiedAt) {
+    public CheckIn(final Game game, final Member member) {
         this.game = game;
         this.member = member;
-        this.content = content;
-        this.emotion = emotion;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
     }
 }
