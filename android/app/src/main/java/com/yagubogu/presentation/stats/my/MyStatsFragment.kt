@@ -81,8 +81,8 @@ class MyStatsFragment : Fragment() {
         binding.tvWinCount.text = DUMMY_PIE_CHART_WIN_COUNT.toString()
         binding.tvDrawCount.text = DUMMY_PIE_CHART_DRAW_COUNT.toString()
         binding.tvLoseCount.text = DUMMY_PIE_CHART_LOSE_COUNT.toString()
-        binding.tvWinRate.text = getString(R.string.stats_pie_chart_winning_percentage, winRate)
-        binding.tvTotalGameCount.text = getString(R.string.stats_my_pie_chart_attendance_count, DUMMY_PIE_CHART_TOTAL_COUNT)
+        binding.tvWinPercentage.text = getString(R.string.stats_pie_chart_winning_percentage, winRate)
+        binding.tvTotalAttendanceCount.text = getString(R.string.stats_my_pie_chart_attendance_count, DUMMY_PIE_CHART_TOTAL_COUNT)
     }
 
     override fun onDestroyView() {
