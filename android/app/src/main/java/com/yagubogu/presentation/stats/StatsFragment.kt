@@ -11,8 +11,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStatsBinding
 import com.yagubogu.databinding.ViewTabStatsBinding
-import com.yagubogu.presentation.stats.my.MyStatsFragment
-import com.yagubogu.presentation.stats.stadium.StadiumListFragment
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StatsFragment : Fragment() {
@@ -44,11 +42,7 @@ class StatsFragment : Fragment() {
     }
 
     private fun setupFragmentStateAdapter() {
-        binding.vpStatsFragment.adapter =
-            StatsFragmentStateAdapter(
-                this,
-                listOf(MyStatsFragment(), StadiumListFragment()),
-            )
+        binding.vpStatsFragment.adapter = StatsFragmentStateAdapter(this)
     }
 
     private fun setupTabLayoutMediator() {
