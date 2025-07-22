@@ -22,7 +22,7 @@ class HomeViewModel(
                 val nearestStadiumWithDistance = getNearestStadiumWithDistance(currentCoordinate)
                 val (nearestStadium: Stadium, distance: Distance) = nearestStadiumWithDistance
 
-                if (isNearEnough(distance)) {
+                if (distance.isWithin(Distance(THRESHOLD_IN_METERS))) {
                     _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
                 } else {
                     _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
@@ -43,10 +43,8 @@ class HomeViewModel(
                 stadium to distance
             }.minBy { it.second.value }
 
-    private fun isNearEnough(distance: Distance): Boolean = distance.value <= THRESHOLD_IN_METERS
-
     companion object {
-        private const val THRESHOLD_IN_METERS = 300
+        private const val THRESHOLD_IN_METERS = 300.0
         private const val TAG = "HomeViewModel"
     }
 }
