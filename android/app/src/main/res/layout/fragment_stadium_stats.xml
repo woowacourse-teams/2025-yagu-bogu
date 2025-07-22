@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="stadiumStatsUiModel"
+            type="com.yagubogu.presentation.stats.stadium.StadiumStatsUiModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,6 +34,7 @@
                 style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{@string/stats_stadium_pie_chart_title(stadiumStatsUiModel.stadiumName)}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="챔피언스필드 현황" />
@@ -34,6 +44,7 @@
                 style="@style/TextView.Pretendard.Medium.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{@string/stats_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_stadium_name"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -48,17 +59,17 @@
                 android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_stadium_name" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_stadium_name" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/pie_chart"
-                app:layout_constraintEnd_toEndOf="@id/pie_chart"
-                app:layout_constraintStart_toStartOf="@id/pie_chart"
-                app:layout_constraintTop_toTopOf="@id/pie_chart">
+                app:layout_constraintBottom_toBottomOf="@+id/pie_chart"
+                app:layout_constraintEnd_toEndOf="@+id/pie_chart"
+                app:layout_constraintStart_toStartOf="@+id/pie_chart"
+                app:layout_constraintTop_toTopOf="@+id/pie_chart">
 
                 <TextView
                     android:id="@+id/tv_win_percentage"
@@ -66,7 +77,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
-                    android:textColor="@color/team_kia"
+                    android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
+                    android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeam.teamColor)}"
                     tools:text="58%" />
 
                 <TextView
@@ -75,6 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
+                    android:text="@{stadiumStatsUiModel.firstTeam.name}"
                     android:textColor="@color/gray500"
                     tools:text="KIA" />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -88,7 +101,7 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pie_chart">
+                app:layout_constraintTop_toBottomOf="@+id/pie_chart">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/legend_first"
@@ -98,13 +111,15 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp">
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showFirstLegend ? View.VISIBLE : View.GONE}">
 
                     <View
                         android:id="@+id/icon_first_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
+                        app:backgroundTint="@{stadiumStatsUiModel.firstTeam.teamColor}"
                         tools:backgroundTint="@color/team_kia" />
 
                     <TextView
@@ -113,6 +128,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.firstTeam.name}"
                         android:textSize="14sp"
                         tools:text="KIA" />
 
@@ -122,6 +138,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="75%" />
@@ -136,13 +153,15 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp">
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showSecondLegend ? View.VISIBLE : View.GONE}">
 
                     <View
                         android:id="@+id/icon_second_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
+                        app:backgroundTint="@{stadiumStatsUiModel.secondTeam.teamColor}"
                         tools:backgroundTint="@color/team_samsung" />
 
                     <TextView
@@ -151,6 +170,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.secondTeam.name}"
                         android:textSize="14sp"
                         tools:text="삼성" />
 
@@ -160,6 +180,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.secondTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="20%" />
@@ -174,13 +195,15 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp">
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showThirdLegend ? View.VISIBLE : View.GONE}">
 
                     <View
                         android:id="@+id/icon_third_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
+                        app:backgroundTint="@{stadiumStatsUiModel.thirdTeam.teamColor}"
                         tools:backgroundTint="@color/gray400" />
 
                     <TextView
@@ -189,6 +212,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.thirdTeam.name}"
                         android:textSize="14sp"
                         tools:text="기타" />
 
@@ -198,6 +222,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.thirdTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="5%" />

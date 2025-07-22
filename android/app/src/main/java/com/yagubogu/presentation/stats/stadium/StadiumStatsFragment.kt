@@ -21,9 +21,9 @@ class StadiumStatsFragment : Fragment() {
         StadiumStatsUiModel(
             "고척돔",
             listOf(
-                TeamStatus("KIA", R.color.team_kia, 70),
-                TeamStatus("삼성", R.color.team_samsung, 20),
-                TeamStatus("기타", R.color.gray500, 10),
+                TeamStatus("한화", R.color.team_hanwha, 70),
+                TeamStatus("삼성", R.color.team_samsung, 30),
+                TeamStatus("기타", R.color.gray400, 10),
             ),
         )
 
@@ -43,6 +43,7 @@ class StadiumStatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupChart()
         loadChartData()
+        binding.stadiumStatsUiModel = dummyStadiumUiModel
     }
 
     private fun setupChart() {
