@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="myStatsUiModel"
+            type="com.yagubogu.presentation.stats.my.MyStatsUiModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -54,6 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
+                    android:text="@{@string/stats_pie_chart_winning_percentage(myStatsUiModel.winRate)}"
                     android:textColor="@color/primary500"
                     tools:text="58%" />
 
@@ -63,6 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
+                    android:text="@{@string/stats_my_pie_chart_attendance_count(myStatsUiModel.totalCount)}"
                     android:textColor="@color/gray500"
                     tools:text="24 경기" />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -92,6 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:text="@{String.valueOf(myStatsUiModel.winCount)}"
                     android:textColor="@color/primary500"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -124,6 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:text="@{String.valueOf(myStatsUiModel.drawCount)}"
                     android:textColor="@color/gray400"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -156,6 +167,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:text="@{String.valueOf(myStatsUiModel.loseCount)}"
                     android:textColor="@color/figma_red"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

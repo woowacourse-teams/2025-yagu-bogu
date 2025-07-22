@@ -6,18 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentMyStatsBinding
-import kotlin.math.roundToInt
 
 @Suppress("ktlint:standard:backing-property-naming")
 class MyStatsFragment : Fragment() {
     private var _binding: FragmentMyStatsBinding? = null
     private val binding: FragmentMyStatsBinding get() = _binding!!
+    private val dummyStatsUiModel: MyStatsUiModel =
+        MyStatsUiModel(
+            winCount = 190,
+            drawCount = 10,
+            loseCount = 99,
+        )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,7 +39,7 @@ class MyStatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupChart()
         loadChartData()
-        bindPieChartTexts()
+        binding.myStatsUiModel = dummyStatsUiModel
     }
 
     private fun setupChart() {
@@ -58,8 +62,8 @@ class MyStatsFragment : Fragment() {
 
     private fun loadChartData() {
         val entries = ArrayList<PieEntry>()
-        entries.add(PieEntry(winRate.toFloat(), "Win"))
-        entries.add(PieEntry(etcRate.toFloat(), "Etc"))
+        entries.add(PieEntry(dummyStatsUiModel.winRate.toFloat(), "Win"))
+        entries.add(PieEntry(dummyStatsUiModel.etcRate.toFloat(), "Etc"))
 
         val myStatsChartDataSet = PieDataSet(entries, MY_ATTENDANCE_WIN_RATE_DESCRIPTION)
 
@@ -75,14 +79,6 @@ class MyStatsFragment : Fragment() {
         binding.pieChart.invalidate()
     }
 
-    private fun bindPieChartTexts() {
-        binding.tvWinCount.text = DUMMY_PIE_CHART_WIN_COUNT.toString()
-        binding.tvDrawCount.text = DUMMY_PIE_CHART_DRAW_COUNT.toString()
-        binding.tvLoseCount.text = DUMMY_PIE_CHART_LOSE_COUNT.toString()
-        binding.tvWinPercentage.text = getString(R.string.stats_pie_chart_winning_percentage, winRate)
-        binding.tvTotalAttendanceCount.text = getString(R.string.stats_my_pie_chart_attendance_count, DUMMY_PIE_CHART_TOTAL_COUNT)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -90,15 +86,6 @@ class MyStatsFragment : Fragment() {
 
     companion object {
         private const val MY_ATTENDANCE_WIN_RATE_DESCRIPTION = "내 직관 승률"
-        private const val DUMMY_PIE_CHART_WIN_COUNT = 190
-        private const val DUMMY_PIE_CHART_DRAW_COUNT = 10
-        private const val DUMMY_PIE_CHART_LOSE_COUNT = 99
-        private const val DUMMY_PIE_CHART_TOTAL_COUNT =
-            DUMMY_PIE_CHART_WIN_COUNT + DUMMY_PIE_CHART_DRAW_COUNT + DUMMY_PIE_CHART_LOSE_COUNT
-        private val winRate: Int =
-            ((DUMMY_PIE_CHART_WIN_COUNT.toFloat() / DUMMY_PIE_CHART_TOTAL_COUNT) * 100)
-                .roundToInt()
-        private val etcRate: Int = 100 - winRate
 
         private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
         private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
