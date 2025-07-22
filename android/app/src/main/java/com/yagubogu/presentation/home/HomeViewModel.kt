@@ -34,11 +34,11 @@ class HomeViewModel(
         )
     }
 
-    private fun getNearestStadiumWithDistance(currentCoordinate: Coordinate): Pair<Stadium, Float> =
+    private fun getNearestStadiumWithDistance(coordinate: Coordinate): Pair<Stadium, Float> =
         Stadium.entries
             .map { stadium: Stadium ->
                 val distance =
-                    locationRepository.getDistanceInMeters(currentCoordinate, stadium.coordinate)
+                    locationRepository.getDistanceInMeters(coordinate, stadium.coordinate)
                 stadium to distance
             }.minBy { it.second }
 

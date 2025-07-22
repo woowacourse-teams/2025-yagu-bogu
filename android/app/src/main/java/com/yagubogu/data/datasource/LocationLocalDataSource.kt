@@ -29,13 +29,13 @@ class LocationLocalDataSource(
     }
 
     fun getDistanceInMeters(
-        currentCoordinate: Coordinate,
+        coordinate: Coordinate,
         targetCoordinate: Coordinate,
     ): Float {
         val results = FloatArray(RESULTS_ARRAY_SIZE)
         Location.distanceBetween(
-            currentCoordinate.latitude.value,
-            currentCoordinate.longitude.value,
+            coordinate.latitude.value,
+            coordinate.longitude.value,
             targetCoordinate.latitude.value,
             targetCoordinate.longitude.value,
             results,

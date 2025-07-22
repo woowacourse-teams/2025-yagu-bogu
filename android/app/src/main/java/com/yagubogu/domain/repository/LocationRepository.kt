@@ -9,7 +9,7 @@ interface LocationRepository {
     )
 
     fun getDistanceInMeters(
-        currentCoordinate: Coordinate,
+        coordinate: Coordinate,
         targetCoordinate: Coordinate,
     ): Float
 }

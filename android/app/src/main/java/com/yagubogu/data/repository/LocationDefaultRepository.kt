@@ -15,7 +15,7 @@ class LocationDefaultRepository(
     }
 
     override fun getDistanceInMeters(
-        currentCoordinate: Coordinate,
+        coordinate: Coordinate,
         targetCoordinate: Coordinate,
-    ): Float = locationLocalDataSource.getDistanceInMeters(currentCoordinate, targetCoordinate)
+    ): Float = locationLocalDataSource.getDistanceInMeters(coordinate, targetCoordinate)
 }
