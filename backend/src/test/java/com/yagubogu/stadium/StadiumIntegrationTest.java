@@ -1,10 +1,11 @@
 package com.yagubogu.stadium;
 
+import static com.yagubogu.fixture.TestFixture.getLocalDate;
+
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +33,14 @@ public class StadiumIntegrationTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("오늘 구장의 팀별 점유율")
+    @DisplayName("구장별 팬 점유율 조회한다")
     @Test
     void findStatCounts() {
         // given
         OccupancyRateTotalResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("stadiumId", 1L)
-                .when().queryParam("date", LocalDate.of(2025, 7, 21).toString())
+                .when().queryParam("date", getLocalDate().toString())
                 .get("/api/stadiums/{stadiumId}/occupancy-rate")
                 .then().log().all()
                 .statusCode(200)
@@ -47,7 +48,10 @@ public class StadiumIntegrationTest {
                 .as(OccupancyRateTotalResponse.class);
 
         OccupancyRateTotalResponse expected = new OccupancyRateTotalResponse(
-                List.of(new OccupancyRateResponse(1L, "광주 KIA 챔피언스필드", 63.7))
+                List.of(
+                        new OccupancyRateResponse(1L, "기아", 66.7),
+                        new OccupancyRateResponse(2L, "롯데", 33.3)
+                )
         );
 
         Assertions.assertThat(actual).isEqualTo(expected);

@@ -7,7 +7,8 @@ INSERT INTO members (team_id, nickname, role)
 VALUES (1, '포르', 'USER'),
        (2, '포라', 'USER'),
        (3, '두리', 'USER'),
-       (NULL, '관리자','ADMIN');
+       (NULL, '관리자', 'ADMIN'),
+       (1, '밍트', 'USER');
 
 INSERT INTO stadiums (full_name, short_name, location)
 VALUES ('광주 KIA 챔피언스필드', '챔피언스필드', '광주');
@@ -22,4 +23,5 @@ VALUES (1, 1),
        (1, 2),
        (1, 3),
        (2, 1),
-       (3, 2);
+       (3, 2),
+       (5, 1);
