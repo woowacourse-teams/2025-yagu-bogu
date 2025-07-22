@@ -7,6 +7,8 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import org.assertj.core.api.SoftAssertions;
@@ -31,9 +33,12 @@ class StatServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository);
+        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -49,10 +54,10 @@ class StatServiceTest {
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(actual.winCounts()).isEqualTo(2);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(5);
                     softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
                     softAssertions.assertThat(actual.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(3);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(6);
                 }
         );
     }
@@ -136,6 +141,48 @@ class StatServiceTest {
         WinRateResponse actual = statService.findWinRate(memberId, year);
 
         // then
-        assertThat(actual.winRate()).isEqualTo(66.7);
+        assertThat(actual.winRate()).isEqualTo(83.3);
+    }
+
+    @DisplayName("행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_withWinRate() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        // when
+        final LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(luckyStadium.short_name()).isEqualTo("챔피언스필드");
+    }
+
+    @DisplayName("관람횟수가 0이면 null을 반환한다")
+    @Test
+    void findLuckyStadium_withAnyCheckIn() {
+        // given
+        long memberId = 6L;
+        int year = 2025;
+
+        // when
+        final LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(luckyStadium.short_name()).isNull();
+    }
+
+    @DisplayName("내 팀이 승리한 적이 없다면 null을 반환한다")
+    @Test
+    void findLuckyStadium_whenMyTeamHasNoWinningCheckIns() {
+        // given
+        long memberId = 2L;
+        int year = 2025;
+
+        // when
+        final LuckyStadiumResponse actual = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(actual.short_name()).isNull();
     }
 }

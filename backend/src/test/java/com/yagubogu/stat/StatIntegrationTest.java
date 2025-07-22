@@ -1,5 +1,6 @@
 package com.yagubogu.stat;
 
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.restassured.RestAssured;
@@ -42,7 +43,7 @@ public class StatIntegrationTest {
                 .extract()
                 .as(StatCountsResponse.class);
 
-        StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
+        StatCountsResponse expected = new StatCountsResponse(5, 1, 0, 6);
 
         Assertions.assertThat(actual).isEqualTo(expected);
     }
@@ -59,7 +60,24 @@ public class StatIntegrationTest {
                 .extract()
                 .as(WinRateResponse.class);
 
-        WinRateResponse expected = new WinRateResponse(66.7);
+        WinRateResponse expected = new WinRateResponse(83.3);
+
+        Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium() {
+        LuckyStadiumResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 1L, "year", 2025)
+                .when().get("/api/stats/lucky-stadiums")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LuckyStadiumResponse.class);
+
+        LuckyStadiumResponse expected = new LuckyStadiumResponse("챔피언스필드");
 
         Assertions.assertThat(actual).isEqualTo(expected);
     }

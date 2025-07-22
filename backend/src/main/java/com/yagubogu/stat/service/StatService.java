@@ -5,8 +5,12 @@ import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,7 @@ public class StatService {
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
+    private final StadiumRepository stadiumRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getById(memberId);
@@ -38,12 +43,36 @@ public class StatService {
         int loseCounts = checkInRepository.findLoseCounts(member, year);
         int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
 
-        double winRate = (double) winCounts / favoriteCheckInCounts * 100;
-
-        return new WinRateResponse(calculateRoundRate(winRate));
+        return new WinRateResponse(calculateRoundRate(winCounts, favoriteCheckInCounts));
     }
 
-    private double calculateRoundRate(final double rate) {
+    public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
+        Member member = getById(memberId);
+        validateAdmin(member);
+
+        List<Stadium> stadiums = stadiumRepository.findAll();
+        double winRate = 0;
+        Stadium luckyStadium = null;
+        for (Stadium stadium : stadiums) {
+
+            int winCounts = checkInRepository.findWinCountsByStadiumAndMember(stadium, member, year);
+            int favoriteCheckInCounts = checkInRepository.findFavoriteCheckInCountsByStadiumAndMember(stadium, member,
+                    year);
+
+            double currentWinRate = calculateRoundRate(winCounts, favoriteCheckInCounts);
+            if (currentWinRate > winRate) {
+                winRate = currentWinRate;
+                luckyStadium = stadium;
+            }
+        }
+        return LuckyStadiumResponse.from(luckyStadium);
+    }
+
+    private double calculateRoundRate(final long winCounts, final long favoriteCheckInCounts) {
+        if (favoriteCheckInCounts == 0) {
+            return 0;
+        }
+        double rate = (double) winCounts / favoriteCheckInCounts * 100;
         return Math.round(rate * 10) / 10.0;
     }
 
