@@ -1,9 +1,10 @@
 package com.yagubogu.stat;
 
 import com.yagubogu.stat.dto.StatCountsResponse;
+import com.yagubogu.stat.dto.WinRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class StatIntegrationTest {
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
     @Test
     void findStatCounts() {
-        StatCountsResponse response = RestAssured.given().log().all()
+        StatCountsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParams("memberId", 1L, "year", 2025)
                 .when().get("/api/stats/counts")
@@ -41,14 +42,26 @@ public class StatIntegrationTest {
                 .extract()
                 .as(StatCountsResponse.class);
 
-        SoftAssertions.assertSoftly(
-                softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(2);
-                }
-        );
+        StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
+
+        Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("직관 승률을 조회한다")
+    @Test
+    void findWinRate() {
+        WinRateResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 1L, "year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+
+        WinRateResponse expected = new WinRateResponse(66.7);
+
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 }
 
