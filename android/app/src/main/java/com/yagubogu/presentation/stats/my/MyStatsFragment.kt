@@ -61,11 +61,11 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun loadChartData() {
-        val entries = ArrayList<PieEntry>()
-        entries.add(PieEntry(dummyStatsUiModel.winRate.toFloat(), "Win"))
-        entries.add(PieEntry(dummyStatsUiModel.etcRate.toFloat(), "Etc"))
+        val pieEntries = ArrayList<PieEntry>()
+        pieEntries.add(PieEntry(dummyStatsUiModel.winningPercentage.toFloat(), "Win"))
+        pieEntries.add(PieEntry(dummyStatsUiModel.etcPercentage.toFloat(), "Etc"))
 
-        val myStatsChartDataSet = PieDataSet(entries, MY_ATTENDANCE_WIN_RATE_DESCRIPTION)
+        val myStatsChartDataSet = PieDataSet(pieEntries, WINNING_PERCENTAGE)
 
         myStatsChartDataSet.colors =
             listOf(
@@ -85,7 +85,7 @@ class MyStatsFragment : Fragment() {
     }
 
     companion object {
-        private const val MY_ATTENDANCE_WIN_RATE_DESCRIPTION = "내 직관 승률"
+        private const val WINNING_PERCENTAGE = "내 직관 승률"
 
         private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
         private const val PIE_CHART_ANIMATION_MILLISECOND = 1000

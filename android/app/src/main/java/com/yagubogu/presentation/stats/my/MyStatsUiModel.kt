@@ -8,6 +8,6 @@ data class MyStatsUiModel(
     val loseCount: Int,
 ) {
     val totalCount: Int get() = winCount + drawCount + loseCount
-    val winRate: Int get() = ((winCount.toFloat() / totalCount) * 100).roundToInt()
-    val etcRate: Int get() = 100 - winRate
+    val winningPercentage: Int get() = ((winCount.toFloat() / totalCount) * 100).roundToInt()
+    val etcPercentage: Int get() = 100 - winningPercentage
 }

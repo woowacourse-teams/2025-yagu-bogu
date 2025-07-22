@@ -39,6 +39,6 @@
     <color name="team_nc">#FF315288</color>
     <color name="team_kiwoom">#FF570514</color>
 
-    <!-- Figma Colors -->
-    <color name="figma_red">#FFFF2C2C</color>
+    <!-- Colors -->
+    <color name="red">#FFFF2C2C</color>
 </resources>
