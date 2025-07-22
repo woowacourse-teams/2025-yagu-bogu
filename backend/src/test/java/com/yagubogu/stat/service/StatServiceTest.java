@@ -1,11 +1,14 @@
 package com.yagubogu.stat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.dto.StatCountsResponse;
-import org.assertj.core.api.Assertions;
+import com.yagubogu.stat.dto.WinRateResponse;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,10 +49,10 @@ class StatServiceTest {
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(1);
+                    softAssertions.assertThat(response.winCounts()).isEqualTo(2);
                     softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
                     softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(2);
+                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(3);
                 }
         );
     }
@@ -104,7 +107,7 @@ class StatServiceTest {
         int year = 2025;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> statService.findStatCounts(memberId, year))
+        assertThatThrownBy(() -> statService.findStatCounts(memberId, year))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }
@@ -117,8 +120,22 @@ class StatServiceTest {
         int year = 2025;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> statService.findStatCounts(memberId, year))
+        assertThatThrownBy(() -> statService.findStatCounts(memberId, year))
                 .isExactlyInstanceOf(ForbiddenException.class)
                 .hasMessage("Member should not be admin");
+    }
+
+    @DisplayName("승률을 계산한다")
+    @Test
+    void findWinRate() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        // when
+        WinRateResponse response = statService.findWinRate(memberId, year);
+
+        // then
+        assertThat(response.winRate()).isEqualTo(66.7);
     }
 }
