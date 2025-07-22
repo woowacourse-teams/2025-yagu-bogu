@@ -1,16 +1,31 @@
 package com.yagubogu.presentation.stats.stadium
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStadiumStatsBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StadiumStatsFragment : Fragment() {
     private var _binding: FragmentStadiumStatsBinding? = null
     private val binding: FragmentStadiumStatsBinding get() = _binding!!
+
+    private val dummyStadiumUiModel: StadiumStatsUiModel =
+        StadiumStatsUiModel(
+            "고척돔",
+            listOf(
+                TeamStatus("KIA", R.color.team_kia, 70),
+                TeamStatus("삼성", R.color.team_samsung, 20),
+                TeamStatus("기타", R.color.gray500, 10),
+            ),
+        )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -21,8 +36,59 @@ class StadiumStatsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        setupChart()
+        loadChartData()
+    }
+
+    private fun setupChart() {
+        binding.pieChart.apply {
+            legend.isEnabled = false
+
+            isDrawHoleEnabled = true
+            setHoleColor(Color.TRANSPARENT)
+            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
+
+            description.isEnabled = false
+            setDrawEntryLabels(false)
+            setDrawCenterText(false)
+
+            isRotationEnabled = false
+            setTouchEnabled(false)
+            animateY(PIE_CHART_ANIMATION_MILLISECOND)
+        }
+    }
+
+    private fun loadChartData() {
+        val entries = ArrayList<PieEntry>()
+
+        dummyStadiumUiModel.teams.forEach { teamStatus ->
+            entries.add(PieEntry(teamStatus.percentage.toFloat(), teamStatus.name))
+        }
+
+        val myStatsChartDataSet = PieDataSet(entries, STADIUM_CHART_DESCRIPTION)
+
+        myStatsChartDataSet.colors = dummyStadiumUiModel.teams.map { requireContext().getColor(it.teamColor) }
+        val pieData = PieData(myStatsChartDataSet)
+        pieData.setDrawValues(false)
+
+        binding.pieChart.data = pieData
+        binding.pieChart.invalidate()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val STADIUM_CHART_DESCRIPTION = "오늘의 구장 현황"
+
+        private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
+        private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
 }
