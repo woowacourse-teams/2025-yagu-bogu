@@ -1,15 +1,12 @@
 package com.yagubogu.presentation.stats.stadium.list
 
-import android.content.Context
+import android.content.res.Resources
 import android.graphics.Rect
-import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class StadiumListItemDecoration(
     private val spacingDp: Float = DEFAULT_SPACING_DP,
-    private val context: Context,
     private val spanCount: Int = DEFAULT_SPAN_COUNT,
 ) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
@@ -19,7 +16,7 @@ class StadiumListItemDecoration(
         state: RecyclerView.State,
     ) {
         val position = parent.getChildAdapterPosition(view)
-        val spacingPx: Int = dpToPixel(spacingDp)
+        val spacingPx: Int = spacingDp.fromDpToPx()
 
         if (position >= 0) {
             val column = position % spanCount
@@ -34,10 +31,7 @@ class StadiumListItemDecoration(
         }
     }
 
-    private fun dpToPixel(spacingDp: Float): Int {
-        val densityDpi = context.resources.displayMetrics.densityDpi
-        return (densityDpi * spacingDp).toInt()
-    }
+    private fun Float.fromDpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
     companion object {
         private const val DEFAULT_SPACING_DP = 12f

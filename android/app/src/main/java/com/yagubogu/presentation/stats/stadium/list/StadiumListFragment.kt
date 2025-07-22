@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.stats.stadium.list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +40,7 @@ class StadiumListFragment : Fragment() {
         binding.rvStadiumList.adapter = adapter
         adapter.submitList(DUMMY_STADIUMS)
 
-        binding.rvStadiumList.addItemDecoration(StadiumListItemDecoration(context = requireContext()))
+        binding.rvStadiumList.addItemDecoration(StadiumListItemDecoration())
     }
 
     companion object {
