@@ -1,7 +1,5 @@
 package com.yagubogu.stadium.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -19,6 +17,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -44,7 +44,7 @@ class StadiumServiceTest {
     void findOccupancyRate() {
         // given
         long stadiumId = 1L;
-        LocalDate today = TestFixture.getLocalDate();
+        LocalDate today = TestFixture.getValidDate();
 
         // when
         OccupancyRateTotalResponse response = stadiumService.findOccupancyRate(stadiumId, today);

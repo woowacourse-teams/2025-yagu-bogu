@@ -1,7 +1,5 @@
 package com.yagubogu.stadium;
 
-import static com.yagubogu.fixture.TestFixture.getLocalDate;
-
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import io.restassured.RestAssured;
@@ -17,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static com.yagubogu.fixture.TestFixture.getValidDate;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -40,7 +40,7 @@ public class StadiumIntegrationTest {
         OccupancyRateTotalResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("stadiumId", 1L)
-                .when().queryParam("date", getLocalDate().toString())
+                .when().queryParam("date", getValidDate().toString())
                 .get("/api/stadiums/{stadiumId}/occupancy-rate")
                 .then().log().all()
                 .statusCode(200)
