@@ -44,15 +44,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(2);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(3);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(2);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(3);
                 }
         );
     }
@@ -65,15 +65,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(1);
                 }
         );
     }
@@ -86,15 +86,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(1);
                 }
         );
     }
@@ -133,9 +133,9 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        WinRateResponse response = statService.findWinRate(memberId, year);
+        WinRateResponse actual = statService.findWinRate(memberId, year);
 
         // then
-        assertThat(response.winRate()).isEqualTo(66.7);
+        assertThat(actual.winRate()).isEqualTo(66.7);
     }
 }
