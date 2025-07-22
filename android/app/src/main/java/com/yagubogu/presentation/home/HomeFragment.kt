@@ -3,11 +3,9 @@ package com.yagubogu.presentation.home
 import android.Manifest
 import android.content.Intent
 import android.graphics.Color
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -21,10 +19,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.home.model.HomeUiEvent
 import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -32,7 +33,11 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val locationProvider by lazy { LocationProvider(requireContext()) }
+    private val viewModel: HomeViewModel by viewModels {
+        val app = requireActivity().application as YaguBoguApplication
+        HomeViewModelFactory(app.locationRepository)
+    }
+
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
     override fun onCreateView(
@@ -51,6 +56,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupMenu()
         setupBindings()
+        setupObservers()
     }
 
     override fun onDestroyView() {
@@ -82,11 +88,23 @@ class HomeFragment : Fragment() {
 
     private fun setupBindings() {
         binding.btnCheckIn.setOnClickListener {
-            if (locationProvider.isLocationPermissionGranted()) {
-                fetchLocationAndCheckIn()
+            if (isLocationPermissionGranted()) {
+                viewModel.checkIn()
             } else {
                 requestLocationPermissions()
             }
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.uiEvent.observe(viewLifecycleOwner) { value: HomeUiEvent ->
+            showSnackbar(
+                when (value) {
+                    is HomeUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
+                    HomeUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
+                    HomeUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
+                },
+            )
         }
     }
 
@@ -98,24 +116,21 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> fetchLocationAndCheckIn()
+                isPermissionGranted -> viewModel.checkIn()
                 shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
                 else -> showPermissionDeniedDialog()
             }
         }
 
-    private fun fetchLocationAndCheckIn() {
-        locationProvider.fetchCurrentLocation(
-            onSuccess = { location: Location ->
-                val currentLatitude = location.latitude
-                val currentLongitude = location.longitude
-                Log.d("HomeFragment", "위도: $currentLatitude, 경도: $currentLongitude")
-            },
-            onFailure = { exception: Exception ->
-                Log.e("HomeFragment", "위치 불러오기 실패", exception)
-                showSnackbar(R.string.home_location_fetch_failed_message)
-            },
-        )
+    private fun isLocationPermissionGranted(): Boolean {
+        val isFineLocationPermissionGranted =
+            PermissionUtil.isGranted(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        val isCoarseLocationPermissionGranted =
+            PermissionUtil.isGranted(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            )
+        return isFineLocationPermissionGranted || isCoarseLocationPermissionGranted
     }
 
     private fun requestLocationPermissions() {
@@ -152,8 +167,12 @@ class HomeFragment : Fragment() {
     private fun openAppSettings() {
         val intent =
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", requireContext().packageName, null)
+                data = Uri.fromParts(PACKAGE_SCHEME, requireContext().packageName, null)
             }
         startActivity(intent)
+    }
+
+    companion object {
+        private const val PACKAGE_SCHEME = "package"
     }
 }
