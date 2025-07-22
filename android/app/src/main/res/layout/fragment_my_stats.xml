@@ -44,6 +44,37 @@
 
             </com.github.mikephil.charting.charts.PieChart>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="@id/pieChart"
+                app:layout_constraintBottom_toBottomOf="@id/pieChart"
+                app:layout_constraintStart_toStartOf="@id/pieChart"
+                app:layout_constraintEnd_toEndOf="@id/pieChart">
+
+                <TextView
+                    android:id="@+id/tv_win_rate"
+                    style="@style/TextView.Pretendard.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary500"
+                    android:textSize="40sp"
+                    android:includeFontPadding="false"
+                    tools:text="58%" />
+
+                <TextView
+                    android:id="@+id/tv_total_game_count"
+                    style="@style/TextView.Pretendard.Medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gray500"
+                    android:textSize="16sp"
+                    android:includeFontPadding="false"
+                    tools:text="24 경기" />
+            </LinearLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_win_count"
                 android:layout_width="0dp"

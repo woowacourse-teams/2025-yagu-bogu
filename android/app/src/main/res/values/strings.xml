@@ -24,7 +24,8 @@
 
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_my_stats_pie_chart_title">직관 승률</string>
-    <string name="stats_tab_my_stats_pie_chart_inside_text">%d%%\n%d 경기</string>
+    <string name="stats_tab_my_stats_pie_chart_inside_first_line">%d%%</string>
+    <string name="stats_tab_my_stats_pie_chart_inside_second_line">%d 경기</string>
     <string name="stats_tab_my_stats_pie_chart_win_title">승리</string>
     <string name="stats_tab_my_stats_pie_chart_draw_title">무승부</string>
     <string name="stats_tab_my_stats_pie_chart_lose_title">패배</string>
