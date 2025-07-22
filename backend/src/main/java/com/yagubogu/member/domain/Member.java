@@ -38,8 +38,13 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    public Member(final String nickname, final Role role) {
+    public Member(final Team team, final String nickname, final Role role) {
+        this.team = team;
         this.nickname = nickname;
         this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return role.equals(Role.ADMIN);
     }
 }
