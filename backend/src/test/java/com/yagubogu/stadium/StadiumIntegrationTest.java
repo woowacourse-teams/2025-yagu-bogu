@@ -5,7 +5,6 @@ import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
 import static com.yagubogu.fixture.TestFixture.getToday;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -54,6 +54,6 @@ public class StadiumIntegrationTest {
                 )
         );
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 }

@@ -8,7 +8,6 @@ import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import java.time.LocalDate;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -51,7 +51,7 @@ class StadiumServiceTest {
         TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     List<TeamOccupancyRate> teams = response.teams();
                     TeamOccupancyRate first = teams.getFirst();

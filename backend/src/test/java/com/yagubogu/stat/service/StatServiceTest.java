@@ -1,21 +1,21 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -47,7 +47,7 @@ class StatServiceTest {
         StatCountsResponse response = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     softAssertions.assertThat(response.winCounts()).isEqualTo(2);
                     softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
@@ -68,7 +68,7 @@ class StatServiceTest {
         StatCountsResponse response = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     softAssertions.assertThat(response.winCounts()).isEqualTo(0);
                     softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
@@ -89,7 +89,7 @@ class StatServiceTest {
         StatCountsResponse response = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     softAssertions.assertThat(response.winCounts()).isEqualTo(0);
                     softAssertions.assertThat(response.drawCounts()).isEqualTo(0);
