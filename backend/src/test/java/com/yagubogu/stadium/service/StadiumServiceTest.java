@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
@@ -72,5 +73,19 @@ class StadiumServiceTest {
         assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, today))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Game is not found");
+    }
+
+    @DisplayName("인증한 회원이 0명이면 빈 리스트를 반환한다.")
+    @Test
+    void findOccupancyRate_noPerson() {
+        // given
+        long stadiumId = 1L;
+        LocalDate date = LocalDate.of(2024, 5, 5);
+
+        // when
+        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, date);
+
+        // then
+        assertThat(response.teams()).isEqualTo(List.of());
     }
 }
