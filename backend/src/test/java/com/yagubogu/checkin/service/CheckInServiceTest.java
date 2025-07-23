@@ -1,5 +1,8 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -14,9 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -91,9 +91,9 @@ class CheckInServiceTest {
     void createCheckIn_notFoundMember() {
         // given
         long invalidStadiumId = 1L;
-        long validMemberId = 999L;
+        long invalidMemberId = 999L;
         LocalDate date = TestFixture.getValidDate();
-        CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, invalidStadiumId, date);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidMemberId, invalidStadiumId, date);
 
         // when & then
         assertThatThrownBy(() -> checkInService.createCheckIn(request))
