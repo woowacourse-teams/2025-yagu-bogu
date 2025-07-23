@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Team> findTeamById(final long memberId);
+    Optional<Team> findTeamById(long memberId);
 }

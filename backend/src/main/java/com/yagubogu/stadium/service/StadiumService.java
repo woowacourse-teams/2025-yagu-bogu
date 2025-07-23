@@ -1,13 +1,14 @@
 package com.yagubogu.stadium.service;
 
+import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +22,12 @@ public class StadiumService {
     private final CheckInRepository checkInRepository;
     private final StadiumRepository stadiumRepository;
 
-    public OccupancyRateTotalResponse findOccupancyRate(final long stadiumId, final LocalDate today) {
+    public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
         Stadium stadium = getStadiumById(stadiumId);
+        Game game = getGame(stadium, date);
+        int checkInPeople = checkInRepository.countByGame(game);
 
-        Game game = getGame(stadium, today);
-        int checkInPeoples = checkInRepository.countByGame(game);
-
-        return getOccupancyRateTotalResponse(game, checkInPeoples);
+        return getOccupancyRateTotalResponse(game, checkInPeople);
     }
 
     private Stadium getStadiumById(final long stadiumId) {
@@ -40,16 +40,16 @@ public class StadiumService {
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
-    private OccupancyRateTotalResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeoples) {
-        List<Object[]> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
+    private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeople) {
+        List<TeamCheckInCountResponse> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
 
-        return new OccupancyRateTotalResponse(teamCheckIns.stream()
-                .map(objects -> {
-                    long teamId = (long) objects[0];
-                    String teamName = (String) objects[1];
-                    double occupancyRate = (1.0 * (Long) objects[2]) / checkInPeoples * 100;
-                    double roundOccupancyRate = calculateRoundRate(occupancyRate);
-                    return new OccupancyRateResponse(teamId, teamName, roundOccupancyRate);
+        return new TeamOccupancyRatesResponse(teamCheckIns.stream()
+                .map(response -> {
+                    long teamId = response.id();
+                    String teamName = response.name();
+                    double occupancyRate = (1.0 * response.count()) / checkInPeople * 100;
+                    double roundedOccupancyRate = calculateRoundRate(occupancyRate);
+                    return new TeamOccupancyRate(teamId, teamName, roundedOccupancyRate);
                 })
                 .toList());
     }

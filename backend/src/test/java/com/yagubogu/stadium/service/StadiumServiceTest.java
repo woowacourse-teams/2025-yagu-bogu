@@ -1,5 +1,6 @@
 package com.yagubogu.stadium.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -7,9 +8,9 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,20 +47,20 @@ class StadiumServiceTest {
     void findOccupancyRate() {
         // given
         long stadiumId = 1L;
-        LocalDate today = TestFixture.getValidDate();
+        LocalDate today = TestFixture.getToday();
 
         // when
-        OccupancyRateTotalResponse response = stadiumService.findOccupancyRate(stadiumId, today);
+        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);
 
         // then
         assertSoftly(
                 softAssertions -> {
-                    List<OccupancyRateResponse> teams = response.teams();
-                    OccupancyRateResponse first = teams.getFirst();
+                    List<TeamOccupancyRate> teams = response.teams();
+                    TeamOccupancyRate first = teams.getFirst();
                     softAssertions.assertThat(first.name()).isEqualTo("기아");
                     softAssertions.assertThat(first.occupancyRate()).isEqualTo(66.7);
 
-                    OccupancyRateResponse second = teams.get(1);
+                    TeamOccupancyRate second = teams.get(1);
                     softAssertions.assertThat(second.name()).isEqualTo("롯데");
                     softAssertions.assertThat(second.occupancyRate()).isEqualTo(33.3);
                 }
@@ -82,13 +83,25 @@ class StadiumServiceTest {
     @DisplayName("구장에 오늘 경기가 없으면 예외가 발생한다.")
     @Test
     void findOccupancyRate_notTodayGameInStadium() {
-        // given
         long stadiumId = 1L;
-        LocalDate date = LocalDate.of(1000, 5, 5);
-
+        LocalDate date = TestFixture.getInvalidDate();
         // when & then
         assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Game is not found");
+    }
+
+    @DisplayName("인증한 회원이 0명이면 빈 리스트를 반환한다.")
+    @Test
+    void findOccupancyRate_noPerson() {
+        // given
+        long stadiumId = 1L;
+        LocalDate date = LocalDate.of(2024, 5, 5);
+
+        // when
+        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, date);
+
+        // then
+        assertThat(response.teams()).isEqualTo(List.of());
     }
 }

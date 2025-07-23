@@ -6,7 +6,6 @@ import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -48,7 +49,6 @@ public class StatIntegrationTest {
         // when
         StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
 
-        // then
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -68,7 +68,6 @@ public class StatIntegrationTest {
         // when
         WinRateResponse expected = new WinRateResponse(66.7);
 
-        // then
         assertThat(actual).isEqualTo(expected);
     }
 }
