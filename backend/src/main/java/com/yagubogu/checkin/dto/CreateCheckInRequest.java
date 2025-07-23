@@ -6,7 +6,6 @@ import java.time.LocalDate;
 public record CreateCheckInRequest(
         long memberId,
         long stadiumId,
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate date
+        @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date
 ) {
 }
