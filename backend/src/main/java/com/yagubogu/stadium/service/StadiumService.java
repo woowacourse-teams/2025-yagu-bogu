@@ -5,8 +5,10 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,8 @@ public class StadiumService {
     private final StadiumRepository stadiumRepository;
 
     public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
-        Game game = getGame(stadiumId, date);
+        Stadium stadium = getStadiumById(stadiumId);
+        Game game = getGame(stadium, date);
         int checkInPeople = checkInRepository.countByGame(game);
 
         return getOccupancyRateTotalResponse(game, checkInPeople);

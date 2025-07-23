@@ -1,11 +1,16 @@
 package com.yagubogu.stadium.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -80,9 +81,10 @@ class StadiumServiceTest {
     }
 
     @DisplayName("구장에 오늘 경기가 없으면 예외가 발생한다.")
-    @CsvSource({"999, 2025-07-21", "1, 3000-05-05"})
-    @ParameterizedTest
-    void findOccupancyRate_notTodayGameInStadium(long stadiumId, LocalDate today) {
+    @Test
+    void findOccupancyRate_notTodayGameInStadium() {
+        long stadiumId = 1L;
+        LocalDate date = TestFixture.getInvalidDate();
         // when & then
         assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
                 .isExactlyInstanceOf(NotFoundException.class)

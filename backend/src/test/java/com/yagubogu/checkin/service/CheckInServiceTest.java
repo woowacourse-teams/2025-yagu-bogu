@@ -49,7 +49,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         long stadiumId = 1L;
-        LocalDate date = TestFixture.getValidDate();
+        LocalDate date = TestFixture.getToday();
 
         // when & then
         assertThatCode(() -> checkInService.createCheckIn(new CreateCheckInRequest(memberId, stadiumId, date)))
@@ -62,7 +62,7 @@ class CheckInServiceTest {
         // given
         long invalidStadiumId = 999L;
         long validMemberId = 1L;
-        LocalDate date = TestFixture.getValidDate();
+        LocalDate date = TestFixture.getToday();
 
         CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, invalidStadiumId, date);
         // when & then
@@ -92,7 +92,7 @@ class CheckInServiceTest {
         // given
         long invalidStadiumId = 1L;
         long invalidMemberId = 999L;
-        LocalDate date = TestFixture.getValidDate();
+        LocalDate date = TestFixture.getToday();
         CreateCheckInRequest request = new CreateCheckInRequest(invalidMemberId, invalidStadiumId, date);
 
         // when & then
