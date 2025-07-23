@@ -66,8 +66,8 @@ class StadiumServiceTest {
     }
 
     @DisplayName("구장에 오늘 경기가 없으면 예외가 발생한다.")
-    @ParameterizedTest
     @CsvSource({"999, 2025-07-21", "1, 3000-05-05"})
+    @ParameterizedTest
     void findOccupancyRate_notTodayGameInStadium(long stadiumId, LocalDate today) {
         // when & then
         assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, today))
