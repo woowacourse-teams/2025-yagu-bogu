@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StatCountsResponse(
+data class StatsCountsResponse(
     @SerialName("winCounts")
     val winCounts: Int, // 승리 횟수
     @SerialName("drawCounts")
