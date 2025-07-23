@@ -1,11 +1,13 @@
 package com.yagubogu.stadium;
 
+import static com.yagubogu.fixture.TestFixture.getValidDate;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +17,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static com.yagubogu.fixture.TestFixture.getValidDate;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -56,6 +56,6 @@ public class StadiumIntegrationTest {
         );
 
         // then
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 }
