@@ -2,10 +2,12 @@ package com.yagubogu.stat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +17,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -47,7 +47,7 @@ public class StatIntegrationTest {
                 .as(StatCountsResponse.class);
 
         // when
-        StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
+        StatCountsResponse expected = new StatCountsResponse(5, 1, 0, 6);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -66,7 +66,24 @@ public class StatIntegrationTest {
                 .as(WinRateResponse.class);
 
         // when
-        WinRateResponse expected = new WinRateResponse(66.7);
+        WinRateResponse expected = new WinRateResponse(83.3);
+
+        Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium() {
+        LuckyStadiumResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 1L, "year", 2025)
+                .when().get("/api/stats/lucky-stadiums")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LuckyStadiumResponse.class);
+
+        LuckyStadiumResponse expected = new LuckyStadiumResponse("챔피언스필드");
 
         assertThat(actual).isEqualTo(expected);
     }

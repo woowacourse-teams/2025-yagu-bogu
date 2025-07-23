@@ -1,5 +1,6 @@
 package com.yagubogu.stadium.controller;
 
+import com.yagubogu.stadium.dto.StadiumsResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.service.StadiumService;
 import java.time.LocalDate;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StadiumController {
 
     private final StadiumService stadiumService;
+
+    @GetMapping
+    public ResponseEntity<StadiumsResponse> findStadiums() {
+        StadiumsResponse response = stadiumService.findAll();
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/{stadiumId}/occupancy-rate")
     public ResponseEntity<TeamOccupancyRatesResponse> findOccupancyRate(

@@ -6,6 +6,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.dto.StadiumsResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -21,6 +22,11 @@ public class StadiumService {
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
     private final StadiumRepository stadiumRepository;
+
+    public StadiumsResponse findAll() {
+        List<Stadium> stadiums = stadiumRepository.findAll();
+        return StadiumsResponse.from(stadiums);
+    }
 
     public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
         Stadium stadium = getStadiumById(stadiumId);
