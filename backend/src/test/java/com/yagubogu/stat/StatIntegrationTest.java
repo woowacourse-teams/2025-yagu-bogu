@@ -1,5 +1,7 @@
 package com.yagubogu.stat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.restassured.RestAssured;
@@ -33,6 +35,7 @@ public class StatIntegrationTest {
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
     @Test
     void findStatCounts() {
+        // given
         StatCountsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParams("memberId", 1L, "year", 2025)
@@ -42,14 +45,17 @@ public class StatIntegrationTest {
                 .extract()
                 .as(StatCountsResponse.class);
 
+        // when
         StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        // then
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("직관 승률을 조회한다")
     @Test
     void findWinRate() {
+        // given
         WinRateResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParams("memberId", 1L, "year", 2025)
@@ -59,9 +65,11 @@ public class StatIntegrationTest {
                 .extract()
                 .as(WinRateResponse.class);
 
+        // when
         WinRateResponse expected = new WinRateResponse(66.7);
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        // then
+        assertThat(actual).isEqualTo(expected);
     }
 }
 

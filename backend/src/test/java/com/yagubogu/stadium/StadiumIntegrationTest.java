@@ -33,7 +33,7 @@ public class StadiumIntegrationTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("구장별 팬 점유율 조회한다")
+    @DisplayName("구장별 팬 점유율을 조회한다")
     @Test
     void findStatCounts() {
         // given
@@ -47,6 +47,7 @@ public class StadiumIntegrationTest {
                 .extract()
                 .as(OccupancyRateTotalResponse.class);
 
+        // when
         OccupancyRateTotalResponse expected = new OccupancyRateTotalResponse(
                 List.of(
                         new OccupancyRateResponse(1L, "기아", 66.7),
@@ -54,6 +55,7 @@ public class StadiumIntegrationTest {
                 )
         );
 
+        // then
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 }
