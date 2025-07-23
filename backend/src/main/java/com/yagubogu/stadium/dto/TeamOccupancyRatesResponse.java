@@ -1,4 +1,4 @@
-package com.yagubogu.stat.dto;
+package com.yagubogu.stadium.dto;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.yagubogu.stadium;
 
-import com.yagubogu.stat.dto.TeamOccupancyRatesResponse;
-import com.yagubogu.stat.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;

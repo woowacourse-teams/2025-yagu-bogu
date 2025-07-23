@@ -1,7 +1,7 @@
 package com.yagubogu.stadium.controller;
 
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
 import com.yagubogu.stadium.service.StadiumService;
-import com.yagubogu.stat.dto.TeamOccupancyRatesResponse;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
