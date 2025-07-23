@@ -1,7 +1,7 @@
 package com.yagubogu.stadium.controller;
 
 import com.yagubogu.stadium.service.StadiumService;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
+import com.yagubogu.stat.dto.TeamOccupancyRatesResponse;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +19,11 @@ public class StadiumController {
     private final StadiumService stadiumService;
 
     @GetMapping("/{stadiumId}/occupancy-rate")
-    public ResponseEntity<OccupancyRateTotalResponse> findOccupancyRate(
+    public ResponseEntity<TeamOccupancyRatesResponse> findOccupancyRate(
             @PathVariable final long stadiumId,
             @RequestParam final LocalDate date
     ) {
-        OccupancyRateTotalResponse response = stadiumService.findOccupancyRate(stadiumId, date);
+        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, date);
         return ResponseEntity.ok(response);
     }
 }

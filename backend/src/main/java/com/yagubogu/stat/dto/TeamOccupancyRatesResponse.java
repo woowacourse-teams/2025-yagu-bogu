@@ -2,10 +2,10 @@ package com.yagubogu.stat.dto;
 
 import java.util.List;
 
-public record OccupancyRateTotalResponse(
-        List<OccupancyRateResponse> teams
+public record TeamOccupancyRatesResponse(
+        List<TeamOccupancyRate> teams
 ) {
-    public record OccupancyRateResponse(
+    public record TeamOccupancyRate(
             long id,
             String name,
             double occupancyRate

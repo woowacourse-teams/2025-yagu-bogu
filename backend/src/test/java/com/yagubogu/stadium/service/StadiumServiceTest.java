@@ -1,13 +1,11 @@
 package com.yagubogu.stadium.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
+import com.yagubogu.stat.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stat.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import java.time.LocalDate;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -19,6 +17,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -47,17 +47,17 @@ class StadiumServiceTest {
         LocalDate today = TestFixture.getLocalDate();
 
         // when
-        OccupancyRateTotalResponse response = stadiumService.findOccupancyRate(stadiumId, today);
+        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);
 
         // then
         SoftAssertions.assertSoftly(
                 softAssertions -> {
-                    List<OccupancyRateResponse> teams = response.teams();
-                    OccupancyRateResponse first = teams.getFirst();
+                    List<TeamOccupancyRate> teams = response.teams();
+                    TeamOccupancyRate first = teams.getFirst();
                     softAssertions.assertThat(first.name()).isEqualTo("기아");
                     softAssertions.assertThat(first.occupancyRate()).isEqualTo(66.7);
 
-                    OccupancyRateResponse second = teams.get(1);
+                    TeamOccupancyRate second = teams.get(1);
                     softAssertions.assertThat(second.name()).isEqualTo("롯데");
                     softAssertions.assertThat(second.occupancyRate()).isEqualTo(33.3);
                 }

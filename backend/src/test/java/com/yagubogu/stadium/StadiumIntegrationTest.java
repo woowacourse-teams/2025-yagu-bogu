@@ -1,9 +1,7 @@
 package com.yagubogu.stadium;
 
-import static com.yagubogu.fixture.TestFixture.getLocalDate;
-
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
-import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
+import com.yagubogu.stat.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stat.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
@@ -17,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static com.yagubogu.fixture.TestFixture.getLocalDate;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -37,7 +37,7 @@ public class StadiumIntegrationTest {
     @Test
     void findStatCounts() {
         // given
-        OccupancyRateTotalResponse actual = RestAssured.given().log().all()
+        TeamOccupancyRatesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("stadiumId", 1L)
                 .when().queryParam("date", getLocalDate().toString())
@@ -45,12 +45,12 @@ public class StadiumIntegrationTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(OccupancyRateTotalResponse.class);
+                .as(TeamOccupancyRatesResponse.class);
 
-        OccupancyRateTotalResponse expected = new OccupancyRateTotalResponse(
+        TeamOccupancyRatesResponse expected = new TeamOccupancyRatesResponse(
                 List.of(
-                        new OccupancyRateResponse(1L, "기아", 66.7),
-                        new OccupancyRateResponse(2L, "롯데", 33.3)
+                        new TeamOccupancyRate(1L, "기아", 66.7),
+                        new TeamOccupancyRate(2L, "롯데", 33.3)
                 )
         );
 
