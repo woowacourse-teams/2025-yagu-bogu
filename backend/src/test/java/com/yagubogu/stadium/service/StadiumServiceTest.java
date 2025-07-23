@@ -45,7 +45,7 @@ class StadiumServiceTest {
     void findOccupancyRate() {
         // given
         long stadiumId = 1L;
-        LocalDate today = TestFixture.getLocalDate();
+        LocalDate today = TestFixture.getToday();
 
         // when
         TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);

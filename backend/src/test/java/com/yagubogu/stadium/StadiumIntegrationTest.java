@@ -16,7 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
-import static com.yagubogu.fixture.TestFixture.getLocalDate;
+import static com.yagubogu.fixture.TestFixture.getToday;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -40,7 +40,7 @@ public class StadiumIntegrationTest {
         TeamOccupancyRatesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("stadiumId", 1L)
-                .when().queryParam("date", getLocalDate().toString())
+                .when().queryParam("date", getToday().toString())
                 .get("/api/stadiums/{stadiumId}/occupancy-rate")
                 .then().log().all()
                 .statusCode(200)
