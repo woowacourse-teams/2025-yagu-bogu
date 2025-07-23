@@ -47,8 +47,8 @@ public class StadiumService {
                     long teamId = response.id();
                     String teamName = response.name();
                     double occupancyRate = (1.0 * response.count()) / checkInPeople * 100;
-                    double roundOccupancyRate = calculateRoundRate(occupancyRate);
-                    return new TeamOccupancyRate(teamId, teamName, roundOccupancyRate);
+                    double roundedOccupancyRate = calculateRoundRate(occupancyRate);
+                    return new TeamOccupancyRate(teamId, teamName, roundedOccupancyRate);
                 })
                 .toList());
     }
