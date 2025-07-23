@@ -1,5 +1,6 @@
 package com.yagubogu.stat.controller;
 
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.stat.service.StatService;
@@ -33,6 +34,15 @@ public class StatController {
             @RequestParam final int year
     ) {
         WinRateResponse response = statService.findWinRate(memberId, year);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/lucky-stadiums")
+    public ResponseEntity<LuckyStadiumResponse> findLuckyStadiums(
+            @RequestParam final long memberId,
+            @RequestParam final int year
+    ) {
+        LuckyStadiumResponse response = statService.findLuckyStadium(memberId, year);
         return ResponseEntity.ok(response);
     }
 }

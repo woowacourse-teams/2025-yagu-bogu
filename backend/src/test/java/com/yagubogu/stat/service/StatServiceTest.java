@@ -2,14 +2,16 @@ package com.yagubogu.stat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +33,12 @@ class StatServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository);
+        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -44,15 +49,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(2);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(3);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(5);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(6);
                 }
         );
     }
@@ -65,15 +70,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(1);
                 }
         );
     }
@@ -86,15 +91,15 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse actual = statService.findStatCounts(memberId, year);
 
         // then
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
-                    softAssertions.assertThat(response.winCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.drawCounts()).isEqualTo(0);
-                    softAssertions.assertThat(response.loseCounts()).isEqualTo(1);
-                    softAssertions.assertThat(response.favoriteCheckInCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.winCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.drawCounts()).isEqualTo(0);
+                    softAssertions.assertThat(actual.loseCounts()).isEqualTo(1);
+                    softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(1);
                 }
         );
     }
@@ -133,9 +138,51 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        WinRateResponse response = statService.findWinRate(memberId, year);
+        WinRateResponse actual = statService.findWinRate(memberId, year);
 
         // then
-        assertThat(response.winRate()).isEqualTo(66.7);
+        assertThat(actual.winRate()).isEqualTo(83.3);
+    }
+
+    @DisplayName("0%가 아닌 승률이 있을 때 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_withWinRate() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        // when
+        LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(luckyStadium.shortName()).isEqualTo("챔피언스필드");
+    }
+
+    @DisplayName("모든 승률이 0%일 때 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_withOnlyZeroPercentWinRate() {
+        // given
+        long memberId = 2L;
+        int year = 2025;
+
+        // when
+        LuckyStadiumResponse actual = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(actual.shortName()).isNull();
+    }
+
+    @DisplayName("관람횟수가 0일 때 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_noCheckInCounts() {
+        // given
+        long memberId = 6L;
+        int year = 2025;
+
+        // when
+        LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(luckyStadium.shortName()).isNull();
     }
 }
