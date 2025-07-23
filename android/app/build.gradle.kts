@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.viewpager2)
     implementation(libs.play.services.location)
