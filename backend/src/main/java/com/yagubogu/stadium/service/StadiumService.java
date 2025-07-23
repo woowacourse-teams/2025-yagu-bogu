@@ -20,9 +20,9 @@ public class StadiumService {
 
     public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
         Game game = getGame(stadiumId, date);
-        int checkInPeoples = checkInRepository.countByGame(game);
+        int checkInPeople = checkInRepository.countByGame(game);
 
-        return getOccupancyRateTotalResponse(game, checkInPeoples);
+        return getOccupancyRateTotalResponse(game, checkInPeople);
     }
 
     private Game getGame(final Long stadiumId, final LocalDate today) {
@@ -30,14 +30,14 @@ public class StadiumService {
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
-    private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeoples) {
+    private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeople) {
         List<Object[]> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
 
         return new TeamOccupancyRatesResponse(teamCheckIns.stream()
                 .map(objects -> {
                     long teamId = (long) objects[0];
                     String teamName = (String) objects[1];
-                    double occupancyRate = (1.0 * (Long) objects[2]) / checkInPeoples * 100;
+                    double occupancyRate = (1.0 * (Long) objects[2]) / checkInPeople * 100;
                     double roundOccupancyRate = calculateRoundRate(occupancyRate);
                     return new TeamOccupancyRate(teamId, teamName, roundOccupancyRate);
                 })
