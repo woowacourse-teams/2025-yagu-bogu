@@ -20,9 +20,9 @@ class HomeViewModel(
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
                 val nearestStadiumWithDistance = getNearestStadiumWithDistance(currentCoordinate)
-                val (nearestStadium: Stadium, distance: Distance) = nearestStadiumWithDistance
+                val (nearestStadium: Stadium, nearestDistance: Distance) = nearestStadiumWithDistance
 
-                if (distance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+                if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
                     _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
                 } else {
                     _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
