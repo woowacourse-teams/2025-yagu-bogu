@@ -33,10 +33,10 @@ public class StadiumIntegrationTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("구장별 팬 점유율 조회한다")
+    @DisplayName("구장별 팬 점유율을 조회한다")
     @Test
     void findStatCounts() {
-        // given
+        // given & when
         TeamOccupancyRatesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("stadiumId", 1L)
@@ -54,6 +54,7 @@ public class StadiumIntegrationTest {
                 )
         );
 
+        // then
         assertThat(actual).isEqualTo(expected);
     }
 }

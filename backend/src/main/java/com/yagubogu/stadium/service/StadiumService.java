@@ -18,6 +18,7 @@ public class StadiumService {
 
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
+    private final StadiumRepository stadiumRepository;
 
     public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
         Game game = getGame(stadiumId, date);
@@ -26,8 +27,13 @@ public class StadiumService {
         return getOccupancyRateTotalResponse(game, checkInPeople);
     }
 
-    private Game getGame(final Long stadiumId, final LocalDate today) {
-        return gameRepository.findByStadiumIdAndDate(stadiumId, today)
+    private Stadium getStadiumById(final long stadiumId) {
+        return stadiumRepository.findById(stadiumId)
+                .orElseThrow(() -> new NotFoundException("Stadium is not found"));
+    }
+
+    private Game getGame(final Stadium stadium, final LocalDate today) {
+        return gameRepository.findByStadiumAndDate(stadium, today)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 

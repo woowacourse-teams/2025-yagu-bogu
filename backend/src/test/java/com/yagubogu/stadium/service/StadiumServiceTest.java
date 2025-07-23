@@ -11,8 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
@@ -30,14 +28,17 @@ class StadiumServiceTest {
     private StadiumService stadiumService;
 
     @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
     private CheckInRepository checkInRepository;
 
     @Autowired
-    private GameRepository gameRepository;
+    private StadiumRepository stadiumRepository;
 
     @BeforeEach
     void setUp() {
-        stadiumService = new StadiumService(gameRepository, checkInRepository);
+        stadiumService = new StadiumService(gameRepository, checkInRepository, stadiumRepository);
     }
 
     @DisplayName("구장별 팬 점유율을 조회한다")
@@ -65,12 +66,25 @@ class StadiumServiceTest {
         );
     }
 
+    @DisplayName("구장을 찾을 수 없으면 없으면 예외가 발생한다.")
+    @Test
+    void findOccupancyRate_notFoundStadium() {
+        // given
+        long stadiumId = 999L;
+        LocalDate date = LocalDate.of(2025, 7, 21);
+
+        // when & then
+        assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
+                .isExactlyInstanceOf(NotFoundException.class)
+                .hasMessage("Stadium is not found");
+    }
+
     @DisplayName("구장에 오늘 경기가 없으면 예외가 발생한다.")
     @CsvSource({"999, 2025-07-21", "1, 3000-05-05"})
     @ParameterizedTest
     void findOccupancyRate_notTodayGameInStadium(long stadiumId, LocalDate today) {
         // when & then
-        assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, today))
+        assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Game is not found");
     }
