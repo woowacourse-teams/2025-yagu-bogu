@@ -30,6 +30,12 @@ public class Stadium {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
     public Stadium(final String fullName, final String shortName, final String location) {
         this.fullName = fullName;
         this.shortName = shortName;
