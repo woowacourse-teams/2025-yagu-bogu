@@ -1,5 +1,6 @@
 package com.yagubogu.stadium.service;
 
+import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -31,13 +32,13 @@ public class StadiumService {
     }
 
     private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeople) {
-        List<Object[]> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
+        List<TeamCheckInCountResponse> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
 
         return new TeamOccupancyRatesResponse(teamCheckIns.stream()
-                .map(objects -> {
-                    long teamId = (long) objects[0];
-                    String teamName = (String) objects[1];
-                    double occupancyRate = (1.0 * (Long) objects[2]) / checkInPeople * 100;
+                .map(response -> {
+                    long teamId = response.id();
+                    String teamName = response.name();
+                    double occupancyRate = (1.0 * response.count()) / checkInPeople * 100;
                     double roundOccupancyRate = calculateRoundRate(occupancyRate);
                     return new TeamOccupancyRate(teamId, teamName, roundOccupancyRate);
                 })
