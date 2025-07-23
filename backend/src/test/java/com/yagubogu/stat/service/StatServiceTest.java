@@ -144,7 +144,7 @@ class StatServiceTest {
         assertThat(actual.winRate()).isEqualTo(83.3);
     }
 
-    @DisplayName("행운의 구장을 조회한다")
+    @DisplayName("0%가 아닌 승률이 있을 때 행운의 구장을 조회한다")
     @Test
     void findLuckyStadium_withWinRate() {
         // given
@@ -152,37 +152,37 @@ class StatServiceTest {
         int year = 2025;
 
         // when
-        final LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+        LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
 
         // then
-        assertThat(luckyStadium.short_name()).isEqualTo("챔피언스필드");
+        assertThat(luckyStadium.shortName()).isEqualTo("챔피언스필드");
     }
 
-    @DisplayName("관람횟수가 0이면 null을 반환한다")
+    @DisplayName("모든 승률이 0%일 때 행운의 구장을 조회한다")
     @Test
-    void findLuckyStadium_withAnyCheckIn() {
-        // given
-        long memberId = 6L;
-        int year = 2025;
-
-        // when
-        final LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
-
-        // then
-        assertThat(luckyStadium.short_name()).isNull();
-    }
-
-    @DisplayName("내 팀이 승리한 적이 없다면 null을 반환한다")
-    @Test
-    void findLuckyStadium_whenMyTeamHasNoWinningCheckIns() {
+    void findLuckyStadium_withOnlyZeroPercentWinRate() {
         // given
         long memberId = 2L;
         int year = 2025;
 
         // when
-        final LuckyStadiumResponse actual = statService.findLuckyStadium(memberId, year);
+        LuckyStadiumResponse actual = statService.findLuckyStadium(memberId, year);
 
         // then
-        assertThat(actual.short_name()).isNull();
+        assertThat(actual.shortName()).isNull();
+    }
+
+    @DisplayName("관람횟수가 0일 때 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_noCheckInCounts() {
+        // given
+        long memberId = 6L;
+        int year = 2025;
+
+        // when
+        LuckyStadiumResponse luckyStadium = statService.findLuckyStadium(memberId, year);
+
+        // then
+        assertThat(luckyStadium.shortName()).isNull();
     }
 }

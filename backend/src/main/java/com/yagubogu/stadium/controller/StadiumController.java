@@ -17,7 +17,7 @@ public class StadiumController {
 
     @GetMapping
     public ResponseEntity<StadiumsResponse> findStadiums() {
-        StadiumsResponse actual = stadiumService.findAll();
-        return ResponseEntity.ok(actual);
+        StadiumsResponse response = stadiumService.findAll();
+        return ResponseEntity.ok(response);
     }
 }

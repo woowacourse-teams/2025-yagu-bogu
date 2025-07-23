@@ -3,7 +3,7 @@ package com.yagubogu.stat.dto;
 import com.yagubogu.stadium.domain.Stadium;
 
 public record LuckyStadiumResponse(
-        String short_name
+        String shortName
 ) {
     public static LuckyStadiumResponse from(final Stadium luckyStadium) {
         if (luckyStadium == null) {

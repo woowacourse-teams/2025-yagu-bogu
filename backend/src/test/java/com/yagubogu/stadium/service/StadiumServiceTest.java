@@ -32,9 +32,6 @@ class StadiumServiceTest {
     @Test
     void findAllStadiums() {
         // given
-        StadiumsResponse actual = stadiumService.findAll();
-
-        // when
         List<StadiumResponse> expected = List.of(
                 new StadiumResponse(1L, "잠실 야구장"),
                 new StadiumResponse(2L, "고척 스카이돔"),
@@ -47,6 +44,9 @@ class StadiumServiceTest {
                 new StadiumResponse(9L, "부산 사직야구장")
         );
 
+        // when
+        StadiumsResponse actual = stadiumService.findAll();
+        
         // then
         Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
     }

@@ -24,7 +24,7 @@ public class StatService {
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getById(memberId);
-        validateAdmin(member);
+        validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
         int drawCounts = checkInRepository.findDrawCounts(member, year);
@@ -36,39 +36,38 @@ public class StatService {
 
     public WinRateResponse findWinRate(final long memberId, final int year) {
         Member member = getById(memberId);
-        validateAdmin(member);
+        validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
         int drawCounts = checkInRepository.findDrawCounts(member, year);
         int loseCounts = checkInRepository.findLoseCounts(member, year);
         int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
 
-        return new WinRateResponse(calculateRoundRate(winCounts, favoriteCheckInCounts));
+        return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
         Member member = getById(memberId);
-        validateAdmin(member);
+        validateUser(member);
 
         List<Stadium> stadiums = stadiumRepository.findAll();
-        double winRate = 0;
+        double lowestWinRate = 0;
         Stadium luckyStadium = null;
         for (Stadium stadium : stadiums) {
-
             int winCounts = checkInRepository.findWinCountsByStadiumAndMember(stadium, member, year);
             int favoriteCheckInCounts = checkInRepository.findFavoriteCheckInCountsByStadiumAndMember(stadium, member,
                     year);
 
-            double currentWinRate = calculateRoundRate(winCounts, favoriteCheckInCounts);
-            if (currentWinRate > winRate) {
-                winRate = currentWinRate;
+            double currentWinRate = calculateWinRate(winCounts, favoriteCheckInCounts);
+            if (currentWinRate > lowestWinRate) {
+                lowestWinRate = currentWinRate;
                 luckyStadium = stadium;
             }
         }
         return LuckyStadiumResponse.from(luckyStadium);
     }
 
-    private double calculateRoundRate(final long winCounts, final long favoriteCheckInCounts) {
+    private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
         if (favoriteCheckInCounts == 0) {
             return 0;
         }
@@ -81,7 +80,7 @@ public class StatService {
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 
-    private void validateAdmin(final Member member) {
+    private void validateUser(final Member member) {
         if (member.isAdmin()) {
             throw new ForbiddenException("Member should not be admin");
         }
