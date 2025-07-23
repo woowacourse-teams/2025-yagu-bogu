@@ -1,12 +1,13 @@
-package com.yagubogu.stat;
+package com.yagubogu.stadium;
 
+import static com.yagubogu.fixture.TestFixture.getValidDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
+import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.assertj.core.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StatIntegrationTest {
+public class StadiumIntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -32,46 +33,29 @@ public class StatIntegrationTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
+    @DisplayName("구장별 팬 점유율을 조회한다")
     @Test
     void findStatCounts() {
         // given
-        StatCountsResponse actual = RestAssured.given().log().all()
+        OccupancyRateTotalResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .queryParams("memberId", 1L, "year", 2025)
-                .when().get("/api/stats/counts")
+                .pathParam("stadiumId", 1L)
+                .when().queryParam("date", getValidDate().toString())
+                .get("/api/stadiums/{stadiumId}/occupancy-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(StatCountsResponse.class);
+                .as(OccupancyRateTotalResponse.class);
 
         // when
-        StatCountsResponse expected = new StatCountsResponse(2, 1, 0, 3);
-
-        // then
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @DisplayName("직관 승률을 조회한다")
-    @Test
-    void findWinRate() {
-        // given
-        WinRateResponse actual = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .queryParams("memberId", 1L, "year", 2025)
-                .when().get("/api/stats/win-rate")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(WinRateResponse.class);
-
-        // when
-        WinRateResponse expected = new WinRateResponse(66.7);
+        OccupancyRateTotalResponse expected = new OccupancyRateTotalResponse(
+                List.of(
+                        new OccupancyRateResponse(1L, "기아", 66.7),
+                        new OccupancyRateResponse(2L, "롯데", 33.3)
+                )
+        );
 
         // then
         assertThat(actual).isEqualTo(expected);
     }
 }
-
-
-
