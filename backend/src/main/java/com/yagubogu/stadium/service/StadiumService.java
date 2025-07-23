@@ -23,15 +23,7 @@ public class StadiumService {
         Game game = getGame(stadiumId, date);
         int checkInPeople = checkInRepository.countByGame(game);
 
-        checkIfCheckInIsZero(checkInPeople);
-
         return getOccupancyRateTotalResponse(game, checkInPeople);
-    }
-
-    private static void checkIfCheckInIsZero(final int checkInPeople) {
-        if (checkInPeople == 0) {
-            new TeamOccupancyRatesResponse(List.of());
-        }
     }
 
     private Game getGame(final Long stadiumId, final LocalDate today) {
