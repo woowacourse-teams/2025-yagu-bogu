@@ -1,7 +1,12 @@
 package com.yagubogu.stadium;
 
+import static com.yagubogu.fixture.TestFixture.getToday;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
+import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
@@ -57,4 +62,28 @@ public class StadiumIntegrationTest {
         Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
     }
 
+    @DisplayName("구장별 팬 점유율을 조회한다")
+    @Test
+    void findStatCounts() {
+        // given & when
+        TeamOccupancyRatesResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("stadiumId", 1L)
+                .when().queryParam("date", getToday().toString())
+                .get("/api/stadiums/{stadiumId}/occupancy-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(TeamOccupancyRatesResponse.class);
+
+        TeamOccupancyRatesResponse expected = new TeamOccupancyRatesResponse(
+                List.of(
+                        new TeamOccupancyRate(1L, "기아", 66.7),
+                        new TeamOccupancyRate(2L, "롯데", 33.3)
+                )
+        );
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
 }
