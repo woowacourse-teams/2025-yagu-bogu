@@ -4,6 +4,8 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse;
 import com.yagubogu.stat.dto.OccupancyRateTotalResponse.OccupancyRateResponse;
 import java.time.LocalDate;
@@ -17,16 +19,24 @@ public class StadiumService {
 
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
+    private final StadiumRepository stadiumRepository;
 
     public OccupancyRateTotalResponse findOccupancyRate(final long stadiumId, final LocalDate today) {
-        Game game = getGame(stadiumId, today);
+        Stadium stadium = getStadiumById(stadiumId);
+
+        Game game = getGame(stadium, today);
         int checkInPeoples = checkInRepository.countByGame(game);
 
         return getOccupancyRateTotalResponse(game, checkInPeoples);
     }
 
-    private Game getGame(final Long stadiumId, final LocalDate today) {
-        return gameRepository.findByStadiumIdAndDate(stadiumId, today)
+    private Stadium getStadiumById(final long stadiumId) {
+        return stadiumRepository.findById(stadiumId)
+                .orElseThrow(() -> new NotFoundException("Stadium is not found"));
+    }
+
+    private Game getGame(final Stadium stadium, final LocalDate today) {
+        return gameRepository.findByStadiumAndDate(stadium, today)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 

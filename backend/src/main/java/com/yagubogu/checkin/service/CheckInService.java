@@ -8,6 +8,7 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,9 @@ public class CheckInService {
 
     public void createCheckIn(final CreateCheckInRequest request) {
         long stadiumId = request.stadiumId();
-        validateStadium(stadiumId);
+        Stadium stadium = getStadiumById(stadiumId);
         LocalDate date = request.date();
-        Game game = getGame(stadiumId, date);
+        Game game = getGame(stadium, date);
 
         long memberId = request.memberId();
         Member member = getMember(memberId);
@@ -34,13 +35,13 @@ public class CheckInService {
         checkInRepository.save(new CheckIn(game, member));
     }
 
-    private void validateStadium(final long stadiumId) {
-        stadiumRepository.findById(stadiumId)
+    private Stadium getStadiumById(final long stadiumId) {
+        return stadiumRepository.findById(stadiumId)
                 .orElseThrow(() -> new NotFoundException("Stadium is not found"));
     }
 
-    private Game getGame(final long stadiumId, final LocalDate date) {
-        return gameRepository.findByStadiumIdAndDate(stadiumId, date)
+    private Game getGame(final Stadium stadium, final LocalDate date) {
+        return gameRepository.findByStadiumAndDate(stadium, date)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
