@@ -33,6 +33,5 @@
     <string name="stats_my_pie_chart_lose">패배</string>
 
     <string name="stats_stadium_pie_chart_title">%s 현황</string>
-    <string name="stats_stadium_refresh_time">%d:%d 기준</string>
-
+    <string name="stats_stadium_refresh_time">%02d:%02d 기준</string>
 </resources>
