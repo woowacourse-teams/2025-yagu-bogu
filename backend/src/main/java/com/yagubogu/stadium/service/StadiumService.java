@@ -18,8 +18,8 @@ public class StadiumService {
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
 
-    public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate today) {
-        Game game = getGame(stadiumId, today);
+    public TeamOccupancyRatesResponse findOccupancyRate(final long stadiumId, final LocalDate date) {
+        Game game = getGame(stadiumId, date);
         int checkInPeoples = checkInRepository.countByGame(game);
 
         return getOccupancyRateTotalResponse(game, checkInPeoples);
