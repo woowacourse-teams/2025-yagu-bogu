@@ -21,7 +21,6 @@ public class CheckInController {
     public ResponseEntity<Void> createCheckIn(
             @RequestBody CreateCheckInRequest request
     ) {
-        System.out.println("hi");
         checkInService.createCheckIn(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
