@@ -39,6 +39,7 @@ public class CheckInService {
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
         Member member = getMember(memberId);
         int checkInCounts = checkInRepository.countByMemberAndYear(member, year);
+
         return new CheckInCountsResponse(checkInCounts);
     }
 

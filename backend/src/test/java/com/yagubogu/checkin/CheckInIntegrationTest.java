@@ -1,11 +1,12 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,6 @@ public class CheckInIntegrationTest {
                 .extract()
                 .as(CheckInCountsResponse.class);
 
-        Assertions.assertThat(actual.checkInCounts()).isEqualTo(6);
+        assertThat(actual.checkInCounts()).isEqualTo(6);
     }
 }

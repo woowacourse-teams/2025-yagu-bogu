@@ -35,6 +35,7 @@ public class CheckInController {
             @RequestParam long year
     ) {
         CheckInCountsResponse response = checkInService.findCheckInCounts(memberId, year);
+        
         return ResponseEntity.ok(response);
     }
 }
