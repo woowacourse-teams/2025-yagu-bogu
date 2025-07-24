@@ -109,11 +109,12 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        int expected = 6;
 
         // when
         CheckInCountsResponse actual = checkInService.findCheckInCounts(memberId, year);
 
         // then
-        assertThat(actual.checkInCounts()).isEqualTo(6);
+        assertThat(actual.checkInCounts()).isEqualTo(expected);
     }
 }
