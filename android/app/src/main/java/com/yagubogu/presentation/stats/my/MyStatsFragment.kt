@@ -48,9 +48,9 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { myStats: MyStatsUiModel ->
-            binding.myStatsUiModel = myStats
-            loadChartData(myStats)
+        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { myStatsUiModel: MyStatsUiModel ->
+            binding.myStatsUiModel = myStatsUiModel
+            loadChartData(myStatsUiModel)
         }
     }
 
@@ -73,10 +73,10 @@ class MyStatsFragment : Fragment() {
         }
     }
 
-    private fun loadChartData(myStats: MyStatsUiModel) {
+    private fun loadChartData(myStatsUiModel: MyStatsUiModel) {
         val pieEntries = ArrayList<PieEntry>()
-        pieEntries.add(PieEntry(myStats.winningPercentage.toFloat(), "Win"))
-        pieEntries.add(PieEntry(myStats.etcPercentage.toFloat(), "Etc"))
+        pieEntries.add(PieEntry(myStatsUiModel.winningPercentage.toFloat(), "Win"))
+        pieEntries.add(PieEntry(myStatsUiModel.etcPercentage.toFloat(), "Etc"))
 
         val myStatsChartDataSet = PieDataSet(pieEntries, WINNING_PERCENTAGE)
 
