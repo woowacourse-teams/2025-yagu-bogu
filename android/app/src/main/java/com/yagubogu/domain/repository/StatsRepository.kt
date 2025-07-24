@@ -1,7 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
-import com.yagubogu.domain.model.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.TeamOccupancyRate
 import java.time.LocalDate
 
 interface StatsRepository {

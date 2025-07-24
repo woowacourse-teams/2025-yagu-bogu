@@ -1,11 +1,11 @@
 package com.yagubogu.data.dto.response
 
-import com.yagubogu.domain.model.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.TeamOccupancyRate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TeamDto(
+data class TeamOccupancyRateDto(
     @SerialName("id")
     val id: Long, // 팀 ID
     @SerialName("name")

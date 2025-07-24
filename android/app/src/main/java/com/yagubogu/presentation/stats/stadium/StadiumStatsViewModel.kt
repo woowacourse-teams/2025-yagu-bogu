@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
-import com.yagubogu.domain.model.TeamOccupancyRate
 import com.yagubogu.domain.repository.StatsRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
