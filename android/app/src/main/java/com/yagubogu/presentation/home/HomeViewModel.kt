@@ -27,27 +27,32 @@ class HomeViewModel(
     fun checkIn() {
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
-                viewModelScope.launch {
-                    val stadiums: Stadiums = stadiumRepository.getStadiums()
-                    val (nearestStadium: Stadium, nearestDistance: Distance) =
-                        stadiums.findNearestTo(
-                            currentCoordinate,
-                            locationRepository::getDistanceInMeters,
-                        )
-
-                    if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-                        checkInsRepository.addCheckIn(MEMBER_ID, nearestStadium.id, LocalDate.now())
-                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
-                    } else {
-                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
-                    }
-                }
+                handleCheckIn(currentCoordinate)
             },
             onFailure = { exception: Exception ->
                 Log.e(TAG, "위치 불러오기 실패", exception)
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
+    }
+
+    private fun handleCheckIn(currentCoordinate: Coordinate) {
+        viewModelScope.launch {
+            val stadiums: Stadiums = stadiumRepository.getStadiums()
+            val (nearestStadium: Stadium, nearestDistance: Distance) =
+                stadiums.findNearestTo(
+                    currentCoordinate,
+                    locationRepository::getDistanceInMeters,
+                )
+
+            if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+                val today = LocalDate.now()
+                checkInsRepository.addCheckIn(MEMBER_ID, nearestStadium.id, today)
+                _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
+            } else {
+                _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+            }
+        }
     }
 
     companion object {
