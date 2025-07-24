@@ -1,5 +1,8 @@
 package com.yagubogu.stadium;
 
+import static com.yagubogu.fixture.TestFixture.getToday;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
 import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
@@ -16,9 +19,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static com.yagubogu.fixture.TestFixture.getToday;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -60,6 +60,7 @@ public class StadiumIntegrationTest {
     void findStatCounts() {
         // given
         TeamOccupancyRatesResponse expected = new TeamOccupancyRatesResponse(
+                "잠실구장",
                 List.of(
                         new TeamOccupancyRate(1L, "기아", 66.7),
                         new TeamOccupancyRate(2L, "롯데", 33.3)

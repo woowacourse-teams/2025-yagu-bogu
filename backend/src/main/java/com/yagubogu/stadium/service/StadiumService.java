@@ -33,7 +33,7 @@ public class StadiumService {
         Game game = getGame(stadium, date);
         int checkInPeople = checkInRepository.countByGame(game);
 
-        return getOccupancyRateTotalResponse(game, checkInPeople);
+        return getOccupancyRateTotalResponse(stadium, game, checkInPeople);
     }
 
     private Stadium getStadiumById(final long stadiumId) {
@@ -46,18 +46,24 @@ public class StadiumService {
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
-    private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(final Game game, final int checkInPeople) {
+    private TeamOccupancyRatesResponse getOccupancyRateTotalResponse(
+            final Stadium stadium,
+            final Game game,
+            final int checkInPeople
+    ) {
         List<TeamCheckInCountResponse> teamCheckIns = checkInRepository.countCheckInGroupByTeam(game);
 
-        return new TeamOccupancyRatesResponse(teamCheckIns.stream()
-                .map(response -> {
-                    long teamId = response.id();
-                    String teamName = response.name();
-                    double occupancyRate = (1.0 * response.count()) / checkInPeople * 100;
-                    double roundedOccupancyRate = calculateRoundRate(occupancyRate);
-                    return new TeamOccupancyRate(teamId, teamName, roundedOccupancyRate);
-                })
-                .toList());
+        return new TeamOccupancyRatesResponse(
+                stadium.getShortName(),
+                teamCheckIns.stream()
+                        .map(response -> {
+                            long teamId = response.id();
+                            String teamName = response.name();
+                            double occupancyRate = (1.0 * response.count()) / checkInPeople * 100;
+                            double roundedOccupancyRate = calculateRoundRate(occupancyRate);
+                            return new TeamOccupancyRate(teamId, teamName, roundedOccupancyRate);
+                        })
+                        .toList());
     }
 
     private double calculateRoundRate(final double rate) {
