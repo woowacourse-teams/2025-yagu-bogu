@@ -7,6 +7,6 @@ public record MemberFavoriteResponse(
 ) {
 
     public static MemberFavoriteResponse from(final Team team) {
-        return new MemberFavoriteResponse(team.getName());
+        return new MemberFavoriteResponse(team.getShortName());
     }
 }
