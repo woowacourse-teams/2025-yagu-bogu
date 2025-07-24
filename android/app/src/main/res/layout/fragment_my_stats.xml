@@ -49,20 +49,20 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_my_chart_title" />
 
-                <TextView
-                    android:id="@+id/tv_winning_percentage"
-                    style="@style/TextView.Pretendard.Bold.40"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="@{@string/stats_pie_chart_winning_percentage(myStatsUiModel.winningPercentage)}"
-                    android:textColor="@color/primary500"
-                    app:layout_constraintBottom_toTopOf="@id/tv_total_attendance_count"
-                    app:layout_constraintEnd_toEndOf="@id/pie_chart"
-                    app:layout_constraintStart_toStartOf="@id/pie_chart"
-                    app:layout_constraintTop_toTopOf="@id/pie_chart"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    tools:text="58%" />
+            <TextView
+                android:id="@+id/tv_winning_percentage"
+                style="@style/TextView.Pretendard.Bold.40"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{@string/stats_percentage(myStatsUiModel.winningPercentage)}"
+                android:textColor="@color/primary500"
+                app:layout_constraintBottom_toTopOf="@id/tv_total_attendance_count"
+                app:layout_constraintEnd_toEndOf="@id/pie_chart"
+                app:layout_constraintStart_toStartOf="@id/pie_chart"
+                app:layout_constraintTop_toTopOf="@id/pie_chart"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="58%" />
 
                 <TextView
                     android:id="@+id/tv_total_attendance_count"
