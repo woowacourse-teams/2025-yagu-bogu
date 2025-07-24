@@ -1,9 +1,11 @@
 package com.yagubogu.checkin;
 
+import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,5 +40,20 @@ public class CheckInIntegrationTest {
                 .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(201);
+    }
+
+    @DisplayName("회원의 총 인증 횟수를 조회한다")
+    @Test
+    void findCheckInCounts() {
+        CheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 1L, "year", 2025)
+                .when().get("/api/check-ins/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CheckInCountsResponse.class);
+
+        Assertions.assertThat(actual.checkInCounts()).isEqualTo(6);
     }
 }
