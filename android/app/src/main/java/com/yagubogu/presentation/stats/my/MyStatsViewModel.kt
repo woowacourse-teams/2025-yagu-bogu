@@ -19,7 +19,7 @@ class MyStatsViewModel(
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
     init {
-        fetchMyStats(1, 2025)
+        fetchMyStats(MEMBER_ID, YEAR)
     }
 
     private fun fetchMyStats(
@@ -65,5 +65,7 @@ class MyStatsViewModel(
 
     companion object {
         private const val TAG = "MyStatsViewModel"
+        private const val MEMBER_ID = 5009L
+        private const val YEAR = 2025
     }
 }

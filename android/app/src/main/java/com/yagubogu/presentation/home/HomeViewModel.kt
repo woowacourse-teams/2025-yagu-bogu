@@ -1,6 +1,8 @@
 package com.yagubogu.presentation.home
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.Coordinate
@@ -11,20 +13,33 @@ import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
+import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
+import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val memberRepository: MemberRepository,
+    private val checkInsRepository: CheckInsRepository,
+    private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
-    private val checkInsRepository: CheckInsRepository,
 ) : ViewModel() {
+    private val _homeUiModel = MutableLiveData<HomeUiModel>()
+    val homeUiModel: LiveData<HomeUiModel> get() = _homeUiModel
+
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
+
+    init {
+        fetchMemberInformation(MEMBER_ID, YEAR)
+    }
 
     fun checkIn() {
         locationRepository.getCurrentCoordinate(
@@ -36,6 +51,44 @@ class HomeViewModel(
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
+    }
+
+    private fun fetchMemberInformation(
+        memberId: Long,
+        year: Int,
+    ) {
+        viewModelScope.launch {
+            val myTeamDeferred: Deferred<Result<String>> =
+                async { memberRepository.getFavoriteTeam(memberId) }
+            val attendanceCountDeferred: Deferred<Result<Int>> =
+                async { checkInsRepository.getCheckInCounts(memberId, year) }
+            val winRateDeferred: Deferred<Result<Double>> =
+                async { statsRepository.getStatsWinRate(memberId, year) }
+
+            val myTeamResult: Result<String> = myTeamDeferred.await()
+            val attendanceCountResult: Result<Int> = attendanceCountDeferred.await()
+            val winRateResult: Result<Double> = winRateDeferred.await()
+
+            if (myTeamResult.isSuccess && attendanceCountResult.isSuccess && winRateResult.isSuccess) {
+                val myTeam: String = myTeamResult.getOrThrow()
+                val attendanceCount: Int = attendanceCountResult.getOrThrow()
+                val winRate: Double = winRateResult.getOrThrow()
+
+                val homeUiModel =
+                    HomeUiModel(
+                        myTeam = myTeam,
+                        attendanceCount = attendanceCount,
+                        winRate = winRate.roundToInt(),
+                    )
+                _homeUiModel.value = homeUiModel
+            } else {
+                val errors: List<String> =
+                    listOf(myTeamResult, attendanceCountResult, winRateResult)
+                        .filter { it.isFailure }
+                        .mapNotNull { it.exceptionOrNull()?.message }
+                Log.e(TAG, "API 호출 실패: ${errors.joinToString()}")
+            }
+        }
     }
 
     private fun handleCheckIn(currentCoordinate: Coordinate) {
@@ -66,6 +119,10 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(MEMBER_ID, nearestStadium.id, today)
             .onSuccess {
+                _homeUiModel.value =
+                    homeUiModel.value?.let { currentHomeUiModel: HomeUiModel ->
+                        currentHomeUiModel.copy(attendanceCount = currentHomeUiModel.attendanceCount + 1)
+                    }
                 _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
             }.onFailure { exception: Throwable ->
                 Log.e(TAG, "API 호출 실패", exception)
@@ -76,5 +133,6 @@ class HomeViewModel(
         private const val TAG = "HomeViewModel"
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val MEMBER_ID = 5009L
+        private const val YEAR = 2025
     }
 }
