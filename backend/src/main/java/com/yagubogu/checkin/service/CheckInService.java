@@ -1,6 +1,7 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -33,6 +34,12 @@ public class CheckInService {
         Member member = getMember(memberId);
 
         checkInRepository.save(new CheckIn(game, member));
+    }
+
+    public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
+        Member member = getMember(memberId);
+        int checkInCounts = checkInRepository.countByMemberAndYear(member, year);
+        return new CheckInCountsResponse(checkInCounts);
     }
 
     private Stadium getStadiumById(final long stadiumId) {
