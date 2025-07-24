@@ -24,7 +24,7 @@ public class Stadium {
     @Column(name = "full_name", nullable = false, unique = true)
     private String fullName;
 
-    @Column(name = "shortName", nullable = false, unique = true)
+    @Column(name = "short_name", nullable = false, unique = true)
     private String shortName;
 
     @Column(name = "location", nullable = false)
