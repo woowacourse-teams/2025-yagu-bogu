@@ -33,4 +33,8 @@
     <string name="stats_my_pie_chart_win">승리</string>
     <string name="stats_my_pie_chart_draw">무승부</string>
     <string name="stats_my_pie_chart_lose">패배</string>
+    <string name="stats_my_team">최다 응원팀</string>
+    <string name="stats_my_lucky_stadium">행운의 구장</string>
+    <string name="stats_my_team_emoji">🏆</string>
+    <string name="stats_my_lucky_stadium_emoji">🍀</string>
 </resources>
