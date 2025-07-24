@@ -19,7 +19,7 @@ class MyStatsViewModel(
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
     init {
-        fetchMyStats(1, 2025)
+        fetchMyStats(5006, 2025)
     }
 
     private fun fetchMyStats(

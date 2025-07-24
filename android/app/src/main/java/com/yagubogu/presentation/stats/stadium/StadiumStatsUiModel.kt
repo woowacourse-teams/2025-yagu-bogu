@@ -17,7 +17,7 @@ data class StadiumStatsUiModel(
     val showThirdLegend: Boolean get() = thirdTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
 
     companion object {
-        private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus("", R.color.white, 0)
+        private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus("", R.color.white, 0.0)
 
         private const val FIRST_TEAM_INDEX = 0
         private const val SECOND_TEAM_INDEX = 1

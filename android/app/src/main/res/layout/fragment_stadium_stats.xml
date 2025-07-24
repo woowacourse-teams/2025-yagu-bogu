@@ -67,14 +67,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
+                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.roundedPercentage)}"
                 android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeam.teamColor)}"
                 app:layout_constraintBottom_toTopOf="@id/tv_team_name"
                 app:layout_constraintEnd_toEndOf="@id/pie_chart"
                 app:layout_constraintStart_toStartOf="@id/pie_chart"
                 app:layout_constraintTop_toTopOf="@id/pie_chart"
                 app:layout_constraintVertical_chainStyle="packed"
-                tools:text="58%" />
+                tools:text="58.5%" />
 
             <TextView
                 android:id="@+id/tv_team_name"
@@ -136,7 +136,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="75%" />
@@ -178,7 +178,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.secondTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.secondTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="20%" />
@@ -220,7 +220,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_percentage(stadiumStatsUiModel.thirdTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.thirdTeam.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="5%" />
