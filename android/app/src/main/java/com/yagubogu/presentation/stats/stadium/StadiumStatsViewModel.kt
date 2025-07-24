@@ -74,10 +74,10 @@ class StadiumStatsViewModel(
         val sortedTeamStatus = teamStatuses.sortedByDescending { it.percentage }
 
         return when {
-            sortedTeamStatus.size <= 2 -> sortedTeamStatus
+            sortedTeamStatus.size <= MAX_LEGEND_TEAM_SIZE -> sortedTeamStatus
             else -> {
-                val topTwoTeams = sortedTeamStatus.take(2)
-                val remainingTeams = sortedTeamStatus.drop(2)
+                val topLegendTeams = sortedTeamStatus.take(MAX_LEGEND_TEAM_SIZE)
+                val remainingTeams = sortedTeamStatus.drop(MAX_LEGEND_TEAM_SIZE)
                 val othersTotalPercentage = remainingTeams.sumOf { it.percentage }
 
                 val othersTeamStatus =
@@ -86,13 +86,14 @@ class StadiumStatsViewModel(
                         teamColor = R.color.gray400,
                         percentage = othersTotalPercentage,
                     )
-                topTwoTeams + othersTeamStatus
+                topLegendTeams + othersTeamStatus
             }
         }
     }
 
     companion object {
         private const val DUMMY_STADIUM_ID = 2L // 잠실구장
+        private const val MAX_LEGEND_TEAM_SIZE = 2
         private const val TAG = "StadiumStatsViewModel"
     }
 }
