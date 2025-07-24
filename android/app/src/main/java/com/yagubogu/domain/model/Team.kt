@@ -22,6 +22,6 @@ enum class Team(
     ;
 
     companion object {
-        fun getById(id: Long): Team? = if (id in 1..entries.size) entries[id.toInt() - 1] else null
+        fun getById(id: Long): Team = entries[id.toInt() - 1]
     }
 }

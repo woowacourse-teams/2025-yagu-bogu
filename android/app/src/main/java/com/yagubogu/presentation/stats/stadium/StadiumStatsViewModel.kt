@@ -49,16 +49,13 @@ class StadiumStatsViewModel(
                     stadiumOccupancyResult.getOrThrow()
 
                 val teamStatus: List<TeamOccupancyStatus> =
-                    teamOccupancyRates.mapNotNull { teamOccupancyRate: TeamOccupancyRate ->
-                        val currentTeam =
-                            Team.getById(teamOccupancyRate.id) ?: return@mapNotNull null
-                        currentTeam.let { team: Team ->
-                            TeamOccupancyStatus(
-                                team.shortName,
-                                team.color,
-                                teamOccupancyRate.occupancyRate,
-                            )
-                        }
+                    teamOccupancyRates.map { teamOccupancyRate: TeamOccupancyRate ->
+                        val currentTeam: Team = Team.getById(teamOccupancyRate.id)
+                        TeamOccupancyStatus(
+                            currentTeam.shortName,
+                            currentTeam.color,
+                            teamOccupancyRate.occupancyRate,
+                        )
                     }
                 val refinedTeamStatus = refineTeamStatus(teamStatus)
 
