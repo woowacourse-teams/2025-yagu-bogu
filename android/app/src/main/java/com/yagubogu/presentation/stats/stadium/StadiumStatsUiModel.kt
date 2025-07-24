@@ -19,8 +19,8 @@ data class StadiumStatsUiModel(
     companion object {
         private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus("", R.color.white, 0)
 
-        private val FIRST_TEAM_INDEX = 0
-        private val SECOND_TEAM_INDEX = 1
-        private val THIRD_TEAM_INDEX = 2
+        private const val FIRST_TEAM_INDEX = 0
+        private const val SECOND_TEAM_INDEX = 1
+        private const val THIRD_TEAM_INDEX = 2
     }
 }
