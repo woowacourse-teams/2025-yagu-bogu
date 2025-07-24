@@ -11,7 +11,5 @@ class CheckInsDefaultRepository(
         memberId: Long,
         stadiumId: Long,
         date: LocalDate,
-    ) {
-        checkInsDataSource.addCheckIn(memberId, stadiumId, date)
-    }
+    ): Result<Unit> = checkInsDataSource.addCheckIn(memberId, stadiumId, date)
 }

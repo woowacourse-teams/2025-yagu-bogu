@@ -38,30 +38,41 @@ class HomeViewModel(
 
     private fun handleCheckIn(currentCoordinate: Coordinate) {
         viewModelScope.launch {
-            stadiumRepository
-                .getStadiums()
+            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiums()
+            stadiumsResult
                 .onSuccess { stadiums: Stadiums ->
-                    val (nearestStadium: Stadium, nearestDistance: Distance) =
-                        stadiums.findNearestTo(
-                            currentCoordinate,
-                            locationRepository::getDistanceInMeters,
-                        )
-                    if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-                        val today = LocalDate.now()
-                        checkInsRepository.addCheckIn(MEMBER_ID, nearestStadium.id, today)
-                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
-                    } else {
-                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
-                    }
-                }.onFailure { exception: Throwable ->
-                    Log.e(TAG, "API 호출 실패", exception)
+                    checkInIfWithinThreshold(currentCoordinate, stadiums)
+                }.onFailure {
+                    Log.e(TAG, "API 호출 실패", stadiumsResult.exceptionOrNull())
                 }
         }
     }
 
+    private suspend fun checkInIfWithinThreshold(
+        currentCoordinate: Coordinate,
+        stadiums: Stadiums,
+    ) {
+        val (nearestStadium: Stadium, nearestDistance: Distance) =
+            stadiums.findNearestTo(currentCoordinate, locationRepository::getDistanceInMeters)
+
+        if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+            _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+            return
+        }
+
+        val today = LocalDate.now()
+        checkInsRepository
+            .addCheckIn(MEMBER_ID, nearestStadium.id, today)
+            .onSuccess {
+                _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
+            }.onFailure { exception: Throwable ->
+                Log.e(TAG, "API 호출 실패", exception)
+            }
+    }
+
     companion object {
         private const val TAG = "HomeViewModel"
-        private const val THRESHOLD_IN_METERS = 2200.0
-        private const val MEMBER_ID = 1L
+        private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
+        private const val MEMBER_ID = 5009L
     }
 }

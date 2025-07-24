@@ -7,5 +7,5 @@ interface CheckInsDataSource {
         memberId: Long,
         stadiumId: Long,
         date: LocalDate,
-    )
+    ): Result<Unit>
 }
