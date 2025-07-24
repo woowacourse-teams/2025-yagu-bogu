@@ -1,8 +1,10 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -99,5 +101,19 @@ class CheckInServiceTest {
         assertThatThrownBy(() -> checkInService.createCheckIn(request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
+    }
+
+    @DisplayName("회원의 총 인증 횟수를 조회한다")
+    @Test
+    void findCheckInCounts() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        // when
+        CheckInCountsResponse actual = checkInService.findCheckInCounts(memberId, year);
+
+        // then
+        assertThat(actual.checkInCounts()).isEqualTo(6);
     }
 }
