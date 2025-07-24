@@ -36,7 +36,12 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels {
         val app = requireActivity().application as YaguBoguApplication
-        HomeViewModelFactory(app.locationRepository, app.stadiumRepository, app.checkInsRepository)
+        HomeViewModelFactory(
+            app.memberRepository,
+            app.locationRepository,
+            app.stadiumRepository,
+            app.checkInsRepository,
+        )
     }
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()

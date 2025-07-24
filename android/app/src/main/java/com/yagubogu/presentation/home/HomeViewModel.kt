@@ -9,6 +9,7 @@ import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class HomeViewModel(
+    private val memberRepository: MemberRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
     private val checkInsRepository: CheckInsRepository,

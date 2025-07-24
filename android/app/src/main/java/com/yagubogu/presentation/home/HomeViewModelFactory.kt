@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 
 class HomeViewModelFactory(
+    private val memberRepository: MemberRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
     private val checkInsRepository: CheckInsRepository,
@@ -14,7 +16,12 @@ class HomeViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(locationRepository, stadiumRepository, checkInsRepository) as T
+            return HomeViewModel(
+                memberRepository,
+                locationRepository,
+                stadiumRepository,
+                checkInsRepository,
+            ) as T
         }
         throw IllegalArgumentException()
     }
