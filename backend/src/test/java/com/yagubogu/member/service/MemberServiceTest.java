@@ -43,7 +43,7 @@ public class MemberServiceTest {
         assertThat(actual.favorite()).isEqualTo(expected);
     }
 
-    @DisplayName("예외 : 멤버를 찾지 못하면 예외가 발생한다.")
+    @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다.")
     @Test
     void findFavorites_notFoundMember() {
         // given
