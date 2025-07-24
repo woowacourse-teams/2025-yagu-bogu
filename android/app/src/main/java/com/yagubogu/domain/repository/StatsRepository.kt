@@ -1,7 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
-import com.yagubogu.presentation.stats.stadium.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
 import java.time.LocalDate
 
 interface StatsRepository {
@@ -20,8 +20,8 @@ interface StatsRepository {
         year: Int,
     ): Result<String?>
 
-    suspend fun getStatsStadiumOccupancyRate(
+    suspend fun getTeamOccupancyRates(
         memberId: Long,
         date: LocalDate,
-    ): Result<List<TeamOccupancyRate>>
+    ): Result<TeamOccupancyRates>
 }

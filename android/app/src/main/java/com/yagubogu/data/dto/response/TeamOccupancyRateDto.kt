@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response
 
-import com.yagubogu.presentation.stats.stadium.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,7 +13,7 @@ data class TeamOccupancyRateDto(
     @SerialName("occupancyRate")
     val occupancyRate: Double, // 점유율
 ) {
-    fun toDomain(): TeamOccupancyRate =
+    fun toPresentation(): TeamOccupancyRate =
         TeamOccupancyRate(
             id = id,
             name = name,

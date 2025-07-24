@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.stadium
+package com.yagubogu.presentation.stats.stadium.model
 
 import com.yagubogu.R
 import java.time.LocalTime

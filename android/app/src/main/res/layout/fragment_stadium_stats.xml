@@ -9,7 +9,7 @@
 
         <variable
             name="stadiumStatsUiModel"
-            type="com.yagubogu.presentation.stats.stadium.StadiumStatsUiModel" />
+            type="com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

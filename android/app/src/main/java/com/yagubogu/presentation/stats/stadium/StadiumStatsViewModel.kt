@@ -8,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.StatsRepository
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
+import com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyStatus
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -37,35 +39,29 @@ class StadiumStatsViewModel(
         date: LocalDate,
     ) {
         viewModelScope.launch {
-            val statsStadiumOccupancyDeferred: Deferred<Result<List<TeamOccupancyRate>>> =
-                async { statsRepository.getStatsStadiumOccupancyRate(stadiumId, date) }
+            val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
+                statsRepository.getTeamOccupancyRates(stadiumId, date)
+            teamOccupancyRatesResult
+                .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
+                    val teamStatus: List<TeamOccupancyStatus> =
+                        teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
+                            val currentTeam: Team = Team.getById(teamOccupancyRate.id)
+                            TeamOccupancyStatus(
+                                currentTeam.shortName,
+                                currentTeam.color,
+                                teamOccupancyRate.occupancyRate,
+                            )
+                        }
+                    val refinedTeamStatus = refineTeamStatus(teamStatus)
 
-            val stadiumOccupancyResult: Result<List<TeamOccupancyRate>> =
-                statsStadiumOccupancyDeferred.await()
-
-            if (stadiumOccupancyResult.isSuccess) {
-                val teamOccupancyRates: List<TeamOccupancyRate> =
-                    stadiumOccupancyResult.getOrThrow()
-
-                val teamStatus: List<TeamOccupancyStatus> =
-                    teamOccupancyRates.map { teamOccupancyRate: TeamOccupancyRate ->
-                        val currentTeam: Team = Team.getById(teamOccupancyRate.id)
-                        TeamOccupancyStatus(
-                            currentTeam.shortName,
-                            currentTeam.color,
-                            teamOccupancyRate.occupancyRate,
+                    _stadiumStatsUiModel.value =
+                        StadiumStatsUiModel(
+                            teamOccupancyRates.stadiumName,
+                            refinedTeamStatus,
                         )
-                    }
-                val refinedTeamStatus = refineTeamStatus(teamStatus)
-
-                _stadiumStatsUiModel.value =
-                    StadiumStatsUiModel(
-                        "잠실구장",
-                        refinedTeamStatus,
-                    )
-            } else {
-                Log.e(TAG, "API 호출 실패: ${stadiumOccupancyResult.exceptionOrNull()?.message}")
-            }
+                }.onFailure { exception: Throwable ->
+                    Log.e(TAG, "API 호출 실패", exception)
+                }
         }
     }
 

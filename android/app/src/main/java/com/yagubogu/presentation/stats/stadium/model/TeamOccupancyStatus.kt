@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.stadium
+package com.yagubogu.presentation.stats.stadium.model
 
 import androidx.annotation.ColorRes
 import kotlin.math.roundToInt

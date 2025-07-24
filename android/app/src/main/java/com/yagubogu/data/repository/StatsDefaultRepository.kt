@@ -4,9 +4,10 @@ import com.yagubogu.data.datasource.StatsDataSource
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
+import com.yagubogu.data.dto.response.TeamOccupancyRatesResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.stats.stadium.TeamOccupancyRate
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
 import java.time.LocalDate
 
 class StatsDefaultRepository(
@@ -42,13 +43,13 @@ class StatsDefaultRepository(
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getStatsStadiumOccupancyRate(
+    override suspend fun getTeamOccupancyRates(
         memberId: Long,
         date: LocalDate,
-    ): Result<List<TeamOccupancyRate>> =
+    ): Result<TeamOccupancyRates> =
         statsDataSource
-            .getStadiumOccupancyRate(memberId, date)
-            .map { statsStadiumOccupancyRateResponse ->
-                statsStadiumOccupancyRateResponse.toDomains()
+            .getTeamOccupancyRates(memberId, date)
+            .map { teamOccupancyRatesResponse: TeamOccupancyRatesResponse ->
+                teamOccupancyRatesResponse.toPresentation()
             }
 }

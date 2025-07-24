@@ -10,10 +10,10 @@ import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStadiumStatsBinding
-import com.yagubogu.presentation.stats.my.MyStatsUiModel
+import com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel
+import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyStatus
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StadiumStatsFragment : Fragment() {
