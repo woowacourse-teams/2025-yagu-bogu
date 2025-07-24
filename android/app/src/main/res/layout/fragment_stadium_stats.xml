@@ -119,7 +119,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
-                        app:backgroundTint="@{stadiumStatsUiModel.firstTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.firstTeam.teamColor}"
                         tools:backgroundTint="@color/team_kia" />
 
                     <TextView
@@ -161,7 +161,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
-                        app:backgroundTint="@{stadiumStatsUiModel.secondTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.secondTeam.teamColor}"
                         tools:backgroundTint="@color/team_samsung" />
 
                     <TextView
@@ -203,7 +203,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_legend_icon"
-                        app:backgroundTint="@{stadiumStatsUiModel.thirdTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.thirdTeam.teamColor}"
                         tools:backgroundTint="@color/gray400" />
 
                     <TextView

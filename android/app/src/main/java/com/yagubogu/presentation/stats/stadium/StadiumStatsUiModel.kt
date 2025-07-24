@@ -5,20 +5,22 @@ import java.time.LocalTime
 
 data class StadiumStatsUiModel(
     val stadiumName: String,
-    val teams: List<TeamStatus>,
+    val teamOccupancyStatuses: List<TeamOccupancyStatus>,
+    val refreshTime: LocalTime = LocalTime.now(),
 ) {
-    val refreshTime: LocalTime get() = LocalTime.now()
-    private val teamSize: Int get() = teams.size
+    val firstTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(FIRST_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
+    val secondTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(SECOND_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
+    val thirdTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(THIRD_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
 
-    val firstTeam: TeamStatus get() = teams.getOrElse(0) { DEFAULT_TEAM_STATUS }
-    val secondTeam: TeamStatus get() = teams.getOrElse(1) { DEFAULT_TEAM_STATUS }
-    val thirdTeam: TeamStatus get() = teams.getOrElse(2) { DEFAULT_TEAM_STATUS }
-
-    val showFirstLegend: Boolean get() = teamSize >= 1
-    val showSecondLegend: Boolean get() = teamSize >= 2
-    val showThirdLegend: Boolean get() = teamSize >= 3
+    val showFirstLegend: Boolean get() = firstTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
+    val showSecondLegend: Boolean get() = secondTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
+    val showThirdLegend: Boolean get() = thirdTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
 
     companion object {
-        private val DEFAULT_TEAM_STATUS = TeamStatus("", R.color.white, 0)
+        private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus("", R.color.white, 0)
+
+        private val FIRST_TEAM_INDEX = 0
+        private val SECOND_TEAM_INDEX = 1
+        private val THIRD_TEAM_INDEX = 2
     }
 }

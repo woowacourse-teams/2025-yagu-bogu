@@ -21,9 +21,9 @@ class StadiumStatsFragment : Fragment() {
         StadiumStatsUiModel(
             "고척돔",
             listOf(
-                TeamStatus("한화", R.color.team_hanwha, 70),
-                TeamStatus("삼성", R.color.team_samsung, 30),
-                TeamStatus("기타", R.color.gray400, 10),
+                TeamOccupancyStatus("한화", R.color.team_hanwha, 70),
+                TeamOccupancyStatus("삼성", R.color.team_samsung, 30),
+                TeamOccupancyStatus("기타", R.color.gray400, 10),
             ),
         )
 
@@ -65,16 +65,16 @@ class StadiumStatsFragment : Fragment() {
     }
 
     private fun loadChartData() {
-        val entries = ArrayList<PieEntry>()
+        val pieEntries = ArrayList<PieEntry>()
 
-        dummyStadiumUiModel.teams.forEach { teamStatus ->
-            entries.add(PieEntry(teamStatus.percentage.toFloat(), teamStatus.name))
+        dummyStadiumUiModel.teamOccupancyStatuses.forEach { teamOccupancyStatus: TeamOccupancyStatus ->
+            pieEntries.add(PieEntry(teamOccupancyStatus.percentage.toFloat(), teamOccupancyStatus.name))
         }
 
-        val myStatsChartDataSet = PieDataSet(entries, STADIUM_CHART_DESCRIPTION)
+        val stadiumStatsChartDataSet = PieDataSet(pieEntries, STADIUM_CHART_DESCRIPTION)
 
-        myStatsChartDataSet.colors = dummyStadiumUiModel.teams.map { requireContext().getColor(it.teamColor) }
-        val pieData = PieData(myStatsChartDataSet)
+        stadiumStatsChartDataSet.colors = dummyStadiumUiModel.teamOccupancyStatuses.map { requireContext().getColor(it.teamColor) }
+        val pieData = PieData(stadiumStatsChartDataSet)
         pieData.setDrawValues(false)
 
         binding.pieChart.data = pieData
