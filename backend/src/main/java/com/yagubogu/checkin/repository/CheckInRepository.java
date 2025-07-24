@@ -83,6 +83,15 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             JOIN ci.member m
             WHERE ci.game = :game
             GROUP BY m.team.id
+            ORDER BY COUNT(ci) DESC
             """)
     List<TeamCheckInCountResponse> countCheckInGroupByTeam(Game game);
+
+    @Query("""
+                SELECT COUNT(c)
+                FROM CheckIn c
+                WHERE c.member = :member
+                  AND YEAR(c.game.date) = :year
+            """)
+    int countByMemberAndYear(Member member, long year);
 }
