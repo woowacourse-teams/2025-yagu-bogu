@@ -11,19 +11,21 @@ class StadiumDefaultRepository(
 ) : StadiumRepository {
     private var cachedStadiums: Stadiums? = null
 
-    override suspend fun getStadiums(): Stadiums {
+    override suspend fun getStadiums(): Result<Stadiums> {
         cachedStadiums?.let { stadiums: Stadiums ->
-            return stadiums
+            return Result.success(stadiums)
         }
-
-        val stadiumsResponse: StadiumsResponse = stadiumDataSource.getStadiums()
-        val stadiums =
-            Stadiums(
-                stadiumsResponse.stadiums.map { stadiumDto: StadiumDto ->
-                    stadiumDto.toDomain()
-                },
-            )
-        cachedStadiums = stadiums
-        return stadiums
+        return stadiumDataSource
+            .getStadiums()
+            .map { stadiumsResponse: StadiumsResponse ->
+                val stadiums =
+                    Stadiums(
+                        stadiumsResponse.stadiums.map { stadiumDto: StadiumDto ->
+                            stadiumDto.toDomain()
+                        },
+                    )
+                cachedStadiums = stadiums
+                stadiums
+            }
     }
 }

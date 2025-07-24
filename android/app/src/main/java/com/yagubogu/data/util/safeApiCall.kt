@@ -8,8 +8,7 @@ import retrofit2.Response
 @Suppress("UNCHECKED_CAST")
 inline fun <T> safeApiCall(apiCall: () -> Response<T>): Result<T> =
     runCatching {
-        val response = apiCall()
-
+        val response: Response<T> = apiCall()
         if (response.isSuccessful) {
             response.body() as T
         } else {

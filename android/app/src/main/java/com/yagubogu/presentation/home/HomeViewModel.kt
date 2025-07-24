@@ -38,26 +38,30 @@ class HomeViewModel(
 
     private fun handleCheckIn(currentCoordinate: Coordinate) {
         viewModelScope.launch {
-            val stadiums: Stadiums = stadiumRepository.getStadiums()
-            val (nearestStadium: Stadium, nearestDistance: Distance) =
-                stadiums.findNearestTo(
-                    currentCoordinate,
-                    locationRepository::getDistanceInMeters,
-                )
-
-            if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-                val today = LocalDate.now()
-                checkInsRepository.addCheckIn(MEMBER_ID, nearestStadium.id, today)
-                _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
-            } else {
-                _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
-            }
+            stadiumRepository
+                .getStadiums()
+                .onSuccess { stadiums: Stadiums ->
+                    val (nearestStadium: Stadium, nearestDistance: Distance) =
+                        stadiums.findNearestTo(
+                            currentCoordinate,
+                            locationRepository::getDistanceInMeters,
+                        )
+                    if (nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+                        val today = LocalDate.now()
+                        checkInsRepository.addCheckIn(MEMBER_ID, nearestStadium.id, today)
+                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
+                    } else {
+                        _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+                    }
+                }.onFailure { exception: Throwable ->
+                    Log.e(TAG, "API 호출 실패", exception)
+                }
         }
     }
 
     companion object {
-        private const val THRESHOLD_IN_METERS = 300.0
         private const val TAG = "HomeViewModel"
+        private const val THRESHOLD_IN_METERS = 2200.0
         private const val MEMBER_ID = 1L
     }
 }
