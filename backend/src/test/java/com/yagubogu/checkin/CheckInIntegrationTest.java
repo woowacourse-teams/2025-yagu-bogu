@@ -32,11 +32,68 @@ public class CheckInIntegrationTest {
     @DisplayName("인증을 저장한다")
     @Test
     void createCheckIn() {
+        // given
+        long memberId = 5L;
+        long stadiumId = 1L;
+        LocalDate date = LocalDate.of(2025, 7, 19);
+
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new CreateCheckInRequest(5L, 1L, LocalDate.of(2025, 7, 19)))
+                .body(new CreateCheckInRequest(memberId, stadiumId, date))
                 .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(201);
+    }
+
+    @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_notFoundStadium() {
+        // given
+        long memberId = 1L;
+        long invalidStadiumId = 999L;
+        LocalDate date = LocalDate.of(2025, 7, 21);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(memberId, invalidStadiumId, date))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 인증할 때 게임이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_notFoundGame() {
+        // given
+        long memberId = 1L;
+        long stadiumId = 1L;
+        LocalDate invalidDate = LocalDate.of(1000, 7, 21);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(memberId, stadiumId, invalidDate))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 인증할 때 회원이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+        long stadiumId = 1L;
+        LocalDate date = LocalDate.of(2025, 7, 21);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(invalidMemberId, stadiumId, date))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
     }
 }

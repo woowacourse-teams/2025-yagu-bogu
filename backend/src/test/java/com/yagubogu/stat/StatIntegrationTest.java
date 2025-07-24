@@ -72,6 +72,17 @@ public class StatIntegrationTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @DisplayName("예외: 관리자일 경우 직관 승률을 조회하면 예외가 발생한다")
+    @Test
+    void findWinRate_whenAdmin() {
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 4L, "year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(403);
+    }
+
     @DisplayName("행운의 구장을 조회한다")
     @Test
     void findLuckyStadium() {
