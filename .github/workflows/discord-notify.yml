@@ -8,13 +8,11 @@ jobs:
   # dev-be, dev-an 대상 PR 알림
   notify-discord:
     runs-on: ubuntu-latest
-    # dev 브랜치로 머지되는 경우는 제외하여 중복 알림 방지
     if: "!(github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev')"
     steps:
       - name: Set Discord Webhook & Mention
         id: meta
         run: |
-          # PR의 대상 브랜치(base_ref)를 기준으로 웹훅과 멘션을 결정
           BRANCH="${{ github.base_ref }}"
           case "$BRANCH" in
             dev-be*)
@@ -31,6 +29,7 @@ jobs:
               ;;
           esac
 
+      # ⭐️ [변경] 이 스텝에서는 순수 메시지 본문만 생성합니다.
       - name: Compose PR Notification Message
         id: message
         run: |
@@ -70,23 +69,36 @@ jobs:
               EVENT_MSG="ℹ️ PR 상태가 변경되었습니다."
               ;;
           esac
-          printf "msg<<EOF\n%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s\nEOF\n" \
-            "$EVENT_MSG" "$NUMBER" "$HEAD" "$BASE" "$COMMITS" "$FILES" "$ADD" "$DEL" "$TITLE" "$LABEL_LINE" "$ACTOR" "$URL" >> "$GITHUB_OUTPUT"
+          # GITHUB_OUTPUT에 heredoc을 사용하여 멀티라인 문자열을 안전하게 저장합니다.
+          {
+            echo 'msg_body<<EOF'
+            printf "%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s" \
+              "$EVENT_MSG" "$NUMBER" "$HEAD" "$BASE" "$COMMITS" "$FILES" "$ADD" "$DEL" "$TITLE" "$LABEL_LINE" "$ACTOR" "$URL"
+            echo ''
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
+      # ⭐️ [변경] 이 스텝에서 jq를 사용해 안전하게 JSON을 생성하고 전송합니다.
       - name: Send Discord Notification
         if: steps.meta.outputs.url != ''
         run: |
+          MENTION="${{ steps.meta.outputs.mention }}"
+          MSG_BODY="${{ steps.message.outputs.msg_body }}"
+          
+          # 멘션과 메시지 본문을 합칩니다.
+          FINAL_CONTENT="${MENTION}\n${MSG_BODY}"
+          
+          # jq를 사용하여 특수문자를 자동으로 이스케이프 처리하고 JSON 페이로드를 생성합니다.
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{
-                 \"content\": \"${{ steps.meta.outputs.mention }}\n${{ steps.message.outputs.msg }}\"
-               }" \
+               -d "$JSON_PAYLOAD" \
                "${{ steps.meta.outputs.url }}"
 
-  # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림
+  # dev 브랜치 머지 시 알림 (변경 없음)
   notify-dev-merge:
     runs-on: ubuntu-latest
-    # PR이 닫히고, 머지되었으며, 타겟 브랜치가 'dev'일 때만 실행
     if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev'
     steps:
       - name: Compose Dev Merge Notification Message
@@ -100,33 +112,25 @@ jobs:
           ACTOR="${{ github.actor }}"
           EVENT_MSG="🎉 **dev** 브랜치에 새로운 코드가 머지되었습니다!"
           
-          # 각 팀에 대한 멘션을 별도로 정의
           MENTION_BE="<@&1395631364199682048>"
           MENTION_AN="<@&1395631119700983970>"
           
-          # 공통 메시지 본문 생성
-          printf "msg<<EOF\n%s\n#️⃣ PR #%s: %s\n🌿 브랜치: %s → **%s**\n🙋 머지한 사람: %s\n🔗 %s\nEOF\n" \
-            "$EVENT_MSG" "$NUMBER" "$TITLE" "$HEAD" "$BASE" "$ACTOR" "$URL" > msg_content.txt
+          # 멀티라인 문자열을 안전하게 변수에 저장
+          MSG_BODY=$(printf "%s\n#️⃣ PR #%s: %s\n🌿 브랜치: %s → **%s**\n🙋 머지한 사람: %s\n🔗 %s" \
+            "$EVENT_MSG" "$NUMBER" "$TITLE" "$HEAD" "$BASE" "$ACTOR" "$URL")
 
-          # 메시지 본문과 각 팀의 멘션을 별도의 output으로 설정
-          echo "msg_body=$(cat msg_content.txt)" >> "$GITHUB_OUTPUT"
+          echo "msg_body=$MSG_BODY" >> "$GITHUB_OUTPUT"
           echo "mention_be=$MENTION_BE" >> "$GITHUB_OUTPUT"
           echo "mention_an=$MENTION_AN" >> "$GITHUB_OUTPUT"
 
       - name: Send Notification to BE Team
         run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{
-                 \"content\": \"${{ steps.message.outputs.mention_be }}\n${{ steps.message.outputs.msg_body }}\"
-               }" \
-               "${{ secrets.DISCORD_WEBHOOK_BE }}"
+          FINAL_CONTENT="${{ steps.message.outputs.mention_be }}\n${{ steps.message.outputs.msg_body }}"
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_BE }}"
 
       - name: Send Notification to AN Team
         run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{
-                 \"content\": \"${{ steps.message.outputs.mention_an }}\n${{ steps.message.outputs.msg_body }}\"
-               }" \
-               "${{ secrets.DISCORD_WEBHOOK_AN }}"
+          FINAL_CONTENT="${{ steps.message.outputs.mention_an }}\n${{ steps.message.outputs.msg_body }}"
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_AN }}"
