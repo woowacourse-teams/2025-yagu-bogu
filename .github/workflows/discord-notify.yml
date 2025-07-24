@@ -5,15 +5,17 @@ on:
     types: [ opened, synchronize, closed ]
 
 jobs:
-  # 이 job은 변경되지 않았습니다.
+  # dev-be, dev-an 대상 PR 알림
   notify-discord:
     runs-on: ubuntu-latest
+    # dev 브랜치로 머지되는 경우는 제외하여 중복 알림 방지
     if: "!(github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev')"
     steps:
       - name: Set Discord Webhook & Mention
         id: meta
         run: |
-          BRANCH="${{ github.head_ref }}"
+          # PR의 대상 브랜치(base_ref)를 기준으로 웹훅과 멘션을 결정
+          BRANCH="${{ github.base_ref }}"
           case "$BRANCH" in
             dev-be*)
               echo "url=${{ secrets.DISCORD_WEBHOOK_BE }}" >> "$GITHUB_OUTPUT"
@@ -28,6 +30,7 @@ jobs:
               echo "mention=" >> "$GITHUB_OUTPUT"
               ;;
           esac
+
       - name: Compose PR Notification Message
         id: message
         run: |
@@ -69,6 +72,7 @@ jobs:
           esac
           printf "msg<<EOF\n%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s\nEOF\n" \
             "$EVENT_MSG" "$NUMBER" "$HEAD" "$BASE" "$COMMITS" "$FILES" "$ADD" "$DEL" "$TITLE" "$LABEL_LINE" "$ACTOR" "$URL" >> "$GITHUB_OUTPUT"
+
       - name: Send Discord Notification
         if: steps.meta.outputs.url != ''
         run: |
@@ -79,9 +83,10 @@ jobs:
                }" \
                "${{ steps.meta.outputs.url }}"
 
-  # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림 (멘션 분리 적용)
+  # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림
   notify-dev-merge:
     runs-on: ubuntu-latest
+    # PR이 닫히고, 머지되었으며, 타겟 브랜치가 'dev'일 때만 실행
     if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev'
     steps:
       - name: Compose Dev Merge Notification Message
