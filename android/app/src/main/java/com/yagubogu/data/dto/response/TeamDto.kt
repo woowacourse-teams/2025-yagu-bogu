@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TeamDTO(
+data class TeamDto(
     @SerialName("id")
     val id: Int, // 팀 ID
     @SerialName("name")
