@@ -34,13 +34,12 @@ public class MemberIntegrationTest {
     @Test
     void findFavorites() {
         // given
-        long memberId = 1L;
         String expected = "기아";
 
         // when
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .pathParam("memberId", memberId)
+                .pathParam("memberId", 1L)
                 .when().get("/api/members/{memberId}/favorites")
                 .then().log().all()
                 .statusCode(200)
