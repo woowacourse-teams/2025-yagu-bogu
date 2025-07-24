@@ -18,7 +18,7 @@
         tools:context=".presentation.stats.stadium.StadiumStatsFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_my_team"
+            android:id="@+id/constraint_today_stadium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
@@ -46,9 +46,9 @@
                 android:layout_height="wrap_content"
                 android:text="@{@string/stats_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_stadium_name"
+                app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tv_stadium_name"
+                app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
                 tools:text="14:30 기준" />
 
             <com.github.mikephil.charting.charts.PieChart
@@ -59,17 +59,17 @@
                 android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_stadium_name" />
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_name" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/pie_chart"
-                app:layout_constraintEnd_toEndOf="@+id/pie_chart"
-                app:layout_constraintStart_toStartOf="@+id/pie_chart"
-                app:layout_constraintTop_toTopOf="@+id/pie_chart">
+                app:layout_constraintBottom_toBottomOf="@id/pie_chart"
+                app:layout_constraintEnd_toEndOf="@id/pie_chart"
+                app:layout_constraintStart_toStartOf="@id/pie_chart"
+                app:layout_constraintTop_toTopOf="@id/pie_chart">
 
                 <TextView
                     android:id="@+id/tv_win_percentage"
