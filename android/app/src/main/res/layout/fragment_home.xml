@@ -38,7 +38,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_today_stadium"
+            android:id="@+id/constraint_my_team"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -82,8 +82,8 @@
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
             android:paddingVertical="16dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_winning_percentage"
-            app:layout_constraintStart_toEndOf="@id/constraint_today_stadium"
-            app:layout_constraintTop_toTopOf="@id/constraint_today_stadium">
+            app:layout_constraintStart_toEndOf="@id/constraint_my_team"
+            app:layout_constraintTop_toTopOf="@id/constraint_my_team">
 
             <TextView
                 android:id="@+id/tv_total_attendance"
@@ -120,7 +120,7 @@
             android:paddingVertical="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/constraint_total_attendance"
-            app:layout_constraintTop_toTopOf="@id/constraint_today_stadium">
+            app:layout_constraintTop_toTopOf="@id/constraint_my_team">
 
             <TextView
                 android:id="@+id/tv_winning_percentage"
@@ -155,7 +155,7 @@
             android:layout_marginTop="28dp"
             android:text="@string/home_recent_attendance_record"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/constraint_today_stadium" />
+            app:layout_constraintTop_toBottomOf="@id/constraint_my_team" />
 
         <TextView
             style="@style/TextView.Pretendard.Medium"
@@ -169,7 +169,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/constraint_today_stadium" />
+            app:layout_constraintTop_toBottomOf="@id/constraint_my_team" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

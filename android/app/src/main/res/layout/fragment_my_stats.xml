@@ -16,7 +16,7 @@
         tools:context=".presentation.stats.my.MyStatsFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_today_stadium"
+            android:id="@+id/constraint_my_stats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
