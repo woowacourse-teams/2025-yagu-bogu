@@ -26,6 +26,7 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.home.model.CheckInUiEvent
+import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -87,6 +88,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBindings() {
+        binding.homeUiModel = DUMMY_HOME_UI_MODEL
+
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
                 viewModel.checkIn()
@@ -175,5 +178,6 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private val DUMMY_HOME_UI_MODEL = HomeUiModel("KIA", 24, 75)
     }
 }
