@@ -20,7 +20,7 @@ public class MemberController {
     public ResponseEntity<MemberFavoriteResponse> findFavorites(
             @PathVariable final long memberId
     ) {
-        MemberFavoriteResponse response = memberService.findFavorites(memberId);
+        MemberFavoriteResponse response = memberService.findFavorite(memberId);
 
         return ResponseEntity.ok(response);
     }

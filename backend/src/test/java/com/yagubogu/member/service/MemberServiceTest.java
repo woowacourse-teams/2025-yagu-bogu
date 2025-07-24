@@ -31,13 +31,13 @@ public class MemberServiceTest {
 
     @DisplayName("멤버가 응원하는 팀을 조회한다")
     @Test
-    void findFavorites() {
+    void findFavorite() {
         // given
         long memberId = 1L;
         String expected = "기아";
 
         // when
-        MemberFavoriteResponse actual = memberService.findFavorites(memberId);
+        MemberFavoriteResponse actual = memberService.findFavorite(memberId);
 
         // then
         assertThat(actual.favorite()).isEqualTo(expected);
@@ -45,12 +45,12 @@ public class MemberServiceTest {
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다.")
     @Test
-    void findFavorites_notFoundMember() {
+    void findFavorite_notFoundMember() {
         // given
         long invalidMemberId = 999L;
 
         // when & then
-        assertThatThrownBy(() -> memberService.findFavorites(invalidMemberId))
+        assertThatThrownBy(() -> memberService.findFavorite(invalidMemberId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }

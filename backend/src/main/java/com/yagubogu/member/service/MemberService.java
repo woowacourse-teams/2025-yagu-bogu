@@ -14,7 +14,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public MemberFavoriteResponse findFavorites(final long memberId) {
+    public MemberFavoriteResponse findFavorite(final long memberId) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
