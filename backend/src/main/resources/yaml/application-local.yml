@@ -5,6 +5,10 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  sql:
+    init:
+      mode: always
+
   jpa:
     show-sql: true
     properties:

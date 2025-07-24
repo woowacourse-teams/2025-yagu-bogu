@@ -2,7 +2,6 @@ package com.yagubogu.stadium.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -68,29 +67,23 @@ class StadiumServiceTest {
         Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
     }
 
-    @DisplayName("구장별 팬 점유율을 조회한다")
+    @DisplayName("구장별 팬 점유율을 조회할 때 점유율이 높은 순으로 정렬된다")
     @Test
-    void findOccupancyRate() {
+    void findOccupancyRateInDesc() {
         // given
         long stadiumId = 1L;
         LocalDate today = TestFixture.getToday();
+        List<TeamOccupancyRate> expected = List.of(
+                new TeamOccupancyRate(1L, "기아", 66.7),
+                new TeamOccupancyRate(2L, "롯데", 33.3)
+        );
 
         // when
         TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);
+        List<TeamOccupancyRate> actual = response.teams();
 
         // then
-        assertSoftly(
-                softAssertions -> {
-                    List<TeamOccupancyRate> teams = response.teams();
-                    TeamOccupancyRate first = teams.getFirst();
-                    softAssertions.assertThat(first.name()).isEqualTo("기아");
-                    softAssertions.assertThat(first.occupancyRate()).isEqualTo(66.7);
-
-                    TeamOccupancyRate second = teams.get(1);
-                    softAssertions.assertThat(second.name()).isEqualTo("롯데");
-                    softAssertions.assertThat(second.occupancyRate()).isEqualTo(33.3);
-                }
-        );
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
     @DisplayName("구장을 찾을 수 없으면 없으면 예외가 발생한다.")
