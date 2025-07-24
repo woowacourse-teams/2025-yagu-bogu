@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
@@ -16,6 +17,10 @@ import com.yagubogu.databinding.FragmentStadiumStatsBinding
 class StadiumStatsFragment : Fragment() {
     private var _binding: FragmentStadiumStatsBinding? = null
     private val binding: FragmentStadiumStatsBinding get() = _binding!!
+
+    private val viewModel: StadiumStatsViewModel by viewModels {
+        StadiumStatsViewModelFactory()
+    }
 
     private val dummyStadiumUiModel: StadiumStatsUiModel =
         StadiumStatsUiModel(
