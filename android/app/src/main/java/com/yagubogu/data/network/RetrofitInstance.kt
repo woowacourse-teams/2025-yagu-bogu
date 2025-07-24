@@ -1,6 +1,8 @@
 package com.yagubogu.data.network
 
 import com.yagubogu.BuildConfig
+import com.yagubogu.data.service.CheckInsApiService
+import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -36,6 +38,14 @@ object RetrofitInstance {
             .addConverterFactory(
                 Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
             ).build()
+    }
+
+    val stadiumApiService: StadiumApiService by lazy {
+        retrofit.create(StadiumApiService::class.java)
+    }
+
+    val checkInsApiService: CheckInsApiService by lazy {
+        retrofit.create(CheckInsApiService::class.java)
     }
 
     val statsApiService: StatsApiService by lazy {

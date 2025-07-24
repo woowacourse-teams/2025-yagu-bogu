@@ -11,9 +11,9 @@ import com.yagubogu.domain.model.Longitude
 
 class LocationLocalDataSource(
     private val locationClient: FusedLocationProviderClient,
-) {
+) : LocationDataSource {
     @SuppressLint("MissingPermission")
-    fun getCurrentCoordinate(
+    override fun getCurrentCoordinate(
         onSuccess: (Coordinate) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
@@ -29,7 +29,7 @@ class LocationLocalDataSource(
             }
     }
 
-    fun getDistanceInMeters(
+    override fun getDistanceInMeters(
         coordinate: Coordinate,
         targetCoordinate: Coordinate,
     ): Distance {

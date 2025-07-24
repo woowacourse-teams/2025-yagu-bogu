@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="homeUiModel"
+            type="com.yagubogu.presentation.home.model.HomeUiModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
             android:paddingVertical="16dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_total_attendance"
@@ -54,7 +62,7 @@
                 style="@style/TextView.Pretendard.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="KIA"
+                android:text="@{homeUiModel.myTeam}"
                 android:textColor="@color/primary700"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -78,7 +86,7 @@
             android:id="@+id/constraint_total_attendance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginHorizontal="4dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
             android:paddingVertical="16dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_winning_percentage"
@@ -90,7 +98,7 @@
                 style="@style/TextView.Pretendard.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="24"
+                android:text="@{String.valueOf(homeUiModel.attendanceCount)}"
                 android:textColor="@color/primary700"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -103,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/home_total_attendance"
+                android:text="@string/home_attendance_count"
                 android:textColor="@color/gray500"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +122,7 @@
             android:id="@+id/constraint_winning_percentage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
             android:paddingVertical="16dp"
@@ -127,7 +135,7 @@
                 style="@style/TextView.Pretendard.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="75%"
+                android:text="@{@string/all_winning_percentage(homeUiModel.winningPercentage)}"
                 android:textColor="@color/primary700"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
