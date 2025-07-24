@@ -15,15 +15,15 @@ import com.yagubogu.data.repository.StatsDefaultRepository
 class YaguBoguApplication : Application() {
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
 
-    private val locationLocalDataSource by lazy { LocationLocalDataSource(locationClient) }
-    val locationRepository by lazy { LocationDefaultRepository(locationLocalDataSource) }
+    private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
+    val locationRepository by lazy { LocationDefaultRepository(locationDataSource) }
 
-    private val stadiumRemoteDataSource by lazy { StadiumRemoteDataSource(RetrofitInstance.stadiumApiService) }
-    val stadiumRepository by lazy { StadiumDefaultRepository(stadiumRemoteDataSource) }
+    private val stadiumDataSource by lazy { StadiumRemoteDataSource(RetrofitInstance.stadiumApiService) }
+    val stadiumRepository by lazy { StadiumDefaultRepository(stadiumDataSource) }
 
-    private val checkInsRemoteDataSource by lazy { CheckInsRemoteDataSource(RetrofitInstance.checkInsApiService) }
-    val checkInsRepository by lazy { CheckInsDefaultRepository(checkInsRemoteDataSource) }
+    private val checkInsDataSource by lazy { CheckInsRemoteDataSource(RetrofitInstance.checkInsApiService) }
+    val checkInsRepository by lazy { CheckInsDefaultRepository(checkInsDataSource) }
 
-    private val statsRemoteDataSource by lazy { StatsRemoteDataSource(RetrofitInstance.statsApiService) }
-    val statsRepository by lazy { StatsDefaultRepository(statsRemoteDataSource) }
+    private val statsDataSource by lazy { StatsRemoteDataSource(RetrofitInstance.statsApiService) }
+    val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
 }
