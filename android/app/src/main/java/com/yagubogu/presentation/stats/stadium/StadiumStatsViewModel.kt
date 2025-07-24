@@ -12,24 +12,24 @@ import com.yagubogu.domain.model.Longitude
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.model.TeamOccupancyRate
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.home.model.Stadium
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import com.yagubogu.presentation.home.model.Stadium as StadiumDomain
 
 class StadiumStatsViewModel(
     private val statsRepository: StatsRepository,
 ) : ViewModel() {
-    private val _currentStadium: MutableLiveData<StadiumDomain> = MutableLiveData()
-    val currentStadium: LiveData<StadiumDomain> get() = _currentStadium
+    private val _currentStadium: MutableLiveData<Stadium> = MutableLiveData()
+    val currentStadium: LiveData<Stadium> get() = _currentStadium
 
     private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
     init {
         _currentStadium.value =
-            StadiumDomain(
+            Stadium(
                 2,
                 "잠실야구장",
                 "잠실구장",
