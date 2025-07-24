@@ -105,7 +105,7 @@
                     android:id="@+id/linear_legend_first"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_legend_item"
+                    android:background="@drawable/bg_gray050_radius_8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
@@ -116,7 +116,7 @@
                         android:id="@+id/icon_first_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:background="@drawable/bg_legend_icon"
+                        android:background="@drawable/bg_radius_4dp"
                         app:legendBackgroundTint="@{stadiumStatsUiModel.firstTeam.teamColor}"
                         tools:backgroundTint="@color/team_kia" />
 
@@ -147,7 +147,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_legend_item"
+                    android:background="@drawable/bg_gray050_radius_8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
@@ -158,7 +158,7 @@
                         android:id="@+id/icon_second_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:background="@drawable/bg_legend_icon"
+                        android:background="@drawable/bg_radius_4dp"
                         app:legendBackgroundTint="@{stadiumStatsUiModel.secondTeam.teamColor}"
                         tools:backgroundTint="@color/team_samsung" />
 
@@ -189,7 +189,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_legend_item"
+                    android:background="@drawable/bg_gray050_radius_8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="10dp"
@@ -200,7 +200,7 @@
                         android:id="@+id/icon_third_legend"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:background="@drawable/bg_legend_icon"
+                        android:background="@drawable/bg_radius_4dp"
                         app:legendBackgroundTint="@{stadiumStatsUiModel.thirdTeam.teamColor}"
                         tools:backgroundTint="@color/gray400" />
 
