@@ -29,7 +29,6 @@ jobs:
               ;;
           esac
 
-      # ⭐️ [변경] 이 스텝에서는 순수 메시지 본문만 생성합니다.
       - name: Compose PR Notification Message
         id: message
         run: |
@@ -69,7 +68,6 @@ jobs:
               EVENT_MSG="ℹ️ PR 상태가 변경되었습니다."
               ;;
           esac
-          # GITHUB_OUTPUT에 heredoc을 사용하여 멀티라인 문자열을 안전하게 저장합니다.
           {
             echo 'msg_body<<EOF'
             printf "%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s" \
@@ -78,17 +76,16 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
-      # ⭐️ [변경] 이 스텝에서 jq를 사용해 안전하게 JSON을 생성하고 전송합니다.
       - name: Send Discord Notification
         if: steps.meta.outputs.url != ''
         run: |
           MENTION="${{ steps.meta.outputs.mention }}"
           MSG_BODY="${{ steps.message.outputs.msg_body }}"
           
-          # 멘션과 메시지 본문을 합칩니다.
-          FINAL_CONTENT="${MENTION}\n${MSG_BODY}"
+          # ⭐️ [변경] '\n' 대신 실제 줄바꿈을 사용하여 변수 할당
+          FINAL_CONTENT="${MENTION}
+          ${MSG_BODY}"
           
-          # jq를 사용하여 특수문자를 자동으로 이스케이프 처리하고 JSON 페이로드를 생성합니다.
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
           
           curl -H "Content-Type: application/json" \
@@ -96,7 +93,7 @@ jobs:
                -d "$JSON_PAYLOAD" \
                "${{ steps.meta.outputs.url }}"
 
-  # dev 브랜치 머지 시 알림 (변경 없음)
+  # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림
   notify-dev-merge:
     runs-on: ubuntu-latest
     if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev'
@@ -115,7 +112,6 @@ jobs:
           MENTION_BE="<@&1395631364199682048>"
           MENTION_AN="<@&1395631119700983970>"
           
-          # 멀티라인 문자열을 안전하게 변수에 저장
           MSG_BODY=$(printf "%s\n#️⃣ PR #%s: %s\n🌿 브랜치: %s → **%s**\n🙋 머지한 사람: %s\n🔗 %s" \
             "$EVENT_MSG" "$NUMBER" "$TITLE" "$HEAD" "$BASE" "$ACTOR" "$URL")
 
@@ -125,12 +121,14 @@ jobs:
 
       - name: Send Notification to BE Team
         run: |
-          FINAL_CONTENT="${{ steps.message.outputs.mention_be }}\n${{ steps.message.outputs.msg_body }}"
+          FINAL_CONTENT="${{ steps.message.outputs.mention_be }}
+          ${{ steps.message.outputs.msg_body }}"
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
           curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_BE }}"
 
       - name: Send Notification to AN Team
         run: |
-          FINAL_CONTENT="${{ steps.message.outputs.mention_an }}\n${{ steps.message.outputs.msg_body }}"
+          FINAL_CONTENT="${{ steps.message.outputs.mention_an }}
+          ${{ steps.message.outputs.msg_body }}"
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
           curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_AN }}"
