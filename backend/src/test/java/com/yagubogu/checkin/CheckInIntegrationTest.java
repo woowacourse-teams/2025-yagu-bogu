@@ -39,4 +39,37 @@ public class CheckInIntegrationTest {
                 .then().log().all()
                 .statusCode(201);
     }
+
+    @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_noSuchStadium() {
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(1L, 999L, LocalDate.of(2025, 7, 21)))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 인증할 때 게임이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_noSuchGame() {
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(1L, 1L, LocalDate.of(1000, 7, 21)))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 인증할 때 회원이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_noSuchMember() {
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateCheckInRequest(999L, 1L, LocalDate.of(2025, 7, 21)))
+                .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
 }
