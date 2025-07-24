@@ -78,7 +78,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     int countByGame(Game game);
 
     @Query("""
-            SELECT new com.yagubogu.checkin.dto.TeamCheckInCountResponse(m.team.id, m.team.name, COUNT(ci))
+            SELECT new com.yagubogu.checkin.dto.TeamCheckInCountResponse(m.team.id, m.team.shortName, COUNT(ci))
             FROM CheckIn ci
             JOIN ci.member m
             WHERE ci.game = :game
