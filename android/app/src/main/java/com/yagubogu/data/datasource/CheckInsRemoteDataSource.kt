@@ -7,8 +7,8 @@ import kotlinx.datetime.LocalDate.Companion as KLocalDate
 
 class CheckInsRemoteDataSource(
     private val checkInsApiService: CheckInsApiService,
-) {
-    suspend fun addCheckIn(
+) : CheckInsDataSource {
+    override suspend fun addCheckIn(
         memberId: Long,
         stadiumId: Long,
         date: LocalDate,

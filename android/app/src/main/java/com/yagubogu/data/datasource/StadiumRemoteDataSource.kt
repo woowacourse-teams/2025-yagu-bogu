@@ -5,6 +5,6 @@ import com.yagubogu.data.service.StadiumApiService
 
 class StadiumRemoteDataSource(
     private val stadiumApiService: StadiumApiService,
-) {
-    suspend fun getStadiums(): StadiumsResponse = stadiumApiService.getStadiums()
+) : StadiumDataSource {
+    override suspend fun getStadiums(): StadiumsResponse = stadiumApiService.getStadiums()
 }
