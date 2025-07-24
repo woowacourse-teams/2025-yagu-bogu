@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_white_radius_12dp"
             android:padding="20dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/tv_stadium_name"
+                android:id="@+id/tv_stadium_chart_title"
                 style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,9 +46,9 @@
                 android:layout_height="wrap_content"
                 android:text="@{@string/stats_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
-                app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+                app:layout_constraintBottom_toBottomOf="@id/tv_stadium_chart_title"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+                app:layout_constraintTop_toTopOf="@id/tv_stadium_chart_title"
                 tools:text="14:30 기준" />
 
             <com.github.mikephil.charting.charts.PieChart
@@ -59,38 +59,36 @@
                 android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_stadium_name" />
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_chart_title" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <TextView
+                android:id="@+id/tv_winning_percentage"
+                style="@style/TextView.Pretendard.Bold.40"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
+                android:includeFontPadding="false"
+                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
+                android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeam.teamColor)}"
+                app:layout_constraintBottom_toTopOf="@id/tv_team_name"
+                app:layout_constraintEnd_toEndOf="@id/pie_chart"
+                app:layout_constraintStart_toStartOf="@id/pie_chart"
+                app:layout_constraintTop_toTopOf="@id/pie_chart"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="58%" />
+
+            <TextView
+                android:id="@+id/tv_team_name"
+                style="@style/TextView.Pretendard.Medium.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{stadiumStatsUiModel.firstTeam.name}"
+                android:textColor="@color/gray500"
                 app:layout_constraintBottom_toBottomOf="@id/pie_chart"
                 app:layout_constraintEnd_toEndOf="@id/pie_chart"
                 app:layout_constraintStart_toStartOf="@id/pie_chart"
-                app:layout_constraintTop_toTopOf="@id/pie_chart">
-
-                <TextView
-                    android:id="@+id/tv_win_percentage"
-                    style="@style/TextView.Pretendard.Bold.40"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
-                    android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeam.teamColor)}"
-                    tools:text="58%" />
-
-                <TextView
-                    android:id="@+id/tv_total_attendance_count"
-                    style="@style/TextView.Pretendard.Medium.16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="@{stadiumStatsUiModel.firstTeam.name}"
-                    android:textColor="@color/gray500"
-                    tools:text="KIA" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
+                app:layout_constraintTop_toBottomOf="@id/tv_winning_percentage"
+                tools:text="KIA" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/layout_legend"
@@ -101,10 +99,10 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/pie_chart">
+                app:layout_constraintTop_toBottomOf="@id/pie_chart">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/legend_first"
+                    android:id="@+id/linear_legend_first"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_legend_item"
@@ -145,7 +143,7 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/legend_second"
+                    android:id="@+id/linear_legend_second"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -187,7 +185,7 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/legend_third"
+                    android:id="@+id/linear_legend_third"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
