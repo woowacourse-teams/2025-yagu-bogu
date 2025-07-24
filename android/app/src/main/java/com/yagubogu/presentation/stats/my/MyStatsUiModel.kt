@@ -6,7 +6,7 @@ data class MyStatsUiModel(
     val loseCount: Int,
     val totalCount: Int,
     val winningPercentage: Int,
-    val luckyStadium: String,
+    val luckyStadium: String?,
 ) {
     val etcPercentage: Int get() = FULL_PERCENTAGE - winningPercentage
 
