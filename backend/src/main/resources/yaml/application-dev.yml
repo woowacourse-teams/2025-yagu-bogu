@@ -5,6 +5,10 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  sql:
+    init:
+      mode: always
+
   jpa:
     show-sql: true
     properties:
@@ -12,5 +16,5 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     defer-datasource-initialization: true
