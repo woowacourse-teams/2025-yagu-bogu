@@ -6,22 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentMyStatsBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
 class MyStatsFragment : Fragment() {
     private var _binding: FragmentMyStatsBinding? = null
     private val binding: FragmentMyStatsBinding get() = _binding!!
-    private val dummyStatsUiModel: MyStatsUiModel =
-        MyStatsUiModel(
-            winCount = 190,
-            drawCount = 10,
-            loseCount = 99,
-        )
+
+    private val viewModel: MyStatsViewModel by viewModels {
+        val app = requireActivity().application as YaguBoguApplication
+        MyStatsViewModelFactory(app.statsRepository)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,12 +39,24 @@ class MyStatsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupChart()
-        loadChartData()
-        binding.myStatsUiModel = dummyStatsUiModel
+        setupObservers()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun setupObservers() {
+        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { myStats: MyStatsUiModel ->
+            binding.myStatsUiModel = myStats
+            loadChartData(myStats)
+        }
     }
 
     private fun setupChart() {
         binding.pieChart.apply {
+            setNoDataText("")
             legend.isEnabled = false
 
             isDrawHoleEnabled = true
@@ -60,10 +73,10 @@ class MyStatsFragment : Fragment() {
         }
     }
 
-    private fun loadChartData() {
+    private fun loadChartData(myStats: MyStatsUiModel) {
         val pieEntries = ArrayList<PieEntry>()
-        pieEntries.add(PieEntry(dummyStatsUiModel.winningPercentage.toFloat(), "Win"))
-        pieEntries.add(PieEntry(dummyStatsUiModel.etcPercentage.toFloat(), "Etc"))
+        pieEntries.add(PieEntry(myStats.winningPercentage.toFloat(), "Win"))
+        pieEntries.add(PieEntry(myStats.etcPercentage.toFloat(), "Etc"))
 
         val myStatsChartDataSet = PieDataSet(pieEntries, WINNING_PERCENTAGE)
 
@@ -77,11 +90,6 @@ class MyStatsFragment : Fragment() {
 
         binding.pieChart.data = pieData
         binding.pieChart.invalidate()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {
