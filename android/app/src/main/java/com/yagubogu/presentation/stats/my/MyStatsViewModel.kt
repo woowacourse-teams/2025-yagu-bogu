@@ -34,14 +34,14 @@ class MyStatsViewModel(
             val luckyStadiumDeferred: Deferred<Result<String?>> =
                 async { statsRepository.getLuckyStadiums(memberId, year) }
 
-            val statsCountsResult = statsCountsDeferred.await()
-            val winRateResult = winRateDeferred.await()
-            val luckyStadiumResult = luckyStadiumDeferred.await()
+            val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
+            val winRateResult: Result<Double> = winRateDeferred.await()
+            val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
 
             if (statsCountsResult.isSuccess && winRateResult.isSuccess && luckyStadiumResult.isSuccess) {
-                val statsCounts = statsCountsResult.getOrThrow()
-                val winRate = winRateResult.getOrThrow()
-                val luckyStadium = luckyStadiumResult.getOrThrow() ?: "기록 없음"
+                val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
+                val winRate: Double = winRateResult.getOrThrow()
+                val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
                 val myStatsUiModel =
                     MyStatsUiModel(
