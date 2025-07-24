@@ -12,12 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(YaguBoguException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        return new ExceptionResponse(e.getMessage());
-    }
-
     /**
      * 403 Forbidden
      */
@@ -33,6 +27,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleNotFoundException(final NotFoundException e) {
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 500 Internal Server Error
+     */
+    @ExceptionHandler(YaguBoguException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
         return new ExceptionResponse(e.getMessage());
     }
 }
