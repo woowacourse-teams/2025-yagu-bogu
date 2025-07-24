@@ -11,6 +11,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStadiumStatsBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -19,7 +20,8 @@ class StadiumStatsFragment : Fragment() {
     private val binding: FragmentStadiumStatsBinding get() = _binding!!
 
     private val viewModel: StadiumStatsViewModel by viewModels {
-        StadiumStatsViewModelFactory()
+        val app = requireActivity().application as YaguBoguApplication
+        StadiumStatsViewModelFactory(app.statsRepository)
     }
 
     private val dummyStadiumUiModel: StadiumStatsUiModel =
