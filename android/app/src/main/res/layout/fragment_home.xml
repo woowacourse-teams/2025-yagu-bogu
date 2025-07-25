@@ -135,7 +135,7 @@
                 style="@style/TextView.Pretendard.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{@string/all_winning_percentage(homeUiModel.winningPercentage)}"
+                android:text="@{@string/all_winning_percentage(homeUiModel.winRate)}"
                 android:textColor="@color/primary700"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"

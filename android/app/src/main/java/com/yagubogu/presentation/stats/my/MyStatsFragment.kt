@@ -21,7 +21,7 @@ class MyStatsFragment : Fragment() {
 
     private val viewModel: MyStatsViewModel by viewModels {
         val app = requireActivity().application as YaguBoguApplication
-        MyStatsViewModelFactory(app.statsRepository)
+        MyStatsViewModelFactory(app.statsRepository, app.memberRepository)
     }
 
     override fun onCreateView(
@@ -48,9 +48,9 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { myStatsUiModel: MyStatsUiModel ->
-            binding.myStatsUiModel = myStatsUiModel
-            loadChartData(myStatsUiModel)
+        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { value: MyStatsUiModel ->
+            binding.myStatsUiModel = value
+            loadChartData(value)
         }
     }
 

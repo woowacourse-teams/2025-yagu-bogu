@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.StatsCounts
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StatsRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -14,12 +15,13 @@ import kotlin.math.roundToInt
 
 class MyStatsViewModel(
     private val statsRepository: StatsRepository,
+    private val memberRepository: MemberRepository,
 ) : ViewModel() {
     private val _myStatsUiModel = MutableLiveData<MyStatsUiModel>()
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
     init {
-        fetchMyStats(5006, 2025)
+        fetchMyStats(MEMBER_ID, YEAR)
     }
 
     private fun fetchMyStats(
@@ -31,16 +33,20 @@ class MyStatsViewModel(
                 async { statsRepository.getStatsCounts(memberId, year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(memberId, year) }
+            val myTeamDeferred: Deferred<Result<String>> =
+                async { memberRepository.getFavoriteTeam(memberId) }
             val luckyStadiumDeferred: Deferred<Result<String?>> =
                 async { statsRepository.getLuckyStadiums(memberId, year) }
 
             val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
             val winRateResult: Result<Double> = winRateDeferred.await()
+            val myTeamResult: Result<String> = myTeamDeferred.await()
             val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
 
-            if (statsCountsResult.isSuccess && winRateResult.isSuccess && luckyStadiumResult.isSuccess) {
+            if (statsCountsResult.isSuccess && winRateResult.isSuccess && myTeamResult.isSuccess && luckyStadiumResult.isSuccess) {
                 val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
+                val myTeam: String = myTeamResult.getOrThrow()
                 val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
                 val myStatsUiModel =
@@ -50,6 +56,7 @@ class MyStatsViewModel(
                         loseCount = statsCounts.loseCounts,
                         totalCount = statsCounts.favoriteCheckInCounts,
                         winningPercentage = winRate.roundToInt(),
+                        myTeam = myTeam,
                         luckyStadium = luckyStadium,
                     )
                 _myStatsUiModel.value = myStatsUiModel
@@ -65,5 +72,7 @@ class MyStatsViewModel(
 
     companion object {
         private const val TAG = "MyStatsViewModel"
+        private const val MEMBER_ID = 5009L
+        private const val YEAR = 2025
     }
 }

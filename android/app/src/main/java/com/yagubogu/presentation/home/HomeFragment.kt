@@ -36,7 +36,13 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels {
         val app = requireActivity().application as YaguBoguApplication
-        HomeViewModelFactory(app.locationRepository, app.stadiumRepository, app.checkInsRepository)
+        HomeViewModelFactory(
+            app.memberRepository,
+            app.checkInsRepository,
+            app.statsRepository,
+            app.locationRepository,
+            app.stadiumRepository,
+        )
     }
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
@@ -88,8 +94,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBindings() {
-        binding.homeUiModel = DUMMY_HOME_UI_MODEL
-
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
                 viewModel.checkIn()
@@ -100,6 +104,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.homeUiModel.observe(viewLifecycleOwner) { value: HomeUiModel ->
+            binding.homeUiModel = value
+        }
+
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
@@ -178,6 +186,5 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private val DUMMY_HOME_UI_MODEL = HomeUiModel("KIA", 24, 75)
     }
 }
