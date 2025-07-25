@@ -5,9 +5,10 @@ on:
     types: [ opened, synchronize, closed ]
 
 jobs:
-  # dev-be, dev-an 대상 PR 알림
+  # dev, dev-be, dev-an 대상 PR 알림
   notify-discord:
     runs-on: ubuntu-latest
+    # dev 브랜치로 머지되는 경우는 제외하여 중복 알림 방지
     if: "!(github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev')"
     steps:
       - name: Set Discord Webhook & Mention
@@ -15,7 +16,7 @@ jobs:
         run: |
           BRANCH="${{ github.base_ref }}"
           case "$BRANCH" in
-            dev-be*)
+            dev-be*|dev) # dev 브랜치도 BE팀 채널로 알림
               echo "url=${{ secrets.DISCORD_WEBHOOK_BE }}" >> "$GITHUB_OUTPUT"
               echo "mention=<@&1395631364199682048>" >> "$GITHUB_OUTPUT"
               ;;
@@ -82,7 +83,6 @@ jobs:
           MENTION="${{ steps.meta.outputs.mention }}"
           MSG_BODY="${{ steps.message.outputs.msg_body }}"
           
-          # ⭐️ [변경] '\n' 대신 실제 줄바꿈을 사용하여 변수 할당
           FINAL_CONTENT="${MENTION}
           ${MSG_BODY}"
           
