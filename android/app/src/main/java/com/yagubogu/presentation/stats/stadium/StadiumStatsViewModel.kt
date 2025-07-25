@@ -24,9 +24,7 @@ class StadiumStatsViewModel(
         _stadiumStatsUiModel.value =
             StadiumStatsUiModel(
                 "로딩중",
-                listOf(
-                    TeamOccupancyStatus(Team.LG, 0.0),
-                ),
+                listOf(TeamOccupancyStatus(Team.LG, 0.0)),
             )
 
         val today = LocalDate.now()
@@ -42,7 +40,7 @@ class StadiumStatsViewModel(
                 statsRepository.getTeamOccupancyRates(stadiumId, date)
             teamOccupancyRatesResult
                 .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
-                    val teamStatus: List<TeamOccupancyStatus> =
+                    val teamOccupancyStatuses: List<TeamOccupancyStatus> =
                         teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
                             val team: Team = Team.getById(teamOccupancyRate.teamId)
                             TeamOccupancyStatus(
@@ -50,12 +48,13 @@ class StadiumStatsViewModel(
                                 teamOccupancyRate.occupancyRate,
                             )
                         }
-                    val refinedTeamStatus: List<TeamOccupancyStatus> = refineTeamStatus(teamStatus)
 
+                    val refinedTeamStatuses: List<TeamOccupancyStatus> =
+                        refineTeamStatus(teamOccupancyStatuses)
                     _stadiumStatsUiModel.value =
                         StadiumStatsUiModel(
                             teamOccupancyRates.stadiumName,
-                            refinedTeamStatus,
+                            refinedTeamStatuses,
                         )
                 }.onFailure { exception: Throwable ->
                     Log.e(TAG, "API 호출 실패", exception)
@@ -70,17 +69,17 @@ class StadiumStatsViewModel(
             when {
                 teamStatuses.size <= MAX_LEGEND_TEAM_SIZE -> teamStatuses
                 else -> {
-                    val topLegendTeams: List<TeamOccupancyStatus> =
+                    val topLegendTeamStatues: List<TeamOccupancyStatus> =
                         teamStatuses.take(MAX_LEGEND_TEAM_SIZE)
-                    val othersTotalPercentage: Double =
-                        FULL_PERCENTAGE - topLegendTeams.sumOf { it.percentage }
+                    val etcPercentage: Double =
+                        FULL_PERCENTAGE - topLegendTeamStatues.sumOf { it.percentage }
 
-                    val othersTeamStatus =
+                    val etcTeamStatus =
                         TeamOccupancyStatus(
                             team = null,
-                            percentage = othersTotalPercentage,
+                            percentage = etcPercentage,
                         )
-                    topLegendTeams + othersTeamStatus
+                    topLegendTeamStatues + etcTeamStatus
                 }
             }
         }

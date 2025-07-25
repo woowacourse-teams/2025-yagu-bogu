@@ -67,8 +67,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeam.roundedPercentage)}"
-                android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeam.teamColor)}"
+                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeamStatus.roundedPercentage)}"
+                android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeamStatus.teamColor)}"
                 app:layout_constraintBottom_toTopOf="@id/tv_team_name"
                 app:layout_constraintEnd_toEndOf="@id/pie_chart"
                 app:layout_constraintStart_toStartOf="@id/pie_chart"
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.firstTeam.teamName}"
+                android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
                 android:textColor="@color/gray500"
                 app:layout_constraintBottom_toBottomOf="@id/pie_chart"
                 app:layout_constraintEnd_toEndOf="@id/pie_chart"
@@ -117,7 +117,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_radius_4dp"
-                        app:legendBackgroundTint="@{stadiumStatsUiModel.firstTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
                         tools:backgroundTint="@color/team_kia" />
 
                     <TextView
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.firstTeam.teamName}"
+                        android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
                         android:textSize="14sp"
                         tools:text="KIA" />
 
@@ -136,7 +136,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.firstTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.firstTeamStatus.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="75%" />
@@ -159,7 +159,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_radius_4dp"
-                        app:legendBackgroundTint="@{stadiumStatsUiModel.secondTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
                         tools:backgroundTint="@color/team_samsung" />
 
                     <TextView
@@ -168,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.secondTeam.teamName}"
+                        android:text="@{stadiumStatsUiModel.secondTeamStatus.teamName}"
                         android:textSize="14sp"
                         tools:text="삼성" />
 
@@ -178,7 +178,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.secondTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.secondTeamStatus.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="20%" />
@@ -201,7 +201,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:background="@drawable/bg_radius_4dp"
-                        app:legendBackgroundTint="@{stadiumStatsUiModel.thirdTeam.teamColor}"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.thirdTeamStatus.teamColor}"
                         tools:backgroundTint="@color/gray400" />
 
                     <TextView
@@ -210,7 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.thirdTeam.teamName}"
+                        android:text="@{stadiumStatsUiModel.thirdTeamStatus.teamName}"
                         android:textSize="14sp"
                         tools:text="기타" />
 
@@ -220,7 +220,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.thirdTeam.percentage)}"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.thirdTeamStatus.percentage)}"
                         android:textColor="@color/gray500"
                         android:textSize="14sp"
                         tools:text="5%" />

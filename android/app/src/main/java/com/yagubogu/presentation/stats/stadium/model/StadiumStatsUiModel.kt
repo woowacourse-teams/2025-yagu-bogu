@@ -7,13 +7,16 @@ data class StadiumStatsUiModel(
     val teamOccupancyStatuses: List<TeamOccupancyStatus>,
     val refreshTime: LocalTime = LocalTime.now(),
 ) {
-    val firstTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(FIRST_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
-    val secondTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(SECOND_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
-    val thirdTeam: TeamOccupancyStatus get() = teamOccupancyStatuses.getOrElse(THIRD_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
+    val firstTeamStatus: TeamOccupancyStatus =
+        teamOccupancyStatuses.getOrElse(FIRST_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
+    val secondTeamStatus: TeamOccupancyStatus =
+        teamOccupancyStatuses.getOrElse(SECOND_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
+    val thirdTeamStatus: TeamOccupancyStatus =
+        teamOccupancyStatuses.getOrElse(THIRD_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
 
-    val showFirstLegend: Boolean get() = firstTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
-    val showSecondLegend: Boolean get() = secondTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
-    val showThirdLegend: Boolean get() = thirdTeam != DEFAULT_TEAM_OCCUPANCY_STATUS
+    val showFirstLegend: Boolean = firstTeamStatus != DEFAULT_TEAM_OCCUPANCY_STATUS
+    val showSecondLegend: Boolean = secondTeamStatus != DEFAULT_TEAM_OCCUPANCY_STATUS
+    val showThirdLegend: Boolean = thirdTeamStatus != DEFAULT_TEAM_OCCUPANCY_STATUS
 
     companion object {
         private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus(null, 0.0)
