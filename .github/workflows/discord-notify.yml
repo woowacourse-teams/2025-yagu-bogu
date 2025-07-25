@@ -1,0 +1,134 @@
+name: Discord PR Notification
+
+on:
+  pull_request:
+    types: [ opened, synchronize, closed ]
+
+jobs:
+  # dev-be, dev-an 대상 PR 알림
+  notify-discord:
+    runs-on: ubuntu-latest
+    if: "!(github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev')"
+    steps:
+      - name: Set Discord Webhook & Mention
+        id: meta
+        run: |
+          BRANCH="${{ github.base_ref }}"
+          case "$BRANCH" in
+            dev-be*)
+              echo "url=${{ secrets.DISCORD_WEBHOOK_BE }}" >> "$GITHUB_OUTPUT"
+              echo "mention=<@&1395631364199682048>" >> "$GITHUB_OUTPUT"
+              ;;
+            dev-an*)
+              echo "url=${{ secrets.DISCORD_WEBHOOK_AN }}" >> "$GITHUB_OUTPUT"
+              echo "mention=<@&1395631119700983970>" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "url=" >> "$GITHUB_OUTPUT"
+              echo "mention=" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Compose PR Notification Message
+        id: message
+        run: |
+          ACTION="${{ github.event.action }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+          TITLE="${{ github.event.pull_request.title }}"
+          URL="${{ github.event.pull_request.html_url }}"
+          COMMITS="${{ github.event.pull_request.commits }}"
+          FILES="${{ github.event.pull_request.changed_files }}"
+          ADD="${{ github.event.pull_request.additions }}"
+          DEL="${{ github.event.pull_request.deletions }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+          NUMBER="${{ github.event.number }}"
+          ACTOR="${{ github.actor }}"
+          LABELS=$(jq -r '.pull_request.labels | map(.name) | join(", ")' <<< '${{ toJson(github.event) }}')
+          if [[ -z "$LABELS" ]]; then
+            LABEL_LINE=""
+          else
+            LABEL_LINE="📛 라벨: $LABELS"
+          fi
+          case "$ACTION" in
+            opened)
+              EVENT_MSG="📌 새로운 PR이 생성되었습니다!"
+              ;;
+            synchronize)
+              EVENT_MSG="📦 PR에 커밋이 추가되었습니다!"
+              ;;
+            closed)
+              if [[ "$MERGED" == "true" ]]; then
+                EVENT_MSG="✅ PR이 머지되었습니다!"
+              else
+                EVENT_MSG="❌ PR이 닫혔지만 머지되지 않았습니다."
+              fi
+              ;;
+            *)
+              EVENT_MSG="ℹ️ PR 상태가 변경되었습니다."
+              ;;
+          esac
+          {
+            echo 'msg_body<<EOF'
+            printf "%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s" \
+              "$EVENT_MSG" "$NUMBER" "$HEAD" "$BASE" "$COMMITS" "$FILES" "$ADD" "$DEL" "$TITLE" "$LABEL_LINE" "$ACTOR" "$URL"
+            echo ''
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send Discord Notification
+        if: steps.meta.outputs.url != ''
+        run: |
+          MENTION="${{ steps.meta.outputs.mention }}"
+          MSG_BODY="${{ steps.message.outputs.msg_body }}"
+          
+          # ⭐️ [변경] '\n' 대신 실제 줄바꿈을 사용하여 변수 할당
+          FINAL_CONTENT="${MENTION}
+          ${MSG_BODY}"
+          
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$JSON_PAYLOAD" \
+               "${{ steps.meta.outputs.url }}"
+
+  # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림
+  notify-dev-merge:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base_ref == 'dev'
+    steps:
+      - name: Compose Dev Merge Notification Message
+        id: message
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          URL="${{ github.event.pull_request.html_url }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+          NUMBER="${{ github.event.number }}"
+          ACTOR="${{ github.actor }}"
+          EVENT_MSG="🎉 **dev** 브랜치에 새로운 코드가 머지되었습니다!"
+          
+          MENTION_BE="<@&1395631364199682048>"
+          MENTION_AN="<@&1395631119700983970>"
+          
+          MSG_BODY=$(printf "%s\n#️⃣ PR #%s: %s\n🌿 브랜치: %s → **%s**\n🙋 머지한 사람: %s\n🔗 %s" \
+            "$EVENT_MSG" "$NUMBER" "$TITLE" "$HEAD" "$BASE" "$ACTOR" "$URL")
+
+          echo "msg_body=$MSG_BODY" >> "$GITHUB_OUTPUT"
+          echo "mention_be=$MENTION_BE" >> "$GITHUB_OUTPUT"
+          echo "mention_an=$MENTION_AN" >> "$GITHUB_OUTPUT"
+
+      - name: Send Notification to BE Team
+        run: |
+          FINAL_CONTENT="${{ steps.message.outputs.mention_be }}
+          ${{ steps.message.outputs.msg_body }}"
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_BE }}"
+
+      - name: Send Notification to AN Team
+        run: |
+          FINAL_CONTENT="${{ steps.message.outputs.mention_an }}
+          ${{ steps.message.outputs.msg_body }}"
+          JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_AN }}"
