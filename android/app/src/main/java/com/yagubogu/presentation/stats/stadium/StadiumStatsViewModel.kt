@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.R
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel
@@ -26,7 +25,7 @@ class StadiumStatsViewModel(
             StadiumStatsUiModel(
                 "로딩중",
                 listOf(
-                    TeamOccupancyStatus("dummy", R.color.white, 0.0),
+                    TeamOccupancyStatus(Team.LG, 0.0),
                 ),
             )
 
@@ -45,14 +44,13 @@ class StadiumStatsViewModel(
                 .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
                     val teamStatus: List<TeamOccupancyStatus> =
                         teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
-                            val currentTeam: Team = Team.getById(teamOccupancyRate.id)
+                            val team: Team = Team.getById(teamOccupancyRate.teamId)
                             TeamOccupancyStatus(
-                                currentTeam.shortName,
-                                currentTeam.color,
+                                team,
                                 teamOccupancyRate.occupancyRate,
                             )
                         }
-                    val refinedTeamStatus = refineTeamStatus(teamStatus)
+                    val refinedTeamStatus: List<TeamOccupancyStatus> = refineTeamStatus(teamStatus)
 
                     _stadiumStatsUiModel.value =
                         StadiumStatsUiModel(
@@ -65,31 +63,32 @@ class StadiumStatsViewModel(
         }
     }
 
-    private fun refineTeamStatus(teamStatuses: List<TeamOccupancyStatus>): List<TeamOccupancyStatus> {
-        if (teamStatuses.isEmpty()) return emptyList()
-        val sortedTeamStatus = teamStatuses.sortedByDescending { it.percentage }
+    private fun refineTeamStatus(teamStatuses: List<TeamOccupancyStatus>): List<TeamOccupancyStatus> =
+        if (teamStatuses.isEmpty()) {
+            teamStatuses
+        } else {
+            when {
+                teamStatuses.size <= MAX_LEGEND_TEAM_SIZE -> teamStatuses
+                else -> {
+                    val topLegendTeams: List<TeamOccupancyStatus> =
+                        teamStatuses.take(MAX_LEGEND_TEAM_SIZE)
+                    val othersTotalPercentage: Double =
+                        FULL_PERCENTAGE - topLegendTeams.sumOf { it.percentage }
 
-        return when {
-            sortedTeamStatus.size <= MAX_LEGEND_TEAM_SIZE -> sortedTeamStatus
-            else -> {
-                val topLegendTeams = sortedTeamStatus.take(MAX_LEGEND_TEAM_SIZE)
-                val remainingTeams = sortedTeamStatus.drop(MAX_LEGEND_TEAM_SIZE)
-                val othersTotalPercentage = remainingTeams.sumOf { it.percentage }
-
-                val othersTeamStatus =
-                    TeamOccupancyStatus(
-                        name = "기타",
-                        teamColor = R.color.gray400,
-                        percentage = othersTotalPercentage,
-                    )
-                topLegendTeams + othersTeamStatus
+                    val othersTeamStatus =
+                        TeamOccupancyStatus(
+                            team = null,
+                            percentage = othersTotalPercentage,
+                        )
+                    topLegendTeams + othersTeamStatus
+                }
             }
         }
-    }
 
     companion object {
         private const val DUMMY_STADIUM_ID = 2L // 잠실구장
         private const val MAX_LEGEND_TEAM_SIZE = 2
+        private const val FULL_PERCENTAGE = 100
         private const val TAG = "StadiumStatsViewModel"
     }
 }

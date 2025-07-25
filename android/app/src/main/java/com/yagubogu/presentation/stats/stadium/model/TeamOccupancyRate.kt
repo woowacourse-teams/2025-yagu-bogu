@@ -1,7 +1,7 @@
 package com.yagubogu.presentation.stats.stadium.model
 
 data class TeamOccupancyRate(
-    val id: Long,
-    val name: String,
+    val teamId: Long,
+    val teamName: String,
     val occupancyRate: Double,
 )

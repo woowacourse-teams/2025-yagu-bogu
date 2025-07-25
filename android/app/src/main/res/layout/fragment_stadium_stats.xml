@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.firstTeam.name}"
+                android:text="@{stadiumStatsUiModel.firstTeam.teamName}"
                 android:textColor="@color/gray500"
                 app:layout_constraintBottom_toBottomOf="@id/pie_chart"
                 app:layout_constraintEnd_toEndOf="@id/pie_chart"
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.firstTeam.name}"
+                        android:text="@{stadiumStatsUiModel.firstTeam.teamName}"
                         android:textSize="14sp"
                         tools:text="KIA" />
 
@@ -168,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.secondTeam.name}"
+                        android:text="@{stadiumStatsUiModel.secondTeam.teamName}"
                         android:textSize="14sp"
                         tools:text="삼성" />
 
@@ -210,7 +210,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="@{stadiumStatsUiModel.thirdTeam.name}"
+                        android:text="@{stadiumStatsUiModel.thirdTeam.teamName}"
                         android:textSize="14sp"
                         tools:text="기타" />
 

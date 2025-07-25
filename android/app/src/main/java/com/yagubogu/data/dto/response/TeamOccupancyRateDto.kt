@@ -15,8 +15,8 @@ data class TeamOccupancyRateDto(
 ) {
     fun toPresentation(): TeamOccupancyRate =
         TeamOccupancyRate(
-            id = id,
-            name = name,
+            teamId = id,
+            teamName = name,
             occupancyRate = occupancyRate,
         )
 }

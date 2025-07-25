@@ -75,7 +75,7 @@ class StadiumStatsFragment : Fragment() {
             pieEntries.add(
                 PieEntry(
                     teamOccupancyStatus.percentage.toFloat(),
-                    teamOccupancyStatus.name,
+                    "Etc",
                 ),
             )
         }
