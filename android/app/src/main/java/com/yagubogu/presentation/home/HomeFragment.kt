@@ -70,6 +70,10 @@ class HomeFragment : Fragment() {
         setupBindings()
         setupObservers()
         setupChart()
+
+        val stadiumSpinnerAdapter =
+            StadiumSpinnerAdapter(requireContext(), listOf("전체 구장", "잠실 구장"))
+        binding.spinnerStadium.adapter = stadiumSpinnerAdapter
     }
 
     override fun onDestroyView() {
@@ -149,24 +153,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadChartData(stadiumStatsUiModel: StadiumStatsUiModel) {
-        val pieEntries = ArrayList<PieEntry>()
-
-        stadiumStatsUiModel.teamOccupancyStatuses.forEach { teamOccupancyStatus: TeamOccupancyStatus ->
-            pieEntries.add(
+        val pieEntries: List<PieEntry> =
+            stadiumStatsUiModel.teamOccupancyStatuses.map { teamOccupancyStatus: TeamOccupancyStatus ->
                 PieEntry(
                     teamOccupancyStatus.percentage.toFloat(),
                     teamOccupancyStatus.teamName,
-                ),
-            )
-        }
+                )
+            }
 
-        val stadiumStatsChartDataSet = PieDataSet(pieEntries, STADIUM_CHART_DESCRIPTION)
+        val stadiumStatsChartDataSet: PieDataSet =
+            PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
+                colors =
+                    stadiumStatsUiModel.teamOccupancyStatuses.map { teamOccupancyStatus: TeamOccupancyStatus ->
+                        requireContext().getColor(teamOccupancyStatus.teamColor)
+                    }
+            }
 
-        stadiumStatsChartDataSet.colors =
-            stadiumStatsUiModel.teamOccupancyStatuses.map { requireContext().getColor(it.teamColor) }
         val pieData = PieData(stadiumStatsChartDataSet)
         pieData.setDrawValues(false)
-
         binding.pieChart.data = pieData
         binding.pieChart.invalidate()
     }
@@ -238,7 +242,7 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val STADIUM_CHART_DESCRIPTION = "오늘의 구장 현황"
+        private const val PIE_DATA_SET_LABEL = "오늘의 구장 현황"
         private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
         private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }

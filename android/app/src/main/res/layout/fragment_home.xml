@@ -58,19 +58,18 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="4dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
+            android:paddingVertical="14dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_total_attendance"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cv_check_in">
 
             <TextView
                 android:id="@+id/tv_team"
-                style="@style/TextView.Pretendard.Bold"
+                style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{homeUiModel.myTeam}"
                 android:textColor="@color/primary700"
-                android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -94,19 +93,18 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="4dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
+            android:paddingVertical="14dp"
             app:layout_constraintEnd_toStartOf="@id/constraint_winning_percentage"
             app:layout_constraintStart_toEndOf="@id/constraint_my_team"
             app:layout_constraintTop_toTopOf="@id/constraint_my_team">
 
             <TextView
                 android:id="@+id/tv_total_attendance"
-                style="@style/TextView.Pretendard.Bold"
+                style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{String.valueOf(homeUiModel.attendanceCount)}"
                 android:textColor="@color/primary700"
-                android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -131,19 +129,18 @@
             android:layout_marginStart="4dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
+            android:paddingVertical="14dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/constraint_total_attendance"
             app:layout_constraintTop_toTopOf="@id/constraint_my_team">
 
             <TextView
                 android:id="@+id/tv_winning_percentage"
-                style="@style/TextView.Pretendard.Bold"
+                style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{@string/all_winning_percentage(homeUiModel.winRate)}"
                 android:textColor="@color/primary700"
-                android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -173,26 +170,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/constraint_my_team">
 
-            <TextView
-                android:id="@+id/tv_stadium_chart_title"
-                style="@style/TextView.Pretendard.Bold.20"
+            <Spinner
+                android:id="@+id/spinner_stadium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{@string/home_stadium_pie_chart_title(stadiumStatsUiModel.stadiumName)}"
+                android:overlapAnchor="false"
+                android:spinnerMode="dropdown"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="챔피언스필드 현황" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_refresh_time"
-                style="@style/TextView.Pretendard.Medium.16"
+                style="@style/TextView.Pretendard.Regular.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{@string/home_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
-                app:layout_constraintBottom_toBottomOf="@id/tv_stadium_chart_title"
+                app:layout_constraintBottom_toBottomOf="@id/spinner_stadium"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_stadium_chart_title"
+                app:layout_constraintTop_toTopOf="@id/spinner_stadium"
                 tools:text="14:30 기준" />
 
             <com.github.mikephil.charting.charts.PieChart
@@ -203,7 +199,7 @@
                 android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_stadium_chart_title" />
+                app:layout_constraintTop_toBottomOf="@id/spinner_stadium" />
 
             <TextView
                 android:id="@+id/tv_stadium_rate"

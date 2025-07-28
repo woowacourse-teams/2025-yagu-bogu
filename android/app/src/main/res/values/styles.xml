@@ -20,6 +20,10 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextView.Pretendard.Regular.16" parent="TextView.Pretendard.Regular">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextView.Pretendard.Medium" parent="TextView.Pretendard">
         <item name="android:fontFamily">@font/pretendard_medium</item>
         <item name="android:textColor">@color/black</item>
