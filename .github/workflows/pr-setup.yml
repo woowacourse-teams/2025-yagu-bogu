@@ -38,37 +38,37 @@ jobs:
           script: |
             const { pull_request: pr, repository } = context.payload;
             const branch = pr.head.ref.toLowerCase();
-            const title = pr.title.toLowerCase();
-
+            const author = pr.user.login;
+            
             const anTeam = ['medAndro', 'ijh1298', 'jiyuneel'];
             const beTeam = ['jjunh0', 'Starlight258', 'bowook', 'nourzoo'];
-
+            
             const branchLabelMap = {
-              'feat/': '🚀 feat',
-              'fix/': '🔨 fix',
-              'refactor/': '🔧 refactor',
-              'style/': '💈 style',
-              'design/': '🎀 design',
-              'chore/': '⚙️ chore',
-              'test/': '💯 test',
-              'docs/': '📄 docs',
-              'deploy/': '🔫 deploy'
+            'feat/': '🚀 feat',
+            'fix/': '🔨 fix',
+            'refactor/': '🔧 refactor',
+            'style/': '💈 style',
+            'design/': '🎀 design',
+            'chore/': '⚙️ chore',
+            'test/': '💯 test',
+            'docs/': '📄 docs',
+            'deploy/': '🔫 deploy'
             };
-
+            
             const branchPrefix = Object.keys(branchLabelMap).find(p => branch.startsWith(p));
-            const titlePrefixLabel = title.startsWith('[an]') ? '🤖 AN' : title.startsWith('[be]') ? '🐒 BE' : null;
-
-            const labels = [];
-            if (branchPrefix) labels.push(branchLabelMap[branchPrefix]);
-            if (titlePrefixLabel) labels.push(titlePrefixLabel);
-
-            if (labels.length) {
-              await github.rest.issues.addLabels({
-                owner: repository.owner.login,
-                repo: repository.name,
-                issue_number: pr.number,
-                labels,
-              });
+            const authorLabel = anTeam.includes(author) ? '🤖 AN' : beTeam.includes(author) ? '🐒 BE' : null;
+            
+            const labels = new Set();
+            if (branchPrefix) labels.add(branchLabelMap[branchPrefix]);
+            if (authorLabel) labels.add(authorLabel);
+            
+            if (labels.size) {
+            await github.rest.issues.addLabels({
+            owner: repository.owner.login,
+            repo: repository.name,
+            issue_number: pr.number,
+            labels: Array.from(labels),
+            });
             }
 
       - name: Set reviewers
