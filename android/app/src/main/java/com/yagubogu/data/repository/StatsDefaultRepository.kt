@@ -7,7 +7,7 @@ import com.yagubogu.data.dto.response.StatsWinRateResponse
 import com.yagubogu.data.dto.response.TeamOccupancyRatesResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
+import com.yagubogu.presentation.home.model.TeamOccupancyRates
 import java.time.LocalDate
 
 class StatsDefaultRepository(

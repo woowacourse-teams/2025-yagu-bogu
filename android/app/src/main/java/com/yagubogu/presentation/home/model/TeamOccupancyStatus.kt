@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.stadium.model
+package com.yagubogu.presentation.home.model
 
 import androidx.annotation.ColorRes
 import com.yagubogu.R

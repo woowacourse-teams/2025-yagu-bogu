@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response
 
-import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
+import com.yagubogu.presentation.home.model.TeamOccupancyRates
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

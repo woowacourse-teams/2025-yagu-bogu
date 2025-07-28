@@ -21,12 +21,17 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.model.TeamOccupancyStatus
 import com.yagubogu.presentation.util.PermissionUtil
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -64,6 +69,7 @@ class HomeFragment : Fragment() {
         setupMenu()
         setupBindings()
         setupObservers()
+        setupChart()
     }
 
     override fun onDestroyView() {
@@ -117,6 +123,52 @@ class HomeFragment : Fragment() {
                 },
             )
         }
+
+        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { stadiumStatsUiModel: StadiumStatsUiModel ->
+            binding.stadiumStatsUiModel = stadiumStatsUiModel
+            loadChartData(stadiumStatsUiModel)
+        }
+    }
+
+    private fun setupChart() {
+        binding.pieChart.apply {
+            legend.isEnabled = false
+
+            isDrawHoleEnabled = true
+            setHoleColor(Color.TRANSPARENT)
+            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
+
+            description.isEnabled = false
+            setDrawEntryLabels(false)
+            setDrawCenterText(false)
+
+            isRotationEnabled = false
+            setTouchEnabled(false)
+            animateY(PIE_CHART_ANIMATION_MILLISECOND)
+        }
+    }
+
+    private fun loadChartData(stadiumStatsUiModel: StadiumStatsUiModel) {
+        val pieEntries = ArrayList<PieEntry>()
+
+        stadiumStatsUiModel.teamOccupancyStatuses.forEach { teamOccupancyStatus: TeamOccupancyStatus ->
+            pieEntries.add(
+                PieEntry(
+                    teamOccupancyStatus.percentage.toFloat(),
+                    teamOccupancyStatus.teamName,
+                ),
+            )
+        }
+
+        val stadiumStatsChartDataSet = PieDataSet(pieEntries, STADIUM_CHART_DESCRIPTION)
+
+        stadiumStatsChartDataSet.colors =
+            stadiumStatsUiModel.teamOccupancyStatuses.map { requireContext().getColor(it.teamColor) }
+        val pieData = PieData(stadiumStatsChartDataSet)
+        pieData.setDrawValues(false)
+
+        binding.pieChart.data = pieData
+        binding.pieChart.invalidate()
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
@@ -186,5 +238,8 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private const val STADIUM_CHART_DESCRIPTION = "오늘의 구장 현황"
+        private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
+        private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
 }

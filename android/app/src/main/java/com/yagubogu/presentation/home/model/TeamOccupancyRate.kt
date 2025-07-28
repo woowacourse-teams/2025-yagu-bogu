@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.stadium.model
+package com.yagubogu.presentation.home.model
 
 data class TeamOccupancyRate(
     val teamId: Long,
