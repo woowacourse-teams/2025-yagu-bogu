@@ -1,15 +1,15 @@
-package com.yagubogu.presentation.record
+package com.yagubogu.presentation.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.yagubogu.databinding.FragmentRecordBinding
+import com.yagubogu.databinding.FragmentChatBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
-class RecordFragment : Fragment() {
-    private var _binding: FragmentRecordBinding? = null
+class ChatFragment : Fragment() {
+    private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -17,7 +17,7 @@ class RecordFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentRecordBinding.inflate(inflater, container, false)
+        _binding = FragmentChatBinding.inflate(inflater, container, false)
         return binding.root
     }
 

@@ -6,5 +6,5 @@ enum class StatsTab(
     val titleResId: Int,
 ) {
     MY_STATS(R.string.stats_tab_my_stats),
-    STADIUM_STATS(R.string.stats_tab_stadium_stats),
+    ATTENDANCE_HISTORY(R.string.stats_tab_attendance_history),
 }
