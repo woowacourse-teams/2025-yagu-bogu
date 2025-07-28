@@ -14,7 +14,7 @@ data class TeamOccupancyStatus(
         get() = percentage.roundToInt()
 
     @ColorRes
-    val teamColor: Int = team?.getTeamColor() ?: R.color.gray400
+    val teamColor: Int = team?.getTeamColor() ?: R.color.gray300
 
     val teamName: String = team?.shortName ?: TEAM_NAME_ETC
 

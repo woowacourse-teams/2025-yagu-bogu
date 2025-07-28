@@ -92,7 +92,7 @@ class MyStatsFragment : Fragment() {
         val pieData = PieData(myStatsChartDataSet)
         pieData.setDrawValues(false)
         binding.pieChart.data = pieData
-        binding.pieChart.invalidate()
+        binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
     }
 
     companion object {

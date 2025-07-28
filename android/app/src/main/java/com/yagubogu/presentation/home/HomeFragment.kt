@@ -12,6 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -28,11 +29,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.domain.model.Stadium
+import com.yagubogu.domain.model.Stadiums
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.model.TeamOccupancyStatus
 import com.yagubogu.presentation.util.PermissionUtil
+import java.time.LocalDate
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -70,10 +74,6 @@ class HomeFragment : Fragment() {
         setupBindings()
         setupObservers()
         setupChart()
-
-        val stadiumSpinnerAdapter =
-            StadiumSpinnerAdapter(requireContext(), listOf("전체 구장", "잠실 구장"))
-        binding.spinnerStadium.adapter = stadiumSpinnerAdapter
     }
 
     override fun onDestroyView() {
@@ -132,6 +132,30 @@ class HomeFragment : Fragment() {
             binding.stadiumStatsUiModel = stadiumStatsUiModel
             loadChartData(stadiumStatsUiModel)
         }
+
+        viewModel.stadiums.observe(viewLifecycleOwner) { value: Stadiums ->
+            val stadiumSpinnerAdapter =
+                StadiumSpinnerAdapter(requireContext(), value.values.map { it.shortName })
+
+            binding.spinnerStadium.apply {
+                adapter = stadiumSpinnerAdapter
+                onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long,
+                        ) {
+                            val selectedStadium: Stadium = value.values[position]
+                            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+                            viewModel.fetchStadiumStats(selectedStadium.id, today)
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+                    }
+            }
+        }
     }
 
     private fun setupChart() {
@@ -172,7 +196,7 @@ class HomeFragment : Fragment() {
         val pieData = PieData(stadiumStatsChartDataSet)
         pieData.setDrawValues(false)
         binding.pieChart.data = pieData
-        binding.pieChart.invalidate()
+        binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =

@@ -45,7 +45,11 @@ class HomeViewModel(
     private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
+    private val _stadiums: MutableLiveData<Stadiums> = MutableLiveData()
+    val stadiums: LiveData<Stadiums> get() = _stadiums
+
     init {
+        fetchStadiums()
         fetchMemberInformation(MEMBER_ID, YEAR)
 
         _stadiumStatsUiModel.value =
@@ -53,10 +57,6 @@ class HomeViewModel(
                 "로딩중",
                 listOf(TeamOccupancyStatus(Team.LG, 0.0)),
             )
-
-//        val today = LocalDate.now()
-        val today = LocalDate.of(2025, 7, 25)
-        fetchStadiumStats(DUMMY_STADIUM_ID, today)
     }
 
     fun checkIn() {
@@ -69,6 +69,49 @@ class HomeViewModel(
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
+    }
+
+    fun fetchStadiumStats(
+        stadiumId: Long,
+        date: LocalDate,
+    ) {
+        viewModelScope.launch {
+            val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
+                statsRepository.getTeamOccupancyRates(stadiumId, date)
+            teamOccupancyRatesResult
+                .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
+                    val teamOccupancyStatuses: List<TeamOccupancyStatus> =
+                        teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
+                            val team: Team = Team.getById(teamOccupancyRate.teamId)
+                            TeamOccupancyStatus(
+                                team,
+                                teamOccupancyRate.occupancyRate,
+                            )
+                        }
+
+                    val refinedTeamStatuses: List<TeamOccupancyStatus> =
+                        refineTeamStatus(teamOccupancyStatuses)
+                    _stadiumStatsUiModel.value =
+                        StadiumStatsUiModel(
+                            teamOccupancyRates.stadiumName,
+                            refinedTeamStatuses,
+                        )
+                }.onFailure { exception: Throwable ->
+                    Log.e(TAG, "API 호출 실패", exception)
+                }
+        }
+    }
+
+    private fun fetchStadiums() {
+        viewModelScope.launch {
+            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiums()
+            stadiumsResult
+                .onSuccess { stadiums: Stadiums ->
+                    _stadiums.value = stadiums
+                }.onFailure {
+                    Log.e(TAG, "API 호출 실패", stadiumsResult.exceptionOrNull())
+                }
+        }
     }
 
     private fun fetchMemberInformation(
@@ -106,37 +149,6 @@ class HomeViewModel(
                         .mapNotNull { it.exceptionOrNull()?.message }
                 Log.e(TAG, "API 호출 실패: ${errors.joinToString()}")
             }
-        }
-    }
-
-    private fun fetchStadiumStats(
-        stadiumId: Long,
-        date: LocalDate,
-    ) {
-        viewModelScope.launch {
-            val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
-                statsRepository.getTeamOccupancyRates(stadiumId, date)
-            teamOccupancyRatesResult
-                .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
-                    val teamOccupancyStatuses: List<TeamOccupancyStatus> =
-                        teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
-                            val team: Team = Team.getById(teamOccupancyRate.teamId)
-                            TeamOccupancyStatus(
-                                team,
-                                teamOccupancyRate.occupancyRate,
-                            )
-                        }
-
-                    val refinedTeamStatuses: List<TeamOccupancyStatus> =
-                        refineTeamStatus(teamOccupancyStatuses)
-                    _stadiumStatsUiModel.value =
-                        StadiumStatsUiModel(
-                            teamOccupancyRates.stadiumName,
-                            refinedTeamStatuses,
-                        )
-                }.onFailure { exception: Throwable ->
-                    Log.e(TAG, "API 호출 실패", exception)
-                }
         }
     }
 
@@ -205,8 +217,6 @@ class HomeViewModel(
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
-
-        private const val DUMMY_STADIUM_ID = 2L // 잠실구장
         private const val MAX_LEGEND_TEAM_SIZE = 2
         private const val FULL_PERCENTAGE = 100
     }
