@@ -163,10 +163,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/bg_white_radius_12dp"
             android:padding="20dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/constraint_my_team">
 
@@ -184,12 +185,23 @@
                 style="@style/TextView.Pretendard.Regular.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
                 android:text="@{@string/home_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
                 app:layout_constraintBottom_toBottomOf="@id/spinner_stadium"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_refresh"
                 app:layout_constraintTop_toTopOf="@id/spinner_stadium"
                 tools:text="14:30 기준" />
+
+            <ImageView
+                android:id="@+id/iv_refresh"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_refresh"
+                app:layout_constraintBottom_toBottomOf="@id/tv_refresh_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_refresh_time"
+                app:tint="@color/gray400" />
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pie_chart"

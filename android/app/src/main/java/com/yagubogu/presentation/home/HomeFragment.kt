@@ -56,6 +56,8 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
+    private var selectedStadiumId: Long = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -111,6 +113,16 @@ class HomeFragment : Fragment() {
                 requestLocationPermissions()
             }
         }
+
+        binding.ivRefresh.setOnClickListener { view: View ->
+            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+            viewModel.fetchStadiumStats(selectedStadiumId, today)
+            view
+                .animate()
+                .rotationBy(360f)
+                .setDuration(1000L)
+                .start()
+        }
     }
 
     private fun setupObservers() {
@@ -128,9 +140,9 @@ class HomeFragment : Fragment() {
             )
         }
 
-        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { stadiumStatsUiModel: StadiumStatsUiModel ->
-            binding.stadiumStatsUiModel = stadiumStatsUiModel
-            loadChartData(stadiumStatsUiModel)
+        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
+            binding.stadiumStatsUiModel = value
+            loadChartData(value)
         }
 
         viewModel.stadiums.observe(viewLifecycleOwner) { value: Stadiums ->
@@ -148,8 +160,9 @@ class HomeFragment : Fragment() {
                             id: Long,
                         ) {
                             val selectedStadium: Stadium = value.values[position]
+                            selectedStadiumId = selectedStadium.id
                             val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-                            viewModel.fetchStadiumStats(selectedStadium.id, today)
+                            viewModel.fetchStadiumStats(selectedStadiumId, today)
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>?) = Unit
