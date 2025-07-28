@@ -7,18 +7,15 @@ spring:
   config:
     activate:
       on-profile: local
-    import: classpath:/application-local.yml
 
 ---
 spring:
   config:
     activate:
       on-profile: dev
-    import: classpath:/application-dev.yml
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-    import: classpath:/application-prod.yml
