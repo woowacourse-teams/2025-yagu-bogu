@@ -28,7 +28,18 @@ class StadiumStatsViewModel(
             )
 
         val today = LocalDate.now()
-        fetchStadiumStats(DUMMY_STADIUM_ID, today)
+//        fetchStadiumStats(DUMMY_STADIUM_ID, today)
+
+        val dummyStadiumStatusUiModel =
+            StadiumStatsUiModel(
+                "챔피언스필드",
+                listOf(
+                    TeamOccupancyStatus(Team.DOOSAN, 78.2),
+                    TeamOccupancyStatus(Team.HANWHA, 100.0 - 78.2),
+                ),
+            )
+
+        _stadiumStatsUiModel.value = dummyStadiumStatusUiModel
     }
 
     private fun fetchStadiumStats(
