@@ -25,6 +25,11 @@ android {
             "BASE_URL",
             "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL")}\"",
         )
+        buildConfigField(
+            type = "String",
+            "WEB_CLIENT_ID",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}\"",
+        )
     }
 
     buildTypes {
@@ -65,6 +70,9 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
