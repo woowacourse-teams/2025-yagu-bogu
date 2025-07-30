@@ -21,13 +21,17 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
+import com.yagubogu.presentation.home.ranking.VictoryFairyItem
 import com.yagubogu.presentation.util.PermissionUtil
 import java.time.LocalDate
 
@@ -131,6 +135,15 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+        val victoryFairyAdapter = VictoryFairyAdapter()
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+        binding.rvVictoryFairy.apply {
+            adapter = victoryFairyAdapter
+            layoutManager = linearLayoutManager
+        }
+        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
+        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
     }
 
     private fun setupObservers() {
@@ -220,5 +233,46 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private val DUMMY_MY_VICTORY_FAIRY: VictoryFairyItem =
+            VictoryFairyItem(
+                rank = 1,
+                profileUrl = "",
+                nickname = "이포르",
+                team = Team.KIA,
+                winRate = 100.0,
+            )
+
+        private val DUMMY_VICTORY_FAIRY_ITEMS: List<VictoryFairyItem> =
+            listOf(
+                DUMMY_MY_VICTORY_FAIRY,
+                VictoryFairyItem(
+                    rank = 2,
+                    profileUrl = "",
+                    nickname = "닉네임",
+                    team = Team.SAMSUNG,
+                    winRate = 87.2,
+                ),
+                VictoryFairyItem(
+                    rank = 3,
+                    profileUrl = "",
+                    nickname = "닉네임",
+                    team = Team.LOTTE,
+                    winRate = 75.0,
+                ),
+                VictoryFairyItem(
+                    rank = 4,
+                    profileUrl = "",
+                    nickname = "닉네임",
+                    team = Team.DOOSAN,
+                    winRate = 66.7,
+                ),
+                VictoryFairyItem(
+                    rank = 982,
+                    profileUrl = "",
+                    nickname = "닉네임",
+                    team = Team.HANWHA,
+                    winRate = 32.5,
+                ),
+            )
     }
 }
