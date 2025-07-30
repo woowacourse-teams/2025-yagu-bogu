@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -20,10 +21,13 @@ class LoginActivity : AppCompatActivity() {
     }
     private var isAppInitialized: Boolean = false
 
+    private val viewModel: LoginViewModel by viewModels { LoginViewModelFactory(application) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         super.onCreate(savedInstanceState)
         setupView()
+        setupBindings()
         setupListeners()
         performInitialization()
     }
@@ -60,5 +64,9 @@ class LoginActivity : AppCompatActivity() {
                 isAppInitialized = true
             }
         }
+    }
+
+    private fun setupBindings() {
+        binding.vm = viewModel
     }
 }
