@@ -12,7 +12,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -22,19 +21,13 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
-import com.yagubogu.domain.model.Stadium
-import com.yagubogu.domain.model.Stadiums
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.model.TeamOccupancyStatus
 import com.yagubogu.presentation.util.PermissionUtil
 import java.time.LocalDate
 
@@ -56,8 +49,6 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
-    private var selectedStadiumId: Long = 0
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,7 +66,6 @@ class HomeFragment : Fragment() {
         setupMenu()
         setupBindings()
         setupObservers()
-        setupChart()
     }
 
     override fun onDestroyView() {
@@ -115,8 +105,9 @@ class HomeFragment : Fragment() {
         }
 
         binding.ivRefresh.setOnClickListener { view: View ->
+//            val today = LocalDate.now()
             val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-            viewModel.fetchStadiumStats(selectedStadiumId, today)
+            viewModel.fetchStadiumStats(today)
             view
                 .animate()
                 .rotationBy(360f)
@@ -142,74 +133,7 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
-            loadChartData(value)
         }
-
-        viewModel.stadiums.observe(viewLifecycleOwner) { value: Stadiums ->
-            val stadiumSpinnerAdapter =
-                StadiumSpinnerAdapter(requireContext(), value.values.map { it.shortName })
-
-            binding.spinnerStadium.apply {
-                adapter = stadiumSpinnerAdapter
-                onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long,
-                        ) {
-                            val selectedStadium: Stadium = value.values[position]
-                            selectedStadiumId = selectedStadium.id
-                            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-                            viewModel.fetchStadiumStats(selectedStadiumId, today)
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-                    }
-            }
-        }
-    }
-
-    private fun setupChart() {
-        binding.pieChart.apply {
-            legend.isEnabled = false
-
-            isDrawHoleEnabled = true
-            setHoleColor(Color.TRANSPARENT)
-            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
-
-            description.isEnabled = false
-            setDrawEntryLabels(false)
-            setDrawCenterText(false)
-
-            isRotationEnabled = false
-            setTouchEnabled(false)
-            animateY(PIE_CHART_ANIMATION_MILLISECOND)
-        }
-    }
-
-    private fun loadChartData(stadiumStatsUiModel: StadiumStatsUiModel) {
-        val pieEntries: List<PieEntry> =
-            stadiumStatsUiModel.teamOccupancyStatuses.map { teamOccupancyStatus: TeamOccupancyStatus ->
-                PieEntry(
-                    teamOccupancyStatus.percentage.toFloat(),
-                    teamOccupancyStatus.teamName,
-                )
-            }
-
-        val stadiumStatsChartDataSet: PieDataSet =
-            PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
-                colors =
-                    stadiumStatsUiModel.teamOccupancyStatuses.map { teamOccupancyStatus: TeamOccupancyStatus ->
-                        requireContext().getColor(teamOccupancyStatus.teamColor)
-                    }
-            }
-
-        val pieData = PieData(stadiumStatsChartDataSet)
-        pieData.setDrawValues(false)
-        binding.pieChart.data = pieData
-        binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
@@ -279,8 +203,5 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val PIE_DATA_SET_LABEL = "오늘의 구장 현황"
-        private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
-        private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
 }

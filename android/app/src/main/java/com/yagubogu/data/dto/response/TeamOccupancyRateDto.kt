@@ -1,5 +1,6 @@
 package com.yagubogu.data.dto.response
 
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.home.model.TeamOccupancyRate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,8 +16,7 @@ data class TeamOccupancyRateDto(
 ) {
     fun toPresentation(): TeamOccupancyRate =
         TeamOccupancyRate(
-            teamId = id,
-            teamName = name,
+            team = Team.getById(id),
             occupancyRate = occupancyRate,
         )
 }

@@ -44,11 +44,11 @@ class StatsDefaultRepository(
             }
 
     override suspend fun getTeamOccupancyRates(
-        memberId: Long,
+        stadiumId: Long,
         date: LocalDate,
     ): Result<TeamOccupancyRates> =
         statsDataSource
-            .getTeamOccupancyRates(memberId, date)
+            .getTeamOccupancyRates(stadiumId, date)
             .map { teamOccupancyRatesResponse: TeamOccupancyRatesResponse ->
                 teamOccupancyRatesResponse.toPresentation()
             }

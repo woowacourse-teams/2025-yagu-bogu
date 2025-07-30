@@ -21,7 +21,7 @@ interface StatsRepository {
     ): Result<String?>
 
     suspend fun getTeamOccupancyRates(
-        memberId: Long,
+        stadiumId: Long,
         date: LocalDate,
     ): Result<TeamOccupancyRates>
 }

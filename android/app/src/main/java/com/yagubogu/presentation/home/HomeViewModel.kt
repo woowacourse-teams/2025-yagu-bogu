@@ -9,7 +9,6 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
@@ -45,18 +44,8 @@ class HomeViewModel(
     private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
-    private val _stadiums: MutableLiveData<Stadiums> = MutableLiveData()
-    val stadiums: LiveData<Stadiums> get() = _stadiums
-
     init {
-        fetchStadiums()
         fetchMemberInformation(MEMBER_ID, YEAR)
-
-        _stadiumStatsUiModel.value =
-            StadiumStatsUiModel(
-                "로딩중",
-                listOf(TeamOccupancyStatus(Team.LG, 0.0)),
-            )
     }
 
     fun checkIn() {
@@ -71,45 +60,27 @@ class HomeViewModel(
         )
     }
 
-    fun fetchStadiumStats(
-        stadiumId: Long,
-        date: LocalDate,
-    ) {
+    fun fetchStadiumStats(date: LocalDate) {
         viewModelScope.launch {
             val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
-                statsRepository.getTeamOccupancyRates(stadiumId, date)
+                statsRepository.getTeamOccupancyRates(2, date)
             teamOccupancyRatesResult
                 .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
                     val teamOccupancyStatuses: List<TeamOccupancyStatus> =
                         teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
-                            val team: Team = Team.getById(teamOccupancyRate.teamId)
                             TeamOccupancyStatus(
-                                team,
+                                teamOccupancyRate.team,
                                 teamOccupancyRate.occupancyRate,
                             )
                         }
 
-                    val refinedTeamStatuses: List<TeamOccupancyStatus> =
-                        refineTeamStatus(teamOccupancyStatuses)
                     _stadiumStatsUiModel.value =
                         StadiumStatsUiModel(
                             teamOccupancyRates.stadiumName,
-                            refinedTeamStatuses,
+                            teamOccupancyStatuses,
                         )
                 }.onFailure { exception: Throwable ->
                     Log.e(TAG, "API 호출 실패", exception)
-                }
-        }
-    }
-
-    private fun fetchStadiums() {
-        viewModelScope.launch {
-            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiums()
-            stadiumsResult
-                .onSuccess { stadiums: Stadiums ->
-                    _stadiums.value = stadiums
-                }.onFailure {
-                    Log.e(TAG, "API 호출 실패", stadiumsResult.exceptionOrNull())
                 }
         }
     }
@@ -151,28 +122,6 @@ class HomeViewModel(
             }
         }
     }
-
-    private fun refineTeamStatus(teamStatuses: List<TeamOccupancyStatus>): List<TeamOccupancyStatus> =
-        if (teamStatuses.isEmpty()) {
-            teamStatuses
-        } else {
-            when {
-                teamStatuses.size <= MAX_LEGEND_TEAM_SIZE -> teamStatuses
-                else -> {
-                    val topLegendTeamStatues: List<TeamOccupancyStatus> =
-                        teamStatuses.take(MAX_LEGEND_TEAM_SIZE)
-                    val etcPercentage: Double =
-                        FULL_PERCENTAGE - topLegendTeamStatues.sumOf { it.percentage }
-
-                    val etcTeamStatus =
-                        TeamOccupancyStatus(
-                            team = null,
-                            percentage = etcPercentage,
-                        )
-                    topLegendTeamStatues + etcTeamStatus
-                }
-            }
-        }
 
     private fun handleCheckIn(currentCoordinate: Coordinate) {
         viewModelScope.launch {
@@ -217,7 +166,5 @@ class HomeViewModel(
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
-        private const val MAX_LEGEND_TEAM_SIZE = 2
-        private const val FULL_PERCENTAGE = 100
     }
 }
