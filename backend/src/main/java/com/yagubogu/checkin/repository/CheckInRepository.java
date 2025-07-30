@@ -1,10 +1,12 @@
 package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.dto.CheckInResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.team.domain.Team;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -94,4 +96,31 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                   AND YEAR(c.game.date) = :year
             """)
     int countByMemberAndYear(Member member, long year);
+
+    @Query("""
+                SELECT new com.yagubogu.checkin.dto.CheckInResponse(
+                    c.id,
+                    g.stadium.fullName,
+                    new com.yagubogu.team.dto.TeamInfoResponse(
+                        g.homeTeam.id,
+                        g.homeTeam.shortName,
+                        g.homeScore,
+                        CASE WHEN g.homeTeam = :team THEN true ELSE false END
+                    ),
+                    new com.yagubogu.team.dto.TeamInfoResponse(
+                        g.awayTeam.id,
+                        g.awayTeam.shortName,
+                        g.awayScore,
+                        CASE WHEN g.awayTeam = :team THEN true ELSE false END
+                    ),
+                    g.date
+                )
+                FROM CheckIn c
+                JOIN c.game g
+                WHERE c.member = :member
+                  AND (g.homeTeam = :team OR g.awayTeam = :team)
+                  AND YEAR(g.date) = :year
+                ORDER BY g.date DESC
+            """)
+    List<CheckInResponse> findCheckInHistory(Member member, Team team, int year);
 }

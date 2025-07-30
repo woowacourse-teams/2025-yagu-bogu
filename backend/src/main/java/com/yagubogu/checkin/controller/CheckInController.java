@@ -1,12 +1,14 @@
 package com.yagubogu.checkin.controller;
 
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.service.CheckInService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +24,7 @@ public class CheckInController {
 
     @PostMapping
     public ResponseEntity<Void> createCheckIn(
-            @RequestBody CreateCheckInRequest request
+            @RequestBody final CreateCheckInRequest request
     ) {
         checkInService.createCheckIn(request);
 
@@ -31,11 +33,21 @@ public class CheckInController {
 
     @GetMapping("/counts")
     public ResponseEntity<CheckInCountsResponse> findCheckInCounts(
-            @RequestParam long memberId,
-            @RequestParam long year
+            @RequestParam final long memberId,
+            @RequestParam final long year
     ) {
         CheckInCountsResponse response = checkInService.findCheckInCounts(memberId, year);
-        
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
+            @PathVariable final long memberId,
+            @RequestParam final int year
+    ) {
+        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year);
+
         return ResponseEntity.ok(response);
     }
 }
