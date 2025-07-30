@@ -18,4 +18,10 @@ class LoginViewModel(
             googleLoginManager.signIn()
         }
     }
+
+    fun signOut() {
+        viewModelScope.launch {
+            googleLoginManager.signOut()
+        }
+    }
 }

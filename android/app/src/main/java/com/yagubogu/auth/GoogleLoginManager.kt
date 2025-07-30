@@ -2,6 +2,7 @@ package com.yagubogu.auth
 
 import android.content.Context
 import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -48,6 +49,11 @@ class GoogleLoginManager(
         result.onFailure {
             Log.e(TAG, it.message ?: "로그인에 실패했습니다.")
         }
+    }
+
+    suspend fun signOut() {
+        val clearCredentialStateRequest = ClearCredentialStateRequest()
+        credentialManager.clearCredentialState(clearCredentialStateRequest)
     }
 
     private suspend fun requestCredential(): Result<GetCredentialResponse> =
