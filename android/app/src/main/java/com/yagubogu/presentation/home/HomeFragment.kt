@@ -49,6 +49,8 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
+    private var isExpanded: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -113,6 +115,21 @@ class HomeFragment : Fragment() {
                 .rotationBy(360f)
                 .setDuration(1000L)
                 .start()
+        }
+
+        binding.constraintShowMore.setOnClickListener {
+            isExpanded = !isExpanded
+            when (isExpanded) {
+                true -> {
+                    binding.tvShowMore.text = getString(R.string.home_show_less)
+                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
+                }
+
+                false -> {
+                    binding.tvShowMore.text = getString(R.string.home_show_more)
+                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_down)
+                }
+            }
         }
     }
 
