@@ -19,15 +19,12 @@ fun ImageView.setCustomChartDividerTint(
         )
 }
 
-@BindingAdapter("setCustomChartBackgroundTint")
-fun View.setCustomChartBackgroundTint(
+@BindingAdapter("setCustomChartBackground")
+fun View.setCustomChartBackground(
     @ColorRes colorRes: Int?,
 ) {
     colorRes ?: return
-    this.backgroundTintList =
-        ColorStateList.valueOf(
-            ContextCompat.getColor(context, colorRes),
-        )
+    setBackgroundColor(ContextCompat.getColor(context, colorRes))
 }
 
 @BindingAdapter("setConstraintWidthPercent")

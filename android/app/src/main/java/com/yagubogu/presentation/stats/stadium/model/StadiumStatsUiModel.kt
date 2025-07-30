@@ -31,7 +31,7 @@ data class StadiumStatsUiModel(
     companion object {
         private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus(null, 0.0)
 
-        private const val CHART_END_PADDING_SIZE = 20.0
+        private const val CHART_END_PADDING_SIZE = 25.0
         private const val FIRST_TEAM_INDEX = 0
         private const val SECOND_TEAM_INDEX = 1
     }

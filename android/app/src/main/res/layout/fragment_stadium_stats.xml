@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="android.view.View" />
-
         <variable
             name="stadiumStatsUiModel"
             type="com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel" />
@@ -24,7 +22,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_white_radius_12dp"
-            android:padding="20dp"
+            android:paddingTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -34,6 +32,7 @@
                 style="@style/TextView.Pretendard.Bold.20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:text="@{@string/stats_stadium_pie_chart_title(stadiumStatsUiModel.stadiumName)}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -44,6 +43,7 @@
                 style="@style/TextView.Pretendard.Medium.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="@{@string/stats_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
                 android:textColor="@color/gray400"
                 app:layout_constraintBottom_toBottomOf="@id/tv_stadium_chart_title"
@@ -51,181 +51,17 @@
                 app:layout_constraintTop_toTopOf="@id/tv_stadium_chart_title"
                 tools:text="14:30 기준" />
 
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
+                layout="@layout/item_stadium_chart_bar"
                 android:layout_width="match_parent"
-                android:layout_height="85dp"
-                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_stadium_chart_title">
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_chart_title"
+                app:stadiumStatsUiModel="@{stadiumStatsUiModel}" />
 
-                <View
-                    android:id="@+id/left_rect"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_left_radius_14dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:setConstraintWidthPercent="@{stadiumStatsUiModel.firstTeamBias}"
-                    app:setCustomChartBackgroundTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
-                    tools:backgroundTint="@color/team_kia"
-                    tools:layout_constraintWidth_percent="0.3" />
-
-                <View
-                    android:id="@+id/right_rect"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_right_radius_14dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:setConstraintWidthPercent="@{stadiumStatsUiModel.secondTeamBias}"
-                    app:setCustomChartBackgroundTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
-                    tools:backgroundTint="@color/team_kiwoom"
-                    tools:layout_constraintWidth_percent="0.7" />
-
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline_split"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:setConstraintGuidePercent="@{stadiumStatsUiModel.firstTeamBias}"
-                    tools:layout_constraintGuide_percent="0.3" />
-
-                <View
-                    android:id="@+id/left_divider_background"
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/white"
-                    android:translationX="-4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/triangle_right"
-                    app:layout_constraintStart_toStartOf="@id/triangle_left"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <View
-                    android:id="@+id/right_divider_background"
-                    android:layout_width="28dp"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/white"
-                    android:translationX="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/triangle_right"
-                    app:layout_constraintStart_toStartOf="@id/triangle_left"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/triangle_left"
-                    android:layout_width="28dp"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/chart_divider_triangle_left"
-                    android:translationX="-4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/guideline_split"
-                    app:layout_constraintStart_toStartOf="@id/guideline_split"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:setCustomChartDividerTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
-                    tools:tint="@color/team_kia" />
-
-                <ImageView
-                    android:id="@+id/triangle_right"
-                    android:layout_width="28dp"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/chart_divider_triangle_right"
-                    android:translationX="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/guideline_split"
-                    app:layout_constraintStart_toStartOf="@id/guideline_split"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:setCustomChartDividerTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
-                    tools:tint="@color/team_kiwoom" />
-
-
-                <TextView
-                    android:id="@+id/tv_vs"
-                    style="@style/TextView.Pretendard.Bold.16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_white_radius_100dp"
-                    android:elevation="8dp"
-                    android:includeFontPadding="false"
-                    android:paddingVertical="4dp"
-                    android:text="VS"
-                    android:textColor="@color/gray700"
-                    android:textSize="20sp"
-                    android:paddingHorizontal="12dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/guideline_split"
-                    app:layout_constraintStart_toStartOf="@id/guideline_split"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_first_team_name"
-                    style="@style/TextView.Esamanru.Bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:elevation="8dp"
-                    android:includeFontPadding="false"
-                    android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
-                    android:textColor="@android:color/white"
-                    android:textSize="22sp"
-                    app:layout_constraintBottom_toTopOf="@id/tv_first_team_percent"
-
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    tools:text="KIA" />
-
-                <TextView
-                    android:id="@+id/tv_first_team_percent"
-                    style="@style/TextView.Pretendard.Medium.16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elevation="8dp"
-                    android:includeFontPadding="false"
-                    android:text="@{@string/stats_chart_percentage(stadiumStatsUiModel.firstTeamStatus.percentage)}"
-                    android:textColor="@android:color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-
-                    app:layout_constraintStart_toStartOf="@+id/tv_first_team_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_first_team_name"
-                    tools:text="16%" />
-
-
-                <TextView
-                    android:id="@+id/tv_second_team_name"
-                    style="@style/TextView.Esamanru.Bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:elevation="8dp"
-                    android:includeFontPadding="false"
-                    android:text="@{stadiumStatsUiModel.secondTeamStatus.teamName}"
-                    android:textColor="@android:color/white"
-                    android:textSize="22sp"
-                    app:layout_constraintBottom_toTopOf="@id/tv_second_team_percent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    tools:text="키움" />
-
-                <TextView
-                    android:id="@+id/tv_second_team_percent"
-                    style="@style/TextView.Pretendard.Medium.16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elevation="8dp"
-                    android:includeFontPadding="false"
-                    android:text="@{@string/stats_chart_percentage(stadiumStatsUiModel.secondTeamStatus.percentage)}"
-                    android:textColor="@android:color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/tv_second_team_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_second_team_name"
-                    tools:text="16%" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
