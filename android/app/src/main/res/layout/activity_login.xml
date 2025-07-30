@@ -11,7 +11,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+        android:id="@+id/constraint_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".presentation.login.LoginActivity">
