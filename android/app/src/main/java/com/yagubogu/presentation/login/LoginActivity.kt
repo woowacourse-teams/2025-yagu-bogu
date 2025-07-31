@@ -6,7 +6,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.yagubogu.YaguBoguApplication
+import com.yagubogu.BuildConfig
+import com.yagubogu.auth.GoogleLoginManager
 import com.yagubogu.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
@@ -15,7 +16,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val viewModel: LoginViewModel by viewModels {
-        val googleLoginManager = (application as YaguBoguApplication).googleLoginManager
+        val googleLoginManager = GoogleLoginManager(BuildConfig.WEB_CLIENT_ID, "")
         LoginViewModelFactory(googleLoginManager)
     }
 
@@ -37,5 +38,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupBindings() {
         binding.vm = viewModel
+        binding.btnSignIn.setOnClickListener {
+            viewModel.signIn(this)
+        }
     }
 }

@@ -20,7 +20,7 @@
             android:id="@+id/btn_signIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> vm.signIn()}"
+            
             android:text="구글 로그인하기"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"

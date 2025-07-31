@@ -20,9 +20,8 @@ import kotlinx.coroutines.withContext
 class GoogleLoginManager(
     serverClientId: String,
     nonce: String,
-    private val context: Context,
 ) {
-    private val credentialManager = CredentialManager.create(context)
+    private lateinit var credentialManager: CredentialManager
 
     private val googleIdOption: GetGoogleIdOption =
         GetGoogleIdOption
@@ -42,8 +41,9 @@ class GoogleLoginManager(
             .addCredentialOption(googleIdOption)
             .build()
 
-    suspend fun signIn() {
-        val result: Result<GetCredentialResponse> = requestCredential()
+    suspend fun signIn(context: Context) {
+        credentialManager = CredentialManager.create(context)
+        val result: Result<GetCredentialResponse> = requestCredential(context)
         result.onSuccess {
             handleCredential(result.getOrThrow())
         }
@@ -57,16 +57,13 @@ class GoogleLoginManager(
         credentialManager.clearCredentialState(clearCredentialStateRequest)
     }
 
-    private suspend fun requestCredential(): Result<GetCredentialResponse> =
-        withContext(Dispatchers.IO) {
-            return@withContext try {
-                val response: GetCredentialResponse =
-                    credentialManager.getCredential(context, credentialRequest)
-                Result.success(response)
-            } catch (e: GetCredentialException) {
-                Result.failure(e)
-            }
-        }
+    private suspend fun requestCredential(context: Context): Result<GetCredentialResponse> = try {
+        val response: GetCredentialResponse =
+            credentialManager.getCredential(context, credentialRequest)
+        Result.success(response)
+    } catch (e: GetCredentialException) {
+        Result.failure(e)
+    }
 
     private fun handleCredential(credentialResponse: GetCredentialResponse) {
         // 정상적으로 반환된 Credential을 처리합니다.
