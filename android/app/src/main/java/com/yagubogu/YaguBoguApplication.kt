@@ -16,8 +16,9 @@ import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
 
 class YaguBoguApplication : Application() {
-    val googleLoginManager: GoogleLoginManager =
-        GoogleLoginManager(BuildConfig.WEB_CLIENT_ID, "", this)
+    val googleLoginManager: GoogleLoginManager by lazy {
+        GoogleLoginManager(BuildConfig.WEB_CLIENT_ID, "", applicationContext)
+    }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
