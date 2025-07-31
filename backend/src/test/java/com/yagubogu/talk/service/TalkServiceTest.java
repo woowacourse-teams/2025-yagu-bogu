@@ -1,8 +1,10 @@
 package com.yagubogu.talk.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
@@ -154,5 +156,44 @@ class TalkServiceTest {
         assertThat(response.content()).isEqualTo(content);
         assertThat(response.memberId()).isEqualTo(memberId);
         assertThat(response.id()).isEqualTo(53L);
+    }
+
+    @DisplayName("본인이 작성한 톡을 삭제한다")
+    @Test
+    void removeTalk() {
+        // given
+        long gameId = 1L;
+        long talkId = 9L;
+        long memberId = 1L;
+        String content = "우리팀 망했어";
+        TalkRequest request = new TalkRequest(memberId, content);
+
+        // pre-condition check
+        assertThat(talkRepository.findById(talkId)).isPresent();
+
+        // when
+        talkService.removeTalk(gameId, talkId, request);
+
+        // then
+        assertThat(talkRepository.findById(talkId)).isNotPresent();
+    }
+
+    @DisplayName("예외: 다른 사람이 작성한 톡을 삭제하려고 하면 예외가 발생한다")
+    @Test
+    void removeTalk_ByOtherUser() {
+        // given
+        long gameId = 1L;
+        long talkId = 10L;
+        long memberId = 1L;
+        String content = "우리팀 망했어";
+        TalkRequest request = new TalkRequest(memberId, content);
+
+        // pre-condition check
+        assertThat(talkRepository.findById(talkId)).isPresent();
+
+        // when & then
+        assertThatThrownBy(() -> talkService.removeTalk(gameId, talkId, request))
+                .isExactlyInstanceOf(ForbiddenException.class)
+                .hasMessage("Invalid memberId for the talk");
     }
 }

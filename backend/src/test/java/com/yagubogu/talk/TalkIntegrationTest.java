@@ -130,7 +130,7 @@ public class TalkIntegrationTest {
         long memberId = 1L;
         String content = "오늘 야구보구 인증하구";
 
-        // when
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new TalkRequest(memberId, content))
@@ -141,5 +141,23 @@ public class TalkIntegrationTest {
                 .body("nickname", is("포라"))
                 .body("favorite", is("롯데"))
                 .body("content", is(content));
+    }
+
+    @DisplayName("톡을 삭제한다")
+    @Test
+    void removeTalk() {
+        // given
+        long gameId = 1L;
+        long talkId = 9L;
+        long memberId = 1L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(memberId, content))
+                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .then().log().all()
+                .statusCode(204);
     }
 }
