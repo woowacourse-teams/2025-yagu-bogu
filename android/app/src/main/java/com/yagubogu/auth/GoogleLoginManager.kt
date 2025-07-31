@@ -12,6 +12,7 @@ import androidx.credentials.PasswordCredential
 import androidx.credentials.PublicKeyCredential
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,13 @@ class GoogleLoginManager(
     private val context: Context,
 ) {
     private val credentialManager = CredentialManager.create(context)
+
+    private val signInWithGoogleOption: GetSignInWithGoogleOption =
+        GetSignInWithGoogleOption
+            .Builder(
+                serverClientId = serverClientId,
+            ).setNonce(nonce)
+            .build()
 
     private val googleIdOption: GetGoogleIdOption =
         GetGoogleIdOption
@@ -40,6 +48,7 @@ class GoogleLoginManager(
         GetCredentialRequest
             .Builder()
             .addCredentialOption(googleIdOption)
+            .addCredentialOption(signInWithGoogleOption)
             .build()
 
     suspend fun signIn() {
