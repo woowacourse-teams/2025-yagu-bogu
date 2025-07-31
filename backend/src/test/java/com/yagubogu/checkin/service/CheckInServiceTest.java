@@ -122,7 +122,7 @@ class CheckInServiceTest {
         assertThat(actual.checkInCounts()).isEqualTo(expected);
     }
 
-    @DisplayName("당해 년도 직관 내역을 모두 조회한다")
+    @DisplayName("직관 인증 내역을 모두 조회한다")
     @Test
     void findCheckInHistory_allCheckInsGivenYear() {
         // given
@@ -138,7 +138,7 @@ class CheckInServiceTest {
         assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
     }
 
-    @DisplayName("직관 내역 조회 결과가 날짜 순으로 정렬되어 반환된다")
+    @DisplayName("직관 인증 내역이 인증 날짜 내림차순으로 정렬되어 반환된다")
     @Test
     void findCheckInHistory_sortsByCheckInDateDescending() {
         // given
