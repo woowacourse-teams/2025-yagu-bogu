@@ -1,7 +1,7 @@
 package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
-import com.yagubogu.checkin.dto.CheckInResponse;
+import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
@@ -98,7 +98,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     int countByMemberAndYear(Member member, long year);
 
     @Query("""
-                SELECT new com.yagubogu.checkin.dto.CheckInResponse(
+                SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
                     c.id,
                     g.stadium.fullName,
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
@@ -122,5 +122,5 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                   AND YEAR(g.date) = :year
                 ORDER BY g.date DESC
             """)
-    List<CheckInResponse> findCheckInHistory(Member member, Team team, int year);
+    List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 }

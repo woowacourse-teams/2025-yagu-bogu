@@ -1,9 +1,9 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
-import com.yagubogu.checkin.dto.CheckInResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -145,38 +145,38 @@ class CheckInServiceTest {
         long memberId = 1L;
         int year = 2025;
 
-        List<CheckInResponse> expected = List.of(
-                new CheckInResponse(1L,
+        List<CheckInGameResponse> expected = List.of(
+                new CheckInGameResponse(1L,
                         "잠실 야구장",
                         new CheckInGameTeamResponse(1L, "기아", 10, true),
                         new CheckInGameTeamResponse(2L, "롯데", 9, false),
                         LocalDate.of(2025, 7, 21)
                 ),
-                new CheckInResponse(2L,
+                new CheckInGameResponse(2L,
                         "잠실 야구장",
                         new CheckInGameTeamResponse(1L, "기아", 5, true),
                         new CheckInGameTeamResponse(3L, "삼성", 5, false),
                         LocalDate.of(2025, 7, 20)
                 ),
-                new CheckInResponse(3L,
+                new CheckInGameResponse(3L,
                         "잠실 야구장",
                         new CheckInGameTeamResponse(1L, "기아", 10, true),
                         new CheckInGameTeamResponse(3L, "삼성", 5, false),
                         LocalDate.of(2025, 7, 19)
                 ),
-                new CheckInResponse(4L,
+                new CheckInGameResponse(4L,
                         "광주 KIA 챔피언스필드",
                         new CheckInGameTeamResponse(1L, "기아", 10, true),
                         new CheckInGameTeamResponse(2L, "롯데", 9, false),
                         LocalDate.of(2025, 7, 18)
                 ),
-                new CheckInResponse(5L,
+                new CheckInGameResponse(5L,
                         "광주 KIA 챔피언스필드",
                         new CheckInGameTeamResponse(3L, "삼성", 1, false),
                         new CheckInGameTeamResponse(1L, "기아", 9, true),
                         LocalDate.of(2025, 7, 17)
                 ),
-                new CheckInResponse(6L,
+                new CheckInGameResponse(6L,
                         "대구 삼성라이온즈파크",
                         new CheckInGameTeamResponse(1L, "기아", 10, true),
                         new CheckInGameTeamResponse(2L, "롯데", 9, false),
