@@ -165,14 +165,12 @@ class TalkServiceTest {
         long gameId = 1L;
         long talkId = 9L;
         long memberId = 1L;
-        String content = "우리팀 망했어";
-        TalkRequest request = new TalkRequest(memberId, content);
 
         // pre-condition check
         assertThat(talkRepository.findById(talkId)).isPresent();
 
         // when
-        talkService.removeTalk(gameId, talkId, request);
+        talkService.removeTalk(gameId, talkId, memberId);
 
         // then
         assertThat(talkRepository.findById(talkId)).isNotPresent();
@@ -185,14 +183,12 @@ class TalkServiceTest {
         long gameId = 1L;
         long talkId = 10L;
         long memberId = 1L;
-        String content = "우리팀 망했어";
-        TalkRequest request = new TalkRequest(memberId, content);
 
         // pre-condition check
         assertThat(talkRepository.findById(talkId)).isPresent();
 
         // when & then
-        assertThatThrownBy(() -> talkService.removeTalk(gameId, talkId, request))
+        assertThatThrownBy(() -> talkService.removeTalk(gameId, talkId, memberId))
                 .isExactlyInstanceOf(ForbiddenException.class)
                 .hasMessage("Invalid memberId for the talk");
     }

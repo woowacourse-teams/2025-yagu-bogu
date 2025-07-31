@@ -29,7 +29,11 @@ public class TalkService {
 
     private final MemberRepository memberRepository;
 
-    public CursorResult<TalkResponse> findTalks(final long gameId, final Long cursorId, final int limit) {
+    public CursorResult<TalkResponse> findTalks(
+            final long gameId,
+            final Long cursorId,
+            final int limit
+    ) {
         List<TalkResponse> talkResponses;
         Pageable pageable = PageRequest.of(0, limit + 1);
 
@@ -49,7 +53,11 @@ public class TalkService {
         return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
     }
 
-    public CursorResult<TalkResponse> pollTalks(final long gameId, final Long cursorId, final int limit) {
+    public CursorResult<TalkResponse> pollTalks(
+            final long gameId,
+            final Long cursorId,
+            final int limit
+    ) {
         if (cursorId == null) {
             throw new BadRequestException("cursorId is null");
         }
@@ -72,7 +80,10 @@ public class TalkService {
         return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
     }
 
-    public TalkResponse createTalk(final long gameId, final TalkRequest request) {
+    public TalkResponse createTalk(
+            final long gameId,
+            final TalkRequest request
+    ) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
         Member member = memberRepository.findById(request.memberId())
@@ -91,7 +102,11 @@ public class TalkService {
         );
     }
 
-    public void removeTalk(final long gameId, final long talkId, final TalkRequest request) {
+    public void removeTalk(
+            final long gameId,
+            final long talkId,
+            final long memberId // TODO: 나중에 삭제
+    ) {
         Talk talk = talkRepository.findById(talkId)
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
 
@@ -99,7 +114,7 @@ public class TalkService {
             throw new BadRequestException("Invalid gameId for the talk");
         }
 
-        if (talk.getMember().getId() != request.memberId()) {
+        if (talk.getMember().getId() != memberId) {
             throw new ForbiddenException("Invalid memberId for the talk");
         }
 

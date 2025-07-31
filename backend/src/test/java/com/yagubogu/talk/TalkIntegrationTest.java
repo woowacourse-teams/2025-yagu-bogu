@@ -41,6 +41,7 @@ public class TalkIntegrationTest {
         // when & then
         given()
                 .queryParam("limit", 10)
+                .queryParam("memberId", 1)
                 .when()
                 .get("/api/talks/{gameId}", gameId)
                 .then()
@@ -59,6 +60,7 @@ public class TalkIntegrationTest {
         given()
                 .queryParam("before", 25)
                 .queryParam("limit", 10)
+                .queryParam("memberId", 1)
                 .when()
                 .get("/api/talks/{gameId}", gameId)
                 .then()
@@ -77,6 +79,7 @@ public class TalkIntegrationTest {
         given()
                 .queryParam("before", 6)
                 .queryParam("limit", 10)
+                .queryParam("memberId", 1)
                 .when()
                 .get("/api/talks/{gameId}", gameId)
                 .then()
@@ -149,13 +152,11 @@ public class TalkIntegrationTest {
         // given
         long gameId = 1L;
         long talkId = 9L;
-        long memberId = 1L;
-        String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TalkRequest(memberId, content))
+                .queryParam("memberId", 1)
                 .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
                 .then().log().all()
                 .statusCode(204);

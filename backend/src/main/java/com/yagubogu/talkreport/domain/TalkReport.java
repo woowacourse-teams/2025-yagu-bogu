@@ -1,7 +1,7 @@
-package com.yagubogu.talk.domain;
+package com.yagubogu.talkreport.domain;
 
-import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.talk.domain.Talk;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,34 +19,31 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "talks")
+@Table(name = "talk_reports", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"talk_id", "reporter_id"})
+})
 @Entity
-public class Talk {
+public class TalkReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "talk_id")
+    @Column(name = "talk_report_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "game_id", nullable = false)
-    private Game game;
+    @JoinColumn(name = "talk_id", nullable = false)
+    private Talk talk;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "reporter_id", nullable = false)
+    private Member reporter;
 
-    @Column(name = "content", nullable = false)
-    private String content;
+    @Column(name = "reported_at", nullable = false)
+    private LocalDateTime reportedAt;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    public Talk(final Game game, final Member member, final String content, final LocalDateTime createdAt) {
-        this.game = game;
-        this.member = member;
-        this.content = content;
-        this.createdAt = createdAt;
+    public TalkReport(final Talk talk, final Member reporter, final LocalDateTime reportedAt) {
+        this.talk = talk;
+        this.reporter = reporter;
+        this.reportedAt = reportedAt;
     }
 }
-
