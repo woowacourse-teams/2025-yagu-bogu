@@ -24,11 +24,26 @@ class StadiumStatsViewModel(
         _stadiumStatsUiModel.value =
             StadiumStatsUiModel(
                 "로딩중",
-                listOf(TeamOccupancyStatus(Team.LG, 0.0)),
+                listOf(
+                    TeamOccupancyStatus(Team.LG, 50.0),
+                    TeamOccupancyStatus(Team.SAMSUNG, 50.0),
+                ),
             )
 
+        // todo: API 연동
         val today = LocalDate.now()
-        fetchStadiumStats(DUMMY_STADIUM_ID, today)
+        // fetchStadiumStats(DUMMY_STADIUM_ID, today)
+
+        val dummyStadiumStatusUiModel =
+            StadiumStatsUiModel(
+                "챔피언스필드",
+                listOf(
+                    TeamOccupancyStatus(Team.HANWHA, 100.0),
+                    TeamOccupancyStatus(Team.SSG, 0.0),
+                ),
+            )
+
+        _stadiumStatsUiModel.value = dummyStadiumStatusUiModel
     }
 
     private fun fetchStadiumStats(
@@ -85,7 +100,6 @@ class StadiumStatsViewModel(
         }
 
     companion object {
-        private const val DUMMY_STADIUM_ID = 2L // 잠실구장
         private const val MAX_LEGEND_TEAM_SIZE = 2
         private const val FULL_PERCENTAGE = 100
         private const val TAG = "StadiumStatsViewModel"

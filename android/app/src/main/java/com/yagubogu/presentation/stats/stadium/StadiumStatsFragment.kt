@@ -39,7 +39,7 @@ class StadiumStatsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupChart()
+//        setupChart()
         setupObservers()
     }
 
@@ -47,24 +47,6 @@ class StadiumStatsFragment : Fragment() {
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { stadiumStatsUiModel: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = stadiumStatsUiModel
             loadChartData(stadiumStatsUiModel)
-        }
-    }
-
-    private fun setupChart() {
-        binding.pieChart.apply {
-            legend.isEnabled = false
-
-            isDrawHoleEnabled = true
-            setHoleColor(Color.TRANSPARENT)
-            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
-
-            description.isEnabled = false
-            setDrawEntryLabels(false)
-            setDrawCenterText(false)
-
-            isRotationEnabled = false
-            setTouchEnabled(false)
-            animateY(PIE_CHART_ANIMATION_MILLISECOND)
         }
     }
 
@@ -86,9 +68,6 @@ class StadiumStatsFragment : Fragment() {
             stadiumStatsUiModel.teamOccupancyStatuses.map { requireContext().getColor(it.teamColor) }
         val pieData = PieData(stadiumStatsChartDataSet)
         pieData.setDrawValues(false)
-
-        binding.pieChart.data = pieData
-        binding.pieChart.invalidate()
     }
 
     override fun onDestroyView() {
@@ -98,8 +77,5 @@ class StadiumStatsFragment : Fragment() {
 
     companion object {
         private const val STADIUM_CHART_DESCRIPTION = "오늘의 구장 현황"
-
-        private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
-        private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
 }
