@@ -16,7 +16,7 @@ data class StadiumStatsUiModel(
     val secondTeamBias = remapRange(secondTeamStatus.percentage)
 
     private fun remapRange(value: Double): Double {
-        val scalingFactor: Double = ((FULL_PERCENTAGE - CHART_END_PADDING_SIZE) - CHART_END_PADDING_SIZE) / FULL_PERCENTAGE
+        val scalingFactor: Double = (FULL_PERCENTAGE - CHART_END_PADDING_SIZE * 2) / FULL_PERCENTAGE
         val percentResult: Double = CHART_END_PADDING_SIZE + value * scalingFactor
         return percentResult / FULL_PERCENTAGE
     }
