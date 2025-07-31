@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
@@ -13,7 +14,10 @@ class LoginActivity : AppCompatActivity() {
         ActivityLoginBinding.inflate(layoutInflater)
     }
 
-    private val viewModel: LoginViewModel by viewModels { LoginViewModelFactory(application) }
+    private val viewModel: LoginViewModel by viewModels {
+        val googleLoginManager = (application as YaguBoguApplication).googleLoginManager
+        LoginViewModelFactory(googleLoginManager)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

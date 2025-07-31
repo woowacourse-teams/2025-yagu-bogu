@@ -3,6 +3,7 @@ package com.yagubogu.auth
 import android.content.Context
 import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -67,9 +68,9 @@ class GoogleLoginManager(
             }
         }
 
-    private fun handleCredential(result: GetCredentialResponse) {
+    private fun handleCredential(credentialResponse: GetCredentialResponse) {
         // 정상적으로 반환된 Credential을 처리합니다.
-        val credential = result.credential
+        val credential: Credential = credentialResponse.credential
         val responseJson: String
 
         when (credential) {
