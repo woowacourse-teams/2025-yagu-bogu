@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 public class TalkService {
 
     private final TalkRepository talkRepository;
+
     private final GameRepository gameRepository;
+
     private final MemberRepository memberRepository;
 
     public CursorResult<TalkResponse> findTalks(final long gameId, final Long cursorId, final int limit) {
@@ -41,11 +43,11 @@ public class TalkService {
         }
 
         Long nextCursorId = hasNextPage ? talkResponses.get(talkResponses.size() - 1).id() : null;
+
         return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
     }
 
     public CursorResult<TalkResponse> pollTalks(final long gameId, final Long cursorId, final int limit) {
-
         if (cursorId == null) {
             throw new IllegalArgumentException("cursorId는 null일 수 없습니다. 초기로딩을 해주세요.");
         }

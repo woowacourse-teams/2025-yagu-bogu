@@ -25,7 +25,7 @@ public class TalkController {
 
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
-            @PathVariable long gameId,
+            @PathVariable final long gameId,
             @RequestParam(value = "before", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
@@ -36,7 +36,7 @@ public class TalkController {
 
     @GetMapping("/{gameId}/polling")
     public ResponseEntity<CursorResult<TalkResponse>> pollTalks(
-            @PathVariable long gameId,
+            @PathVariable final long gameId,
             @RequestParam(value = "after", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
@@ -47,8 +47,8 @@ public class TalkController {
 
     @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
-            @PathVariable long gameId,
-            @Valid @RequestBody TalkRequest request
+            @PathVariable final long gameId,
+            @Valid @RequestBody final TalkRequest request
     ) {
         TalkResponse response = talkService.createTalk(gameId, request);
 
