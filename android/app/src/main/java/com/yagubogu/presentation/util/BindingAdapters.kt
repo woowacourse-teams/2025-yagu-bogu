@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 
 @BindingAdapter("setCustomChartDividerTint")
@@ -13,10 +12,7 @@ fun ImageView.setCustomChartDividerTint(
     @ColorRes colorRes: Int?,
 ) {
     colorRes ?: return
-    this.imageTintList =
-        ColorStateList.valueOf(
-            ContextCompat.getColor(context, colorRes),
-        )
+    this.imageTintList = ColorStateList.valueOf(context.getColor(colorRes))
 }
 
 @BindingAdapter("setCustomChartBackground")
@@ -24,7 +20,7 @@ fun View.setCustomChartBackground(
     @ColorRes colorRes: Int?,
 ) {
     colorRes ?: return
-    setBackgroundColor(ContextCompat.getColor(context, colorRes))
+    setBackgroundColor(context.getColor(colorRes))
 }
 
 @BindingAdapter("setConstraintWidthPercent")
