@@ -101,13 +101,13 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 SELECT new com.yagubogu.checkin.dto.CheckInResponse(
                     c.id,
                     g.stadium.fullName,
-                    new com.yagubogu.team.dto.TeamInfoResponse(
+                    new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                         g.homeTeam.id,
                         g.homeTeam.shortName,
                         g.homeScore,
                         CASE WHEN g.homeTeam = :team THEN true ELSE false END
                     ),
-                    new com.yagubogu.team.dto.TeamInfoResponse(
+                    new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                         g.awayTeam.id,
                         g.awayTeam.shortName,
                         g.awayScore,

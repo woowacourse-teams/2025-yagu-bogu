@@ -1,6 +1,6 @@
-package com.yagubogu.team.dto;
+package com.yagubogu.checkin.dto;
 
-public record TeamInfoResponse(
+public record CheckInGameTeamResponse(
         Long id,
         String name,
         int score,
