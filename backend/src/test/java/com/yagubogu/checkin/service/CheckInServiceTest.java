@@ -49,7 +49,7 @@ class CheckInServiceTest {
         checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository);
     }
 
-    @DisplayName("인증을 저장한다.")
+    @DisplayName("인증을 저장한다")
     @Test
     void findOccupancyRate() {
         // given
@@ -62,7 +62,7 @@ class CheckInServiceTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("구장을 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("구장을 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundStadium() {
         // given
@@ -77,7 +77,7 @@ class CheckInServiceTest {
                 .hasMessage("Stadium is not found");
     }
 
-    @DisplayName("경기를 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("경기를 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundGame() {
         // given
@@ -92,7 +92,7 @@ class CheckInServiceTest {
                 .hasMessage("Game is not found");
     }
 
-    @DisplayName("회원을 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("회원을 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundMember() {
         // given
