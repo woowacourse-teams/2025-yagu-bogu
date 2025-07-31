@@ -12,26 +12,20 @@ data class StadiumStatsUiModel(
     val secondTeamStatus: TeamOccupancyStatus =
         teamOccupancyStatuses.getOrElse(SECOND_TEAM_INDEX) { DEFAULT_TEAM_OCCUPANCY_STATUS }
 
-    val firstTeamBias = remapRange(firstTeamStatus.percentage, CHART_END_PADDING_SIZE)
-    val secondTeamBias = remapRange(secondTeamStatus.percentage, CHART_END_PADDING_SIZE)
+    val firstTeamBias = remapRange(firstTeamStatus.percentage)
+    val secondTeamBias = remapRange(secondTeamStatus.percentage)
 
-    fun remapRange(
-        value: Double,
-        endPaddingSize: Double,
-    ): Double {
-        require(endPaddingSize >= 0.0 && endPaddingSize < 50.0) {
-            "분할 차트의 양 끝 패딩 사이즈는 0.0에서 50.0사이의 값이 필요합니다"
-        }
-        val scalingFactor = ((100 - endPaddingSize) - endPaddingSize) / 100f
-        val percentResult = endPaddingSize + value * scalingFactor
-
-        return percentResult / 100.0
+    private fun remapRange(value: Double): Double {
+        val scalingFactor: Double = ((FULL_PERCENTAGE - CHART_END_PADDING_SIZE) - CHART_END_PADDING_SIZE) / FULL_PERCENTAGE
+        val percentResult: Double = CHART_END_PADDING_SIZE + value * scalingFactor
+        return percentResult / FULL_PERCENTAGE
     }
 
     companion object {
         private val DEFAULT_TEAM_OCCUPANCY_STATUS = TeamOccupancyStatus(null, 0.0)
 
-        private const val CHART_END_PADDING_SIZE = 25.0
+        private const val FULL_PERCENTAGE = 100.0
+        private const val CHART_END_PADDING_SIZE = 28.0
         private const val FIRST_TEAM_INDEX = 0
         private const val SECOND_TEAM_INDEX = 1
     }

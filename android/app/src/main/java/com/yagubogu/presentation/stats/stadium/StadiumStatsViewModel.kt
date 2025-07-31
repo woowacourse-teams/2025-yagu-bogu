@@ -38,8 +38,8 @@ class StadiumStatsViewModel(
             StadiumStatsUiModel(
                 "챔피언스필드",
                 listOf(
-                    TeamOccupancyStatus(Team.KIA, 98.2),
-                    TeamOccupancyStatus(Team.DOOSAN, 1.8),
+                    TeamOccupancyStatus(Team.HANWHA, 100.0),
+                    TeamOccupancyStatus(Team.SSG, 0.0),
                 ),
             )
 
