@@ -56,6 +56,15 @@ public class CheckInService {
         return new CheckInHistoryResponse(checkInGameResponses);
     }
 
+    public CheckInHistoryResponse findCheckInWinHistory(final long memberId, final int year) {
+        Member member = getMember(memberId);
+        Team team = member.getTeam();
+
+        List<CheckInGameResponse> checkInGameResponses = checkInRepository.findCheckInWinHistory(member, team, year);
+
+        return new CheckInHistoryResponse(checkInGameResponses);
+    }
+
     private Stadium getStadiumById(final long stadiumId) {
         return stadiumRepository.findById(stadiumId)
                 .orElseThrow(() -> new NotFoundException("Stadium is not found"));

@@ -50,4 +50,14 @@ public class CheckInController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/wins/members/{memberId}")
+    public ResponseEntity<CheckInHistoryResponse> findCheckInWinHistory(
+            @PathVariable final long memberId,
+            @RequestParam final int year
+    ) {
+        CheckInHistoryResponse response = checkInService.findCheckInWinHistory(memberId, year);
+
+        return ResponseEntity.ok(response);
+    }
 }

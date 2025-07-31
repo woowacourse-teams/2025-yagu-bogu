@@ -143,4 +143,33 @@ public class CheckInIntegrationTest {
                 .then().log().all()
                 .statusCode(404);
     }
+
+    @DisplayName("이긴 직관 내역을 조회한다")
+    @Test
+    void findCheckInWinHistory() {
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/wins/members/{memberId}")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외 : 이긴 직관 내역을 조회하는데 회원이 없으면 예외가 발생한다")
+    @Test
+    void findCheckInWinHistory_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", invalidMemberId)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/wins/members/{memberId}")
+                .then().log().all()
+                .statusCode(404);
+    }
 }
