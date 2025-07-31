@@ -28,8 +28,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:setConstraintWidthPercent="@{stadiumStatsUiModel.firstTeamBias}"
-                app:setCustomChartBackground="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
+                app:setConstraintWidthPercent="@{stadiumStatsUiModel.awayTeamBias}"
+                app:setCustomChartBackground="@{stadiumStatsUiModel.awayTeamStatus.teamColor}"
                 tools:background="@color/team_kia"
                 tools:layout_constraintWidth_percent="0.3" />
 
@@ -38,8 +38,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:setConstraintWidthPercent="@{stadiumStatsUiModel.secondTeamBias}"
-                app:setCustomChartBackground="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
+                app:setConstraintWidthPercent="@{stadiumStatsUiModel.homeTeamBias}"
+                app:setCustomChartBackground="@{stadiumStatsUiModel.homeTeamStatus.teamColor}"
                 tools:background="@color/team_kiwoom"
                 tools:layout_constraintWidth_percent="0.7" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:setConstraintGuidePercent="@{stadiumStatsUiModel.firstTeamBias}"
+                app:setConstraintGuidePercent="@{stadiumStatsUiModel.awayTeamBias}"
                 tools:layout_constraintGuide_percent="0.3" />
 
             <View
@@ -85,7 +85,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
+                app:setCustomChartDividerTint="@{stadiumStatsUiModel.awayTeamStatus.teamColor}"
                 tools:tint="@color/team_kia" />
 
             <ImageView
@@ -100,7 +100,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
+                app:setCustomChartDividerTint="@{stadiumStatsUiModel.homeTeamStatus.teamColor}"
                 tools:tint="@color/team_kiwoom" />
 
 
@@ -131,7 +131,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginBottom="4dp"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
+                android:text="@{stadiumStatsUiModel.awayTeamStatus.teamName}"
                 android:textColor="@color/white"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@id/tv_first_team_percent"
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/all_win_rate(stadiumStatsUiModel.firstTeamStatus.percentage)}"
+                android:text="@{@string/all_win_rate(stadiumStatsUiModel.awayTeamStatus.percentage)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -163,7 +163,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="4dp"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.secondTeamStatus.teamName}"
+                android:text="@{stadiumStatsUiModel.homeTeamStatus.teamName}"
                 android:textColor="@color/white"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@id/tv_second_team_percent"
@@ -178,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/all_win_rate(stadiumStatsUiModel.secondTeamStatus.percentage)}"
+                android:text="@{@string/all_win_rate(stadiumStatsUiModel.homeTeamStatus.percentage)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"

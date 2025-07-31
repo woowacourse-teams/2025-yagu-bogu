@@ -7,11 +7,11 @@ data class StadiumStatsUiModel(
     val teamOccupancyStatuses: List<TeamOccupancyStatus>,
     val refreshTime: LocalTime = LocalTime.now(),
 ) {
-    val firstTeamStatus: TeamOccupancyStatus = teamOccupancyStatuses[FIRST_TEAM_INDEX]
-    val secondTeamStatus: TeamOccupancyStatus = teamOccupancyStatuses[SECOND_TEAM_INDEX]
+    val awayTeamStatus: TeamOccupancyStatus = teamOccupancyStatuses[FIRST_TEAM_INDEX]
+    val homeTeamStatus: TeamOccupancyStatus = teamOccupancyStatuses[SECOND_TEAM_INDEX]
 
-    val firstTeamBias = remapRange(firstTeamStatus.percentage)
-    val secondTeamBias = remapRange(secondTeamStatus.percentage)
+    val awayTeamBias: Double = remapRange(awayTeamStatus.percentage)
+    val homeTeamBias: Double = remapRange(homeTeamStatus.percentage)
 
     private fun remapRange(value: Double): Double {
         val scalingFactor: Double = (FULL_PERCENTAGE - CHART_END_PADDING_SIZE * 2) / FULL_PERCENTAGE
