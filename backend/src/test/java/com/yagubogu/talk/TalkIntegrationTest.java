@@ -4,7 +4,9 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 
+import com.yagubogu.talk.dto.TalkRequest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ public class TalkIntegrationTest {
     @Test
     void findTalks_firstPage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
 
         // when & then
         given()
@@ -51,7 +53,7 @@ public class TalkIntegrationTest {
     @Test
     void findTalks_middlePage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
 
         // when & then
         given()
@@ -69,7 +71,7 @@ public class TalkIntegrationTest {
     @Test
     void findTalks_lastPage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
 
         // when & then
         given()
@@ -87,7 +89,7 @@ public class TalkIntegrationTest {
     @Test
     void pollTalks_existing() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
 
         // when & then
         given()
@@ -106,7 +108,7 @@ public class TalkIntegrationTest {
     @Test
     void pollTalks_noExisting() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
 
         // when & then
         given()
@@ -118,5 +120,26 @@ public class TalkIntegrationTest {
                 .statusCode(200)
                 .body("content.size()", is(0))
                 .body("nextCursorId", is(52));
+    }
+
+    @DisplayName("정상적으로 톡을 저장하고 응답을 반환한다")
+    @Test
+    void createTalk() {
+        // given
+        long gameId = 1L;
+        long memberId = 1L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(memberId, content))
+                .when().post("/api/talks/{gameId}", gameId)
+                .then().log().all()
+                .statusCode(201)
+                .body("memberId", is(1))
+                .body("nickname", is("포라"))
+                .body("favorite", is("롯데"))
+                .body("content", is(content));
     }
 }

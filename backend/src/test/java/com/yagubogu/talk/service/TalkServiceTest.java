@@ -2,7 +2,10 @@ package com.yagubogu.talk.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.dto.CursorResult;
+import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,16 +29,22 @@ class TalkServiceTest {
     @Autowired
     private TalkRepository talkRepository;
 
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
     @BeforeEach
     void setUp() {
-        talkService = new TalkService(talkRepository);
+        talkService = new TalkService(talkRepository, gameRepository, memberRepository);
     }
 
     @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다")
     @Test
     void findTalks_firstPage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
         Long cursorId = null;
         int limit = 10;
 
@@ -55,7 +64,7 @@ class TalkServiceTest {
     @Test
     void findTalks_middlePage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
         Long cursorId = 43L;
         int limit = 10;
 
@@ -75,7 +84,7 @@ class TalkServiceTest {
     @Test
     void findTalks_lastPage() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
         Long cursorId = 3L;
         int limit = 10;
 
@@ -95,7 +104,7 @@ class TalkServiceTest {
     @Test
     void pollTalks_hasNewTalk() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
         Long cursorId = 50L;
         int limit = 10;
 
@@ -116,7 +125,7 @@ class TalkServiceTest {
     @Test
     void pollTalks_hasNoNewTalk() {
         // given
-        Long gameId = 1L;
+        long gameId = 1L;
         Long cursorId = 52L;
         int limit = 10;
 
@@ -127,5 +136,23 @@ class TalkServiceTest {
         assertThat(actual.content()).isEmpty();
         assertThat(actual.nextCursorId()).isEqualTo(cursorId);
         assertThat(actual.hasNext()).isFalse();
+    }
+
+    @DisplayName("새로운 톡을 생성한다")
+    @Test
+    void createTalk() {
+        // given
+        long gameId = 1L;
+        long memberId = 1L;
+        String content = "오늘 야구 재밌겠당";
+        TalkRequest request = new TalkRequest(memberId, content);
+
+        // when
+        TalkResponse response = talkService.createTalk(gameId, request);
+
+        // then
+        assertThat(response.content()).isEqualTo(content);
+        assertThat(response.memberId()).isEqualTo(memberId);
+        assertThat(response.id()).isEqualTo(53L);
     }
 }
