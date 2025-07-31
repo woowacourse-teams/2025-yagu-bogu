@@ -2,6 +2,7 @@ package com.yagubogu.talk.service;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -49,7 +50,7 @@ public class TalkService {
 
     public CursorResult<TalkResponse> pollTalks(final long gameId, final Long cursorId, final int limit) {
         if (cursorId == null) {
-            throw new IllegalArgumentException("cursorId는 null일 수 없습니다. 초기로딩을 해주세요.");
+            throw new BadRequestException("cursorId is null");
         }
 
         Pageable pageable = PageRequest.of(0, limit + 1);
