@@ -55,7 +55,7 @@ public class TalkIntegrationTest {
 
         // when & then
         given()
-                .queryParam("after", 25)
+                .queryParam("before", 25)
                 .queryParam("limit", 10)
                 .when()
                 .get("/api/talks/{gameId}", gameId)
@@ -73,7 +73,7 @@ public class TalkIntegrationTest {
 
         // when & then
         given()
-                .queryParam("after", 6)
+                .queryParam("before", 6)
                 .queryParam("limit", 10)
                 .when()
                 .get("/api/talks/{gameId}", gameId)
@@ -81,5 +81,42 @@ public class TalkIntegrationTest {
                 .statusCode(200)
                 .body("content[0].id", is(5))
                 .body("nextCursorId", is(nullValue()));
+    }
+
+    @DisplayName("새 톡을 가져온다")
+    @Test
+    void pollTalks_existing() {
+        // given
+        Long gameId = 1L;
+
+        // when & then
+        given()
+                .queryParam("after", 47)
+                .queryParam("limit", 10)
+                .when()
+                .get("/api/talks/{gameId}/polling", gameId)
+                .then()
+                .statusCode(200)
+                .body("content.size()", is(5))
+                .body("content[-1].id", is(52))
+                .body("nextCursorId", is(52));
+    }
+
+    @DisplayName("새 톡이 없다면 가져오지 않는다")
+    @Test
+    void pollTalks_noExisting() {
+        // given
+        Long gameId = 1L;
+
+        // when & then
+        given()
+                .queryParam("after", 52)
+                .queryParam("limit", 10)
+                .when()
+                .get("/api/talks/{gameId}/polling", gameId)
+                .then()
+                .statusCode(200)
+                .body("content.size()", is(0))
+                .body("nextCursorId", is(52));
     }
 }

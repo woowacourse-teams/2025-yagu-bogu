@@ -90,4 +90,42 @@ class TalkServiceTest {
         assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
         assertThat(actual.hasNext()).isFalse();
     }
+
+    @DisplayName("새로운 메시지가 있을 때 polling으로 가져온다")
+    @Test
+    void pollTalks_hasNewTalk() {
+        // given
+        Long gameId = 1L;
+        Long cursorId = 50L;
+        int limit = 10;
+
+        long expectedLastTalkId = 52L;
+        Long expectedNextCursorId = 52L;
+
+        // when
+        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+
+        // then
+        assertThat(actual.content()).hasSize(2);
+        assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
+        assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+        assertThat(actual.hasNext()).isFalse();
+    }
+
+    @DisplayName("새 메시지가 없을 때 nextCursorId는 바뀌지 않는다")
+    @Test
+    void pollTalks_hasNoNewTalk() {
+        // given
+        Long gameId = 1L;
+        Long cursorId = 52L;
+        int limit = 10;
+
+        // when
+        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+
+        // then
+        assertThat(actual.content()).isEmpty();
+        assertThat(actual.nextCursorId()).isEqualTo(cursorId);
+        assertThat(actual.hasNext()).isFalse();
+    }
 }
