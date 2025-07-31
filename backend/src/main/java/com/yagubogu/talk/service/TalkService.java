@@ -3,6 +3,7 @@ package com.yagubogu.talk.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.BadRequestException;
+import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -73,7 +74,7 @@ public class TalkService {
 
     public TalkResponse createTalk(final long gameId, final TalkRequest request) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game is not found."));
+                .orElseThrow(() -> new NotFoundException("Game is not found"));
         Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
         LocalDateTime now = LocalDateTime.now();
@@ -88,5 +89,20 @@ public class TalkService {
                 talk.getContent(),
                 talk.getCreatedAt()
         );
+    }
+
+    public void removeTalk(final long gameId, final long talkId, final TalkRequest request) {
+        Talk talk = talkRepository.findById(talkId)
+                .orElseThrow(() -> new NotFoundException("Talk is not found"));
+
+        if (talk.getGame().getId() != gameId) {
+            throw new BadRequestException("Invalid gameId for the talk");
+        }
+
+        if (talk.getMember().getId() != request.memberId()) {
+            throw new ForbiddenException("Invalid memberId for the talk");
+        }
+
+        talkRepository.deleteById(talkId);
     }
 }
