@@ -39,5 +39,20 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId AND t.id < :cursorId
             ORDER BY t.id DESC
             """)
-    List<TalkResponse> findNextTalks(final Long gameId, Long cursorId, Pageable pageable);
+    List<TalkResponse> findPreviousTalks(final Long gameId, Long cursorId, Pageable pageable);
+
+    @Query("""
+            SELECT new com.yagubogu.talk.dto.TalkResponse(
+                t.id,
+                t.member.id,
+                t.member.nickname,
+                t.member.team.shortName,
+                t.content,
+                t.createdAt
+            )
+            FROM Talk t
+            WHERE t.game.id = :gameId AND t.id > :cursorId
+            ORDER BY t.id ASC 
+            """)
+    List<TalkResponse> findNewTalks(final Long gameId, Long cursorId, Pageable pageable);
 }

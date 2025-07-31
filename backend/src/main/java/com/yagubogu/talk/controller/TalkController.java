@@ -21,10 +21,21 @@ public class TalkController {
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
             @PathVariable Long gameId,
-            @RequestParam(value = "after", required = false) final Long cursorId,
+            @RequestParam(value = "before", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
         CursorResult<TalkResponse> response = talkService.findTalks(gameId, cursorId, limit);
+
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/{gameId}/polling")
+    public ResponseEntity<CursorResult<TalkResponse>> pollTalks(
+            @PathVariable Long gameId,
+            @RequestParam(value = "after", required = false) final Long cursorId,
+            @RequestParam("limit") final int limit
+    ) {
+        CursorResult<TalkResponse> response = talkService.pollTalks(gameId, cursorId, limit);
 
         return ResponseEntity.ok(response);
     }
