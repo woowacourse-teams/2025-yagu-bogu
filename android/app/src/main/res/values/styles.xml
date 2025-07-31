@@ -59,6 +59,10 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Pretendard.Bold.16" parent="TextView.Pretendard.Bold">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextView.Pretendard.Bold.20" parent="TextView.Pretendard.Bold">
         <item name="android:textSize">20sp</item>
     </style>

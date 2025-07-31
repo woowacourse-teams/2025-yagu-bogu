@@ -9,6 +9,7 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
+import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
@@ -46,6 +47,30 @@ class HomeViewModel(
 
     init {
         fetchMemberInformation(MEMBER_ID, YEAR)
+
+        _stadiumStatsUiModel.value =
+            StadiumStatsUiModel(
+                "로딩중",
+                listOf(
+                    TeamOccupancyStatus(Team.LG, 50.0),
+                    TeamOccupancyStatus(Team.SAMSUNG, 50.0),
+                ),
+            )
+
+        // todo: API 연동
+        val today = LocalDate.now()
+        // fetchStadiumStats(DUMMY_STADIUM_ID, today)
+
+        val dummyStadiumStatusUiModel =
+            StadiumStatsUiModel(
+                "챔피언스필드",
+                listOf(
+                    TeamOccupancyStatus(Team.HANWHA, 100.0),
+                    TeamOccupancyStatus(Team.SSG, 0.0),
+                ),
+            )
+
+        _stadiumStatsUiModel.value = dummyStadiumStatusUiModel
     }
 
     fun checkIn() {
