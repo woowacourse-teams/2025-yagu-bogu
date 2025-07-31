@@ -29,18 +29,14 @@ fun View.setCustomChartBackground(
 
 @BindingAdapter("setConstraintWidthPercent")
 fun View.setConstraintWidthPercent(percent: Double) {
-    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams
-    layoutParams?.let { params ->
-        params.matchConstraintPercentWidth = percent.toFloat()
-        this.layoutParams = params
-    }
+    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return
+    layoutParams.matchConstraintPercentWidth = percent.toFloat()
+    this.layoutParams = layoutParams
 }
 
 @BindingAdapter("setConstraintGuidePercent")
 fun View.setConstraintGuidePercent(percent: Double) {
-    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams
-    layoutParams?.let { params ->
-        params.guidePercent = percent.toFloat()
-        this.layoutParams = params
-    }
+    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return
+    layoutParams.guidePercent = percent.toFloat()
+    this.layoutParams = layoutParams
 }
