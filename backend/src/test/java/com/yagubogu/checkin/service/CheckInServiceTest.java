@@ -13,7 +13,6 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.dto.TeamInfoResponse;
 import java.time.LocalDate;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,7 +135,7 @@ class CheckInServiceTest {
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
 
         // then
-        Assertions.assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
+        assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
     }
 
     @DisplayName("직관 내역 조회 결과가 날짜 순으로 정렬되어 반환된다")
@@ -189,6 +188,6 @@ class CheckInServiceTest {
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
 
         // then
-        Assertions.assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
     }
 }
