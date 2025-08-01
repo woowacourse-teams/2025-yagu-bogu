@@ -2,6 +2,21 @@ spring:
   profiles:
     active: local
 
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: ${GOOGLE_CLIENT_ID}
+
+security:
+  jwt:
+    access-token:
+      secret-key: ${JWT_ACCESS_TOKEN_SECRET_KEY}
+      expire-length: 900000      # 15분 (ms)
+    refresh-token:
+      secret-key: ${JWT_REFRESH_TOKEN_SECRET_KEY}
+      expire-length: 1209600000  # 14일 (ms)
+
 ---
 spring:
   config:

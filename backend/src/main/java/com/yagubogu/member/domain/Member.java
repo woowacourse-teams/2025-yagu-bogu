@@ -31,17 +31,35 @@ public class Member {
     @JoinColumn(name = "team_id", nullable = true)
     private Team team;
 
-    @Column(name = "nickname", nullable = false, unique = true)
+    @Column(name = "nickname", nullable = false)
     private String nickname;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "provider", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OAuthProvider provider;
+
+    @Column(name = "sub", nullable = false, unique = true)
+    private String sub;
 
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    public Member(final Team team, final String nickname, final Role role) {
+    @Column(name = "image", nullable = true)
+    private String image;
+
+    public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
+                  final String sub, final Role role, final String image) {
         this.team = team;
         this.nickname = nickname;
+        this.email = email;
+        this.provider = provider;
+        this.sub = sub;
         this.role = role;
+        this.image = image;
     }
 
     public boolean isAdmin() {

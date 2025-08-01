@@ -56,6 +56,9 @@ jobs:
       DB_URL: ${{ secrets.DB_URL }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      JWT_ACCESS_TOKEN_SECRET_KEY: ${{ secrets.JWT_ACCESS_TOKEN_SECRET_KEY }}
+      JWT_REFRESH_TOKEN_SECRET_KEY: ${{ secrets.JWT_REFRESH_TOKEN_SECRET_KEY }}
     steps:
       - name: Kill existing process on port 80
         run: |
@@ -65,9 +68,6 @@ jobs:
         run: |
           cd /home/ubuntu/deploy
           sudo nohup java \
-            -Dspring.datasource.url="$DB_URL" \
-            -Dspring.datasource.username="$DB_USERNAME" \
-            -Dspring.datasource.password="$DB_PASSWORD" \
             -Dspring.profiles.active=dev \
             -Dserver.port=80 \
             -jar ./backend-build.jar >> output.log 2>&1 &

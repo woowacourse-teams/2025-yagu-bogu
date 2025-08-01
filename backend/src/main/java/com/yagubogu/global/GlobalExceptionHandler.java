@@ -1,5 +1,6 @@
 package com.yagubogu.global;
 
+import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.YaguBoguException;
@@ -30,12 +31,22 @@ public class GlobalExceptionHandler {
         return new ExceptionResponse(e.getMessage());
     }
 
+
     /**
      * 500 Internal Server Error
      */
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 502 Bad Gateway Exception
+     */
+    @ExceptionHandler(BadGatewayException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
         return new ExceptionResponse(e.getMessage());
     }
 }

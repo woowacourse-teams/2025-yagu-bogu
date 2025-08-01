@@ -16,3 +16,18 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: 'this-is-client-id'
+
+security:
+  jwt:
+    access-token:
+      secret-key: this-is-secret-key
+      expire-length: 900000      # 15분 (ms)
+    refresh-token:
+      secret-key: this-is-secret-key
+      expire-length: 1209600000  # 14일 (ms)
