@@ -19,7 +19,7 @@ public class KboClient {
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
 
-    public KboClientResponse fetchGame(LocalDate date) {
+    public KboClientResponse fetchGame(final LocalDate date) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("leId", "1");
         param.add("srId", "0,1,3,4,5,6,7,8,9");
@@ -36,7 +36,7 @@ public class KboClient {
 
             return kboClientResponse;
         } catch (Exception e) {
-            throw new KboClientException("Failed to fetch game data from Kbo api");
+            throw new KboClientException("Failed to fetch game data from Kbo api", e);
         }
     }
 
