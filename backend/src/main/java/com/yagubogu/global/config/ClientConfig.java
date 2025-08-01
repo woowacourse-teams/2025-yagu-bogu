@@ -1,25 +1,26 @@
 package com.yagubogu.global.config;
 
-import java.time.Duration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+@EnableConfigurationProperties(KboClientProperties.class)
 @Configuration
 public class ClientConfig {
 
     @Bean
-    public RestClient kboRestClient() {
+    public RestClient kboRestClient(KboClientProperties props) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
-        requestFactory.setReadTimeout(Duration.ofSeconds(30));
+        requestFactory.setConnectTimeout(props.connectTimeout());
+        requestFactory.setReadTimeout(props.readTimeout());
 
         return RestClient.builder()
                 .requestFactory(requestFactory)
-                .baseUrl("https://www.koreabaseball.com/ws/Main.asmx")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8")
+                .baseUrl(props.baseUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, props.contentType())
                 .build();
     }
 }

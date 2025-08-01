@@ -16,3 +16,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+  api:
+    kbo:
+      base-url: https://www.koreabaseball.com/ws/Main.asmx
+      connect-timeout: 5s
+      read-timeout: 30s
+      content-type: application/x-www-form-urlencoded; charset=UTF-8
