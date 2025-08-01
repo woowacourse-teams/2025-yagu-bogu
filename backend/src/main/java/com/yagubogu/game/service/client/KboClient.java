@@ -11,8 +11,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class KboClient {
 
     private final RestClient kboRestClient;
@@ -32,6 +32,7 @@ public class KboClient {
                     .body(String.class);
             KboClientResponse kboClientResponse = objectMapper.readValue(responseBody, KboClientResponse.class);
             validateResponse(kboClientResponse);
+
             return kboClientResponse;
         } catch (Exception e) {
             throw new KboClientException("Failed to fetch game data from Kbo api");

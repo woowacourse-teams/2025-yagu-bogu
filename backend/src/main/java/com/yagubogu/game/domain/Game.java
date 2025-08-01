@@ -56,9 +56,16 @@ public class Game {
     private Integer awayScore;
 
 
-    public Game(final Stadium stadium, final Team homeTeam, final Team awayTeam, final LocalDate date,
-                final LocalTime startAt, final String gameCode,
-                final Integer homeScore, final Integer awayScore) {
+    public Game(
+            final Stadium stadium,
+            final Team homeTeam,
+            final Team awayTeam,
+            final LocalDate date,
+            final LocalTime startAt,
+            final String gameCode,
+            final Integer homeScore,
+            final Integer awayScore
+    ) {
         this.stadium = stadium;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;

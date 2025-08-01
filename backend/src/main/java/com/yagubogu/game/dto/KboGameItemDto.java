@@ -16,5 +16,4 @@ public record KboGameItemDto(
         @JsonProperty("T_SCORE_CN") String homeScore,
         @JsonProperty("B_SCORE_CN") String awayScore
 ) {
-
 }
