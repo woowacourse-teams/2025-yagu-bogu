@@ -161,4 +161,20 @@ public class TalkIntegrationTest {
                 .then().log().all()
                 .statusCode(204);
     }
+
+    @DisplayName("톡을 신고한다")
+    @Test
+    void reportTalk() {
+        // given
+        long talkId = 9L;
+        long reporterId = 2L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("reporterId", 2)
+                .when().post("/api/talks/{talkId}/reports", talkId)
+                .then().log().all()
+                .statusCode(201);
+    }
 }
