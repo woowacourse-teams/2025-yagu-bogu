@@ -1,7 +1,7 @@
 package com.yagubogu.game.schedule;
 
 import com.yagubogu.game.service.GameService;
-import com.yagubogu.global.exception.KboClientException;
+import com.yagubogu.global.exception.ClientException;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +19,7 @@ public class GameScheduler {
 
         try {
             gameService.fetchGameList(today);
-        } catch (KboClientException e) {
+        } catch (ClientException e) {
             // TODO: 예외 로깅
         }
     }

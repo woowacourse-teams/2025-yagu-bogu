@@ -5,7 +5,7 @@ import com.yagubogu.game.dto.KboClientResponse;
 import com.yagubogu.game.dto.KboGameItemDto;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
-import com.yagubogu.global.exception.KboClientException;
+import com.yagubogu.global.exception.ClientException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -33,7 +33,7 @@ public class GameService {
             "고척", "고척돔",
             "대구", "라이온즈파크"
     );
-    
+
     private final KboClient kboClient;
     private final GameRepository gameRepository;
     private final TeamRepository teamRepository;
@@ -61,11 +61,11 @@ public class GameService {
 
     private Stadium getStadiumByName(final String stadiumName) {
         return stadiumRepository.findByShortName(STADIUM_NAME_MAP.get(stadiumName))
-                .orElseThrow(() -> new KboClientException("Stadium name match failed: " + stadiumName));
+                .orElseThrow(() -> new ClientException("Stadium name match failed: " + stadiumName));
     }
 
     private Team getTeamByShortName(final String teamShortName) {
         return teamRepository.findByShortName(teamShortName)
-                .orElseThrow(() -> new KboClientException("Team code match failed: " + teamShortName));
+                .orElseThrow(() -> new ClientException("Team code match failed: " + teamShortName));
     }
 }

@@ -2,7 +2,7 @@ package com.yagubogu.game.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.dto.KboClientResponse;
-import com.yagubogu.global.exception.KboClientException;
+import com.yagubogu.global.exception.ClientException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +36,13 @@ public class KboClient {
 
             return kboClientResponse;
         } catch (Exception e) {
-            throw new KboClientException("Failed to fetch game data from Kbo api", e);
+            throw new ClientException("Failed to fetch game data from Kbo api", e);
         }
     }
 
     private void validateResponse(final KboClientResponse kboClientResponse) {
         if (isResponseErrorCode(kboClientResponse)) {
-            throw new KboClientException("Unexpected response code from Kbo api");
+            throw new ClientException("Unexpected response code from Kbo api");
         }
     }
 
