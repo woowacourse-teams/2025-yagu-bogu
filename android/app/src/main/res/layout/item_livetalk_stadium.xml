@@ -10,7 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_white_stroke_primary500_radius_12dp"
         android:paddingHorizontal="24dp"
         android:paddingVertical="20dp">
@@ -20,19 +20,21 @@
             style="@style/TextView.Pretendard.Bold.20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="고척 스카이돔"
+            android:includeFontPadding="false"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="고척 스카이돔" />
 
         <ImageView
             android:id="@+id/iv_user_counter_icon"
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:layout_marginStart="8dp"
+            android:contentDescription="@string/livetalk_people_icon_description"
             android:src="@drawable/ic_users"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_stadium_name"
-            app:layout_constraintStart_toEndOf="@+id/tv_stadium_name"
-            app:layout_constraintTop_toTopOf="@+id/tv_stadium_name"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+            app:layout_constraintStart_toEndOf="@id/tv_stadium_name"
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
             app:tint="@color/gray500" />
 
         <TextView
@@ -41,12 +43,87 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="100"
             android:textColor="@color/gray500"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_user_counter_icon"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
             app:layout_constraintStart_toEndOf="@+id/iv_user_counter_icon"
-            app:layout_constraintTop_toTopOf="@+id/iv_user_counter_icon" />
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+            tools:text="100" />
 
+
+        <ImageView
+            android:id="@+id/tv_arrow_right"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:contentDescription="@string/livetalk_stadium_select_arrow"
+            android:src="@drawable/ic_arrow_right"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+            app:tint="@color/gray500" />
+
+        <TextView
+            android:id="@+id/tv_home_team_emoji"
+            style="@style/TextView.Pretendard.Medium.28"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toStartOf="@id/tv_livetalk_vs_design"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_stadium_name"
+            tools:text="🐻" />
+
+        <TextView
+            android:id="@+id/tv_home_team_nickname"
+            style="@style/TextView.Esamanru.Medium.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/tv_home_team_emoji"
+            app:layout_constraintStart_toStartOf="@+id/tv_home_team_emoji"
+            app:layout_constraintTop_toBottomOf="@+id/tv_home_team_emoji"
+            tools:text="베어스"
+            tools:textColor="@color/team_doosan" />
+
+        <TextView
+            android:id="@+id/tv_livetalk_vs_design"
+            style="@style/TextView.Pretendard.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="vs"
+            android:textColor="@color/gray500"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_home_team_nickname"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_home_team_emoji"
+            tools:textColor="@color/team_doosan" />
+
+        <TextView
+            android:id="@+id/tv_away_team_emoji"
+            style="@style/TextView.Pretendard.Medium.28"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_livetalk_vs_design"
+            app:layout_constraintTop_toTopOf="@+id/tv_home_team_emoji"
+            tools:text="🦸" />
+
+        <TextView
+            android:id="@+id/tv_away_team_nickname"
+            style="@style/TextView.Esamanru.Medium.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_home_team_nickname"
+            app:layout_constraintEnd_toEndOf="@+id/tv_away_team_emoji"
+            app:layout_constraintStart_toStartOf="@+id/tv_away_team_emoji"
+            app:layout_constraintTop_toBottomOf="@+id/tv_home_team_emoji"
+            app:layout_constraintTop_toTopOf="@id/tv_home_team_nickname"
+            tools:text="히어로즈"
+            tools:textColor="@color/team_doosan" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

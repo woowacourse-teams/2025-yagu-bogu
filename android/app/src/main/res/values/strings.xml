@@ -43,4 +43,6 @@
 
     <string name="stats_stadium_pie_chart_title">%s 인증현황</string>
     <string name="stats_stadium_refresh_time">%02d:%02d 기준</string>
+    <string name="livetalk_people_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_stadium_select_arrow">현장톡 구장 선택 진입 아이콘</string>
 </resources>
