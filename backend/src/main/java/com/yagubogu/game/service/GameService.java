@@ -22,6 +22,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
+    private static final Map<String, String> STADIUM_NAME_MAP = Map.of(
+            "문학", "랜더스필드",
+            "잠실", "잠실구장",
+            "사직", "사직구장",
+            "광주", "챔피언스필드",
+            "대전", "볼파크",
+            "창원", "엔씨파크",
+            "수원", "위즈파크",
+            "고척", "고척돔",
+            "대구", "라이온즈파크"
+    );
+    
     private final KboClient kboClient;
     private final GameRepository gameRepository;
     private final TeamRepository teamRepository;
