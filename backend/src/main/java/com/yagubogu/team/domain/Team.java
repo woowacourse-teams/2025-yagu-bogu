@@ -27,8 +27,12 @@ public class Team {
     @Column(name = "short_name", nullable = false, unique = true)
     private String shortName;
 
-    public Team(final String name, final String shortName) {
+    @Column(name = "team_code", nullable = false, unique = true)
+    private String teamCode;
+
+    public Team(final String name, final String shortName, final String teamCode) {
         this.name = name;
         this.shortName = shortName;
+        this.teamCode = teamCode;
     }
 }

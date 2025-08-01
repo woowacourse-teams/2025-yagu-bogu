@@ -1,8 +1,8 @@
-INSERT INTO teams (name, short_name)
-VALUES ('기아 타이거즈', '기아'),
-       ('롯데 자이언츠', '롯데'),
-       ('삼성 라이온즈', '삼성'),
-       ('두산 베어스', '두산');
+INSERT INTO teams (name, short_name, team_code)
+VALUES ('기아 타이거즈', '기아', 'HT'),
+       ('롯데 자이언츠', '롯데', 'LT'),
+       ('삼성 라이온즈', '삼성', 'SS'),
+       ('두산 베어스', '두산', 'OB');
 
 INSERT INTO members (team_id, nickname, email, provider, sub, role, image)
 VALUES (1, '포르', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://image.com/por.png'),
