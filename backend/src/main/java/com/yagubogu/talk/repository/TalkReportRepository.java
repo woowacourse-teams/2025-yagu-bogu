@@ -1,6 +1,6 @@
-package com.yagubogu.talkreport.repository;
+package com.yagubogu.talk.repository;
 
-import com.yagubogu.talkreport.domain.TalkReport;
+import com.yagubogu.talk.domain.TalkReport;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

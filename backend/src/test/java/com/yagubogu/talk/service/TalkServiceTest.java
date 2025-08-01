@@ -9,6 +9,7 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,12 @@ class TalkServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private TalkReportRepository talkReportRepository;
+
     @BeforeEach
     void setUp() {
-        talkService = new TalkService(talkRepository, gameRepository, memberRepository);
+        talkService = new TalkService(talkRepository, gameRepository, memberRepository, talkReportRepository);
     }
 
     @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다")

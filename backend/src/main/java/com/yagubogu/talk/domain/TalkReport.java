@@ -1,7 +1,6 @@
-package com.yagubogu.talkreport.domain;
+package com.yagubogu.talk.domain;
 
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.talk.domain.Talk;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

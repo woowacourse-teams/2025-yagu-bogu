@@ -11,9 +11,12 @@ import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +31,8 @@ public class TalkService {
     private final GameRepository gameRepository;
 
     private final MemberRepository memberRepository;
+
+    private final TalkReportRepository talkReportRepository;
 
     public CursorResult<TalkResponse> findTalks(
             final long gameId,
@@ -119,5 +124,34 @@ public class TalkService {
         }
 
         talkRepository.deleteById(talkId);
+    }
+
+    public List<TalkResponse> hideReportedTalks(
+            final List<TalkResponse> talks,
+            final long memberId // TODO: 나중에 삭제
+    ) {
+        if (talks.isEmpty()) {
+            return talks;
+        }
+
+        List<Long> talkIds = talks.stream()
+                .map(TalkResponse::id)
+                .toList();
+
+        Set<Long> hiddenTalkIds = new HashSet<>(
+                talkReportRepository.findTalkIdsByMemberIdAndTalkIds(memberId, talkIds)
+        );
+
+        return talks.stream()
+                .map(talk -> hiddenTalkIds.contains(talk.id())
+                        ? new TalkResponse(
+                        talk.id(),
+                        talk.memberId(),
+                        talk.nickname(),
+                        talk.favorite(),
+                        "숨김처리되었습니다",
+                        talk.createdAt())
+                        : talk)
+                .toList();
     }
 }

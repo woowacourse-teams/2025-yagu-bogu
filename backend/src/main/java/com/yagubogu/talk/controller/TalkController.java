@@ -1,10 +1,12 @@
 package com.yagubogu.talk.controller;
 
-import com.yagubogu.facade.TalkFacadeService;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.service.TalkReportService;
+import com.yagubogu.talk.service.TalkService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TalkController {
 
-    private final TalkFacadeService talkFacadeService;
+    private final TalkService talkService;
+
+    private final TalkReportService talkReportService;
 
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
@@ -31,10 +35,16 @@ public class TalkController {
             @RequestParam("limit") final int limit,
             @RequestParam("memberId") final long memberId // TODO: 나중에 제거
     ) {
-        CursorResult<TalkResponse> response = talkFacadeService.findTalksWithHiddenReport(gameId, cursorId, limit,
+        CursorResult<TalkResponse> rawTalksCursorResult = talkService.findTalks(gameId, cursorId, limit);
+        List<TalkResponse> hiddenReportedTalks = talkService.hideReportedTalks(rawTalksCursorResult.content(),
                 memberId);
 
-        return ResponseEntity.ok(response);
+        CursorResult<TalkResponse> finalCursorResult = new CursorResult<>(
+                hiddenReportedTalks,
+                rawTalksCursorResult.nextCursorId(),
+                rawTalksCursorResult.hasNext()
+        );
+        return ResponseEntity.ok(finalCursorResult);
     }
 
     @GetMapping("/{gameId}/polling")
@@ -43,7 +53,7 @@ public class TalkController {
             @RequestParam(value = "after", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        CursorResult<TalkResponse> response = talkFacadeService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> response = talkService.pollTalks(gameId, cursorId, limit);
 
         return ResponseEntity.ok(response);
     }
@@ -53,7 +63,7 @@ public class TalkController {
             @PathVariable final long gameId,
             @Valid @RequestBody final TalkRequest request
     ) {
-        TalkResponse response = talkFacadeService.createTalk(gameId, request);
+        TalkResponse response = talkService.createTalk(gameId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -63,7 +73,7 @@ public class TalkController {
             @PathVariable final long talkId,
             @RequestParam("reporterId") final long reporterId // TODO: 나중에 삭제
     ) {
-        talkFacadeService.reportTalk(talkId, reporterId);
+        talkReportService.reportTalk(talkId, reporterId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -74,7 +84,7 @@ public class TalkController {
             @PathVariable final long talkId,
             @RequestParam("memberId") final long memberId // TODO: 나중에 삭제
     ) {
-        talkFacadeService.removeTalk(gameId, talkId, memberId);
+        talkService.removeTalk(gameId, talkId, memberId);
         return ResponseEntity.noContent().build();
     }
 }
