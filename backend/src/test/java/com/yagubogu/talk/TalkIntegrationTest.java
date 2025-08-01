@@ -19,7 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
         "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.datasource.url=jdbc:h2:mem:talkdatabase;DB_CLOSE_DELAY=-1",
+        "spring.datasource.url=jdbc:h2:mem:talkdatabase",
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "spring.jpa.defer-datasource-initialization=true",
         "spring.sql.init.data-locations=classpath:talk-test-data.sql",

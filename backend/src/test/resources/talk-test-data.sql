@@ -1,28 +1,22 @@
--- 1. 팀 생성
--- 롯데자이언츠 (ID: 1)
-INSERT INTO teams (name, short_name)
-VALUES ('롯데자이언츠', '롯데');
--- 한화이글스 (ID: 2)
-INSERT INTO teams (name, short_name)
-VALUES ('한화이글스', '한화');
+-- 1. 팀 생성 (ID 명시)
+INSERT INTO teams (team_id, name, short_name)
+VALUES (1, '롯데자이언츠', '롯데');
+INSERT INTO teams (team_id, name, short_name)
+VALUES (2, '한화이글스', '한화');
 
--- 2. 멤버 생성
--- 포라 (롯데팬, ID: 1, team_id: 1)
-INSERT INTO members (team_id, nickname, role)
-VALUES (1, '포라', 'USER');
--- 누구 (한화팬, ID: 2, team_id: 2)
-INSERT INTO members (team_id, nickname, role)
-VALUES (2, '누구', 'USER');
+-- 2. 멤버 생성 (ID 명시, team_id는 위에서 명시한 ID 참조)
+INSERT INTO members (member_id, team_id, nickname, role)
+VALUES (1, 1, '포라', 'USER');
+INSERT INTO members (member_id, team_id, nickname, role)
+VALUES (2, 2, '누구', 'USER');
 
--- 3. 구장 생성
--- 사직야구장 (ID: 1)
-INSERT INTO stadiums (full_name, short_name, location, latitude, longitude)
-VALUES ('사직야구장', '사직구장', '부산', 35.1943, 129.0615);
+-- 3. 구장 생성 (ID 명시)
+INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude)
+VALUES (1, '사직야구장', '사직구장', '부산', 35.1943, 129.0615);
 
--- 4. 경기 생성 - 롯데가 홈구장, 롯데가 이김
--- Game (ID: 1)
-INSERT INTO games (stadium_id, home_team_id, away_team_id, date, home_score, away_score)
-VALUES (1, 1, 2, '2025-07-25', 10, 0);
+-- 4. 경기 생성 (ID 명시, stadium_id, home_team_id, away_team_id는 위에서 명시한 ID 참조)
+INSERT INTO games (game_id, stadium_id, home_team_id, away_team_id, date, home_score, away_score)
+VALUES (1, 1, 1, 2, '2025-07-25', 10, 0);
 
 -- 5. 톡 52개 생성
 -- 기준 시간: 2025-07-25 15:00:00
