@@ -1,10 +1,9 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInGameResponse;
+import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
+import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -13,12 +12,17 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -45,7 +49,7 @@ class CheckInServiceTest {
         checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository);
     }
 
-    @DisplayName("인증을 저장한다.")
+    @DisplayName("인증을 저장한다")
     @Test
     void findOccupancyRate() {
         // given
@@ -58,7 +62,7 @@ class CheckInServiceTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("구장을 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("구장을 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundStadium() {
         // given
@@ -73,7 +77,7 @@ class CheckInServiceTest {
                 .hasMessage("Stadium is not found");
     }
 
-    @DisplayName("경기를 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("경기를 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundGame() {
         // given
@@ -88,7 +92,7 @@ class CheckInServiceTest {
                 .hasMessage("Game is not found");
     }
 
-    @DisplayName("회원을 찾을 수 없으면 예외가 발생한다.")
+    @DisplayName("회원을 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundMember() {
         // given
@@ -116,5 +120,74 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.checkInCounts()).isEqualTo(expected);
+    }
+
+    @DisplayName("직관 인증 내역을 모두 조회한다")
+    @Test
+    void findCheckInHistory_allCheckInsGivenYear() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        int expectedSize = 6;
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+
+        // then
+        assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
+    }
+
+    @DisplayName("직관 인증 내역이 인증 날짜 내림차순으로 정렬되어 반환된다")
+    @Test
+    void findCheckInHistory_sortsByCheckInDateDescending() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+
+        List<CheckInGameResponse> expected = List.of(
+                new CheckInGameResponse(1L,
+                        "잠실 야구장",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 21)
+                ),
+                new CheckInGameResponse(2L,
+                        "잠실 야구장",
+                        new CheckInGameTeamResponse(1L, "기아", 5, true),
+                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        LocalDate.of(2025, 7, 20)
+                ),
+                new CheckInGameResponse(3L,
+                        "잠실 야구장",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        LocalDate.of(2025, 7, 19)
+                ),
+                new CheckInGameResponse(4L,
+                        "광주 KIA 챔피언스필드",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 18)
+                ),
+                new CheckInGameResponse(5L,
+                        "광주 KIA 챔피언스필드",
+                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
+                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        LocalDate.of(2025, 7, 17)
+                ),
+                new CheckInGameResponse(6L,
+                        "대구 삼성라이온즈파크",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 16)
+                )
+        );
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+
+        // then
+        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
     }
 }
