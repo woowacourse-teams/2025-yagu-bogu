@@ -163,6 +163,7 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
+            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumOccupancyRates.first()
         }
     }
 

@@ -217,8 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
                     app:layout_constraintBottom_toTopOf="@id/constraint_show_more"
-                    app:layout_constraintTop_toBottomOf="@id/tv_team_occupancy_title"
-                    app:teamOccupancyRates="@{stadiumStatsUiModel.stadiumOccupancyRates.first}" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_team_occupancy_title" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraint_show_more"
