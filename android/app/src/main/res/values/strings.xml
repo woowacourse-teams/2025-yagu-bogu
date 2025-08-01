@@ -49,5 +49,6 @@
     <string name="stats_gain_score">득점</string>
     <string name="stats_loss_score">실점</string>
 
+    <string name="stats_attendance_history_title">최근 직관 내역</string>
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
 </resources>
