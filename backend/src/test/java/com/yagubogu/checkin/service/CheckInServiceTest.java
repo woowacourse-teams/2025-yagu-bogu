@@ -1,5 +1,6 @@
 package com.yagubogu.checkin.service;
 
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
@@ -128,11 +129,12 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.ALL;
 
         int expectedSize = 6;
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
@@ -144,6 +146,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.ALL;
 
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
@@ -185,7 +188,7 @@ class CheckInServiceTest {
         );
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
@@ -197,11 +200,12 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.WIN;
 
         int expectedSize = 5;
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInWinHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
@@ -213,6 +217,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.WIN;
 
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
@@ -248,7 +253,7 @@ class CheckInServiceTest {
         );
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInWinHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);

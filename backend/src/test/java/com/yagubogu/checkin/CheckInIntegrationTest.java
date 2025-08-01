@@ -1,5 +1,6 @@
 package com.yagubogu.checkin;
 
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import io.restassured.RestAssured;
@@ -123,6 +124,7 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .pathParam("memberId", 1L)
                 .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
                 .when().get("/api/check-ins/members/{memberId}")
                 .then().log().all()
                 .statusCode(200);
@@ -139,6 +141,7 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
                 .when().get("/api/check-ins/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
@@ -152,7 +155,8 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .pathParam("memberId", 1L)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/wins/members/{memberId}")
+                .queryParam("result", CheckInResultFilter.WIN)
+                .when().get("/api/check-ins/members/{memberId}")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -168,7 +172,8 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/wins/members/{memberId}")
+                .queryParam("result", CheckInResultFilter.WIN)
+                .when().get("/api/check-ins/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }

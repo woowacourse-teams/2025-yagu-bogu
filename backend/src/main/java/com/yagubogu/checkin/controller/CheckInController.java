@@ -1,5 +1,6 @@
 package com.yagubogu.checkin.controller;
 
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
@@ -44,19 +45,10 @@ public class CheckInController {
     @GetMapping("/members/{memberId}")
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @PathVariable final long memberId,
-            @RequestParam final int year
+            @RequestParam final int year,
+            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter filter
     ) {
-        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/wins/members/{memberId}")
-    public ResponseEntity<CheckInHistoryResponse> findCheckInWinHistory(
-            @PathVariable final long memberId,
-            @RequestParam final int year
-    ) {
-        CheckInHistoryResponse response = checkInService.findCheckInWinHistory(memberId, year);
+        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year, filter);
 
         return ResponseEntity.ok(response);
     }
