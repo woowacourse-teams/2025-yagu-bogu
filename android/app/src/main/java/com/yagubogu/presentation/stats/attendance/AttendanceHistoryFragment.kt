@@ -56,14 +56,16 @@ class AttendanceHistoryFragment : Fragment() {
                             team = Team.KIA,
                             name = "KIA",
                             score = 9,
+                            isMyTeam = true,
                         ),
                     homeTeam =
                         TeamItem(
                             team = Team.DOOSAN,
                             name = "두산",
                             score = 5,
+                            isMyTeam = false,
                         ),
-                    date = LocalDate.of(2025, 8, 1),
+                    attendanceDate = LocalDate.of(2025, 8, 1),
                     stadiumName = "잠실 야구장",
                 ),
                 AttendanceHistoryItem(
@@ -72,14 +74,16 @@ class AttendanceHistoryFragment : Fragment() {
                             team = Team.KIWOOM,
                             name = "키움",
                             score = 7,
+                            isMyTeam = false,
                         ),
                     homeTeam =
                         TeamItem(
                             team = Team.KIA,
                             name = "KIA",
                             score = 4,
+                            isMyTeam = true,
                         ),
-                    date = LocalDate.of(2025, 7, 31),
+                    attendanceDate = LocalDate.of(2025, 7, 31),
                     stadiumName = "광주 KIA 챔피언스필드",
                 ),
                 AttendanceHistoryItem(
@@ -88,14 +92,16 @@ class AttendanceHistoryFragment : Fragment() {
                             team = Team.KIA,
                             name = "KIA",
                             score = 20,
+                            isMyTeam = true,
                         ),
                     homeTeam =
                         TeamItem(
                             team = Team.LG,
                             name = "LG",
                             score = 8,
+                            isMyTeam = false,
                         ),
-                    date = LocalDate.of(2025, 7, 22),
+                    attendanceDate = LocalDate.of(2025, 7, 22),
                     stadiumName = "잠실 야구장",
                 ),
             )

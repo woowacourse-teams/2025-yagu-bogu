@@ -26,7 +26,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:textColorRes="@{attendanceHistoryItem.awayTeam.teamColor}"
+            app:textColorRes="@{attendanceHistoryItem.awayTeamColorRes}"
             tools:text="9"
             tools:textColor="@color/team_kia" />
 
@@ -66,12 +66,12 @@
             tools:text="두산" />
 
         <TextView
-            android:id="@+id/tv_date"
+            android:id="@+id/tv_attendance_date"
             style="@style/TextView.Pretendard.Regular.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{attendanceHistoryItem.date.toString()}"
+            android:text="@{attendanceHistoryItem.attendanceDate.toString()}"
             android:textColor="@color/gray500"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +88,7 @@
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_date"
+            app:layout_constraintTop_toBottomOf="@id/tv_attendance_date"
             tools:text="잠실 야구장" />
 
         <TextView
@@ -100,7 +100,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:textColorRes="@{attendanceHistoryItem.homeTeam.teamColor}"
+            app:textColorRes="@{attendanceHistoryItem.homeTeamColorRes}"
             tools:text="5"
             tools:textColor="@color/team_doosan" />
 

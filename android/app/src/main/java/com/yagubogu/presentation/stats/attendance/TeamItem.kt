@@ -8,6 +8,7 @@ data class TeamItem(
     val team: Team,
     val name: String,
     val score: Int,
+    val isMyTeam: Boolean,
 ) {
     @ColorRes
     val teamColor: Int = team.getTeamColor()

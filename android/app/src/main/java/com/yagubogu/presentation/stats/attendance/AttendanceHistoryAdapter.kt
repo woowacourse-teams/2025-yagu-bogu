@@ -24,7 +24,7 @@ class AttendanceHistoryAdapter : ListAdapter<AttendanceHistoryItem, AttendanceHi
                 override fun areItemsTheSame(
                     oldItem: AttendanceHistoryItem,
                     newItem: AttendanceHistoryItem,
-                ): Boolean = oldItem.date == newItem.date
+                ): Boolean = oldItem.attendanceDate == newItem.attendanceDate
 
                 override fun areContentsTheSame(
                     oldItem: AttendanceHistoryItem,
