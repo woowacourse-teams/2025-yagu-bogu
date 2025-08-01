@@ -47,6 +47,6 @@ public class KboClient {
     }
 
     private boolean isResponseErrorCode(final KboClientResponse kboClientResponse) {
-        return !SUCCESS_CODE.equals(kboClientResponse.code());
+        return !SUCCESS_CODE.equals(kboClientResponse.statusCode());
     }
 }

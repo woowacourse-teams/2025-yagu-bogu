@@ -1,10 +1,11 @@
 package com.yagubogu.game.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record KboClientResponse(
-        List<KboGameItemDto> game,
-        String code,
+        @JsonProperty("game") List<KboGameItemDto> games,
+        @JsonProperty("code") String statusCode,
         String msg
 ) {
 }

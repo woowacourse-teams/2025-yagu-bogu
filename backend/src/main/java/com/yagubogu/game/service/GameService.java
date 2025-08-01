@@ -27,23 +27,12 @@ public class GameService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
-    private static final Map<String, String> STADIUM_NAME_MAP = Map.of(
-            "문학", "랜더스필드",
-            "잠실", "잠실구장",
-            "사직", "사직구장",
-            "광주", "챔피언스필드",
-            "대전", "볼파크",
-            "창원", "엔씨파크",
-            "수원", "위즈파크",
-            "고척", "고척돔",
-            "대구", "라이온즈파크"
-    );
 
     public void fetchGameList(final LocalDate date) {
         KboClientResponse kboClientResponse = kboClient.fetchGame(date);
         List<Game> games = new ArrayList<>();
 
-        for (KboGameItemDto kboGameItem : kboClientResponse.game()) {
+        for (KboGameItemDto kboGameItem : kboClientResponse.games()) {
             Stadium stadium = getStadiumByName(kboGameItem.stadiumName());
             Team homeTeam = getTeamByShortName(kboGameItem.homeTeamName());
             Team awayTeam = getTeamByShortName(kboGameItem.awayTeamName());
