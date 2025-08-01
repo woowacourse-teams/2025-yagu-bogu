@@ -11,9 +11,9 @@ import androidx.fragment.app.commit
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
-import com.yagubogu.presentation.chat.ChatFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.stats.StatsFragment
+import com.yagubogu.presentation.talk.TalkFragment
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -51,8 +51,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.item_stats ->
                     replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
 
-                R.id.item_chat ->
-                    replaceFragment(ChatFragment::class.java, R.string.bottom_navigation_chat)
+                R.id.item_talk ->
+                    replaceFragment(TalkFragment::class.java, R.string.bottom_navigation_talk)
 
                 R.id.item_challenge ->
                     replaceFragment(

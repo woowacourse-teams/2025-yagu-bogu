@@ -1,15 +1,15 @@
-package com.yagubogu.presentation.chat
+package com.yagubogu.presentation.talk
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.yagubogu.databinding.FragmentChatBinding
+import com.yagubogu.databinding.FragmentTalkBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
-class ChatFragment : Fragment() {
-    private var _binding: FragmentChatBinding? = null
+class TalkFragment : Fragment() {
+    private var _binding: FragmentTalkBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -17,7 +17,7 @@ class ChatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentChatBinding.inflate(inflater, container, false)
+        _binding = FragmentTalkBinding.inflate(inflater, container, false)
         return binding.root
     }
 

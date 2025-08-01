@@ -9,7 +9,7 @@
 
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
-    <string name="bottom_navigation_chat">현장톡</string>
+    <string name="bottom_navigation_talk">현장톡</string>
     <string name="bottom_navigation_challenge">챌린지</string>
 
     <string name="permission_dialog_open_settings">"설정으로 이동"</string>
