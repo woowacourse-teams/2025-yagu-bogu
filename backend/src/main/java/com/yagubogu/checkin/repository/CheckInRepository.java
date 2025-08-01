@@ -148,7 +148,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 (g.homeTeam = :team AND g.homeScore > g.awayScore)
                     OR
                 (g.awayTeam = :team AND g.awayScore > g.homeScore)
-            )
+            ) AND YEAR(g.date) = :year
             ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
