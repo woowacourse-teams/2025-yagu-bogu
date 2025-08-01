@@ -130,13 +130,13 @@ public class TalkIntegrationTest {
     void createTalk() {
         // given
         long gameId = 1L;
-        long memberId = 1L;
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TalkRequest(memberId, content))
+                .body(new TalkRequest(content))
+                .queryParam("memberId", 1)
                 .when().post("/api/talks/{gameId}", gameId)
                 .then().log().all()
                 .statusCode(201)

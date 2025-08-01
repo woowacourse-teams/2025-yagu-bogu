@@ -151,10 +151,10 @@ class TalkServiceTest {
         long gameId = 1L;
         long memberId = 1L;
         String content = "오늘 야구 재밌겠당";
-        TalkRequest request = new TalkRequest(memberId, content);
+        TalkRequest request = new TalkRequest(content);
 
         // when
-        TalkResponse response = talkService.createTalk(gameId, request);
+        TalkResponse response = talkService.createTalk(gameId, request, memberId);
 
         // then
         assertThat(response.content()).isEqualTo(content);

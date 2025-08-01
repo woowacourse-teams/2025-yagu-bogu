@@ -90,11 +90,12 @@ public class TalkService {
     @Transactional
     public TalkResponse createTalk(
             final long gameId,
-            final TalkRequest request
+            final TalkRequest request,
+            final long memberId // TODO: 나중에 삭제
     ) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
-        Member member = memberRepository.findById(request.memberId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
         LocalDateTime now = LocalDateTime.now();
 

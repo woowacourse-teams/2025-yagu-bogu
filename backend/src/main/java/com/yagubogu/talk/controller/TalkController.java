@@ -61,9 +61,10 @@ public class TalkController {
     @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
             @PathVariable final long gameId,
-            @Valid @RequestBody final TalkRequest request
+            @Valid @RequestBody final TalkRequest request,
+            @RequestParam("memberId") final long memberId // TODO: 아이디 삭제
     ) {
-        TalkResponse response = talkService.createTalk(gameId, request);
+        TalkResponse response = talkService.createTalk(gameId, request, memberId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
