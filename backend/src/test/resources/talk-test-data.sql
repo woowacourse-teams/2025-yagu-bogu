@@ -1,8 +1,8 @@
 -- 1. 팀 생성 (ID 명시)
-INSERT INTO teams (team_id, name, short_name)
-VALUES (1, '롯데자이언츠', '롯데');
-INSERT INTO teams (team_id, name, short_name)
-VALUES (2, '한화이글스', '한화');
+INSERT INTO teams (team_id, name, short_name, team_code)
+VALUES (1, '롯데자이언츠', '롯데', 'LT');
+INSERT INTO teams (team_id, name, short_name, team_code)
+VALUES (2, '한화이글스', '한화', 'HH');
 
 -- 2. 멤버 생성 (ID 명시, team_id는 위에서 명시한 ID 참조)
 INSERT INTO members (member_id, team_id, nickname, role)
