@@ -201,7 +201,6 @@ class CheckInServiceTest {
         long memberId = 1L;
         int year = 2025;
         CheckInResultFilter filter = CheckInResultFilter.WIN;
-
         int expectedSize = 5;
 
         // when
