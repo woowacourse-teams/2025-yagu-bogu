@@ -21,9 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class TalkService {
@@ -87,7 +85,6 @@ public class TalkService {
         return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
     }
 
-    @Transactional
     public TalkResponse createTalk(
             final long gameId,
             final TalkRequest request,
@@ -111,7 +108,6 @@ public class TalkService {
         );
     }
 
-    @Transactional
     public void removeTalk(
             final long gameId,
             final long talkId,

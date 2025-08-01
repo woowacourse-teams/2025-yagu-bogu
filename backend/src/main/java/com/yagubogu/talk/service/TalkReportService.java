@@ -8,7 +8,6 @@ import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.domain.TalkReport;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class TalkReportService {
 
     private final MemberRepository memberRepository;
 
-    @Transactional
     public void reportTalk(
             final long talkId,
             final long reporterId // TODO: 나중에 삭제

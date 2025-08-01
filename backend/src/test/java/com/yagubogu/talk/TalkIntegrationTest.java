@@ -172,7 +172,6 @@ public class TalkIntegrationTest {
     void reportTalk() {
         // given
         long talkId = 9L;
-        long reporterId = 2L;
 
         // when & then
         RestAssured.given().log().all()
