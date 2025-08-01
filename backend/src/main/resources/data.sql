@@ -1,15 +1,15 @@
 -- 1. 팀 데이터
-INSERT INTO teams (name, short_name)
-VALUES ('KIA 타이거즈', 'KIA'),
-       ('LG 트윈스', 'LG'),
-       ('키움 히어로즈', '키움'),
-       ('KT 위즈', 'KT'),
-       ('삼성 라이온즈', '삼성'),
-       ('롯데 자이언츠', '롯데'),
-       ('SSG 랜더스', 'SSG'),
-       ('NC 다이노스', 'NC'),
-       ('한화 이글스', '한화'),
-       ('두산 베어스', '두산');
+INSERT INTO teams (name, short_name, team_code)
+VALUES ('KIA 타이거즈', 'KIA', 'HT'),
+       ('LG 트윈스', 'LG', 'LG'),
+       ('키움 히어로즈', '키움', 'WO'),
+       ('KT 위즈', 'KT', 'KT'),
+       ('삼성 라이온즈', '삼성', 'SS'),
+       ('롯데 자이언츠', '롯데', 'LT'),
+       ('SSG 랜더스', 'SSG', 'SK'),
+       ('NC 다이노스', 'NC', 'NC'),
+       ('한화 이글스', '한화', 'HH'),
+       ('두산 베어스', '두산', 'OB');
 
 -- 2. 구장 데이터
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude)
