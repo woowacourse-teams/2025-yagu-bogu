@@ -60,11 +60,11 @@ public class GameService {
 
     private Stadium getStadiumByName(final String stadiumName) {
         return stadiumRepository.findByShortName(STADIUM_NAME_MAP.get(stadiumName))
-                .orElseThrow(() -> new KboClientException("stadium name match failed: " + stadiumName));
+                .orElseThrow(() -> new KboClientException("Stadium name match failed: " + stadiumName));
     }
 
     private Team getTeamByShortName(final String teamShortName) {
         return teamRepository.findByShortName(teamShortName)
-                .orElseThrow(() -> new KboClientException("team code match failed: " + teamShortName));
+                .orElseThrow(() -> new KboClientException("Team code match failed: " + teamShortName));
     }
 }

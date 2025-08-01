@@ -20,7 +20,7 @@ public class GameScheduler {
         try {
             gameService.fetchGameList(today);
         } catch (KboClientException e) {
-            //TODO: 예외 로깅
+            // TODO: 예외 로깅
         }
     }
 }
