@@ -5,6 +5,10 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanCountsByGameResponse;
+import com.yagubogu.checkin.dto.FanRateByGameResponse;
+import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -15,8 +19,11 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -36,8 +43,75 @@ public class CheckInService {
 
         long memberId = request.memberId();
         Member member = getMember(memberId);
+        Team team = member.getTeam();
 
-        checkInRepository.save(new CheckIn(game, member));
+        checkInRepository.save(new CheckIn(game, member, team));
+    }
+
+    public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
+        Member member = getMember(memberId);
+        Team myTeam = member.getTeam();
+
+        List<Game> games = gameRepository.findGameByDate(date);
+        List<Pair<Long, FanRateByGameResponse>> pairs = new ArrayList<>();
+
+        FanRateByGameResponse myTeamEnterThisGame = null;
+
+        for (Game game : games) {
+            FanCountsByGameResponse fanCountsByGameResponse = checkInRepository.countTotalAndHomeTeamAndAwayTeam(
+                    game,
+                    game.getHomeTeam(),
+                    game.getAwayTeam()
+            );
+
+            long total = fanCountsByGameResponse.totalCheckInCounts();
+
+            FanRateByGameResponse fanRateByGameResponse = getFanRateByGameResponse(game, fanCountsByGameResponse,
+                    total);
+
+            if (game.getHomeTeam().equals(myTeam) || game.getAwayTeam().equals(myTeam)) {
+                myTeamEnterThisGame = fanRateByGameResponse;
+                continue;
+            }
+            pairs.add(Pair.of(total, fanRateByGameResponse));
+        }
+
+        pairs.sort(Comparator.comparing(Pair<Long, FanRateByGameResponse>::getFirst).reversed());
+
+        List<FanRateByGameResponse> fanRateByGameResponses = new ArrayList<>();
+        fanRateByGameResponses.addFirst(myTeamEnterThisGame);
+        pairs.forEach(pair -> fanRateByGameResponses.add(pair.getSecond()));
+
+        return new FanRateResponse(fanRateByGameResponses);
+    }
+
+    private FanRateByGameResponse getFanRateByGameResponse(
+            final Game game,
+            final FanCountsByGameResponse fanCountsByGameResponse,
+            final long total
+    ) {
+        long home = fanCountsByGameResponse.homeTeamCheckInCounts();
+        long away = fanCountsByGameResponse.awayTeamCheckInCounts();
+
+        double homeFanRate = calculateRoundRate(((double) home / total) * 100);
+        double awayFanRate = calculateRoundRate(((double) away / total) * 100);
+
+        return new FanRateByGameResponse(
+                new TeamFanRateResponse(
+                        game.getHomeTeam().getShortName(),
+                        game.getHomeTeam().getTeamCode(),
+                        homeFanRate
+                ),
+                new TeamFanRateResponse(
+                        game.getAwayTeam().getShortName(),
+                        game.getAwayTeam().getTeamCode(),
+                        awayFanRate
+                )
+        );
+    }
+
+    private double calculateRoundRate(final double rate) {
+        return Math.round(rate * 10) / 10.0;
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
