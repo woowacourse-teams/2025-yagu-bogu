@@ -9,7 +9,6 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
@@ -18,9 +17,7 @@ import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.model.TeamOccupancyRate
 import com.yagubogu.presentation.home.model.TeamOccupancyRates
-import com.yagubogu.presentation.home.model.TeamOccupancyStatus
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
@@ -47,30 +44,8 @@ class HomeViewModel(
 
     init {
         fetchMemberInformation(MEMBER_ID, YEAR)
-
-        _stadiumStatsUiModel.value =
-            StadiumStatsUiModel(
-                "로딩중",
-                listOf(
-                    TeamOccupancyStatus(Team.LG, 50.0),
-                    TeamOccupancyStatus(Team.SAMSUNG, 50.0),
-                ),
-            )
-
-        // todo: API 연동
-        val today = LocalDate.now()
-        // fetchStadiumStats(DUMMY_STADIUM_ID, today)
-
-        val dummyStadiumStatusUiModel =
-            StadiumStatsUiModel(
-                "챔피언스필드",
-                listOf(
-                    TeamOccupancyStatus(Team.HANWHA, 100.0),
-                    TeamOccupancyStatus(Team.SSG, 0.0),
-                ),
-            )
-
-        _stadiumStatsUiModel.value = dummyStadiumStatusUiModel
+        val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+        fetchStadiumStats(today)
     }
 
     fun checkIn() {
@@ -85,24 +60,19 @@ class HomeViewModel(
         )
     }
 
+    // TODO: API 변경되는 거에 따라서 수정해야 됨
     fun fetchStadiumStats(date: LocalDate) {
         viewModelScope.launch {
             val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
                 statsRepository.getTeamOccupancyRates(2, date)
             teamOccupancyRatesResult
                 .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
-                    val teamOccupancyStatuses: List<TeamOccupancyStatus> =
-                        teamOccupancyRates.rates.map { teamOccupancyRate: TeamOccupancyRate ->
-                            TeamOccupancyStatus(
-                                teamOccupancyRate.team,
-                                teamOccupancyRate.occupancyRate,
-                            )
-                        }
-
                     _stadiumStatsUiModel.value =
                         StadiumStatsUiModel(
-                            teamOccupancyRates.stadiumName,
-                            teamOccupancyStatuses,
+                            stadiumOccupancyRates =
+                                listOf(
+                                    teamOccupancyRates,
+                                ),
                         )
                 }.onFailure { exception: Throwable ->
                     Log.e(TAG, "API 호출 실패", exception)

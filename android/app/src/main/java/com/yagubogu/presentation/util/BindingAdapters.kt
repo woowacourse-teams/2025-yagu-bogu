@@ -11,7 +11,7 @@ import androidx.databinding.BindingAdapter
 fun ImageView.setCustomChartDividerTint(
     @ColorRes colorRes: Int?,
 ) {
-    colorRes ?: return
+    if (colorRes == null || colorRes == 0) return
     this.imageTintList = ColorStateList.valueOf(context.getColor(colorRes))
 }
 
@@ -19,7 +19,7 @@ fun ImageView.setCustomChartDividerTint(
 fun View.setCustomChartBackground(
     @ColorRes colorRes: Int?,
 ) {
-    colorRes ?: return
+    if (colorRes == null || colorRes == 0) return
     setBackgroundColor(context.getColor(colorRes))
 }
 
