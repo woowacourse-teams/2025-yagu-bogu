@@ -3,6 +3,7 @@ package com.yagubogu.presentation.util
 import android.content.res.ColorStateList
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
@@ -35,4 +36,12 @@ fun View.setConstraintGuidePercent(percent: Double) {
     val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return
     layoutParams.guidePercent = percent.toFloat()
     this.layoutParams = layoutParams
+}
+
+@BindingAdapter("textColorRes")
+fun TextView.setTextColorRes(
+    @ColorRes colorRes: Int?,
+) {
+    if (colorRes == null || colorRes == 0) return
+    setTextColor(context.getColor(colorRes))
 }

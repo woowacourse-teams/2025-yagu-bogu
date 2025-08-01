@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="attendanceHistoryItem"
+            type="com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,12 +21,12 @@
             style="@style/TextView.Esamanru.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9"
-            android:textColor="@color/team_kia"
+            android:text="@{String.valueOf(attendanceHistoryItem.awayTeam.score)}"
             android:textSize="56dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:textColorRes="@{attendanceHistoryItem.awayTeam.teamColor}"
             tools:text="9"
             tools:textColor="@color/team_kia" />
 
@@ -28,7 +35,7 @@
             style="@style/TextView.Pretendard.SemiBold.20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="KIA"
+            android:text="@{attendanceHistoryItem.awayTeam.name}"
             app:layout_constraintEnd_toStartOf="@id/tv_vs"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
@@ -52,7 +59,7 @@
             style="@style/TextView.Pretendard.SemiBold.20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="두산"
+            android:text="@{attendanceHistoryItem.homeTeam.name}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_vs"
             app:layout_constraintTop_toTopOf="parent"
@@ -64,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="2025.08.01"
+            android:text="@{attendanceHistoryItem.date.toString()}"
             android:textColor="@color/gray500"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,7 +83,7 @@
             style="@style/TextView.Pretendard.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="잠실 야구장"
+            android:text="@{attendanceHistoryItem.stadiumName}"
             android:textColor="@color/gray500"
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,12 +95,12 @@
             style="@style/TextView.Esamanru.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5"
-            android:textColor="@color/team_doosan"
+            android:text="@{String.valueOf(attendanceHistoryItem.homeTeam.score)}"
             android:textSize="56dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:textColorRes="@{attendanceHistoryItem.homeTeam.teamColor}"
             tools:text="5"
             tools:textColor="@color/team_doosan" />
 
