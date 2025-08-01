@@ -18,8 +18,12 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
+        "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.datasource.url=jdbc:h2:mem:talkdatabase;DB_CLOSE_DELAY=-1",
-        "spring.sql.init.data-locations=classpath:talk-test-data.sql"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.jpa.defer-datasource-initialization=true",
+        "spring.sql.init.data-locations=classpath:talk-test-data.sql",
+        "spring.sql.init.mode=always"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
