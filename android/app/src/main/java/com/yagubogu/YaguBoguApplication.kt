@@ -2,7 +2,6 @@ package com.yagubogu
 
 import android.app.Application
 import com.google.android.gms.location.LocationServices
-import com.yagubogu.auth.GoogleLoginManager
 import com.yagubogu.data.datasource.CheckInsRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
@@ -16,10 +15,6 @@ import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
 
 class YaguBoguApplication : Application() {
-    val googleLoginManager: GoogleLoginManager by lazy {
-        GoogleLoginManager(BuildConfig.WEB_CLIENT_ID, "", applicationContext)
-    }
-
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
     val locationRepository by lazy { LocationDefaultRepository(locationDataSource) }

@@ -3,6 +3,7 @@ package com.yagubogu.presentation.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.yagubogu.BuildConfig
+import com.yagubogu.auth.GoogleCredentialHandler
+import com.yagubogu.auth.GoogleCredentialRequestManager
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
@@ -21,7 +25,12 @@ class LoginActivity : AppCompatActivity() {
     }
     private var isAppInitialized: Boolean = false
 
-    private val viewModel: LoginViewModel by viewModels { LoginViewModelFactory(application) }
+    private val viewModel: LoginViewModel by viewModels {
+        val googleCredentialRequestManager =
+            GoogleCredentialRequestManager(this, BuildConfig.WEB_CLIENT_ID, "")
+        val googleCredentialHandler = GoogleCredentialHandler(googleCredentialRequestManager)
+        LoginViewModelFactory(googleCredentialHandler)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
@@ -35,6 +44,10 @@ class LoginActivity : AppCompatActivity() {
     private fun setupSplash() {
         val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isAppInitialized }
+
+        viewModel.login.observe(this) {
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setupView() {
