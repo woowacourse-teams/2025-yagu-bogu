@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KboClient {
 
+    public static final String SUCCESS_CODE = "100";
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
 
@@ -46,6 +47,6 @@ public class KboClient {
     }
 
     private boolean isResponseErrorCode(final KboClientResponse kboClientResponse) {
-        return !kboClientResponse.code().equals("100");
+        return !SUCCESS_CODE.equals(kboClientResponse.code());
     }
 }
