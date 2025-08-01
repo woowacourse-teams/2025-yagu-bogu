@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.dto.KboClientResponse;
-import com.yagubogu.game.dto.KboGameItemDto;
+import com.yagubogu.game.dto.KboGameDto;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
 import com.yagubogu.global.exception.ClientException;
@@ -52,7 +52,7 @@ class GameServiceTest {
     void fetchGameList() {
         // given
         LocalDate today = TestFixture.getToday();
-        KboGameItemDto gameItem = new KboGameItemDto(
+        KboGameDto gameItem = new KboGameDto(
                 "20250721OBLG0", "2025-07-21", 0L, "18:30",
                 "잠실", "기아", "두산", "정상경기", "", "정규시즌", "5", "3"
         );
@@ -77,7 +77,7 @@ class GameServiceTest {
     void fetchGameList_stadiumNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
-        KboGameItemDto gameItem = new KboGameItemDto(
+        KboGameDto gameItem = new KboGameDto(
                 "20250721SSHH0", "2025-07-21", 0L, "18:30",
                 "존재하지않는경기장", "한화", "삼성", "정상경기", "", "정규시즌", "5", "3"
         );
@@ -96,7 +96,7 @@ class GameServiceTest {
     void fetchGameList_homeTeamNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
-        KboGameItemDto gameItem = new KboGameItemDto(
+        KboGameDto gameItem = new KboGameDto(
                 "20250721SSHH0", "2025-07-21", 0L, "18:30",
                 "잠실", "존재하지않는원정팀", "삼성", "정상경기", "", "정규시즌", "5", "3"
         );
@@ -115,7 +115,7 @@ class GameServiceTest {
     void fetchGameList_awayTeamNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
-        KboGameItemDto gameItem = new KboGameItemDto(
+        KboGameDto gameItem = new KboGameDto(
                 "20250721SSHH0", "2025-07-21", 0L, "18:30",
                 "잠실", "한화", "존재하지않는원정팀", "정상경기", "", "정규시즌", "5", "3"
         );

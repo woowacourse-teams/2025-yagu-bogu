@@ -2,7 +2,7 @@ package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.KboClientResponse;
-import com.yagubogu.game.dto.KboGameItemDto;
+import com.yagubogu.game.dto.KboGameDto;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
 import com.yagubogu.global.exception.ClientException;
@@ -44,7 +44,7 @@ public class GameService {
         KboClientResponse kboClientResponse = kboClient.fetchGame(date);
         List<Game> games = new ArrayList<>();
 
-        for (KboGameItemDto kboGameItem : kboClientResponse.games()) {
+        for (KboGameDto kboGameItem : kboClientResponse.games()) {
             Stadium stadium = getStadiumByName(kboGameItem.stadiumName());
             Team homeTeam = getTeamByShortName(kboGameItem.homeTeamName());
             Team awayTeam = getTeamByShortName(kboGameItem.awayTeamName());
