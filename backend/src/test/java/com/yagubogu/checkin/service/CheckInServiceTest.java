@@ -4,6 +4,7 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
@@ -16,6 +17,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
@@ -189,5 +192,22 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
+    @ParameterizedTest
+    @CsvSource(value = {
+            "1,true",
+            "3,false"
+    })
+    void findCheckInStatus(long memberId, boolean expected) {
+        // given
+        LocalDate date = TestFixture.getToday();
+
+        // when
+        CheckInStatusResponse actual = checkInService.findCheckInStatus(memberId, date);
+
+        // then
+        assertThat(actual.isCheckIn()).isEqualTo(expected);
     }
 }

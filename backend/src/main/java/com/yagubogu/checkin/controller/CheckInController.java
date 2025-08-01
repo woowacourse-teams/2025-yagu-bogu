@@ -2,8 +2,10 @@ package com.yagubogu.checkin.controller;
 
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.service.CheckInService;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,16 @@ public class CheckInController {
             @RequestParam final int year
     ) {
         CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/status/members/{memberId}")
+    public ResponseEntity<CheckInStatusResponse> findCheckInStatus(
+            @PathVariable final long memberId,
+            @RequestParam final LocalDate date
+    ) {
+        CheckInStatusResponse response = checkInService.findCheckInStatus(memberId, date);
 
         return ResponseEntity.ok(response);
     }
