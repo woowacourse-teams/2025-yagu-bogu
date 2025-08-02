@@ -1,6 +1,7 @@
 package com.yagubogu.checkin;
 
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -140,6 +141,43 @@ public class CheckInIntegrationTest {
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("year", 2025)
                 .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("인증 여부를 조회한다")
+    @Test
+    void findCheckInStatus() {
+        // given
+        boolean expected = true;
+
+        // when
+        CheckInStatusResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .queryParam("date", "2025-07-21")
+                .when().get("/api/check-ins/status/members/{memberId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CheckInStatusResponse.class);
+
+        // then
+        assertThat(actual.isCheckIn()).isEqualTo(expected);
+    }
+
+    @DisplayName("예외 : 인증 여부를 조회하는데 일치하는 회원이 없으면 404 상태를 반환한다")
+    @Test
+    void findCheckInStatus_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", invalidMemberId)
+                .queryParam("date", "2025-07-21")
+                .when().get("/api/check-ins/status/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }
