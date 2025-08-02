@@ -54,6 +54,16 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="닉네임" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_nickname"
+            app:layout_constraintStart_toEndOf="@id/tv_nickname"
+            app:layout_constraintTop_toTopOf="@id/tv_nickname"
+            app:medalRank="@{victoryFairyItem.rank}"
+            tools:src="@drawable/ic_medal_first" />
+
         <TextView
             android:id="@+id/tv_fan"
             style="@style/TextView.Pretendard.Medium.12"
