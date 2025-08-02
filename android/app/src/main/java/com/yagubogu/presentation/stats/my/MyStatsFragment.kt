@@ -76,8 +76,8 @@ class MyStatsFragment : Fragment() {
     private fun loadChartData(myStatsUiModel: MyStatsUiModel) {
         val pieEntries: List<PieEntry> =
             buildList {
-                add(PieEntry(myStatsUiModel.winningPercentage.toFloat(), "Win"))
-                add(PieEntry(myStatsUiModel.etcPercentage.toFloat(), "Etc"))
+                add(PieEntry(myStatsUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN))
+                add(PieEntry(myStatsUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC))
             }
 
         val myStatsChartDataSet: PieDataSet =
@@ -97,6 +97,8 @@ class MyStatsFragment : Fragment() {
 
     companion object {
         private const val PIE_DATA_SET_LABEL = "내 직관 승률"
+        private const val PIE_ENTRY_LABEL_WIN = "Win"
+        private const val PIE_ENTRY_LABEL_ETC = "Etc"
         private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
         private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }
