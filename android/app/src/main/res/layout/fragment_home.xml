@@ -299,6 +299,7 @@
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
                     android:layout_height="0.4dp"
+                    app:dividerColor="@color/gray300"
                     app:layout_constraintTop_toBottomOf="@id/rv_victory_fairy" />
 
                 <include
