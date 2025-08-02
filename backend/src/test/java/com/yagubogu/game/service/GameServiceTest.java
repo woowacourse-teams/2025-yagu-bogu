@@ -1,15 +1,16 @@
 package com.yagubogu.game.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-
 import com.yagubogu.fixture.TestFixture;
+import com.yagubogu.game.dto.GamesResponse;
+import com.yagubogu.game.dto.GamesResponse.GameResponse;
+import com.yagubogu.game.dto.GamesResponse.StadiumInfoResponse;
+import com.yagubogu.game.dto.GamesResponse.TeamInfoResponse;
 import com.yagubogu.game.dto.KboClientResponse;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
 import com.yagubogu.global.exception.ClientException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
@@ -21,6 +22,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -128,4 +133,37 @@ class GameServiceTest {
                 .isInstanceOf(ClientException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
+
+    @DisplayName("오늘 경기하는 모든 구장, 팀 조회한다")
+    @Test
+    void findGamesByDate() {
+        // given
+        LocalDate date = TestFixture.getToday();
+        List<GameResponse> expected = List.of(
+                new GameResponse(
+                        new StadiumInfoResponse(1L, "잠실 야구장"),
+                        new TeamInfoResponse(1L, "기아 타이거즈", "HT"),
+                        new TeamInfoResponse(2L, "롯데 자이언츠", "LT")
+                )
+        );
+
+        // when
+        GamesResponse actual = gameService.findGamesByDate(date);
+
+        // then
+        assertThat(actual.games()).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("예외: 미래 날짜를 조회하려고 하면 예외가 발생한다")
+    @Test
+    void findGamesByDate_WhenDateIsInFuture() {
+        // given
+        LocalDate invalidDate = LocalDate.now().plusDays(1);
+
+        // when & then
+        assertThatThrownBy(() -> gameService.findGamesByDate(invalidDate))
+                .isInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("Future dates cannot be retrieved.");
+    }
+
 }
