@@ -53,7 +53,7 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
-    private var isExpanded: Boolean = false
+    private var isTeamOccupancyChartExpanded: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -122,8 +122,8 @@ class HomeFragment : Fragment() {
         }
 
         binding.constraintShowMore.setOnClickListener {
-            isExpanded = !isExpanded
-            when (isExpanded) {
+            isTeamOccupancyChartExpanded = !isTeamOccupancyChartExpanded
+            when (isTeamOccupancyChartExpanded) {
                 true -> {
                     binding.tvShowMore.text = getString(R.string.home_show_less)
                     binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
