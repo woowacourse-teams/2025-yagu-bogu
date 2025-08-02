@@ -2,7 +2,7 @@ package com.yagubogu.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record KboGameDto(
+public record KboGameResponse(
         @JsonProperty("G_ID") String gameCode,
         @JsonProperty("G_DT") String gameDate,
         @JsonProperty("HEADER_NO") Long headerNumber,

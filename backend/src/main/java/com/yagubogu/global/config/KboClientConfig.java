@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 @EnableConfigurationProperties(KboClientProperties.class)
 @Configuration
-public class ClientConfig {
+public class KboClientConfig {
 
     @Bean
     public RestClient kboRestClient(KboClientProperties props) {
