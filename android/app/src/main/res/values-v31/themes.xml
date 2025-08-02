@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- API 31+ Splash Screen Theme -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/primary500</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_animated_splash_icon</item>

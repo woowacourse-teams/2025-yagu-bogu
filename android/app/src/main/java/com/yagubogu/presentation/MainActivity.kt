@@ -17,14 +17,13 @@ import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.record.RecordFragment
 import com.yagubogu.presentation.stats.StatsFragment
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private var isReady = false
+    private var isAppInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
@@ -36,10 +35,9 @@ class MainActivity : AppCompatActivity() {
         performInitialization(savedInstanceState)
     }
 
-    fun setupSplash() {
-        // Todo : android 12 이상만 지원하므로 minsdk지원 필요
+    private fun setupSplash() {
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isReady }
+        splashScreen.setKeepOnScreenCondition { !isAppInitialized }
     }
 
     private fun setupView() {
@@ -97,12 +95,11 @@ class MainActivity : AppCompatActivity() {
     private fun performInitialization(savedInstanceState: Bundle?) {
         lifecycleScope.launch {
             try {
-                // todo: 초기화 작업들
-                delay(700)
+                // Todo : 초기화 작업 수행, (MainViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
             } catch (e: Exception) {
                 Log.e("MainActivity", "초기화 실패", e)
             } finally {
-                isReady = true
+                isAppInitialized = true
                 if (savedInstanceState == null) {
                     binding.bnvNavigation.selectedItemId = R.id.item_home
                 }
