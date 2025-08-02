@@ -21,13 +21,19 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
+import com.yagubogu.presentation.home.ranking.VictoryFairyItem
 import com.yagubogu.presentation.util.PermissionUtil
+import java.time.LocalDate
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -46,6 +52,8 @@ class HomeFragment : Fragment() {
     }
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
+
+    private var isTeamOccupancyChartExpanded: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,6 +109,41 @@ class HomeFragment : Fragment() {
                 requestLocationPermissions()
             }
         }
+
+        binding.ivRefresh.setOnClickListener { view: View ->
+//            val today = LocalDate.now()
+            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+            viewModel.fetchStadiumStats(today)
+            view
+                .animate()
+                .rotationBy(360f)
+                .setDuration(1000L)
+                .start()
+        }
+
+        binding.constraintShowMore.setOnClickListener {
+            isTeamOccupancyChartExpanded = !isTeamOccupancyChartExpanded
+            when (isTeamOccupancyChartExpanded) {
+                true -> {
+                    binding.tvShowMore.text = getString(R.string.home_show_less)
+                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
+                }
+
+                false -> {
+                    binding.tvShowMore.text = getString(R.string.home_show_more)
+                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_down)
+                }
+            }
+        }
+
+        val victoryFairyAdapter = VictoryFairyAdapter()
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+        binding.rvVictoryFairy.apply {
+            adapter = victoryFairyAdapter
+            layoutManager = linearLayoutManager
+        }
+        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
+        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
     }
 
     private fun setupObservers() {
@@ -116,6 +159,11 @@ class HomeFragment : Fragment() {
                     CheckInUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
                 },
             )
+        }
+
+        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
+            binding.stadiumStatsUiModel = value
+            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumOccupancyRates.first()
         }
     }
 
@@ -186,5 +234,46 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private val DUMMY_MY_VICTORY_FAIRY: VictoryFairyItem =
+            VictoryFairyItem(
+                rank = 1,
+                profileImageUrl = "",
+                nickname = "이포르",
+                team = Team.KIA,
+                winRate = 100.0,
+            )
+
+        private val DUMMY_VICTORY_FAIRY_ITEMS: List<VictoryFairyItem> =
+            listOf(
+                DUMMY_MY_VICTORY_FAIRY,
+                VictoryFairyItem(
+                    rank = 2,
+                    profileImageUrl = "",
+                    nickname = "닉네임",
+                    team = Team.SAMSUNG,
+                    winRate = 87.2,
+                ),
+                VictoryFairyItem(
+                    rank = 3,
+                    profileImageUrl = "",
+                    nickname = "닉네임",
+                    team = Team.LOTTE,
+                    winRate = 75.0,
+                ),
+                VictoryFairyItem(
+                    rank = 4,
+                    profileImageUrl = "",
+                    nickname = "닉네임",
+                    team = Team.DOOSAN,
+                    winRate = 66.7,
+                ),
+                VictoryFairyItem(
+                    rank = 982,
+                    profileImageUrl = "",
+                    nickname = "닉네임",
+                    team = Team.HANWHA,
+                    winRate = 32.5,
+                ),
+            )
     }
 }
