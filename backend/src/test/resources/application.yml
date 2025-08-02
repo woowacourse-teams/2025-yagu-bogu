@@ -31,3 +31,10 @@ security:
     refresh-token:
       secret-key: this-is-secret-key
       expire-length: 1209600000  # 14일 (ms)
+
+api:
+  kbo:
+    base-url: https://www.koreabaseball.com/ws/Main.asmx
+    connect-timeout: 5s
+    read-timeout: 30s
+    content-type: application/x-www-form-urlencoded; charset=UTF-8
