@@ -64,13 +64,9 @@ public class TalkService {
 
     public CursorResult<TalkResponse> pollTalks(
             final long gameId,
-            final Long cursorId,
+            final long cursorId,
             final int limit
     ) {
-        if (cursorId == null) {
-            throw new BadRequestException("cursorId is null");
-        }
-
         Pageable pageable = PageRequest.of(0, limit + 1);
         List<TalkResponse> talkResponses = talkRepository.findNewTalks(gameId, cursorId, pageable);
 

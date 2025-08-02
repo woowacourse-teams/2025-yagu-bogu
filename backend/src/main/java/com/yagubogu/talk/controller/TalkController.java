@@ -42,7 +42,7 @@ public class TalkController {
     @GetMapping("/{gameId}/polling")
     public ResponseEntity<CursorResult<TalkResponse>> pollTalks(
             @PathVariable final long gameId,
-            @RequestParam(value = "after", required = false) final Long cursorId,
+            @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
         CursorResult<TalkResponse> response = talkService.pollTalks(gameId, cursorId, limit);
