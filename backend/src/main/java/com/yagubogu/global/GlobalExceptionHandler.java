@@ -2,6 +2,7 @@ package com.yagubogu.global;
 
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleNotFoundException(final NotFoundException e) {
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 422 UnprocessableEntity
+     */
+    @ExceptionHandler(value = UnprocessableEntityException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ExceptionResponse handleUnprocessableException(final UnprocessableEntityException e) {
         return new ExceptionResponse(e.getMessage());
     }
 
