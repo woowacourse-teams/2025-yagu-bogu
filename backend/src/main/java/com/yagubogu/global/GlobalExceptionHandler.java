@@ -1,5 +1,6 @@
 package com.yagubogu.global;
 
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.YaguBoguException;
@@ -11,6 +12,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * 400 Bad Request
+     */
+    @ExceptionHandler(value = BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleBadRequestException(final BadRequestException e) {
+        return new ExceptionResponse(e.getMessage());
+    }
 
     /**
      * 403 Forbidden
