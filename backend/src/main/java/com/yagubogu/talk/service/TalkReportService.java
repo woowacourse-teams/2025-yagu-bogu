@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 public class TalkReportService {
 
     private final TalkReportRepository talkReportRepository;
-
     private final TalkRepository talkRepository;
-
     private final MemberRepository memberRepository;
 
     public void reportTalk(

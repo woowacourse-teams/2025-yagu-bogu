@@ -48,4 +48,3 @@ public class Talk {
         this.createdAt = createdAt;
     }
 }
-

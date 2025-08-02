@@ -27,13 +27,11 @@ import org.springframework.stereotype.Service;
 public class TalkService {
 
     private final TalkRepository talkRepository;
-
     private final GameRepository gameRepository;
-
     private final MemberRepository memberRepository;
-
     private final TalkReportRepository talkReportRepository;
 
+    
     public CursorResult<TalkResponse> findTalks(
             final long gameId,
             final Long cursorId,
