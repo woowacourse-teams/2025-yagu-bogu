@@ -194,7 +194,7 @@ class CheckInServiceTest {
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("직관 인증 내역중 이긴 직관 내역을 모두 조회한다")
+    @DisplayName("직관 인증 내역 중 이긴 직관 내역을 모두 조회한다")
     @Test
     void findCheckInWinHistory_allCheckInWinsGivenYear() {
         // given
