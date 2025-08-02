@@ -24,21 +24,34 @@ public class TalkReportService {
             final long talkId,
             final long reporterId // TODO: 나중에 삭제
     ) {
-        Talk talk = talkRepository.findById(talkId)
-                .orElseThrow(() -> new NotFoundException("Talk is not found"));
-        Member member = memberRepository.findById(reporterId)
-                .orElseThrow(() -> new NotFoundException("Member is not found"));
+        Talk talk = getTalk(talkId);
+        Member member = getMember(reporterId);
 
-        if (talk.getMember().equals(member)) {
-            throw new BadRequestException("Cannot report your own comment");
-        }
-        if (talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)) {
-            throw new BadRequestException("Talk already exists");
-        }
+        validateReportConstraints(talkId, reporterId, talk, member);
 
         LocalDateTime reportedAt = LocalDateTime.now();
 
         TalkReport talkReport = new TalkReport(talk, member, reportedAt);
         talkReportRepository.save(talkReport);
+    }
+
+    private Talk getTalk(final long talkId) {
+        return talkRepository.findById(talkId)
+                .orElseThrow(() -> new NotFoundException("Talk is not found"));
+    }
+
+    private Member getMember(final long reporterId) {
+        return memberRepository.findById(reporterId)
+                .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
+    private void validateReportConstraints(final long talkId, final long reporterId, final Talk talk,
+                                           final Member member) {
+        if (talk.getMember().equals(member)) {
+            throw new BadRequestException("Cannot report your own comment");
+        }
+        if (talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)) {
+            throw new BadRequestException("You have already reported this talk");
+        }
     }
 }
