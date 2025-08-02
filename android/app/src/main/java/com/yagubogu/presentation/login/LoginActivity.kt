@@ -23,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.clActivityLoginRoot) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityLoginRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.clBtnGoogle.setOnClickListener {
+        binding.constraintBtnGoogle.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
