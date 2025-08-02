@@ -237,7 +237,7 @@ class HomeFragment : Fragment() {
         private val DUMMY_MY_VICTORY_FAIRY: VictoryFairyItem =
             VictoryFairyItem(
                 rank = 1,
-                profileUrl = "",
+                profileImageUrl = "",
                 nickname = "이포르",
                 team = Team.KIA,
                 winRate = 100.0,
@@ -248,28 +248,28 @@ class HomeFragment : Fragment() {
                 DUMMY_MY_VICTORY_FAIRY,
                 VictoryFairyItem(
                     rank = 2,
-                    profileUrl = "",
+                    profileImageUrl = "",
                     nickname = "닉네임",
                     team = Team.SAMSUNG,
                     winRate = 87.2,
                 ),
                 VictoryFairyItem(
                     rank = 3,
-                    profileUrl = "",
+                    profileImageUrl = "",
                     nickname = "닉네임",
                     team = Team.LOTTE,
                     winRate = 75.0,
                 ),
                 VictoryFairyItem(
                     rank = 4,
-                    profileUrl = "",
+                    profileImageUrl = "",
                     nickname = "닉네임",
                     team = Team.DOOSAN,
                     winRate = 66.7,
                 ),
                 VictoryFairyItem(
                     rank = 982,
-                    profileUrl = "",
+                    profileImageUrl = "",
                     nickname = "닉네임",
                     team = Team.HANWHA,
                     winRate = 32.5,
