@@ -31,11 +31,12 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
 
-    
-    public CursorResult<TalkResponse> findTalks(
+
+    public CursorResult<TalkResponse> findTalksExcludingReported(
             final long gameId,
             final Long cursorId,
-            final int limit
+            final int limit,
+            final long memberId
     ) {
         List<TalkResponse> talkResponses;
         Pageable pageable = PageRequest.of(0, limit + 1);
@@ -52,8 +53,13 @@ public class TalkService {
         }
 
         Long nextCursorId = hasNextPage ? talkResponses.get(talkResponses.size() - 1).id() : null;
+        List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses, memberId);
 
-        return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
+        return new CursorResult<>(
+                hiddenReportedTalks,
+                nextCursorId,
+                hasNextPage
+        );
     }
 
     public CursorResult<TalkResponse> pollTalks(

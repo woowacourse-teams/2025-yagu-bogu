@@ -6,7 +6,6 @@ import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.service.TalkReportService;
 import com.yagubogu.talk.service.TalkService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +34,9 @@ public class TalkController {
             @RequestParam("limit") final int limit,
             @RequestParam("memberId") final long memberId // TODO: 나중에 제거
     ) {
-        CursorResult<TalkResponse> rawTalksCursorResult = talkService.findTalks(gameId, cursorId, limit);
-        List<TalkResponse> hiddenReportedTalks = talkService.hideReportedTalks(rawTalksCursorResult.content(),
-                memberId);
-
-        CursorResult<TalkResponse> finalCursorResult = new CursorResult<>(
-                hiddenReportedTalks,
-                rawTalksCursorResult.nextCursorId(),
-                rawTalksCursorResult.hasNext()
-        );
-        return ResponseEntity.ok(finalCursorResult);
+        CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
+                limit, memberId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{gameId}/polling")

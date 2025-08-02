@@ -53,12 +53,14 @@ class TalkServiceTest {
         long gameId = 1L;
         Long cursorId = null;
         int limit = 10;
+        long memberId = 1L;
 
         long expectedLatestTalkId = 52L;
         Long expectedNextCursorId = 43L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberId);
 
         // then
         assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
@@ -73,12 +75,14 @@ class TalkServiceTest {
         long gameId = 1L;
         Long cursorId = 43L;
         int limit = 10;
+        long memberId = 1L;
 
         long expectedLatestTalkId = 42L;
         Long expectedNextCursorId = 33L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberId);
 
         // then
         assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
@@ -93,12 +97,14 @@ class TalkServiceTest {
         long gameId = 1L;
         Long cursorId = 3L;
         int limit = 10;
+        long memberId = 1L;
 
         long expectedLatestTalkId = 2L;
         Long expectedNextCursorId = null;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberId);
 
         // then
         assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
