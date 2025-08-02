@@ -9,9 +9,9 @@
         android:icon="@drawable/ic_stats"
         android:title="@string/bottom_navigation_stats" />
     <item
-        android:id="@+id/item_talk"
-        android:icon="@drawable/ic_talk"
-        android:title="@string/bottom_navigation_talk" />
+        android:id="@+id/item_livetalk"
+        android:icon="@drawable/ic_livetalk"
+        android:title="@string/bottom_navigation_livetalk" />
     <item
         android:id="@+id/item_challenge"
         android:icon="@drawable/ic_challenge"
