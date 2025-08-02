@@ -3,6 +3,8 @@
 
     <string name="all_settings">설정</string>
     <string name="all_cancel">취소</string>
+    <string name="all_ok">확인</string>
+    <string name="all_winning_percentage">%d%%</string>
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
     <string name="all_fan">%s 팬</string>
@@ -46,4 +48,5 @@
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
 
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
+    <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
 </resources>

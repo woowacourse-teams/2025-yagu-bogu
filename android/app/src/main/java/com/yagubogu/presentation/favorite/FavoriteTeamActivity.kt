@@ -1,7 +1,6 @@
 package com.yagubogu.presentation.favorite
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -31,16 +30,23 @@ class FavoriteTeamActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        val adapter = FavoriteTeamListAdapter()
+        val adapter =
+            FavoriteTeamListAdapter(
+                object : FavoriteTeamListAdapter.OnItemClickListener {
+                    override fun onItemClick(item: FavoriteTeamUiModel) {
+                        val dialog = SelectionConfirmDialogFragment.newInstance(item)
+                        dialog.show(supportFragmentManager, SelectionConfirmDialogFragment.TAG)
+                    }
+                },
+            )
         binding.rvFavoriteTeamList.adapter = adapter
         adapter.submitList(DUMMY_FAVORITE_TEAMS)
-        Log.d("FavoriteTeamActivity", DUMMY_FAVORITE_TEAMS.toString())
 
         binding.rvFavoriteTeamList.addItemDecoration(FavoriteTeamItemDecoration(context = this))
     }
 
     companion object {
         // TODO 어떻게 생성할 것인지 결정
-        private val DUMMY_FAVORITE_TEAMS = Team.entries.map { FavoriteTeamUiModel(it) }
+        private val DUMMY_FAVORITE_TEAMS = Team.entries.map { FavoriteTeamUiModel.of(it) }
     }
 }
