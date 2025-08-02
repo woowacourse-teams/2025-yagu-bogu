@@ -24,7 +24,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId
             ORDER BY t.id DESC
             """)
-    List<TalkResponse> findLatestTalks(final long gameId, Pageable pageable);
+    List<TalkResponse> fetchRecentTalks(final long gameId, Pageable pageable);
 
     @Query("""
             SELECT new com.yagubogu.talk.dto.TalkResponse(
@@ -39,7 +39,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId AND t.id < :cursorId
             ORDER BY t.id DESC
             """)
-    List<TalkResponse> findPreviousTalks(final long gameId, Long cursorId, Pageable pageable);
+    List<TalkResponse> fetchTalksBeforeCursor(final long gameId, Long cursorId, Pageable pageable);
 
     @Query("""
             SELECT new com.yagubogu.talk.dto.TalkResponse(
@@ -54,5 +54,5 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId AND t.id > :cursorId
             ORDER BY t.id ASC 
             """)
-    List<TalkResponse> findNewTalks(final long gameId, Long cursorId, Pageable pageable);
+    List<TalkResponse> fetchTalksAfterCursor(final long gameId, Long cursorId, Pageable pageable);
 }

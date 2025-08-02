@@ -42,9 +42,9 @@ public class TalkService {
         Pageable pageable = PageRequest.of(0, limit + 1);
 
         if (cursorId == null) {
-            talkResponses = talkRepository.findLatestTalks(gameId, pageable);
+            talkResponses = talkRepository.fetchRecentTalks(gameId, pageable);
         } else {
-            talkResponses = talkRepository.findPreviousTalks(gameId, cursorId, pageable);
+            talkResponses = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
         }
 
         boolean hasNextPage = talkResponses.size() > limit;
@@ -68,7 +68,7 @@ public class TalkService {
             final int limit
     ) {
         Pageable pageable = PageRequest.of(0, limit + 1);
-        List<TalkResponse> talkResponses = talkRepository.findNewTalks(gameId, cursorId, pageable);
+        List<TalkResponse> talkResponses = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
 
         boolean hasNextPage = talkResponses.size() > limit;
         if (hasNextPage) {
