@@ -75,10 +75,10 @@ class MyStatsFragment : Fragment() {
 
     private fun loadChartData(myStatsUiModel: MyStatsUiModel) {
         val pieEntries: List<PieEntry> =
-            buildList {
-                add(PieEntry(myStatsUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN))
-                add(PieEntry(myStatsUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC))
-            }
+            listOf(
+                PieEntry(myStatsUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN),
+                PieEntry(myStatsUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC),
+            )
 
         val myStatsChartDataSet: PieDataSet =
             PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
