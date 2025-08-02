@@ -79,12 +79,12 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
-                android:id="@+id/iv_google_g"
+                android:id="@+id/iv_google_g_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/login_google_icon_description"
-                android:src="@drawable/ic_google"
+                android:src="@drawable/ic_google_g_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tv_google_login_text"
                 app:layout_constraintHorizontal_chainStyle="packed"
@@ -101,7 +101,7 @@
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/iv_google_g"
+                app:layout_constraintStart_toEndOf="@id/iv_google_g_icon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="SpUsage" />
         </androidx.constraintlayout.widget.ConstraintLayout>
