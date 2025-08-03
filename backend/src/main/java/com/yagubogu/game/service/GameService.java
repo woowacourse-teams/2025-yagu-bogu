@@ -70,7 +70,7 @@ public class GameService {
 
     private void validateIsNotFuture(final LocalDate date) {
         if (date.isAfter(LocalDate.now())) {
-            throw new UnprocessableEntityException("Future dates cannot be retrieved.");
+            throw new UnprocessableEntityException("Cannot retrieve games for future dates");
         }
     }
 

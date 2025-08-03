@@ -163,7 +163,7 @@ class GameServiceTest {
         // when & then
         assertThatThrownBy(() -> gameService.findGamesByDate(invalidDate))
                 .isInstanceOf(UnprocessableEntityException.class)
-                .hasMessage("Future dates cannot be retrieved.");
+                .hasMessage("Cannot retrieve games for future dates");
     }
 
 }
