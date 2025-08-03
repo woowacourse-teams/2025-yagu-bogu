@@ -148,9 +148,6 @@ public class CheckInIntegrationTest {
     @DisplayName("인증 여부를 조회한다")
     @Test
     void findCheckInStatus() {
-        // given
-        boolean expected = true;
-
         // when
         CheckInStatusResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -163,7 +160,7 @@ public class CheckInIntegrationTest {
                 .as(CheckInStatusResponse.class);
 
         // then
-        assertThat(actual.isCheckIn()).isEqualTo(expected);
+        assertThat(actual.isCheckIn()).isTrue();
     }
 
     @DisplayName("예외 : 인증 여부를 조회하는데 일치하는 회원이 없으면 404 상태를 반환한다")
