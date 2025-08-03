@@ -43,10 +43,9 @@ public class JwtProvider {
         return makeToken(memberClaims, now, refreshTokenProperties);
     }
 
-    public boolean isInvalidAccessToken(final String token) {
+    public void validateAccessToken(final String token) {
         try {
-            DecodedJWT decodedJWT = verifyAccessToken(token);
-            return decodedJWT.getExpiresAt().before(new Date());
+            verifyAccessToken(token);
         } catch (TokenExpiredException e) {
             throw new UnAuthorizedException("Expired token");
         } catch (JWTVerificationException e) {
