@@ -20,6 +20,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -37,15 +38,13 @@ public class TalkService {
             final int limit,
             final long memberId
     ) {
-        Pageable pageable = PageRequest.of(0, limit + 1);
-        List<TalkResponse> talkResponses = getTalkResponses(gameId, cursorId, pageable);
+        Pageable pageable = PageRequest.of(0, limit);
+        Slice<TalkResponse> talkResponses = getTalkResponses(gameId, cursorId, pageable);
+        
+        Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
+        List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
-        boolean hasNextPage = hasNextPageAndTrim(limit, talkResponses);
-
-        Long nextCursorId = getNextCursorIdOrNull(hasNextPage, talkResponses);
-        List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses, memberId);
-
-        return new CursorResult<>(hiddenReportedTalks, nextCursorId, hasNextPage);
+        return new CursorResult<>(hiddenReportedTalks, nextCursorId, talkResponses.hasNext());
     }
 
     public CursorResult<TalkResponse> pollTalks(
@@ -54,13 +53,11 @@ public class TalkService {
             final int limit
     ) {
         Pageable pageable = PageRequest.of(0, limit + 1);
-        List<TalkResponse> talkResponses = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
-
-        boolean hasNextPage = hasNextPageAndTrim(limit, talkResponses);
+        Slice<TalkResponse> talkResponses = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
 
-        return new CursorResult<>(talkResponses, nextCursorId, hasNextPage);
+        return new CursorResult<>(talkResponses.getContent(), nextCursorId, talkResponses.hasNext());
     }
 
     public TalkResponse createTalk(
@@ -118,8 +115,8 @@ public class TalkService {
                 .toList();
     }
 
-    private List<TalkResponse> getTalkResponses(final long gameId, final Long cursorId, final Pageable pageable) {
-        List<TalkResponse> talkResponses;
+    private Slice<TalkResponse> getTalkResponses(final long gameId, final Long cursorId, final Pageable pageable) {
+        Slice<TalkResponse> talkResponses;
         if (cursorId == null) {
             talkResponses = talkRepository.fetchRecentTalks(gameId, pageable);
         } else {
@@ -128,25 +125,17 @@ public class TalkService {
         return talkResponses;
     }
 
-    private static boolean hasNextPageAndTrim(final int limit, final List<TalkResponse> talkResponses) {
-        boolean hasNextPage = talkResponses.size() > limit;
-        if (hasNextPage) {
-            talkResponses.remove(limit);
-        }
-        return hasNextPage;
-    }
-
-    private static Long getNextCursorIdOrNull(final boolean hasNextPage, final List<TalkResponse> talks) {
+    private static Long getNextCursorIdOrNull(final boolean hasNextPage, final Slice<TalkResponse> talks) {
         if (!hasNextPage || talks.isEmpty()) {
             return null;
         }
-        return talks.getLast().id();
+        return talks.getContent().getLast().id();
     }
 
-    private static long getNextCursorIdOrStay(final long cursorId, final List<TalkResponse> talks) {
+    private static long getNextCursorIdOrStay(final long cursorId, final Slice<TalkResponse> talks) {
         long nextCursorId;
         if (!talks.isEmpty()) {
-            nextCursorId = talks.getLast().id();
+            nextCursorId = talks.getContent().getLast().id();
         } else {
             nextCursorId = cursorId;
         }

@@ -2,8 +2,8 @@ package com.yagubogu.talk.repository;
 
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.TalkResponse;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,7 +24,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId
             ORDER BY t.id DESC
             """)
-    List<TalkResponse> fetchRecentTalks(final long gameId, Pageable pageable);
+    Slice<TalkResponse> fetchRecentTalks(final long gameId, Pageable pageable);
 
     @Query("""
             SELECT new com.yagubogu.talk.dto.TalkResponse(
@@ -39,7 +39,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             WHERE t.game.id = :gameId AND t.id < :cursorId
             ORDER BY t.id DESC
             """)
-    List<TalkResponse> fetchTalksBeforeCursor(final long gameId, Long cursorId, Pageable pageable);
+    Slice<TalkResponse> fetchTalksBeforeCursor(final long gameId, Long cursorId, Pageable pageable);
 
     @Query("""
             SELECT new com.yagubogu.talk.dto.TalkResponse(
@@ -52,7 +52,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             )
             FROM Talk t
             WHERE t.game.id = :gameId AND t.id > :cursorId
-            ORDER BY t.id ASC 
+            ORDER BY t.id ASC
             """)
-    List<TalkResponse> fetchTalksAfterCursor(final long gameId, Long cursorId, Pageable pageable);
+    Slice<TalkResponse> fetchTalksAfterCursor(final long gameId, Long cursorId, Pageable pageable);
 }
