@@ -45,5 +45,3 @@ public record GamesResponse(List<GameResponse> games) {
     public record TeamInfoResponse(Long id, String name, String code) {
     }
 }
-
-
