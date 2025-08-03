@@ -1,6 +1,7 @@
 package com.yagubogu.presentation
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
         }
@@ -43,38 +45,59 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
-        binding.bnvNavigation.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.item_home ->
-                    replaceFragment(HomeFragment::class.java, R.string.app_name)
+        binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.item_home -> {
+                    switchFragment(HomeFragment::class.java, R.string.app_name)
+                    true
+                }
 
-                R.id.item_stats ->
-                    replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
+                R.id.item_stats -> {
+                    switchFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
+                    true
+                }
 
-                R.id.item_livetalk ->
-                    replaceFragment(LiveTalkFragment::class.java, R.string.bottom_navigation_livetalk)
+                R.id.item_livetalk -> {
+                    switchFragment(
+                        LiveTalkFragment::class.java,
+                        R.string.bottom_navigation_livetalk,
+                    )
+                    true
+                }
 
-                R.id.item_challenge ->
-                    replaceFragment(
+                R.id.item_challenge -> {
+                    switchFragment(
                         ChallengeFragment::class.java,
                         R.string.bottom_navigation_challenge,
                     )
+                    true
+                }
 
                 else -> false
             }
         }
     }
 
-    private fun replaceFragment(
-        fragment: Class<out Fragment>,
+    private fun switchFragment(
+        fragmentClass: Class<out Fragment>,
         @StringRes titleResId: Int,
-    ): Boolean {
+    ) {
+        val tag: String = fragmentClass.name
+        val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
+        if (targetFragment?.isVisible == true) return
+
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(binding.fcvFragment.id, fragment, null)
+            supportFragmentManager.fragments.forEach { if (it.isVisible) hide(it) }
+
+            if (targetFragment == null) {
+                add(binding.fcvFragment.id, fragmentClass, null, tag)
+            } else {
+                show(targetFragment)
+            }
         }
+
         setToolbarTitle(titleResId)
-        return true
     }
 
     private fun setToolbarTitle(
