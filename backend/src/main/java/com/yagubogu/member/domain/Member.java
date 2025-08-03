@@ -41,8 +41,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private OAuthProvider provider;
 
-    @Column(name = "sub", nullable = false, unique = true)
-    private String sub;
+    @Column(name = "oauth_id", nullable = false, unique = true)
+    private String oauthId;
 
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -52,12 +52,12 @@ public class Member {
     private String image;
 
     public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
-                  final String sub, final Role role, final String image) {
+                  final String oauthId, final Role role, final String image) {
         this.team = team;
         this.nickname = nickname;
         this.email = email;
         this.provider = provider;
-        this.sub = sub;
+        this.oauthId = oauthId;
         this.role = role;
         this.image = image;
     }

@@ -26,8 +26,11 @@ public class GoogleAuthExceptionHandler implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response)
-            throws IOException {
+    public void handleError(
+            final URI url,
+            final HttpMethod method,
+            final ClientHttpResponse response
+    ) throws IOException {
         GoogleErrorResponse errorResponse = parseErrorResponse(response);
         String error = errorResponse.error();
         throw new BadGatewayException(error);
