@@ -34,33 +34,33 @@ class JwtProviderTest {
     @DisplayName("액세스 토큰을 생성한다")
     @Test
     void createAccessToken() {
-        // Given
+        // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
-        // When
+        // when
         String accessToken = jwtProvider.createAccessToken(memberClaims);
 
-        // Then
+        // then
         assertThat(accessToken).isNotBlank();
     }
 
     @DisplayName("리프레시 토큰을 생성한다")
     @Test
     void createRefreshToken() {
-        // Given
+        // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
-        // When
+        // when
         String refreshToken = jwtProvider.createRefreshToken(memberClaims);
 
-        // Then
+        // then
         assertThat(refreshToken).isNotBlank();
     }
 
     @DisplayName("예외: 유효하지 않은 액세스 토큰이면 false를 발생한다")
     @Test
     void isInvalidAccessToken() {
-        // Given
+        // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
         JwtProperties jwtProperties = new JwtProperties();
@@ -77,42 +77,42 @@ class JwtProviderTest {
 
         JwtProvider expiredTokenProvider = new JwtProvider(jwtProperties);
 
-        // When
+        // when
         String expiredToken = expiredTokenProvider.createAccessToken(memberClaims);
         try {
             Thread.sleep(5);
         } catch (InterruptedException ignored) {
         }
 
-        // Then
+        // then
         assertThat(expiredTokenProvider.isInvalidAccessToken(expiredToken)).isFalse();
     }
 
     @DisplayName("액세스 토큰을 통해 memberId를 반환한다")
     @Test
     void getMemberIdByAccessToken() {
-        // Given
+        // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
         String accessToken = jwtProvider.createAccessToken(memberClaims);
 
-        // When
+        // when
         Long memberId = jwtProvider.getMemberIdByAccessToken(accessToken);
 
-        // Then
+        // then
         assertThat(memberId).isEqualTo(1L);
     }
 
     @DisplayName("액세스 토큰을 통해 role을 반환한다")
     @Test
     void getRoleByAccessToken() {
-        // Given
+        // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
         String accessToken = jwtProvider.createAccessToken(memberClaims);
 
-        // When
+        // when
         Role role = jwtProvider.getRoleByAccessToken(accessToken);
 
-        // Then
+        // then
         assertThat(role).isEqualTo(Role.USER);
     }
 }
