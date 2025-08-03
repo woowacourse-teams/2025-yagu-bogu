@@ -31,8 +31,8 @@ class JwtProviderTest {
         jwtProvider = new JwtProvider(jwtProperties);
     }
 
-    @Test
     @DisplayName("액세스 토큰을 생성한다")
+    @Test
     void createAccessToken() {
         // Given
         MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
@@ -44,8 +44,8 @@ class JwtProviderTest {
         assertThat(accessToken).isNotBlank();
     }
 
-    @Test
     @DisplayName("리프레시 토큰을 생성한다")
+    @Test
     void createRefreshToken() {
         // Given
         MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
@@ -57,8 +57,8 @@ class JwtProviderTest {
         assertThat(refreshToken).isNotBlank();
     }
 
-    @Test
     @DisplayName("예외: 유효하지 않은 액세스 토큰이면 false를 발생한다")
+    @Test
     void isInvalidAccessToken() {
         // Given
         MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
@@ -88,8 +88,8 @@ class JwtProviderTest {
         assertThat(expiredTokenProvider.isInvalidAccessToken(expiredToken)).isFalse();
     }
 
-    @Test
     @DisplayName("액세스 토큰을 통해 memberId를 반환한다")
+    @Test
     void getMemberIdByAccessToken() {
         // Given
         MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
@@ -102,8 +102,8 @@ class JwtProviderTest {
         assertThat(memberId).isEqualTo(1L);
     }
 
-    @Test
     @DisplayName("액세스 토큰을 통해 role을 반환한다")
+    @Test
     void getRoleByAccessToken() {
         // Given
         MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
