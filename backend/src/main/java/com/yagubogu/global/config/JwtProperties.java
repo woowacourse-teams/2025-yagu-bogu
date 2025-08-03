@@ -1,6 +1,5 @@
 package com.yagubogu.global.config;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,7 +12,8 @@ public class JwtProperties {
     private TokenProperties accessToken;
     private TokenProperties refreshToken;
 
-    @Data
+    @Setter
+    @Getter
     public static class TokenProperties {
         private String secretKey;
         private long expireLength;
