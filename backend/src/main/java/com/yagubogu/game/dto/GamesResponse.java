@@ -18,8 +18,8 @@ public record GamesResponse(List<GameResponse> games) {
             TeamInfoResponse homeTeam,
             TeamInfoResponse awayTeam
     ) {
-        public static GameResponse from(Game game) {
 
+        public static GameResponse from(Game game) {
             return new GameResponse(
                     new StadiumInfoResponse(
                             game.getStadium().getId(),
