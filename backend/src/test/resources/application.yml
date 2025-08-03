@@ -22,15 +22,17 @@ oauth:
     base-uri: 'https://oauth2.googleapis.com'
     token-info-uri: '/tokeninfo'
     client-id: 'this-is-client-id'
+    connect-timeout: 180s # 3분
+    read-timeout: 180s
 
 security:
   jwt:
     access-token:
       secret-key: this-is-secret-key
-      expire-length: 900000      # 15분 (ms)
+      expire-length: 900      # 15분 (초)
     refresh-token:
       secret-key: this-is-secret-key
-      expire-length: 1209600000  # 14일 (ms)
+      expire-length: 1209600  # 14일 (초)
 
 api:
   kbo:

@@ -4,7 +4,7 @@ VALUES ('기아 타이거즈', '기아', 'HT'),
        ('삼성 라이온즈', '삼성', 'SS'),
        ('두산 베어스', '두산', 'OB');
 
-INSERT INTO members (team_id, nickname, email, provider, oauth_id, role, image)
+INSERT INTO members (team_id, nickname, email, provider, oauth_id, role, image_url)
 VALUES (1, '포르', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://image.com/por.png'),
     (2, '포라', 'pora@example.com', 'GOOGLE', 'sub-pora', 'USER', 'https://image.com/pora.png'),
     (3, '두리', 'doori@example.com', 'GOOGLE', 'sub-doori', 'USER', 'https://image.com/doori.png'),

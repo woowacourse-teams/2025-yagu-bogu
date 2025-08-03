@@ -24,7 +24,7 @@ VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.88
        (9, '이글스파크', '볼파크', '대전', 36.3173, 127.4280);
 
 -- 3. 멤버 정보
-INSERT INTO members (member_id, team_id, nickname, email, provider, oauth_id, role, image)
+INSERT INTO members (member_id, team_id, nickname, email, provider, oauth_id, role, image_url)
 VALUES
     (5000, 2, '엘지1', '엘지1@example.com', 'GOOGLE', 'sub-엘지1', 'USER', 'https://image.com/엘지1.png'),
     (5001, 2, '엘지2', '엘지2@example.com', 'GOOGLE', 'sub-엘지2', 'USER', 'https://image.com/엘지2.png'),

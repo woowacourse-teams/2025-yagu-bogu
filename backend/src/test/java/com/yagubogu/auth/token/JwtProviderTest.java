@@ -82,7 +82,7 @@ class JwtProviderTest {
         // when
         String expiredToken = expiredTokenProvider.createAccessToken(memberClaims);
         try {
-            Thread.sleep(5);
+            Thread.sleep(1100);
         } catch (InterruptedException ignored) {
         }
 
