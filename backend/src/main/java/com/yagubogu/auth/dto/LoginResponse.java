@@ -8,14 +8,6 @@ public record LoginResponse(
         boolean isNew,
         MemberResponse user
 ) {
-    public LoginResponse(final String accessToken, final String refreshToken, final boolean isNew,
-                         final MemberResponse user) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.isNew = isNew;
-        this.user = user;
-    }
-
     public record MemberResponse(
             long id,
             String nickname,

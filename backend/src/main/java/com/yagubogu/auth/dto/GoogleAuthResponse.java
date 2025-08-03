@@ -13,7 +13,6 @@ public record GoogleAuthResponse(
         String aud,
         Long iat,
         Long exp,
-
         String email,
         boolean emailVerified,
         String name,
