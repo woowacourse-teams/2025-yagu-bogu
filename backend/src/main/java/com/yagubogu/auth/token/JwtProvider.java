@@ -7,9 +7,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.config.JwtProperties.TokenProperties;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
 import java.time.LocalDateTime;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 public class JwtProvider {
 
     private static final String ROLE = "role";
-    private static final int MILLI_TO_SECONDS = 1000;
 
     private final JwtProperties jwtProperties;
 
@@ -76,7 +75,7 @@ public class JwtProvider {
             final LocalDateTime now,
             final TokenProperties tokenProperties
     ) {
-        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpireLength() / MILLI_TO_SECONDS);
+        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpireLength());
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecretKey());
 
         return JWT.create()
