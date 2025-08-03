@@ -1,4 +1,4 @@
-package com.yagubogu.auth.token;
+package com.yagubogu.auth.service;
 
 
 import com.auth0.jwt.JWT;
