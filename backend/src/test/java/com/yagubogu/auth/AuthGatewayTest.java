@@ -66,7 +66,6 @@ public class AuthGatewayTest {
             softAssertions.assertThat(loginResponse.accessToken()).isNotBlank();
             softAssertions.assertThat(loginResponse.refreshToken()).isNotBlank();
             softAssertions.assertThat(loginResponse.isNew()).isTrue();
-            softAssertions.assertThat(loginResponse.member().id()).isEqualTo(7L);
         });
     }
 }

@@ -14,7 +14,7 @@ public record LoginResponse(
             String profileImageUrl
     ) {
         public static MemberResponse from(final Member member) {
-            return new MemberResponse(member.getId(), member.getNickname(), member.getImage());
+            return new MemberResponse(member.getId(), member.getNickname(), member.getImageUrl());
         }
     }
 }

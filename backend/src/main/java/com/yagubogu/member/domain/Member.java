@@ -48,18 +48,18 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @Column(name = "image", nullable = true)
-    private String image;
+    @Column(name = "image_url", nullable = true)
+    private String imageUrl;
 
     public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
-                  final String oauthId, final Role role, final String image) {
+                  final String oauthId, final Role role, final String imageUrl) {
         this.team = team;
         this.nickname = nickname;
         this.email = email;
         this.provider = provider;
         this.oauthId = oauthId;
         this.role = role;
-        this.image = image;
+        this.imageUrl = imageUrl;
     }
 
     public boolean isAdmin() {
