@@ -1,6 +1,7 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.FanRateGameEntry;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -8,7 +9,6 @@ import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateResponse;
-import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -20,10 +20,9 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -51,67 +50,24 @@ public class CheckInService {
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
         Team myTeam = member.getTeam();
-
         List<Game> games = gameRepository.findGameByDate(date);
-        List<Pair<Long, FanRateByGameResponse>> pairs = new ArrayList<>();
 
-        FanRateByGameResponse myTeamEnterThisGame = null;
+        List<FanRateGameEntry> fanRateGameEntries = new ArrayList<>();
+        FanRateByGameResponse myTeamGameResponse = null;
 
         for (Game game : games) {
-            FanCountsByGameResponse fanCountsByGameResponse = checkInRepository.countTotalAndHomeTeamAndAwayTeam(
-                    game,
-                    game.getHomeTeam(),
-                    game.getAwayTeam()
-            );
+            FanCountsByGameResponse counts = getFanCountsForGame(game);
+            FanRateByGameResponse fanRateByGameResponse = createFanRateByGameResponse(game, counts);
 
-            long total = fanCountsByGameResponse.totalCheckInCounts();
-
-            FanRateByGameResponse fanRateByGameResponse = getFanRateByGameResponse(game, fanCountsByGameResponse,
-                    total);
-
-            if (game.getHomeTeam().equals(myTeam) || game.getAwayTeam().equals(myTeam)) {
-                myTeamEnterThisGame = fanRateByGameResponse;
+            if (game.hasTeam(myTeam)) {
+                myTeamGameResponse = fanRateByGameResponse;
                 continue;
             }
-            pairs.add(Pair.of(total, fanRateByGameResponse));
+            fanRateGameEntries.add(new FanRateGameEntry(counts.totalCheckInCounts(), fanRateByGameResponse));
         }
+        Collections.sort(fanRateGameEntries);
 
-        pairs.sort(Comparator.comparing(Pair<Long, FanRateByGameResponse>::getFirst).reversed());
-
-        List<FanRateByGameResponse> fanRateByGameResponses = new ArrayList<>();
-        fanRateByGameResponses.addFirst(myTeamEnterThisGame);
-        pairs.forEach(pair -> fanRateByGameResponses.add(pair.getSecond()));
-
-        return new FanRateResponse(fanRateByGameResponses);
-    }
-
-    private FanRateByGameResponse getFanRateByGameResponse(
-            final Game game,
-            final FanCountsByGameResponse fanCountsByGameResponse,
-            final long total
-    ) {
-        long home = fanCountsByGameResponse.homeTeamCheckInCounts();
-        long away = fanCountsByGameResponse.awayTeamCheckInCounts();
-
-        double homeFanRate = calculateRoundRate(((double) home / total) * 100);
-        double awayFanRate = calculateRoundRate(((double) away / total) * 100);
-
-        return new FanRateByGameResponse(
-                new TeamFanRateResponse(
-                        game.getHomeTeam().getShortName(),
-                        game.getHomeTeam().getTeamCode(),
-                        homeFanRate
-                ),
-                new TeamFanRateResponse(
-                        game.getAwayTeam().getShortName(),
-                        game.getAwayTeam().getTeamCode(),
-                        awayFanRate
-                )
-        );
-    }
-
-    private double calculateRoundRate(final double rate) {
-        return Math.round(rate * 10) / 10.0;
+        return FanRateResponse.from(myTeamGameResponse, fanRateGameEntries);
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
@@ -143,5 +99,32 @@ public class CheckInService {
     private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
+    private FanCountsByGameResponse getFanCountsForGame(final Game game) {
+        return checkInRepository.countTotalAndHomeTeamAndAwayTeam(
+                game,
+                game.getHomeTeam(),
+                game.getAwayTeam()
+        );
+    }
+
+    private FanRateByGameResponse createFanRateByGameResponse(
+            final Game game,
+            final FanCountsByGameResponse counts
+    ) {
+        long total = counts.totalCheckInCounts();
+        double homeRate = calculateRoundRate(counts.homeTeamCheckInCounts(), total);
+        double awayRate = calculateRoundRate(counts.awayTeamCheckInCounts(), total);
+
+        return FanRateByGameResponse.from(game, homeRate, awayRate);
+    }
+
+    private double calculateRoundRate(final long checkInCounts, long total) {
+        if (total == 0) {
+            return 0.0;
+        }
+
+        return Math.round(((double) checkInCounts / total) * 1000) / 10.0;
     }
 }
