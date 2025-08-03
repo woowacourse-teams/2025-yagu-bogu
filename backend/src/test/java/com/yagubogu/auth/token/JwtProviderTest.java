@@ -69,8 +69,8 @@ class JwtProviderTest {
         shortExpAccess.setExpireLength(1);
 
         TokenProperties shortExpRefresh = new TokenProperties();
-        shortExpAccess.setSecretKey("refresh-secret-key");
-        shortExpAccess.setExpireLength(1000000);
+        shortExpRefresh.setSecretKey("refresh-secret-key");
+        shortExpRefresh.setExpireLength(1000000);
 
         jwtProperties.setAccessToken(shortExpAccess);
         jwtProperties.setRefreshToken(shortExpRefresh);
