@@ -52,7 +52,7 @@ class AuthServiceTest {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
-            softAssertions.assertThat(response.member()).isEqualTo(new MemberResponse(1L, "name", "picture"));
+            softAssertions.assertThat(response.member()).isEqualTo(new MemberResponse(1L, "test-user", "picture"));
         });
     }
 }
