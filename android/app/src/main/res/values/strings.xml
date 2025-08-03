@@ -48,6 +48,9 @@
     <string name="stats_loss_score_emoji">😡</string>
     <string name="stats_gain_score">득점</string>
     <string name="stats_loss_score">실점</string>
+    <string name="stats_hit">안타</string>
+    <string name="stats_hit_allowed">피안타</string>
+    <string name="stats_error">실책</string>
 
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
 </resources>
