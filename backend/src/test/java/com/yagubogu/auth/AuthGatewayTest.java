@@ -10,6 +10,7 @@ import com.yagubogu.auth.dto.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.Instant;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class MemberIntegrationTest {
+public class AuthGatewayTest {
 
     @LocalServerPort
     private int port;
@@ -43,14 +44,15 @@ public class MemberIntegrationTest {
     @Test
     void login() {
         // given
-        GoogleAuthResponse googleAuthResponse = new GoogleAuthResponse("accounts.google.com", "sub-test-unique-01", "azp",
+        GoogleAuthResponse googleAuthResponse = new GoogleAuthResponse("accounts.google.com", "sub-test-unique-01",
+                "azp",
                 "this-is-client-id",
                 111L, Instant.now().plusSeconds(3000).getEpochSecond(), "email", true, "name",
                 "picture", "givenName", "familyName", "ko");
         when(authGateway.validateToken(any())).thenReturn(googleAuthResponse);
 
         // when
-        RestAssured.given().log().all()
+        LoginResponse loginResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest("ID_TOKEN"))
                 .when().post("/api/auth/login")
@@ -58,5 +60,13 @@ public class MemberIntegrationTest {
                 .statusCode(200)
                 .extract()
                 .as(LoginResponse.class);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(loginResponse.accessToken()).isNotBlank();
+            softAssertions.assertThat(loginResponse.refreshToken()).isNotBlank();
+            softAssertions.assertThat(loginResponse.isNew()).isTrue();
+            softAssertions.assertThat(loginResponse.member().id()).isEqualTo(7L);
+        });
     }
 }

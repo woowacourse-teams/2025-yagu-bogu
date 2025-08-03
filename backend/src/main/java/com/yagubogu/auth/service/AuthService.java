@@ -29,14 +29,14 @@ public class AuthService {
         validateToken(response, OAuthProvider.GOOGLE);
 
         Optional<Member> memberOptional = memberRepository.findBySub(response.sub());
-        boolean isExisting = memberOptional.isPresent();
+        boolean isNew = memberOptional.isEmpty();
         Member member = memberOptional.orElseGet(() -> memberRepository.save(response.toMember()));
         MemberClaims memberClaims = MemberClaims.from(member);
 
         String accessToken = jwtProvider.createAccessToken(memberClaims);
         String refreshToken = jwtProvider.createRefreshToken(memberClaims);
 
-        return new LoginResponse(accessToken, refreshToken, isExisting, MemberResponse.from(member));
+        return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
     private void validateToken(final AuthResponse response, final OAuthProvider provider) {
