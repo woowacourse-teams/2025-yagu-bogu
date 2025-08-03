@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.yagubogu.R
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.domain.model.Team
 import java.time.LocalDate
@@ -30,6 +33,30 @@ class AttendanceHistoryFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
+
+        val spinnerItems: Array<String> =
+            resources.getStringArray(R.array.stats_attendance_history_filter)
+        val spinnerAdapter =
+            ArrayAdapter(requireContext(), R.layout.item_spinner_attendance_history, spinnerItems)
+        binding.spinnerAttendanceHistoryFilter.apply {
+            adapter = spinnerAdapter
+            onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long,
+                    ) {
+                        when (position) {
+                            0 -> {}
+                            1 -> {}
+                        }
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+                }
+        }
     }
 
     override fun onDestroyView() {

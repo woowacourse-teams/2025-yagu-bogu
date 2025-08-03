@@ -18,6 +18,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Spinner
+            android:id="@+id/spinner_attendance_history_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:overlapAnchor="false"
+            android:paddingEnd="20dp"
+            android:spinnerMode="dropdown"
+            app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_attendance_history_title" />
+
+        <ImageView
+            android:id="@+id/iv_spinner_arrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_arrow_down"
+            app:layout_constraintBottom_toBottomOf="@id/spinner_attendance_history_filter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/spinner_attendance_history_filter"
+            app:tint="@color/gray500" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_attendance_history"
             android:layout_width="match_parent"
