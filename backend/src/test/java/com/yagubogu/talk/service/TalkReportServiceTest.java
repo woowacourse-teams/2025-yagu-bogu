@@ -59,7 +59,7 @@ class TalkReportServiceTest {
 
     @DisplayName("예외: 본인이 작성한 톡을 신고하면 예외가 발생한다")
     @Test
-    void reportTalk_() {
+    void reportTalk_whenReportingOwnTalk() {
         // given
         long talkId = 11L;
         long reporterId = 1L;
@@ -68,5 +68,19 @@ class TalkReportServiceTest {
         assertThatThrownBy(() -> talkReportService.reportTalk(talkId, reporterId))
                 .isExactlyInstanceOf(BadRequestException.class)
                 .hasMessage("Cannot report your own comment");
+    }
+
+    @DisplayName("예외: 이미 신고한 톡을 재신고하면 예외가 발생한다")
+    @Test
+    void reportTalk_whenReportingAlreadyReportedTalk() {
+        // given
+        long talkId = 11L;
+        long reporterId = 2L;
+
+        // when & then
+        talkReportService.reportTalk(talkId, reporterId);
+        assertThatThrownBy(() -> talkReportService.reportTalk(talkId, reporterId))
+                .isExactlyInstanceOf(BadRequestException.class)
+                .hasMessage("You have already reported this talk");
     }
 }
