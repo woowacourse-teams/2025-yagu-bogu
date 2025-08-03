@@ -9,8 +9,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-@Configuration
 @EnableConfigurationProperties(GoogleAuthProperties.class)
+@Configuration
 public class GoogleAuthClientConfig {
 
     private final GoogleAuthProperties googleAuthProperties;
