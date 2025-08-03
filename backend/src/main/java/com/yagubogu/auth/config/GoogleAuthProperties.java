@@ -1,4 +1,4 @@
-package com.yagubogu.global.config;
+package com.yagubogu.auth.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

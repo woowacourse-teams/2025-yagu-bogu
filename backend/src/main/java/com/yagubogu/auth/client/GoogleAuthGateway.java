@@ -1,10 +1,10 @@
 package com.yagubogu.auth.client;
 
+import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.exception.GoogleAuthExceptionHandler;
-import com.yagubogu.global.config.GoogleAuthProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;

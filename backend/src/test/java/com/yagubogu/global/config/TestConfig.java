@@ -1,5 +1,7 @@
 package com.yagubogu.global.config;
 
+import com.yagubogu.auth.config.GoogleAuthProperties;
+import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.service.GoogleAuthValidator;
 import com.yagubogu.auth.token.JwtProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

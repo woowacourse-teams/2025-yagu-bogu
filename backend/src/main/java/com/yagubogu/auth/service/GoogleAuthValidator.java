@@ -2,7 +2,7 @@ package com.yagubogu.auth.service;
 
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.exception.InvalidTokenException;
-import com.yagubogu.global.config.GoogleAuthProperties;
+import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.time.Instant;
 import org.springframework.stereotype.Component;

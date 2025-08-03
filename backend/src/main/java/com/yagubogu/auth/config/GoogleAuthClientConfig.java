@@ -1,6 +1,5 @@
-package com.yagubogu.auth.client;
+package com.yagubogu.auth.config;
 
-import com.yagubogu.global.config.GoogleAuthProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

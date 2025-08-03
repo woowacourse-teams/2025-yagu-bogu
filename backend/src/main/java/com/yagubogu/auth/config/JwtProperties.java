@@ -1,4 +1,4 @@
-package com.yagubogu.global.config;
+package com.yagubogu.auth.config;
 
 import lombok.Getter;
 import lombok.Setter;
