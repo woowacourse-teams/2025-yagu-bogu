@@ -1,5 +1,6 @@
 package com.yagubogu.talk.dto;
 
+import com.yagubogu.talk.domain.Talk;
 import java.time.LocalDateTime;
 
 public record TalkResponse(
@@ -10,4 +11,14 @@ public record TalkResponse(
         String content,
         LocalDateTime createdAt
 ) {
+    public static TalkResponse from(Talk talk) {
+        return new TalkResponse(
+                talk.getId(),
+                talk.getMember().getId(),
+                talk.getMember().getNickname(),
+                talk.getMember().getTeam().getShortName(),
+                talk.getContent(),
+                talk.getCreatedAt()
+        );
+    }
 }

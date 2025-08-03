@@ -77,14 +77,7 @@ public class TalkService {
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
 
-        return new TalkResponse(
-                talk.getId(),
-                talk.getMember().getId(),
-                talk.getMember().getNickname(),
-                talk.getMember().getTeam().getShortName(),
-                talk.getContent(),
-                talk.getCreatedAt()
-        );
+        return TalkResponse.from(talk);
     }
 
     public void removeTalk(
