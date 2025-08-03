@@ -26,9 +26,9 @@ import org.springframework.test.context.TestPropertySource;
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 @DataJpaTest
-class GameServiceTest {
+class GameSyncServiceTest {
 
-    private GameService gameService;
+    private GameSyncService gameSyncService;
 
     @Autowired
     private GameRepository gameRepository;
@@ -44,12 +44,12 @@ class GameServiceTest {
 
     @BeforeEach
     void setUp() {
-        gameService = new GameService(kboClient, gameRepository, teamRepository, stadiumRepository);
+        gameSyncService = new GameSyncService(kboClient, gameRepository, teamRepository, stadiumRepository);
     }
 
     @DisplayName("경기 목록을 성공적으로 가져와서 저장한다")
     @Test
-    void fetchGameList() {
+    void syncGameSchedule() {
         // given
         LocalDate today = TestFixture.getToday();
         KboGameResponse gameItem = new KboGameResponse(
@@ -61,7 +61,7 @@ class GameServiceTest {
         given(kboClient.fetchGame(today)).willReturn(response);
 
         // when
-        gameService.fetchGameList(today);
+        gameSyncService.syncGameSchedule(today);
 
         // then
         assertThat(gameRepository.findAll()
@@ -74,7 +74,7 @@ class GameServiceTest {
 
     @DisplayName("예외 : 경기장을 찾을 수 없으면 예외가 발생한다")
     @Test
-    void fetchGameList_stadiumNotFound() {
+    void syncGameSchedule_stadiumNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
         KboGameResponse gameItem = new KboGameResponse(
@@ -86,14 +86,14 @@ class GameServiceTest {
         given(kboClient.fetchGame(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameService.fetchGameList(today))
+        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
                 .isInstanceOf(ClientException.class)
                 .hasMessage("Stadium name match failed: 존재하지않는경기장");
     }
 
     @DisplayName("예외 : 홈팀을 찾을 수 없으면 예외가 발생한다")
     @Test
-    void fetchGameList_homeTeamNotFound() {
+    void syncGameSchedule_homeTeamNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
         KboGameResponse gameItem = new KboGameResponse(
@@ -105,14 +105,14 @@ class GameServiceTest {
         given(kboClient.fetchGame(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameService.fetchGameList(today))
+        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
                 .isInstanceOf(ClientException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
 
     @DisplayName("예외 : 원정팀을 찾을 수 없으면 예외가 발생한다")
     @Test
-    void fetchGameList_awayTeamNotFound() {
+    void syncGameSchedule_awayTeamNotFound() {
         // given
         LocalDate today = TestFixture.getToday();
         KboGameResponse gameItem = new KboGameResponse(
@@ -124,7 +124,7 @@ class GameServiceTest {
         given(kboClient.fetchGame(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameService.fetchGameList(today))
+        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
                 .isInstanceOf(ClientException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }

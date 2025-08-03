@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class GameService {
+public class GameSyncService {
 
     private static final Map<String, String> STADIUM_NAME_MAP = Map.of(
             "문학", "랜더스필드",
@@ -39,9 +39,14 @@ public class GameService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
-
-    public void fetchGameList(final LocalDate date) {
+    public void syncGameSchedule(final LocalDate date) {
         KboClientResponse kboClientResponse = kboClient.fetchGame(date);
+        List<Game> games = convertToGames(kboClientResponse);
+
+        gameRepository.saveAll(games);
+    }
+
+    private List<Game> convertToGames(final KboClientResponse kboClientResponse) {
         List<Game> games = new ArrayList<>();
 
         for (KboGameResponse kboGameItem : kboClientResponse.games()) {
@@ -53,10 +58,10 @@ public class GameService {
             String gameCode = kboGameItem.gameCode();
 
             Game game = new Game(stadium, homeTeam, awayTeam, gameDate, startAt, gameCode, null, null);
-
             games.add(game);
         }
-        gameRepository.saveAll(games);
+
+        return games;
     }
 
     private Stadium getStadiumByName(final String stadiumName) {
