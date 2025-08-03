@@ -31,7 +31,7 @@ public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
             throw new InvalidTokenException("Invalid issuer");
         }
 
-        if (!googleAuthProperties.getClientId().equals(response.aud())) {
+        if (!googleAuthProperties.clientId().equals(response.aud())) {
             throw new InvalidTokenException("Invalid audience");
         }
 

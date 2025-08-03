@@ -21,7 +21,7 @@ public class GoogleAuthClientConfig {
     @Bean
     public RestClient googleRestClient(ClientHttpRequestFactory clientHttpRequestFactory) {
         return RestClient.builder()
-                .baseUrl(googleAuthProperties.getBaseUri())
+                .baseUrl(googleAuthProperties.baseUri())
                 .requestFactory(clientHttpRequestFactory)
                 .build();
     }

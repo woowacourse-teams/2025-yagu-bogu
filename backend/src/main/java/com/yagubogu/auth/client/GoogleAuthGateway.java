@@ -34,7 +34,7 @@ public class GoogleAuthGateway implements AuthGateway {
     public AuthResponse validateToken(final LoginRequest loginRequest) {
         return googleRestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(googleAuthProperties.getTokenInfoUri())
+                        .path(googleAuthProperties.tokenInfoUri())
                         .queryParam(ID_TOKEN, loginRequest.idToken())
                         .build())
                 .retrieve()
