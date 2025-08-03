@@ -11,6 +11,7 @@ public record TalkResponse(
         String content,
         LocalDateTime createdAt
 ) {
+
     public static TalkResponse from(Talk talk) {
         return new TalkResponse(
                 talk.getId(),
@@ -19,6 +20,17 @@ public record TalkResponse(
                 talk.getMember().getTeam().getShortName(),
                 talk.getContent(),
                 talk.getCreatedAt()
+        );
+    }
+
+    public static TalkResponse hiddenFrom(TalkResponse talkResponse) {
+        return new TalkResponse(
+                talkResponse.id(),
+                talkResponse.memberId(),
+                talkResponse.nickname(),
+                talkResponse.favorite(),
+                "숨김처리되었습니다",
+                talkResponse.createdAt()
         );
     }
 }

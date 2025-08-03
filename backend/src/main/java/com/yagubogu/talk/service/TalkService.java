@@ -117,13 +117,7 @@ public class TalkService {
 
         return talks.stream()
                 .map(talk -> hiddenTalkIds.contains(talk.id())
-                        ? new TalkResponse(
-                        talk.id(),
-                        talk.memberId(),
-                        talk.nickname(),
-                        talk.favorite(),
-                        "숨김처리되었습니다",
-                        talk.createdAt())
+                        ? TalkResponse.hiddenFrom(talk)
                         : talk)
                 .toList();
     }
