@@ -5,6 +5,7 @@ import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.exception.GoogleAuthExceptionHandler;
 import com.yagubogu.global.config.GoogleAuthProperties;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -15,23 +16,23 @@ public class GoogleAuthGateway implements AuthGateway {
 
     private static final String ID_TOKEN = "id_token";
 
-    private final RestClient restClient;
+    private final RestClient googleRestClient;
     private final GoogleAuthExceptionHandler googleAuthExceptionHandler;
     private final GoogleAuthProperties googleAuthProperties;
 
     public GoogleAuthGateway(
-            final RestClient restClient,
+            @Qualifier("googleRestClient") final RestClient googleRestClient,
             final GoogleAuthExceptionHandler googleAuthExceptionHandler,
             final GoogleAuthProperties googleAuthProperties
     ) {
-        this.restClient = restClient;
+        this.googleRestClient = googleRestClient;
         this.googleAuthExceptionHandler = googleAuthExceptionHandler;
         this.googleAuthProperties = googleAuthProperties;
     }
 
     @Override
     public AuthResponse validateToken(final LoginRequest loginRequest) {
-        return restClient.get()
+        return googleRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(googleAuthProperties.getTokenInfoUri())
                         .queryParam(ID_TOKEN, loginRequest.idToken())

@@ -2,7 +2,6 @@ package com.yagubogu.auth.client;
 
 import com.yagubogu.global.config.GoogleAuthProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -20,17 +19,11 @@ public class GoogleAuthClientConfig {
     }
 
     @Bean
-    public RestClient restClient(RestClient.Builder restClientBuilder) {
-        return restClientBuilder
+    public RestClient googleRestClient(ClientHttpRequestFactory clientHttpRequestFactory) {
+        return RestClient.builder()
+                .baseUrl(googleAuthProperties.getBaseUri())
+                .requestFactory(clientHttpRequestFactory)
                 .build();
-    }
-
-    @Bean
-    public RestClientCustomizer restClientCustomizer() {
-        return (restClientBuilder) -> {
-            restClientBuilder.requestFactory(clientHttpRequestFactory())
-                    .baseUrl(googleAuthProperties.getBaseUri());
-        };
     }
 
     @Bean
@@ -38,6 +31,7 @@ public class GoogleAuthClientConfig {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(2000);
         factory.setReadTimeout(30000);
+
         return factory;
     }
 }
