@@ -6,7 +6,7 @@ public record LoginResponse(
         String accessToken,
         String refreshToken,
         boolean isNew,
-        MemberResponse user
+        MemberResponse member
 ) {
     public record MemberResponse(
             long id,
