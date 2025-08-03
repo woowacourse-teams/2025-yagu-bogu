@@ -5,7 +5,7 @@ import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
-import com.yagubogu.auth.dto.MemberInfo;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.token.JwtProvider;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -31,10 +31,10 @@ public class AuthService {
         Optional<Member> memberOptional = memberRepository.findBySub(response.sub());
         boolean isExisting = memberOptional.isPresent();
         Member member = memberOptional.orElseGet(() -> memberRepository.save(response.toMember()));
-        MemberInfo memberInfo = MemberInfo.from(member);
+        MemberClaims memberClaims = MemberClaims.from(member);
 
-        String accessToken = jwtProvider.createAccessToken(memberInfo);
-        String refreshToken = jwtProvider.createRefreshToken(memberInfo);
+        String accessToken = jwtProvider.createAccessToken(memberClaims);
+        String refreshToken = jwtProvider.createRefreshToken(memberClaims);
 
         return new LoginResponse(accessToken, refreshToken, isExisting, MemberResponse.from(member));
     }

@@ -2,7 +2,7 @@ package com.yagubogu.auth.token;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.yagubogu.auth.dto.MemberInfo;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.config.JwtProperties;
 import com.yagubogu.global.config.JwtProperties.TokenProperties;
 import com.yagubogu.member.domain.Role;
@@ -35,10 +35,10 @@ class JwtProviderTest {
     @Test
     void createAccessToken() {
         // Given
-        MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
+        MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
         // When
-        String accessToken = jwtProvider.createAccessToken(memberInfo);
+        String accessToken = jwtProvider.createAccessToken(memberClaims);
 
         // Then
         assertThat(accessToken).isNotBlank();
@@ -48,10 +48,10 @@ class JwtProviderTest {
     @Test
     void createRefreshToken() {
         // Given
-        MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
+        MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
         // When
-        String refreshToken = jwtProvider.createRefreshToken(memberInfo);
+        String refreshToken = jwtProvider.createRefreshToken(memberClaims);
 
         // Then
         assertThat(refreshToken).isNotBlank();
@@ -61,7 +61,7 @@ class JwtProviderTest {
     @Test
     void isInvalidAccessToken() {
         // Given
-        MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
+        MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
         JwtProperties jwtProperties = new JwtProperties();
         TokenProperties shortExpAccess = new TokenProperties();
@@ -78,7 +78,7 @@ class JwtProviderTest {
         JwtProvider expiredTokenProvider = new JwtProvider(jwtProperties);
 
         // When
-        String expiredToken = expiredTokenProvider.createAccessToken(memberInfo);
+        String expiredToken = expiredTokenProvider.createAccessToken(memberClaims);
         try {
             Thread.sleep(5);
         } catch (InterruptedException ignored) {
@@ -92,8 +92,8 @@ class JwtProviderTest {
     @Test
     void getMemberIdByAccessToken() {
         // Given
-        MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
-        String accessToken = jwtProvider.createAccessToken(memberInfo);
+        MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
+        String accessToken = jwtProvider.createAccessToken(memberClaims);
 
         // When
         Long memberId = jwtProvider.getMemberIdByAccessToken(accessToken);
@@ -106,8 +106,8 @@ class JwtProviderTest {
     @Test
     void getRoleByAccessToken() {
         // Given
-        MemberInfo memberInfo = new MemberInfo(1L, Role.USER);
-        String accessToken = jwtProvider.createAccessToken(memberInfo);
+        MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
+        String accessToken = jwtProvider.createAccessToken(memberClaims);
 
         // When
         Role role = jwtProvider.getRoleByAccessToken(accessToken);

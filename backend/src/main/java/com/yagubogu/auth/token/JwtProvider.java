@@ -7,7 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.yagubogu.auth.dto.MemberInfo;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.config.JwtProperties;
 import com.yagubogu.global.config.JwtProperties.TokenProperties;
 import com.yagubogu.global.exception.UnAuthorizedException;
@@ -31,16 +31,16 @@ public class JwtProvider {
         this.jwtProperties = jwtProperties;
     }
 
-    public String createAccessToken(final MemberInfo memberInfo) {
+    public String createAccessToken(final MemberClaims memberClaims) {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties accessTokenProperties = jwtProperties.getAccessToken();
-        return makeToken(memberInfo, now, accessTokenProperties);
+        return makeToken(memberClaims, now, accessTokenProperties);
     }
 
-    public String createRefreshToken(final MemberInfo memberInfo) {
+    public String createRefreshToken(final MemberClaims memberClaims) {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties refreshTokenProperties = jwtProperties.getRefreshToken();
-        return makeToken(memberInfo, now, refreshTokenProperties);
+        return makeToken(memberClaims, now, refreshTokenProperties);
     }
 
     public boolean isInvalidAccessToken(final String token) {
@@ -71,7 +71,7 @@ public class JwtProvider {
     }
 
     private String makeToken(
-            final MemberInfo memberInfo,
+            final MemberClaims memberClaims,
             final LocalDateTime now,
             final TokenProperties tokenProperties
     ) {
@@ -79,8 +79,8 @@ public class JwtProvider {
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecretKey());
 
         return JWT.create()
-                .withSubject(memberInfo.id().toString())
-                .withClaim(ROLE, memberInfo.role().name())
+                .withSubject(memberClaims.id().toString())
+                .withClaim(ROLE, memberClaims.role().name())
                 .withIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .withExpiresAt(Date.from(validity.atZone(ZoneId.systemDefault()).toInstant()))
                 .sign(algorithm);
