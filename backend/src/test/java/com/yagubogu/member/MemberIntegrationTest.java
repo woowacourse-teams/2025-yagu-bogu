@@ -81,4 +81,19 @@ public class MemberIntegrationTest {
             softAssertions.assertThat(actual.member().nickname()).isEqualTo("test-user");
         });
     }
+
+    @DisplayName("회원 탈퇴한다")
+    @Test
+    void removeMember() {
+        // given
+        String accessToken = TestSupport.getAccessToken("id_token");
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(AUTH_HEADER, accessToken)
+                .when().delete("/api/members/me")
+                .then().log().all()
+                .statusCode(204);
+    }
 }

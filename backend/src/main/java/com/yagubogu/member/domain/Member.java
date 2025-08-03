@@ -15,7 +15,11 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
+@SQLDelete(sql = "UPDATE members SET deleted = true WHERE member_id = ?")
+@Where(clause = "deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "members")
@@ -51,6 +55,9 @@ public class Member {
     @Column(name = "image_url", nullable = true)
     private String imageUrl;
 
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean deleted = false;
+
     public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
                   final String oauthId, final Role role, final String imageUrl) {
         this.team = team;
@@ -60,6 +67,10 @@ public class Member {
         this.oauthId = oauthId;
         this.role = role;
         this.imageUrl = imageUrl;
+    }
+
+    public void markDeleted() {
+        this.deleted = true;
     }
 
     public boolean isAdmin() {
