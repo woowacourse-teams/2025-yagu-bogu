@@ -1,6 +1,5 @@
 package com.yagubogu.talk;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 
@@ -39,7 +38,7 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        given()
+        RestAssured.given()
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
                 .when()
@@ -57,7 +56,7 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        given()
+        RestAssured.given()
                 .queryParam("before", 25)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
@@ -76,7 +75,7 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        given()
+        RestAssured.given()
                 .queryParam("before", 6)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
@@ -95,7 +94,7 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        given()
+        RestAssured.given()
                 .queryParam("after", 47)
                 .queryParam("limit", 10)
                 .when()
@@ -114,7 +113,7 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        given()
+        RestAssured.given()
                 .queryParam("after", 52)
                 .queryParam("limit", 10)
                 .when()
