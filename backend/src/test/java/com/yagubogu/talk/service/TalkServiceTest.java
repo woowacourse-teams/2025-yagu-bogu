@@ -2,6 +2,7 @@ package com.yagubogu.talk.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.ForbiddenException;
@@ -63,9 +64,11 @@ class TalkServiceTest {
                 memberId);
 
         // then
-        assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-        assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-        assertThat(actual.hasNext()).isTrue();
+        assertSoftly(softAssertions -> {
+            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            assertThat(actual.hasNext()).isTrue();
+        });
     }
 
     @DisplayName("커서가 주어진 경우 해당 커서 다음 페이지를 조회한다")
@@ -85,9 +88,11 @@ class TalkServiceTest {
                 memberId);
 
         // then
-        assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-        assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-        assertThat(actual.hasNext()).isTrue();
+        assertSoftly(softAssertions -> {
+            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            assertThat(actual.hasNext()).isTrue();
+        });
     }
 
     @DisplayName("마지막 페이지 조회 시 hasNext가 false이고 nextCursorId가 null이다")
@@ -107,9 +112,11 @@ class TalkServiceTest {
                 memberId);
 
         // then
-        assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-        assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-        assertThat(actual.hasNext()).isFalse();
+        assertSoftly(softAssertions -> {
+            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            assertThat(actual.hasNext()).isFalse();
+        });
     }
 
     @DisplayName("새로운 메시지가 있을 때 polling으로 가져온다")
@@ -127,10 +134,12 @@ class TalkServiceTest {
         CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
 
         // then
-        assertThat(actual.content()).hasSize(2);
-        assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
-        assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-        assertThat(actual.hasNext()).isFalse();
+        assertSoftly(softAssertions -> {
+            assertThat(actual.content()).hasSize(2);
+            assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
+            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            assertThat(actual.hasNext()).isFalse();
+        });
     }
 
     @DisplayName("새 메시지가 없을 때 nextCursorId는 바뀌지 않는다")
@@ -145,9 +154,11 @@ class TalkServiceTest {
         CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
 
         // then
-        assertThat(actual.content()).isEmpty();
-        assertThat(actual.nextCursorId()).isEqualTo(cursorId);
-        assertThat(actual.hasNext()).isFalse();
+        assertSoftly(softAssertions -> {
+            assertThat(actual.content()).isEmpty();
+            assertThat(actual.nextCursorId()).isEqualTo(cursorId);
+            assertThat(actual.hasNext()).isFalse();
+        });
     }
 
     @DisplayName("새로운 톡을 생성한다")
@@ -163,9 +174,11 @@ class TalkServiceTest {
         TalkResponse response = talkService.createTalk(gameId, request, memberId);
 
         // then
-        assertThat(response.content()).isEqualTo(content);
-        assertThat(response.memberId()).isEqualTo(memberId);
-        assertThat(response.id()).isEqualTo(53L);
+        assertSoftly(softAssertions -> {
+            assertThat(response.content()).isEqualTo(content);
+            assertThat(response.memberId()).isEqualTo(memberId);
+            assertThat(response.id()).isEqualTo(53L);
+        });
     }
 
     @DisplayName("본인이 작성한 톡을 삭제한다")

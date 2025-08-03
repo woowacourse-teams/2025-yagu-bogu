@@ -2,6 +2,7 @@ package com.yagubogu.talk.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.member.repository.MemberRepository;
@@ -50,8 +51,10 @@ class TalkReportServiceTest {
         talkReportService.reportTalk(talkId, reporterId);
 
         // then
-        assertThat(talkReportRepository.count()).isEqualTo(1);
-        assertThat(talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)).isTrue();
+        assertSoftly(softAssertions -> {
+            assertThat(talkReportRepository.count()).isEqualTo(1);
+            assertThat(talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)).isTrue();
+        });
     }
 
     @DisplayName("예외: 본인이 작성한 톡을 신고하면 예외가 발생한다")
