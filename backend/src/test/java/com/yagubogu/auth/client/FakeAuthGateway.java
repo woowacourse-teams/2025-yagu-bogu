@@ -4,11 +4,7 @@ import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import java.time.Instant;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
-@Profile("test")
-@Component
 public class FakeAuthGateway implements AuthGateway {
 
     @Override
