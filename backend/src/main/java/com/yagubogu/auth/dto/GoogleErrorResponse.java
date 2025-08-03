@@ -1,5 +1,9 @@
 package com.yagubogu.auth.dto;
 
-public record GoogleErrorResponse(String error) {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public record GoogleErrorResponse(
+        String error,
+        @JsonProperty("error_description") String errorDescription
+) {
 }

@@ -31,7 +31,6 @@ public class GlobalExceptionHandler {
         return new ExceptionResponse(e.getMessage());
     }
 
-
     /**
      * 500 Internal Server Error
      */
