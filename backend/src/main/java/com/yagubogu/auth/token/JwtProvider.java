@@ -31,17 +31,15 @@ public class JwtProvider {
     }
 
     public String createAccessToken(final MemberClaims memberClaims) {
-        LocalDateTime now = LocalDateTime.now();
         TokenProperties accessTokenProperties = jwtProperties.getAccessToken();
 
-        return createToken(memberClaims, now, accessTokenProperties);
+        return createToken(memberClaims, accessTokenProperties);
     }
 
     public String createRefreshToken(final MemberClaims memberClaims) {
-        LocalDateTime now = LocalDateTime.now();
         TokenProperties refreshTokenProperties = jwtProperties.getRefreshToken();
 
-        return createToken(memberClaims, now, refreshTokenProperties);
+        return createToken(memberClaims, refreshTokenProperties);
     }
 
     public void validateAccessToken(final String token) {
@@ -72,9 +70,9 @@ public class JwtProvider {
 
     private String createToken(
             final MemberClaims memberClaims,
-            final LocalDateTime now,
             final TokenProperties tokenProperties
     ) {
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime validity = now.plusSeconds(tokenProperties.getExpireLength());
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecretKey());
 

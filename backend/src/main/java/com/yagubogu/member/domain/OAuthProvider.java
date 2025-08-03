@@ -2,7 +2,8 @@ package com.yagubogu.member.domain;
 
 public enum OAuthProvider {
 
-    GOOGLE;
+    GOOGLE,
+    ;
 
     public boolean isGoogle() {
         return this == GOOGLE;
