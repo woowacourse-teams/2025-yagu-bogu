@@ -4,13 +4,13 @@ VALUES ('기아 타이거즈', '기아', 'HT'),
        ('삼성 라이온즈', '삼성', 'SS'),
        ('두산 베어스', '두산', 'OB');
 
-INSERT INTO members (team_id, nickname, role)
-VALUES (1, '포르', 'USER'),
-       (2, '포라', 'USER'),
-       (3, '두리', 'USER'),
-       (NULL, '관리자', 'ADMIN'),
-       (1, '밍트', 'USER'),
-       (4, '우가', 'USER');
+INSERT INTO members (team_id, nickname, email, provider, oauth_id, role, image_url)
+VALUES (1, '포르', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://image.com/por.png'),
+    (2, '포라', 'pora@example.com', 'GOOGLE', 'sub-pora', 'USER', 'https://image.com/pora.png'),
+    (3, '두리', 'doori@example.com', 'GOOGLE', 'sub-doori', 'USER', 'https://image.com/doori.png'),
+    (NULL, '관리자', 'admin@example.com', 'GOOGLE', 'sub-admin', 'ADMIN', 'https://image.com/admin.png'),
+    (1, '밍트', 'mint@example.com', 'GOOGLE', 'sub-mint', 'USER', 'https://image.com/mint.png'),
+    (4, '우가', 'wooga@example.com', 'GOOGLE', 'sub-wooga', 'USER', 'https://image.com/wooga.png');
 
 INSERT INTO stadiums (full_name, short_name, location, latitude, longitude)
 VALUES ('잠실 야구장', '잠실구장', '잠실', 37.512192, 127.072055),
