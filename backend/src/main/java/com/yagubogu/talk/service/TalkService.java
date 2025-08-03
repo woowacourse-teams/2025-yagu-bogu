@@ -31,7 +31,6 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
 
-
     public CursorResult<TalkResponse> findTalksExcludingReported(
             final long gameId,
             final Long cursorId,
@@ -69,10 +68,8 @@ public class TalkService {
             final TalkRequest request,
             final long memberId // TODO: 나중에 삭제
     ) {
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game is not found"));
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("Member is not found"));
+        Game game = getGame(gameId);
+        Member member = getMember(memberId);
         LocalDateTime now = LocalDateTime.now();
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
@@ -85,8 +82,7 @@ public class TalkService {
             final long talkId,
             final long memberId // TODO: 나중에 삭제
     ) {
-        Talk talk = talkRepository.findById(talkId)
-                .orElseThrow(() -> new NotFoundException("Talk is not found"));
+        Talk talk = getTalk(talkId);
 
         if (talk.getGame().getId() != gameId) {
             throw new BadRequestException("Invalid gameId for the talk");
@@ -155,5 +151,20 @@ public class TalkService {
             nextCursorId = cursorId;
         }
         return nextCursorId;
+    }
+
+    private Game getGame(final long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new NotFoundException("Game is not found"));
+    }
+
+    private Member getMember(final long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
+    private Talk getTalk(final long talkId) {
+        return talkRepository.findById(talkId)
+                .orElseThrow(() -> new NotFoundException("Talk is not found"));
     }
 }

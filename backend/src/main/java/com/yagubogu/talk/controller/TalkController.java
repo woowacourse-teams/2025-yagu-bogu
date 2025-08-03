@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TalkController {
 
     private final TalkService talkService;
-
     private final TalkReportService talkReportService;
 
     @GetMapping("/{gameId}")
