@@ -1,10 +1,12 @@
 package com.yagubogu.auth.token;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.config.JwtProperties;
 import com.yagubogu.global.config.JwtProperties.TokenProperties;
+import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,9 +59,9 @@ class JwtProviderTest {
         assertThat(refreshToken).isNotBlank();
     }
 
-    @DisplayName("예외: 유효하지 않은 액세스 토큰이면 false를 발생시킨다")
+    @DisplayName("예외: 만료된 액세스 토큰이면 예외를 발생시킨다")
     @Test
-    void isInvalidAccessToken() {
+    void validateAccessToken_expired() {
         // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
@@ -85,7 +87,21 @@ class JwtProviderTest {
         }
 
         // then
-        assertThat(expiredTokenProvider.isInvalidAccessToken(expiredToken)).isFalse();
+        assertThatThrownBy(() -> expiredTokenProvider.validateAccessToken(expiredToken))
+                .isInstanceOf(UnAuthorizedException.class)
+                .hasMessageContaining("Expired token");
+    }
+
+    @DisplayName("예외: 유효하지 않은 액세스 토큰이면 예외를 발생시킨다")
+    @Test
+    void validateAccessToken_verification() {
+        // given
+        String invalidToken = "invalid.token";
+
+        // when & then
+        assertThatThrownBy(() -> jwtProvider.validateAccessToken(invalidToken))
+                .isInstanceOf(UnAuthorizedException.class)
+                .hasMessageContaining("Invalid token");
     }
 
     @DisplayName("액세스 토큰을 통해 memberId를 반환한다")
