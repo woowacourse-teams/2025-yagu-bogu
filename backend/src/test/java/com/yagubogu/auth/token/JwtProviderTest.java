@@ -57,7 +57,7 @@ class JwtProviderTest {
         assertThat(refreshToken).isNotBlank();
     }
 
-    @DisplayName("예외: 유효하지 않은 액세스 토큰이면 false를 발생한다")
+    @DisplayName("예외: 유효하지 않은 액세스 토큰이면 false를 발생시킨다")
     @Test
     void isInvalidAccessToken() {
         // given
