@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.yagubogu.auth.client.AuthGateway;
-import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import io.restassured.RestAssured;
@@ -43,11 +43,11 @@ public class MemberIntegrationTest {
     @Test
     void login() {
         // given
-        AuthResponse authResponse = new AuthResponse("accounts.google.com", "sub-test-unique-01", "azp",
+        GoogleAuthResponse googleAuthResponse = new GoogleAuthResponse("accounts.google.com", "sub-test-unique-01", "azp",
                 "this-is-client-id",
                 111L, Instant.now().plusSeconds(3000).getEpochSecond(), "email", true, "name",
                 "picture", "givenName", "familyName", "ko");
-        when(authGateway.validateToken(any())).thenReturn(authResponse);
+        when(authGateway.validateToken(any())).thenReturn(googleAuthResponse);
 
         // when
         RestAssured.given().log().all()
