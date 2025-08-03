@@ -3,6 +3,7 @@ package com.yagubogu.presentation
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,6 +34,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setToolbarTitle(binding.bnvNavigation.selectedItemId)
+    }
+
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
@@ -46,30 +52,24 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
-            when (item.itemId) {
+            when (val itemId: Int = item.itemId) {
                 R.id.item_home -> {
-                    switchFragment(HomeFragment::class.java, R.string.app_name)
+                    switchFragment(HomeFragment::class.java, itemId)
                     true
                 }
 
                 R.id.item_stats -> {
-                    switchFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
+                    switchFragment(StatsFragment::class.java, itemId)
                     true
                 }
 
                 R.id.item_livetalk -> {
-                    switchFragment(
-                        LiveTalkFragment::class.java,
-                        R.string.bottom_navigation_livetalk,
-                    )
+                    switchFragment(LiveTalkFragment::class.java, itemId)
                     true
                 }
 
                 R.id.item_challenge -> {
-                    switchFragment(
-                        ChallengeFragment::class.java,
-                        R.string.bottom_navigation_challenge,
-                    )
+                    switchFragment(ChallengeFragment::class.java, itemId)
                     true
                 }
 
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchFragment(
         fragmentClass: Class<out Fragment>,
-        @StringRes titleResId: Int,
+        selectedItemId: Int,
     ) {
         val tag: String = fragmentClass.name
         val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
@@ -96,13 +96,21 @@ class MainActivity : AppCompatActivity() {
                 show(targetFragment)
             }
         }
-
-        setToolbarTitle(titleResId)
+        setToolbarTitle(selectedItemId)
     }
 
     private fun setToolbarTitle(
-        @StringRes titleResId: Int,
+        @IdRes selectedItemId: Int,
     ) {
+        @StringRes
+        val titleResId: Int =
+            when (selectedItemId) {
+                R.id.item_home -> R.string.app_name
+                R.id.item_stats -> R.string.bottom_navigation_stats
+                R.id.item_livetalk -> R.string.bottom_navigation_livetalk
+                R.id.item_challenge -> R.string.bottom_navigation_challenge
+                else -> R.string.app_name
+            }
         binding.tvToolbarTitle.text = getString(titleResId)
     }
 }
