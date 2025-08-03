@@ -2,6 +2,7 @@ package com.yagubogu.checkin;
 
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.fixture.TestFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -151,7 +152,7 @@ public class CheckInIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("memberId", 1L)
-                .queryParam("date", "2025-07-21")
+                .queryParam("date", TestFixture.getToday().toString())
                 .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
