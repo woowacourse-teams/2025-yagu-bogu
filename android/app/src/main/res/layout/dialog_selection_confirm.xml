@@ -40,7 +40,6 @@
             app:layout_constraintTop_toBottomOf="@id/tv_selection_confirm_message"
             tools:text="\uD83D\uDC2F" />
 
-
         <TextView
             android:id="@+id/tv_favorite_team_name"
             style="@style/TextView.Pretendard.Medium.16"
@@ -79,6 +78,5 @@
             app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
             app:layout_constraintTop_toBottomOf="@id/tv_favorite_team_name"
             app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

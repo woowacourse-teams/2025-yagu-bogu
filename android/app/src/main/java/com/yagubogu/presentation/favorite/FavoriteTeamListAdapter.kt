@@ -20,7 +20,7 @@ class FavoriteTeamListAdapter(
         holder: FavoriteTeamViewHolder,
         position: Int,
     ) {
-        val item = currentList[position]
+        val item = getItem(position)
         holder.bind(item)
         holder.itemView.setOnClickListener {
             favoriteTeamClickListener.onItemClick(item)
