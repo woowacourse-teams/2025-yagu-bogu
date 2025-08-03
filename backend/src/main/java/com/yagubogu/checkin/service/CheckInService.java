@@ -5,6 +5,8 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.VictoryFairyRackingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingDataResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -15,13 +17,17 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class CheckInService {
+
+    private static final int TOP_FIVE = 5;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -36,8 +42,9 @@ public class CheckInService {
 
         long memberId = request.memberId();
         Member member = getMember(memberId);
+        Team team = member.getTeam();
 
-        checkInRepository.save(new CheckIn(game, member));
+        checkInRepository.save(new CheckIn(game, member, team));
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
@@ -54,6 +61,54 @@ public class CheckInService {
         List<CheckInGameResponse> checkInGameResponses = checkInRepository.findCheckInHistory(member, team, year);
 
         return new CheckInHistoryResponse(checkInGameResponses);
+    }
+
+    public VictoryFairyRackingResponses findVictoryFairyRankings(final long memberId) {
+        List<VictoryFairyRankingDataResponse> sortedList = getSortedRankingList();
+
+        int myRanking = findMyRanking(sortedList, memberId);
+        VictoryFairyRankingDataResponse myRankingData = findMyRankingData(sortedList, memberId);
+
+        List<VictoryFairyRankingDataResponse> top5 = sortedList.stream()
+                .limit(TOP_FIVE)
+                .toList();
+
+        return VictoryFairyRackingResponses.from(top5, myRankingData, myRanking);
+    }
+
+    private List<VictoryFairyRankingDataResponse> getSortedRankingList() {
+        List<VictoryFairyRankingDataResponse> memberCheckIns = checkInRepository.findGroupedMemberCheckinsBySameTeam();
+
+        return memberCheckIns.stream()
+                .sorted(Comparator
+                        // 1. 승률 먼저 정렬
+                        .comparingDouble(VictoryFairyRankingDataResponse::winPercent).reversed()
+                        // 2. 직관 횟수 정렬
+                        .thenComparing(Comparator.comparing(VictoryFairyRankingDataResponse::totalCheckIns).reversed())
+                        // 3. 닉네임순 정렬
+                        .thenComparing(VictoryFairyRankingDataResponse::nickname)
+                )
+                .toList();
+    }
+
+    private int findMyRanking(
+            final List<VictoryFairyRankingDataResponse> sortedList,
+            final long memberId
+    ) {
+        return IntStream.range(0, sortedList.size())
+                .filter(i -> sortedList.get(i).memberId().equals(memberId))
+                .findFirst()
+                .orElse(-1) + 1;
+    }
+
+    private VictoryFairyRankingDataResponse findMyRankingData(
+            final List<VictoryFairyRankingDataResponse> sortedList,
+            final long memberId
+    ) {
+        return sortedList.stream()
+                .filter(d -> d.memberId().equals(memberId))
+                .findFirst()
+                .orElse(null);
     }
 
     private Stadium getStadiumById(final long stadiumId) {

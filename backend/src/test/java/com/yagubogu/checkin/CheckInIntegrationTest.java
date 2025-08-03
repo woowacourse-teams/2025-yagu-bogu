@@ -143,4 +143,16 @@ public class CheckInIntegrationTest {
                 .then().log().all()
                 .statusCode(404);
     }
+
+    @DisplayName("승리 요정 랭킹을 조회한다")
+    @Test
+    void findVictoryFairyRankings() {
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .when().get("/api/check-ins/members/{memberId}/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200);
+    }
 }
