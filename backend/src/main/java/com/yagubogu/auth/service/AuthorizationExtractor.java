@@ -7,8 +7,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 @Component
 public class AuthorizationExtractor {
 
-    private static final String AUTH_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer";
+    public static final String AUTH_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer";
 
     public Optional<String> extract(final NativeWebRequest request) {
         String header = request.getHeader(AUTH_HEADER);
