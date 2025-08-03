@@ -144,7 +144,7 @@ public class CheckInIntegrationTest {
                 .statusCode(404);
     }
 
-    @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율")
+    @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율을 조회한다")
     @Test
     void findFanRatesByStadiums() {
         // when & then
@@ -157,7 +157,7 @@ public class CheckInIntegrationTest {
                 .statusCode(200);
     }
 
-    @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율")
+    @DisplayName("예외: 존재하지 않는 회원으로 구장별 팬 점유율 조회 시 404 상태를 반환한다")
     @Test
     void findFanRatesByStadiums_notFoundMember() {
         // given
