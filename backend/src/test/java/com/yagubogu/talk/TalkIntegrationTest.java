@@ -145,6 +145,40 @@ public class TalkIntegrationTest {
                 .body("content", is(content));
     }
 
+    @DisplayName("예외: 존재하지 않는 gameId로 톡을 생성하면 에러가 발생한다")
+    @Test
+    void createTalk_withInvalidGameId() {
+        // given
+        long gameId = 999L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(content))
+                .queryParam("memberId", 1)
+                .when().post("/api/talks/{gameId}", gameId)
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 존재하지 않는 memberId로 톡을 생성하면 에러가 발생한다")
+    @Test
+    void createTalk_withInvalidMemberId() {
+        // given
+        long gameId = 1L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(content))
+                .queryParam("memberId", 999)
+                .when().post("/api/talks/{gameId}", gameId)
+                .then().log().all()
+                .statusCode(404);
+    }
+
     @DisplayName("톡을 삭제한다")
     @Test
     void removeTalk() {
@@ -159,6 +193,54 @@ public class TalkIntegrationTest {
                 .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
                 .then().log().all()
                 .statusCode(204);
+    }
+
+    @DisplayName("예외: 존재하지 않는 talkId로 톡을 삭제하면 예외가 발생한다")
+    @Test
+    void removeTalk_withInvalidTalkId() {
+        // given
+        long gameId = 1L;
+        long talkId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("memberId", 1)
+                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: talk의 gameId와 요청 gameId가 일치하지 않으면 예외가 발생한다")
+    @Test
+    void removeTalk_withMismatchedGameId() {
+        // given
+        long gameId = 2L;
+        long talkId = 31L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("memberId", 1)
+                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @DisplayName("예외: talk의 memberId와 요청 memberId가 일치하지 않으면 예외가 발생한다")
+    @Test
+    void removeTalk_withMismatchedMemberId() {
+        // given
+        long gameId = 1L;
+        long talkId = 31L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("memberId", 2)
+                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .then().log().all()
+                .statusCode(403);
     }
 
     @DisplayName("톡을 신고한다")
