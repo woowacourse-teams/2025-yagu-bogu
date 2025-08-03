@@ -35,14 +35,14 @@ public class JwtProvider {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties accessTokenProperties = jwtProperties.getAccessToken();
 
-        return makeToken(memberClaims, now, accessTokenProperties);
+        return createToken(memberClaims, now, accessTokenProperties);
     }
 
     public String createRefreshToken(final MemberClaims memberClaims) {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties refreshTokenProperties = jwtProperties.getRefreshToken();
 
-        return makeToken(memberClaims, now, refreshTokenProperties);
+        return createToken(memberClaims, now, refreshTokenProperties);
     }
 
     public void validateAccessToken(final String token) {
@@ -71,7 +71,7 @@ public class JwtProvider {
         }
     }
 
-    private String makeToken(
+    private String createToken(
             final MemberClaims memberClaims,
             final LocalDateTime now,
             final TokenProperties tokenProperties
