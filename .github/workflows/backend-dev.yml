@@ -67,7 +67,7 @@ jobs:
       - name: Start server
         run: |
           cd /home/ubuntu/deploy
-          sudo nohup java \
+          sudo -E nohup java \
             -Dspring.profiles.active=dev \
             -Dserver.port=80 \
             -jar ./backend-build.jar >> output.log 2>&1 &
