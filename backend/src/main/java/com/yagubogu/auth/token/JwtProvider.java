@@ -34,12 +34,14 @@ public class JwtProvider {
     public String createAccessToken(final MemberClaims memberClaims) {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties accessTokenProperties = jwtProperties.getAccessToken();
+
         return makeToken(memberClaims, now, accessTokenProperties);
     }
 
     public String createRefreshToken(final MemberClaims memberClaims) {
         LocalDateTime now = LocalDateTime.now();
         TokenProperties refreshTokenProperties = jwtProperties.getRefreshToken();
+
         return makeToken(memberClaims, now, refreshTokenProperties);
     }
 
@@ -88,6 +90,7 @@ public class JwtProvider {
     private DecodedJWT verifyAccessToken(final String token) {
         Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getAccessToken().getSecretKey());
         JWTVerifier verifier = JWT.require(algorithm).build();
+
         return verifier.verify(token);
     }
 }
