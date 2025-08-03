@@ -8,7 +8,7 @@ import com.yagubogu.member.domain.Role;
 
 public record GoogleAuthResponse(
         String iss,
-        String sub,
+        String oauthId,
         String azp,
         String aud,
         Long iat,
@@ -57,6 +57,6 @@ public record GoogleAuthResponse(
 
     @Override
     public Member toMember() {
-        return new Member(null, name, email, OAuthProvider.GOOGLE, sub, Role.USER, picture);
+        return new Member(null, name, email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture);
     }
 }

@@ -6,5 +6,5 @@ public interface AuthResponse {
 
     Member toMember();
 
-    String sub();
+    String oauthId();
 }
