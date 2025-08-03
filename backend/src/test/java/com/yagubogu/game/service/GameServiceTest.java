@@ -165,5 +165,4 @@ class GameServiceTest {
                 .isInstanceOf(UnprocessableEntityException.class)
                 .hasMessage("Cannot retrieve games for future dates");
     }
-
 }
