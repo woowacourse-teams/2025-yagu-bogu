@@ -1,5 +1,6 @@
 package com.yagubogu.auth.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,29 +8,26 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+@RequiredArgsConstructor
 @EnableConfigurationProperties(GoogleAuthProperties.class)
 @Configuration
 public class GoogleAuthClientConfig {
 
     private final GoogleAuthProperties googleAuthProperties;
 
-    public GoogleAuthClientConfig(final GoogleAuthProperties googleAuthProperties) {
-        this.googleAuthProperties = googleAuthProperties;
-    }
-
     @Bean
-    public RestClient googleRestClient(ClientHttpRequestFactory clientHttpRequestFactory) {
+    public RestClient googleRestClient(ClientHttpRequestFactory googleClientHttpRequestFactory) {
         return RestClient.builder()
                 .baseUrl(googleAuthProperties.baseUri())
-                .requestFactory(clientHttpRequestFactory)
+                .requestFactory(googleClientHttpRequestFactory)
                 .build();
     }
 
     @Bean
-    public ClientHttpRequestFactory clientHttpRequestFactory() {
+    public ClientHttpRequestFactory googleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(2000);
-        factory.setReadTimeout(30000);
+        factory.setConnectTimeout((int) googleAuthProperties.connectTimeout().toMillis());
+        factory.setReadTimeout((int) googleAuthProperties.readTimeout().toMillis());
 
         return factory;
     }
