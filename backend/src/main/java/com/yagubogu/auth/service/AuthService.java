@@ -30,7 +30,7 @@ public class AuthService {
 
         Optional<Member> memberOptional = memberRepository.findByOauthId(response.sub());
         boolean isNew = memberOptional.isEmpty();
-        Member member = memberOptional.orElseGet(() -> memberRepository.save(response.toMember()));
+        Member member = findOrCreateMember(isNew, response, memberOptional);
         MemberClaims memberClaims = MemberClaims.from(member);
 
         String accessToken = jwtProvider.createAccessToken(memberClaims);
@@ -39,15 +39,24 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
+    private Member findOrCreateMember(final boolean isNew, final AuthResponse response,
+                                      final Optional<Member> memberOptional) {
+        if (isNew) {
+            return memberRepository.save(response.toMember());
+        }
+        return memberOptional.get();
+    }
+
     private void validateToken(final AuthResponse response, final OAuthProvider provider) {
         authValidators.stream()
                 .filter(v -> v.supports(provider))
                 .findFirst()
-                .map(validator -> {
-                    invokeValidator(validator, response);
-                    return true;
-                })
-                .orElseThrow(() -> new UnsupportedOperationException("No validator for: " + provider));
+                .ifPresentOrElse(
+                        validator -> invokeValidator(validator, response),
+                        () -> {
+                            throw new UnsupportedOperationException("No validator for: " + provider);
+                        }
+                );
     }
 
     @SuppressWarnings("unchecked")
