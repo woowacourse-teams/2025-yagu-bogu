@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:database;
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+api:
+  kbo:
+    base-url: https://www.koreabaseball.com/ws
+    connect-timeout: 5s
+    read-timeout: 30s
+    content-type: application/x-www-form-urlencoded; charset=UTF-8

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - StadiumIntegrationTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>StadiumIntegrationTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.yagubogu.stadium.html">com.yagubogu.stadium</a> &gt; StadiumIntegrationTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.089s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">전체 구장 목록을 조회한다</td>
+<td class="success">findAllStadiums()</td>
+<td class="success">0.028s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">구장별 팬 점유율을 조회한다</td>
+<td class="success">findStatCounts()</td>
+<td class="success">0.061s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2025-08-05T01:44:59.706+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.stadium.StadiumIntegrationTest]: StadiumIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:44:59.709+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.stadium.StadiumIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-08-05T01:44:59.718+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : Starting StadiumIntegrationTest using Java 21.0.6 with PID 49548 (started by juno in /Users/juno/Workspace/2025-yagu-bogu/backend)
+2025-08-05T01:44:59.718+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2025-08-05T01:44:59.770+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-05T01:44:59.775+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 4 ms. Found 5 JPA repository interfaces.
+2025-08-05T01:44:59.802+09:00  INFO 49548 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2025-08-05T01:44:59.803+09:00  INFO 49548 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-05T01:44:59.803+09:00  INFO 49548 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-08-05T01:44:59.808+09:00  INFO 49548 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-05T01:44:59.808+09:00  INFO 49548 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 90 ms
+2025-08-05T01:44:59.820+09:00  INFO 49548 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-05T01:44:59.821+09:00  INFO 49548 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-08-05T01:44:59.824+09:00  INFO 49548 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-05T01:44:59.824+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Starting...
+2025-08-05T01:44:59.824+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-10 - Added connection conn59: url=jdbc:h2:mem:database user=SA
+2025-08-05T01:44:59.827+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Start completed.
+2025-08-05T01:44:59.827+09:00  INFO 49548 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-10)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-05T01:44:59.849+09:00  INFO 49548 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    drop table if exists attendances cascade 
+Hibernate: 
+    drop table if exists check_ins cascade 
+Hibernate: 
+    drop table if exists games cascade 
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists stadiums cascade 
+Hibernate: 
+    drop table if exists teams cascade 
+Hibernate: 
+    create table attendances (
+        attendance_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        game_id bigint not null,
+        member_id bigint not null,
+        modified_at timestamp(6) not null,
+        content varchar(255),
+        emotion varchar(255) not null,
+        primary key (attendance_id)
+    )
+Hibernate: 
+    create table check_ins (
+        check_ins_id bigint generated by default as identity,
+        game_id bigint not null,
+        member_id bigint not null,
+        primary key (check_ins_id)
+    )
+Hibernate: 
+    create table games (
+        away_bases_on_balls integer,
+        away_errors integer,
+        away_hits integer,
+        away_runs integer,
+        away_score integer,
+        date date not null,
+        home_bases_on_balls integer,
+        home_errors integer,
+        home_hits integer,
+        home_runs integer,
+        home_score integer,
+        start_at time(6) not null,
+        away_team_id bigint not null,
+        game_id bigint generated by default as identity,
+        home_team_id bigint not null,
+        stadium_id bigint not null,
+        game_code varchar(255) not null unique,
+        game_state enum ('CANCELED','COMPLETED','LIVE','SCHEDULED'),
+        primary key (game_id)
+    )
+Hibernate: 
+    create table members (
+        member_id bigint generated by default as identity,
+        team_id bigint,
+        nickname varchar(255) not null unique,
+        role enum ('ADMIN','USER') not null,
+        primary key (member_id)
+    )
+Hibernate: 
+    create table stadiums (
+        latitude float(53) not null,
+        longitude float(53) not null,
+        stadium_id bigint generated by default as identity,
+        full_name varchar(255) not null unique,
+        location varchar(255) not null,
+        short_name varchar(255) not null unique,
+        primary key (stadium_id)
+    )
+Hibernate: 
+    create table teams (
+        team_id bigint generated by default as identity,
+        name varchar(255) not null unique,
+        short_name varchar(255) not null unique,
+        team_code varchar(255) not null unique,
+        primary key (team_id)
+    )
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKk57buatyhi7gyacl4fjca1kyn 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKr7cd1e30648d21vcif5fgfttu 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKnisshsxfvs6ppe2qtoc1jy9g6 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKejp1an6sdpmragkv1ptxn6qxi 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists games 
+       add constraint FKsxy8nadhptuk96oduoogs8p2c 
+       foreign key (away_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FKm58kfr0wpwqw4gbyan1wt4ohc 
+       foreign key (home_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FK8qmvvn736k8rf7iqqa72scgpl 
+       foreign key (stadium_id) 
+       references stadiums
+Hibernate: 
+    alter table if exists members 
+       add constraint FKf4xefr0g300jkn6um58gf0l6i 
+       foreign key (team_id) 
+       references teams
+2025-08-05T01:44:59.856+09:00  INFO 49548 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-05T01:44:59.897+09:00  WARN 49548 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-05T01:44:59.923+09:00  INFO 49548 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:database'
+2025-08-05T01:44:59.934+09:00  INFO 49548 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 51460 (http) with context path '/'
+2025-08-05T01:44:59.936+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : Started StadiumIntegrationTest in 0.226 seconds (process running for 6.147)
+Request method:	GET
+Request URI:	http://localhost:51460/api/stadiums?memberId=1&amp;year=2025
+Proxy:			&lt;none&gt;
+Request params:	&lt;none&gt;
+Query params:	memberId=1
+				year=2025
+Form params:	&lt;none&gt;
+Path params:	&lt;none&gt;
+Headers:		Accept=*/*
+				Content-Type=application/json
+Cookies:		&lt;none&gt;
+Multiparts:		&lt;none&gt;
+Body:			&lt;none&gt;
+2025-08-05T01:44:59.943+09:00  INFO 49548 --- [o-auto-9-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-05T01:44:59.943+09:00  INFO 49548 --- [o-auto-9-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-08-05T01:44:59.943+09:00  INFO 49548 --- [o-auto-9-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 04 Aug 2025 16:44:59 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+{
+    &quot;stadiums&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;fullName&quot;: &quot;잠실 야구장&quot;,
+            &quot;shortName&quot;: &quot;잠실구장&quot;,
+            &quot;location&quot;: &quot;잠실&quot;,
+            &quot;latitude&quot;: 37.512192,
+            &quot;longitude&quot;: 127.072055
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;fullName&quot;: &quot;고척 스카이돔&quot;,
+            &quot;shortName&quot;: &quot;고척돔&quot;,
+            &quot;location&quot;: &quot;고척&quot;,
+            &quot;latitude&quot;: 37.498191,
+            &quot;longitude&quot;: 126.867073
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;fullName&quot;: &quot;인천 SSG 랜더스필드&quot;,
+            &quot;shortName&quot;: &quot;랜더스필드&quot;,
+            &quot;location&quot;: &quot;인천&quot;,
+            &quot;latitude&quot;: 37.437196,
+            &quot;longitude&quot;: 126.693294
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;fullName&quot;: &quot;대전 한화생명 볼파크&quot;,
+            &quot;shortName&quot;: &quot;볼파크&quot;,
+            &quot;location&quot;: &quot;대전&quot;,
+            &quot;latitude&quot;: 36.316589,
+            &quot;longitude&quot;: 127.431211
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;fullName&quot;: &quot;광주 KIA 챔피언스필드&quot;,
+            &quot;shortName&quot;: &quot;챔피언스필드&quot;,
+            &quot;location&quot;: &quot;광주&quot;,
+            &quot;latitude&quot;: 35.168282,
+            &quot;longitude&quot;: 126.889138
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;fullName&quot;: &quot;대구 삼성라이온즈파크&quot;,
+            &quot;shortName&quot;: &quot;라이온즈파크&quot;,
+            &quot;location&quot;: &quot;대구&quot;,
+            &quot;latitude&quot;: 35.841318,
+            &quot;longitude&quot;: 128.681559
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;fullName&quot;: &quot;창원 NC파크&quot;,
+            &quot;shortName&quot;: &quot;엔씨파크&quot;,
+            &quot;location&quot;: &quot;창원&quot;,
+            &quot;latitude&quot;: 35.222754,
+            &quot;longitude&quot;: 128.582251
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;fullName&quot;: &quot;수원 KT위즈파크&quot;,
+            &quot;shortName&quot;: &quot;위즈파크&quot;,
+            &quot;location&quot;: &quot;수원&quot;,
+            &quot;latitude&quot;: 37.299977,
+            &quot;longitude&quot;: 127.00969
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;fullName&quot;: &quot;부산 사직야구장&quot;,
+            &quot;shortName&quot;: &quot;사직구장&quot;,
+            &quot;location&quot;: &quot;부산&quot;,
+            &quot;latitude&quot;: 35.194146,
+            &quot;longitude&quot;: 129.061497
+        }
+    ]
+}
+2025-08-05T01:44:59.959+09:00  INFO 49548 --- [    Test worker] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-05T01:44:59.960+09:00  INFO 49548 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-05T01:44:59.961+09:00  INFO 49548 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+Hibernate: 
+    drop table if exists attendances cascade 
+Hibernate: 
+    drop table if exists check_ins cascade 
+Hibernate: 
+    drop table if exists games cascade 
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists stadiums cascade 
+Hibernate: 
+    drop table if exists teams cascade 
+2025-08-05T01:44:59.963+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown initiated...
+2025-08-05T01:44:59.963+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-08-05T01:44:59.971+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : Starting StadiumIntegrationTest using Java 21.0.6 with PID 49548 (started by juno in /Users/juno/Workspace/2025-yagu-bogu/backend)
+2025-08-05T01:44:59.971+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2025-08-05T01:45:00.018+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-05T01:45:00.022+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 4 ms. Found 5 JPA repository interfaces.
+2025-08-05T01:45:00.046+09:00  INFO 49548 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2025-08-05T01:45:00.046+09:00  INFO 49548 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-05T01:45:00.046+09:00  INFO 49548 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-08-05T01:45:00.051+09:00  INFO 49548 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-05T01:45:00.051+09:00  INFO 49548 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 80 ms
+2025-08-05T01:45:00.062+09:00  INFO 49548 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-05T01:45:00.062+09:00  INFO 49548 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-08-05T01:45:00.065+09:00  INFO 49548 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-05T01:45:00.065+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Starting...
+2025-08-05T01:45:00.065+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-11 - Added connection conn61: url=jdbc:h2:mem:database user=SA
+2025-08-05T01:45:00.065+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Start completed.
+2025-08-05T01:45:00.065+09:00  INFO 49548 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-11)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-05T01:45:00.085+09:00  INFO 49548 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    drop table if exists attendances cascade 
+Hibernate: 
+    drop table if exists check_ins cascade 
+Hibernate: 
+    drop table if exists games cascade 
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists stadiums cascade 
+Hibernate: 
+    drop table if exists teams cascade 
+Hibernate: 
+    create table attendances (
+        attendance_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        game_id bigint not null,
+        member_id bigint not null,
+        modified_at timestamp(6) not null,
+        content varchar(255),
+        emotion varchar(255) not null,
+        primary key (attendance_id)
+    )
+Hibernate: 
+    create table check_ins (
+        check_ins_id bigint generated by default as identity,
+        game_id bigint not null,
+        member_id bigint not null,
+        primary key (check_ins_id)
+    )
+Hibernate: 
+    create table games (
+        away_bases_on_balls integer,
+        away_errors integer,
+        away_hits integer,
+        away_runs integer,
+        away_score integer,
+        date date not null,
+        home_bases_on_balls integer,
+        home_errors integer,
+        home_hits integer,
+        home_runs integer,
+        home_score integer,
+        start_at time(6) not null,
+        away_team_id bigint not null,
+        game_id bigint generated by default as identity,
+        home_team_id bigint not null,
+        stadium_id bigint not null,
+        game_code varchar(255) not null unique,
+        game_state enum ('CANCELED','COMPLETED','LIVE','SCHEDULED'),
+        primary key (game_id)
+    )
+Hibernate: 
+    create table members (
+        member_id bigint generated by default as identity,
+        team_id bigint,
+        nickname varchar(255) not null unique,
+        role enum ('ADMIN','USER') not null,
+        primary key (member_id)
+    )
+Hibernate: 
+    create table stadiums (
+        latitude float(53) not null,
+        longitude float(53) not null,
+        stadium_id bigint generated by default as identity,
+        full_name varchar(255) not null unique,
+        location varchar(255) not null,
+        short_name varchar(255) not null unique,
+        primary key (stadium_id)
+    )
+Hibernate: 
+    create table teams (
+        team_id bigint generated by default as identity,
+        name varchar(255) not null unique,
+        short_name varchar(255) not null unique,
+        team_code varchar(255) not null unique,
+        primary key (team_id)
+    )
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKk57buatyhi7gyacl4fjca1kyn 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKr7cd1e30648d21vcif5fgfttu 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKnisshsxfvs6ppe2qtoc1jy9g6 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKejp1an6sdpmragkv1ptxn6qxi 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists games 
+       add constraint FKsxy8nadhptuk96oduoogs8p2c 
+       foreign key (away_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FKm58kfr0wpwqw4gbyan1wt4ohc 
+       foreign key (home_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FK8qmvvn736k8rf7iqqa72scgpl 
+       foreign key (stadium_id) 
+       references stadiums
+Hibernate: 
+    alter table if exists members 
+       add constraint FKf4xefr0g300jkn6um58gf0l6i 
+       foreign key (team_id) 
+       references teams
+2025-08-05T01:45:00.091+09:00  INFO 49548 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-05T01:45:00.137+09:00  WARN 49548 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-05T01:45:00.164+09:00  INFO 49548 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:database'
+2025-08-05T01:45:00.175+09:00  INFO 49548 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 51463 (http) with context path '/'
+2025-08-05T01:45:00.177+09:00  INFO 49548 --- [    Test worker] c.y.stadium.StadiumIntegrationTest       : Started StadiumIntegrationTest in 0.212 seconds (process running for 6.388)
+Request method:	GET
+Request URI:	http://localhost:51463/api/stadiums/1/occupancy-rate?date=2025-07-21
+Proxy:			&lt;none&gt;
+Request params:	&lt;none&gt;
+Query params:	date=2025-07-21
+Form params:	&lt;none&gt;
+Path params:	stadiumId=1
+Headers:		Accept=*/*
+				Content-Type=application/json
+Cookies:		&lt;none&gt;
+Multiparts:		&lt;none&gt;
+Body:			&lt;none&gt;
+2025-08-05T01:45:00.183+09:00  INFO 49548 --- [-auto-10-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-05T01:45:00.183+09:00  INFO 49548 --- [-auto-10-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-08-05T01:45:00.184+09:00  INFO 49548 --- [-auto-10-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.stadium_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.stadium_id=? 
+        and g1_0.date=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    where
+        ci1_0.game_id=?
+Hibernate: 
+    select
+        m1_0.team_id,
+        t1_0.short_name,
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        teams t1_0 
+            on t1_0.team_id=m1_0.team_id 
+    where
+        ci1_0.game_id=? 
+    group by
+        m1_0.team_id 
+    order by
+        count(ci1_0.check_ins_id) desc
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 04 Aug 2025 16:45:00 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+{
+    &quot;stadiumShortName&quot;: &quot;잠실구장&quot;,
+    &quot;teams&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;기아&quot;,
+            &quot;occupancyRate&quot;: 66.7
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;롯데&quot;,
+            &quot;occupancyRate&quot;: 33.3
+        }
+    ]
+}
+2025-08-05T01:45:00.200+09:00  INFO 49548 --- [    Test worker] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-05T01:45:00.201+09:00  INFO 49548 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-05T01:45:00.202+09:00  INFO 49548 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+Hibernate: 
+    drop table if exists attendances cascade 
+Hibernate: 
+    drop table if exists check_ins cascade 
+Hibernate: 
+    drop table if exists games cascade 
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists stadiums cascade 
+Hibernate: 
+    drop table if exists teams cascade 
+2025-08-05T01:45:00.203+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Shutdown initiated...
+2025-08-05T01:45:00.237+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Shutdown completed.
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.14.3</a> at 2025. 8. 5. 오전 1:45:01</p>
+</div>
+</div>
+</body>
+</html>

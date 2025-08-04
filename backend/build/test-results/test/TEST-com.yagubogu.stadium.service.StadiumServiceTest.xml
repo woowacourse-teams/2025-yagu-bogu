@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.yagubogu.stadium.service.StadiumServiceTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-08-04T16:45:00.245Z" hostname="juno-3.local" time="0.023">
+  <properties/>
+  <testcase name="전체 구장 목록을 조회한다" classname="com.yagubogu.stadium.service.StadiumServiceTest" time="0.003"/>
+  <testcase name="구장에 오늘 경기가 없으면 예외가 발생한다." classname="com.yagubogu.stadium.service.StadiumServiceTest" time="0.004"/>
+  <testcase name="구장별 팬 점유율을 조회할 때 점유율이 높은 순으로 정렬된다" classname="com.yagubogu.stadium.service.StadiumServiceTest" time="0.007"/>
+  <testcase name="구장을 찾을 수 없으면 없으면 예외가 발생한다." classname="com.yagubogu.stadium.service.StadiumServiceTest" time="0.003"/>
+  <testcase name="인증한 회원이 0명이면 빈 리스트를 반환한다." classname="com.yagubogu.stadium.service.StadiumServiceTest" time="0.005"/>
+  <system-out><![CDATA[2025-08-05T01:45:00.240+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.stadium.service.StadiumServiceTest]: StadiumServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:45:00.244+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.stadium.service.StadiumServiceTest
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.stadium_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.stadium_id=? 
+        and g1_0.date=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.stadium_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.stadium_id=? 
+        and g1_0.date=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    where
+        ci1_0.game_id=?
+Hibernate: 
+    select
+        m1_0.team_id,
+        t1_0.short_name,
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        teams t1_0 
+            on t1_0.team_id=m1_0.team_id 
+    where
+        ci1_0.game_id=? 
+    group by
+        m1_0.team_id 
+    order by
+        count(ci1_0.check_ins_id) desc
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.stadium_id=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.stadium_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.stadium_id=? 
+        and g1_0.date=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    where
+        ci1_0.game_id=?
+Hibernate: 
+    select
+        m1_0.team_id,
+        t1_0.short_name,
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        teams t1_0 
+            on t1_0.team_id=m1_0.team_id 
+    where
+        ci1_0.game_id=? 
+    group by
+        m1_0.team_id 
+    order by
+        count(ci1_0.check_ins_id) desc
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

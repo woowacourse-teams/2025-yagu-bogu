@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - GameSyncServiceTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>GameSyncServiceTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.yagubogu.game.service.html">com.yagubogu.game.service</a> &gt; GameSyncServiceTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">8</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.305s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">경기 결과를 성공적으로 가져와서 저장한다</td>
+<td class="success">syncGameResult()</td>
+<td class="success">0.206s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">CANCELED 상태 경기는 스코어보드를 업데이트하지 않는다</td>
+<td class="success">syncGameResult_gameCanceled()</td>
+<td class="success">0.060s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">LIVE 상태 경기는 스코어보드를 업데이트하지 않는다</td>
+<td class="success">syncGameResult_gameNotCompleted()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">DB에 존재하지 않는 게임 코드는 건너뛴다</td>
+<td class="success">syncGameResult_gameNotFound()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">경기 목록을 성공적으로 가져와서 저장한다</td>
+<td class="success">syncGameSchedule()</td>
+<td class="success">0.011s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">예외 : 원정팀을 찾을 수 없으면 예외가 발생한다</td>
+<td class="success">syncGameSchedule_awayTeamNotFound()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">예외 : 홈팀을 찾을 수 없으면 예외가 발생한다</td>
+<td class="success">syncGameSchedule_homeTeamNotFound()</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">예외 : 경기장을 찾을 수 없으면 예외가 발생한다</td>
+<td class="success">syncGameSchedule_stadiumNotFound()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2025-08-05T01:44:58.862+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.game.service.GameSyncServiceTest]: GameSyncServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:44:58.866+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.game.service.GameSyncServiceTest
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    update
+        games 
+    set
+        away_score=?,
+        away_bases_on_balls=?,
+        away_errors=?,
+        away_hits=?,
+        away_runs=?,
+        away_team_id=?,
+        date=?,
+        game_code=?,
+        game_state=?,
+        home_score=?,
+        home_bases_on_balls=?,
+        home_errors=?,
+        home_hits=?,
+        home_runs=?,
+        home_team_id=?,
+        stadium_id=?,
+        start_at=? 
+    where
+        game_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    update
+        games 
+    set
+        away_score=?,
+        away_bases_on_balls=?,
+        away_errors=?,
+        away_hits=?,
+        away_runs=?,
+        away_team_id=?,
+        date=?,
+        game_code=?,
+        game_state=?,
+        home_score=?,
+        home_bases_on_balls=?,
+        home_errors=?,
+        home_hits=?,
+        home_runs=?,
+        home_team_id=?,
+        stadium_id=?,
+        start_at=? 
+    where
+        game_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    insert 
+    into
+        games
+        (away_score, away_bases_on_balls, away_errors, away_hits, away_runs, away_team_id, date, game_code, game_state, home_score, home_bases_on_balls, home_errors, home_hits, home_runs, home_team_id, stadium_id, start_at, game_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name is null
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.14.3</a> at 2025. 8. 5. 오전 1:45:01</p>
+</div>
+</div>
+</body>
+</html>

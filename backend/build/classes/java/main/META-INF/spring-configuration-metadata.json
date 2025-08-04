@@ -1,0 +1,35 @@
+{
+  "groups": [
+    {
+      "name": "api.kbo",
+      "type": "com.yagubogu.global.config.KboClientProperties",
+      "sourceType": "com.yagubogu.global.config.KboClientProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "api.kbo.base-url",
+      "type": "java.lang.String",
+      "sourceType": "com.yagubogu.global.config.KboClientProperties"
+    },
+    {
+      "name": "api.kbo.connect-timeout",
+      "type": "java.time.Duration",
+      "sourceType": "com.yagubogu.global.config.KboClientProperties"
+    },
+    {
+      "name": "api.kbo.content-type",
+      "type": "java.lang.String",
+      "sourceType": "com.yagubogu.global.config.KboClientProperties"
+    },
+    {
+      "name": "api.kbo.read-timeout",
+      "type": "java.time.Duration",
+      "sourceType": "com.yagubogu.global.config.KboClientProperties"
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}

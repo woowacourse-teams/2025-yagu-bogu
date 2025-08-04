@@ -1,0 +1,1601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.yagubogu.stat.service.StatServiceTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2025-08-04T16:45:01.247Z" hostname="juno-3.local" time="0.063">
+  <properties/>
+  <testcase name="승률을 계산한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.009"/>
+  <testcase name="모든 승률이 0%일 때 행운의 구장을 조회한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.012"/>
+  <testcase name="관람횟수가 0일 때 행운의 구장을 조회한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.015"/>
+  <testcase name="무가 1인 사용자의 통계를 계산한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.004"/>
+  <testcase name="패가 1인 사용자의 통계를 계산한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.004"/>
+  <testcase name="0%가 아닌 승률이 있을 때 행운의 구장을 조회한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.009"/>
+  <testcase name="회원이 조회되지 않으면 NotFoundException이 발생한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.003"/>
+  <testcase name="승이 1인 맴버의 통계를 계산한다." classname="com.yagubogu.stat.service.StatServiceTest" time="0.004"/>
+  <testcase name="관리자인 경우 ForbiddenException 발생한다" classname="com.yagubogu.stat.service.StatServiceTest" time="0.002"/>
+  <system-out><![CDATA[2025-08-05T01:45:01.241+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.stat.service.StatServiceTest]: StatServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:45:01.246+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.stat.service.StatServiceTest
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                or g1_0.away_team_id=m1_0.team_id
+            ) 
+            and g1_0.home_score=g1_0.away_score
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score<g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score<g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                or g1_0.away_team_id=m1_0.team_id
+            ) 
+            and g1_0.home_score=g1_0.away_score
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score<g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score<g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                or g1_0.away_team_id=m1_0.team_id
+            ) 
+            and g1_0.home_score=g1_0.away_score
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score<g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score<g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                m1_0.team_id=g1_0.home_team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                m1_0.team_id=g1_0.away_team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        ci1_0.member_id=? 
+        and g1_0.stadium_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            m1_0.team_id=g1_0.home_team_id 
+            or m1_0.team_id=g1_0.away_team_id
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score>g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score>g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                or g1_0.away_team_id=m1_0.team_id
+            ) 
+            and g1_0.home_score=g1_0.away_score
+        )
+Hibernate: 
+    select
+        count(ci1_0.check_ins_id) 
+    from
+        check_ins ci1_0 
+    join
+        members m1_0 
+            on m1_0.member_id=ci1_0.member_id 
+    join
+        games g1_0 
+            on g1_0.game_id=ci1_0.game_id 
+    where
+        m1_0.member_id=? 
+        and extract(year from g1_0.date)=? 
+        and (
+            (
+                g1_0.home_team_id=m1_0.team_id 
+                and g1_0.home_score<g1_0.away_score
+            ) 
+            or (
+                g1_0.away_team_id=m1_0.team_id 
+                and g1_0.away_score<g1_0.home_score
+            )
+        )
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

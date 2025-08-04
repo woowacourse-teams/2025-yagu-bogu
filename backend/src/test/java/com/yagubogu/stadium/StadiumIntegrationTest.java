@@ -1,12 +1,7 @@
 package com.yagubogu.stadium;
 
-import static com.yagubogu.fixture.TestFixture.getToday;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
-import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
-import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
@@ -19,6 +14,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -55,32 +52,6 @@ public class StadiumIntegrationTest {
         assertThat(actual.stadiums()).isEqualTo(expected);
     }
 
-    @DisplayName("구장별 팬 점유율을 조회한다")
-    @Test
-    void findStatCounts() {
-        // given
-        TeamOccupancyRatesResponse expected = new TeamOccupancyRatesResponse(
-                "잠실구장",
-                List.of(
-                        new TeamOccupancyRate(1L, "기아", 66.7),
-                        new TeamOccupancyRate(2L, "롯데", 33.3)
-                )
-        );
-
-        // when
-        TeamOccupancyRatesResponse actual = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .pathParam("stadiumId", 1L)
-                .when().queryParam("date", getToday().toString())
-                .get("/api/stadiums/{stadiumId}/occupancy-rate")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(TeamOccupancyRatesResponse.class);
-
-        // then
-        assertThat(actual).isEqualTo(expected);
-    }
 
     private List<StadiumResponse> getStadiums() {
         return List.of(

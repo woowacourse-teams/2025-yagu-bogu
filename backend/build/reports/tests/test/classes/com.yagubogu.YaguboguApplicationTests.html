@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - YaguboguApplicationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>YaguboguApplicationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.yagubogu.html">com.yagubogu</a> &gt; YaguboguApplicationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.224s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+<li>
+<a href="#">Standard error</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">contextLoads()</td>
+<td class="success">0.224s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>01:44:54.081 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.yagubogu.YaguboguApplicationTests]: YaguboguApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+01:44:54.118 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.YaguboguApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-08-05T01:44:54.240+09:00  INFO 49548 --- [    Test worker] com.yagubogu.YaguboguApplicationTests    : Starting YaguboguApplicationTests using Java 21.0.6 with PID 49548 (started by juno in /Users/juno/Workspace/2025-yagu-bogu/backend)
+2025-08-05T01:44:54.240+09:00  INFO 49548 --- [    Test worker] com.yagubogu.YaguboguApplicationTests    : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2025-08-05T01:44:54.541+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-05T01:44:54.564+09:00  INFO 49548 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 5 JPA repository interfaces.
+2025-08-05T01:44:54.735+09:00  INFO 49548 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-05T01:44:54.754+09:00  INFO 49548 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-08-05T01:44:54.765+09:00  INFO 49548 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-08-05T01:44:54.850+09:00  INFO 49548 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-05T01:44:54.860+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-08-05T01:44:54.921+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:database user=SA
+2025-08-05T01:44:54.922+09:00  INFO 49548 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-08-05T01:44:54.942+09:00  INFO 49548 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-05T01:44:55.250+09:00  INFO 49548 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    drop table if exists attendances cascade 
+Hibernate: 
+    drop table if exists check_ins cascade 
+Hibernate: 
+    drop table if exists games cascade 
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists stadiums cascade 
+Hibernate: 
+    drop table if exists teams cascade 
+Hibernate: 
+    create table attendances (
+        attendance_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        game_id bigint not null,
+        member_id bigint not null,
+        modified_at timestamp(6) not null,
+        content varchar(255),
+        emotion varchar(255) not null,
+        primary key (attendance_id)
+    )
+Hibernate: 
+    create table check_ins (
+        check_ins_id bigint generated by default as identity,
+        game_id bigint not null,
+        member_id bigint not null,
+        primary key (check_ins_id)
+    )
+Hibernate: 
+    create table games (
+        away_bases_on_balls integer,
+        away_errors integer,
+        away_hits integer,
+        away_runs integer,
+        away_score integer,
+        date date not null,
+        home_bases_on_balls integer,
+        home_errors integer,
+        home_hits integer,
+        home_runs integer,
+        home_score integer,
+        start_at time(6) not null,
+        away_team_id bigint not null,
+        game_id bigint generated by default as identity,
+        home_team_id bigint not null,
+        stadium_id bigint not null,
+        game_code varchar(255) not null unique,
+        game_state enum ('CANCELED','COMPLETED','LIVE','SCHEDULED'),
+        primary key (game_id)
+    )
+Hibernate: 
+    create table members (
+        member_id bigint generated by default as identity,
+        team_id bigint,
+        nickname varchar(255) not null unique,
+        role enum ('ADMIN','USER') not null,
+        primary key (member_id)
+    )
+Hibernate: 
+    create table stadiums (
+        latitude float(53) not null,
+        longitude float(53) not null,
+        stadium_id bigint generated by default as identity,
+        full_name varchar(255) not null unique,
+        location varchar(255) not null,
+        short_name varchar(255) not null unique,
+        primary key (stadium_id)
+    )
+Hibernate: 
+    create table teams (
+        team_id bigint generated by default as identity,
+        name varchar(255) not null unique,
+        short_name varchar(255) not null unique,
+        team_code varchar(255) not null unique,
+        primary key (team_id)
+    )
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKk57buatyhi7gyacl4fjca1kyn 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists attendances 
+       add constraint FKr7cd1e30648d21vcif5fgfttu 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKnisshsxfvs6ppe2qtoc1jy9g6 
+       foreign key (game_id) 
+       references games
+Hibernate: 
+    alter table if exists check_ins 
+       add constraint FKejp1an6sdpmragkv1ptxn6qxi 
+       foreign key (member_id) 
+       references members
+Hibernate: 
+    alter table if exists games 
+       add constraint FKsxy8nadhptuk96oduoogs8p2c 
+       foreign key (away_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FKm58kfr0wpwqw4gbyan1wt4ohc 
+       foreign key (home_team_id) 
+       references teams
+Hibernate: 
+    alter table if exists games 
+       add constraint FK8qmvvn736k8rf7iqqa72scgpl 
+       foreign key (stadium_id) 
+       references stadiums
+Hibernate: 
+    alter table if exists members 
+       add constraint FKf4xefr0g300jkn6um58gf0l6i 
+       foreign key (team_id) 
+       references teams
+2025-08-05T01:44:55.277+09:00  INFO 49548 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-05T01:44:55.382+09:00  INFO 49548 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-08-05T01:44:56.195+09:00  WARN 49548 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-05T01:44:56.324+09:00  INFO 49548 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:database'
+2025-08-05T01:44:56.364+09:00  INFO 49548 --- [    Test worker] com.yagubogu.YaguboguApplicationTests    : Started YaguboguApplicationTests in 2.202 seconds (process running for 2.575)
+</pre>
+</span>
+</div>
+<div class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/juno/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.6/17b32fd9f57deef02842f7f05abc4ad8127fe34e/byte-buddy-agent-1.17.6.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.14.3</a> at 2025. 8. 5. 오전 1:45:01</p>
+</div>
+</div>
+</body>
+</html>

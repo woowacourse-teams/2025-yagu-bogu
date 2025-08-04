@@ -2,6 +2,7 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
+import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
@@ -123,4 +124,44 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
+
+    @Query("""
+            SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
+                c.id,
+                g.stadium.fullName,
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.homeTeam.id,
+                    g.homeTeam.shortName,
+                    g.homeScore,
+                    CASE WHEN g.homeTeam = :team THEN true ELSE false END
+                ),
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.awayTeam.id,
+                    g.awayTeam.shortName,
+                    g.awayScore,
+                    CASE WHEN g.awayTeam = :team THEN true ELSE false END
+                ),
+                g.date
+            )
+            FROM CheckIn c
+            JOIN c.game g
+            WHERE c.member = :member AND (
+                (g.homeTeam = :team AND g.homeScore > g.awayScore)
+                    OR
+                (g.awayTeam = :team AND g.awayScore > g.homeScore)
+            ) AND YEAR(g.date) = :year
+            ORDER BY g.date DESC
+            """)
+    List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
+
+    @Query("""
+                SELECT new com.yagubogu.checkin.dto.FanCountsByGameResponse(
+                    COUNT(c),
+                    COALESCE(SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END), 0),
+                    COALESCE(SUM(CASE WHEN c.team = :awayTeam THEN 1 ELSE 0 END), 0)
+                )
+                FROM CheckIn c
+                WHERE c.game = :game
+            """)
+    FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
 }

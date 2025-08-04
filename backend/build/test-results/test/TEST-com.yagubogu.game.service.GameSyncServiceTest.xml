@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.yagubogu.game.service.GameSyncServiceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-08-04T16:44:58.935Z" hostname="juno-3.local" time="0.313">
+  <properties/>
+  <testcase name="경기 결과를 성공적으로 가져와서 저장한다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.206"/>
+  <testcase name="CANCELED 상태 경기는 스코어보드를 업데이트하지 않는다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.06"/>
+  <testcase name="예외 : 홈팀을 찾을 수 없으면 예외가 발생한다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.008"/>
+  <testcase name="LIVE 상태 경기는 스코어보드를 업데이트하지 않는다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.006"/>
+  <testcase name="경기 목록을 성공적으로 가져와서 저장한다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.011"/>
+  <testcase name="예외 : 경기장을 찾을 수 없으면 예외가 발생한다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.005"/>
+  <testcase name="DB에 존재하지 않는 게임 코드는 건너뛴다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.004"/>
+  <testcase name="예외 : 원정팀을 찾을 수 없으면 예외가 발생한다" classname="com.yagubogu.game.service.GameSyncServiceTest" time="0.005"/>
+  <system-out><![CDATA[2025-08-05T01:44:58.862+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.game.service.GameSyncServiceTest]: GameSyncServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:44:58.866+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.game.service.GameSyncServiceTest
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    update
+        games 
+    set
+        away_score=?,
+        away_bases_on_balls=?,
+        away_errors=?,
+        away_hits=?,
+        away_runs=?,
+        away_team_id=?,
+        date=?,
+        game_code=?,
+        game_state=?,
+        home_score=?,
+        home_bases_on_balls=?,
+        home_errors=?,
+        home_hits=?,
+        home_runs=?,
+        home_team_id=?,
+        stadium_id=?,
+        start_at=? 
+    where
+        game_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    update
+        games 
+    set
+        away_score=?,
+        away_bases_on_balls=?,
+        away_errors=?,
+        away_hits=?,
+        away_runs=?,
+        away_team_id=?,
+        date=?,
+        game_code=?,
+        game_state=?,
+        home_score=?,
+        home_bases_on_balls=?,
+        home_errors=?,
+        home_hits=?,
+        home_runs=?,
+        home_team_id=?,
+        stadium_id=?,
+        start_at=? 
+    where
+        game_id=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+Hibernate: 
+    insert 
+    into
+        games
+        (away_score, away_bases_on_balls, away_errors, away_hits, away_runs, away_team_id, date, game_code, game_state, home_score, home_bases_on_balls, home_errors, home_hits, home_runs, home_team_id, stadium_id, start_at, game_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name is null
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        g1_0.game_id,
+        g1_0.away_score,
+        g1_0.away_bases_on_balls,
+        g1_0.away_errors,
+        g1_0.away_hits,
+        g1_0.away_runs,
+        g1_0.away_team_id,
+        g1_0.date,
+        g1_0.game_code,
+        g1_0.game_state,
+        g1_0.home_score,
+        g1_0.home_bases_on_balls,
+        g1_0.home_errors,
+        g1_0.home_hits,
+        g1_0.home_runs,
+        g1_0.home_team_id,
+        g1_0.stadium_id,
+        g1_0.start_at 
+    from
+        games g1_0 
+    where
+        g1_0.game_code=?
+Hibernate: 
+    select
+        s1_0.stadium_id,
+        s1_0.full_name,
+        s1_0.latitude,
+        s1_0.location,
+        s1_0.longitude,
+        s1_0.short_name 
+    from
+        stadiums s1_0 
+    where
+        s1_0.short_name=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.short_name=?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

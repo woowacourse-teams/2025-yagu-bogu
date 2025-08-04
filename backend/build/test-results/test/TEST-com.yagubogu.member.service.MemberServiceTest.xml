@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.yagubogu.member.service.MemberServiceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-08-04T16:44:59.699Z" hostname="juno-3.local" time="0.006">
+  <properties/>
+  <testcase name="예외: 멤버를 찾지 못하면 예외가 발생한다." classname="com.yagubogu.member.service.MemberServiceTest" time="0.003"/>
+  <testcase name="멤버가 응원하는 팀을 조회한다" classname="com.yagubogu.member.service.MemberServiceTest" time="0.003"/>
+  <system-out><![CDATA[2025-08-05T01:44:59.692+09:00  INFO 49548 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.yagubogu.member.service.MemberServiceTest]: MemberServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-05T01:44:59.698+09:00  INFO 49548 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.yagubogu.YaguboguApplication for test class com.yagubogu.member.service.MemberServiceTest
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        m1_0.member_id,
+        m1_0.nickname,
+        m1_0.role,
+        m1_0.team_id 
+    from
+        members m1_0 
+    where
+        m1_0.member_id=?
+Hibernate: 
+    select
+        t1_0.team_id,
+        t1_0.name,
+        t1_0.short_name,
+        t1_0.team_code 
+    from
+        teams t1_0 
+    where
+        t1_0.team_id=?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
