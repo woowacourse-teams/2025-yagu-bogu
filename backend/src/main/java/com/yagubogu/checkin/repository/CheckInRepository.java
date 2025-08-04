@@ -3,7 +3,7 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
-import com.yagubogu.checkin.dto.VictoryFairyRankingDataResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
@@ -126,7 +126,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 
     @Query("""
-                select new com.yagubogu.checkin.dto.VictoryFairyRankingDataResponse(
+                select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
                     ci.member.id,
                     ci.member.nickname,
                     ci.member.team.shortName,
@@ -145,5 +145,5 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 JOIN ci.game g
                 group by ci.member.id
             """)
-    List<VictoryFairyRankingDataResponse> findGroupedMemberCheckinsBySameTeam();
+    List<VictoryFairyRankingEntryResponse> findGroupedMemberCheckinsBySameTeam();
 }

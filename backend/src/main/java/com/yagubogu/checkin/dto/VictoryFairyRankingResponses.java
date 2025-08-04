@@ -17,15 +17,15 @@ public record VictoryFairyRankingResponses(
     }
 
     public static VictoryFairyRankingResponses from(
-            List<VictoryFairyRankingDataResponse> top5,
-            VictoryFairyRankingDataResponse myRankingData,
+            List<VictoryFairyRankingEntryResponse> topRankings,
+            VictoryFairyRankingEntryResponse myRankingData,
             int myRanking
     ) {
 
-        List<VictoryFairyRankingResponse> topRankings = new ArrayList<>();
-        for (int i = 0; i < top5.size(); i++) {
-            VictoryFairyRankingDataResponse data = top5.get(i);
-            topRankings.add(new VictoryFairyRankingResponse(
+        List<VictoryFairyRankingResponse> rankingResponses = new ArrayList<>();
+        for (int i = 0; i < topRankings.size(); i++) {
+            VictoryFairyRankingEntryResponse data = topRankings.get(i);
+            rankingResponses.add(new VictoryFairyRankingResponse(
                     i + 1,
                     data.nickname(),
                     data.teamShortName(),
@@ -43,6 +43,6 @@ public record VictoryFairyRankingResponses(
             );
         }
 
-        return new VictoryFairyRankingResponses(topRankings, myRankingResponse);
+        return new VictoryFairyRankingResponses(rankingResponses, myRankingResponse);
     }
 }

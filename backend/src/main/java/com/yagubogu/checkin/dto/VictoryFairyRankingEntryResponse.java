@@ -1,6 +1,6 @@
 package com.yagubogu.checkin.dto;
 
-public record VictoryFairyRankingDataResponse(
+public record VictoryFairyRankingEntryResponse(
         Long memberId,
         String nickname,
         String teamShortName,

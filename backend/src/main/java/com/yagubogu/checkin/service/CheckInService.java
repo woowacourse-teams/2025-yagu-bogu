@@ -5,7 +5,7 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRankingDataResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -64,35 +64,35 @@ public class CheckInService {
     }
 
     public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
-        List<VictoryFairyRankingDataResponse> sortedList = getSortedRankingList();
+        List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
 
         int myRanking = findMyRanking(sortedList, memberId);
-        VictoryFairyRankingDataResponse myRankingData = findMyRankingData(sortedList, memberId);
+        VictoryFairyRankingEntryResponse myRankingData = findMyRankingData(sortedList, memberId);
 
-        List<VictoryFairyRankingDataResponse> top5 = sortedList.stream()
+        List<VictoryFairyRankingEntryResponse> topRankings = sortedList.stream()
                 .limit(TOP_RANKINGS)
                 .toList();
 
-        return VictoryFairyRankingResponses.from(top5, myRankingData, myRanking);
+        return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
     }
 
-    private List<VictoryFairyRankingDataResponse> getSortedRankingList() {
-        List<VictoryFairyRankingDataResponse> memberCheckIns = checkInRepository.findGroupedMemberCheckinsBySameTeam();
+    private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
+        List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findGroupedMemberCheckinsBySameTeam();
 
         return memberCheckIns.stream()
                 .sorted(Comparator
                         // 1. 승률 먼저 정렬
-                        .comparingDouble(VictoryFairyRankingDataResponse::winPercent).reversed()
+                        .comparingDouble(VictoryFairyRankingEntryResponse::winPercent).reversed()
                         // 2. 직관 횟수 정렬
-                        .thenComparing(Comparator.comparing(VictoryFairyRankingDataResponse::totalCheckIns).reversed())
+                        .thenComparing(Comparator.comparing(VictoryFairyRankingEntryResponse::totalCheckIns).reversed())
                         // 3. 닉네임순 정렬
-                        .thenComparing(VictoryFairyRankingDataResponse::nickname)
+                        .thenComparing(VictoryFairyRankingEntryResponse::nickname)
                 )
                 .toList();
     }
 
     private int findMyRanking(
-            final List<VictoryFairyRankingDataResponse> sortedList,
+            final List<VictoryFairyRankingEntryResponse> sortedList,
             final long memberId
     ) {
         return IntStream.range(0, sortedList.size())
@@ -101,8 +101,8 @@ public class CheckInService {
                 .orElse(-1) + 1;
     }
 
-    private VictoryFairyRankingDataResponse findMyRankingData(
-            final List<VictoryFairyRankingDataResponse> sortedList,
+    private VictoryFairyRankingEntryResponse findMyRankingData(
+            final List<VictoryFairyRankingEntryResponse> sortedList,
             final long memberId
     ) {
         return sortedList.stream()
