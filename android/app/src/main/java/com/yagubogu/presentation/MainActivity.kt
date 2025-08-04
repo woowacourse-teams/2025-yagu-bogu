@@ -1,43 +1,34 @@
 package com.yagubogu.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import androidx.lifecycle.lifecycleScope
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LiveTalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private var isAppInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setupSplash()
         super.onCreate(savedInstanceState)
         setupView()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        performInitialization(savedInstanceState)
-    }
-
-    private fun setupSplash() {
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isAppInitialized }
+        if (savedInstanceState == null) {
+            binding.bnvNavigation.selectedItemId = R.id.item_home
+        }
     }
 
     private fun setupView() {
@@ -90,20 +81,5 @@ class MainActivity : AppCompatActivity() {
         @StringRes titleResId: Int,
     ) {
         binding.tvToolbarTitle.text = getString(titleResId)
-    }
-
-    private fun performInitialization(savedInstanceState: Bundle?) {
-        lifecycleScope.launch {
-            try {
-                // Todo : 초기화 작업 수행, (MainViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
-            } catch (e: Exception) {
-                Log.e("MainActivity", "초기화 실패", e)
-            } finally {
-                isAppInitialized = true
-                if (savedInstanceState == null) {
-                    binding.bnvNavigation.selectedItemId = R.id.item_home
-                }
-            }
-        }
     }
 }
