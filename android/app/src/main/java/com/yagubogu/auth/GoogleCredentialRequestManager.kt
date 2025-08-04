@@ -24,7 +24,7 @@ class GoogleCredentialRequestManager(
     private val credentialManager = CredentialManager.create(context)
 
     // 기존에 로그인한 구글 계정이 있다면 자동 로그인 시도
-    private val googleIdOptionDefault: GetGoogleIdOption =
+    private val googleIdOption: GetGoogleIdOption =
         GetGoogleIdOption
             .Builder()
             .setFilterByAuthorizedAccounts(false) // 모든 계정 표시 (true로 하면 이전 로그인 계정만 표시)
@@ -40,8 +40,8 @@ class GoogleCredentialRequestManager(
             .build()
 
     // Credential 요청 객체 생성 (기본 옵션)
-    private val credentialRequestWithDefault: GetCredentialRequest =
-        buildCredentialRequest(googleIdOptionDefault)
+    private val credentialRequestWithGoogleIdOption: GetCredentialRequest =
+        buildCredentialRequest(googleIdOption)
 
     // Credential 요청 객체 생성 (명시적 로그인 옵션)
     private val credentialRequestWithSignIn: GetCredentialRequest =
@@ -50,7 +50,8 @@ class GoogleCredentialRequestManager(
     /**
      * 기존 로그인된 계정으로부터 Credential 요청을 시도함
      */
-    suspend fun getCredentialRequestWithDefault(): Result<GetCredentialResponse> = getCredentialResponseResult(credentialRequestWithDefault)
+    suspend fun getCredentialRequestWithDefault(): Result<GetCredentialResponse> =
+        getCredentialResponseResult(credentialRequestWithGoogleIdOption)
 
     /**
      * 명시적으로 로그인 UI를 띄워서 Credential 요청을 시도함
