@@ -13,8 +13,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.yagubogu.BuildConfig
-import com.yagubogu.auth.GoogleCredentialHandler
-import com.yagubogu.auth.GoogleCredentialRequestManager
+import com.yagubogu.data.auth.GoogleCredentialHandler
+import com.yagubogu.data.auth.GoogleCredentialRequestManager
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch

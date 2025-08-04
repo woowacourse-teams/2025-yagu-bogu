@@ -1,4 +1,4 @@
-package com.yagubogu.auth
+package com.yagubogu.data.auth
 
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialResponse

@@ -1,4 +1,4 @@
-package com.yagubogu.auth
+package com.yagubogu.data.auth
 
 import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest

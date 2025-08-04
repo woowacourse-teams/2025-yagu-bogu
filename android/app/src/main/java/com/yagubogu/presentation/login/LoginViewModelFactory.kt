@@ -2,7 +2,7 @@ package com.yagubogu.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.yagubogu.auth.GoogleCredentialHandler
+import com.yagubogu.data.auth.GoogleCredentialHandler
 
 class LoginViewModelFactory(
     private val googleCredentialHandler: GoogleCredentialHandler,

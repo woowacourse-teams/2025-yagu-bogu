@@ -1,4 +1,4 @@
-package com.yagubogu.auth
+package com.yagubogu.data.auth
 
 sealed class GoogleCredentialResult {
     data class Success(

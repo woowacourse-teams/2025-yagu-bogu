@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.auth.GoogleCredentialHandler
-import com.yagubogu.auth.GoogleCredentialResult
+import com.yagubogu.data.auth.GoogleCredentialHandler
+import com.yagubogu.data.auth.GoogleCredentialResult
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
