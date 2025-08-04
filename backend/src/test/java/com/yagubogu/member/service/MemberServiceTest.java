@@ -1,5 +1,8 @@
 package com.yagubogu.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.repository.MemberRepository;
@@ -9,9 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -53,5 +53,18 @@ public class MemberServiceTest {
         assertThatThrownBy(() -> memberService.findFavorite(invalidMemberId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
+    }
+
+    @DisplayName("회원을 탈퇴한다")
+    @Test
+    void removeMember() {
+        // given
+        Long memberId = 1L;
+
+        // when
+        memberService.removeMember(memberId);
+
+        // then
+        assertThat(memberRepository.findById(memberId)).isEmpty();
     }
 }

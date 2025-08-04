@@ -2,6 +2,7 @@ package com.yagubogu.checkin.domain;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -34,8 +35,13 @@ public class CheckIn {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public CheckIn(final Game game, final Member member) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
+    public CheckIn(final Game game, final Member member, final Team team) {
         this.game = game;
         this.member = member;
+        this.team = team;
     }
 }

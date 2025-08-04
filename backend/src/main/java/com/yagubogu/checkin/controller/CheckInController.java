@@ -1,9 +1,12 @@
 package com.yagubogu.checkin.controller;
 
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.service.CheckInService;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +47,20 @@ public class CheckInController {
     @GetMapping("/members/{memberId}")
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @PathVariable final long memberId,
-            @RequestParam final int year
+            @RequestParam final int year,
+            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter filter
     ) {
-        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year);
+        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberId, year, filter);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/stadiums/fan-rates")
+    public ResponseEntity<FanRateResponse> findFanRatesByStadiums(
+            @RequestParam final long memberId,
+            @RequestParam final LocalDate date
+    ) {
+        FanRateResponse response = checkInService.findFanRatesByGames(memberId, date);
 
         return ResponseEntity.ok(response);
     }
