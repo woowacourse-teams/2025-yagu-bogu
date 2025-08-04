@@ -6,10 +6,9 @@ VALUES ('롯데자이언츠', '롯데', 'LT'),
        ('두산 베어스', '두산', 'OB');
 
 -- 2. 멤버 생성 (ID 명시, team_id는 위에서 명시한 ID 참조)
-INSERT INTO members (team_id, nickname, role)
-VALUES (1, '포라', 'USER');
-INSERT INTO members (team_id, nickname, role)
-VALUES (2, '누구', 'USER');
+INSERT INTO members (team_id, nickname, email, provider, oauth_id, role, image_url)
+VALUES (1, '포라', 'pora@example.com', 'GOOGLE', 'sub-pora', 'USER', 'https://image.com/pora.png'),
+       (2, '누구', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://image.com/por.png');
 
 -- 3. 구장 생성 (ID 명시)
 INSERT INTO stadiums (full_name, short_name, location, latitude, longitude)
@@ -17,9 +16,9 @@ VALUES ('사직야구장', '사직구장', '부산', 35.1943, 129.0615),
        ('창원 NC파크', '엔씨파크', '창원', 35.222754, 128.582251);
 
 -- 4. 경기 생성 (ID 명시, stadium_id, home_team_id, away_team_id는 위에서 명시한 ID 참조)
-INSERT INTO games (stadium_id, home_team_id, away_team_id, date, home_score, away_score)
-VALUES (1, 1, 2, '2025-07-25', 10, 0),
-       (2, 3, 4, '2025-07-25', 9, 0);
+INSERT INTO games (stadium_id, home_team_id, away_team_id, date, start_at, home_score, away_score, game_code)
+VALUES (1, 1, 2, '2025-07-25', '18:00', 10, 0, '20250721LGHT0'),
+       (2, 3, 4, '2025-07-25', '18:00', 9, 0, '20250720WOHT0');
 
 -- 5. 톡 52개 생성
 -- 기준 시간: 2025-07-25 15:00:00
