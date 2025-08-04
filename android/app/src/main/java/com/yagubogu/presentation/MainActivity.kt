@@ -12,8 +12,8 @@ import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
+import com.yagubogu.presentation.livetalk.LiveTalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
-import com.yagubogu.presentation.talk.TalkFragment
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -51,8 +51,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.item_stats ->
                     replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
 
-                R.id.item_talk ->
-                    replaceFragment(TalkFragment::class.java, R.string.bottom_navigation_talk)
+                R.id.item_livetalk ->
+                    replaceFragment(LiveTalkFragment::class.java, R.string.bottom_navigation_livetalk)
 
                 R.id.item_challenge ->
                     replaceFragment(
