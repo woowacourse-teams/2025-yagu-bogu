@@ -19,7 +19,7 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<GamesResponse> findGamesByDate(
-            @RequestParam(name = "date") final LocalDate date
+            @RequestParam final LocalDate date
     ) {
         GamesResponse gamesResponse = gameService.findGamesByDate(date);
 
