@@ -20,6 +20,10 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextView.Pretendard.Regular.16" parent="TextView.Pretendard.Regular">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextView.Pretendard.Medium" parent="TextView.Pretendard">
         <item name="android:fontFamily">@font/pretendard_medium</item>
         <item name="android:textColor">@color/black</item>
@@ -95,21 +99,6 @@
     <style name="TextView.Esamanru.Bold" parent="TextView.Esamanru">
         <item name="android:fontFamily">@font/esamanru_bold</item>
         <item name="android:textColor">@color/black</item>
-    </style>
-
-    <style name="BottomNavigationView">
-        <item name="android:paddingTop">4dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="itemActiveIndicatorStyle">@android:color/transparent</item>
-        <item name="itemBackground">@android:color/transparent</item>
-        <item name="itemIconSize">24dp</item>
-        <item name="itemIconTint">@color/color_bottom_navigation</item>
-        <item name="itemPaddingBottom">28dp</item>
-        <item name="itemRippleColor">@android:color/transparent</item>
-        <item name="itemTextAppearanceActive">@style/TextView.Pretendard.SemiBold.12</item>
-        <item name="itemTextAppearanceInactive">@style/TextView.Pretendard.SemiBold.12</item>
-        <item name="itemTextColor">@color/color_bottom_navigation</item>
-        <item name="labelVisibilityMode">labeled</item>
     </style>
 
 </resources>
