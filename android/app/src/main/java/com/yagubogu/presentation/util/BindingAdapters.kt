@@ -7,6 +7,7 @@ import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.yagubogu.R
+import java.time.LocalDate
 
 @BindingAdapter("setCustomChartDividerTint")
 fun ImageView.setCustomChartDividerTint(
@@ -62,4 +63,10 @@ fun TextView.setTextColorRes(
 ) {
     if (colorRes == null || colorRes == 0) return
     setTextColor(context.getColor(colorRes))
+}
+
+@BindingAdapter("dateFormat")
+fun TextView.setDateFormat(date: LocalDate?) {
+    date ?: return
+    text = date.format(DateFormatter.yyyyMMdd)
 }
