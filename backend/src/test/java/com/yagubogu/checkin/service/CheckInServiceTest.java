@@ -204,14 +204,17 @@ class CheckInServiceTest {
         FanRateResponse expected = new FanRateResponse(
                 List.of(
                         new FanRateByGameResponse(
+                                3L,
                                 new TeamFanRateResponse("기아", "HT", 66.7),
                                 new TeamFanRateResponse("롯데", "LT", 33.3)
                         ),
                         new FanRateByGameResponse(
+                                4L,
                                 new TeamFanRateResponse("LG", "LG", 75.0),
                                 new TeamFanRateResponse("KT", "KT", 25.0)
                         ),
                         new FanRateByGameResponse(
+                                2L,
                                 new TeamFanRateResponse("삼성", "SS", 50.0),
                                 new TeamFanRateResponse("두산", "OB", 50.0)
                         )

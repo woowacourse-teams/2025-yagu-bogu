@@ -1,13 +1,13 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
-import com.yagubogu.checkin.domain.FanRateGameEntry;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
+import com.yagubogu.checkin.dto.FanRateGameEntry;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -20,7 +20,6 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,21 +52,20 @@ public class CheckInService {
         List<Game> games = gameRepository.findGameByDate(date);
 
         List<FanRateGameEntry> fanRateGameEntries = new ArrayList<>();
-        FanRateByGameResponse myTeamEnterThisGame = null;
+        FanRateByGameResponse myTeamGame = null;
 
         for (Game game : games) {
             FanCountsByGameResponse counts = getFanCountsForGame(game);
             FanRateByGameResponse fanRateByGameResponse = createFanRateByGameResponse(game, counts);
 
             if (game.hasTeam(myTeam)) {
-                myTeamEnterThisGame = fanRateByGameResponse;
+                myTeamGame = fanRateByGameResponse;
                 continue;
             }
             fanRateGameEntries.add(new FanRateGameEntry(counts.totalCheckInCounts(), fanRateByGameResponse));
         }
-        Collections.sort(fanRateGameEntries);
 
-        return FanRateResponse.from(myTeamEnterThisGame, fanRateGameEntries);
+        return FanRateResponse.from(myTeamGame, fanRateGameEntries);
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
@@ -117,7 +115,7 @@ public class CheckInService {
         double homeRate = calculateRoundRate(counts.homeTeamCheckInCounts(), total);
         double awayRate = calculateRoundRate(counts.awayTeamCheckInCounts(), total);
 
-        return FanRateByGameResponse.from(game, homeRate, awayRate);
+        return FanRateByGameResponse.from(game, total, homeRate, awayRate);
     }
 
     private double calculateRoundRate(final long checkInCounts, final long total) {

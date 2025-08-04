@@ -1,6 +1,5 @@
 package com.yagubogu.checkin.dto;
 
-import com.yagubogu.checkin.domain.FanRateGameEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,13 @@ public record FanRateResponse(
     ) {
         List<FanRateByGameResponse> fanRateByGameResponses = new ArrayList<>();
         fanRateByGameResponses.add(myTeamResponse);
-        exceptMyTeam.forEach(team -> fanRateByGameResponses.add(team.getResponse()));
+
+        List<FanRateByGameResponse> sortedOthers = exceptMyTeam.stream()
+                .map(FanRateGameEntry::getResponse)
+                .sorted()
+                .toList();
+
+        fanRateByGameResponses.addAll(sortedOthers);
 
         return new FanRateResponse(fanRateByGameResponses);
     }

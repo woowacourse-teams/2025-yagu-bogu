@@ -128,11 +128,12 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     @Query("""
                 SELECT new com.yagubogu.checkin.dto.FanCountsByGameResponse(
                     COUNT(c),
-                    SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END),
-                    SUM(CASE WHEN c.team = :awayTeam THEN 1 ELSE 0 END)
+                    COALESCE(SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END), 0),
+                    COALESCE(SUM(CASE WHEN c.team = :awayTeam THEN 1 ELSE 0 END), 0)
                 )
                 FROM CheckIn c
                 WHERE c.game = :game
             """)
     FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
+
 }

@@ -1,6 +1,5 @@
-package com.yagubogu.checkin.domain;
+package com.yagubogu.checkin.dto;
 
-import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
