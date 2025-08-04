@@ -1,7 +1,7 @@
 package com.yagubogu.global;
 
-import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
+import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.YaguBoguException;
