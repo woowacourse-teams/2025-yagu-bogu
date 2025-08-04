@@ -134,8 +134,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                     ROUND(
                         (1.0 * SUM(
                             CASE
-                                WHEN (g.homeTeam.id = ci.member.team.id AND g.homeScore > g.awayScore)
-                                    OR (g.awayTeam.id = ci.member.team.id AND g.awayScore > g.homeScore)
+                                WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
+                                    OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
                                 THEN 1 ELSE 0
                                 END
                         ) / COUNT(ci)) * 100, 1
@@ -143,7 +143,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 )
                 from CheckIn ci
                 JOIN ci.game g
-                where ci.member.team.id = ci.team.id
                 group by ci.member.id
             """)
     List<VictoryFairyRankingDataResponse> findGroupedMemberCheckinsBySameTeam();

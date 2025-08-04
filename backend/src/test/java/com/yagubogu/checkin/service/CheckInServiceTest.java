@@ -222,7 +222,7 @@ class CheckInServiceTest {
                         4,
                         "포르",
                         "기아",
-                        83.3
+                        71.4
                 ),
                 new VictoryFairyRankingResponse(
                         5,
