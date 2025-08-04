@@ -66,8 +66,8 @@ public class CheckInService {
     public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
         List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
 
-        int myRanking = findMyRanking(sortedList, memberId);
-        VictoryFairyRankingEntryResponse myRankingData = findMyRankingData(sortedList, memberId);
+        int myRanking = findMyRankingIndex(sortedList, memberId);
+        VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);
 
         List<VictoryFairyRankingEntryResponse> topRankings = sortedList.stream()
                 .limit(TOP_RANKINGS)
@@ -91,7 +91,7 @@ public class CheckInService {
                 .toList();
     }
 
-    private int findMyRanking(
+    private int findMyRankingIndex(
             final List<VictoryFairyRankingEntryResponse> sortedList,
             final long memberId
     ) {
@@ -101,7 +101,7 @@ public class CheckInService {
                 .orElse(-1) + 1;
     }
 
-    private VictoryFairyRankingEntryResponse findMyRankingData(
+    private VictoryFairyRankingEntryResponse findMyRanking(
             final List<VictoryFairyRankingEntryResponse> sortedList,
             final long memberId
     ) {
