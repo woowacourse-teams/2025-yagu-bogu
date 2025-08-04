@@ -50,7 +50,7 @@ class GoogleCredentialRequestManager(
     /**
      * 기존 로그인된 계정으로부터 Credential 요청을 시도함
      */
-    suspend fun getCredentialRequestWithDefault(): Result<GetCredentialResponse> =
+    suspend fun getCredentialRequestWithGoogleIdOption(): Result<GetCredentialResponse> =
         getCredentialResponseResult(credentialRequestWithGoogleIdOption)
 
     /**
