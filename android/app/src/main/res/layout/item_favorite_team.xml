@@ -8,12 +8,17 @@
         <variable
             name="favoriteTeamUiModel"
             type="com.yagubogu.presentation.favorite.FavoriteTeamUiModel" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.favorite.FavoriteTeamViewHolder.Handler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_white_stroke_gray100_radius_12dp">
+        android:background="@drawable/bg_white_stroke_gray100_radius_12dp"
+        android:onClick="@{() -> handler.onItemClick(favoriteTeamUiModel)}">
 
         <TextView
             android:id="@+id/tv_team_emoji"

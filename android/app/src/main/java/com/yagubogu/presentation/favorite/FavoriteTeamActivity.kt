@@ -32,7 +32,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val adapter =
             FavoriteTeamListAdapter(
-                object : FavoriteTeamListAdapter.OnItemClickListener {
+                object : FavoriteTeamListAdapter.Handler {
                     override fun onItemClick(item: FavoriteTeamUiModel) {
                         val dialog = FavoriteTeamConfirmDialogFragment.newInstance(item)
                         dialog.show(supportFragmentManager, dialog.tag)

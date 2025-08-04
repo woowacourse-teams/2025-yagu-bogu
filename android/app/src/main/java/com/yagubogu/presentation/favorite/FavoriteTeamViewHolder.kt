@@ -12,10 +12,18 @@ class FavoriteTeamViewHolder(
         binding.favoriteTeamUiModel = favoriteTeamUiModel
     }
 
+    interface Handler {
+        fun onItemClick(item: FavoriteTeamUiModel)
+    }
+
     companion object {
-        fun from(parent: ViewGroup): FavoriteTeamViewHolder {
+        fun from(
+            parent: ViewGroup,
+            handler: Handler,
+        ): FavoriteTeamViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemFavoriteTeamBinding.inflate(inflater, parent, false)
+            binding.handler = handler
             return FavoriteTeamViewHolder(binding)
         }
     }

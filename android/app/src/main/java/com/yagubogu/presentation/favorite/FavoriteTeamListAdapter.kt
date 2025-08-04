@@ -5,16 +5,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 class FavoriteTeamListAdapter(
-    private val favoriteTeamClickListener: OnItemClickListener,
+    private val handler: Handler,
 ) : ListAdapter<FavoriteTeamUiModel, FavoriteTeamViewHolder>(diffCallback) {
-    interface OnItemClickListener {
-        fun onItemClick(item: FavoriteTeamUiModel)
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): FavoriteTeamViewHolder = FavoriteTeamViewHolder.from(parent)
+    ): FavoriteTeamViewHolder = FavoriteTeamViewHolder.from(parent, handler)
 
     override fun onBindViewHolder(
         holder: FavoriteTeamViewHolder,
@@ -23,9 +19,11 @@ class FavoriteTeamListAdapter(
         val item = getItem(position)
         holder.bind(item)
         holder.itemView.setOnClickListener {
-            favoriteTeamClickListener.onItemClick(item)
+            handler.onItemClick(item)
         }
     }
+
+    interface Handler : FavoriteTeamViewHolder.Handler
 
     companion object {
         private val diffCallback =
