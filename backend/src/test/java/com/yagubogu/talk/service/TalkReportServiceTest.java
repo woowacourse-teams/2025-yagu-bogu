@@ -1,6 +1,5 @@
 package com.yagubogu.talk.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -52,8 +51,8 @@ class TalkReportServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(talkReportRepository.count()).isEqualTo(1);
-            assertThat(talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)).isTrue();
+            softAssertions.assertThat(talkReportRepository.count()).isEqualTo(1);
+            softAssertions.assertThat(talkReportRepository.existsByTalkIdAndReporterId(talkId, reporterId)).isTrue();
         });
     }
 

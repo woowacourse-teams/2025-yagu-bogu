@@ -65,9 +65,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            assertThat(actual.hasNext()).isTrue();
+            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.hasNext()).isTrue();
         });
     }
 
@@ -89,9 +89,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            assertThat(actual.hasNext()).isTrue();
+            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.hasNext()).isTrue();
         });
     }
 
@@ -113,9 +113,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.hasNext()).isFalse();
         });
     }
 
@@ -135,10 +135,10 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(actual.content()).hasSize(2);
-            assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
-            assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.content()).hasSize(2);
+            softAssertions.assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
+            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.hasNext()).isFalse();
         });
     }
 
@@ -155,9 +155,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(actual.content()).isEmpty();
-            assertThat(actual.nextCursorId()).isEqualTo(cursorId);
-            assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.content()).isEmpty();
+            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(cursorId);
+            softAssertions.assertThat(actual.hasNext()).isFalse();
         });
     }
 
@@ -175,9 +175,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            assertThat(response.content()).isEqualTo(content);
-            assertThat(response.memberId()).isEqualTo(memberId);
-            assertThat(response.id()).isEqualTo(53L);
+            softAssertions.assertThat(response.content()).isEqualTo(content);
+            softAssertions.assertThat(response.memberId()).isEqualTo(memberId);
+            softAssertions.assertThat(response.id()).isEqualTo(53L);
         });
     }
 
