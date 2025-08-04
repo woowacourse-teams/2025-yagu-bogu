@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.auth.GoogleCredentialHandler
+import com.yagubogu.auth.GoogleCredentialResult
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
@@ -16,10 +17,13 @@ class LoginViewModel(
 
     fun signIn() {
         viewModelScope.launch {
-            googleCredentialHandler.signIn(
-                onSuccess = { _login.setValue(it) },
-                onFailure = { _login.setValue(it) },
-            )
+            val result: GoogleCredentialResult = googleCredentialHandler.signIn()
+            when (result) {
+                is GoogleCredentialResult.Success -> _login.value = result.idToken
+                is GoogleCredentialResult.Failure -> result.exception.toString()
+                GoogleCredentialResult.Cancel -> _login.value = "사용자 취소"
+                GoogleCredentialResult.Suspending -> Unit
+            }
         }
     }
 
