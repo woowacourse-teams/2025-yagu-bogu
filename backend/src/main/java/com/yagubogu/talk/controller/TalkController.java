@@ -35,6 +35,7 @@ public class TalkController {
     ) {
         CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
                 limit, memberId);
+        
         return ResponseEntity.ok(response);
     }
 
@@ -77,7 +78,7 @@ public class TalkController {
             @RequestParam("memberId") final long memberId // TODO: 나중에 삭제
     ) {
         talkService.removeTalk(gameId, talkId, memberId);
-        
+
         return ResponseEntity.noContent().build();
     }
 }
