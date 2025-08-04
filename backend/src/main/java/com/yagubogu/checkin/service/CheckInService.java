@@ -1,8 +1,8 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
@@ -75,13 +75,18 @@ public class CheckInService {
         return new CheckInCountsResponse(checkInCounts);
     }
 
-    public CheckInHistoryResponse findCheckInHistory(final long memberId, final int year) {
+    public CheckInHistoryResponse findCheckInHistory(
+            final long memberId,
+            final int year,
+            final CheckInResultFilter filter
+    ) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        List<CheckInGameResponse> checkInGameResponses = checkInRepository.findCheckInHistory(member, team, year);
-
-        return new CheckInHistoryResponse(checkInGameResponses);
+        return switch (filter) {
+            case ALL -> new CheckInHistoryResponse(checkInRepository.findCheckInHistory(member, team, year));
+            case WIN -> new CheckInHistoryResponse(checkInRepository.findCheckInWinHistory(member, team, year));
+        };
     }
 
     private Stadium getStadiumById(final long stadiumId) {

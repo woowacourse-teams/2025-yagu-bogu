@@ -135,5 +135,4 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE c.game = :game
             """)
     FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
-
 }

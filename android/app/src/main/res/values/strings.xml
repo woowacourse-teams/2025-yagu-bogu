@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">야구보구</string>
+
+    <string name="all_settings">설정</string>
+    <string name="all_cancel">취소</string>
+    <string name="all_winning_percentage">%d%%</string>
+
+    <string name="bottom_navigation_home">홈</string>
+    <string name="bottom_navigation_stats">통계</string>
+    <string name="bottom_navigation_record">기록</string>
+    <string name="bottom_navigation_challenge">챌린지</string>
+
+    <string name="permission_dialog_open_settings">"설정으로 이동"</string>
+    <string name="permission_dialog_location_title">위치 권한 필요</string>
+    <string name="permission_dialog_location_description">인증하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
+
+    <string name="home_check_in">직관 인증하기</string>
+    <string name="home_my_team">우리 팀</string>
+    <string name="home_attendance_count">인증 횟수</string>
+    <string name="home_winning_percentage">승률</string>
+    <string name="home_recent_attendance_record">최근 직관 기록</string>
+    <string name="home_empty_attendance_record_description">직관 기록이 없습니다.\n직관의 추억을 기록해 주세요!</string>
+    <string name="home_location_permission_denied_message">위치 권한이 거부되었습니다.</string>
+    <string name="home_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
+    <string name="home_check_in_success_message">직관 인증이 완료되었습니다!</string>
+    <string name="home_check_in_failure_message">구장 근처에서만 인증할 수 있어요.</string>
+
+    <string name="stats_tab_my_stats">내 통계</string>
+    <string name="stats_tab_stadium_stats">오늘의 구장 통계</string>
+    <string name="stats_percentage">%d%%</string>
+    <string name="stats_legend_percentage">%.1f%%</string>
+
+    <string name="stats_my_pie_chart_title">직관 승률</string>
+    <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
+    <string name="stats_my_pie_chart_win">승리</string>
+    <string name="stats_my_pie_chart_draw">무승부</string>
+    <string name="stats_my_pie_chart_lose">패배</string>
+    <string name="stats_my_team">최다 응원팀</string>
+    <string name="stats_my_lucky_stadium">행운의 구장</string>
+    <string name="stats_my_team_emoji">🏆</string>
+    <string name="stats_my_lucky_stadium_emoji">🍀</string>
+    <string name="stats_my_no_lucky_stadium">없어요..</string>
+
+    <string name="stats_stadium_pie_chart_title">%s 현황</string>
+    <string name="stats_stadium_refresh_time">%02d:%02d 기준</string>
+</resources>
