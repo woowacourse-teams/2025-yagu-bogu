@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CheckInService {
 
-    private static final int TOP_FIVE = 5;
+    private static final int TOP_RANKINGS = 5;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -70,7 +70,7 @@ public class CheckInService {
         VictoryFairyRankingDataResponse myRankingData = findMyRankingData(sortedList, memberId);
 
         List<VictoryFairyRankingDataResponse> top5 = sortedList.stream()
-                .limit(TOP_FIVE)
+                .limit(TOP_RANKINGS)
                 .toList();
 
         return VictoryFairyRankingResponses.from(top5, myRankingData, myRanking);
