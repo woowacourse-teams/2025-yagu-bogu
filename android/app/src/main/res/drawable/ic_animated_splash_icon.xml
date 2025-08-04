@@ -108,6 +108,6 @@
 
     <item
         android:drawable="@drawable/ic_splash_icon_frame_26"
-        android:duration="10" />
+        android:duration="1000" />
 
 </animation-list>
