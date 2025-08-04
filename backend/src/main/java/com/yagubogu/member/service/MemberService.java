@@ -15,7 +15,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public void removeMember(final Long memberId) {
-        memberRepository.softDeleteById(memberId);
+        memberRepository.deleteById(memberId);
     }
 
     public MemberFavoriteResponse findFavorite(final long memberId) {

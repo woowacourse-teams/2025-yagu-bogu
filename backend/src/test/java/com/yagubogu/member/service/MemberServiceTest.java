@@ -65,6 +65,6 @@ public class MemberServiceTest {
         memberService.removeMember(memberId);
 
         // then
-        assertThat(memberRepository.findActiveById(memberId)).isEmpty();
+        assertThat(memberRepository.findById(memberId)).isEmpty();
     }
 }
