@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupView()
         setupListeners()
-        performInitialization(savedInstanceState)
+        performInitialization()
     }
 
     private fun setupSplash() {
@@ -49,7 +49,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun performInitialization(savedInstanceState: Bundle?) {
+    private fun performInitialization() {
         lifecycleScope.launch {
             try {
                 // Todo : 초기화 작업 수행, (LoginViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
@@ -57,8 +57,6 @@ class LoginActivity : AppCompatActivity() {
                 Log.e("LoginActivity", "초기화 실패", e)
             } finally {
                 isAppInitialized = true
-                if (savedInstanceState == null) {
-                }
             }
         }
     }
