@@ -22,4 +22,3 @@ public record FanRateByGameResponse(
         return Long.compare(other.totalCounts, this.totalCounts);
     }
 }
-
