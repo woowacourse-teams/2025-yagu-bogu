@@ -1,4 +1,4 @@
-package com.yagubogu.auth.token;
+package com.yagubogu.auth.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

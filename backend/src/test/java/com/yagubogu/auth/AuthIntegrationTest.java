@@ -1,10 +1,10 @@
-package com.yagubogu.member;
+package com.yagubogu.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.fixture.TestSupport;
-import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.auth.dto.LoginRequest;
+import com.yagubogu.auth.dto.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
@@ -25,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class MemberIntegrationTest {
+public class AuthIntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -35,38 +34,25 @@ public class MemberIntegrationTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("멤버의 응원팀을 조회한다")
+    @DisplayName("로그인한다")
     @Test
-    void findFavorites() {
-        // given
-        String expected = "기아";
-
-        // when
-        MemberFavoriteResponse actual = RestAssured.given().log().all()
+    void login() {
+        // given & when
+        LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .pathParam("memberId", 1L)
-                .when().get("/api/members/{memberId}/favorites")
+                .body(new LoginRequest("id_token"))
+                .when().post("/api/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(MemberFavoriteResponse.class);
+                .as(LoginResponse.class);
 
         // then
-        assertThat(actual.favorite()).isEqualTo(expected);
-    }
-
-    @DisplayName("회원 탈퇴한다")
-    @Test
-    void removeMember() {
-        // given
-        String accessToken = TestSupport.getAccessToken("id_token");
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().delete("/api/members/me")
-                .then().log().all()
-                .statusCode(204);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.accessToken()).isNotNull();
+            softAssertions.assertThat(actual.refreshToken()).isNotNull();
+            softAssertions.assertThat(actual.isNew()).isTrue();
+            softAssertions.assertThat(actual.member().nickname()).isEqualTo("test-user");
+        });
     }
 }

@@ -1,14 +1,16 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.client.AuthGateway;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.auth.token.JwtProvider;
+import com.yagubogu.auth.support.AuthValidator;
+import com.yagubogu.auth.support.JwtProvider;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
+import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
@@ -39,15 +41,30 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
-    private Member findOrCreateMember(final boolean isNew, final AuthResponse response,
-                                      final Optional<Member> memberOptional) {
+    public MemberClaims makeMemberClaims(final String token) {
+        jwtProvider.validateAccessToken(token);
+        Long memberId = jwtProvider.getMemberIdByAccessToken(token);
+        Role role = jwtProvider.getRoleByAccessToken(token);
+
+        return new MemberClaims(memberId, role);
+    }
+
+    private Member findOrCreateMember(
+            final boolean isNew,
+            final AuthResponse response,
+            final Optional<Member> memberOptional
+    ) {
         if (isNew) {
             return memberRepository.save(response.toMember());
         }
+
         return memberOptional.get();
     }
 
-    private void validateToken(final AuthResponse response, final OAuthProvider provider) {
+    private void validateToken(
+            final AuthResponse response,
+            final OAuthProvider provider
+    ) {
         authValidators.stream()
                 .filter(v -> v.supports(provider))
                 .findFirst()
@@ -60,7 +77,10 @@ public class AuthService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AuthResponse> void invokeValidator(AuthValidator<?> validator, AuthResponse response) {
+    private <T extends AuthResponse> void invokeValidator(
+            final AuthValidator<?> validator,
+            final AuthResponse response
+    ) {
         ((AuthValidator<T>) validator).validate((T) response);
     }
 }

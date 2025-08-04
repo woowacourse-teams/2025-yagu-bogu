@@ -1,4 +1,4 @@
-package com.yagubogu.auth.service;
+package com.yagubogu.auth.support;
 
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.member.domain.OAuthProvider;
