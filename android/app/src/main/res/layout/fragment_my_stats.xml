@@ -21,15 +21,13 @@
             android:paddingBottom="20dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraint_my_stats"
-                android:layout_width="0dp"
+                android:id="@+id/constraint_win_rate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_white_radius_12dp"
                 android:padding="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -103,7 +101,7 @@
                         style="@style/TextView.Pretendard.Bold.32"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="4dp"
                         android:text="@{String.valueOf(myStatsUiModel.winCount)}"
                         android:textColor="@color/primary500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -136,7 +134,7 @@
                         style="@style/TextView.Pretendard.Bold.32"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="4dp"
                         android:text="@{String.valueOf(myStatsUiModel.drawCount)}"
                         android:textColor="@color/gray400"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -169,7 +167,7 @@
                         style="@style/TextView.Pretendard.Bold.32"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="4dp"
                         android:text="@{String.valueOf(myStatsUiModel.loseCount)}"
                         android:textColor="@color/red"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -180,36 +178,34 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraint_my_team"
-                android:layout_width="0dp"
+                android:id="@+id/constraint_my_stats"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_white_radius_12dp"
                 android:paddingVertical="20dp"
-                app:layout_constraintEnd_toStartOf="@id/constraint_lucky_stadium"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/constraint_my_stats">
+                app:layout_constraintTop_toBottomOf="@id/constraint_win_rate">
 
                 <TextView
                     android:id="@+id/tv_my_team_emoji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_my_team_emoji"
-                    android:textSize="28sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_my_team_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_my_team_name"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_my_team_name"
                     style="@style/TextView.Pretendard.SemiBold.20"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:text="@{myStatsUiModel.myTeam}"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_lucky_stadium_name"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_my_team_emoji"
                     tools:text="KIA" />
@@ -222,44 +218,40 @@
                     android:text="@string/stats_my_team"
                     android:textColor="@color/gray500"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/tv_my_team_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_my_team_name"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_team_name" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="0.4dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="10dp"
+                    app:dividerColor="@color/gray300"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_my_team_name" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraint_lucky_stadium"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/bg_white_radius_12dp"
-                android:paddingVertical="20dp"
-                app:layout_constraintBottom_toBottomOf="@id/constraint_my_team"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/constraint_my_team"
-                app:layout_constraintTop_toBottomOf="@id/constraint_my_stats"
-                app:layout_constraintTop_toTopOf="@id/constraint_my_team">
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_lucky_stadium_emoji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_my_lucky_stadium_emoji"
-                    android:textSize="28sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_lucky_stadium_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_lucky_stadium_name"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_lucky_stadium_name"
                     style="@style/TextView.Pretendard.SemiBold.20"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:text="@{myStatsUiModel.luckyStadium != null ? myStatsUiModel.luckyStadium : @string/stats_my_no_lucky_stadium}"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_my_team_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_lucky_stadium_emoji"
                     tools:text="챔피언스필드" />
 
@@ -271,11 +263,208 @@
                     android:text="@string/stats_my_lucky_stadium"
                     android:textColor="@color/gray500"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/tv_lucky_stadium_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_lucky_stadium_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_lucky_stadium_name" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_attendance_stats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:paddingVertical="20dp"
+                app:layout_constraintTop_toBottomOf="@id/constraint_my_stats">
+
+                <TextView
+                    android:id="@+id/tv_attendance_stats_title"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/stats_attendance_stats_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_gain_score_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/stats_gain_score_emoji"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_gain_score"
+                    app:layout_constraintStart_toStartOf="@id/tv_gain_score"
+                    app:layout_constraintTop_toBottomOf="@id/tv_attendance_stats_title" />
+
+                <TextView
+                    android:id="@+id/tv_gain_score"
+                    style="@style/TextView.Pretendard.SemiBold.20"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="6.5점"
+                    app:layout_constraintEnd_toStartOf="@id/tv_loss_score"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_gain_score_emoji"
+                    tools:text="6.5점" />
+
+                <TextView
+                    android:id="@+id/tv_gain_score_text"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/stats_gain_score"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="@id/tv_gain_score"
+                    app:layout_constraintStart_toStartOf="@id/tv_gain_score"
+                    app:layout_constraintTop_toBottomOf="@id/tv_gain_score" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="0.4dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="10dp"
+                    app:dividerColor="@color/gray300"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_gain_score_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_gain_score_emoji" />
+
+                <TextView
+                    android:id="@+id/tv_loss_score_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stats_loss_score_emoji"
+                    android:textSize="24sp"
+                    app:layout_constraintEnd_toEndOf="@id/tv_loss_score"
+                    app:layout_constraintStart_toStartOf="@id/tv_loss_score"
+                    app:layout_constraintTop_toTopOf="@id/tv_gain_score_emoji" />
+
+                <TextView
+                    android:id="@+id/tv_loss_score"
+                    style="@style/TextView.Pretendard.SemiBold.20"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="2.2점"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_gain_score"
+                    app:layout_constraintTop_toBottomOf="@id/tv_loss_score_emoji"
+                    tools:text="2.2점" />
+
+                <TextView
+                    android:id="@+id/tv_loss_score_text"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/stats_loss_score"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="@id/tv_loss_score"
+                    app:layout_constraintStart_toStartOf="@id/tv_loss_score"
+                    app:layout_constraintTop_toBottomOf="@id/tv_loss_score" />
+
+                <TextView
+                    android:id="@+id/tv_hit_count"
+                    style="@style/TextView.Pretendard.SemiBold.20"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:gravity="center"
+                    android:text="8.6개"
+                    app:layout_constraintEnd_toStartOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_gain_score_text"
+                    tools:text="8.6개" />
+
+                <TextView
+                    android:id="@+id/tv_hit_count_text"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/stats_hit"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="@id/tv_hit_count"
+                    app:layout_constraintStart_toStartOf="@id/tv_hit_count"
+                    app:layout_constraintTop_toBottomOf="@id/tv_hit_count" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="0.4dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="10dp"
+                    app:dividerColor="@color/gray300"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_hit_count_text"
+                    app:layout_constraintEnd_toStartOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintStart_toEndOf="@id/tv_hit_count"
+                    app:layout_constraintTop_toTopOf="@id/tv_hit_count" />
+
+                <TextView
+                    android:id="@+id/tv_hit_allowed_count"
+                    style="@style/TextView.Pretendard.SemiBold.20"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="6.2개"
+                    app:layout_constraintEnd_toStartOf="@id/tv_error_count"
+                    app:layout_constraintStart_toEndOf="@id/tv_hit_count"
+                    app:layout_constraintTop_toTopOf="@id/tv_hit_count"
+                    tools:text="6.2개" />
+
+                <TextView
+                    android:id="@+id/tv_hit_allowed_count_text"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/stats_hit_allowed"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintStart_toStartOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintTop_toBottomOf="@id/tv_hit_allowed_count" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="0.4dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="10dp"
+                    app:dividerColor="@color/gray300"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_hit_count_text"
+                    app:layout_constraintEnd_toStartOf="@id/tv_error_count"
+                    app:layout_constraintStart_toEndOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintTop_toTopOf="@id/tv_hit_count" />
+
+                <TextView
+                    android:id="@+id/tv_error_count"
+                    style="@style/TextView.Pretendard.SemiBold.20"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="1.4개"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_hit_allowed_count"
+                    app:layout_constraintTop_toBottomOf="@id/tv_gain_score_text"
+                    app:layout_constraintTop_toTopOf="@id/tv_hit_count"
+                    tools:text="1.4개" />
+
+                <TextView
+                    android:id="@+id/tv_error_count_text"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/stats_error"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="@id/tv_error_count"
+                    app:layout_constraintStart_toStartOf="@id/tv_error_count"
+                    app:layout_constraintTop_toBottomOf="@id/tv_error_count" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>

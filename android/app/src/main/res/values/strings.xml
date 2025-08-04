@@ -17,6 +17,10 @@
     <string name="permission_dialog_location_title">위치 권한 필요</string>
     <string name="permission_dialog_location_description">인증하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
 
+    <string name="login_app_description">야구보구 인증하구 기록하구</string>
+    <string name="login_google_icon_description">구글 G 아이콘</string>
+    <string name="login_button_google_account">Google 계정으로 계속하기</string>
+
     <string name="home_check_in">직관 인증하기</string>
     <string name="home_my_team">우리 팀</string>
     <string name="home_attendance_count">인증 횟수</string>
@@ -39,11 +43,20 @@
     <string name="stats_my_pie_chart_win">승리</string>
     <string name="stats_my_pie_chart_draw">무승부</string>
     <string name="stats_my_pie_chart_lose">패배</string>
-    <string name="stats_my_team">최다 응원팀</string>
-    <string name="stats_my_lucky_stadium">행운의 구장</string>
     <string name="stats_my_team_emoji">🏆</string>
     <string name="stats_my_lucky_stadium_emoji">🍀</string>
+    <string name="stats_my_team">응원팀</string>
+    <string name="stats_my_lucky_stadium">행운의 구장</string>
     <string name="stats_my_no_lucky_stadium">없어요..</string>
+    <string name="stats_attendance_stats_title">직관 평균 통계</string>
+    <string name="stats_gain_score_emoji">😊</string>
+    <string name="stats_loss_score_emoji">😡</string>
+    <string name="stats_gain_score">득점</string>
+    <string name="stats_loss_score">실점</string>
+    <string name="stats_hit">안타</string>
+    <string name="stats_hit_allowed">피안타</string>
+    <string name="stats_error">실책</string>
+
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
 
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
