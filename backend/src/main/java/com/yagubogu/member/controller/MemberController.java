@@ -18,15 +18,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/{memberId}/favorites")
-    public ResponseEntity<MemberFavoriteResponse> findFavorites(
-            @PathVariable final long memberId
-    ) {
-        MemberFavoriteResponse response = memberService.findFavorite(memberId);
-
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/me")
     public ResponseEntity<Void> removeMember(
             final MemberClaims memberClaims
@@ -34,5 +25,14 @@ public class MemberController {
         memberService.removeMember(memberClaims.id());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{memberId}/favorites")
+    public ResponseEntity<MemberFavoriteResponse> findFavorites(
+            @PathVariable final long memberId
+    ) {
+        MemberFavoriteResponse response = memberService.findFavorite(memberId);
+
+        return ResponseEntity.ok(response);
     }
 }
