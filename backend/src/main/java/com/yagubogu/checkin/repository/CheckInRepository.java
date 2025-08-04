@@ -145,5 +145,5 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 JOIN ci.game g
                 group by ci.member.id
             """)
-    List<VictoryFairyRankingEntryResponse> findGroupedMemberCheckinsBySameTeam();
+    List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
 }

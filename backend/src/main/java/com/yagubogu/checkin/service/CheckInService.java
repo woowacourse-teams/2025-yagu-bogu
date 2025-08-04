@@ -77,7 +77,7 @@ public class CheckInService {
     }
 
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
-        List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findGroupedMemberCheckinsBySameTeam();
+        List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
 
         return memberCheckIns.stream()
                 .sorted(Comparator
