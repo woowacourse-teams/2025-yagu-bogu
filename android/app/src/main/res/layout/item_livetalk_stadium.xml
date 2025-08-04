@@ -40,14 +40,13 @@
 
         <TextView
             android:id="@+id/tv_user_count"
-            style="@style/TextView.Pretendard.Medium"
+            style="@style/TextView.Pretendard.Medium.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:textColor="@color/gray500"
-            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
-            app:layout_constraintStart_toEndOf="@+id/iv_user_counter_icon"
+            app:layout_constraintStart_toEndOf="@id/iv_user_counter_icon"
             app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
             tools:text="100" />
 
@@ -56,8 +55,7 @@
             android:id="@+id/tv_arrow_right"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="4dp"
-            android:contentDescription="@string/livetalk_stadium_select_arrow"
+            android:contentDescription="@string/livetalk_stadium_select_arrow_description"
             android:src="@drawable/ic_arrow_right"
             app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
             app:layout_constraintEnd_toEndOf="parent"
@@ -73,19 +71,20 @@
             android:textAlignment="center"
             app:layout_constraintEnd_toStartOf="@id/tv_livetalk_vs_design"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_stadium_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
             tools:text="\uD83D\uDC3B" />
 
         <TextView
             android:id="@+id/tv_away_team_nickname"
-            style="@style/TextView.Esamanru.Medium.14"
+            style="@style/TextView.Esamanru.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/tv_away_team_emoji"
-            app:layout_constraintStart_toStartOf="@+id/tv_away_team_emoji"
-            app:layout_constraintTop_toBottomOf="@+id/tv_away_team_emoji"
+            app:layout_constraintEnd_toEndOf="@id/tv_away_team_emoji"
+            app:layout_constraintStart_toStartOf="@id/tv_away_team_emoji"
+            app:layout_constraintTop_toBottomOf="@id/tv_away_team_emoji"
             tools:text="베어스"
             tools:textColor="@color/team_doosan" />
 
@@ -109,19 +108,20 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tv_livetalk_vs_design"
-            app:layout_constraintTop_toTopOf="@+id/tv_away_team_emoji"
+            app:layout_constraintStart_toEndOf="@id/tv_livetalk_vs_design"
+            app:layout_constraintTop_toTopOf="@id/tv_away_team_emoji"
             tools:text="\uD83E\uDDB8" />
 
         <TextView
             android:id="@+id/tv_home_team_nickname"
-            style="@style/TextView.Esamanru.Medium.14"
+            style="@style/TextView.Esamanru.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_away_team_nickname"
-            app:layout_constraintEnd_toEndOf="@+id/tv_home_team_emoji"
-            app:layout_constraintStart_toStartOf="@+id/tv_home_team_emoji"
-            app:layout_constraintTop_toBottomOf="@+id/tv_away_team_emoji"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_away_team_nickname"
+            app:layout_constraintEnd_toEndOf="@id/tv_home_team_emoji"
+            app:layout_constraintStart_toStartOf="@id/tv_home_team_emoji"
+            app:layout_constraintTop_toBottomOf="@id/tv_away_team_emoji"
             app:layout_constraintTop_toTopOf="@id/tv_away_team_nickname"
             tools:text="히어로즈"
             tools:textColor="@color/team_kiwoom" />
