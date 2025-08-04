@@ -1,9 +1,10 @@
 package com.yagubogu.global;
 
-import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.BadGatewayException;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBadRequestException(final BadRequestException e) {
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 401 UnAuthorized
+     */
+    @ExceptionHandler(value = UnAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionResponse handleUnAuthorizedException(final UnAuthorizedException e) {
         return new ExceptionResponse(e.getMessage());
     }
 

@@ -21,4 +21,8 @@ public class TestSupport {
     public static String getAccessToken(String idToken) {
         return BEARER + loginResponse(idToken).accessToken();
     }
+
+    public static String getRefreshToken(String idToken) {
+        return loginResponse(idToken).refreshToken();
+    }
 }

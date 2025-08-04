@@ -1,15 +1,28 @@
 package com.yagubogu.auth;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.auth.domain.RefreshToken;
+import com.yagubogu.auth.dto.CreateRefreshTokenRequest;
+import com.yagubogu.auth.dto.CreateRefreshTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
+import com.yagubogu.auth.repository.RefreshTokenRepository;
+import com.yagubogu.fixture.TestFixture;
+import com.yagubogu.fixture.TestSupport;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -29,6 +42,15 @@ public class AuthIntegrationTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -38,7 +60,7 @@ public class AuthIntegrationTest {
     @Test
     void login() {
         // given & when
-        LoginResponse actual = RestAssured.given().log().all()
+        LoginResponse actual = given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest("id_token"))
                 .when().post("/api/auth/login")
@@ -54,5 +76,69 @@ public class AuthIntegrationTest {
             softAssertions.assertThat(actual.isNew()).isTrue();
             softAssertions.assertThat(actual.member().nickname()).isEqualTo("test-user");
         });
+    }
+
+    @DisplayName("토큰을 갱신한다")
+    @Test
+    void refresh() {
+        // given
+        String refreshToken = TestSupport.getRefreshToken("id_token");
+
+        // when
+        CreateRefreshTokenResponse actual = given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateRefreshTokenRequest(refreshToken))
+                .when().post("/api/auth/refresh")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CreateRefreshTokenResponse.class);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.accessToken()).isNotBlank();
+            softAssertions.assertThat(actual.refreshToken()).isNotBlank();
+            softAssertions.assertThat(actual.refreshToken()).isNotEqualTo(refreshToken);
+        });
+    }
+
+    @DisplayName("예외: refresh token이 존재하지 않으면 예외가 발생한다")
+    @Test
+    void refresh_tokenNotFound() {
+        // given
+        String nonExistToken = "non-exist-token";
+
+        // when & then
+        given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateRefreshTokenRequest(nonExistToken))
+                .when().post("/api/auth/refresh")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @Test
+    void refresh_tokenInvalid() {
+        // given
+        String expiredToken = "expired-token";
+        Team team = teamRepository.save(TestFixture.getTeam());
+        Member member = memberRepository.save(TestFixture.getUser(team));
+
+        RefreshToken refreshToken = new RefreshToken(
+                expiredToken,
+                member,
+                Instant.now().minusSeconds(1)
+        );
+        refreshToken.revoke();
+        refreshTokenRepository.save(refreshToken);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateRefreshTokenRequest(expiredToken))
+                .when().post("/api/auth/refresh")
+                .then().log().all()
+                .statusCode(401);
     }
 }

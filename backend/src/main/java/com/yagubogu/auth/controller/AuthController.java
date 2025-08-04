@@ -1,5 +1,7 @@
 package com.yagubogu.auth.controller;
 
+import com.yagubogu.auth.dto.CreateRefreshTokenRequest;
+import com.yagubogu.auth.dto.CreateRefreshTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.service.AuthService;
@@ -22,6 +24,15 @@ public class AuthController {
             @RequestBody final LoginRequest request
     ) {
         LoginResponse response = authService.login(request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<CreateRefreshTokenResponse> refresh(
+            @RequestBody final CreateRefreshTokenRequest request
+    ) {
+        CreateRefreshTokenResponse response = authService.refresh(request.refreshToken());
 
         return ResponseEntity.ok(response);
     }
