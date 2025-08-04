@@ -52,9 +52,9 @@ public class CheckInController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/members/{memberId}/victory-fairy/rankings")
+    @GetMapping("/victory-fairy/rankings")
     public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            @PathVariable final long memberId
+            @RequestParam final long memberId
     ) {
         VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberId);
 
