@@ -9,12 +9,12 @@ public record FanRateResponse(
 ) {
 
     public static FanRateResponse from(
-            FanRateByGameResponse myTeamEnterThisGame,
+            FanRateByGameResponse myTeamResponse,
             List<FanRateGameEntry> exceptMyTeam
     ) {
         List<FanRateByGameResponse> fanRateByGameResponses = new ArrayList<>();
-        fanRateByGameResponses.add(myTeamEnterThisGame);
-        exceptMyTeam.forEach(pair -> fanRateByGameResponses.add(pair.getResponse()));
+        fanRateByGameResponses.add(myTeamResponse);
+        exceptMyTeam.forEach(team -> fanRateByGameResponses.add(team.getResponse()));
 
         return new FanRateResponse(fanRateByGameResponses);
     }
