@@ -12,19 +12,19 @@ data class AttendanceHistoryItem(
     val stadiumName: String,
 ) {
     @ColorRes
-    val awayTeamColorRes: Int = determineTeamColorRes(awayTeam)
+    val awayTeamColorRes: Int = determineTeamColorRes(awayTeam, homeTeam)
 
     @ColorRes
-    val homeTeamColorRes: Int = determineTeamColorRes(homeTeam)
+    val homeTeamColorRes: Int = determineTeamColorRes(homeTeam, awayTeam)
 
     @ColorRes
-    private fun determineTeamColorRes(team: TeamItem): Int {
-        val myTeam: TeamItem = if (awayTeam.isMyTeam) awayTeam else homeTeam
-        val opponentTeam: TeamItem = if (myTeam == awayTeam) homeTeam else awayTeam
-
-        val gameResult = GameResult.from(myTeam.score, opponentTeam.score)
-        return if (team.isMyTeam && gameResult == GameResult.WIN) {
-            team.teamColor
+    private fun determineTeamColorRes(
+        thisTeam: TeamItem,
+        otherTeam: TeamItem,
+    ): Int {
+        val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
+        return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {
+            thisTeam.teamColor
         } else {
             R.color.gray400
         }
