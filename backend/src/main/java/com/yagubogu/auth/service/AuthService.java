@@ -39,7 +39,7 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
-    public MemberClaims makeMemberClaims(final String token){
+    public MemberClaims makeMemberClaims(final String token) {
         jwtProvider.validateAccessToken(token);
         Long memberId = jwtProvider.getMemberIdByAccessToken(token);
         Role role = jwtProvider.getRoleByAccessToken(token);
@@ -47,8 +47,11 @@ public class AuthService {
         return new MemberClaims(memberId, role);
     }
 
-    private Member findOrCreateMember(final boolean isNew, final AuthResponse response,
-                                      final Optional<Member> memberOptional) {
+    private Member findOrCreateMember(
+            final boolean isNew,
+            final AuthResponse response,
+            final Optional<Member> memberOptional
+    ) {
         if (isNew) {
             return memberRepository.save(response.toMember());
         }
@@ -56,7 +59,10 @@ public class AuthService {
         return memberOptional.get();
     }
 
-    private void validateToken(final AuthResponse response, final OAuthProvider provider) {
+    private void validateToken(
+            final AuthResponse response,
+            final OAuthProvider provider
+    ) {
         authValidators.stream()
                 .filter(v -> v.supports(provider))
                 .findFirst()
@@ -69,7 +75,10 @@ public class AuthService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AuthResponse> void invokeValidator(AuthValidator<?> validator, AuthResponse response) {
+    private <T extends AuthResponse> void invokeValidator(
+            final AuthValidator<?> validator,
+            final AuthResponse response
+    ) {
         ((AuthValidator<T>) validator).validate((T) response);
     }
 }

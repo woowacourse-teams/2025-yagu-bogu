@@ -1,13 +1,13 @@
 package com.yagubogu.fixture;
 
-import static com.yagubogu.auth.service.AuthorizationExtractor.BEARER_PREFIX;
-
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
 public class TestSupport {
+
+    private static final String BEARER = "Bearer ";
 
     public static LoginResponse loginResponse(String idToken) {
         return RestAssured.given()
@@ -19,6 +19,6 @@ public class TestSupport {
     }
 
     public static String getAccessToken(String idToken) {
-        return BEARER_PREFIX + loginResponse(idToken).accessToken();
+        return BEARER + loginResponse(idToken).accessToken();
     }
 }

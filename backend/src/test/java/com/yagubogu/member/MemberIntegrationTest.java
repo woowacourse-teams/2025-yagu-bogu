@@ -1,6 +1,5 @@
 package com.yagubogu.member;
 
-import static com.yagubogu.auth.service.AuthorizationExtractor.AUTH_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.dto.LoginRequest;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
@@ -91,7 +91,7 @@ public class MemberIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(AUTH_HEADER, accessToken)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .when().delete("/api/members/me")
                 .then().log().all()
                 .statusCode(204);
