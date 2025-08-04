@@ -41,8 +41,9 @@ public class TalkIntegrationTest {
         RestAssured.given()
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
+                .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}", gameId)
+                .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
                 .body("content[0].id", is(52))
@@ -60,8 +61,9 @@ public class TalkIntegrationTest {
                 .queryParam("before", 25)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
+                .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}", gameId)
+                .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
                 .body("content[0].id", is(24))
@@ -79,8 +81,9 @@ public class TalkIntegrationTest {
                 .queryParam("before", 6)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
+                .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}", gameId)
+                .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
                 .body("content[0].id", is(5))
@@ -97,8 +100,9 @@ public class TalkIntegrationTest {
         RestAssured.given()
                 .queryParam("after", 47)
                 .queryParam("limit", 10)
+                .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling", gameId)
+                .get("/api/talks/{gameId}/polling")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(5))
@@ -116,8 +120,9 @@ public class TalkIntegrationTest {
         RestAssured.given()
                 .queryParam("after", 52)
                 .queryParam("limit", 10)
+                .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling", gameId)
+                .get("/api/talks/{gameId}/polling")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(0))
@@ -136,7 +141,8 @@ public class TalkIntegrationTest {
                 .contentType(ContentType.JSON)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 1)
-                .when().post("/api/talks/{gameId}", gameId)
+                .pathParam("gameId", gameId)
+                .when().post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(201)
                 .body("memberId", is(1))
@@ -157,7 +163,8 @@ public class TalkIntegrationTest {
                 .contentType(ContentType.JSON)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 1)
-                .when().post("/api/talks/{gameId}", gameId)
+                .pathParam("gameId", gameId)
+                .when().post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -174,7 +181,8 @@ public class TalkIntegrationTest {
                 .contentType(ContentType.JSON)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 999)
-                .when().post("/api/talks/{gameId}", gameId)
+                .pathParam("gameId", gameId)
+                .when().post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -190,7 +198,9 @@ public class TalkIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("memberId", 1)
-                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .pathParam("gameId", gameId)
+                .pathParam("talkId", talkId)
+                .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -206,7 +216,9 @@ public class TalkIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("memberId", 1)
-                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .pathParam("gameId", gameId)
+                .pathParam("talkId", talkId)
+                .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -222,7 +234,9 @@ public class TalkIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("memberId", 1)
-                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .pathParam("gameId", gameId)
+                .pathParam("talkId", talkId)
+                .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(400);
     }
@@ -238,7 +252,9 @@ public class TalkIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("memberId", 2)
-                .when().delete("/api/talks/{gameId}/{talkId}", gameId, talkId)
+                .pathParam("gameId", gameId)
+                .pathParam("talkId", talkId)
+                .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(403);
     }
@@ -253,7 +269,8 @@ public class TalkIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("reporterId", 2)
-                .when().post("/api/talks/{talkId}/reports", talkId)
+                .pathParam("talkId", talkId)
+                .when().post("/api/talks/{talkId}/reports")
                 .then().log().all()
                 .statusCode(201);
     }

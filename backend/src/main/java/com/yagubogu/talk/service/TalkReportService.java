@@ -45,8 +45,12 @@ public class TalkReportService {
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 
-    private void validateReportConstraints(final long talkId, final long reporterId, final Talk talk,
-                                           final Member member) {
+    private void validateReportConstraints(
+            final long talkId,
+            final long reporterId,
+            final Talk talk,
+            final Member member
+    ) {
         if (talk.getMember().equals(member)) {
             throw new BadRequestException("Cannot report your own comment");
         }

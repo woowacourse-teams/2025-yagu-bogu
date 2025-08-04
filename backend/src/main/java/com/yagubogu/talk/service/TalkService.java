@@ -151,11 +151,11 @@ public class TalkService {
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
     }
 
-    private static boolean isValidGameId(final long gameId, final Talk talk) {
+    private boolean isValidGameId(final long gameId, final Talk talk) {
         return talk.getGame().getId() != gameId;
     }
 
-    private static boolean isValidMemberId(final long memberId, final Talk talk) {
+    private boolean isValidMemberId(final long memberId, final Talk talk) {
         return talk.getMember().getId() != memberId;
     }
 }
