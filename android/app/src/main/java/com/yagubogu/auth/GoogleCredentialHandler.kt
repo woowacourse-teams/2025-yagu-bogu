@@ -28,11 +28,11 @@ class GoogleCredentialHandler(
     ) {
         // 기존 로그인된 계정 우선 요청 (silent sign-in)
         val defaultResult = googleCredentialRequestManager.getCredentialRequestWithDefault()
-        if (handleResult(defaultResult, onSuccess, onFailure)) return
+        if (handleCredentialResponseResult(defaultResult, onSuccess, onFailure)) return
 
         // 실패 시 명시적 로그인 UI 요청 (explicit sign-in)
         val signInResult = googleCredentialRequestManager.getCredentialRequestWithSignIn()
-        handleResult(signInResult, onSuccess, onFailure)
+        handleCredentialResponseResult(signInResult, onSuccess, onFailure)
     }
 
     /**
@@ -49,7 +49,7 @@ class GoogleCredentialHandler(
      *
      * @return 처리 성공 여부 (true면 다음 단계 생략)
      */
-    private fun handleResult(
+    private fun handleCredentialResponseResult(
         result: Result<GetCredentialResponse>,
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit,
@@ -133,6 +133,6 @@ class GoogleCredentialHandler(
     }
 
     companion object {
-        private const val TAG = "GoogleLoginManager"
+        private const val TAG = "GoogleCredentialHandler"
     }
 }
