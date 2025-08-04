@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 public class CheckInService {
 
     private static final int TOP_RANKINGS = 5;
+    private static final int NOT_FOUND = -1;
+    private static final int FOUND = 1;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -98,7 +100,7 @@ public class CheckInService {
         return IntStream.range(0, sortedList.size())
                 .filter(i -> sortedList.get(i).memberId().equals(memberId))
                 .findFirst()
-                .orElse(-1) + 1;
+                .orElse(NOT_FOUND) + FOUND;
     }
 
     private VictoryFairyRankingEntryResponse findMyRanking(
