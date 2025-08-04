@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="stadiumStatsUiModel"
+            type="com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.stats.stadium.StadiumStatsFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_today_stadium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_white_radius_12dp"
+            android:padding="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_stadium_chart_title"
+                style="@style/TextView.Pretendard.Bold.20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/stats_stadium_pie_chart_title(stadiumStatsUiModel.stadiumName)}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="챔피언스필드 현황" />
+
+            <TextView
+                android:id="@+id/tv_refresh_time"
+                style="@style/TextView.Pretendard.Medium.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/stats_stadium_refresh_time(stadiumStatsUiModel.refreshTime.hour, stadiumStatsUiModel.refreshTime.minute)}"
+                android:textColor="@color/gray400"
+                app:layout_constraintBottom_toBottomOf="@id/tv_stadium_chart_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_stadium_chart_title"
+                tools:text="14:30 기준" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pie_chart"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_chart_title" />
+
+            <TextView
+                android:id="@+id/tv_winning_percentage"
+                style="@style/TextView.Pretendard.Bold.40"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{@string/stats_percentage(stadiumStatsUiModel.firstTeamStatus.roundedPercentage)}"
+                android:textColor="@{context.getColor(stadiumStatsUiModel.firstTeamStatus.teamColor)}"
+                app:layout_constraintBottom_toTopOf="@id/tv_team_name"
+                app:layout_constraintEnd_toEndOf="@id/pie_chart"
+                app:layout_constraintStart_toStartOf="@id/pie_chart"
+                app:layout_constraintTop_toTopOf="@id/pie_chart"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="58.5%" />
+
+            <TextView
+                android:id="@+id/tv_team_name"
+                style="@style/TextView.Pretendard.Medium.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
+                android:textColor="@color/gray500"
+                app:layout_constraintBottom_toBottomOf="@id/pie_chart"
+                app:layout_constraintEnd_toEndOf="@id/pie_chart"
+                app:layout_constraintStart_toStartOf="@id/pie_chart"
+                app:layout_constraintTop_toBottomOf="@id/tv_winning_percentage"
+                tools:text="KIA" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_legend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pie_chart">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/linear_legend_first"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_gray050_radius_8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showFirstLegend ? View.VISIBLE : View.GONE}">
+
+                    <View
+                        android:id="@+id/icon_first_legend"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/bg_radius_4dp"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
+                        tools:backgroundTint="@color/team_kia" />
+
+                    <TextView
+                        android:id="@+id/tv_first_team_name"
+                        style="@style/TextView.Pretendard.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
+                        android:textSize="14sp"
+                        tools:text="KIA" />
+
+                    <TextView
+                        android:id="@+id/tv_first_rate"
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.firstTeamStatus.percentage)}"
+                        android:textColor="@color/gray500"
+                        android:textSize="14sp"
+                        tools:text="75%" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/linear_legend_second"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_gray050_radius_8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showSecondLegend ? View.VISIBLE : View.GONE}">
+
+                    <View
+                        android:id="@+id/icon_second_legend"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/bg_radius_4dp"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
+                        tools:backgroundTint="@color/team_samsung" />
+
+                    <TextView
+                        android:id="@+id/tv_second_team_name"
+                        style="@style/TextView.Pretendard.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.secondTeamStatus.teamName}"
+                        android:textSize="14sp"
+                        tools:text="삼성" />
+
+                    <TextView
+                        android:id="@+id/tv_second_rate"
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.secondTeamStatus.percentage)}"
+                        android:textColor="@color/gray500"
+                        android:textSize="14sp"
+                        tools:text="20%" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/linear_legend_third"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_gray050_radius_8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp"
+                    android:visibility="@{stadiumStatsUiModel.showThirdLegend ? View.VISIBLE : View.GONE}">
+
+                    <View
+                        android:id="@+id/icon_third_legend"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/bg_radius_4dp"
+                        app:legendBackgroundTint="@{stadiumStatsUiModel.thirdTeamStatus.teamColor}"
+                        tools:backgroundTint="@color/gray400" />
+
+                    <TextView
+                        android:id="@+id/tv_third_team_name"
+                        style="@style/TextView.Pretendard.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@{stadiumStatsUiModel.thirdTeamStatus.teamName}"
+                        android:textSize="14sp"
+                        tools:text="기타" />
+
+                    <TextView
+                        android:id="@+id/tv_third_rate"
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@{@string/stats_legend_percentage(stadiumStatsUiModel.thirdTeamStatus.percentage)}"
+                        android:textColor="@color/gray500"
+                        android:textSize="14sp"
+                        tools:text="5%" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
