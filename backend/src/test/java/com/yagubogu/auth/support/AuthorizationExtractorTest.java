@@ -30,6 +30,7 @@ class AuthorizationExtractorTest {
     @DisplayName("헤더가 없는 경우 빈 객체를 반환한다")
     @Test
     void extract_empty() {
+        // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         ServletWebRequest webRequest = new ServletWebRequest(request);
 
@@ -43,6 +44,7 @@ class AuthorizationExtractorTest {
     @DisplayName("Bearer 접두어가 아닌 경우 빈 객체를 반환한다")
     @Test
     void extract_not_bearer() {
+        // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Token abc");
         ServletWebRequest webRequest = new ServletWebRequest(request);
