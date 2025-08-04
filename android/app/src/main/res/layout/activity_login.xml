@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="vm"
+            name="viewModel"
             type="com.yagubogu.presentation.login.LoginViewModel" />
     </data>
 
@@ -76,7 +76,7 @@
             android:layout_marginHorizontal="60dp"
             android:layout_marginBottom="180dp"
             android:background="@drawable/bg_white_stroke_gray300_radius_4dp"
-            android:onClick="@{() -> vm.signIn()}"
+            android:onClick="@{() -> viewModel.signIn()}"
             android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

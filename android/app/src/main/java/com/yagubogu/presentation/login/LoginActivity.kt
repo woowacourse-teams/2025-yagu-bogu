@@ -80,6 +80,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupBindings() {
-        binding.vm = viewModel
+        binding.viewModel = viewModel
     }
 }
