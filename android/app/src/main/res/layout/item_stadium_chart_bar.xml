@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="stadiumStatsUiModel"
-            type="com.yagubogu.presentation.stats.stadium.model.StadiumStatsUiModel" />
+            name="teamOccupancyRates"
+            type="com.yagubogu.presentation.home.model.TeamOccupancyRates" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -28,8 +28,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:setConstraintWidthPercent="@{stadiumStatsUiModel.firstTeamBias}"
-                app:setCustomChartBackground="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
+                app:setConstraintWidthPercent="@{teamOccupancyRates.awayTeamBias}"
+                app:setCustomChartBackground="@{teamOccupancyRates.awayTeamOccupancyRate.teamColor}"
                 tools:background="@color/team_kia"
                 tools:layout_constraintWidth_percent="0.3" />
 
@@ -38,8 +38,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:setConstraintWidthPercent="@{stadiumStatsUiModel.secondTeamBias}"
-                app:setCustomChartBackground="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
+                app:setConstraintWidthPercent="@{teamOccupancyRates.homeTeamBias}"
+                app:setCustomChartBackground="@{teamOccupancyRates.homeTeamOccupancyRate.teamColor}"
                 tools:background="@color/team_kiwoom"
                 tools:layout_constraintWidth_percent="0.7" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:setConstraintGuidePercent="@{stadiumStatsUiModel.firstTeamBias}"
+                app:setConstraintGuidePercent="@{teamOccupancyRates.awayTeamBias}"
                 tools:layout_constraintGuide_percent="0.3" />
 
             <View
@@ -85,7 +85,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumStatsUiModel.firstTeamStatus.teamColor}"
+                app:setCustomChartDividerTint="@{teamOccupancyRates.awayTeamOccupancyRate.teamColor}"
                 tools:tint="@color/team_kia" />
 
             <ImageView
@@ -100,7 +100,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumStatsUiModel.secondTeamStatus.teamColor}"
+                app:setCustomChartDividerTint="@{teamOccupancyRates.homeTeamOccupancyRate.teamColor}"
                 tools:tint="@color/team_kiwoom" />
 
 
@@ -131,7 +131,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginBottom="4dp"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.firstTeamStatus.teamName}"
+                android:text="@{teamOccupancyRates.awayTeamOccupancyRate.teamName}"
                 android:textColor="@color/white"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@id/tv_first_team_percent"
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/stats_chart_percentage(stadiumStatsUiModel.firstTeamStatus.percentage)}"
+                android:text="@{@string/all_win_rate(teamOccupancyRates.awayTeamOccupancyRate.occupancyRate)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -163,7 +163,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="4dp"
                 android:includeFontPadding="false"
-                android:text="@{stadiumStatsUiModel.secondTeamStatus.teamName}"
+                android:text="@{teamOccupancyRates.homeTeamOccupancyRate.teamName}"
                 android:textColor="@color/white"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@id/tv_second_team_percent"
@@ -178,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/stats_chart_percentage(stadiumStatsUiModel.secondTeamStatus.percentage)}"
+                android:text="@{@string/all_win_rate(teamOccupancyRates.homeTeamOccupancyRate.occupancyRate)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"

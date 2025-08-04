@@ -16,6 +16,8 @@ import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.model.TeamOccupancyRates
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
@@ -37,8 +39,13 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
+    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
+
     init {
         fetchMemberInformation(MEMBER_ID, YEAR)
+        val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+        fetchStadiumStats(today)
     }
 
     fun checkIn() {
@@ -51,6 +58,26 @@ class HomeViewModel(
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
+    }
+
+    // TODO: API 변경되는 거에 따라서 수정해야 됨
+    fun fetchStadiumStats(date: LocalDate) {
+        viewModelScope.launch {
+            val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
+                statsRepository.getTeamOccupancyRates(2, date)
+            teamOccupancyRatesResult
+                .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
+                    _stadiumStatsUiModel.value =
+                        StadiumStatsUiModel(
+                            stadiumOccupancyRates =
+                                listOf(
+                                    teamOccupancyRates,
+                                ),
+                        )
+                }.onFailure { exception: Throwable ->
+                    Log.e(TAG, "API 호출 실패", exception)
+                }
+        }
     }
 
     private fun fetchMemberInformation(

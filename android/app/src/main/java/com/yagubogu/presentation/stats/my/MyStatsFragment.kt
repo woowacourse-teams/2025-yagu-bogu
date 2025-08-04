@@ -74,27 +74,31 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun loadChartData(myStatsUiModel: MyStatsUiModel) {
-        val pieEntries = ArrayList<PieEntry>()
-        pieEntries.add(PieEntry(myStatsUiModel.winningPercentage.toFloat(), "Win"))
-        pieEntries.add(PieEntry(myStatsUiModel.etcPercentage.toFloat(), "Etc"))
-
-        val myStatsChartDataSet = PieDataSet(pieEntries, WINNING_PERCENTAGE)
-
-        myStatsChartDataSet.colors =
+        val pieEntries: List<PieEntry> =
             listOf(
-                requireContext().getColor(R.color.primary500),
-                requireContext().getColor(R.color.gray300),
+                PieEntry(myStatsUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN),
+                PieEntry(myStatsUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC),
             )
+
+        val myStatsChartDataSet: PieDataSet =
+            PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
+                colors =
+                    listOf(
+                        requireContext().getColor(R.color.primary500),
+                        requireContext().getColor(R.color.gray300),
+                    )
+            }
+
         val pieData = PieData(myStatsChartDataSet)
         pieData.setDrawValues(false)
-
         binding.pieChart.data = pieData
-        binding.pieChart.invalidate()
+        binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
     }
 
     companion object {
-        private const val WINNING_PERCENTAGE = "내 직관 승률"
-
+        private const val PIE_DATA_SET_LABEL = "내 직관 승률"
+        private const val PIE_ENTRY_LABEL_WIN = "Win"
+        private const val PIE_ENTRY_LABEL_ETC = "Etc"
         private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
         private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
     }

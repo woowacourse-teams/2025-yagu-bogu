@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response
 
-import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
+import com.yagubogu.presentation.home.model.TeamOccupancyRates
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,9 +14,7 @@ data class TeamOccupancyRatesResponse(
     fun toPresentation(): TeamOccupancyRates =
         TeamOccupancyRates(
             stadiumName = stadiumShortName,
-            rates =
-                teams.map { teamOccupancyRateDto: TeamOccupancyRateDto ->
-                    teamOccupancyRateDto.toPresentation()
-                },
+            awayTeamOccupancyRate = teams[0].toPresentation(),
+            homeTeamOccupancyRate = teams[1].toPresentation(),
         )
 }

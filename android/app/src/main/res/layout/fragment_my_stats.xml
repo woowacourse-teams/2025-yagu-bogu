@@ -56,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
-                    android:text="@{@string/stats_percentage(myStatsUiModel.winningPercentage)}"
+                    android:text="@{@string/all_rounded_win_rate(myStatsUiModel.winningPercentage)}"
                     android:textColor="@color/primary500"
                     app:layout_constraintBottom_toTopOf="@id/tv_total_attendance_count"
                     app:layout_constraintEnd_toEndOf="@id/pie_chart"

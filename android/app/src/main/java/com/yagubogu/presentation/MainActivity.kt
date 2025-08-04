@@ -15,7 +15,7 @@ import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
-import com.yagubogu.presentation.record.RecordFragment
+import com.yagubogu.presentation.livetalk.LiveTalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
 import kotlinx.coroutines.launch
 
@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.item_stats ->
                     replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
 
-                R.id.item_record ->
-                    replaceFragment(RecordFragment::class.java, R.string.bottom_navigation_record)
+                R.id.item_livetalk ->
+                    replaceFragment(LiveTalkFragment::class.java, R.string.bottom_navigation_livetalk)
 
                 R.id.item_challenge ->
                     replaceFragment(
