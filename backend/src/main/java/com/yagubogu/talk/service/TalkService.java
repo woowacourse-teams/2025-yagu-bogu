@@ -40,7 +40,7 @@ public class TalkService {
     ) {
         Pageable pageable = PageRequest.of(0, limit);
         Slice<TalkResponse> talkResponses = getTalkResponses(gameId, cursorId, pageable);
-        
+
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
@@ -52,7 +52,7 @@ public class TalkService {
             final long cursorId,
             final int limit
     ) {
-        Pageable pageable = PageRequest.of(0, limit + 1);
+        Pageable pageable = PageRequest.of(0, limit);
         Slice<TalkResponse> talkResponses = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
@@ -81,11 +81,11 @@ public class TalkService {
     ) {
         Talk talk = getTalk(talkId);
 
-        if (talk.getGame().getId() != gameId) {
+        if (isValidGameId(gameId, talk)) {
             throw new BadRequestException("Invalid gameId for the talk");
         }
 
-        if (talk.getMember().getId() != memberId) {
+        if (isValidMemberId(memberId, talk)) {
             throw new ForbiddenException("Invalid memberId for the talk");
         }
 
@@ -118,28 +118,23 @@ public class TalkService {
     private Slice<TalkResponse> getTalkResponses(final long gameId, final Long cursorId, final Pageable pageable) {
         Slice<TalkResponse> talkResponses;
         if (cursorId == null) {
-            talkResponses = talkRepository.fetchRecentTalks(gameId, pageable);
-        } else {
-            talkResponses = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
+            return talkRepository.fetchRecentTalks(gameId, pageable);
         }
-        return talkResponses;
+        return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
     }
 
-    private static Long getNextCursorIdOrNull(final boolean hasNextPage, final Slice<TalkResponse> talks) {
+    private Long getNextCursorIdOrNull(final boolean hasNextPage, final Slice<TalkResponse> talks) {
         if (!hasNextPage || talks.isEmpty()) {
             return null;
         }
         return talks.getContent().getLast().id();
     }
 
-    private static long getNextCursorIdOrStay(final long cursorId, final Slice<TalkResponse> talks) {
-        long nextCursorId;
+    private long getNextCursorIdOrStay(final long cursorId, final Slice<TalkResponse> talks) {
         if (!talks.isEmpty()) {
-            nextCursorId = talks.getContent().getLast().id();
-        } else {
-            nextCursorId = cursorId;
+            return talks.getContent().getLast().id();
         }
-        return nextCursorId;
+        return cursorId;
     }
 
     private Game getGame(final long gameId) {
@@ -155,5 +150,13 @@ public class TalkService {
     private Talk getTalk(final long talkId) {
         return talkRepository.findById(talkId)
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
+    }
+
+    private static boolean isValidGameId(final long gameId, final Talk talk) {
+        return talk.getGame().getId() != gameId;
+    }
+
+    private static boolean isValidMemberId(final long memberId, final Talk talk) {
+        return talk.getMember().getId() != memberId;
     }
 }
