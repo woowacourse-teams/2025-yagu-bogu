@@ -126,6 +126,35 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 
     @Query("""
+            SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
+                c.id,
+                g.stadium.fullName,
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.homeTeam.id,
+                    g.homeTeam.shortName,
+                    g.homeScore,
+                    CASE WHEN g.homeTeam = :team THEN true ELSE false END
+                ),
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.awayTeam.id,
+                    g.awayTeam.shortName,
+                    g.awayScore,
+                    CASE WHEN g.awayTeam = :team THEN true ELSE false END
+                ),
+                g.date
+            )
+            FROM CheckIn c
+            JOIN c.game g
+            WHERE c.member = :member AND (
+                (g.homeTeam = :team AND g.homeScore > g.awayScore)
+                    OR
+                (g.awayTeam = :team AND g.awayScore > g.homeScore)
+            ) AND YEAR(g.date) = :year
+            ORDER BY g.date DESC
+            """)
+    List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
+
+    @Query("""
                 SELECT new com.yagubogu.checkin.dto.FanCountsByGameResponse(
                     COUNT(c),
                     COALESCE(SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END), 0),
