@@ -69,7 +69,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_btn_google"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="60dp"
             android:layout_marginBottom="180dp"
             android:background="@drawable/bg_white_stroke_gray300_radius_4dp"
@@ -79,12 +79,12 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
-                android:id="@+id/iv_google_g_icon"
+                android:id="@+id/iv_google_g_logo"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/login_google_icon_description"
-                android:src="@drawable/ic_google_g_icon"
+                android:src="@drawable/ic_google_g_logo"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tv_google_login_text"
                 app:layout_constraintHorizontal_chainStyle="packed"
@@ -101,7 +101,7 @@
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/iv_google_g_icon"
+                app:layout_constraintStart_toEndOf="@id/iv_google_g_logo"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="SpUsage" />
         </androidx.constraintlayout.widget.ConstraintLayout>
