@@ -5,13 +5,13 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.yagubogu.databinding.FragmentFavoriteTeamConfirmBinding
-import com.yagubogu.presentation.util.getParcelableValue
+import com.yagubogu.presentation.util.getParcelableCompat
 
 class FavoriteTeamConfirmDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         activity?.let {
             val favoriteTeam: FavoriteTeamUiModel =
-                arguments?.getParcelableValue(ARG_FAVORITE_TEAM) ?: return@let null
+                arguments?.getParcelableCompat(ARG_FAVORITE_TEAM) ?: return@let null
 
             val binding: FragmentFavoriteTeamConfirmBinding =
                 FragmentFavoriteTeamConfirmBinding.inflate(layoutInflater)
