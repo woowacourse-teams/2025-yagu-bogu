@@ -3,7 +3,7 @@
 
     <string name="all_settings">설정</string>
     <string name="all_cancel">취소</string>
-    <string name="all_ok">확인</string>
+    <string name="all_confirm">확인</string>
     <string name="all_winning_percentage">%d%%</string>
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
