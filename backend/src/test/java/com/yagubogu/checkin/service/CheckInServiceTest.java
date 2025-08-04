@@ -1,11 +1,15 @@
 package com.yagubogu.checkin.service;
 
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateByGameResponse;
+import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -131,11 +135,12 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.ALL;
 
         int expectedSize = 6;
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
@@ -147,6 +152,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.ALL;
 
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
@@ -188,7 +194,7 @@ class CheckInServiceTest {
         );
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
 
         // then
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
@@ -198,7 +204,7 @@ class CheckInServiceTest {
     @ParameterizedTest
     @CsvSource(value = {
             "1,true",
-            "3,false"
+            "4,false"
     })
     void findCheckInStatus(long memberId, boolean expected) {
         // given
@@ -209,5 +215,103 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.isCheckIn()).isEqualTo(expected);
+    }
+  
+    @DisplayName("직관 인증 내역 중 이긴 직관 내역을 모두 조회한다")
+    @Test
+    void findCheckInWinHistory_allCheckInWinsGivenYear() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.WIN;
+        int expectedSize = 5;
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
+
+        // then
+        assertThat(actual.checkInHistory().size()).isEqualTo(expectedSize);
+    }
+
+    @DisplayName("직관 인증 내역 중 이긴 내역만 필터링되어 인증 날짜 내림차순으로 반환된다")
+    @Test
+    void findCheckInWinHistory_returnsOnlyWinsSortedByDateDescending() {
+        // given
+        long memberId = 1L;
+        int year = 2025;
+        CheckInResultFilter filter = CheckInResultFilter.WIN;
+
+        List<CheckInGameResponse> expected = List.of(
+                new CheckInGameResponse(1L,
+                        "잠실 야구장",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 21)
+                ),
+                new CheckInGameResponse(3L,
+                        "잠실 야구장",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        LocalDate.of(2025, 7, 19)
+                ),
+                new CheckInGameResponse(4L,
+                        "광주 KIA 챔피언스필드",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 18)
+                ),
+                new CheckInGameResponse(5L,
+                        "광주 KIA 챔피언스필드",
+                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
+                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        LocalDate.of(2025, 7, 17)
+                ),
+                new CheckInGameResponse(6L,
+                        "대구 삼성라이온즈파크",
+                        new CheckInGameTeamResponse(1L, "기아", 10, true),
+                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        LocalDate.of(2025, 7, 16)
+                )
+        );
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, filter);
+
+        // then
+        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("오늘 경기 구장별 팬 점유율 조회 – 내 팀 경기 처음, 나머지 관중 수 많은 순 정렬")
+    @Test
+    void findFanRatesByGames() {
+        // given
+        long memberId = 1L;
+        LocalDate today = TestFixture.getToday();
+        // 내 팀 포함 경기(기아 vs 롯데) → 관중 수 기준 정렬된 경기 (LG vs KT, 삼성 vs 두산)
+        FanRateResponse expected = new FanRateResponse(
+                List.of(
+                        new FanRateByGameResponse(
+                                3L,
+                                new TeamFanRateResponse("기아", "HT", 66.7),
+                                new TeamFanRateResponse("롯데", "LT", 33.3)
+                        ),
+                        new FanRateByGameResponse(
+                                4L,
+                                new TeamFanRateResponse("LG", "LG", 75.0),
+                                new TeamFanRateResponse("KT", "KT", 25.0)
+                        ),
+                        new FanRateByGameResponse(
+                                2L,
+                                new TeamFanRateResponse("삼성", "SS", 50.0),
+                                new TeamFanRateResponse("두산", "OB", 50.0)
+                        )
+                )
+        );
+
+        // when
+        FanRateResponse actual = checkInService.findFanRatesByGames(memberId, today);
+
+        // then
+        assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected.fanRateByGames());
     }
 }
