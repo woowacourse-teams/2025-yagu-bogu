@@ -1,7 +1,9 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -11,6 +13,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,20 @@ public class CheckInService {
         int checkInCounts = checkInRepository.countByMemberAndYear(member, year);
 
         return new CheckInCountsResponse(checkInCounts);
+    }
+
+    public CheckInHistoryResponse findCheckInHistory(
+            final long memberId,
+            final int year,
+            final CheckInResultFilter filter
+    ) {
+        Member member = getMember(memberId);
+        Team team = member.getTeam();
+
+        return switch (filter) {
+            case ALL -> new CheckInHistoryResponse(checkInRepository.findCheckInHistory(member, team, year));
+            case WIN -> new CheckInHistoryResponse(checkInRepository.findCheckInWinHistory(member, team, year));
+        };
     }
 
     private Stadium getStadiumById(final long stadiumId) {

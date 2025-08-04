@@ -1,7 +1,6 @@
 package com.yagubogu.checkin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import io.restassured.RestAssured;
@@ -16,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -111,6 +112,68 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .body(new CreateCheckInRequest(invalidMemberId, stadiumId, date))
                 .when().post("/api/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("직관 내역을 조회한다")
+    @Test
+    void findCheckInHistory() {
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외 : 직관 내역을 조회하는데 회원이 없으면 예외가 발생한다")
+    @Test
+    void findCheckInHistory_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", invalidMemberId)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("이긴 직관 내역을 조회한다")
+    @Test
+    void findCheckInWinHistory() {
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외 : 이긴 직관 내역을 조회하는데 회원이 없으면 예외가 발생한다")
+    @Test
+    void findCheckInWinHistory_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", invalidMemberId)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .when().get("/api/check-ins/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }

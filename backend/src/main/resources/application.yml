@@ -2,23 +2,44 @@ spring:
   profiles:
     active: local
 
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: ${GOOGLE_CLIENT_ID}
+    connect-timeout: 180s # 3분
+    read-timeout: 180s
+
+security:
+  jwt:
+    access-token:
+      secret-key: ${JWT_ACCESS_TOKEN_SECRET_KEY}
+      expire-length: 900      # 15분 (초)
+    refresh-token:
+      secret-key: ${JWT_REFRESH_TOKEN_SECRET_KEY}
+      expire-length: 1209600  # 14일 (초)
+
+api:
+  kbo:
+    base-url: https://www.koreabaseball.com/ws/Main.asmx
+    connect-timeout: 5s
+    read-timeout: 30s
+    content-type: application/x-www-form-urlencoded; charset=UTF-8
+
 ---
 spring:
   config:
     activate:
       on-profile: local
-    import: classpath:/yaml/application-local.yml
 
 ---
 spring:
   config:
     activate:
       on-profile: dev
-    import: classpath:/yaml/application-dev.yml
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-    import: classpath:/yaml/application-prod.yml
