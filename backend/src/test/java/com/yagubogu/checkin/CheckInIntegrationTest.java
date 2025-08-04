@@ -3,6 +3,7 @@ package com.yagubogu.checkin;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.fixture.TestFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -174,6 +175,35 @@ public class CheckInIntegrationTest {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율을 조회한다")
+    @Test
+    void findFanRatesByStadiums() {
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("memberId", 1L)
+                .queryParam("date", TestFixture.getToday().toString())
+                .when().get("/api/check-ins/stadiums/fan-rates")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외: 존재하지 않는 회원으로 구장별 팬 점유율 조회 시 404 상태를 반환한다")
+    @Test
+    void findFanRatesByStadiums_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("memberId", invalidMemberId)
+                .queryParam("date", "2025-07-21")
+                .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(404);
     }

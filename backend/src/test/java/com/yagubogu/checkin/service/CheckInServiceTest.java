@@ -6,6 +6,9 @@ import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateByGameResponse;
+import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -256,5 +259,39 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("오늘 경기 구장별 팬 점유율 조회 – 내 팀 경기 처음, 나머지 관중 수 많은 순 정렬")
+    @Test
+    void findFanRatesByGames() {
+        // given
+        long memberId = 1L;
+        LocalDate today = TestFixture.getToday();
+        // 내 팀 포함 경기(기아 vs 롯데) → 관중 수 기준 정렬된 경기 (LG vs KT, 삼성 vs 두산)
+        FanRateResponse expected = new FanRateResponse(
+                List.of(
+                        new FanRateByGameResponse(
+                                3L,
+                                new TeamFanRateResponse("기아", "HT", 66.7),
+                                new TeamFanRateResponse("롯데", "LT", 33.3)
+                        ),
+                        new FanRateByGameResponse(
+                                4L,
+                                new TeamFanRateResponse("LG", "LG", 75.0),
+                                new TeamFanRateResponse("KT", "KT", 25.0)
+                        ),
+                        new FanRateByGameResponse(
+                                2L,
+                                new TeamFanRateResponse("삼성", "SS", 50.0),
+                                new TeamFanRateResponse("두산", "OB", 50.0)
+                        )
+                )
+        );
+
+        // when
+        FanRateResponse actual = checkInService.findFanRatesByGames(memberId, today);
+
+        // then
+        assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected.fanRateByGames());
     }
 }
