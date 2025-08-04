@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByStadiumAndDate(Stadium stadium, LocalDate date);
+
+    Optional<Game> findByGameCode(String gameCode);
 }

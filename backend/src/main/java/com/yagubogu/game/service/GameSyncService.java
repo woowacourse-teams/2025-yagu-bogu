@@ -1,8 +1,11 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.KboClientResponse;
+import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.dto.KboGameListResponse;
 import com.yagubogu.game.dto.KboGameResponse;
+import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
 import com.yagubogu.global.exception.ClientException;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -40,29 +44,68 @@ public class GameSyncService {
     private final StadiumRepository stadiumRepository;
 
     public void syncGameSchedule(final LocalDate date) {
-        KboClientResponse kboClientResponse = kboClient.fetchGame(date);
-        List<Game> games = convertToGames(kboClientResponse);
+        KboGameListResponse kboGameListResponse = kboClient.fetchGameList(date);
+        List<Game> games = convertToGames(kboGameListResponse);
 
         gameRepository.saveAll(games);
     }
 
-    private List<Game> convertToGames(final KboClientResponse kboClientResponse) {
+    public List<Game> convertToGames(final KboGameListResponse kboGameListResponse) {
         List<Game> games = new ArrayList<>();
 
-        for (KboGameResponse kboGameItem : kboClientResponse.games()) {
+        for (KboGameResponse kboGameItem : kboGameListResponse.games()) {
             Stadium stadium = getStadiumByName(kboGameItem.stadiumName());
             Team homeTeam = getTeamByShortName(kboGameItem.homeTeamName());
             Team awayTeam = getTeamByShortName(kboGameItem.awayTeamName());
-            LocalDate gameDate = LocalDate.parse(kboGameItem.gameDate());
-            LocalTime startAt = LocalTime.parse(kboGameItem.startAt());
+            LocalDate gameDate = kboGameItem.gameDate();
+            LocalTime startAt = kboGameItem.startAt();
             String gameCode = kboGameItem.gameCode();
+            GameState gameState = kboGameItem.gameState();
 
-            Game game = new Game(stadium, homeTeam, awayTeam, gameDate, startAt, gameCode, null, null);
+            Game game = new Game(
+                    stadium,
+                    homeTeam,
+                    awayTeam,
+                    gameDate,
+                    startAt,
+                    gameCode,
+                    null,
+                    null,
+                    null,
+                    null,
+                    gameState
+            );
             games.add(game);
         }
 
         return games;
     }
+
+    @Transactional
+    public void syncGameResult(LocalDate date) {
+        List<KboGameResponse> gameResponses = kboClient.fetchGameList(date).games();
+
+        for (KboGameResponse response : gameResponses) {
+            gameRepository.findByGameCode(response.gameCode())
+                    .ifPresent(game -> updateGameDetails(game, response));
+        }
+    }
+
+    private void updateGameDetails(Game game, KboGameResponse response) {
+        game.updateGameStatus(response.gameState());
+
+        if (response.gameState().isNotCompleted()) {
+            // TODO: gameState가 LIVE 일 때 로깅
+            return;
+        }
+
+        KboGameResultResponse gameResult = kboClient.fetchGameResult(game);
+        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard().toScoreBoard();
+        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard().toScoreBoard();
+
+        game.updateScoreBoard(homeScoreBoard, awayScoreBoard);
+    }
+
 
     private Stadium getStadiumByName(final String stadiumName) {
         return stadiumRepository.findByShortName(STADIUM_NAME_MAP.get(stadiumName))

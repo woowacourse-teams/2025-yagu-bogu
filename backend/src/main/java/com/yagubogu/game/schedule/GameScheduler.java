@@ -16,9 +16,11 @@ public class GameScheduler {
     @Scheduled(cron = "0 0 0 * * *")
     public void fetchDailyGame() {
         LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
 
         try {
             gameSyncService.syncGameSchedule(today);
+            gameSyncService.syncGameResult(yesterday);
         } catch (ClientException e) {
             // TODO: 예외 로깅
         }
