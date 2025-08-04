@@ -120,7 +120,7 @@ public class CheckInService {
         return FanRateByGameResponse.from(game, homeRate, awayRate);
     }
 
-    private double calculateRoundRate(final long checkInCounts, long total) {
+    private double calculateRoundRate(final long checkInCounts, final long total) {
         if (total == 0) {
             return 0.0;
         }
