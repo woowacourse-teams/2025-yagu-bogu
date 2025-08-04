@@ -1,11 +1,12 @@
 package com.yagubogu.auth;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
+import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
-import com.yagubogu.auth.config.AuthTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ public class AuthIntegrationTest {
                 .as(LoginResponse.class);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.accessToken()).isNotNull();
             softAssertions.assertThat(actual.refreshToken()).isNotNull();
             softAssertions.assertThat(actual.isNew()).isTrue();

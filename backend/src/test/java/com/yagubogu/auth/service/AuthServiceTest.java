@@ -1,15 +1,16 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.gateway.AuthGateway;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.auth.support.JwtProvider;
 import com.yagubogu.member.repository.MemberRepository;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class AuthServiceTest {
         LoginResponse response = authService.login(loginRequest);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
