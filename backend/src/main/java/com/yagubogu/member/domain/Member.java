@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,12 @@ import org.hibernate.annotations.Where;
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "members")
+@Table(
+        name = "members",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"oauth_id", "provider"})
+        }
+)
 @Entity
 public class Member {
 
@@ -45,7 +51,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private OAuthProvider provider;
 
-    @Column(name = "oauth_id", nullable = false, unique = true)
+    @Column(name = "oauth_id", nullable = false)
     private String oauthId;
 
     @Column(name = "role", nullable = false)
