@@ -1,9 +1,9 @@
-package com.yagubogu.auth;
+package com.yagubogu.auth.support;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.yagubogu.auth.client.AuthGateway;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;

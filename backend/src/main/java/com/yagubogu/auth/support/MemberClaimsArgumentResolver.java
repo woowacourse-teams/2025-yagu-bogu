@@ -1,6 +1,7 @@
-package com.yagubogu.auth.service;
+package com.yagubogu.auth.support;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.auth.service.AuthService;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

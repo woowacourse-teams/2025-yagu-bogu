@@ -1,9 +1,9 @@
 package com.yagubogu.auth.config;
 
-import com.yagubogu.auth.client.AuthGateway;
-import com.yagubogu.auth.client.FakeAuthGateway;
-import com.yagubogu.auth.service.GoogleAuthValidator;
-import com.yagubogu.auth.service.JwtProvider;
+import com.yagubogu.auth.gateway.AuthGateway;
+import com.yagubogu.auth.gateway.FakeAuthGateway;
+import com.yagubogu.auth.support.GoogleAuthValidator;
+import com.yagubogu.auth.support.JwtProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

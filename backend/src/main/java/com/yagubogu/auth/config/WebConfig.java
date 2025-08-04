@@ -1,6 +1,6 @@
 package com.yagubogu.auth.config;
 
-import com.yagubogu.auth.service.MemberClaimsArgumentResolver;
+import com.yagubogu.auth.support.MemberClaimsArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

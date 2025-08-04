@@ -1,4 +1,4 @@
-package com.yagubogu.auth.client;
+package com.yagubogu.auth.gateway;
 
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;

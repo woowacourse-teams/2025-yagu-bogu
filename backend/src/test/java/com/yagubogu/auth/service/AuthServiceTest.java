@@ -1,10 +1,12 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.client.AuthGateway;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
+import com.yagubogu.auth.support.GoogleAuthValidator;
+import com.yagubogu.auth.support.JwtProvider;
 import com.yagubogu.member.repository.MemberRepository;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -43,6 +45,7 @@ class AuthServiceTest {
     void login() {
         // given
         LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
+        MemberResponse expectedMember = new MemberResponse(1L, "test-user", "picture");
 
         // when
         LoginResponse response = authService.login(loginRequest);
@@ -52,7 +55,7 @@ class AuthServiceTest {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
-            softAssertions.assertThat(response.member()).isEqualTo(new MemberResponse(1L, "test-user", "picture"));
+            softAssertions.assertThat(response.member()).isEqualTo(expectedMember);
         });
     }
 }

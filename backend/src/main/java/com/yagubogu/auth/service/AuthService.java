@@ -1,11 +1,13 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.client.AuthGateway;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.auth.support.AuthValidator;
+import com.yagubogu.auth.support.JwtProvider;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;

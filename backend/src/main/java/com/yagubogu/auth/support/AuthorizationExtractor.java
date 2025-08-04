@@ -1,4 +1,4 @@
-package com.yagubogu.auth.service;
+package com.yagubogu.auth.support;
 
 import java.util.Optional;
 import org.springframework.http.HttpHeaders;

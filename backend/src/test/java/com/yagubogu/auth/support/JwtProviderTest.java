@@ -1,4 +1,4 @@
-package com.yagubogu.auth.token;
+package com.yagubogu.auth.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.config.JwtProperties.TokenProperties;
-import com.yagubogu.auth.service.JwtProvider;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;

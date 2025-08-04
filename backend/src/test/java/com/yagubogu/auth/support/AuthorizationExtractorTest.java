@@ -1,4 +1,4 @@
-package com.yagubogu.auth.service;
+package com.yagubogu.auth.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
