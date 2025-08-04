@@ -116,7 +116,6 @@ public class TalkService {
     }
 
     private Slice<TalkResponse> getTalkResponses(final long gameId, final Long cursorId, final Pageable pageable) {
-        Slice<TalkResponse> talkResponses;
         if (cursorId == null) {
             return talkRepository.fetchRecentTalks(gameId, pageable);
         }
