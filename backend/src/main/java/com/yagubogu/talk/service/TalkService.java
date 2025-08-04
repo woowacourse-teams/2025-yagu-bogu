@@ -119,6 +119,7 @@ public class TalkService {
         if (cursorId == null) {
             return talkRepository.fetchRecentTalks(gameId, pageable);
         }
+        
         return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
     }
 
@@ -126,6 +127,7 @@ public class TalkService {
         if (!hasNextPage || talks.isEmpty()) {
             return null;
         }
+
         return talks.getContent().getLast().id();
     }
 
@@ -133,6 +135,7 @@ public class TalkService {
         if (!talks.isEmpty()) {
             return talks.getContent().getLast().id();
         }
+
         return cursorId;
     }
 
