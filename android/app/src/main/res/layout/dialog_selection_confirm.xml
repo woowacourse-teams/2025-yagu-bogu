@@ -16,13 +16,12 @@
 
         <TextView
             android:id="@+id/tv_selection_confirm_message"
-            style="@style/TextView.Esamanru.Medium"
+            style="@style/TextView.Esamanru.Medium.20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:layout_marginBottom="20dp"
             android:text="@string/favorite_team_selection_confirm"
-            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@id/tv_favorite_team_emoji"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,7 +75,6 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
-            app:layout_constraintTop_toBottomOf="@id/tv_favorite_team_name"
             app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
