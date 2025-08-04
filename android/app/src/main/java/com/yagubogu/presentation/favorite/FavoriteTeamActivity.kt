@@ -35,7 +35,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
                 object : FavoriteTeamListAdapter.OnItemClickListener {
                     override fun onItemClick(item: FavoriteTeamUiModel) {
                         val dialog = SelectionConfirmDialogFragment.newInstance(item)
-                        dialog.show(supportFragmentManager, SelectionConfirmDialogFragment.TAG)
+                        dialog.show(supportFragmentManager, dialog.tag)
                     }
                 },
             )

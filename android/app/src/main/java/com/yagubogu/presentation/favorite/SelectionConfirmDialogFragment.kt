@@ -27,7 +27,6 @@ class SelectionConfirmDialogFragment : DialogFragment() {
         } ?: throw IllegalStateException("Activity cannot be null")
 
     companion object {
-        const val TAG = "SelectionConfirmDialogFragment"
         private const val ARG_FAVORITE_TEAM = "favorite_team"
 
         fun newInstance(favoriteTeam: FavoriteTeamUiModel): SelectionConfirmDialogFragment =
