@@ -5,8 +5,8 @@ import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRackingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRackingResponses.VictoryFairyRackingResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -199,39 +199,39 @@ class CheckInServiceTest {
     void findVictoryFairyRankings() {
         // given
         long memberId = 5L;
-        List<VictoryFairyRackingResponse> expectedTop5Rankings = List.of(
-                new VictoryFairyRackingResponse(
+        List<VictoryFairyRankingResponse> expectedTop5Rankings = List.of(
+                new VictoryFairyRankingResponse(
                         1,
                         "메다",
                         "두산",
                         100.0
                 ),
-                new VictoryFairyRackingResponse(
+                new VictoryFairyRankingResponse(
                         2,
                         "밍트",
                         "기아",
                         100.0
                 ),
-                new VictoryFairyRackingResponse(
+                new VictoryFairyRankingResponse(
                         3,
                         "우가",
                         "두산",
                         100.0
                 ),
-                new VictoryFairyRackingResponse(
+                new VictoryFairyRankingResponse(
                         4,
                         "포르",
                         "기아",
                         83.3
                 ),
-                new VictoryFairyRackingResponse(
+                new VictoryFairyRankingResponse(
                         5,
                         "두리",
                         "삼성",
                         0.0
                 )
         );
-        VictoryFairyRackingResponse expectedMemberRanking = new VictoryFairyRackingResponse(
+        VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
                 2,
                 "밍트",
                 "기아",
@@ -239,7 +239,7 @@ class CheckInServiceTest {
         );
 
         // when
-        VictoryFairyRackingResponses actual = checkInService.findVictoryFairyRankings(memberId);
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId);
 
         // then
         assertSoftly(softAssertions -> {

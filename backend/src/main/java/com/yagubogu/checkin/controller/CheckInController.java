@@ -3,7 +3,7 @@ package com.yagubogu.checkin.controller;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRackingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.service.CheckInService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,10 +53,10 @@ public class CheckInController {
     }
 
     @GetMapping("/members/{memberId}/victory-fairy/rankings")
-    public ResponseEntity<VictoryFairyRackingResponses> findVictoryFairyRankings(
+    public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
             @PathVariable final long memberId
     ) {
-        VictoryFairyRackingResponses response = checkInService.findVictoryFairyRankings(memberId);
+        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberId);
 
         return ResponseEntity.ok(response);
     }

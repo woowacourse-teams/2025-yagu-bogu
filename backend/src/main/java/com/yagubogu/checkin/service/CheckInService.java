@@ -5,8 +5,8 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRackingResponses;
 import com.yagubogu.checkin.dto.VictoryFairyRankingDataResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -63,7 +63,7 @@ public class CheckInService {
         return new CheckInHistoryResponse(checkInGameResponses);
     }
 
-    public VictoryFairyRackingResponses findVictoryFairyRankings(final long memberId) {
+    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
         List<VictoryFairyRankingDataResponse> sortedList = getSortedRankingList();
 
         int myRanking = findMyRanking(sortedList, memberId);
@@ -73,7 +73,7 @@ public class CheckInService {
                 .limit(TOP_FIVE)
                 .toList();
 
-        return VictoryFairyRackingResponses.from(top5, myRankingData, myRanking);
+        return VictoryFairyRankingResponses.from(top5, myRankingData, myRanking);
     }
 
     private List<VictoryFairyRankingDataResponse> getSortedRankingList() {

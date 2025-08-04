@@ -3,12 +3,12 @@ package com.yagubogu.checkin.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public record VictoryFairyRackingResponses(
-        List<VictoryFairyRackingResponse> topRankings,
-        VictoryFairyRackingResponse myRanking
+public record VictoryFairyRankingResponses(
+        List<VictoryFairyRankingResponse> topRankings,
+        VictoryFairyRankingResponse myRanking
 ) {
 
-    public record VictoryFairyRackingResponse(
+    public record VictoryFairyRankingResponse(
             int ranking,
             String nickname,
             String teamShortName,
@@ -16,16 +16,16 @@ public record VictoryFairyRackingResponses(
     ) {
     }
 
-    public static VictoryFairyRackingResponses from(
+    public static VictoryFairyRankingResponses from(
             List<VictoryFairyRankingDataResponse> top5,
             VictoryFairyRankingDataResponse myRankingData,
             int myRanking
     ) {
 
-        List<VictoryFairyRackingResponse> topRankings = new ArrayList<>();
+        List<VictoryFairyRankingResponse> topRankings = new ArrayList<>();
         for (int i = 0; i < top5.size(); i++) {
             VictoryFairyRankingDataResponse data = top5.get(i);
-            topRankings.add(new VictoryFairyRackingResponse(
+            topRankings.add(new VictoryFairyRankingResponse(
                     i + 1,
                     data.nickname(),
                     data.teamShortName(),
@@ -33,9 +33,9 @@ public record VictoryFairyRackingResponses(
             ));
         }
 
-        VictoryFairyRackingResponse myRankingResponse = null;
+        VictoryFairyRankingResponse myRankingResponse = null;
         if (myRankingData != null) {
-            myRankingResponse = new VictoryFairyRackingResponse(
+            myRankingResponse = new VictoryFairyRankingResponse(
                     myRanking,
                     myRankingData.nickname(),
                     myRankingData.teamShortName(),
@@ -43,6 +43,6 @@ public record VictoryFairyRackingResponses(
             );
         }
 
-        return new VictoryFairyRackingResponses(topRankings, myRankingResponse);
+        return new VictoryFairyRankingResponses(topRankings, myRankingResponse);
     }
 }
