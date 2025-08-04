@@ -42,7 +42,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
         binding.rvFavoriteTeamList.adapter = adapter
         adapter.submitList(DUMMY_FAVORITE_TEAMS)
 
-        binding.rvFavoriteTeamList.addItemDecoration(FavoriteTeamItemDecoration(context = this))
+        binding.rvFavoriteTeamList.addItemDecoration(FavoriteTeamItemDecoration(this))
     }
 
     companion object {

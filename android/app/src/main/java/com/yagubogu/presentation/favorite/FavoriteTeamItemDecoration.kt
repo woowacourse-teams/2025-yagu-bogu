@@ -6,8 +6,8 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class FavoriteTeamItemDecoration(
-    private val spacingDp: Float = DEFAULT_SPACING_DP,
     private val context: Context,
+    private val spacingDp: Float = DEFAULT_SPACING_DP,
     private val spanCount: Int = DEFAULT_SPAN_COUNT,
 ) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
@@ -33,7 +33,7 @@ class FavoriteTeamItemDecoration(
     }
 
     private fun dpToPixel(spacingDp: Float): Int {
-        val density = context.resources.displayMetrics.density
+        val density: Float = context.resources.displayMetrics.density
         return (spacingDp * density).toInt()
     }
 
