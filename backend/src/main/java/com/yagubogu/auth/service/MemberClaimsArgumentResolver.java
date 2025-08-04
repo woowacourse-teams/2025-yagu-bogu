@@ -23,9 +23,12 @@ public class MemberClaimsArgumentResolver implements HandlerMethodArgumentResolv
     }
 
     @Override
-    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
-            throws Exception {
+    public Object resolveArgument(
+            final MethodParameter parameter,
+            final ModelAndViewContainer mavContainer,
+            final NativeWebRequest webRequest,
+            final WebDataBinderFactory binderFactory
+    ) throws Exception {
         return authorizationExtractor.extract(webRequest)
                 .map(authService::makeMemberClaims)
                 .orElseThrow((() -> new UnAuthorizedException("Access token not found")));

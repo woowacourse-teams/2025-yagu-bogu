@@ -1,10 +1,10 @@
 package com.yagubogu.auth.service;
 
 import com.yagubogu.auth.client.AuthGateway;
+import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
-import com.yagubogu.global.config.TestConfig;
 import com.yagubogu.member.repository.MemberRepository;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -16,13 +16,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 @DataJpaTest
-@Import(TestConfig.class)
+@Import(AuthTestConfig.class)
 class AuthServiceTest {
 
     private AuthService authService;
 
     @Autowired
-    private AuthGateway authGateway;
+    private AuthGateway fakeAuthGateway;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -35,7 +35,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(memberRepository, authGateway, jwtProvider, List.of(googleAuthValidator));
+        authService = new AuthService(memberRepository, fakeAuthGateway, jwtProvider, List.of(googleAuthValidator));
     }
 
     @DisplayName("로그인을 수행한다")

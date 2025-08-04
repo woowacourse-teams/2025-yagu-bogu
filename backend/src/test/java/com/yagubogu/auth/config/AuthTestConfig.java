@@ -1,9 +1,7 @@
-package com.yagubogu.global.config;
+package com.yagubogu.auth.config;
 
 import com.yagubogu.auth.client.AuthGateway;
 import com.yagubogu.auth.client.FakeAuthGateway;
-import com.yagubogu.auth.config.GoogleAuthProperties;
-import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.service.GoogleAuthValidator;
 import com.yagubogu.auth.service.JwtProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 @EnableConfigurationProperties({JwtProperties.class, GoogleAuthProperties.class})
-public class TestConfig {
+public class AuthTestConfig {
 
     @Bean
     public JwtProvider jwtProvider(JwtProperties jwtProperties) {
