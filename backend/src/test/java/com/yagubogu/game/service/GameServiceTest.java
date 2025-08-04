@@ -139,17 +139,29 @@ class GameServiceTest {
     void findGamesByDate() {
         // given
         LocalDate date = TestFixture.getToday();
-        GameResponse expected = new GameResponse(
-                new StadiumInfoResponse(1L, "잠실 야구장"),
-                new TeamInfoResponse(1L, "기아 타이거즈", "HT"),
-                new TeamInfoResponse(2L, "롯데 자이언츠", "LT")
+        List<GameResponse> expected = List.of(
+                new GameResponse(
+                        new StadiumInfoResponse(1L, "잠실 야구장"),
+                        new TeamInfoResponse(1L, "기아 타이거즈", "HT"),
+                        new TeamInfoResponse(2L, "롯데 자이언츠", "LT")
+                ),
+                new GameResponse(
+                        new StadiumInfoResponse(2L, "고척 스카이돔"),
+                        new TeamInfoResponse(3L, "삼성 라이온즈", "SS"),
+                        new TeamInfoResponse(4L, "두산 베어스", "OB")
+                ),
+                new GameResponse(
+                        new StadiumInfoResponse(3L, "인천 SSG 랜더스필드"),
+                        new TeamInfoResponse(5L, "LG 트윈스", "LG"),
+                        new TeamInfoResponse(6L, "KT 위즈", "KT")
+                )
         );
 
         // when
         GamesResponse actual = gameService.findGamesByDate(date);
 
         // then
-        assertThat(actual.games()).containsExactlyInAnyOrder(expected);
+        assertThat(actual.games()).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @DisplayName("예외: 미래 날짜를 조회하려고 하면 예외가 발생한다")
