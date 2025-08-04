@@ -53,21 +53,21 @@ public class CheckInService {
         List<Game> games = gameRepository.findGameByDate(date);
 
         List<FanRateGameEntry> fanRateGameEntries = new ArrayList<>();
-        FanRateByGameResponse myTeamGameResponse = null;
+        FanRateByGameResponse myTeamEnterThisGame = null;
 
         for (Game game : games) {
             FanCountsByGameResponse counts = getFanCountsForGame(game);
             FanRateByGameResponse fanRateByGameResponse = createFanRateByGameResponse(game, counts);
 
             if (game.hasTeam(myTeam)) {
-                myTeamGameResponse = fanRateByGameResponse;
+                myTeamEnterThisGame = fanRateByGameResponse;
                 continue;
             }
             fanRateGameEntries.add(new FanRateGameEntry(counts.totalCheckInCounts(), fanRateByGameResponse));
         }
         Collections.sort(fanRateGameEntries);
 
-        return FanRateResponse.from(myTeamGameResponse, fanRateGameEntries);
+        return FanRateResponse.from(myTeamEnterThisGame, fanRateGameEntries);
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
