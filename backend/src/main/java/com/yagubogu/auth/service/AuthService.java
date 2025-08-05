@@ -1,6 +1,6 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.config.JwtProperties;
+import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.CreateTokenResponse;
@@ -11,7 +11,7 @@ import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthValidator;
-import com.yagubogu.auth.support.JwtProvider;
+import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -31,10 +31,10 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final AuthGateway authGateway;
-    private final JwtProvider jwtProvider;
+    private final AuthTokenProvider authTokenProvider;
     private final List<AuthValidator<? extends AuthResponse>> authValidators;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtProperties jwtProperties;
+    private final AuthTokenProperties authTokenProperties;
 
     public LoginResponse login(final LoginRequest request) {
         AuthResponse response = authGateway.validateToken(request);
@@ -45,16 +45,16 @@ public class AuthService {
         Member member = findOrCreateMember(isNew, response, memberOptional);
         MemberClaims memberClaims = MemberClaims.from(member);
 
-        String accessToken = jwtProvider.createAccessToken(memberClaims);
+        String accessToken = authTokenProvider.createAccessToken(memberClaims);
         String refreshToken = generateRefreshToken(member);
 
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
     public MemberClaims makeMemberClaims(final String token) {
-        jwtProvider.validateAccessToken(token);
-        Long memberId = jwtProvider.getMemberIdByAccessToken(token);
-        Role role = jwtProvider.getRoleByAccessToken(token);
+        authTokenProvider.validateAccessToken(token);
+        Long memberId = authTokenProvider.getMemberIdByAccessToken(token);
+        Role role = authTokenProvider.getRoleByAccessToken(token);
 
         return new MemberClaims(memberId, role);
     }
@@ -67,7 +67,7 @@ public class AuthService {
         Member member = storedRefreshToken.getMember();
         MemberClaims memberClaims = MemberClaims.from(member);
 
-        String newAccessToken = jwtProvider.createAccessToken(memberClaims);
+        String newAccessToken = authTokenProvider.createAccessToken(memberClaims);
         String newRefreshToken = generateRefreshToken(member);
 
         return new CreateTokenResponse(newAccessToken, newRefreshToken);
@@ -124,7 +124,7 @@ public class AuthService {
     }
 
     private Instant calculateExpireAt() {
-        long expiresIn = jwtProperties.getRefreshToken().getExpiresIn();
+        long expiresIn = authTokenProperties.getRefreshToken().getExpiresIn();
 
         return Instant.now().plus(expiresIn, ChronoUnit.SECONDS);
     }

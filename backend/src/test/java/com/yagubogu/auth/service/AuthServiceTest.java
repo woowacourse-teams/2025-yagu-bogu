@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.config.JwtProperties;
+import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -12,7 +12,7 @@ import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.GoogleAuthValidator;
-import com.yagubogu.auth.support.JwtProvider;
+import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
@@ -43,7 +43,7 @@ class AuthServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
-    private JwtProvider jwtProvider;
+    private AuthTokenProvider authTokenProvider;
 
     @Autowired
     private GoogleAuthValidator googleAuthValidator;
@@ -52,12 +52,12 @@ class AuthServiceTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private JwtProperties jwtProperties;
+    private AuthTokenProperties authTokenProperties;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(memberRepository, fakeAuthGateway, jwtProvider, List.of(googleAuthValidator),
-                refreshTokenRepository, jwtProperties);
+        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider, List.of(googleAuthValidator),
+                refreshTokenRepository, authTokenProperties);
     }
 
     @DisplayName("로그인을 수행한다")

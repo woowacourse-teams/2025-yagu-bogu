@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Setter
 @Getter
-@ConfigurationProperties(prefix = "security.jwt")
-public class JwtProperties {
+@ConfigurationProperties(prefix = "security.token")
+public class AuthTokenProperties {
 
     private TokenProperties accessToken;
     private TokenProperties refreshToken;
