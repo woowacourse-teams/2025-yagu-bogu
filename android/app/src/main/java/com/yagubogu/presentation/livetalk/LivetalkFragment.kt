@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentLiveTalkBinding
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
@@ -17,13 +15,6 @@ import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 class LivetalkFragment : Fragment() {
     private var _binding: FragmentLiveTalkBinding? = null
     private val binding get() = _binding!!
-
-    private val viewModel: LivetalkViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        LivetalkViewModelFactory(
-            app.stadiumRepository,
-        )
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
