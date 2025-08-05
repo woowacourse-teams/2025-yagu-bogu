@@ -1,11 +1,20 @@
 package com.yagubogu.presentation.livetalk.stadium
 
+import androidx.annotation.ColorRes
+import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.presentation.util.getTeamColor
+
 data class LivetalkStadiumItem(
     val stadiumName: String,
     val userCount: Int,
-    val awayTeamEmoji: String,
-    val awayTeamNickname: String,
-    val homeTeamEmoji: String,
-    val homeTeamNickname: String,
+    val awayTeam: Team,
+    val awayTeamEmoji: String = awayTeam.getEmoji(),
+    @ColorRes
+    val awayTeamColor: Int = awayTeam.getTeamColor(),
+    val homeTeam: Team,
+    val homeTeamEmoji: String = homeTeam.getEmoji(),
+    @ColorRes
+    val homeTeamColor: Int = homeTeam.getTeamColor(),
     val isVerified: Boolean,
 )
