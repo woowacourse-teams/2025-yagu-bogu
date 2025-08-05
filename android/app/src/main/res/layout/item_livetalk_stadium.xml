@@ -5,14 +5,16 @@
 
     <data>
 
+        <variable
+            name="livetalkStadiumItem"
+            type="com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem" />
     </data>
-
-    <!--Todo: 데이터바인딩 예정, background가 true면 직관 인증된 구장-->
+    
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="7dp"
-        android:background="@{true ? @drawable/bg_white_stroke_primary500_radius_12dp : @drawable/bg_white_stroke_gray100_radius_12dp}"
+        android:background="@{livetalkStadiumItem.isVerified ? @drawable/bg_white_stroke_primary500_radius_12dp : @drawable/bg_white_stroke_gray100_radius_12dp}"
         android:paddingHorizontal="24dp"
         android:paddingVertical="20dp"
         tools:background="@drawable/bg_white_stroke_primary500_radius_12dp">
