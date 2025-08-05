@@ -8,23 +8,22 @@ import com.yagubogu.databinding.FragmentFavoriteTeamConfirmBinding
 import com.yagubogu.presentation.util.getParcelableCompat
 
 class FavoriteTeamConfirmDialogFragment : DialogFragment() {
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-        activity?.let {
-            val favoriteTeam: FavoriteTeamUiModel =
-                arguments?.getParcelableCompat(ARG_FAVORITE_TEAM) ?: return@let null
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val favoriteTeam: FavoriteTeamUiModel =
+            arguments?.getParcelableCompat(ARG_FAVORITE_TEAM)
+                ?: return super.onCreateDialog(savedInstanceState)
 
-            val binding: FragmentFavoriteTeamConfirmBinding =
-                FragmentFavoriteTeamConfirmBinding.inflate(layoutInflater)
+        val binding: FragmentFavoriteTeamConfirmBinding =
+            FragmentFavoriteTeamConfirmBinding.inflate(layoutInflater)
 
-            binding.favoriteTeamUiModel = favoriteTeam
-            binding.tvNegativeBtn.setOnClickListener { dialog?.cancel() }
+        binding.favoriteTeamUiModel = favoriteTeam
+        binding.tvNegativeBtn.setOnClickListener { dialog?.cancel() }
 
-            val builder =
-                AlertDialog
-                    .Builder(requireActivity())
-                    .setView(binding.root)
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+        return AlertDialog
+            .Builder(requireActivity())
+            .setView(binding.root)
+            .create()
+    }
 
     companion object {
         private const val ARG_FAVORITE_TEAM = "favorite_team"
