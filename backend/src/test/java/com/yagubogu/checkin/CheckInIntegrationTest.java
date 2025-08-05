@@ -2,6 +2,7 @@ package com.yagubogu.checkin;
 
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.fixture.TestFixture;
 import io.restassured.RestAssured;
@@ -131,7 +132,7 @@ public class CheckInIntegrationTest {
                 .statusCode(200);
     }
 
-    @DisplayName("예외 : 직관 내역을 조회하는데 회원이 없으면 예외가 발생한다")
+    @DisplayName("예외: 직관 내역을 조회하는데 회원이 없으면 예외가 발생한다")
     @Test
     void findCheckInHistory_notFoundMember() {
         // given
@@ -144,6 +145,40 @@ public class CheckInIntegrationTest {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .when().get("/api/check-ins/members/{memberId}")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("인증 여부를 조회한다")
+    @Test
+    void findCheckInStatus() {
+        // when
+        CheckInStatusResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 1L)
+                .queryParam("date", "2025-07-21")
+                .when().get("/api/check-ins/status/members/{memberId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CheckInStatusResponse.class);
+
+        // then
+        assertThat(actual.isCheckIn()).isTrue();
+    }
+
+    @DisplayName("예외: 인증 여부를 조회하는데 일치하는 회원이 없으면 404 상태를 반환한다")
+    @Test
+    void findCheckInStatus_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", invalidMemberId)
+                .queryParam("date", "2025-07-21")
+                .when().get("/api/check-ins/status/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }

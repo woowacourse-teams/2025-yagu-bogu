@@ -8,6 +8,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -124,6 +125,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
+
+    boolean existsByMemberAndGameDate(Member member, LocalDate date);
 
     @Query("""
             SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
