@@ -7,7 +7,12 @@ import com.yagubogu.databinding.ItemFavoriteTeamBinding
 
 class FavoriteTeamViewHolder(
     private val binding: ItemFavoriteTeamBinding,
+    private val handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.handler = handler
+    }
+
     fun bind(favoriteTeamUiModel: FavoriteTeamUiModel) {
         binding.favoriteTeamUiModel = favoriteTeamUiModel
     }
@@ -23,8 +28,7 @@ class FavoriteTeamViewHolder(
         ): FavoriteTeamViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemFavoriteTeamBinding.inflate(inflater, parent, false)
-            binding.handler = handler
-            return FavoriteTeamViewHolder(binding)
+            return FavoriteTeamViewHolder(binding, handler)
         }
     }
 }
