@@ -22,7 +22,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintFavoriteTeamRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -31,8 +31,8 @@ class FavoriteTeamActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val adapter =
-            FavoriteTeamListAdapter(
-                object : FavoriteTeamListAdapter.Handler {
+            FavoriteTeamAdapter(
+                object : FavoriteTeamAdapter.Handler {
                     override fun onItemClick(item: FavoriteTeamUiModel) {
                         val dialog = FavoriteTeamConfirmDialogFragment.newInstance(item)
                         dialog.show(supportFragmentManager, dialog.tag)
@@ -41,8 +41,6 @@ class FavoriteTeamActivity : AppCompatActivity() {
             )
         binding.rvFavoriteTeamList.adapter = adapter
         adapter.submitList(DUMMY_FAVORITE_TEAMS)
-
-        binding.rvFavoriteTeamList.addItemDecoration(FavoriteTeamItemDecoration(this))
     }
 
     companion object {
