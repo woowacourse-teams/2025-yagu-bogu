@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,7 +18,7 @@ class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
-    private var isAppInitialized = false
+    private var isAppInitialized: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
@@ -28,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupSplash() {
-        val splashScreen = installSplashScreen()
+        val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isAppInitialized }
     }
 
