@@ -21,7 +21,6 @@ public record VictoryFairyRankingResponses(
             VictoryFairyRankingEntryResponse myRankingData,
             int myRanking
     ) {
-
         List<VictoryFairyRankingResponse> rankingResponses = new ArrayList<>();
         for (int i = 0; i < topRankings.size(); i++) {
             VictoryFairyRankingEntryResponse data = topRankings.get(i);
