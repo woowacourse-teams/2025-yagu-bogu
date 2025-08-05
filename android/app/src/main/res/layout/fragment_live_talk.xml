@@ -5,7 +5,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingHorizontal="20dp"
         tools:context=".presentation.livetalk.LiveTalkFragment">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_live_talk_stadium"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_livetalk_stadium"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
