@@ -5,6 +5,7 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
@@ -62,6 +63,15 @@ public class CheckInController {
             @RequestParam final LocalDate date
     ) {
         FanRateResponse response = checkInService.findFanRatesByGames(memberId, date);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/victory-fairy/rankings")
+    public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
+            @RequestParam final long memberId
+    ) {
+        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberId);
 
         return ResponseEntity.ok(response);
     }

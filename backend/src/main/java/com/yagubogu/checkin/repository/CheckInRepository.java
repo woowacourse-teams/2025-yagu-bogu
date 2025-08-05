@@ -4,6 +4,7 @@ import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
@@ -127,6 +128,28 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 
     boolean existsByMemberAndGameDate(Member member, LocalDate date);
+
+    @Query("""
+                select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
+                    ci.member.id,
+                    ci.member.nickname,
+                    ci.member.team.shortName,
+                    COUNT(ci),
+                    ROUND(
+                        (1.0 * SUM(
+                            CASE
+                                WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
+                                    OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
+                                THEN 1 ELSE 0
+                                END
+                        ) / COUNT(ci)) * 100, 1
+                    )
+                )
+                from CheckIn ci
+                JOIN ci.game g
+                group by ci.member.id
+            """)
+    List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
 
     @Query("""
             SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(

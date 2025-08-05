@@ -10,6 +10,8 @@ import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.TeamFanRateResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -30,6 +32,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -200,6 +203,68 @@ class CheckInServiceTest {
         assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
     }
 
+    @DisplayName("승리 요정 랭킹 조회 - 승률, 직관 횟수, 닉네임 순 정렬되어 반환된다")
+    @Test
+    void findVictoryFairyRankings() {
+        // given
+        long memberId = 5L;
+        List<VictoryFairyRankingResponse> expectedTop5Rankings = List.of(
+                new VictoryFairyRankingResponse(
+                        1,
+                        "구구",
+                        "KT",
+                        100.0
+                ),
+                new VictoryFairyRankingResponse(
+                        2,
+                        "메다",
+                        "LG",
+                        100.0
+                ),
+                new VictoryFairyRankingResponse(
+                        3,
+                        "밍트",
+                        "기아",
+                        100.0
+                ),
+                new VictoryFairyRankingResponse(
+                        4,
+                        "크림",
+                        "삼성",
+                        100.0
+                ),
+                new VictoryFairyRankingResponse(
+                        5,
+                        "포르",
+                        "기아",
+                        83.3
+                )
+        );
+        VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
+                3,
+                "밍트",
+                "기아",
+                100.0
+        );
+
+        // when
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId);
+
+        // then
+        assertSoftly(softAssertions -> {
+                    softAssertions.assertThat(actual.topRankings()).containsExactlyElementsOf(expectedTop5Rankings);
+                    softAssertions.assertThat(actual.myRanking().ranking())
+                            .isEqualTo(expectedMemberRanking.ranking());
+                    softAssertions.assertThat(actual.myRanking().nickname())
+                            .isEqualTo(expectedMemberRanking.nickname());
+                    softAssertions.assertThat(actual.myRanking().teamShortName())
+                            .isEqualTo(expectedMemberRanking.teamShortName());
+                    softAssertions.assertThat(actual.myRanking().winPercent())
+                            .isEqualTo(expectedMemberRanking.winPercent());
+                }
+        );
+    }
+
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @ParameterizedTest
     @CsvSource(value = {
@@ -216,7 +281,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.isCheckIn()).isEqualTo(expected);
     }
-  
+
     @DisplayName("직관 인증 내역 중 이긴 직관 내역을 모두 조회한다")
     @Test
     void findCheckInWinHistory_allCheckInWinsGivenYear() {

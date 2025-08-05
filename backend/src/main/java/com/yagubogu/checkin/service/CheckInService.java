@@ -6,6 +6,8 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateGameEntry;
@@ -20,14 +22,20 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class CheckInService {
+
+    private static final int TOP_RANKINGS = 5;
+    private static final int NOT_FOUND = -1;
+    private static final int FOUND = 1;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -90,6 +98,54 @@ public class CheckInService {
         };
     }
 
+    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
+        List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
+
+        int myRanking = findMyRankingIndex(sortedList, memberId);
+        VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);
+
+        List<VictoryFairyRankingEntryResponse> topRankings = sortedList.stream()
+                .limit(TOP_RANKINGS)
+                .toList();
+
+        return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
+    }
+
+    private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
+        List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
+
+        return memberCheckIns.stream()
+                .sorted(Comparator
+                        // 1. 승률 먼저 정렬
+                        .comparingDouble(VictoryFairyRankingEntryResponse::winPercent).reversed()
+                        // 2. 직관 횟수 정렬
+                        .thenComparing(Comparator.comparing(VictoryFairyRankingEntryResponse::totalCheckIns).reversed())
+                        // 3. 닉네임순 정렬
+                        .thenComparing(VictoryFairyRankingEntryResponse::nickname)
+                )
+                .toList();
+    }
+
+    private int findMyRankingIndex(
+            final List<VictoryFairyRankingEntryResponse> sortedList,
+            final long memberId
+    ) {
+        return IntStream.range(0, sortedList.size())
+                .filter(i -> sortedList.get(i).memberId().equals(memberId))
+                .findFirst()
+                .orElse(NOT_FOUND) + FOUND;
+    }
+
+    private VictoryFairyRankingEntryResponse findMyRanking(
+            final List<VictoryFairyRankingEntryResponse> sortedList,
+            final long memberId
+    ) {
+        return sortedList.stream()
+                .filter(d -> d.memberId().equals(memberId))
+                .findFirst()
+                .orElse(null);
+    }
+  
     public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
         boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
