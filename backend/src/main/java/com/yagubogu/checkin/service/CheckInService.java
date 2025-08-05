@@ -4,6 +4,7 @@ import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
@@ -143,6 +144,13 @@ public class CheckInService {
                 .filter(d -> d.memberId().equals(memberId))
                 .findFirst()
                 .orElse(null);
+    }
+  
+    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+        Member member = getMember(memberId);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+
+        return new CheckInStatusResponse(isCheckIn);
     }
 
     private Stadium getStadiumById(final long stadiumId) {

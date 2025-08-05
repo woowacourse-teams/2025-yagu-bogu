@@ -3,6 +3,7 @@ package com.yagubogu.checkin.controller;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.FanRateResponse;
@@ -71,6 +72,16 @@ public class CheckInController {
             @RequestParam final long memberId
     ) {
         VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/status/members/{memberId}")
+    public ResponseEntity<CheckInStatusResponse> findCheckInStatus(
+            @PathVariable final long memberId,
+            @RequestParam final LocalDate date
+    ) {
+        CheckInStatusResponse response = checkInService.findCheckInStatus(memberId, date);
 
         return ResponseEntity.ok(response);
     }
