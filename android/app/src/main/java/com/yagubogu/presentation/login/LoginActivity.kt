@@ -13,8 +13,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.yagubogu.BuildConfig
-import com.yagubogu.data.auth.GoogleCredentialHandler
-import com.yagubogu.data.auth.GoogleCredentialRequestManager
+import com.yagubogu.data.auth.GoogleCredentialManager
+import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
@@ -26,10 +26,10 @@ class LoginActivity : AppCompatActivity() {
     private var isAppInitialized: Boolean = false
 
     private val viewModel: LoginViewModel by viewModels {
-        val googleCredentialRequestManager =
-            GoogleCredentialRequestManager(this, BuildConfig.WEB_CLIENT_ID, "")
-        val googleCredentialHandler = GoogleCredentialHandler(googleCredentialRequestManager)
-        LoginViewModelFactory(googleCredentialHandler)
+        val googleCredentialManager =
+            GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
+        val authDefaultRepository = AuthDefaultRepository(googleCredentialManager)
+        LoginViewModelFactory(authDefaultRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
