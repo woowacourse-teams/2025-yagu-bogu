@@ -2,7 +2,9 @@ package com.yagubogu
 
 import android.app.Application
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
+import com.yagubogu.common.YaguBoguReleaseTree
 import com.yagubogu.data.datasource.CheckInsRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
@@ -36,10 +38,12 @@ class YaguBoguApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
-            // 개발 환경 - 콘솔 출력
+            // 개발 환경
+            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = false
             Timber.plant(YaguBoguDebugTree())
         } else {
-            // 운영 환경 - Crashlytics 연동 Tree
+            // 운영 환경
+            Timber.plant(YaguBoguReleaseTree())
         }
     }
 }
