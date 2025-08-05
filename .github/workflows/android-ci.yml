@@ -33,8 +33,10 @@ jobs:
 
     - name: Create google-services.json
       run: |
-        mkdir -p ./app/src/debug
-        echo '${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}' > ./app/src/debug/google-services.json
+        mkdir -p app/src/debug
+        cat <<EOF > app/src/debug/google-services.json
+        ${{ secrets.GOOGLE_SERVICE_JSON }}
+        EOF
 
     - name: Clean build with Gradle
       run: ./gradlew clean build
