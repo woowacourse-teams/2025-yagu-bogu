@@ -87,7 +87,7 @@ class GameServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameService.fetchGameList(today))
-                .isInstanceOf(ClientException.class)
+                .isExactlyInstanceOf(ClientException.class)
                 .hasMessage("Stadium name match failed: 존재하지않는경기장");
     }
 
@@ -106,7 +106,7 @@ class GameServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameService.fetchGameList(today))
-                .isInstanceOf(ClientException.class)
+                .isExactlyInstanceOf(ClientException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
 
@@ -125,7 +125,7 @@ class GameServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameService.fetchGameList(today))
-                .isInstanceOf(ClientException.class)
+                .isExactlyInstanceOf(ClientException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
 }

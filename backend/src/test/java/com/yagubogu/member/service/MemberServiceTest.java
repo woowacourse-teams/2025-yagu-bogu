@@ -51,7 +51,7 @@ public class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.findFavorite(invalidMemberId))
-                .isInstanceOf(NotFoundException.class)
+                .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }
 

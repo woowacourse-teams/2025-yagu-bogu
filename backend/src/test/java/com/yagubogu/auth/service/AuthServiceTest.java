@@ -11,8 +11,8 @@ import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
-import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.auth.support.AuthTokenProvider;
+import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
@@ -107,7 +107,7 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.refreshToken(nonExistToken))
-                .isInstanceOf(UnAuthorizedException.class)
+                .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Refresh token not exist");
     }
 
@@ -123,7 +123,7 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.refreshToken(refreshTokenId))
-                .isInstanceOf(UnAuthorizedException.class)
+                .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Refresh token is invalid or expired");
     }
 }

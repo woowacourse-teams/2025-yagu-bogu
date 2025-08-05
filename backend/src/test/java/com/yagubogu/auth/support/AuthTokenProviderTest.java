@@ -88,7 +88,7 @@ class AuthTokenProviderTest {
 
         // then
         assertThatThrownBy(() -> expiredTokenProvider.validateAccessToken(expiredToken))
-                .isInstanceOf(UnAuthorizedException.class)
+                .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Expired token");
     }
 
@@ -100,7 +100,7 @@ class AuthTokenProviderTest {
 
         // when & then
         assertThatThrownBy(() -> authTokenProvider.validateAccessToken(invalidToken))
-                .isInstanceOf(UnAuthorizedException.class)
+                .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Invalid token");
     }
 
