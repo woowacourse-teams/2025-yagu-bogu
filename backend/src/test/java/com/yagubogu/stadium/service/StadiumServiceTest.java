@@ -1,18 +1,8 @@
 package com.yagubogu.stadium.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.yagubogu.checkin.repository.CheckInRepository;
-import com.yagubogu.fixture.TestFixture;
-import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
-import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse;
-import com.yagubogu.stadium.dto.TeamOccupancyRatesResponse.TeamOccupancyRate;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import java.time.LocalDate;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,17 +21,11 @@ class StadiumServiceTest {
     private StadiumService stadiumService;
 
     @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
-    private CheckInRepository checkInRepository;
-
-    @Autowired
     private StadiumRepository stadiumRepository;
 
     @BeforeEach
     void setUp() {
-        stadiumService = new StadiumService(gameRepository, checkInRepository, stadiumRepository);
+        stadiumService = new StadiumService(stadiumRepository);
     }
 
     @DisplayName("전체 구장 목록을 조회한다")
@@ -66,62 +50,4 @@ class StadiumServiceTest {
         // then
         Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
     }
-
-    @DisplayName("구장별 팬 점유율을 조회할 때 점유율이 높은 순으로 정렬된다")
-    @Test
-    void findOccupancyRateInDesc() {
-        // given
-        long stadiumId = 1L;
-        LocalDate today = TestFixture.getToday();
-        List<TeamOccupancyRate> expected = List.of(
-                new TeamOccupancyRate(1L, "기아", 66.7),
-                new TeamOccupancyRate(2L, "롯데", 33.3)
-        );
-
-        // when
-        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, today);
-        List<TeamOccupancyRate> actual = response.teams();
-
-        // then
-        assertThat(actual).containsExactlyElementsOf(expected);
-    }
-
-    @DisplayName("구장을 찾을 수 없으면 없으면 예외가 발생한다.")
-    @Test
-    void findOccupancyRate_notFoundStadium() {
-        // given
-        long stadiumId = 999L;
-        LocalDate date = LocalDate.of(2025, 7, 21);
-
-        // when & then
-        assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessage("Stadium is not found");
-    }
-
-    @DisplayName("구장에 오늘 경기가 없으면 예외가 발생한다.")
-    @Test
-    void findOccupancyRate_notTodayGameInStadium() {
-        long stadiumId = 1L;
-        LocalDate date = TestFixture.getInvalidDate();
-        // when & then
-        assertThatThrownBy(() -> stadiumService.findOccupancyRate(stadiumId, date))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessage("Game is not found");
-    }
-
-    @DisplayName("인증한 회원이 0명이면 빈 리스트를 반환한다.")
-    @Test
-    void findOccupancyRate_noPerson() {
-        // given
-        long stadiumId = 1L;
-        LocalDate date = LocalDate.of(2024, 5, 5);
-
-        // when
-        TeamOccupancyRatesResponse response = stadiumService.findOccupancyRate(stadiumId, date);
-
-        // then
-        assertThat(response.teams()).isEqualTo(List.of());
-    }
-
 }
