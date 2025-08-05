@@ -83,14 +83,14 @@ class AttendanceHistoryFragment : Fragment() {
                 AttendanceHistoryItem(
                     awayTeam =
                         TeamItem(
-                            team = Team.KIA,
+                            team = Team.HT,
                             name = "KIA",
                             score = 9,
                             isMyTeam = true,
                         ),
                     homeTeam =
                         TeamItem(
-                            team = Team.DOOSAN,
+                            team = Team.OB,
                             name = "두산",
                             score = 5,
                             isMyTeam = false,
@@ -101,14 +101,14 @@ class AttendanceHistoryFragment : Fragment() {
                 AttendanceHistoryItem(
                     awayTeam =
                         TeamItem(
-                            team = Team.KIWOOM,
+                            team = Team.WO,
                             name = "키움",
                             score = 7,
                             isMyTeam = false,
                         ),
                     homeTeam =
                         TeamItem(
-                            team = Team.KIA,
+                            team = Team.HT,
                             name = "KIA",
                             score = 4,
                             isMyTeam = true,
@@ -119,7 +119,7 @@ class AttendanceHistoryFragment : Fragment() {
                 AttendanceHistoryItem(
                     awayTeam =
                         TeamItem(
-                            team = Team.KIA,
+                            team = Team.HT,
                             name = "KIA",
                             score = 20,
                             isMyTeam = true,

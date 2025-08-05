@@ -3,16 +3,16 @@ package com.yagubogu.domain.model
 enum class Team(
     val nickname: String,
 ) {
-    KIA("타이거즈"),
+    HT("타이거즈"),
     LG("트윈스"),
-    KIWOOM("히어로즈"),
+    WO("히어로즈"),
     KT("위즈"),
-    SAMSUNG("라이온즈"),
-    LOTTE("자이언츠"),
-    SSG("랜더스"),
+    SS("라이온즈"),
+    LT("자이언츠"),
+    SK("랜더스"),
     NC("다이노스"),
-    HANWHA("이글스"),
-    DOOSAN("베어스"),
+    HH("이글스"),
+    OB("베어스"),
     ;
 
     companion object {
