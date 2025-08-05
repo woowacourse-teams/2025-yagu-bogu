@@ -62,4 +62,7 @@
         <item name="all">전체 경기</item>
         <item name="win">승리한 경기</item>
     </string-array>
+
+    <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
 </resources>
