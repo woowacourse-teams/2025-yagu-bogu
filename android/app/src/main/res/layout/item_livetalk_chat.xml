@@ -40,8 +40,8 @@
             android:layout_marginStart="4dp"
             android:includeFontPadding="false"
             android:visibility="@{false ? View.GONE : View.VISIBLE}"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_profile"
-            app:layout_constraintStart_toEndOf="@+id/iv_profile"
+            app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+            app:layout_constraintStart_toEndOf="@id/iv_profile"
             app:layout_constraintTop_toTopOf="@id/iv_profile"
             tools:text="제미나이(잼민이 아님)" />
 
@@ -55,7 +55,7 @@
             android:textColor="@color/gray500"
             android:visibility="@{false ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/tv_user_nick_name"
-            app:layout_constraintStart_toEndOf="@+id/tv_user_nick_name"
+            app:layout_constraintStart_toEndOf="@id/tv_user_nick_name"
             app:layout_constraintTop_toTopOf="@id/tv_user_nick_name"
             tools:text="KIA 팬" />
 
@@ -94,10 +94,11 @@
             android:layout_marginEnd="4dp"
             android:contentDescription="신고 깃발 아이콘"
             android:src="@drawable/ic_flag"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_chat_write_time"
-            app:layout_constraintStart_toStartOf="@+id/tv_report_user"
-            app:layout_constraintTop_toTopOf="@+id/tv_chat_write_time"
-            app:tint="@{false ? @color/primary700 : @color/gray500}" />
+            android:visibility="@{false ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
+            app:layout_constraintStart_toStartOf="@id/tv_report_user"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
+            app:tint="@color/gray500" />
 
         <TextView
             android:id="@+id/tv_report_user"
@@ -106,11 +107,40 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:paddingStart="18dp"
-            android:textColor="@{false ? @color/primary700 : @color/gray500}"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_chat_write_time"
+            android:text="신고"
+            android:textColor="@color/gray500"
+            android:visibility="@{false ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_chat_write_time"
-            tools:text="신고" />
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time" />
+
+
+        <ImageView
+            android:id="@+id/iv_trash_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="삭제 쓰레기통 아이콘"
+            android:src="@drawable/ic_trash"
+            android:visibility="@{false ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
+            app:layout_constraintStart_toStartOf="@id/tv_report_user"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
+            app:tint="@color/primary700" />
+
+        <TextView
+            android:id="@+id/tv_trash"
+            style="@style/TextView.Pretendard.Regular.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:paddingStart="18dp"
+            android:text="삭제"
+            android:textColor="@color/primary700"
+            android:visibility="@{false ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
