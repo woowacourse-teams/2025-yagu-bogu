@@ -75,4 +75,8 @@ public class Game {
         this.awayScore = awayScore;
         this.gameCode = gameCode;
     }
+
+    public boolean hasTeam(final Team team) {
+        return homeTeam.equals(team) || awayTeam.equals(team);
+    }
 }
