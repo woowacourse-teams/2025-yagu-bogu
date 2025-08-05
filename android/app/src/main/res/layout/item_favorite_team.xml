@@ -17,6 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="6dp"
         android:background="@drawable/bg_white_stroke_gray100_radius_12dp"
         android:onClick="@{() -> handler.onItemClick(favoriteTeamUiModel)}">
 
