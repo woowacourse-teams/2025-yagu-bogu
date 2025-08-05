@@ -61,7 +61,7 @@ public class AuthService {
 
     @Transactional
     public CreateTokenResponse refreshToken(final String refreshToken) {
-        RefreshToken storedRefreshToken = getValidRefreshToken(refreshToken);
+        RefreshToken storedRefreshToken = getPreviousValidRefreshToken(refreshToken);
         storedRefreshToken.revoke();
 
         Member member = storedRefreshToken.getMember();
@@ -108,13 +108,9 @@ public class AuthService {
         ((AuthValidator<T>) validator).validate((T) response);
     }
 
-    private RefreshToken getValidRefreshToken(final String refreshToken) {
-        RefreshToken storedRefreshToken = refreshTokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new UnAuthorizedException("Refresh token not exist"));
-
-        if (!storedRefreshToken.isValid()) {
-            throw new UnAuthorizedException("Refresh token is invalid or expired");
-        }
+    private RefreshToken getPreviousValidRefreshToken(final String refreshToken) {
+        RefreshToken storedRefreshToken = getRefreshToken(refreshToken);
+        validateRefreshToken(storedRefreshToken);
 
         return storedRefreshToken;
     }
@@ -131,5 +127,16 @@ public class AuthService {
         long expireLength = jwtProperties.getRefreshToken().getExpireLength();
 
         return Instant.now().plus(expireLength, ChronoUnit.SECONDS);
+    }
+
+    private RefreshToken getRefreshToken(final String refreshToken) {
+        return refreshTokenRepository.findById(refreshToken)
+                .orElseThrow(() -> new UnAuthorizedException("Refresh token not exist"));
+    }
+
+    private void validateRefreshToken(final RefreshToken storedRefreshToken) {
+        if (!storedRefreshToken.isValid()) {
+            throw new UnAuthorizedException("Refresh token is invalid or expired");
+        }
     }
 }
