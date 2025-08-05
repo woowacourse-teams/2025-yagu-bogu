@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class GameService {
 
@@ -41,7 +43,7 @@ public class GameService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
-
+    @Transactional
     public void fetchGameList(final LocalDate date) {
         KboClientResponse kboClientResponse = kboClient.fetchGame(date);
         List<Game> games = new ArrayList<>();

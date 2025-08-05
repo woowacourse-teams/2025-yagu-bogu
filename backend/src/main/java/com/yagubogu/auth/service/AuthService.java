@@ -1,11 +1,11 @@
 package com.yagubogu.auth.service;
 
-import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.auth.support.JwtProvider;
 import com.yagubogu.member.domain.Member;
@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AuthService {
 
@@ -26,6 +28,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final List<AuthValidator<? extends AuthResponse>> authValidators;
 
+    @Transactional
     public LoginResponse login(final LoginRequest request) {
         AuthResponse response = authGateway.validateToken(request);
         validateToken(response, OAuthProvider.GOOGLE);

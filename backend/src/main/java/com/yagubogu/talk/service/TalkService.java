@@ -22,8 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class TalkService {
 
@@ -60,6 +62,7 @@ public class TalkService {
         return new CursorResult<>(talkResponses.getContent(), nextCursorId, talkResponses.hasNext());
     }
 
+    @Transactional
     public TalkResponse createTalk(
             final long gameId,
             final TalkRequest request,
@@ -74,6 +77,7 @@ public class TalkService {
         return TalkResponse.from(talk);
     }
 
+    @Transactional
     public void removeTalk(
             final long gameId,
             final long talkId,
@@ -119,7 +123,7 @@ public class TalkService {
         if (cursorId == null) {
             return talkRepository.fetchRecentTalks(gameId, pageable);
         }
-        
+
         return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
     }
 

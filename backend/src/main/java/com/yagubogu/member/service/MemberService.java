@@ -7,13 +7,16 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class MemberService {
 
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void removeMember(final Long memberId) {
         memberRepository.deleteById(memberId);
     }
