@@ -3,7 +3,7 @@ package com.yagubogu.auth.service;
 import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.auth.dto.CreateRefreshTokenResponse;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
@@ -60,7 +60,7 @@ public class AuthService {
     }
 
     @Transactional
-    public CreateRefreshTokenResponse refreshToken(final String refreshToken) {
+    public CreateTokenResponse refreshToken(final String refreshToken) {
         RefreshToken storedRefreshToken = getValidRefreshToken(refreshToken);
         storedRefreshToken.revoke();
 
@@ -70,7 +70,7 @@ public class AuthService {
         String newAccessToken = jwtProvider.createAccessToken(memberClaims);
         String newRefreshToken = generateRefreshToken(member);
 
-        return new CreateRefreshTokenResponse(newAccessToken, newRefreshToken);
+        return new CreateTokenResponse(newAccessToken, newRefreshToken);
     }
 
     private Member findOrCreateMember(

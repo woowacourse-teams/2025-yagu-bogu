@@ -6,7 +6,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.CreateRefreshTokenResponse;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
@@ -89,7 +89,7 @@ class AuthServiceTest {
         refreshTokenRepository.save(refreshToken);
 
         // when
-        CreateRefreshTokenResponse response = authService.refreshToken(refreshTokenId);
+        CreateTokenResponse response = authService.refreshToken(refreshTokenId);
 
         // then
         assertSoftly(softAssertions -> {

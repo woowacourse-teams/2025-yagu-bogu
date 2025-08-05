@@ -1,12 +1,11 @@
 package com.yagubogu.auth;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.CreateRefreshTokenRequest;
-import com.yagubogu.auth.dto.CreateRefreshTokenResponse;
+import com.yagubogu.auth.dto.CreateTokenRequest;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
@@ -60,7 +59,7 @@ public class AuthIntegrationTest {
     @Test
     void login() {
         // given & when
-        LoginResponse actual = given().log().all()
+        LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest("id_token"))
                 .when().post("/api/auth/login")
@@ -85,14 +84,14 @@ public class AuthIntegrationTest {
         String refreshToken = TestSupport.getRefreshToken("id_token");
 
         // when
-        CreateRefreshTokenResponse actual = given().log().all()
+        CreateTokenResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new CreateRefreshTokenRequest(refreshToken))
+                .body(new CreateTokenRequest(refreshToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(CreateRefreshTokenResponse.class);
+                .as(CreateTokenResponse.class);
 
         // then
         assertSoftly(softAssertions -> {
@@ -109,9 +108,9 @@ public class AuthIntegrationTest {
         String nonExistToken = "non-exist-token";
 
         // when & then
-        given().log().all()
+        RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new CreateRefreshTokenRequest(nonExistToken))
+                .body(new CreateTokenRequest(nonExistToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
@@ -136,7 +135,7 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new CreateRefreshTokenRequest(expiredToken))
+                .body(new CreateTokenRequest(expiredToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
