@@ -33,10 +33,28 @@ class AttendanceHistoryFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
+        setupSpinner()
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun setupBindings() {
+        val attendanceHistoryAdapter = AttendanceHistoryAdapter()
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+        binding.rvAttendanceHistory.apply {
+            adapter = attendanceHistoryAdapter
+            layoutManager = linearLayoutManager
+        }
+        attendanceHistoryAdapter.submitList(DUMMY_ATTENDANCE_HISTORY_ITEMS)
+    }
+
+    private fun setupSpinner() {
         val spinnerItems: Array<String> =
             resources.getStringArray(R.array.stats_attendance_history_filter)
-        val spinnerAdapter =
+        val spinnerAdapter: ArrayAdapter<String> =
             ArrayAdapter(requireContext(), R.layout.item_spinner_attendance_history, spinnerItems)
         binding.spinnerAttendanceHistoryFilter.apply {
             adapter = spinnerAdapter
@@ -57,21 +75,6 @@ class AttendanceHistoryFragment : Fragment() {
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
                 }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun setupBindings() {
-        val attendanceHistoryAdapter = AttendanceHistoryAdapter()
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvAttendanceHistory.apply {
-            adapter = attendanceHistoryAdapter
-            layoutManager = linearLayoutManager
-        }
-        attendanceHistoryAdapter.submitList(DUMMY_ATTENDANCE_HISTORY_ITEMS)
     }
 
     companion object {
