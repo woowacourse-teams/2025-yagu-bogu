@@ -2,10 +2,12 @@ package com.yagubogu.presentation.util
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.yagubogu.R
+import java.time.LocalDate
 
 @BindingAdapter("setCustomChartDividerTint")
 fun ImageView.setCustomChartDividerTint(
@@ -53,4 +55,18 @@ fun ImageView.setMedalByRank(rank: Int) {
     visibility = View.VISIBLE
     setImageResource(iconRes)
     imageTintList = context.getColorStateList(tintRes)
+}
+
+@BindingAdapter("textColorRes")
+fun TextView.setTextColorRes(
+    @ColorRes colorRes: Int?,
+) {
+    if (colorRes == null || colorRes == 0) return
+    setTextColor(context.getColor(colorRes))
+}
+
+@BindingAdapter("dateFormat")
+fun TextView.setDateFormat(date: LocalDate?) {
+    date ?: return
+    text = date.format(DateFormatter.yyyyMMdd)
 }

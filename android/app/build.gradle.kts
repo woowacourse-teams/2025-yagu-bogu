@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     implementation(libs.play.services.location)
     implementation(libs.mpandroidchart)
+    implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

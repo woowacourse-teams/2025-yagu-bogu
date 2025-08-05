@@ -2,8 +2,15 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.YaguBogu" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-         <item name="colorPrimary">@color/primary500</item>
+        <item name="colorPrimary">@color/primary500</item>
     </style>
 
     <style name="Theme.YaguBogu" parent="Base.Theme.YaguBogu" />
+
+    <!-- API 29-30 Splash Screen Theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary500</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon_frame_26</item>
+        <item name="postSplashScreenTheme">@style/Theme.YaguBogu</item>
+    </style>
 </resources>

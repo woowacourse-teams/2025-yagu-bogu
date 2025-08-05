@@ -57,7 +57,15 @@
     <string name="stats_hit_allowed">피안타</string>
     <string name="stats_error">실책</string>
 
+    <string name="stats_attendance_history_title">최근 직관 내역</string>
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
+    <string-array name="stats_attendance_history_filter">
+        <item name="all">전체 경기</item>
+        <item name="win">승리한 경기</item>
+    </string-array>
+
+    <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
 
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
