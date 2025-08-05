@@ -9,3 +9,4 @@
 .cxx
 local.properties
 app/release/
+app/src/debug/google-services.json
