@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.yagubogu.domain.repository.StadiumRepository
 
-class LiveTalkViewModelFactory(
+class LivetalkViewModelFactory(
     private val stadiumRepository: StadiumRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LiveTalkViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(LivetalkViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LiveTalkViewModel(
+            return LivetalkViewModel(
                 stadiumRepository,
             ) as T
         }

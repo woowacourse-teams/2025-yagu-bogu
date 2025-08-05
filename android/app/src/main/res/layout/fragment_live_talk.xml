@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="20dp"
-        tools:context=".presentation.livetalk.LiveTalkFragment">
+        tools:context=".presentation.livetalk.LivetalkFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_live_talk_stadium"

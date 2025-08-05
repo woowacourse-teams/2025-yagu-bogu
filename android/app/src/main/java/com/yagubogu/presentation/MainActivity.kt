@@ -12,7 +12,7 @@ import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
-import com.yagubogu.presentation.livetalk.LiveTalkFragment
+import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
 
 class MainActivity : AppCompatActivity() {
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
 
                 R.id.item_livetalk ->
-                    replaceFragment(LiveTalkFragment::class.java, R.string.bottom_navigation_livetalk)
+                    replaceFragment(LivetalkFragment::class.java, R.string.bottom_navigation_livetalk)
 
                 R.id.item_challenge ->
                     replaceFragment(

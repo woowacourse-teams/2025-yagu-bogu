@@ -11,13 +11,13 @@ import com.yagubogu.databinding.FragmentLiveTalkBinding
 import kotlin.getValue
 
 @Suppress("ktlint:standard:backing-property-naming")
-class LiveTalkFragment : Fragment() {
+class LivetalkFragment : Fragment() {
     private var _binding: FragmentLiveTalkBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: LiveTalkViewModel by viewModels {
+    private val viewModel: LivetalkViewModel by viewModels {
         val app = requireActivity().application as YaguBoguApplication
-        LiveTalkViewModelFactory(
+        LivetalkViewModelFactory(
             app.stadiumRepository,
         )
     }
