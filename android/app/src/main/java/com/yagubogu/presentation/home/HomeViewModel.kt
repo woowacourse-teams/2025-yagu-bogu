@@ -43,6 +43,10 @@ class HomeViewModel(
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
     init {
+        fetchAll()
+    }
+
+    fun fetchAll() {
         fetchMemberInformation(MEMBER_ID, YEAR)
         val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
         fetchStadiumStats(today)
