@@ -6,11 +6,11 @@ import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.TeamFanRateResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.repository.GameRepository;
@@ -208,37 +208,37 @@ class CheckInServiceTest {
         List<VictoryFairyRankingResponse> expectedTop5Rankings = List.of(
                 new VictoryFairyRankingResponse(
                         1,
-                        "메다",
-                        "두산",
+                        "구구",
+                        "KT",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         2,
+                        "메다",
+                        "LG",
+                        100.0
+                ),
+                new VictoryFairyRankingResponse(
+                        3,
                         "밍트",
                         "기아",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
-                        3,
-                        "우가",
-                        "두산",
+                        4,
+                        "크림",
+                        "삼성",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
-                        4,
+                        5,
                         "포르",
                         "기아",
-                        71.4
-                ),
-                new VictoryFairyRankingResponse(
-                        5,
-                        "두리",
-                        "삼성",
-                        0.0
+                        83.3
                 )
         );
         VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
-                2,
+                3,
                 "밍트",
                 "기아",
                 100.0
@@ -261,7 +261,7 @@ class CheckInServiceTest {
                 }
         );
     }
-  
+
     @DisplayName("직관 인증 내역 중 이긴 직관 내역을 모두 조회한다")
     @Test
     void findCheckInWinHistory_allCheckInWinsGivenYear() {
