@@ -44,8 +44,8 @@ public class RefreshToken {
         return new RefreshToken(UUID.randomUUID().toString(), member, expiresAt);
     }
 
-    public boolean isValid() {
-        return !isRevoked && Instant.now().isBefore(expiresAt);
+    public boolean isInValid() {
+        return isRevoked || Instant.now().isAfter(expiresAt);
     }
 
     public void revoke() {

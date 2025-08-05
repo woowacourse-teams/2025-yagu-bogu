@@ -135,7 +135,7 @@ public class AuthService {
     }
 
     private void validateRefreshToken(final RefreshToken storedRefreshToken) {
-        if (!storedRefreshToken.isValid()) {
+        if (storedRefreshToken.isInValid()) {
             throw new UnAuthorizedException("Refresh token is invalid or expired");
         }
     }
