@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,11 +120,11 @@ public class AuthService {
     }
 
     private String generateRefreshToken(final Member member) {
-        String refreshToken = UUID.randomUUID().toString();
         Instant expiresAt = calculateExpireAt();
-        refreshTokenRepository.save(new RefreshToken(refreshToken, member, expiresAt));
+        RefreshToken refreshToken = RefreshToken.generate(member, expiresAt);
+        refreshTokenRepository.save(refreshToken);
 
-        return refreshToken;
+        return refreshToken.getId();
     }
 
     private Instant calculateExpireAt() {
