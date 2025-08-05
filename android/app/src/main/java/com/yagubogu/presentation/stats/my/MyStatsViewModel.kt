@@ -21,6 +21,10 @@ class MyStatsViewModel(
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
     init {
+        fetchAll()
+    }
+
+    fun fetchAll() {
         fetchMyStats(MEMBER_ID, YEAR)
     }
 

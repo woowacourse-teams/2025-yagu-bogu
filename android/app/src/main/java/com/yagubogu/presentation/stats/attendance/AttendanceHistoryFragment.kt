@@ -36,6 +36,10 @@ class AttendanceHistoryFragment : Fragment() {
         setupSpinner()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
