@@ -28,8 +28,8 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
-        val authDefaultRepository = AuthDefaultRepository(googleCredentialManager)
-        LoginViewModelFactory(authDefaultRepository)
+        val authRepository = AuthDefaultRepository(googleCredentialManager)
+        LoginViewModelFactory(authRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.domain.model.LoginResult
+import com.yagubogu.domain.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val authDefaultRepository: AuthDefaultRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     // TODO: 예외 디버깅용 임시 LiveData
     private val _login = MutableLiveData<String>()
@@ -17,7 +17,7 @@ class LoginViewModel(
 
     fun signIn() {
         viewModelScope.launch {
-            val result: LoginResult = authDefaultRepository.signInWithGoogle()
+            val result: LoginResult = authRepository.signInWithGoogle()
             _login.value =
                 when (result) {
                     is LoginResult.Success -> result.message
