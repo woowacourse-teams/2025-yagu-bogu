@@ -1,6 +1,5 @@
 package com.yagubogu.presentation.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +22,7 @@ import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
@@ -58,7 +58,7 @@ class HomeViewModel(
                 handleCheckIn(currentCoordinate)
             },
             onFailure = { exception: Exception ->
-                Log.e(TAG, "위치 불러오기 실패", exception)
+                Timber.w(exception, "위치 불러오기 실패")
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
             },
         )
@@ -79,7 +79,7 @@ class HomeViewModel(
                                 ),
                         )
                 }.onFailure { exception: Throwable ->
-                    Log.e(TAG, "API 호출 실패", exception)
+                    Timber.w(exception, "API 호출 실패")
                 }
         }
     }
@@ -117,7 +117,7 @@ class HomeViewModel(
                     listOf(myTeamResult, attendanceCountResult, winRateResult)
                         .filter { it.isFailure }
                         .mapNotNull { it.exceptionOrNull()?.message }
-                Log.e(TAG, "API 호출 실패: ${errors.joinToString()}")
+                Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
         }
     }
@@ -129,7 +129,7 @@ class HomeViewModel(
                 .onSuccess { stadiums: Stadiums ->
                     checkInIfWithinThreshold(currentCoordinate, stadiums)
                 }.onFailure {
-                    Log.e(TAG, "API 호출 실패", stadiumsResult.exceptionOrNull())
+                    Timber.w(stadiumsResult.exceptionOrNull(), "API 호출 실패")
                 }
         }
     }
@@ -156,12 +156,11 @@ class HomeViewModel(
                     }
                 _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
             }.onFailure { exception: Throwable ->
-                Log.e(TAG, "API 호출 실패", exception)
+                Timber.w(exception, "API 호출 실패")
             }
     }
 
     companion object {
-        private const val TAG = "HomeViewModel"
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
