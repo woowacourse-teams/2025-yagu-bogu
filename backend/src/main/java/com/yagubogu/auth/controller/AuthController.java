@@ -32,7 +32,7 @@ public class AuthController {
     public ResponseEntity<CreateRefreshTokenResponse> refresh(
             @RequestBody final CreateRefreshTokenRequest request
     ) {
-        CreateRefreshTokenResponse response = authService.refresh(request.refreshToken());
+        CreateRefreshTokenResponse response = authService.refreshToken(request.refreshToken());
 
         return ResponseEntity.ok(response);
     }

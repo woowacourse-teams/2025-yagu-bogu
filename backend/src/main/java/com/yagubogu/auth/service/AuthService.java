@@ -61,7 +61,7 @@ public class AuthService {
     }
 
     @Transactional
-    public CreateRefreshTokenResponse refresh(final String refreshToken) {
+    public CreateRefreshTokenResponse refreshToken(final String refreshToken) {
         RefreshToken storedRefreshToken = getValidRefreshToken(refreshToken);
         storedRefreshToken.revoke();
 

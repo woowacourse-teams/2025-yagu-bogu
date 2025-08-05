@@ -81,7 +81,7 @@ class AuthServiceTest {
 
     @DisplayName("토큰을 갱신한다")
     @Test
-    void refresh() {
+    void refreshToken() {
         // given
         String refreshTokenId = "id";
         Member member = memberRepository.findById(1L).orElseThrow();
@@ -89,7 +89,7 @@ class AuthServiceTest {
         refreshTokenRepository.save(refreshToken);
 
         // when
-        CreateRefreshTokenResponse response = authService.refresh(refreshTokenId);
+        CreateRefreshTokenResponse response = authService.refreshToken(refreshTokenId);
 
         // then
         assertSoftly(softAssertions -> {
@@ -101,19 +101,19 @@ class AuthServiceTest {
 
     @DisplayName("예외: refresh token이 존재하지 않으면 예외가 발생한다")
     @Test
-    void refresh_tokenNotFound() {
+    void refresh_Token_tokenNotFound() {
         // given
         String nonExistToken = "non-exist-token";
 
         // when & then
-        assertThatThrownBy(() -> authService.refresh(nonExistToken))
+        assertThatThrownBy(() -> authService.refreshToken(nonExistToken))
                 .isInstanceOf(UnAuthorizedException.class)
                 .hasMessageContaining("Refresh token not exist");
     }
 
     @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
     @Test
-    void refresh_tokenInvalid() {
+    void refresh_Token_tokenInvalid() {
         // given
         String refreshTokenId = "expired-token";
         Instant expiresAt = Instant.now().minusSeconds(10);
@@ -122,7 +122,7 @@ class AuthServiceTest {
         refreshTokenRepository.save(expiredToken);
 
         // when & then
-        assertThatThrownBy(() -> authService.refresh(refreshTokenId))
+        assertThatThrownBy(() -> authService.refreshToken(refreshTokenId))
                 .isInstanceOf(UnAuthorizedException.class)
                 .hasMessageContaining("Refresh token is invalid or expired");
     }
