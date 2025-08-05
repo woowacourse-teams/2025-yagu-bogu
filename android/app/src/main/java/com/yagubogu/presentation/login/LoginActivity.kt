@@ -1,21 +1,25 @@
 package com.yagubogu.presentation.login
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.BuildConfig
+import com.yagubogu.R
 import com.yagubogu.data.auth.GoogleCredentialManager
 import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.databinding.ActivityLoginBinding
+import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
 
@@ -37,17 +41,12 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupView()
         setupBindings()
-        setupListeners()
         performInitialization()
     }
 
     private fun setupSplash() {
         val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isAppInitialized }
-
-        viewModel.login.observe(this) {
-            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-        }
     }
 
     private fun setupView() {
@@ -57,13 +56,6 @@ class LoginActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, 0, systemBars.right, 0)
             insets
-        }
-    }
-
-    private fun setupListeners() {
-        binding.constraintBtnGoogle.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
         }
     }
 
@@ -81,5 +73,28 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupBindings() {
         binding.viewModel = viewModel
+
+        viewModel.loginResult.observe(this) { loginResult ->
+            when (loginResult) {
+                is LoginResult.Success -> navigateToMain()
+                is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
+                else -> Unit
+            }
+        }
+    }
+
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun showSnackbar(
+        @StringRes message: Int,
+    ) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
+            setBackgroundTint(Color.DKGRAY)
+            setTextColor(context.getColor(R.color.white))
+            show()
+        }
     }
 }

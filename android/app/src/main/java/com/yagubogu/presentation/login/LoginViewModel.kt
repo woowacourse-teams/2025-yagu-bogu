@@ -11,19 +11,13 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
-    // TODO: 예외 디버깅용 임시 LiveData
-    private val _login = MutableLiveData<String>()
-    val login: LiveData<String> get() = _login
+    private val _loginResult = MutableLiveData<LoginResult>()
+    val loginResult: LiveData<LoginResult> get() = _loginResult
 
     fun signIn() {
         viewModelScope.launch {
             val result: LoginResult = authRepository.signInWithGoogle()
-            _login.value =
-                when (result) {
-                    is LoginResult.Success -> result.message
-                    LoginResult.Cancel -> "사용자가 취소했어요."
-                    is LoginResult.Failure -> result.exception?.message ?: "예외 발생"
-                }
+            _loginResult.value = result
         }
     }
 }
