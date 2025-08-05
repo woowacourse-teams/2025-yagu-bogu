@@ -21,11 +21,11 @@ class JwtProviderTest {
         JwtProperties jwtProperties = new JwtProperties();
         TokenProperties accessToken = new TokenProperties();
         accessToken.setSecretKey("access-secret-key");
-        accessToken.setExpireLength(90_000); // 15분
+        accessToken.setExpiresIn(90_000); // 15분
 
         TokenProperties refreshToken = new TokenProperties();
         refreshToken.setSecretKey("refresh-secret-key");
-        refreshToken.setExpireLength(1_209_600_000); // 14일
+        refreshToken.setExpiresIn(1_209_600_000); // 14일
 
         jwtProperties.setAccessToken(accessToken);
         jwtProperties.setRefreshToken(refreshToken);
@@ -68,11 +68,11 @@ class JwtProviderTest {
         JwtProperties jwtProperties = new JwtProperties();
         TokenProperties shortExpAccess = new TokenProperties();
         shortExpAccess.setSecretKey("access-secret-key");
-        shortExpAccess.setExpireLength(1);
+        shortExpAccess.setExpiresIn(1);
 
         TokenProperties shortExpRefresh = new TokenProperties();
         shortExpRefresh.setSecretKey("refresh-secret-key");
-        shortExpRefresh.setExpireLength(1000000);
+        shortExpRefresh.setExpiresIn(1000000);
 
         jwtProperties.setAccessToken(shortExpAccess);
         jwtProperties.setRefreshToken(shortExpRefresh);

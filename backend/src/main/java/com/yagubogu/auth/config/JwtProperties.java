@@ -16,6 +16,6 @@ public class JwtProperties {
     @Getter
     public static class TokenProperties {
         private String secretKey;
-        private long expireLength;
+        private long expiresIn;
     }
 }

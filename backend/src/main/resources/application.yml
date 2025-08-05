@@ -14,10 +14,10 @@ security:
   jwt:
     access-token:
       secret-key: ${JWT_ACCESS_TOKEN_SECRET_KEY}
-      expire-length: 900      # 15분 (초)
+      expires-in: 900      # 15분 (초)
     refresh-token:
       secret-key: ${JWT_REFRESH_TOKEN_SECRET_KEY}
-      expire-length: 1209600  # 14일 (초)
+      expires-in: 1209600  # 14일 (초)
 
 api:
   kbo:

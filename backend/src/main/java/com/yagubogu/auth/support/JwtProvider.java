@@ -73,7 +73,7 @@ public class JwtProvider {
             final TokenProperties tokenProperties
     ) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpireLength());
+        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpiresIn());
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecretKey());
 
         return JWT.create()

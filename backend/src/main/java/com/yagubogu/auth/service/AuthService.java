@@ -124,9 +124,9 @@ public class AuthService {
     }
 
     private Instant calculateExpireAt() {
-        long expireLength = jwtProperties.getRefreshToken().getExpireLength();
+        long expiresIn = jwtProperties.getRefreshToken().getExpiresIn();
 
-        return Instant.now().plus(expireLength, ChronoUnit.SECONDS);
+        return Instant.now().plus(expiresIn, ChronoUnit.SECONDS);
     }
 
     private RefreshToken getRefreshToken(final String refreshToken) {
