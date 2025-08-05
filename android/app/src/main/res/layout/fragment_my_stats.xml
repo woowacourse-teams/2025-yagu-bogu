@@ -13,6 +13,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="none"
         tools:context=".presentation.stats.my.MyStatsFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
