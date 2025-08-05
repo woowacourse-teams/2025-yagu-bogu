@@ -3,9 +3,9 @@ package com.yagubogu.auth.support;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.config.JwtProperties;
 import com.yagubogu.auth.config.JwtProperties.TokenProperties;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +89,7 @@ class JwtProviderTest {
         // then
         assertThatThrownBy(() -> expiredTokenProvider.validateAccessToken(expiredToken))
                 .isInstanceOf(UnAuthorizedException.class)
-                .hasMessageContaining("Expired token");
+                .hasMessage("Expired token");
     }
 
     @DisplayName("예외: 유효하지 않은 액세스 토큰이면 예외를 발생시킨다")
@@ -101,7 +101,7 @@ class JwtProviderTest {
         // when & then
         assertThatThrownBy(() -> jwtProvider.validateAccessToken(invalidToken))
                 .isInstanceOf(UnAuthorizedException.class)
-                .hasMessageContaining("Invalid token");
+                .hasMessage("Invalid token");
     }
 
     @DisplayName("액세스 토큰을 통해 memberId를 반환한다")

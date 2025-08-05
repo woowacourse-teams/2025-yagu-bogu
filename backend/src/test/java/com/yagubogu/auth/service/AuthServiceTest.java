@@ -108,7 +108,7 @@ class AuthServiceTest {
         // when & then
         assertThatThrownBy(() -> authService.refreshToken(nonExistToken))
                 .isInstanceOf(UnAuthorizedException.class)
-                .hasMessageContaining("Refresh token not exist");
+                .hasMessage("Refresh token not exist");
     }
 
     @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
@@ -124,6 +124,6 @@ class AuthServiceTest {
         // when & then
         assertThatThrownBy(() -> authService.refreshToken(refreshTokenId))
                 .isInstanceOf(UnAuthorizedException.class)
-                .hasMessageContaining("Refresh token is invalid or expired");
+                .hasMessage("Refresh token is invalid or expired");
     }
 }
