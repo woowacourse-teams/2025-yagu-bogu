@@ -67,6 +67,13 @@ class HomeFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchAll()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

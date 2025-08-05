@@ -28,6 +28,10 @@ class AttendanceHistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
