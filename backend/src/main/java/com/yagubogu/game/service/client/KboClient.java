@@ -64,7 +64,7 @@ public class KboClient {
                     .body(param)
                     .retrieve()
                     .body(String.class);
-            KboGameResultResponse response = parseResultResponseToKboResultResponse(responseBody);
+            KboGameResultResponse response = parseToKboResultResponse(responseBody);
             validateGameResultResponse(response);
 
             return response;
@@ -73,7 +73,7 @@ public class KboClient {
         }
     }
 
-    private KboGameResultResponse parseResultResponseToKboResultResponse(final String responseBody)
+    private KboGameResultResponse parseToKboResultResponse(final String responseBody)
             throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         JsonNode root = om.readTree(responseBody);
