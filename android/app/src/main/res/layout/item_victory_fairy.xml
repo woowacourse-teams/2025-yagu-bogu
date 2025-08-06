@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{@string/all_fan(victoryFairyItem.team.shortName)}"
+            android:text="@{@string/all_fan(victoryFairyItem.teamName)}"
             android:textColor="@color/gray400"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_nickname"
