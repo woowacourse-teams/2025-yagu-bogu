@@ -64,14 +64,15 @@ public class MemberServiceTest {
     void patchNickname() {
         // given
         long memberId = 1L;
-        String expected = "포라랑";
-        memberService.patchNickname(memberId, new MemberNicknameRequest("기존닉"));
+        String oldNickname = "기존닉";
+        memberService.patchNickname(memberId, new MemberNicknameRequest(oldNickname));
+        String newNickname = "변경닉";
 
         // when
-        MemberNicknameResponse actual = memberService.patchNickname(memberId, new MemberNicknameRequest("포라랑"));
+        MemberNicknameResponse actual = memberService.patchNickname(memberId, new MemberNicknameRequest(newNickname));
 
         // then
-        assertThat(actual.nickname()).isEqualTo(expected);
+        assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다.")
