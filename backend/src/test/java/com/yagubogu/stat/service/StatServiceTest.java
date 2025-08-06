@@ -1,5 +1,9 @@
 package com.yagubogu.stat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
@@ -17,10 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -208,10 +208,10 @@ class StatServiceTest {
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.averageRun()).isEqualTo(expected.averageRuns());
-            softAssertions.assertThat(actual.concededRuns()).isEqualTo(expected.averageAllowedRuns());
+            softAssertions.assertThat(actual.concededRuns()).isEqualTo(expected.averageConcededRuns());
             softAssertions.assertThat(actual.averageErrors()).isEqualTo(expected.averageErrors());
             softAssertions.assertThat(actual.averageHits()).isEqualTo(expected.averageHits());
-            softAssertions.assertThat(actual.concededHits()).isEqualTo(expected.averageAllowedHits());
+            softAssertions.assertThat(actual.concededHits()).isEqualTo(expected.averageConcededHits());
         });
     }
 

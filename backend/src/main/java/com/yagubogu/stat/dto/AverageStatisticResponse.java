@@ -14,10 +14,10 @@ public record AverageStatisticResponse(
     public static AverageStatisticResponse from(final AverageStatistic averageStatistic) {
         return new AverageStatisticResponse(
                 round(averageStatistic.averageRuns()),
-                round(averageStatistic.averageAllowedRuns()),
+                round(averageStatistic.averageConcededRuns()),
                 round(averageStatistic.averageErrors()),
                 round(averageStatistic.averageHits()),
-                round(averageStatistic.averageAllowedHits())
+                round(averageStatistic.averageConcededHits())
         );
     }
 

@@ -2,9 +2,9 @@ package com.yagubogu.stat.dto;
 
 public record AverageStatistic(
         Double averageRuns,
-        Double averageAllowedRuns,
+        Double averageConcededRuns,
         Double averageErrors,
         Double averageHits,
-        Double averageAllowedHits
+        Double averageConcededHits
 ) {
 }
