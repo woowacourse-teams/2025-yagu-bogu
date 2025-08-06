@@ -6,7 +6,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
@@ -56,7 +56,8 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider, List.of(googleAuthValidator),
+        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider,
+                List.of(googleAuthValidator),
                 refreshTokenRepository, authTokenProperties);
     }
 
@@ -89,7 +90,7 @@ class AuthServiceTest {
         refreshTokenRepository.save(refreshToken);
 
         // when
-        TokenResponse response = authService.refreshToken(refreshTokenId);
+        CreateTokenResponse response = authService.refreshToken(refreshTokenId);
 
         // then
         assertSoftly(softAssertions -> {
