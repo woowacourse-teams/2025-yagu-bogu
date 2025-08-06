@@ -94,7 +94,7 @@ public class GameSyncService {
     private void updateGameDetails(Game game, KboGameResponse response) {
         game.updateGameState(response.gameState());
 
-        if (response.gameState().isNotCompleted()) {
+        if (game.getGameState().isNotCompleted()) {
             // TODO: gameState가 LIVE 일 때 로깅
             return;
         }
