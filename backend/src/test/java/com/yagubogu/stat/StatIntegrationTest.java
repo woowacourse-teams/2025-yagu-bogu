@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestSupport;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -122,7 +123,31 @@ public class StatIntegrationTest {
         // then
         assertThat(actual).isEqualTo(expected);
     }
+
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
+    @Test
+    void findAverageStatistic() {
+        // given
+        AverageStatisticResponse expected = new AverageStatisticResponse(
+                9.0,
+                6.9,
+                0.3,
+                12.1,
+                9.4
+        );
+
+        // when
+        AverageStatisticResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/stats/me")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(AverageStatisticResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
 }
-
-
-

@@ -2,6 +2,7 @@ package com.yagubogu.stat.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -48,6 +49,14 @@ public class StatController {
     ) {
         LuckyStadiumResponse response = statService.findLuckyStadium(memberClaims.id(), year);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AverageStatisticResponse> findAverageStatistic(
+            final MemberClaims memberClaims
+    ) {
+        AverageStatisticResponse response = statService.findAverageStatistic(memberClaims.id());
         return ResponseEntity.ok(response);
     }
 }

@@ -86,7 +86,7 @@ public class CheckInIntegrationTest {
                 .as(CheckInCountsResponse.class);
 
         // then
-        assertThat(actual.checkInCounts()).isEqualTo(6);
+        assertThat(actual.checkInCounts()).isEqualTo(7);
     }
 
     @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
