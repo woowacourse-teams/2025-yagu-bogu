@@ -35,17 +35,17 @@ public class TalkController {
     ) {
         CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
                 limit, memberId);
-        
+
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{gameId}/polling")
-    public ResponseEntity<CursorResult<TalkResponse>> pollTalks(
+    @GetMapping("/{gameId}/latest")
+    public ResponseEntity<CursorResult<TalkResponse>> findNewTalks(
             @PathVariable final long gameId,
             @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        CursorResult<TalkResponse> response = talkService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> response = talkService.findNewTalks(gameId, cursorId, limit);
 
         return ResponseEntity.ok(response);
     }

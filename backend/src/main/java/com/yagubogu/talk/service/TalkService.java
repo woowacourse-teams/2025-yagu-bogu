@@ -49,7 +49,7 @@ public class TalkService {
         return new CursorResult<>(hiddenReportedTalks, nextCursorId, talkResponses.hasNext());
     }
 
-    public CursorResult<TalkResponse> pollTalks(
+    public CursorResult<TalkResponse> findNewTalks(
             final long gameId,
             final long cursorId,
             final int limit

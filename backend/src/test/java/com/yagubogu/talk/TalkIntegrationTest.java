@@ -92,7 +92,7 @@ public class TalkIntegrationTest {
 
     @DisplayName("새 톡을 가져온다")
     @Test
-    void pollTalks_existing() {
+    void findNewTalks_existing() {
         // given
         long gameId = 1L;
 
@@ -102,7 +102,7 @@ public class TalkIntegrationTest {
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling")
+                .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(5))
@@ -112,7 +112,7 @@ public class TalkIntegrationTest {
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
     @Test
-    void pollTalks_noExisting() {
+    void findNewTalks_noExisting() {
         // given
         long gameId = 1L;
 
@@ -122,7 +122,7 @@ public class TalkIntegrationTest {
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling")
+                .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(0))

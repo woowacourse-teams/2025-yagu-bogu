@@ -121,7 +121,7 @@ class TalkServiceTest {
 
     @DisplayName("새로운 메시지가 있을 때 polling으로 가져온다")
     @Test
-    void pollTalks_hasNewTalk() {
+    void findNewTalks_hasNewTalk() {
         // given
         long gameId = 1L;
         Long cursorId = 50L;
@@ -131,7 +131,7 @@ class TalkServiceTest {
         Long expectedNextCursorId = 52L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
 
         // then
         assertSoftly(softAssertions -> {
@@ -144,14 +144,14 @@ class TalkServiceTest {
 
     @DisplayName("새 메시지가 없을 때 nextCursorId는 바뀌지 않는다")
     @Test
-    void pollTalks_hasNoNewTalk() {
+    void findNewTalks_hasNoNewTalk() {
         // given
         long gameId = 1L;
         Long cursorId = 52L;
         int limit = 10;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
 
         // then
         assertSoftly(softAssertions -> {
