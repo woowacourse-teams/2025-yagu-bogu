@@ -5,10 +5,10 @@ import java.math.RoundingMode;
 
 public record AverageStatisticResponse(
         Double averageRun,
-        Double averageAllowedRuns,
+        Double concededRuns,
         Double averageErrors,
         Double averageHits,
-        Double averageAllowedHits
+        Double concededHits
 ) {
 
     public static AverageStatisticResponse from(final AverageStatistic averageStatistic) {

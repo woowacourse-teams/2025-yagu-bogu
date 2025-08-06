@@ -208,10 +208,10 @@ class StatServiceTest {
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.averageRun()).isEqualTo(expected.averageRuns());
-            softAssertions.assertThat(actual.averageAllowedRuns()).isEqualTo(expected.averageAllowedRuns());
+            softAssertions.assertThat(actual.concededRuns()).isEqualTo(expected.averageAllowedRuns());
             softAssertions.assertThat(actual.averageErrors()).isEqualTo(expected.averageErrors());
             softAssertions.assertThat(actual.averageHits()).isEqualTo(expected.averageHits());
-            softAssertions.assertThat(actual.averageAllowedHits()).isEqualTo(expected.averageAllowedHits());
+            softAssertions.assertThat(actual.concededHits()).isEqualTo(expected.averageAllowedHits());
         });
     }
 
@@ -228,10 +228,10 @@ class StatServiceTest {
         assertThat(actual)
                 .satisfies(response -> {
                     assertThat(response.averageRun()).isNull();
-                    assertThat(response.averageAllowedRuns()).isNull();
+                    assertThat(response.concededRuns()).isNull();
                     assertThat(response.averageErrors()).isNull();
                     assertThat(response.averageHits()).isNull();
-                    assertThat(response.averageAllowedHits()).isNull();
+                    assertThat(response.concededHits()).isNull();
                 });
     }
 }
