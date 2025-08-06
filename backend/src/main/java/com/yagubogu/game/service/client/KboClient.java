@@ -21,6 +21,8 @@ import org.springframework.web.client.RestClient;
 public class KboClient {
 
     public static final String SUCCESS_CODE = "100";
+    public static final String KBO_GAME_RESULT_URI = "/Schedule.asmx/GetScoreBoardScroll";
+    public static final String KBO_GAMES_URI = "/Main.asmx/GetKboGameList";
 
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
@@ -33,7 +35,7 @@ public class KboClient {
 
         try {
             String responseBody = kboRestClient.post()
-                    .uri("/Main.asmx/GetKboGameList")
+                    .uri(KBO_GAMES_URI)
                     .body(param)
                     .retrieve()
                     .body(String.class);
@@ -58,7 +60,7 @@ public class KboClient {
 
         try {
             String responseBody = kboRestClient.post()
-                    .uri("/Schedule.asmx/GetScoreBoardScroll")
+                    .uri(KBO_GAME_RESULT_URI)
                     .body(param)
                     .retrieve()
                     .body(String.class);
