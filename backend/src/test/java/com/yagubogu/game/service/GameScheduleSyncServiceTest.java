@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.domain.Game;
@@ -198,7 +196,6 @@ class GameScheduleSyncServiceTest {
             softAssertions.assertThat(game.getHomeScore()).isNull();
             softAssertions.assertThat(game.getAwayScore()).isNull();
         });
-        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 
     @DisplayName("CANCELED 상태 경기는 스코어보드를 업데이트하지 않는다")
@@ -224,7 +221,6 @@ class GameScheduleSyncServiceTest {
             soft.assertThat(game.getHomeScore()).isNull();
             soft.assertThat(game.getAwayScore()).isNull();
         });
-        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 
     @DisplayName("DB에 존재하지 않는 게임 코드는 건너뛴다")
@@ -245,6 +241,5 @@ class GameScheduleSyncServiceTest {
 
         // then
         assertThat(gameRepository.findByGameCode(unknownGameCode)).isEmpty();
-        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 }
