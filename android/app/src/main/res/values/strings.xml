@@ -3,6 +3,7 @@
 
     <string name="all_settings">설정</string>
     <string name="all_cancel">취소</string>
+    <string name="all_confirm">확인</string>
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
     <string name="all_fan">%s 팬</string>
@@ -65,4 +66,9 @@
 
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
+
+    <string name="login_failed_message">로그인에 실패했습니다.</string>
+
+    <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
+    <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
 </resources>

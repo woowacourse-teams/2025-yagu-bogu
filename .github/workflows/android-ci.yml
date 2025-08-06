@@ -30,9 +30,19 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./gradlew build
+
+    - name: Create google-services.json for debug
+      run: |
+        mkdir -p ./app/src/debug
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}' | base64 --decode > ./app/src/debug/google-services.json
+    
+    - name: Create google-services.json for release
+      run: |
+        mkdir -p ./app
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' | base64 --decode > ./app/google-services.json
+
+    - name: Clean build with Gradle
+      run: ./gradlew clean build
 
     - name: Run ktlint check
       run: ./gradlew ktlintCheck

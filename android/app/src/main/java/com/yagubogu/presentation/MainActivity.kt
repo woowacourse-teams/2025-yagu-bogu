@@ -1,7 +1,9 @@
 package com.yagubogu.presentation
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -26,9 +28,15 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setToolbarTitle(binding.bnvNavigation.selectedItemId)
     }
 
     private fun setupView() {
@@ -43,43 +51,66 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
-        binding.bnvNavigation.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.item_home ->
-                    replaceFragment(HomeFragment::class.java, R.string.app_name)
+        binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
+            when (val itemId: Int = item.itemId) {
+                R.id.item_home -> {
+                    switchFragment(HomeFragment::class.java, itemId)
+                    true
+                }
 
-                R.id.item_stats ->
-                    replaceFragment(StatsFragment::class.java, R.string.bottom_navigation_stats)
+                R.id.item_stats -> {
+                    switchFragment(StatsFragment::class.java, itemId)
+                    true
+                }
 
-                R.id.item_livetalk ->
-                    replaceFragment(LivetalkFragment::class.java, R.string.bottom_navigation_livetalk)
+                R.id.item_livetalk -> {
+                    switchFragment(LivetalkFragment::class.java, itemId)
+                    true
+                }
 
-                R.id.item_challenge ->
-                    replaceFragment(
-                        ChallengeFragment::class.java,
-                        R.string.bottom_navigation_challenge,
-                    )
+                R.id.item_challenge -> {
+                    switchFragment(ChallengeFragment::class.java, itemId)
+                    true
+                }
 
                 else -> false
             }
         }
     }
 
-    private fun replaceFragment(
-        fragment: Class<out Fragment>,
-        @StringRes titleResId: Int,
-    ): Boolean {
+    private fun switchFragment(
+        fragmentClass: Class<out Fragment>,
+        selectedItemId: Int,
+    ) {
+        val tag: String = fragmentClass.name
+        val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
+        if (targetFragment?.isVisible == true) return
+
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(binding.fcvFragment.id, fragment, null)
+            supportFragmentManager.fragments.forEach { if (it.isVisible) hide(it) }
+
+            if (targetFragment == null) {
+                add(binding.fcvFragment.id, fragmentClass, null, tag)
+            } else {
+                show(targetFragment)
+            }
         }
-        setToolbarTitle(titleResId)
-        return true
+        setToolbarTitle(selectedItemId)
     }
 
     private fun setToolbarTitle(
-        @StringRes titleResId: Int,
+        @IdRes selectedItemId: Int,
     ) {
+        @StringRes
+        val titleResId: Int =
+            when (selectedItemId) {
+                R.id.item_home -> R.string.app_name
+                R.id.item_stats -> R.string.bottom_navigation_stats
+                R.id.item_livetalk -> R.string.bottom_navigation_livetalk
+                R.id.item_challenge -> R.string.bottom_navigation_challenge
+                else -> R.string.app_name
+            }
         binding.tvToolbarTitle.text = getString(titleResId)
     }
 }
