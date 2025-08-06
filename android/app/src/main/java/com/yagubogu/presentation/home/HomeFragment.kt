@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
             val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-            viewModel.fetchStadiumStats(today)
+            viewModel.fetchStadiumStats(5009, today) // TODO: memberId, date 변경
             view
                 .animate()
                 .rotationBy(360f)
@@ -140,7 +140,7 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
-            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumOccupancyRates.first()
+            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumFanRates.first()
         }
     }
 

@@ -16,6 +16,6 @@ enum class Team(
     ;
 
     companion object {
-        fun getById(id: Long): Team = entries[id.toInt() - 1]
+        fun getByCode(code: String): Team = entries.find { it.name == code } ?: throw IllegalArgumentException()
     }
 }
