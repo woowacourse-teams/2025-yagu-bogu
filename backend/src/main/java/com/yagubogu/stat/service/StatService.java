@@ -25,7 +25,7 @@ public class StatService {
     private final StadiumRepository stadiumRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
@@ -37,7 +37,7 @@ public class StatService {
     }
 
     public WinRateResponse findWinRate(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
@@ -49,7 +49,7 @@ public class StatService {
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         List<Stadium> stadiums = stadiumRepository.findAll();
@@ -82,11 +82,6 @@ public class StatService {
         }
         double rate = (double) winCounts / favoriteCheckInCounts * 100;
         return Math.round(rate * 10) / 10.0;
-    }
-
-    private Member getById(final long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 
     private Member getMember(final long memberId) {
