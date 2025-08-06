@@ -85,11 +85,10 @@ class GoogleCredentialManager(
     /**
      * Credential 상태 초기화 (로그아웃)
      */
-    suspend fun signOut(): Result<Boolean> {
+    suspend fun signOut(): Result<Unit> {
         val clearCredentialStateRequest = ClearCredentialStateRequest()
         return runCatching {
             credentialManager.clearCredentialState(clearCredentialStateRequest)
-            true
         }
     }
 

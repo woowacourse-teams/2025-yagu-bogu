@@ -20,5 +20,5 @@ class AuthDefaultRepository(
         }
     }
 
-    override suspend fun signOutWithGoogle(): Result<Boolean> = googleCredentialManager.signOut()
+    override suspend fun signOutWithGoogle(): Result<Unit> = googleCredentialManager.signOut()
 }
