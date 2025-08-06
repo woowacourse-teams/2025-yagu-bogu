@@ -1,7 +1,7 @@
 package com.yagubogu.game.schedule;
 
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.service.GameSyncService;
-import com.yagubogu.global.exception.ClientException;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +21,7 @@ public class GameScheduler {
         try {
             gameSyncService.syncGameSchedule(today);
             gameSyncService.syncGameResult(yesterday);
-        } catch (ClientException e) {
+        } catch (GameSyncException e) {
             // TODO: 예외 로깅
         }
     }

@@ -6,9 +6,9 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameListResponse;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
-import com.yagubogu.global.exception.ClientException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -109,11 +109,11 @@ public class GameSyncService {
 
     private Stadium getStadiumByName(final String stadiumName) {
         return stadiumRepository.findByShortName(STADIUM_NAME_MAP.get(stadiumName))
-                .orElseThrow(() -> new ClientException("Stadium name match failed: " + stadiumName));
+                .orElseThrow(() -> new GameSyncException("Stadium name match failed: " + stadiumName));
     }
 
     private Team getTeamByShortName(final String teamShortName) {
         return teamRepository.findByShortName(teamShortName)
-                .orElseThrow(() -> new ClientException("Team code match failed: " + teamShortName));
+                .orElseThrow(() -> new GameSyncException("Team code match failed: " + teamShortName));
     }
 }

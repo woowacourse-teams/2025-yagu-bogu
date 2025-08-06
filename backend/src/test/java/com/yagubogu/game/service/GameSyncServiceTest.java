@@ -15,9 +15,9 @@ import com.yagubogu.game.dto.KboGameListResponse;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
-import com.yagubogu.global.exception.ClientException;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
@@ -95,7 +95,7 @@ class GameSyncServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
-                .isInstanceOf(ClientException.class)
+                .isInstanceOf(GameSyncException.class)
                 .hasMessage("Stadium name match failed: 존재하지않는경기장");
     }
 
@@ -113,7 +113,7 @@ class GameSyncServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
-                .isInstanceOf(ClientException.class)
+                .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
 
@@ -131,7 +131,7 @@ class GameSyncServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
-                .isInstanceOf(ClientException.class)
+                .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
 

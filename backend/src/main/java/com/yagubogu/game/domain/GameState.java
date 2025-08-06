@@ -1,6 +1,6 @@
 package com.yagubogu.game.domain;
 
-import com.yagubogu.global.exception.ClientException;
+import com.yagubogu.game.exception.GameSyncException;
 import java.util.Arrays;
 
 public enum GameState {
@@ -21,7 +21,7 @@ public enum GameState {
         return Arrays.stream(values())
                 .filter(status -> status.stateNumber.equals(gameState))
                 .findFirst()
-                .orElseThrow(() -> new ClientException("Unknown game status: " + gameState));
+                .orElseThrow(() -> new GameSyncException("Unknown game status: " + gameState));
     }
 
     public boolean isCompleted() {

@@ -7,7 +7,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.KboGameListResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
-import com.yagubogu.global.exception.ClientException;
+import com.yagubogu.game.exception.GameSyncException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class KboClient {
 
             return kboGameListResponse;
         } catch (Exception e) {
-            throw new ClientException("Failed to fetch game data from Kbo api", e);
+            throw new GameSyncException("Failed to fetch game data from Kbo api", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class KboClient {
 
             return response;
         } catch (Exception e) {
-            throw new ClientException("Failed to fetch game data from Kbo api", e);
+            throw new GameSyncException("Failed to fetch game data from Kbo api", e);
         }
     }
 
@@ -113,13 +113,13 @@ public class KboClient {
 
     private void validateGameScheduleResponse(final KboGameListResponse response) {
         if (isResponseErrorCode(response.statusCode())) {
-            throw new ClientException("Unexpected response code from Kbo api: " + response.msg());
+            throw new GameSyncException("Unexpected response code from Kbo api: " + response.msg());
         }
     }
 
     private void validateGameResultResponse(final KboGameResultResponse response) {
         if (isResponseErrorCode(response.statusCode())) {
-            throw new ClientException("Unexpected response code from Kbo api: " + response.msg());
+            throw new GameSyncException("Unexpected response code from Kbo api: " + response.msg());
         }
     }
 
