@@ -4,10 +4,11 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.TokenRequest;
-import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
+import com.yagubogu.auth.dto.LogoutRequest;
+import com.yagubogu.auth.dto.TokenRequest;
+import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.fixture.TestSupport;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
@@ -137,6 +139,65 @@ public class AuthIntegrationTest {
                 .contentType(ContentType.JSON)
                 .body(new TokenRequest(expiredToken))
                 .when().post("/api/auth/refresh")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("로그아웃한다")
+    @Test
+    void logout() {
+        // given
+        String idToken = "id_token";
+        LoginResponse loginResponse = TestSupport.loginResponse(idToken);
+        String accessToken = "Bearer " + loginResponse.accessToken();
+        String refreshTokenId = loginResponse.refreshToken();
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new LogoutRequest(refreshTokenId))
+                .when().post("/api/auth/logout")
+                .then().log().all()
+                .statusCode(204);
+    }
+
+    @DisplayName("예외: refresh token이 존재하지 않으면 예외가 발생한다")
+    @Test
+    void logout_tokenNotFound() {
+        // given
+        String nonExistTokenId = "non-exist-token";
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LogoutRequest(nonExistTokenId))
+                .when().post("/api/auth/logout")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @Test
+    void logout_tokenInvalid() {
+        // given
+        String expiredTokenId = "expired-token";
+        Team team = teamRepository.save(TestFixture.getTeam());
+        Member member = memberRepository.save(TestFixture.getUser(team));
+
+        RefreshToken refreshToken = new RefreshToken(
+                expiredTokenId,
+                member,
+                Instant.now().minusSeconds(1)
+        );
+        refreshToken.revoke();
+        refreshTokenRepository.save(refreshToken);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LogoutRequest(expiredTokenId))
+                .when().post("/api/auth/logout")
                 .then().log().all()
                 .statusCode(401);
     }
