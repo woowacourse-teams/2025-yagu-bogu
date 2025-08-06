@@ -8,6 +8,7 @@ import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
@@ -190,4 +191,48 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE c.game = :game
             """)
     FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
+
+    @Query("""
+            SELECT new com.yagubogu.stat.dto.AverageStatisticResponse(
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.runs
+                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.runs
+                        ELSE 0.0
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = :team THEN g.awayScoreBoard.runs
+                        WHEN g.awayTeam = :team THEN g.homeScoreBoard.runs
+                        ELSE 0.0
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.errors
+                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.errors
+                        ELSE 0.0
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.hits
+                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.hits
+                        ELSE 0.0
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = :team THEN g.awayScoreBoard.hits
+                        WHEN g.awayTeam = :team THEN g.homeScoreBoard.hits
+                        ELSE 0.0
+                    END
+                )
+            )
+            FROM CheckIn ci
+            JOIN ci.game g
+            WHERE ci.member = :member AND ci.team = :team
+            """)
+    AverageStatisticResponse findAverageStatistic(Member member, Team team);
 }

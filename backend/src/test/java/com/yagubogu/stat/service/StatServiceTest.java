@@ -1,23 +1,25 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -184,5 +186,31 @@ class StatServiceTest {
 
         // then
         assertThat(luckyStadium.shortName()).isNull();
+    }
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
+    @Test
+    void findAverageStatistic() {
+        // given
+        long memberId = 1L;
+        AverageStatisticResponse expected = new AverageStatisticResponse(
+                9.0,
+                6.3,
+                0.3,
+                12.3,
+                9.0
+        );
+
+        // when
+        AverageStatisticResponse actual = statService.findAverageStatistic(memberId);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.averageRuns()).isEqualTo(expected.averageRuns());
+            softAssertions.assertThat(actual.averageAllowedRuns()).isEqualTo(expected.averageAllowedRuns());
+            softAssertions.assertThat(actual.averageErrors()).isEqualTo(expected.averageErrors());
+            softAssertions.assertThat(actual.averageHits()).isEqualTo(expected.averageHits());
+            softAssertions.assertThat(actual.averageAllowedHits()).isEqualTo(expected.averageAllowedHits());
+        });
     }
 }

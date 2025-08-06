@@ -7,9 +7,11 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.team.domain.Team;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,15 @@ public class StatService {
         return LuckyStadiumResponse.from(luckyStadium);
     }
 
+    public AverageStatisticResponse findAverageStatistic(final long memberId) {
+        Member member = getMember(memberId);
+        Team team = member.getTeam();
+
+        AverageStatisticResponse response = checkInRepository.findAverageStatistic(member, team);
+
+        return AverageStatisticResponse.of(response);
+    }
+
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
         if (favoriteCheckInCounts == 0) {
             return 0;
@@ -76,6 +87,11 @@ public class StatService {
     }
 
     private Member getById(final long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
+    private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }

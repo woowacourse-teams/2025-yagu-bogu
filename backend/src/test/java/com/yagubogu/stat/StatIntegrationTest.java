@@ -1,5 +1,6 @@
 package com.yagubogu.stat;
 
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -47,7 +48,7 @@ public class StatIntegrationTest {
                 .statusCode(200)
                 .extract()
                 .as(StatCountsResponse.class);
-        
+
         // then
         assertThat(actual).isEqualTo(expected);
     }
@@ -102,7 +103,45 @@ public class StatIntegrationTest {
         // then
         assertThat(actual).isEqualTo(expected);
     }
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
+    @Test
+    void findAverageStatistic() {
+        // given
+        AverageStatisticResponse expected = new AverageStatisticResponse(
+                9.0,
+                6.3,
+                0.3,
+                12.3,
+                9.0
+        );
+
+        // when
+        AverageStatisticResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", 1L)
+                .when().get("/api/stats/teams/fan")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(AverageStatisticResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("예외: 멤버ID에 해당하는 회원을 찾지 못하면 예외가 발생한다")
+    @Test
+    void findAverageStatistic_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParams("memberId", invalidMemberId)
+                .when().get("/api/stats/teams/fan")
+                .then().log().all()
+                .statusCode(404);
+    }
 }
-
-
-
