@@ -7,6 +7,7 @@ import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
@@ -177,4 +178,44 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE c.game = :game
             """)
     FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
+
+    @Query("""
+            SELECT new com.yagubogu.stat.dto.AverageStatistic(
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.runs
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.runs
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.errors
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.errors
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.hits
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.hits
+                    END
+                )
+            )
+            FROM CheckIn ci
+            JOIN ci.game g
+            WHERE ci.member = :member
+                AND (g.homeTeam = ci.team OR g.awayTeam = ci.team)
+            """)
+    AverageStatistic findAverageStatistic(Member member);
 }

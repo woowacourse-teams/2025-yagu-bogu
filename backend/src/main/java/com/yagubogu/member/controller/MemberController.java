@@ -1,5 +1,6 @@
 package com.yagubogu.member.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/members")
 @RestController
 public class MemberController {
@@ -30,11 +32,11 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{memberId}/favorites")
+    @GetMapping("/favorites")
     public ResponseEntity<MemberFavoriteResponse> findFavorites(
-            @PathVariable final long memberId
+            final MemberClaims memberClaims
     ) {
-        MemberFavoriteResponse response = memberService.findFavorite(memberId);
+        MemberFavoriteResponse response = memberService.findFavorite(memberClaims.id());
 
         return ResponseEntity.ok(response);
     }

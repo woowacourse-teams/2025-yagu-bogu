@@ -1,5 +1,7 @@
 package com.yagubogu.talk.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/talks")
 @RestController
 public class TalkController {
@@ -31,10 +34,10 @@ public class TalkController {
             @PathVariable final long gameId,
             @RequestParam(value = "before", required = false) final Long cursorId,
             @RequestParam("limit") final int limit,
-            @RequestParam("memberId") final long memberId // TODO: 나중에 제거
+            final MemberClaims memberClaims
     ) {
         CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
-                limit, memberId);
+                limit, memberClaims.id());
 
         return ResponseEntity.ok(response);
     }
@@ -54,9 +57,9 @@ public class TalkController {
     public ResponseEntity<TalkResponse> createTalk(
             @PathVariable final long gameId,
             @Valid @RequestBody final TalkRequest request,
-            @RequestParam("memberId") final long memberId // TODO: 아이디 삭제
+            final MemberClaims memberClaims
     ) {
-        TalkResponse response = talkService.createTalk(gameId, request, memberId);
+        TalkResponse response = talkService.createTalk(gameId, request, memberClaims.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -64,9 +67,9 @@ public class TalkController {
     @PostMapping("/{talkId}/reports")
     public ResponseEntity<Void> reportTalk(
             @PathVariable final long talkId,
-            @RequestParam("reporterId") final long reporterId // TODO: 나중에 삭제
+            final MemberClaims memberClaims
     ) {
-        talkReportService.reportTalk(talkId, reporterId);
+        talkReportService.reportTalk(talkId, memberClaims.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -75,9 +78,9 @@ public class TalkController {
     public ResponseEntity<Void> removeTalk(
             @PathVariable final long gameId,
             @PathVariable final long talkId,
-            @RequestParam("memberId") final long memberId // TODO: 나중에 삭제
+            final MemberClaims memberClaims
     ) {
-        talkService.removeTalk(gameId, talkId, memberId);
+        talkService.removeTalk(gameId, talkId, memberClaims.id());
 
         return ResponseEntity.noContent().build();
     }

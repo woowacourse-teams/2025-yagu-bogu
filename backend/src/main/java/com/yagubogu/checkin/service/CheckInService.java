@@ -6,12 +6,12 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateGameEntry;
 import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -22,8 +22,8 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +42,12 @@ public class CheckInService {
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
 
-    public void createCheckIn(final CreateCheckInRequest request) {
+    public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
         long stadiumId = request.stadiumId();
         Stadium stadium = getStadiumById(stadiumId);
         LocalDate date = request.date();
         Game game = getGame(stadium, date);
 
-        long memberId = request.memberId();
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
@@ -145,7 +144,7 @@ public class CheckInService {
                 .findFirst()
                 .orElse(null);
     }
-  
+
     public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
         boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
