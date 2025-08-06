@@ -18,6 +18,6 @@ data class TeamFanRateDto(
         TeamFanRate(
             team = Team.getByCode(code),
             teamName = name,
-            occupancyRate = fanRate,
+            fanRate = fanRate,
         )
 }

@@ -4,8 +4,8 @@ data class StadiumFanRate(
     val awayTeamFanRate: TeamFanRate,
     val homeTeamFanRate: TeamFanRate,
 ) {
-    val awayTeamBias: Double = remapRange(awayTeamFanRate.occupancyRate)
-    val homeTeamBias: Double = remapRange(homeTeamFanRate.occupancyRate)
+    val awayTeamBias: Double = remapRange(awayTeamFanRate.fanRate)
+    val homeTeamBias: Double = remapRange(homeTeamFanRate.fanRate)
 
     private fun remapRange(value: Double): Double {
         val scalingFactor: Double = (FULL_PERCENTAGE - CHART_END_PADDING_SIZE * 2) / FULL_PERCENTAGE

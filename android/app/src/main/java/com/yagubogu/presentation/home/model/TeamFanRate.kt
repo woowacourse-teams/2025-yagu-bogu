@@ -7,7 +7,7 @@ import com.yagubogu.presentation.util.getTeamColor
 data class TeamFanRate(
     val team: Team,
     val teamName: String,
-    val occupancyRate: Double,
+    val fanRate: Double,
 ) {
     @ColorRes
     val teamColor: Int = team.getTeamColor()

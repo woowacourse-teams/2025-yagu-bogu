@@ -46,7 +46,7 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
-    private var isTeamOccupancyChartExpanded: Boolean = false
+    private var isStadiumStatsChartExpanded: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,8 +99,8 @@ class HomeFragment : Fragment() {
         }
 
         binding.constraintShowMore.setOnClickListener {
-            isTeamOccupancyChartExpanded = !isTeamOccupancyChartExpanded
-            when (isTeamOccupancyChartExpanded) {
+            isStadiumStatsChartExpanded = !isStadiumStatsChartExpanded
+            when (isStadiumStatsChartExpanded) {
                 true -> {
                     binding.tvShowMore.text = getString(R.string.home_show_less)
                     binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
@@ -140,7 +140,7 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
-            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumFanRates.first()
+            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
         }
     }
 
