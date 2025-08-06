@@ -50,8 +50,8 @@ public class GameIntegrationTest {
                         new TeamByGame(1L, "기아", "HT"),
                         new TeamByGame(2L, "롯데", "LT")),
                 new GameWithCheckIn(
-                        2L,
-                        false,
+                        4L,
+                        true,
                         new StadiumByGame(2L, "고척 스카이돔"),
                         new TeamByGame(3L, "삼성", "SS"),
                         new TeamByGame(4L, "두산", "OB")),

@@ -46,7 +46,7 @@ class GameServiceTest {
         // given
         LocalDate date = TestFixture.getToday();
         long memberId = 1L;
-        List<GameWithCheckIn> gameWithCheckIns = List.of(
+        List<GameWithCheckIn> expected = List.of(
                 new GameWithCheckIn(
                         3L,
                         true,
@@ -54,8 +54,8 @@ class GameServiceTest {
                         new TeamByGame(1L, "기아", "HT"),
                         new TeamByGame(2L, "롯데", "LT")),
                 new GameWithCheckIn(
-                        2L,
-                        false,
+                        4L,
+                        true,
                         new StadiumByGame(2L, "고척 스카이돔"),
                         new TeamByGame(3L, "삼성", "SS"),
                         new TeamByGame(4L, "두산", "OB")),
@@ -71,7 +71,7 @@ class GameServiceTest {
         GameResponse actual = gameService.findGamesByDate(date, memberId);
 
         // then
-        assertThat(actual.games()).containsExactlyInAnyOrderElementsOf(gameWithCheckIns);
+        assertThat(actual.games()).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @DisplayName("예외: 미래 날짜를 조회하려고 하면 예외가 발생한다")
