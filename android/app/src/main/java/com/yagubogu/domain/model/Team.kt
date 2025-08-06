@@ -1,19 +1,18 @@
 package com.yagubogu.domain.model
 
 enum class Team(
-    val shortName: String,
-    val nickName: String,
+    val nickname: String,
 ) {
-    KIA("KIA", "타이거즈"),
-    LG("LG", "트윈스"),
-    KIWOOM("키움", "히어로즈"),
-    KT("KT", "위즈"),
-    SAMSUNG("삼성", "라이온즈"),
-    LOTTE("롯데", "자이언츠"),
-    SSG("SSG", "랜더스"),
-    NC("NC", "다이노스"),
-    HANWHA("한화", "이글스"),
-    DOOSAN("두산", "베어스"),
+    HT("타이거즈"),
+    LG("트윈스"),
+    WO("히어로즈"),
+    KT("위즈"),
+    SS("라이온즈"),
+    LT("자이언츠"),
+    SK("랜더스"),
+    NC("다이노스"),
+    HH("이글스"),
+    OB("베어스"),
     ;
 
     companion object {

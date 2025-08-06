@@ -17,6 +17,7 @@ data class TeamOccupancyRateDto(
     fun toPresentation(): TeamOccupancyRate =
         TeamOccupancyRate(
             team = Team.getById(id),
+            teamName = name,
             occupancyRate = occupancyRate,
         )
 }
