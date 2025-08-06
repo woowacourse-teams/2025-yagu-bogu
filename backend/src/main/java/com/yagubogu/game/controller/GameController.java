@@ -1,5 +1,7 @@
 package com.yagubogu.game.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
@@ -17,12 +19,13 @@ public class GameController {
 
     private final GameService gameService;
 
+    @RequireRole
     @GetMapping
     public ResponseEntity<GameResponse> findGamesByDate(
             @RequestParam final LocalDate date,
-            @RequestParam final long memberId
+            final MemberClaims memberClaims
     ) {
-        GameResponse gameResponse = gameService.findGamesByDate(date, memberId);
+        GameResponse gameResponse = gameService.findGamesByDate(date, memberClaims.id());
 
         return ResponseEntity.ok(gameResponse);
     }

@@ -1,6 +1,9 @@
 package com.yagubogu.game;
 
+import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestFixture;
+import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.dto.StadiumByGame;
@@ -12,15 +15,19 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
@@ -28,19 +35,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class GameIntegrationTest {
 
+    private static final String ID_TOKEN = "ID_TOKEN";
+
     @LocalServerPort
     private int port;
+
+    @Autowired
+    private AuthTokenProvider authTokenProvider;
+
+    private String accessToken;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        accessToken = TestSupport.getAccessToken(ID_TOKEN);
     }
 
     @DisplayName("경기하고 있는 모든 구장, 팀을 조회한다")
     @Test
     void findGamesByDate() {
         // given
-        long memberId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
         LocalDate date = TestFixture.getToday();
         List<GameWithCheckIn> expected = List.of(
                 new GameWithCheckIn(
@@ -66,8 +81,8 @@ public class GameIntegrationTest {
         // when
         GameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .queryParam("memberId", memberId)
                 .when().get("/api/games")
                 .then().log().all()
                 .statusCode(200)
@@ -82,33 +97,16 @@ public class GameIntegrationTest {
     @Test
     void findGamesByDate_WhenDateIsInFuture() {
         // given
-        long memberId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
         LocalDate invalidDate = LocalDate.of(3000, 12, 12);
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", invalidDate.toString())
-                .queryParam("memberId", memberId)
                 .when().get("/api/games")
                 .then().log().all()
                 .statusCode(422);
-    }
-
-    @DisplayName("예외: 해당하는 회원을 찾지 못하면 404 상태 코드를 반환한다")
-    @Test
-    void findGamesByDate_notFoundMember() {
-        // given
-        long invalidMemberId = 999L;
-        LocalDate date = TestFixture.getToday();
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .queryParam("date", date.toString())
-                .queryParam("memberId", invalidMemberId)
-                .when().get("/api/games")
-                .then().log().all()
-                .statusCode(404);
     }
 }
