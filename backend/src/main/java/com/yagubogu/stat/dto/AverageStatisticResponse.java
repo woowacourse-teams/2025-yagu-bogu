@@ -4,24 +4,28 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public record AverageStatisticResponse(
-        double averageRuns,
-        double averageAllowedRuns,
-        double averageErrors,
-        double averageHits,
-        double averageAllowedHits
+        Double averageRun,
+        Double averageAllowedRuns,
+        Double averageErrors,
+        Double averageHits,
+        Double averageAllowedHits
 ) {
 
-    public static AverageStatisticResponse of(final AverageStatisticResponse response) {
+    public static AverageStatisticResponse from(final AverageStatistic averageStatistic) {
         return new AverageStatisticResponse(
-                round(response.averageRuns),
-                round(response.averageAllowedRuns),
-                round(response.averageErrors),
-                round(response.averageHits),
-                round(response.averageAllowedHits)
+                round(averageStatistic.averageRuns()),
+                round(averageStatistic.averageAllowedRuns()),
+                round(averageStatistic.averageErrors()),
+                round(averageStatistic.averageHits()),
+                round(averageStatistic.averageAllowedHits())
         );
     }
 
-    private static double round(final double value) {
+    private static Double round(final Double value) {
+        if (value == null) {
+            return null;
+        }
+
         return BigDecimal.valueOf(value)
                 .setScale(1, RoundingMode.HALF_UP)
                 .doubleValue();

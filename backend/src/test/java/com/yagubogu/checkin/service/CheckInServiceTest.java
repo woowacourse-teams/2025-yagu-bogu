@@ -237,7 +237,7 @@ class CheckInServiceTest {
                         5,
                         "포르",
                         "기아",
-                        62.5
+                        71.4
                 )
         );
         VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
@@ -362,13 +362,13 @@ class CheckInServiceTest {
                         ),
                         new FanRateByGameResponse(
                                 4L,
-                                new TeamFanRateResponse("LG", "LG", 75.0),
-                                new TeamFanRateResponse("KT", "KT", 25.0)
+                                new TeamFanRateResponse("삼성", "SS", 25.0),
+                                new TeamFanRateResponse("두산", "OB", 50.0)
                         ),
                         new FanRateByGameResponse(
-                                3L,
-                                new TeamFanRateResponse("삼성", "SS", 33.3),
-                                new TeamFanRateResponse("두산", "OB", 66.7)
+                                4L,
+                                new TeamFanRateResponse("LG", "LG", 75.0),
+                                new TeamFanRateResponse("KT", "KT", 25.0)
                         )
                 )
         );

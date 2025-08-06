@@ -7,6 +7,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
@@ -70,10 +71,9 @@ public class StatService {
 
     public AverageStatisticResponse findAverageStatistic(final long memberId) {
         Member member = getMember(memberId);
+        AverageStatistic averageStatistic = checkInRepository.findAverageStatistic(member);
 
-        AverageStatisticResponse response = checkInRepository.findAverageStatistic(member);
-
-        return AverageStatisticResponse.of(response);
+        return AverageStatisticResponse.from(averageStatistic);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
