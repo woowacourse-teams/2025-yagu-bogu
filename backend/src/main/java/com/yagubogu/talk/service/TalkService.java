@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TalkService {
 
+    private static final Integer REPORTER_THRESHOLD_FOR_BLOCK = 10;
+
     private final TalkRepository talkRepository;
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
@@ -69,7 +71,7 @@ public class TalkService {
         Member member = getMember(memberId);
         LocalDateTime now = LocalDateTime.now();
 
-        validateBlockedFromStadium(gameId, memberId);
+        validateBlockedFromGame(gameId, memberId);
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
 
@@ -156,10 +158,10 @@ public class TalkService {
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
     }
 
-    private void validateBlockedFromStadium(final long gameId, final long memberId) {
+    private void validateBlockedFromGame(final long gameId, final long memberId) {
         long distinctReporterCount = talkReportRepository.countDistinctReporterByGameIdAndMemberId(gameId,
                 memberId);
-        if (distinctReporterCount >= 10) {
+        if (distinctReporterCount >= REPORTER_THRESHOLD_FOR_BLOCK) {
             throw new ForbiddenException("Access to this talk room is denied");
         }
     }

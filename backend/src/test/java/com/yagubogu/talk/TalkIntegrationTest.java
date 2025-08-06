@@ -159,12 +159,14 @@ public class TalkIntegrationTest {
         long blockedMemberId = 2L;
         String content = "오늘 야구보구 인증하구";
 
-        // when
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new TalkRequest(content))
+                .queryParam("memberId", blockedMemberId)
+                .pathParam("gameId", gameId)
                 .when()
-                .post("/api/talks/{gameId}?memberId={memberId}", gameId, blockedMemberId)
+                .post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(403);
     }
