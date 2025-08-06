@@ -79,6 +79,10 @@ public class Member {
         return role.equals(Role.ADMIN);
     }
 
+    public void updateFavorite(final Team team) {
+        this.team = team;
+    }
+
     public void updateNickname(final String nickname) {
         this.nickname = nickname;
     }

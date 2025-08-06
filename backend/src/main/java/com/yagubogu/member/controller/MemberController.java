@@ -2,6 +2,7 @@ package com.yagubogu.member.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
@@ -56,6 +57,16 @@ public class MemberController {
             final MemberClaims memberClaims
     ) {
         MemberFavoriteResponse response = memberService.findFavorite(memberClaims.id());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/favorites")
+    public ResponseEntity<MemberFavoriteResponse> patchFavorites(
+            final MemberClaims memberClaims,
+            @RequestBody final MemberFavoriteRequest memberFavoriteRequest
+    ) {
+        MemberFavoriteResponse response = memberService.updateFavorite(memberClaims.id(), memberFavoriteRequest);
 
         return ResponseEntity.ok(response);
     }

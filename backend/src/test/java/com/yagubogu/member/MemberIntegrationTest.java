@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestSupport;
+import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
@@ -121,5 +122,28 @@ public class MemberIntegrationTest {
                 .when().delete("/api/members/me")
                 .then().log().all()
                 .statusCode(204);
+    }
+
+    @DisplayName("팀을 갱신한다")
+    @Test
+    void updateTeam() {
+        // given
+        String accessToken = TestSupport.getAccessToken("id_token");
+        MemberFavoriteRequest request = new MemberFavoriteRequest("SS");
+
+        String expected = "삼성";
+
+        // when & then
+        MemberFavoriteResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(request)
+                .when().patch("/api/members/favorites")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(MemberFavoriteResponse.class);
+
+        assertThat(actual.favorite()).isEqualTo(expected);
     }
 }
