@@ -16,14 +16,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final AuthorizationExtractor authorizationExtractor;
-    private final AuthTokenProvider jwtProvider;
+    private final AuthTokenProvider authTokenProvider;
 
     public AuthInterceptor(
             final AuthorizationExtractor authorizationExtractor,
-            final AuthTokenProvider jwtProvider
+            final AuthTokenProvider authTokenProvider
     ) {
         this.authorizationExtractor = authorizationExtractor;
-        this.jwtProvider = jwtProvider;
+        this.authTokenProvider = authTokenProvider;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         String token = authorizationExtractor.extract(request)
                 .orElseThrow(() -> new UnAuthorizedException("Token not exists"));
 
-        Role actualRole = jwtProvider.getRoleByAccessToken(token);
+        Role actualRole = authTokenProvider.getRoleByAccessToken(token);
         if (!actualRole.hasPermission(role)) {
             throw new ForbiddenException("Forbidden request");
         }
