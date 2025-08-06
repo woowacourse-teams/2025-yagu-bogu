@@ -74,11 +74,11 @@ class LoginActivity : AppCompatActivity() {
     private fun setupBindings() {
         binding.viewModel = viewModel
 
-        viewModel.loginResult.observe(this) { loginResult ->
-            when (loginResult) {
+        viewModel.loginResult.observe(this) { value: LoginResult ->
+            when (value) {
                 is LoginResult.Success -> navigateToMain()
                 is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
-                else -> Unit
+                LoginResult.Cancel -> Unit
             }
         }
     }
