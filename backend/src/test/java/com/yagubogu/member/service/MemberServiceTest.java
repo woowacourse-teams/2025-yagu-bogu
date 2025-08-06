@@ -79,7 +79,7 @@ public class MemberServiceTest {
     @Test
     void patchTeam() {
         // given
-        Long memberId = 11L;
+        Long memberId = 12L;
         String teamCode = "SS";
         MemberFavoriteRequest request = new MemberFavoriteRequest(teamCode);
 
