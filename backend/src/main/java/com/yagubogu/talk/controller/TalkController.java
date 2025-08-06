@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/talks")
 @RestController
 public class TalkController {
@@ -27,7 +28,6 @@ public class TalkController {
     private final TalkService talkService;
     private final TalkReportService talkReportService;
 
-    @RequireRole
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
             @PathVariable final long gameId,
@@ -37,7 +37,7 @@ public class TalkController {
     ) {
         CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
                 limit, memberId);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -52,7 +52,6 @@ public class TalkController {
         return ResponseEntity.ok(response);
     }
 
-    @RequireRole
     @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
             @PathVariable final long gameId,
@@ -64,7 +63,6 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @RequireRole
     @PostMapping("/{talkId}/reports")
     public ResponseEntity<Void> reportTalk(
             @PathVariable final long talkId,
@@ -75,7 +73,6 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @RequireRole
     @DeleteMapping("/{gameId}/{talkId}")
     public ResponseEntity<Void> removeTalk(
             @PathVariable final long gameId,
