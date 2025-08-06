@@ -13,6 +13,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByStadiumAndDate(Stadium stadium, LocalDate date);
 
+    Optional<Game> findByGameCode(String gameCode);
+
     List<Game> findByDate(LocalDate date);
 
     List<Game> findGameByDate(LocalDate date);

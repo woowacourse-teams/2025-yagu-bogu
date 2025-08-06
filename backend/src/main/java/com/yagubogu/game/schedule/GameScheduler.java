@@ -1,7 +1,8 @@
 package com.yagubogu.game.schedule;
 
-import com.yagubogu.game.service.GameService;
-import com.yagubogu.global.exception.ClientException;
+import com.yagubogu.game.exception.GameSyncException;
+import com.yagubogu.game.service.GameResultSyncService;
+import com.yagubogu.game.service.GameScheduleSyncService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,15 +12,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameScheduler {
 
-    private final GameService gameService;
+    private final GameScheduleSyncService gameScheduleSyncService;
+    private final GameResultSyncService gameResultSyncService;
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void fetchDailyGame() {
+    public void fetchDailyGameSchedule() {
         LocalDate today = LocalDate.now();
-
         try {
-            gameService.fetchGameList(today);
-        } catch (ClientException e) {
+            gameScheduleSyncService.syncGameSchedule(today);
+        } catch (GameSyncException e) {
+            // TODO: 예외 로깅
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void fetchDailyGameResult() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        try {
+            gameResultSyncService.syncGameResult(yesterday);
+        } catch (GameSyncException e) {
             // TODO: 예외 로깅
         }
     }
