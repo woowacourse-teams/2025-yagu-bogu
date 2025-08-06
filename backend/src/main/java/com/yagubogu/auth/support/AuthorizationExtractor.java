@@ -29,6 +29,7 @@ public class AuthorizationExtractor {
                 return Optional.of(extractToken(header));
             }
         }
+        
         return Optional.empty();
     }
 

@@ -59,10 +59,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (methodAnnotation != null) {
             return methodAnnotation;
         }
+
         RequireRole classAnnotation = handlerMethod.getBeanType().getAnnotation(RequireRole.class);
         if (classAnnotation != null) {
             return classAnnotation;
         }
+
         return null;
     }
 
@@ -77,6 +79,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (!actualRole.hasPermission(role)) {
             throw new ForbiddenException("Forbidden request");
         }
+
         return true;
     }
 }
