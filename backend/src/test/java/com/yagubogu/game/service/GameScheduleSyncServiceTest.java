@@ -68,16 +68,16 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721OBLG3", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
         // when
-        gameScheduleSyncService.syncGameSchedule(today);
+        gameScheduleSyncService.syncGameSchedule(yesterday);
 
         // then
         assertThat(gameRepository.findAll()
@@ -92,16 +92,16 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_stadiumNotFound() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Stadium name match failed: 존재하지않는경기장");
     }
@@ -110,16 +110,16 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_homeTeamNotFound() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "존재하지않는원정팀", "SS", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
@@ -128,16 +128,16 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_awayTeamNotFound() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "HH", "존재하지않는원정팀", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
@@ -146,13 +146,13 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721OBLG0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
-                gameCode, today, 0, LocalTime.of(18, 30),
+                gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
-        given(kboGameSyncClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         KboScoreBoardResponse home = new KboScoreBoardResponse(5, 8, 1, 3);
@@ -164,7 +164,7 @@ class GameScheduleSyncServiceTest {
         ScoreBoard awayScoreBoardExpected = away.toScoreBoard();
 
         // when
-        gameResultSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(yesterday);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -179,17 +179,17 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameNotCompleted() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
-                gameCode, today, 0, LocalTime.of(18, 30),
+                gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.LIVE);
-        given(kboGameSyncClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameResultSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(yesterday);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -205,17 +205,17 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameCanceled() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
-                gameCode, today, 0, LocalTime.of(18, 30),
+                gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.CANCELED);
-        given(kboGameSyncClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameResultSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(yesterday);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -231,17 +231,17 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameNotFound() {
         // given
-        LocalDate today = TestFixture.getYesterday();
+        LocalDate yesterday = TestFixture.getYesterday();
         String unknownGameCode = "20250721XXXX0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
-                unknownGameCode, today, 0, LocalTime.of(18, 30),
+                unknownGameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
-        given(kboGameSyncClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameResultSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(yesterday);
 
         // then
         assertThat(gameRepository.findByGameCode(unknownGameCode)).isEmpty();
