@@ -85,10 +85,12 @@ public class MemberIntegrationTest {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(request)
-                .when().patch("/api/members/{memberId}/favorites", 1L)
+                .pathParam("memberId", 1L)
+                .when().patch("/api/members/{memberId}/favorites")
                 .then().log().all()
                 .statusCode(200)
-                .extract().as(MemberFavoriteResponse.class);
+                .extract()
+                .as(MemberFavoriteResponse.class);
 
         assertThat(actual.favorite()).isEqualTo(expected);
     }

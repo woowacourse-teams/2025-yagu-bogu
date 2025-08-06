@@ -32,7 +32,8 @@ public class MemberService {
     @Transactional
     public MemberFavoriteResponse updateFavorite(
             final Long memberId,
-            final MemberFavoriteRequest memberFavoriteRequest) {
+            final MemberFavoriteRequest memberFavoriteRequest
+    ) {
         Member member = getMember(memberId);
         Team team = getTeamByCode(memberFavoriteRequest.teamCode());
 

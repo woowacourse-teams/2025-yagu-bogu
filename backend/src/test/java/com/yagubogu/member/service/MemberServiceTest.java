@@ -75,9 +75,28 @@ public class MemberServiceTest {
         assertThat(memberRepository.findById(memberId)).isEmpty();
     }
 
+    @DisplayName("팀을 등록한다")
+    @Test
+    void patchTeam() {
+        // given
+        Long memberId = 11L;
+        String teamCode = "SS";
+        MemberFavoriteRequest request = new MemberFavoriteRequest(teamCode);
+
+        // when
+        memberService.updateFavorite(memberId, request);
+
+        // then
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
+            softAssertions.assertThat(member.getTeam()).isNotNull();
+        });
+    }
+
     @DisplayName("팀을 갱신한다")
     @Test
-    void updateTeam() {
+    void modifyTeam() {
         // given
         Long memberId = 1L;
         String beforeTeamCode = memberService.findFavorite(memberId).favorite();
@@ -97,7 +116,7 @@ public class MemberServiceTest {
 
     @DisplayName("예외: 팀 코드를 찾지 못하면 예외가 발생한다")
     @Test
-    void updateTeam_noTeamCode() {
+    void updateTeam_notFoundTeamCode() {
         // given
         Long memberId = 1L;
         String invalidTeamCode = "유효하지않은팀코드";
