@@ -65,15 +65,15 @@ class GoogleCredentialManager(
 
     suspend fun fetchGoogleCredentialResult(): GoogleCredentialResult {
         // 기존 로그인된 계정 우선 요청 (silent sign-in)
-        val googleIdOptionRequestResult: Result<GetCredentialResponse> =
-            getCredentialRequestWithGoogleIdOption()
+        val googleIdOptionResponseResult: Result<GetCredentialResponse> =
+            getCredentialResponseResult(credentialRequestWithGoogleIdOption)
         val googleIdOptionCredentialResult: GoogleCredentialResult =
-            handleGoogleCredentialResponseResult(googleIdOptionRequestResult)
+            handleGoogleCredentialResponseResult(googleIdOptionResponseResult)
 
         // 실패 시 명시적 로그인 UI 요청 (explicit sign-in)
         return if (googleIdOptionCredentialResult is GoogleCredentialResult.Suspending) {
             val signInRequestResult: Result<GetCredentialResponse> =
-                getCredentialRequestWithSignIn()
+                getCredentialResponseResult(credentialRequestWithSignIn)
             val signInCredentialResult: GoogleCredentialResult =
                 handleGoogleCredentialResponseResult(signInRequestResult)
             signInCredentialResult
@@ -138,18 +138,6 @@ class GoogleCredentialManager(
             is GetCredentialException -> GoogleCredentialResult.Suspending
             else -> GoogleCredentialResult.Failure(exception)
         }
-
-    /**
-     * 기존 로그인된 계정으로부터 Credential 요청을 시도함
-     */
-    private suspend fun getCredentialRequestWithGoogleIdOption(): Result<GetCredentialResponse> =
-        getCredentialResponseResult(credentialRequestWithGoogleIdOption)
-
-    /**
-     * 명시적으로 로그인 UI를 띄워서 Credential 요청을 시도함
-     */
-    private suspend fun getCredentialRequestWithSignIn(): Result<GetCredentialResponse> =
-        getCredentialResponseResult(credentialRequestWithSignIn)
 
     /**
      * 주어진 CredentialOption을 바탕으로 CredentialRequest 객체 생성
