@@ -119,7 +119,11 @@ public class TalkService {
                 .toList();
     }
 
-    private Slice<TalkResponse> getTalkResponses(final long gameId, final Long cursorId, final Pageable pageable) {
+    private Slice<TalkResponse> getTalkResponses(
+            final long gameId,
+            final Long cursorId,
+            final Pageable pageable
+    ) {
         if (cursorId == null) {
             return talkRepository.fetchRecentTalks(gameId, pageable);
         }
@@ -127,7 +131,10 @@ public class TalkService {
         return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
     }
 
-    private Long getNextCursorIdOrNull(final boolean hasNextPage, final Slice<TalkResponse> talks) {
+    private Long getNextCursorIdOrNull(
+            final boolean hasNextPage,
+            final Slice<TalkResponse> talks
+    ) {
         if (!hasNextPage || talks.isEmpty()) {
             return null;
         }
@@ -135,7 +142,10 @@ public class TalkService {
         return talks.getContent().getLast().id();
     }
 
-    private long getNextCursorIdOrStay(final long cursorId, final Slice<TalkResponse> talks) {
+    private long getNextCursorIdOrStay(
+            final long cursorId,
+            final Slice<TalkResponse> talks
+    ) {
         if (!talks.isEmpty()) {
             return talks.getContent().getLast().id();
         }
@@ -158,19 +168,28 @@ public class TalkService {
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
     }
 
-    private void validateBlockedFromGame(final long gameId, final long memberId) {
+    private void validateBlockedFromGame(
+            final long gameId,
+            final long memberId
+    ) {
         long distinctReporterCount = talkReportRepository.countDistinctReporterByGameIdAndMemberId(gameId,
                 memberId);
         if (distinctReporterCount >= REPORTER_THRESHOLD_FOR_BLOCK) {
-            throw new ForbiddenException("Access to this talk room is denied");
+            throw new ForbiddenException("Cannot chat due to multiple user reports");
         }
     }
 
-    private boolean isValidGameId(final long gameId, final Talk talk) {
+    private boolean isValidGameId(
+            final long gameId,
+            final Talk talk
+    ) {
         return talk.getGame().getId() != gameId;
     }
 
-    private boolean isValidMemberId(final long memberId, final Talk talk) {
+    private boolean isValidMemberId(
+            final long memberId,
+            final Talk talk
+    ) {
         return talk.getMember().getId() != memberId;
     }
 }
