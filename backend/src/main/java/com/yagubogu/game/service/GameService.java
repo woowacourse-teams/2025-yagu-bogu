@@ -19,7 +19,10 @@ public class GameService {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
 
-    public GameResponse findGamesByDate(final LocalDate date, final long memberId) {
+    public GameResponse findGamesByDate(
+            final LocalDate date,
+            final long memberId
+    ) {
         Member member = getMember(memberId);
         validateIsNotFuture(date);
 
