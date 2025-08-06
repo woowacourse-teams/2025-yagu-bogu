@@ -15,8 +15,8 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KboGameSyncClient {
 
-    public static final String SUCCESS_CODE = "100";
-    public static final String KBO_GAMES_URI = "/Main.asmx/GetKboGameList";
+    private static final String SUCCESS_CODE = "100";
+    private static final String KBO_GAMES_URI = "/Main.asmx/GetKboGameList";
 
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;

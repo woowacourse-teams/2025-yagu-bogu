@@ -17,8 +17,8 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KboGameResultClient {
 
-    public static final String SUCCESS_CODE = "100";
-    public static final String KBO_GAME_RESULT_URI = "/Schedule.asmx/GetScoreBoardScroll";
+    private static final String SUCCESS_CODE = "100";
+    private static final String KBO_GAME_RESULT_URI = "/Schedule.asmx/GetScoreBoardScroll";
 
     private final RestClient kboRestClient;
 

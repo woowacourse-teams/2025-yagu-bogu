@@ -78,15 +78,10 @@ class GameScheduleSyncServiceTest {
         gameScheduleSyncService.syncGameSchedule(yesterday);
 
         // then
-        assertThat(gameRepository.findAll()
-                .stream()
-                .filter(game ->
-                        game.getGameCode().equals(gameItem.gameCode()))
-                .findFirst())
-                .isPresent();
+        assertThat(gameRepository.findByGameCode(gameItem.gameCode())).isPresent();
     }
 
-    @DisplayName("예외 : 경기장을 찾을 수 없으면 예외가 발생한다")
+    @DisplayName("예외: 경기장을 찾을 수 없으면 예외가 발생한다")
     @Test
     void syncGameSchedule_stadiumNotFound() {
         // given
