@@ -2,9 +2,7 @@ package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
@@ -23,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class GameSyncService {
 
@@ -43,6 +42,7 @@ public class GameSyncService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
+    @Transactional
     public void syncGameSchedule(final LocalDate date) {
         KboGamesResponse kboGamesResponse = kboClient.fetchGames(date);
         List<Game> games = convertToGames(kboGamesResponse);
@@ -50,7 +50,7 @@ public class GameSyncService {
         gameRepository.saveAll(games);
     }
 
-    public List<Game> convertToGames(final KboGamesResponse kboGamesResponse) {
+    private List<Game> convertToGames(final KboGamesResponse kboGamesResponse) {
         List<Game> games = new ArrayList<>();
 
         for (KboGameResponse kboGameItem : kboGamesResponse.games()) {
@@ -79,31 +79,6 @@ public class GameSyncService {
         }
 
         return games;
-    }
-
-    @Transactional
-    public void syncGameResult(LocalDate date) {
-        List<KboGameResponse> gameResponses = kboClient.fetchGames(date).games();
-
-        for (KboGameResponse response : gameResponses) {
-            gameRepository.findByGameCode(response.gameCode())
-                    .ifPresent(game -> updateGameDetails(game, response));
-        }
-    }
-
-    private void updateGameDetails(Game game, KboGameResponse response) {
-        game.updateGameState(response.gameState());
-
-        if (game.getGameState().isNotCompleted()) {
-            // TODO: gameState가 LIVE 일 때 로깅
-            return;
-        }
-
-        KboGameResultResponse gameResult = kboClient.fetchGameResult(game);
-        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard().toScoreBoard();
-        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard().toScoreBoard();
-
-        game.updateScoreBoard(homeScoreBoard, awayScoreBoard);
     }
 
     private Stadium getStadiumByName(final String stadiumName) {
