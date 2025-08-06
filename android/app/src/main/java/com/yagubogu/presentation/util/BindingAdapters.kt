@@ -9,7 +9,9 @@ import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.yagubogu.R
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @BindingAdapter("setCustomChartDividerTint")
 fun ImageView.setCustomChartDividerTint(
@@ -96,3 +98,69 @@ fun View.setConditionalMargins(marginEndDp: Int?) {
 }
 
 fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
+
+@BindingAdapter("timeAgo")
+fun setTimeAgo(
+    textView: TextView,
+    timestamp: LocalDateTime?,
+) {
+    if (timestamp == null) {
+        textView.text = ""
+        return
+    }
+
+    val timeAgoText = getTimeAgoString(textView, timestamp)
+    textView.text = timeAgoText
+}
+
+private fun getTimeAgoString(
+    textView: TextView,
+    timestamp: LocalDateTime,
+): String {
+    val now = LocalDateTime.now()
+    val duration = Duration.between(timestamp, now)
+
+    val context = textView.context
+
+    return when {
+        duration.isNegative -> {
+            context.getString(R.string.livechat_time_just_now)
+        }
+
+        duration.toDays() >= 365 -> {
+            val years = (duration.toDays() / 365).toInt()
+            context.getString(R.string.livechat_time_years_ago, years)
+        }
+
+        duration.toDays() >= 30 -> {
+            val months = (duration.toDays() / 30).toInt()
+            context.getString(R.string.livechat_time_months_ago, months)
+        }
+
+        duration.toDays() > 0 -> {
+            context.getString(R.string.livechat_time_days_ago, duration.toDays().toInt())
+        }
+
+        duration.toHours() > 0 -> {
+            val hours = duration.toHoursPart()
+            val minutes = duration.toMinutesPart()
+            context.getString(
+                R.string.livechat_time_hours_with_minutes_ago,
+                hours,
+                minutes,
+            )
+        }
+
+        duration.toMinutes() > 0 -> {
+            context.getString(R.string.livechat_time_minutes_ago, duration.toMinutes().toInt())
+        }
+
+        duration.toSeconds() > 0 -> {
+            context.getString(R.string.livechat_time_seconds_ago, duration.toSeconds().toInt())
+        }
+
+        else -> {
+            context.getString(R.string.livechat_time_just_now)
+        }
+    }
+}

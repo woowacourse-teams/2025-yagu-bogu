@@ -71,4 +71,12 @@
 
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
+
+    <string name="livechat_time_just_now">방금 전</string>
+    <string name="livechat_time_seconds_ago">%d초 전</string>
+    <string name="livechat_time_minutes_ago">%d분 전</string>
+    <string name="livechat_time_hours_with_minutes_ago">%d시간 %d분 전</string>
+    <string name="livechat_time_days_ago">%d일 전</string>
+    <string name="livechat_time_months_ago">%d개월 전</string>
+    <string name="livechat_time_years_ago">%d년 전</string>
 </resources>

@@ -11,7 +11,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/gray050"
         tools:context=".presentation.livetalk.LivetalkChatActivity">
 
         <TextView
@@ -55,9 +55,14 @@
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
             android:layout_weight="1"
+            android:background="@color/gray050"
+            android:clipToPadding="false"
             android:paddingHorizontal="20dp"
+            android:paddingVertical="12dp"
             app:layout_constraintBottom_toTopOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
+            app:layout_constraintVertical_bias="1.0"
+            tools:layout_editor_absoluteX="0dp"
             tools:listitem="@layout/item_livetalk_chat" />
 
         <com.google.android.material.divider.MaterialDivider
