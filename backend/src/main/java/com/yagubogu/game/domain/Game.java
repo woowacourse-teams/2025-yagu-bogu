@@ -108,7 +108,7 @@ public class Game {
         this.gameState = gameState;
     }
 
-    public void updateGameStatus(final GameState gameState) {
+    public void updateGameState(final GameState gameState) {
         this.gameState = gameState;
     }
 
