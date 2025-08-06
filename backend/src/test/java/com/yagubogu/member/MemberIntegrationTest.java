@@ -41,13 +41,14 @@ public class MemberIntegrationTest {
     @Test
     void findFavorites() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String expected = "기아";
 
         // when
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .pathParam("memberId", 1L)
-                .when().get("/api/members/{memberId}/favorites")
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -61,13 +62,14 @@ public class MemberIntegrationTest {
     @Test
     void findNickName() {
         // given
-        String expected = "포라";
+        String accessToken = TestSupport.getAccessToken("id_token");
+        String expected = "test-user";
 
         // when
         MemberNicknameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .pathParam("memberId", 2L)
-                .when().get("/api/members/me/{memberId}/nickname")
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -81,14 +83,15 @@ public class MemberIntegrationTest {
     @Test
     void patchNickname() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String expected = "바꾼닉";
 
         // when
         MemberNicknameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .pathParam("memberId", 2L)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest("바꾼닉"))
-                .when().patch("/api/members/me/{memberId}/nickname")
+                .when().patch("/api/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
