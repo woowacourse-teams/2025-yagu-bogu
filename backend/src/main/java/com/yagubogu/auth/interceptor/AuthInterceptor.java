@@ -8,7 +8,6 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -36,8 +35,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (!(handler instanceof final HandlerMethod handlerMethod)) {
             return true;
         }
-        Arrays.stream(handlerMethod.getMethod().getAnnotations())
-                .forEach(a -> System.out.println("method annotation: " + a.annotationType()));
 
         return validateToken(request, handlerMethod);
     }
