@@ -181,6 +181,21 @@ class TalkServiceTest {
         });
     }
 
+    @DisplayName("예외: 신고를 10번 이상 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
+    @Test
+    void createTalk_blockedFromStadium() {
+        // given
+        long gameId = 1L;
+        long blockedMemberId = 2L;
+        String content = "오늘 야구 재밌겠당";
+        TalkRequest request = new TalkRequest(content);
+
+        // when & then
+        assertThatThrownBy(() -> talkService.createTalk(gameId, request, blockedMemberId))
+                .isExactlyInstanceOf(ForbiddenException.class)
+                .hasMessage("Access to this talk room is denied");
+    }
+
     @DisplayName("본인이 작성한 톡을 삭제한다")
     @Test
     void removeTalk() {

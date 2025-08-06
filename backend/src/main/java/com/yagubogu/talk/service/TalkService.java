@@ -69,6 +69,8 @@ public class TalkService {
         Member member = getMember(memberId);
         LocalDateTime now = LocalDateTime.now();
 
+        validateBlockedFromStadium(gameId, memberId);
+
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
 
         return TalkResponse.from(talk);
@@ -119,7 +121,7 @@ public class TalkService {
         if (cursorId == null) {
             return talkRepository.fetchRecentTalks(gameId, pageable);
         }
-        
+
         return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
     }
 
@@ -152,6 +154,14 @@ public class TalkService {
     private Talk getTalk(final long talkId) {
         return talkRepository.findById(talkId)
                 .orElseThrow(() -> new NotFoundException("Talk is not found"));
+    }
+
+    private void validateBlockedFromStadium(final long gameId, final long memberId) {
+        long distinctReporterCount = talkReportRepository.countDistinctReporterByGameIdAndMemberId(gameId,
+                memberId);
+        if (distinctReporterCount >= 10) {
+            throw new ForbiddenException("Access to this talk room is denied");
+        }
     }
 
     private boolean isValidGameId(final long gameId, final Talk talk) {
