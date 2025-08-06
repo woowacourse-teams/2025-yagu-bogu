@@ -1,6 +1,5 @@
 package com.yagubogu.presentation.stats.my
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +10,7 @@ import com.yagubogu.domain.repository.StatsRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.roundToInt
 
 class MyStatsViewModel(
@@ -21,6 +21,10 @@ class MyStatsViewModel(
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
     init {
+        fetchAll()
+    }
+
+    fun fetchAll() {
         fetchMyStats(MEMBER_ID, YEAR)
     }
 
@@ -65,13 +69,12 @@ class MyStatsViewModel(
                     listOf(statsCountsResult, winRateResult, luckyStadiumResult)
                         .filter { it.isFailure }
                         .mapNotNull { it.exceptionOrNull()?.message }
-                Log.e(TAG, "API 호출 실패: ${errors.joinToString()}")
+                Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
         }
     }
 
     companion object {
-        private const val TAG = "MyStatsViewModel"
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
     }
