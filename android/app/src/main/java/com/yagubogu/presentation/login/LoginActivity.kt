@@ -2,7 +2,6 @@ package com.yagubogu.presentation.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen
@@ -13,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             try {
                 // Todo : 초기화 작업 수행, (LoginViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
             } catch (e: Exception) {
-                Log.e("LoginActivity", "초기화 실패", e)
+                Timber.e(e, "초기화 실패")
             } finally {
                 isAppInitialized = true
             }
