@@ -1,6 +1,6 @@
 package com.yagubogu.auth.dto;
 
-public record CreateTokenResponse(
+public record TokenResponse(
         String accessToken,
         String refreshToken
 ) {

@@ -3,7 +3,7 @@ package com.yagubogu.auth.service;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.auth.dto.CreateTokenResponse;
+import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
@@ -60,7 +60,7 @@ public class AuthService {
     }
 
     @Transactional
-    public CreateTokenResponse refreshToken(final String refreshToken) {
+    public TokenResponse refreshToken(final String refreshToken) {
         RefreshToken storedRefreshToken = getPreviousValidRefreshToken(refreshToken);
         storedRefreshToken.revoke();
 
@@ -70,7 +70,7 @@ public class AuthService {
         String newAccessToken = authTokenProvider.createAccessToken(memberClaims);
         String newRefreshToken = generateRefreshToken(member);
 
-        return new CreateTokenResponse(newAccessToken, newRefreshToken);
+        return new TokenResponse(newAccessToken, newRefreshToken);
     }
 
     private Member findOrCreateMember(
