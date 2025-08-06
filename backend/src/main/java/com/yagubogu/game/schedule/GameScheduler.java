@@ -14,12 +14,19 @@ public class GameScheduler {
     private final GameSyncService gameSyncService;
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void fetchDailyGame() {
+    public void fetchDailyGameSchedule() {
         LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
-
         try {
             gameSyncService.syncGameSchedule(today);
+        } catch (GameSyncException e) {
+            // TODO: 예외 로깅
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void fetchDailyGameResult() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        try {
             gameSyncService.syncGameResult(yesterday);
         } catch (GameSyncException e) {
             // TODO: 예외 로깅
