@@ -7,7 +7,7 @@ import androidx.fragment.app.DialogFragment
 import com.yagubogu.databinding.FragmentFavoriteTeamConfirmBinding
 import com.yagubogu.presentation.util.getParcelableCompat
 
-class FavoriteTeamConfirmDialogFragment : DialogFragment() {
+class FavoriteTeamConfirmFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val favoriteTeam: FavoriteTeamUiModel =
             arguments?.getParcelableCompat(ARG_FAVORITE_TEAM)
@@ -28,8 +28,8 @@ class FavoriteTeamConfirmDialogFragment : DialogFragment() {
     companion object {
         private const val ARG_FAVORITE_TEAM = "favorite_team"
 
-        fun newInstance(favoriteTeam: FavoriteTeamUiModel): FavoriteTeamConfirmDialogFragment =
-            FavoriteTeamConfirmDialogFragment().apply {
+        fun newInstance(favoriteTeam: FavoriteTeamUiModel): FavoriteTeamConfirmFragment =
+            FavoriteTeamConfirmFragment().apply {
                 arguments =
                     Bundle().apply {
                         putParcelable(ARG_FAVORITE_TEAM, favoriteTeam)
