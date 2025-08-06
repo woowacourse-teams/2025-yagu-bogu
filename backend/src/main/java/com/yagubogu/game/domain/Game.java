@@ -119,4 +119,8 @@ public class Game {
         this.homeScoreBoard = homeScoreBoard;
         this.awayScoreBoard = awayScoreBoard;
     }
+
+    public boolean hasTeam(final Team team) {
+        return homeTeam.equals(team) || awayTeam.equals(team);
+    }
 }

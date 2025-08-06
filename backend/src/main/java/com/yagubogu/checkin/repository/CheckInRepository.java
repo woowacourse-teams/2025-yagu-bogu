@@ -2,11 +2,14 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
+import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -123,4 +126,68 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
+
+    boolean existsByMemberAndGameDate(Member member, LocalDate date);
+
+    @Query("""
+                select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
+                    ci.member.id,
+                    ci.member.nickname,
+                    ci.member.team.shortName,
+                    COUNT(ci),
+                    ROUND(
+                        (1.0 * SUM(
+                            CASE
+                                WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
+                                    OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
+                                THEN 1 ELSE 0
+                                END
+                        ) / COUNT(ci)) * 100, 1
+                    )
+                )
+                from CheckIn ci
+                JOIN ci.game g
+                group by ci.member.id
+            """)
+    List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
+
+    @Query("""
+            SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
+                c.id,
+                g.stadium.fullName,
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.homeTeam.id,
+                    g.homeTeam.shortName,
+                    g.homeScore,
+                    CASE WHEN g.homeTeam = :team THEN true ELSE false END
+                ),
+                new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
+                    g.awayTeam.id,
+                    g.awayTeam.shortName,
+                    g.awayScore,
+                    CASE WHEN g.awayTeam = :team THEN true ELSE false END
+                ),
+                g.date
+            )
+            FROM CheckIn c
+            JOIN c.game g
+            WHERE c.member = :member AND (
+                (g.homeTeam = :team AND g.homeScore > g.awayScore)
+                    OR
+                (g.awayTeam = :team AND g.awayScore > g.homeScore)
+            ) AND YEAR(g.date) = :year
+            ORDER BY g.date DESC
+            """)
+    List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
+
+    @Query("""
+                SELECT new com.yagubogu.checkin.dto.FanCountsByGameResponse(
+                    COUNT(c),
+                    COALESCE(SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END), 0),
+                    COALESCE(SUM(CASE WHEN c.team = :awayTeam THEN 1 ELSE 0 END), 0)
+                )
+                FROM CheckIn c
+                WHERE c.game = :game
+            """)
+    FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
 }

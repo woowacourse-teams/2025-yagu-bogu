@@ -2,6 +2,23 @@ spring:
   profiles:
     active: local
 
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: ${GOOGLE_CLIENT_ID}
+    connect-timeout: 180s # 3분
+    read-timeout: 180s
+
+security:
+  token:
+    access-token:
+      secret-key: ${ACCESS_TOKEN_SECRET_KEY}
+      expires-in: 900      # 15분 (초)
+    refresh-token:
+      secret-key: ${REFRESH_TOKEN_SECRET_KEY}
+      expires-in: 1209600  # 14일 (초)
+
 api:
   kbo:
     base-url: https://www.koreabaseball.com/ws
