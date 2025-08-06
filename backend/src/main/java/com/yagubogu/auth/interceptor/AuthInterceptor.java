@@ -46,16 +46,24 @@ public class AuthInterceptor implements HandlerInterceptor {
             final HttpServletRequest request,
             final HandlerMethod handlerMethod
     ) {
-        RequireRole methodAnnotation = handlerMethod.getMethodAnnotation(RequireRole.class);
-        if (methodAnnotation != null) {
-            return validateToken(request, methodAnnotation.value());
-        }
-        RequireRole classAnnotation = handlerMethod.getBeanType().getAnnotation(RequireRole.class);
-        if (classAnnotation != null) {
-            return validateToken(request, classAnnotation.value());
+        RequireRole requireRole = findRequireRoleAnnotation(handlerMethod);
+        if (requireRole != null) {
+            return validateToken(request, requireRole.value());
         }
 
         return true;
+    }
+
+    private RequireRole findRequireRoleAnnotation(final HandlerMethod handlerMethod) {
+        RequireRole methodAnnotation = handlerMethod.getMethodAnnotation(RequireRole.class);
+        if (methodAnnotation != null) {
+            return methodAnnotation;
+        }
+        RequireRole classAnnotation = handlerMethod.getBeanType().getAnnotation(RequireRole.class);
+        if (classAnnotation != null) {
+            return classAnnotation;
+        }
+        return null;
     }
 
     private boolean validateToken(
