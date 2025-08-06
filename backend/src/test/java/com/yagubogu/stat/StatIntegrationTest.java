@@ -130,7 +130,7 @@ public class StatIntegrationTest {
         assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("예외: 멤버ID에 해당하는 회원을 찾지 못하면 예외가 발생한다")
+    @DisplayName("예외: 존재하지 않는 멤버 ID로 평균 득, 실점, 실책, 안타, 피안타 정보를 조회하면 예외가 발생한다")
     @Test
     void findAverageStatistic_notFoundMember() {
         // given
