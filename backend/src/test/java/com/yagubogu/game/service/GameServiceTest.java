@@ -83,7 +83,7 @@ class GameServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameService.findGamesByDate(invalidDate, memberId))
-                .isInstanceOf(UnprocessableEntityException.class)
+                .isExactlyInstanceOf(UnprocessableEntityException.class)
                 .hasMessage("Cannot retrieve games for future dates");
     }
 
@@ -96,7 +96,7 @@ class GameServiceTest {
 
         // when & then
         assertThatThrownBy(() -> gameService.findGamesByDate(invalidDate, invalidMemberId))
-                .isInstanceOf(NotFoundException.class)
+                .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }
 }
