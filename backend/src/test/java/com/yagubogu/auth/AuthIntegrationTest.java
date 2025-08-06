@@ -4,8 +4,8 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.TokenRequest;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.CreateTokenRequest;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
@@ -84,14 +84,14 @@ public class AuthIntegrationTest {
         String refreshToken = TestSupport.getRefreshToken("id_token");
 
         // when
-        TokenResponse actual = RestAssured.given().log().all()
+        CreateTokenResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(refreshToken))
+                .body(new CreateTokenRequest(refreshToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(TokenResponse.class);
+                .as(CreateTokenResponse.class);
 
         // then
         assertSoftly(softAssertions -> {
@@ -110,7 +110,7 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(nonExistToken))
+                .body(new CreateTokenRequest(nonExistToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
@@ -135,7 +135,7 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(expiredToken))
+                .body(new CreateTokenRequest(expiredToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(401);

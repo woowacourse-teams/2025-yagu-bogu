@@ -3,15 +3,15 @@ package com.yagubogu.auth.service;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.CreateTokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
-import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.auth.support.AuthTokenProvider;
+import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -60,7 +60,7 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse refreshToken(final String refreshToken) {
+    public CreateTokenResponse refreshToken(final String refreshToken) {
         RefreshToken storedRefreshToken = getPreviousValidRefreshToken(refreshToken);
         storedRefreshToken.revoke();
 
@@ -70,7 +70,7 @@ public class AuthService {
         String newAccessToken = authTokenProvider.createAccessToken(memberClaims);
         String newRefreshToken = generateRefreshToken(member);
 
-        return new TokenResponse(newAccessToken, newRefreshToken);
+        return new CreateTokenResponse(newAccessToken, newRefreshToken);
     }
 
     private Member findOrCreateMember(

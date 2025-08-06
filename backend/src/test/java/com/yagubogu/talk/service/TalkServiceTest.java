@@ -121,7 +121,7 @@ class TalkServiceTest {
 
     @DisplayName("새로운 메시지가 있을 때 polling으로 가져온다")
     @Test
-    void pollTalks_hasNewTalk() {
+    void findNewTalks_hasNewTalk() {
         // given
         long gameId = 1L;
         Long cursorId = 50L;
@@ -131,7 +131,7 @@ class TalkServiceTest {
         Long expectedNextCursorId = 52L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
 
         // then
         assertSoftly(softAssertions -> {
@@ -144,14 +144,14 @@ class TalkServiceTest {
 
     @DisplayName("새 메시지가 없을 때 nextCursorId는 바뀌지 않는다")
     @Test
-    void pollTalks_hasNoNewTalk() {
+    void findNewTalks_hasNoNewTalk() {
         // given
         long gameId = 1L;
         Long cursorId = 52L;
         int limit = 10;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.pollTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
 
         // then
         assertSoftly(softAssertions -> {
@@ -179,6 +179,21 @@ class TalkServiceTest {
             softAssertions.assertThat(response.memberId()).isEqualTo(memberId);
             softAssertions.assertThat(response.id()).isEqualTo(53L);
         });
+    }
+
+    @DisplayName("예외: 특정 횟수 이상 신고를 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
+    @Test
+    void createTalk_blockedFromStadium() {
+        // given
+        long gameId = 1L;
+        long blockedMemberId = 2L;
+        String content = "오늘 야구 재밌겠당";
+        TalkRequest request = new TalkRequest(content);
+
+        // when & then
+        assertThatThrownBy(() -> talkService.createTalk(gameId, request, blockedMemberId))
+                .isExactlyInstanceOf(ForbiddenException.class)
+                .hasMessage("Cannot chat due to multiple user reports");
     }
 
     @DisplayName("본인이 작성한 톡을 삭제한다")
