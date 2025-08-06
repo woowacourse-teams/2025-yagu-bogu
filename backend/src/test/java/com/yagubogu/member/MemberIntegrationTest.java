@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberNicknameRequest;
+import com.yagubogu.member.dto.MemberNicknameResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,6 +55,47 @@ public class MemberIntegrationTest {
 
         // then
         assertThat(actual.favorite()).isEqualTo(expected);
+    }
+
+    @DisplayName("멤버의 닉네임을 조회한다")
+    @Test
+    void findNickName() {
+        // given
+        String expected = "포라";
+
+        // when
+        MemberNicknameResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 2L)
+                .when().get("/api/members/me/{memberId}/nickname")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(MemberNicknameResponse.class);
+
+        // then
+        assertThat(actual.nickname()).isEqualTo(expected);
+    }
+
+    @DisplayName("멤버의 닉네임을 수정한다")
+    @Test
+    void patchNickname() {
+        // given
+        String expected = "바꾼닉";
+
+        // when
+        MemberNicknameResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("memberId", 2L)
+                .body(new MemberNicknameRequest("바꾼닉"))
+                .when().patch("/api/members/me/{memberId}/nickname")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(MemberNicknameResponse.class);
+
+        // then
+        assertThat(actual.nickname()).isEqualTo(expected);
     }
 
     @DisplayName("회원 탈퇴한다")
