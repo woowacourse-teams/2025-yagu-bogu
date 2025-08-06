@@ -1,13 +1,16 @@
 package com.yagubogu.member.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +35,16 @@ public class MemberController {
             @PathVariable final long memberId
     ) {
         MemberFavoriteResponse response = memberService.findFavorite(memberId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{memberId}/favorites")
+    public ResponseEntity<MemberFavoriteResponse> patchFavorites(
+            @PathVariable final Long memberId,
+            @RequestBody final MemberFavoriteRequest memberFavoriteRequest
+    ) {
+        MemberFavoriteResponse response = memberService.updateFavorite(memberId, memberFavoriteRequest);
 
         return ResponseEntity.ok(response);
     }
