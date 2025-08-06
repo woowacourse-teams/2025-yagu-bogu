@@ -5,5 +5,4 @@ import java.util.List;
 public record GameResponse(
         List<GameWithCheckIn> games
 ) {
-
 }
