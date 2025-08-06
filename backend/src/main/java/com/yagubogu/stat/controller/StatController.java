@@ -47,7 +47,7 @@ public class StatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/teams/fan")
+    @GetMapping("/me")
     public ResponseEntity<AverageStatisticResponse> findAverageStatistic(
             @RequestParam final long memberId
     ) {

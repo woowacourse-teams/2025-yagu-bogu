@@ -120,7 +120,7 @@ public class StatIntegrationTest {
         AverageStatisticResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParams("memberId", 1L)
-                .when().get("/api/stats/teams/fan")
+                .when().get("/api/stats/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -140,7 +140,7 @@ public class StatIntegrationTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParams("memberId", invalidMemberId)
-                .when().get("/api/stats/teams/fan")
+                .when().get("/api/stats/me")
                 .then().log().all()
                 .statusCode(404);
     }
