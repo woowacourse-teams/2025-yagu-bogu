@@ -78,4 +78,8 @@ public class Member {
     public boolean isAdmin() {
         return role.equals(Role.ADMIN);
     }
+
+    public void updateNickname(final String nickname) {
+        this.nickname = nickname;
+    }
 }
