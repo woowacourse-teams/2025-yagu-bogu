@@ -71,7 +71,7 @@ class GameScheduleSyncServiceTest {
         LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721OBLG3", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "기아", "두산", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(today)).willReturn(response);
@@ -95,7 +95,7 @@ class GameScheduleSyncServiceTest {
         LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "존재하지않는경기장", "한화", "삼성", GameState.COMPLETED);
+                "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(today)).willReturn(response);
@@ -113,7 +113,7 @@ class GameScheduleSyncServiceTest {
         LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "존재하지않는원정팀", "삼성", GameState.COMPLETED);
+                "잠실", "존재하지않는원정팀", "SS", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(today)).willReturn(response);
@@ -131,7 +131,7 @@ class GameScheduleSyncServiceTest {
         LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "한화", "존재하지않는원정팀", GameState.COMPLETED);
+                "잠실", "HH", "존재하지않는원정팀", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(today)).willReturn(response);
@@ -151,7 +151,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
-                "잠실", "기아", "두산", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
@@ -184,7 +184,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
-                "잠실", "기아", "두산", GameState.LIVE);
+                "잠실", "HT", "OB", GameState.LIVE);
         given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
@@ -210,7 +210,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
-                "잠실", "기아", "두산", GameState.CANCELED);
+                "잠실", "HT", "OB", GameState.CANCELED);
         given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
@@ -236,7 +236,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 unknownGameCode, today, 0, LocalTime.of(18, 30),
-                "잠실", "기아", "두산", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 

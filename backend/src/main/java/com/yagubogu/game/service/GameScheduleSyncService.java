@@ -55,8 +55,8 @@ public class GameScheduleSyncService {
 
         for (KboGameResponse kboGameItem : kboGamesResponse.games()) {
             Stadium stadium = getStadiumByName(kboGameItem.stadiumName());
-            Team homeTeam = getTeamByShortName(kboGameItem.homeTeamName());
-            Team awayTeam = getTeamByShortName(kboGameItem.awayTeamName());
+            Team homeTeam = getTeamByCode(kboGameItem.homeTeamCode());
+            Team awayTeam = getTeamByCode(kboGameItem.awayTeamCode());
             LocalDate gameDate = kboGameItem.gameDate();
             LocalTime startAt = kboGameItem.startAt();
             String gameCode = kboGameItem.gameCode();
@@ -86,8 +86,8 @@ public class GameScheduleSyncService {
                 .orElseThrow(() -> new GameSyncException("Stadium name match failed: " + stadiumName));
     }
 
-    private Team getTeamByShortName(final String teamShortName) {
-        return teamRepository.findByShortName(teamShortName)
-                .orElseThrow(() -> new GameSyncException("Team code match failed: " + teamShortName));
+    private Team getTeamByCode(final String teamCode) {
+        return teamRepository.findByTeamCode(teamCode)
+                .orElseThrow(() -> new GameSyncException("Team code match failed: " + teamCode));
     }
 }

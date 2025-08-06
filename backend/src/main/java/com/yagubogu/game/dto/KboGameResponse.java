@@ -13,8 +13,8 @@ public record KboGameResponse(
         Integer headerNumber,
         LocalTime startAt,
         String stadiumName,
-        String awayTeamName,
-        String homeTeamName,
+        String awayTeamCode,
+        String homeTeamCode,
         GameState gameState
 ) {
 
@@ -25,8 +25,8 @@ public record KboGameResponse(
             @JsonProperty("HEADER_NO") String headerNumber,
             @JsonProperty("G_TM") String startAt,
             @JsonProperty("S_NM") String stadiumName,
-            @JsonProperty("AWAY_NM") String awayTeamName,
-            @JsonProperty("HOME_NM") String homeTeamName,
+            @JsonProperty("AWAY_ID") String awayTeamCode,
+            @JsonProperty("HOME_ID") String homeTeamCode,
             @JsonProperty("GAME_STATE_SC") String gameState
     ) {
         return new KboGameResponse(
@@ -35,8 +35,8 @@ public record KboGameResponse(
                 Integer.valueOf(headerNumber),
                 LocalTime.parse(startAt),
                 stadiumName,
-                awayTeamName,
-                homeTeamName,
+                awayTeamCode,
+                homeTeamCode,
                 GameState.from(Integer.valueOf(gameState))
         );
     }
