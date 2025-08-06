@@ -31,10 +31,10 @@ public class TalkController {
 
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "before", required = false) final Long cursorId,
-            @RequestParam("limit") final int limit,
-            final MemberClaims memberClaims
+            @RequestParam("limit") final int limit
     ) {
         CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
                 limit, memberClaims.id());
@@ -55,9 +55,9 @@ public class TalkController {
 
     @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
-            @Valid @RequestBody final TalkRequest request,
-            final MemberClaims memberClaims
+            @Valid @RequestBody final TalkRequest request
     ) {
         TalkResponse response = talkService.createTalk(gameId, request, memberClaims.id());
 
@@ -66,8 +66,8 @@ public class TalkController {
 
     @PostMapping("/{talkId}/reports")
     public ResponseEntity<Void> reportTalk(
-            @PathVariable final long talkId,
-            final MemberClaims memberClaims
+            final MemberClaims memberClaims,
+            @PathVariable final long talkId
     ) {
         talkReportService.reportTalk(talkId, memberClaims.id());
 
@@ -76,9 +76,9 @@ public class TalkController {
 
     @DeleteMapping("/{gameId}/{talkId}")
     public ResponseEntity<Void> removeTalk(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
-            @PathVariable final long talkId,
-            final MemberClaims memberClaims
+            @PathVariable final long talkId
     ) {
         talkService.removeTalk(gameId, talkId, memberClaims.id());
 
