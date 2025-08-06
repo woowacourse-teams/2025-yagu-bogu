@@ -1,5 +1,8 @@
 package com.yagubogu.stat.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
+import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -12,37 +15,48 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/stats")
 @RestController
 public class StatController {
 
     private final StatService statService;
 
-    // TODO : ArgumentResolver 구현
     @GetMapping("/counts")
     public ResponseEntity<StatCountsResponse> findStatCounts(
-            @RequestParam final long memberId,
+            final MemberClaims memberClaims,
             @RequestParam final int year
     ) {
-        StatCountsResponse response = statService.findStatCounts(memberId, year);
+        StatCountsResponse response = statService.findStatCounts(memberClaims.id(), year);
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/win-rate")
     public ResponseEntity<WinRateResponse> findWinRate(
-            @RequestParam final long memberId,
+            final MemberClaims memberClaims,
             @RequestParam final int year
     ) {
-        WinRateResponse response = statService.findWinRate(memberId, year);
+        WinRateResponse response = statService.findWinRate(memberClaims.id(), year);
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/lucky-stadiums")
     public ResponseEntity<LuckyStadiumResponse> findLuckyStadiums(
-            @RequestParam final long memberId,
+            final MemberClaims memberClaims,
             @RequestParam final int year
     ) {
-        LuckyStadiumResponse response = statService.findLuckyStadium(memberId, year);
+        LuckyStadiumResponse response = statService.findLuckyStadium(memberClaims.id(), year);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AverageStatisticResponse> findAverageStatistic(
+            final MemberClaims memberClaims
+    ) {
+        AverageStatisticResponse response = statService.findAverageStatistic(memberClaims.id());
         return ResponseEntity.ok(response);
     }
 }
