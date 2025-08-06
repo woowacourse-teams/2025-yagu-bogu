@@ -1,4 +1,4 @@
-package com.yagubogu.auth.client;
+package com.yagubogu.auth.gateway;
 
 import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.auth.dto.AuthResponse;
@@ -6,11 +6,11 @@ import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.exception.GoogleAuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@EnableConfigurationProperties(GoogleAuthProperties.class)
+@Profile("!local")
 @Component
 public class GoogleAuthGateway implements AuthGateway {
 
