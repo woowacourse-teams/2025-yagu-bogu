@@ -7,6 +7,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
 import com.yagubogu.game.exception.GameSyncException;
+import com.yagubogu.game.exception.KboClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +22,7 @@ public class KboGameResultClient {
     private static final String KBO_GAME_RESULT_URI = "/Schedule.asmx/GetScoreBoardScroll";
 
     private final RestClient kboRestClient;
+    private final KboClientExceptionHandler kboClientExceptionHandler;
 
     public KboGameResultResponse fetchGameResult(final Game game) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
@@ -34,11 +36,7 @@ public class KboGameResultClient {
                     .uri(KBO_GAME_RESULT_URI)
                     .body(param)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                            (request, response) -> {
-                                throw new GameSyncException(
-                                        "Kbo server error: " + response.getStatusCode());
-                            })
+                    .onStatus(kboClientExceptionHandler)
                     .body(String.class);
             KboGameResultResponse response = parseToKboResultResponse(responseBody);
             validateGameResultResponse(response);

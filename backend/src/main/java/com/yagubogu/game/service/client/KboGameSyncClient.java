@@ -3,6 +3,7 @@ package com.yagubogu.game.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
+import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class KboGameSyncClient {
 
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
+    private final KboClientExceptionHandler kboClientExceptionHandler;
 
     public KboGamesResponse fetchGames(final LocalDate date) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
@@ -32,11 +34,7 @@ public class KboGameSyncClient {
                     .uri(KBO_GAMES_URI)
                     .body(param)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                            (request, response) -> {
-                                throw new GameSyncException(
-                                        "Kbo server error: " + response.getStatusCode());
-                            })
+                    .onStatus(kboClientExceptionHandler)
                     .body(String.class);
             KboGamesResponse kboGamesResponse = objectMapper.readValue(
                     responseBody,
