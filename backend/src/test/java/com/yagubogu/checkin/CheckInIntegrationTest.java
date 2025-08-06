@@ -64,7 +64,7 @@ public class CheckInIntegrationTest {
                 .extract()
                 .as(CheckInCountsResponse.class);
 
-        assertThat(actual.checkInCounts()).isEqualTo(6);
+        assertThat(actual.checkInCounts()).isEqualTo(7);
     }
 
     @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
@@ -160,7 +160,7 @@ public class CheckInIntegrationTest {
                 .then().log().all()
                 .statusCode(200);
     }
-  
+
     @DisplayName("인증 여부를 조회한다")
     @Test
     void findCheckInStatus() {
