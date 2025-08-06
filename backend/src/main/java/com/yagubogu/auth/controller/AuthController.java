@@ -45,7 +45,7 @@ public class AuthController {
     public ResponseEntity<TokenResponse> logout(
             @RequestBody final LogoutRequest request
     ) {
-        authService.logout(request.refreshToken());
+        authService.logout(request);
 
         return ResponseEntity.noContent().build();
     }

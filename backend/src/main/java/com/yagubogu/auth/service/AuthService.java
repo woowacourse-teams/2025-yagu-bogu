@@ -6,6 +6,7 @@ import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
+import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
@@ -60,11 +61,11 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse refreshToken(final String refreshToken) {
-        RefreshToken storedRefreshToken = getPreviousValidRefreshToken(refreshToken);
-        storedRefreshToken.revoke();
+    public TokenResponse refreshToken(final String refreshTokenId) {
+        RefreshToken refreshToken = getPreviousValidRefreshToken(refreshTokenId);
+        refreshToken.revoke();
 
-        Member member = storedRefreshToken.getMember();
+        Member member = refreshToken.getMember();
         MemberClaims memberClaims = MemberClaims.from(member);
 
         String newAccessToken = authTokenProvider.createAccessToken(memberClaims);
@@ -74,8 +75,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(final String refreshTokenId) {
-        RefreshToken refreshToken = getPreviousValidRefreshToken(refreshTokenId);
+    public void logout(final LogoutRequest request) {
+        String previousRefreshToken = request.refreshToken();
+        RefreshToken refreshToken = getPreviousValidRefreshToken(previousRefreshToken);
         refreshToken.revoke();
     }
 
@@ -114,11 +116,11 @@ public class AuthService {
         ((AuthValidator<T>) validator).validate((T) response);
     }
 
-    private RefreshToken getPreviousValidRefreshToken(final String refreshToken) {
-        RefreshToken storedRefreshToken = getRefreshToken(refreshToken);
-        validateRefreshToken(storedRefreshToken);
+    private RefreshToken getPreviousValidRefreshToken(final String refreshTokenId) {
+        RefreshToken refreshToken = getRefreshToken(refreshTokenId);
+        validateRefreshToken(refreshToken);
 
-        return storedRefreshToken;
+        return refreshToken;
     }
 
     private String generateRefreshToken(final Member member) {
@@ -135,8 +137,8 @@ public class AuthService {
         return Instant.now().plus(expiresIn, ChronoUnit.SECONDS);
     }
 
-    private RefreshToken getRefreshToken(final String refreshToken) {
-        return refreshTokenRepository.findById(refreshToken)
+    private RefreshToken getRefreshToken(final String refreshTokenId) {
+        return refreshTokenRepository.findById(refreshTokenId)
                 .orElseThrow(() -> new UnAuthorizedException("Refresh token not exist"));
     }
 
