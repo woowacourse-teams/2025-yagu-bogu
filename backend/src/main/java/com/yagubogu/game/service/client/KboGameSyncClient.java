@@ -32,6 +32,11 @@ public class KboGameSyncClient {
                     .uri(KBO_GAMES_URI)
                     .body(param)
                     .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            (request, response) -> {
+                                throw new GameSyncException(
+                                        "Kbo server error: " + response.getStatusCode());
+                            })
                     .body(String.class);
             KboGamesResponse kboGamesResponse = objectMapper.readValue(
                     responseBody,

@@ -34,6 +34,11 @@ public class KboGameResultClient {
                     .uri(KBO_GAME_RESULT_URI)
                     .body(param)
                     .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            (request, response) -> {
+                                throw new GameSyncException(
+                                        "Kbo server error: " + response.getStatusCode());
+                            })
                     .body(String.class);
             KboGameResultResponse response = parseToKboResultResponse(responseBody);
             validateGameResultResponse(response);
