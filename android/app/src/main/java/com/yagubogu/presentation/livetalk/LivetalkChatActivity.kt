@@ -1,21 +1,36 @@
 package com.yagubogu.presentation.livetalk
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.yagubogu.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.yagubogu.databinding.ActivityLivetalkChatBinding
 
 class LivetalkChatActivity : AppCompatActivity() {
+    private val binding: ActivityLivetalkChatBinding by lazy {
+        ActivityLivetalkChatBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_livetalk_chat)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContentView(binding.root)
+        setupRecyclerView()
+    }
+
+    private fun setupRecyclerView() {
+        val layoutManager =
+            LinearLayoutManager(this).apply {
+                stackFromEnd = true
+                reverseLayout = true
+            }
+
+        binding.rvChatMessages.apply {
+            this.layoutManager = layoutManager
+            // Todo: adapter = chatAdapter
+
+            setHasFixedSize(true)
+            itemAnimator = null
+
+            clipToPadding = false
         }
     }
 }

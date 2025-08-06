@@ -7,11 +7,11 @@
 
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         tools:context=".presentation.livetalk.LivetalkChatActivity">
 
         <TextView
@@ -28,6 +28,7 @@
 
         <TextView
             android:id="@+id/tv_away_vs_home_name"
+            style="@style/TextView.Pretendard.Regular.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -40,7 +41,7 @@
             android:id="@+id/iv_arrow_left"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:contentDescription="현장톡 구장목록으로 돌아가기 아이콘"
             android:src="@drawable/ic_arrow_left"
             app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
@@ -49,21 +50,23 @@
             app:tint="@color/gray500" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chat_messages"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
+            android:layout_weight="1"
             android:paddingHorizontal="20dp"
             app:layout_constraintBottom_toTopOf="@id/divider"
-            app:layout_constraintTop_toBottomOf="@+id/tv_away_vs_home_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
             tools:listitem="@layout/item_livetalk_chat" />
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0.4dp"
             android:layout_marginVertical="16dp"
             app:dividerColor="@color/gray300"
-            app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"
+            app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -79,7 +82,7 @@
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/constraint_btn_send"
+            app:layout_constraintEnd_toStartOf="@id/constraint_btn_send"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -92,7 +95,8 @@
                 android:hint="현재 고척돔은..."
                 android:inputType="textMultiLine"
                 android:minHeight="16dp"
-                android:textColor="#333333"
+                android:scrollHorizontally="false"
+                android:textColor="@color/gray900"
                 android:textColorHint="@color/gray500"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -108,23 +112,24 @@
             android:layout_marginVertical="16dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/bg_primary500_radius_12dp"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/constraint_input_message">
+            app:layout_constraintStart_toEndOf="@id/constraint_input_message">
 
             <ImageView
                 android:id="@+id/iv_paper_airplane"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="메시지 전송 버튼 비행기 아이콘"
                 android:src="@drawable/ic_paper_airplane"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
