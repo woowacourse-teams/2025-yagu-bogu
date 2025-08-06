@@ -7,6 +7,8 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberNicknameRequest;
+import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.repository.TeamRepository;
 import org.assertj.core.api.SoftAssertions;
@@ -48,6 +50,36 @@ public class MemberServiceTest {
 
         // then
         assertThat(actual.favorite()).isEqualTo(expected);
+    }
+
+    @DisplayName("멤버의 닉네임을 조회한다")
+    @Test
+    void findNickname() {
+        // given
+        long memberId = 1L;
+        String expected = "포르";
+
+        // when
+        MemberNicknameResponse actual = memberService.findNickname(memberId);
+
+        // then
+        assertThat(actual.nickname()).isEqualTo(expected);
+    }
+
+    @DisplayName("멤버의 닉네임을 수정한다")
+    @Test
+    void patchNickname() {
+        // given
+        long memberId = 1L;
+        String oldNickname = "기존닉";
+        memberService.patchNickname(memberId, new MemberNicknameRequest(oldNickname));
+        String newNickname = "변경닉";
+
+        // when
+        MemberNicknameResponse actual = memberService.patchNickname(memberId, new MemberNicknameRequest(newNickname));
+
+        // then
+        assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다")
