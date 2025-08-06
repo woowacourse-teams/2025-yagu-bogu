@@ -106,7 +106,6 @@ public class GameSyncService {
         game.updateScoreBoard(homeScoreBoard, awayScoreBoard);
     }
 
-
     private Stadium getStadiumByName(final String stadiumName) {
         return stadiumRepository.findByShortName(STADIUM_NAME_MAP.get(stadiumName))
                 .orElseThrow(() -> new GameSyncException("Stadium name match failed: " + stadiumName));
