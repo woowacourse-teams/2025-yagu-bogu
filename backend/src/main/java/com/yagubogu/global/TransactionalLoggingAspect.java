@@ -18,16 +18,13 @@ public class TransactionalLoggingAspect {
             final ProceedingJoinPoint joinPoint,
             final Transactional transactional
     ) throws Throwable {
-        String traceId = MDC.get("traceId");
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
 
         long startTime = System.currentTimeMillis();
         if (!transactional.readOnly()) {
-            log.info("[{}] [{}] {} - [BEGIN TX]",
-                    traceId,
-                    className + "." + methodName,
-                    className);
+            log.info("[{}] - [BEGIN TX]",
+                    className + "." + methodName);
         }
 
         try {
@@ -37,10 +34,8 @@ public class TransactionalLoggingAspect {
         } finally {
             if (!transactional.readOnly()) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                log.info("[{}] [{}] {} - [END TX] ({}ms)",
-                        traceId,
+                log.info("[{}] - [END TX] ({}ms)",
                         className + "." + methodName,
-                        className,
                         elapsedTime);
             }
         }
