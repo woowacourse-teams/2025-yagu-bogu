@@ -8,16 +8,15 @@ import com.yagubogu.presentation.util.getTeamColor
 data class LivetalkStadiumItem(
     val stadiumName: String,
     val userCount: Int,
-    val homeTeam: Team,
     val awayTeam: Team,
+    val homeTeam: Team,
     val isVerified: Boolean,
 ) {
     @ColorRes
     val awayTeamColor: Int = awayTeam.getTeamColor()
-
-    val homeTeamEmoji: String = homeTeam.getEmoji()
+    val awayTeamEmoji: String = awayTeam.getEmoji()
 
     @ColorRes
     val homeTeamColor: Int = homeTeam.getTeamColor()
-    val awayTeamEmoji: String = awayTeam.getEmoji()
+    val homeTeamEmoji: String = homeTeam.getEmoji()
 }
