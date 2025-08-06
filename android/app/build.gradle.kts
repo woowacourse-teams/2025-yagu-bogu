@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
+    implementation(libs.androidx.datastore.preferences)
 
     // firebase
     implementation(platform(libs.firebase.bom))
