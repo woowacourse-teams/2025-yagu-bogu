@@ -25,8 +25,8 @@ public class GameController {
             @RequestParam final LocalDate date,
             final MemberClaims memberClaims
     ) {
-        GameResponse gameResponse = gameService.findGamesByDate(date, memberClaims.id());
+        GameResponse response = gameService.findGamesByDate(date, memberClaims.id());
 
-        return ResponseEntity.ok(gameResponse);
+        return ResponseEntity.ok(response);
     }
 }
