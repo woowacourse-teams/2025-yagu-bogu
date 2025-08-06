@@ -3,6 +3,7 @@ package com.yagubogu.member;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import io.restassured.RestAssured;
@@ -10,6 +11,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -27,15 +29,21 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class MemberIntegrationTest {
 
+    private static final String ID_TOKEN = "ID_TOKEN";
+
     @LocalServerPort
     private int port;
+
+    @Autowired
+    private AuthTokenProvider authTokenProvider;
 
     private String accessToken;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        accessToken = TestSupport.getAccessToken("id_token");
+        long memberId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
     }
 
     @DisplayName("멤버의 응원팀을 조회한다")
@@ -48,8 +56,7 @@ public class MemberIntegrationTest {
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("memberId", 1L)
-                .when().get("/api/members/{memberId}/favorites")
+                .when().get("/api/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -62,10 +69,6 @@ public class MemberIntegrationTest {
     @DisplayName("회원 탈퇴한다")
     @Test
     void removeMember() {
-        // given
-        String accessToken = TestSupport.getAccessToken("id_token");
-
-        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)

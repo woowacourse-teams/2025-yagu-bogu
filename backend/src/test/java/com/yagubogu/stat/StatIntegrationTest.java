@@ -3,6 +3,7 @@ package com.yagubogu.stat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
@@ -12,6 +13,7 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -32,12 +34,16 @@ public class StatIntegrationTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private AuthTokenProvider authTokenProvider;
+
     private String accessToken;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        accessToken = TestSupport.getAccessToken("id_token");
+        long memberId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
     }
 
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
@@ -50,7 +56,7 @@ public class StatIntegrationTest {
         StatCountsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParams("memberId", 1L, "year", 2025)
+                .queryParams("year", 2025)
                 .when().get("/api/stats/counts")
                 .then().log().all()
                 .statusCode(200)
@@ -71,7 +77,7 @@ public class StatIntegrationTest {
         WinRateResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParams("memberId", 1L, "year", 2025)
+                .queryParams("year", 2025)
                 .when().get("/api/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
@@ -85,10 +91,12 @@ public class StatIntegrationTest {
     @DisplayName("예외: 관리자일 경우 직관 승률을 조회하면 예외가 발생한다")
     @Test
     void findWinRate_whenAdmin() {
+        accessToken = TestSupport.getAccessTokenByMemberId(4L, authTokenProvider);
+
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParams("memberId", 4L, "year", 2025)
+                .queryParams("year", 2025)
                 .when().get("/api/stats/win-rate")
                 .then().log().all()
                 .statusCode(403);
@@ -104,7 +112,7 @@ public class StatIntegrationTest {
         LuckyStadiumResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParams("memberId", 1L, "year", 2025)
+                .queryParams("year", 2025)
                 .when().get("/api/stats/lucky-stadiums")
                 .then().log().all()
                 .statusCode(200)
