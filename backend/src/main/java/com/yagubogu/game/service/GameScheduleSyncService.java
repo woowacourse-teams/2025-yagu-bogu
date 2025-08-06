@@ -6,7 +6,7 @@ import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.game.service.client.KboClient;
+import com.yagubogu.game.service.client.KboGameSyncClient;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class GameSyncService {
+public class GameScheduleSyncService {
 
     private static final Map<String, String> STADIUM_NAME_MAP = Map.of(
             "문학", "랜더스필드",
@@ -37,14 +37,14 @@ public class GameSyncService {
             "대구", "라이온즈파크"
     );
 
-    private final KboClient kboClient;
+    private final KboGameSyncClient kboGameSyncClient;
     private final GameRepository gameRepository;
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
     @Transactional
     public void syncGameSchedule(final LocalDate date) {
-        KboGamesResponse kboGamesResponse = kboClient.fetchGames(date);
+        KboGamesResponse kboGamesResponse = kboGameSyncClient.fetchGames(date);
         List<Game> games = convertToGames(kboGamesResponse);
 
         gameRepository.saveAll(games);

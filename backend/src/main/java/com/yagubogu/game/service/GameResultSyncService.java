@@ -5,7 +5,8 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.game.service.client.KboClient;
+import com.yagubogu.game.service.client.KboGameResultClient;
+import com.yagubogu.game.service.client.KboGameSyncClient;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GameResultSyncService {
 
-    private final KboClient kboClient;
+    private final KboGameSyncClient kboGameSyncClient;
+    private final KboGameResultClient kboGameResultClient;
     private final GameRepository gameRepository;
 
     @Transactional
     public void syncGameResult(LocalDate date) {
-        List<KboGameResponse> gameResponses = kboClient.fetchGames(date).games();
+        List<KboGameResponse> gameResponses = kboGameSyncClient.fetchGames(date).games();
 
         for (KboGameResponse response : gameResponses) {
             gameRepository.findByGameCode(response.gameCode())
@@ -38,7 +40,7 @@ public class GameResultSyncService {
             return;
         }
 
-        KboGameResultResponse gameResult = kboClient.fetchGameResult(game);
+        KboGameResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
         ScoreBoard homeScoreBoard = gameResult.homeScoreBoard().toScoreBoard();
         ScoreBoard awayScoreBoard = gameResult.awayScoreBoard().toScoreBoard();
 

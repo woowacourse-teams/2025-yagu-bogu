@@ -17,7 +17,8 @@ import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.game.service.client.KboClient;
+import com.yagubogu.game.service.client.KboGameResultClient;
+import com.yagubogu.game.service.client.KboGameSyncClient;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
@@ -36,9 +37,10 @@ import org.springframework.test.context.TestPropertySource;
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 @DataJpaTest
-class GameSyncServiceTest {
+class GameScheduleSyncServiceTest {
 
-    private GameSyncService gameSyncService;
+    private GameScheduleSyncService gameScheduleSyncService;
+    private GameResultSyncService gameResultSyncService;
 
     @Autowired
     private GameRepository gameRepository;
@@ -50,11 +52,16 @@ class GameSyncServiceTest {
     private StadiumRepository stadiumRepository;
 
     @Mock
-    private KboClient kboClient;
+    private KboGameSyncClient kboGameSyncClient;
+
+    @Mock
+    private KboGameResultClient kboGameResultClient;
 
     @BeforeEach
     void setUp() {
-        gameSyncService = new GameSyncService(kboClient, gameRepository, teamRepository, stadiumRepository);
+        gameScheduleSyncService = new GameScheduleSyncService(kboGameSyncClient, gameRepository, teamRepository,
+                stadiumRepository);
+        gameResultSyncService = new GameResultSyncService(kboGameSyncClient, kboGameResultClient, gameRepository);
     }
 
     @DisplayName("경기 목록을 성공적으로 가져와서 저장한다")
@@ -67,10 +74,10 @@ class GameSyncServiceTest {
                 "잠실", "기아", "두산", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
 
         // when
-        gameSyncService.syncGameSchedule(today);
+        gameScheduleSyncService.syncGameSchedule(today);
 
         // then
         assertThat(gameRepository.findAll()
@@ -91,10 +98,10 @@ class GameSyncServiceTest {
                 "존재하지않는경기장", "한화", "삼성", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Stadium name match failed: 존재하지않는경기장");
     }
@@ -109,10 +116,10 @@ class GameSyncServiceTest {
                 "잠실", "존재하지않는원정팀", "삼성", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
@@ -127,10 +134,10 @@ class GameSyncServiceTest {
                 "잠실", "한화", "존재하지않는원정팀", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
-        given(kboClient.fetchGames(today)).willReturn(response);
+        given(kboGameSyncClient.fetchGames(today)).willReturn(response);
 
         // when & then
-        assertThatThrownBy(() -> gameSyncService.syncGameSchedule(today))
+        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(today))
                 .isInstanceOf(GameSyncException.class)
                 .hasMessage("Team code match failed: 존재하지않는원정팀");
     }
@@ -145,19 +152,19 @@ class GameSyncServiceTest {
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
                 "잠실", "기아", "두산", GameState.COMPLETED);
-        given(kboClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         KboScoreBoardResponse home = new KboScoreBoardResponse(5, 8, 1, 3);
         KboScoreBoardResponse away = new KboScoreBoardResponse(3, 6, 2, 4);
-        given(kboClient.fetchGameResult(any(Game.class)))
+        given(kboGameResultClient.fetchGameResult(any(Game.class)))
                 .willReturn(new KboGameResultResponse("100", "success", home, away));
 
         ScoreBoard homeScoreBoardExpected = home.toScoreBoard();
         ScoreBoard awayScoreBoardExpected = away.toScoreBoard();
 
         // when
-        gameSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(today);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -178,11 +185,11 @@ class GameSyncServiceTest {
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
                 "잠실", "기아", "두산", GameState.LIVE);
-        given(kboClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(today);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -191,7 +198,7 @@ class GameSyncServiceTest {
             softAssertions.assertThat(game.getHomeScore()).isNull();
             softAssertions.assertThat(game.getAwayScore()).isNull();
         });
-        verify(kboClient, never()).fetchGameResult(any(Game.class));
+        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 
     @DisplayName("CANCELED 상태 경기는 스코어보드를 업데이트하지 않는다")
@@ -204,11 +211,11 @@ class GameSyncServiceTest {
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, today, 0, LocalTime.of(18, 30),
                 "잠실", "기아", "두산", GameState.CANCELED);
-        given(kboClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(today);
 
         // then
         Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
@@ -217,7 +224,7 @@ class GameSyncServiceTest {
             soft.assertThat(game.getHomeScore()).isNull();
             soft.assertThat(game.getAwayScore()).isNull();
         });
-        verify(kboClient, never()).fetchGameResult(any(Game.class));
+        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 
     @DisplayName("DB에 존재하지 않는 게임 코드는 건너뛴다")
@@ -230,14 +237,14 @@ class GameSyncServiceTest {
         KboGameResponse kboGameResponse = new KboGameResponse(
                 unknownGameCode, today, 0, LocalTime.of(18, 30),
                 "잠실", "기아", "두산", GameState.COMPLETED);
-        given(kboClient.fetchGames(today))
+        given(kboGameSyncClient.fetchGames(today))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
         // when
-        gameSyncService.syncGameResult(today);
+        gameResultSyncService.syncGameResult(today);
 
         // then
         assertThat(gameRepository.findByGameCode(unknownGameCode)).isEmpty();
-        verify(kboClient, never()).fetchGameResult(any(Game.class));
+        verify(kboGameResultClient, never()).fetchGameResult(any(Game.class));
     }
 }
