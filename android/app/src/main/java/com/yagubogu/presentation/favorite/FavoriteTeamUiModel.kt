@@ -14,7 +14,7 @@ data class FavoriteTeamUiModel(
     companion object {
         fun of(team: Team): FavoriteTeamUiModel {
             val id: Long = team.ordinal.toLong()
-            val name: String = team.nickName
+            val name: String = team.nickname
             val emoji: String = team.getEmoji()
             return FavoriteTeamUiModel(id, name, emoji)
         }
