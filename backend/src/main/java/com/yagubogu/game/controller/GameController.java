@@ -22,8 +22,8 @@ public class GameController {
     @RequireRole
     @GetMapping
     public ResponseEntity<GameResponse> findGamesByDate(
-            @RequestParam final LocalDate date,
-            final MemberClaims memberClaims
+            final MemberClaims memberClaims,
+            @RequestParam final LocalDate date
     ) {
         GameResponse response = gameService.findGamesByDate(date, memberClaims.id());
 
