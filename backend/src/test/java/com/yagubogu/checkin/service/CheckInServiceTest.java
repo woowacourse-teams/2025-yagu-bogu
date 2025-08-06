@@ -68,7 +68,8 @@ class CheckInServiceTest {
         LocalDate date = TestFixture.getToday();
 
         // when & then
-        assertThatCode(() -> checkInService.createCheckIn(new CreateCheckInRequest(memberId, stadiumId, date)))
+        assertThatCode(() -> checkInService.createCheckIn(memberId,
+                new CreateCheckInRequest(stadiumId, date)))
                 .doesNotThrowAnyException();
     }
 
@@ -80,9 +81,9 @@ class CheckInServiceTest {
         long validMemberId = 1L;
         LocalDate date = TestFixture.getToday();
 
-        CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, invalidStadiumId, date);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidStadiumId, date);
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(validMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Stadium is not found");
     }
@@ -94,10 +95,10 @@ class CheckInServiceTest {
         long validMemberId = 1L;
         long stadiumId = 1L;
         LocalDate invalidDate = TestFixture.getInvalidDate();
-        CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, stadiumId, invalidDate);
+        CreateCheckInRequest request = new CreateCheckInRequest(stadiumId, invalidDate);
 
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(validMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Game is not found");
     }
@@ -109,10 +110,10 @@ class CheckInServiceTest {
         long invalidStadiumId = 1L;
         long invalidMemberId = 999L;
         LocalDate date = TestFixture.getToday();
-        CreateCheckInRequest request = new CreateCheckInRequest(invalidMemberId, invalidStadiumId, date);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidStadiumId, date);
 
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(invalidMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }

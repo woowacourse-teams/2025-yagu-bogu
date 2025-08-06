@@ -67,3 +67,8 @@ VALUES (1, 1, 1),
        (10, 9, 6),
        (1, 8, 4),
        (11, 8, 1);
+
+-- 5. 톡 52개 생성
+-- 기준 시간: 2025-07-25 15:00:00
+INSERT INTO talks (game_id, member_id, content, created_at)
+VALUES (1, 1, '메세지 1', '2025-07-25 15:00:00');
