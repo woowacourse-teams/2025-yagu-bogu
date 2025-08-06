@@ -63,7 +63,7 @@ class GoogleCredentialManager(
     private val credentialRequestWithSignIn: GetCredentialRequest =
         buildCredentialRequest(signInWithGoogleOption)
 
-    suspend fun fetchGoogleCredentialResult(): GoogleCredentialResult {
+    suspend fun getGoogleCredentialResult(): GoogleCredentialResult {
         // 기존 로그인된 계정 우선 요청 (silent sign-in)
         val googleIdOptionResponseResult: Result<GetCredentialResponse> =
             getCredentialResponseResult(credentialRequestWithGoogleIdOption)

@@ -10,7 +10,7 @@ class AuthDefaultRepository(
 ) : AuthRepository {
     override suspend fun signInWithGoogle(): LoginResult {
         val googleCredentialResult: GoogleCredentialResult =
-            googleCredentialManager.fetchGoogleCredentialResult()
+            googleCredentialManager.getGoogleCredentialResult()
 
         return when (googleCredentialResult) {
             is GoogleCredentialResult.Success -> LoginResult.Success("로그인 성공")
