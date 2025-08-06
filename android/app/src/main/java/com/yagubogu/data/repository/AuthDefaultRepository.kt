@@ -20,8 +20,5 @@ class AuthDefaultRepository(
         }
     }
 
-    /**
-     * Credential 상태 초기화 (로그아웃)
-     */
     override suspend fun signOutWithGoogle(): Result<Boolean> = googleCredentialManager.signOut()
 }

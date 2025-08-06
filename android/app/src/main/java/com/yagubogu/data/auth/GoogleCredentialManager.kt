@@ -19,6 +19,10 @@ import kotlinx.coroutines.withContext
 /**
  * Google 로그인 인증을 위한 Credential 요청 및 로그아웃을 담당하는 클래스.
  * - CredentialManager를 이용해 기존 계정으로 로그인 시도 또는 명시적 로그인 요청을 수행
+ *
+ * @param context ApplicationContext 사용 시 일부 기기에서 예외 발생 가능
+ * @param serverClientId Google Cloud Console의 웹 클라이언트 ID
+ * @param nonce nonce string to use when generating a Google ID token
  */
 class GoogleCredentialManager(
     private val context: Context,
@@ -26,6 +30,38 @@ class GoogleCredentialManager(
     nonce: String,
 ) {
     private val credentialManager = CredentialManager.create(context)
+
+    /**
+     * 기존에 로그인한 구글 계정이 있다면 자동 로그인 시도
+     */
+    private val googleIdOption: GetGoogleIdOption =
+        GetGoogleIdOption
+            .Builder()
+            .setFilterByAuthorizedAccounts(false) // 모든 계정 표시 (true로 하면 이전 로그인 계정만 표시)
+            .setServerClientId(serverClientId)
+            .setNonce(nonce)
+            .build()
+
+    /**
+     * 명시적 로그인 옵션 (사용자에게 계정 선택 UI를 보여줌)
+     */
+    private val signInWithGoogleOption: GetSignInWithGoogleOption =
+        GetSignInWithGoogleOption
+            .Builder(serverClientId = serverClientId)
+            .setNonce(nonce)
+            .build()
+
+    /**
+     * Credential 요청 객체 생성 (기본 옵션)
+     */
+    private val credentialRequestWithGoogleIdOption: GetCredentialRequest =
+        buildCredentialRequest(googleIdOption)
+
+    /*
+     * Credential 요청 객체 생성 (명시적 로그인 옵션)
+     */
+    private val credentialRequestWithSignIn: GetCredentialRequest =
+        buildCredentialRequest(signInWithGoogleOption)
 
     suspend fun fetchGoogleCredentialResult(): GoogleCredentialResult {
         // 기존 로그인된 계정 우선 요청 (silent sign-in)
@@ -103,30 +139,6 @@ class GoogleCredentialManager(
             is GetCredentialException -> GoogleCredentialResult.Suspending
             else -> GoogleCredentialResult.Failure(exception)
         }
-
-    // 기존에 로그인한 구글 계정이 있다면 자동 로그인 시도
-    private val googleIdOption: GetGoogleIdOption =
-        GetGoogleIdOption
-            .Builder()
-            .setFilterByAuthorizedAccounts(false) // 모든 계정 표시 (true로 하면 이전 로그인 계정만 표시)
-            .setServerClientId(serverClientId)
-            .setNonce(nonce)
-            .build()
-
-    // 명시적 로그인 옵션 (사용자에게 계정 선택 UI를 보여줌)
-    private val signInWithGoogleOption: GetSignInWithGoogleOption =
-        GetSignInWithGoogleOption
-            .Builder(serverClientId = serverClientId)
-            .setNonce(nonce)
-            .build()
-
-    // Credential 요청 객체 생성 (기본 옵션)
-    private val credentialRequestWithGoogleIdOption: GetCredentialRequest =
-        buildCredentialRequest(googleIdOption)
-
-    // Credential 요청 객체 생성 (명시적 로그인 옵션)
-    private val credentialRequestWithSignIn: GetCredentialRequest =
-        buildCredentialRequest(signInWithGoogleOption)
 
     /**
      * 기존 로그인된 계정으로부터 Credential 요청을 시도함
