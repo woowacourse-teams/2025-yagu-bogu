@@ -189,7 +189,7 @@ class StatServiceTest {
         assertThat(luckyStadium.shortName()).isNull();
     }
 
-    @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회한다")
     @Test
     void findAverageStatistic() {
         // given
@@ -215,7 +215,7 @@ class StatServiceTest {
         });
     }
 
-    @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회 시 해당되는게 하나도 없으면 null을 반환한다")
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회 시 해당되는게 하나도 없으면 null을 반환한다")
     @Test
     void findAverageStatistic_nullChecking() {
         // given
