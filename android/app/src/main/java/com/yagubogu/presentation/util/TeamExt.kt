@@ -21,14 +21,14 @@ fun Team.getTeamColor(): Int =
 
 fun Team.getEmoji(): String =
     when (this) {
-        Team.KIA -> "\uD83D\uDC2F"
+        Team.HT -> "\uD83D\uDC2F"
         Team.LG -> "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1"
-        Team.KIWOOM -> "\uD83E\uDDB8"
+        Team.WO -> "\uD83E\uDDB8"
         Team.KT -> "\uD83E\uDDD9"
-        Team.SAMSUNG -> "\uD83E\uDD81"
-        Team.LOTTE -> "\uD83C\uDF3A"
-        Team.SSG -> "\uD83D\uDE80"
+        Team.SS -> "\uD83E\uDD81"
+        Team.LT -> "\uD83C\uDF3A"
+        Team.SK -> "\uD83D\uDE80"
         Team.NC -> "\uD83E\uDD95"
-        Team.HANWHA -> "\uD83E\uDD85"
-        Team.DOOSAN -> "\uD83D\uDC3B"
+        Team.HH -> "\uD83E\uDD85"
+        Team.OB -> "\uD83D\uDC3B"
     }
