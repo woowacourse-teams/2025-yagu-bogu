@@ -151,6 +151,24 @@ public class TalkIntegrationTest {
                 .body("content", is(content));
     }
 
+    @DisplayName("예외: 신고를 총 10명 이상에게 받은 사용자는 톡을 생성할 수 없다")
+    @Test
+    void createTalk_blockedFromStadium() {
+        // given
+        long gameId = 1L;
+        long blockedMemberId = 2L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(content))
+                .when()
+                .post("/api/talks/{gameId}?memberId={memberId}", gameId, blockedMemberId)
+                .then().log().all()
+                .statusCode(403);
+    }
+
     @DisplayName("예외: 존재하지 않는 gameId로 톡을 생성하면 에러가 발생한다")
     @Test
     void createTalk_withInvalidGameId() {
