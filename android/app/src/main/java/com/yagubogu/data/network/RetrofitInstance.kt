@@ -1,6 +1,7 @@
 package com.yagubogu.data.network
 
 import com.yagubogu.BuildConfig
+import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInsApiService
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
@@ -39,6 +40,10 @@ object RetrofitInstance {
             .addConverterFactory(
                 Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
             ).build()
+    }
+
+    val authApiService: AuthApiService by lazy {
+        retrofit.create(AuthApiService::class.java)
     }
 
     val memberApiService: MemberApiService by lazy {
