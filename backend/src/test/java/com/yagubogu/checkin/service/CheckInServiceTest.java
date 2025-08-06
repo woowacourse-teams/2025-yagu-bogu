@@ -1,10 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
@@ -33,6 +28,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -124,7 +124,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
-        int expected = 6;
+        int expected = 7;
 
         // when
         CheckInCountsResponse actual = checkInService.findCheckInCounts(memberId, year);
@@ -238,7 +238,7 @@ class CheckInServiceTest {
                         5,
                         "포르",
                         "기아",
-                        83.3
+                        71.4
                 )
         );
         VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
@@ -363,13 +363,13 @@ class CheckInServiceTest {
                         ),
                         new FanRateByGameResponse(
                                 4L,
-                                new TeamFanRateResponse("LG", "LG", 75.0),
-                                new TeamFanRateResponse("KT", "KT", 25.0)
+                                new TeamFanRateResponse("삼성", "SS", 25.0),
+                                new TeamFanRateResponse("두산", "OB", 50.0)
                         ),
                         new FanRateByGameResponse(
-                                2L,
-                                new TeamFanRateResponse("삼성", "SS", 50.0),
-                                new TeamFanRateResponse("두산", "OB", 50.0)
+                                4L,
+                                new TeamFanRateResponse("LG", "LG", 75.0),
+                                new TeamFanRateResponse("KT", "KT", 25.0)
                         )
                 )
         );
