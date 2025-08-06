@@ -3,7 +3,6 @@ package com.yagubogu.presentation.login
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -22,6 +21,7 @@ import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
@@ -64,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
             try {
                 // Todo : 초기화 작업 수행, (LoginViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
             } catch (e: Exception) {
-                Log.e("LoginActivity", "초기화 실패", e)
+                Timber.e(e, "초기화 실패")
             } finally {
                 isAppInitialized = true
             }
