@@ -68,9 +68,9 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
-                "20250721OBLG1", TestFixture.getToday(), 0, LocalTime.of(18, 30),
+                "20250721OBLG3", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "기아", "두산", GameState.COMPLETED);
         KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
 
@@ -92,7 +92,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_stadiumNotFound() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "존재하지않는경기장", "한화", "삼성", GameState.COMPLETED);
@@ -110,7 +110,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_homeTeamNotFound() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "존재하지않는원정팀", "삼성", GameState.COMPLETED);
@@ -128,7 +128,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameSchedule_awayTeamNotFound() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         KboGameResponse gameItem = new KboGameResponse(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "한화", "존재하지않는원정팀", GameState.COMPLETED);
@@ -146,7 +146,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         String gameCode = "20250721OBLG0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
@@ -179,7 +179,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameNotCompleted() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
@@ -205,7 +205,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameCanceled() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
@@ -231,7 +231,7 @@ class GameScheduleSyncServiceTest {
     @Test
     void syncGameResult_gameNotFound() {
         // given
-        LocalDate today = TestFixture.getToday();
+        LocalDate today = TestFixture.getYesterday();
         String unknownGameCode = "20250721XXXX0";
 
         KboGameResponse kboGameResponse = new KboGameResponse(
