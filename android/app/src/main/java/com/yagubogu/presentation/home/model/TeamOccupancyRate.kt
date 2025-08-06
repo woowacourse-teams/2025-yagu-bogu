@@ -6,10 +6,9 @@ import com.yagubogu.presentation.util.getTeamColor
 
 data class TeamOccupancyRate(
     val team: Team,
+    val teamName: String,
     val occupancyRate: Double,
 ) {
     @ColorRes
     val teamColor: Int = team.getTeamColor()
-
-    val teamName: String = team.shortName
 }
