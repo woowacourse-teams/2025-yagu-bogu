@@ -3,9 +3,9 @@ package com.yagubogu.game.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.KboGameListResponse;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
+import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboClient;
@@ -44,16 +44,16 @@ public class GameSyncService {
     private final StadiumRepository stadiumRepository;
 
     public void syncGameSchedule(final LocalDate date) {
-        KboGameListResponse kboGameListResponse = kboClient.fetchGameList(date);
-        List<Game> games = convertToGames(kboGameListResponse);
+        KboGamesResponse kboGamesResponse = kboClient.fetchGames(date);
+        List<Game> games = convertToGames(kboGamesResponse);
 
         gameRepository.saveAll(games);
     }
 
-    public List<Game> convertToGames(final KboGameListResponse kboGameListResponse) {
+    public List<Game> convertToGames(final KboGamesResponse kboGamesResponse) {
         List<Game> games = new ArrayList<>();
 
-        for (KboGameResponse kboGameItem : kboGameListResponse.games()) {
+        for (KboGameResponse kboGameItem : kboGamesResponse.games()) {
             Stadium stadium = getStadiumByName(kboGameItem.stadiumName());
             Team homeTeam = getTeamByShortName(kboGameItem.homeTeamName());
             Team awayTeam = getTeamByShortName(kboGameItem.awayTeamName());
@@ -83,7 +83,7 @@ public class GameSyncService {
 
     @Transactional
     public void syncGameResult(LocalDate date) {
-        List<KboGameResponse> gameResponses = kboClient.fetchGameList(date).games();
+        List<KboGameResponse> gameResponses = kboClient.fetchGames(date).games();
 
         for (KboGameResponse response : gameResponses) {
             gameRepository.findByGameCode(response.gameCode())
