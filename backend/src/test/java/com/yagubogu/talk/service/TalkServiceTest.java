@@ -181,7 +181,7 @@ class TalkServiceTest {
         });
     }
 
-    @DisplayName("예외: 특정 횟수 이상 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
+    @DisplayName("예외: 특정 횟수 이상 신고를 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
     @Test
     void createTalk_blockedFromStadium() {
         // given
@@ -193,7 +193,7 @@ class TalkServiceTest {
         // when & then
         assertThatThrownBy(() -> talkService.createTalk(gameId, request, blockedMemberId))
                 .isExactlyInstanceOf(ForbiddenException.class)
-                .hasMessage("Access to this talk room is denied");
+                .hasMessage("Cannot chat due to multiple user reports");
     }
 
     @DisplayName("본인이 작성한 톡을 삭제한다")
