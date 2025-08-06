@@ -28,14 +28,14 @@ public class GameService {
         return new GameResponse(gameWithCheckIns);
     }
 
+    private Member getMember(final long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
     private void validateIsNotFuture(final LocalDate date) {
         if (date.isAfter(LocalDate.now())) {
             throw new UnprocessableEntityException("Cannot retrieve games for future dates");
         }
-    }
-
-    private Member getMember(final long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 }
