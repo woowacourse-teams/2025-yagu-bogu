@@ -151,7 +151,7 @@ public class TalkIntegrationTest {
                 .body("content", is(content));
     }
 
-    @DisplayName("예외: 신고를 총 10명 이상에게 받은 사용자는 톡을 생성할 수 없다")
+    @DisplayName("예외: 신고를 기준보다 많이 받은 사용자는 톡을 생성할 수 없다")
     @Test
     void createTalk_blockedFromStadium() {
         // given

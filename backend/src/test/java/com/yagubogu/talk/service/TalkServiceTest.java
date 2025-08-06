@@ -181,7 +181,7 @@ class TalkServiceTest {
         });
     }
 
-    @DisplayName("예외: 신고를 10번 이상 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
+    @DisplayName("예외: 특정 횟수 이상 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
     @Test
     void createTalk_blockedFromStadium() {
         // given
