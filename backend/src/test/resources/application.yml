@@ -26,13 +26,13 @@ oauth:
     read-timeout: 180s
 
 security:
-  jwt:
+  token:
     access-token:
       secret-key: this-is-secret-key
-      expire-length: 900      # 15분 (초)
+      expires-in: 900      # 15분 (초)
     refresh-token:
       secret-key: this-is-secret-key
-      expire-length: 1209600  # 14일 (초)
+      expires-in: 1209600  # 14일 (초)
 
 api:
   kbo:

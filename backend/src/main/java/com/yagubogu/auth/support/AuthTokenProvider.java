@@ -7,8 +7,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.yagubogu.auth.config.JwtProperties;
-import com.yagubogu.auth.config.JwtProperties.TokenProperties;
+import com.yagubogu.auth.config.AuthTokenProperties;
+import com.yagubogu.auth.config.AuthTokenProperties.TokenProperties;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Role;
@@ -18,26 +18,26 @@ import java.util.Date;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties(AuthTokenProperties.class)
 @Component
-public class JwtProvider {
+public class AuthTokenProvider {
 
     private static final String ROLE = "role";
 
-    private final JwtProperties jwtProperties;
+    private final AuthTokenProperties authTokenProperties;
 
-    public JwtProvider(final JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
+    public AuthTokenProvider(final AuthTokenProperties authTokenProperties) {
+        this.authTokenProperties = authTokenProperties;
     }
 
     public String createAccessToken(final MemberClaims memberClaims) {
-        TokenProperties accessTokenProperties = jwtProperties.getAccessToken();
+        TokenProperties accessTokenProperties = authTokenProperties.getAccessToken();
 
         return createToken(memberClaims, accessTokenProperties);
     }
 
     public String createRefreshToken(final MemberClaims memberClaims) {
-        TokenProperties refreshTokenProperties = jwtProperties.getRefreshToken();
+        TokenProperties refreshTokenProperties = authTokenProperties.getRefreshToken();
 
         return createToken(memberClaims, refreshTokenProperties);
     }
@@ -73,7 +73,7 @@ public class JwtProvider {
             final TokenProperties tokenProperties
     ) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpireLength());
+        LocalDateTime validity = now.plusSeconds(tokenProperties.getExpiresIn());
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecretKey());
 
         return JWT.create()
@@ -85,7 +85,7 @@ public class JwtProvider {
     }
 
     private DecodedJWT verifyAccessToken(final String token) {
-        Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getAccessToken().getSecretKey());
+        Algorithm algorithm = Algorithm.HMAC256(authTokenProperties.getAccessToken().getSecretKey());
         JWTVerifier verifier = JWT.require(algorithm).build();
 
         return verifier.verify(token);
