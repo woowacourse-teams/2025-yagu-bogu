@@ -1,5 +1,6 @@
 package com.yagubogu.member.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.service.MemberService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/members")
 @RestController
 public class MemberController {

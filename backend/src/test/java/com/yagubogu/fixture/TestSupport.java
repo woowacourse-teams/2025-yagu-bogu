@@ -10,19 +10,17 @@ public class TestSupport {
     private static final String BEARER = "Bearer ";
 
     public static LoginResponse loginResponse(String idToken) {
-        return RestAssured.given()
+        return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest(idToken))
                 .when().post("/api/auth/login")
-                .then().statusCode(200)
-                .extract().as(LoginResponse.class);
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LoginResponse.class);
     }
 
     public static String getAccessToken(String idToken) {
         return BEARER + loginResponse(idToken).accessToken();
-    }
-
-    public static String getRefreshToken(String idToken) {
-        return loginResponse(idToken).refreshToken();
     }
 }

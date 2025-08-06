@@ -1,5 +1,6 @@
 package com.yagubogu.checkin.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -27,6 +28,7 @@ public class CheckInController {
 
     private final CheckInService checkInService;
 
+    @RequireRole
     @PostMapping
     public ResponseEntity<Void> createCheckIn(
             @RequestBody final CreateCheckInRequest request

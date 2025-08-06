@@ -1,5 +1,6 @@
 package com.yagubogu.talk.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
@@ -26,6 +27,7 @@ public class TalkController {
     private final TalkService talkService;
     private final TalkReportService talkReportService;
 
+    @RequireRole
     @GetMapping("/{gameId}")
     public ResponseEntity<CursorResult<TalkResponse>> findTalks(
             @PathVariable final long gameId,
@@ -50,6 +52,7 @@ public class TalkController {
         return ResponseEntity.ok(response);
     }
 
+    @RequireRole
     @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
             @PathVariable final long gameId,
@@ -61,6 +64,7 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @RequireRole
     @PostMapping("/{talkId}/reports")
     public ResponseEntity<Void> reportTalk(
             @PathVariable final long talkId,
@@ -71,6 +75,7 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @RequireRole
     @DeleteMapping("/{gameId}/{talkId}")
     public ResponseEntity<Void> removeTalk(
             @PathVariable final long gameId,

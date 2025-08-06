@@ -1,5 +1,6 @@
 package com.yagubogu.stat.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RequestMapping("/api/stats")
 @RestController
 public class StatController {

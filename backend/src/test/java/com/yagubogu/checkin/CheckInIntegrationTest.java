@@ -1,10 +1,14 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.fixture.TestFixture;
+import com.yagubogu.fixture.TestSupport;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -14,12 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
@@ -30,9 +35,12 @@ public class CheckInIntegrationTest {
     @LocalServerPort
     private int port;
 
+    private String accessToken;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        accessToken = TestSupport.getAccessToken("id_token");
     }
 
     @DisplayName("인증을 저장한다")
@@ -46,6 +54,7 @@ public class CheckInIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(memberId, stadiumId, date))
                 .when().post("/api/check-ins")
                 .then().log().all()
@@ -57,6 +66,7 @@ public class CheckInIntegrationTest {
     void findCheckInCounts() {
         CheckInCountsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("memberId", 1L, "year", 2025)
                 .when().get("/api/check-ins/counts")
                 .then().log().all()
@@ -74,10 +84,12 @@ public class CheckInIntegrationTest {
         long memberId = 1L;
         long invalidStadiumId = 999L;
         LocalDate date = LocalDate.of(2025, 7, 21);
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(memberId, invalidStadiumId, date))
                 .when().post("/api/check-ins")
                 .then().log().all()
@@ -91,10 +103,12 @@ public class CheckInIntegrationTest {
         long memberId = 1L;
         long stadiumId = 1L;
         LocalDate invalidDate = LocalDate.of(1000, 7, 21);
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(memberId, stadiumId, invalidDate))
                 .when().post("/api/check-ins")
                 .then().log().all()
@@ -108,10 +122,12 @@ public class CheckInIntegrationTest {
         long invalidMemberId = 999L;
         long stadiumId = 1L;
         LocalDate date = LocalDate.of(2025, 7, 21);
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(invalidMemberId, stadiumId, date))
                 .when().post("/api/check-ins")
                 .then().log().all()
@@ -121,9 +137,13 @@ public class CheckInIntegrationTest {
     @DisplayName("직관 내역을 조회한다")
     @Test
     void findCheckInHistory() {
+        // given
+        accessToken = TestSupport.getAccessToken("id_token");
+
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", 1L)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
@@ -137,10 +157,12 @@ public class CheckInIntegrationTest {
     void findCheckInHistory_notFoundMember() {
         // given
         long invalidMemberId = 999L;
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
@@ -152,21 +174,29 @@ public class CheckInIntegrationTest {
     @DisplayName("승리 요정 랭킹을 조회한다")
     @Test
     void findVictoryFairyRankings() {
+        // given
+        accessToken = TestSupport.getAccessToken("id_token");
+
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 1L)
                 .when().get("/api/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200);
     }
-  
+
     @DisplayName("인증 여부를 조회한다")
     @Test
     void findCheckInStatus() {
+        // given
+        accessToken = TestSupport.getAccessToken("id_token");
+
         // when
         CheckInStatusResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", 1L)
                 .queryParam("date", "2025-07-21")
                 .when().get("/api/check-ins/status/members/{memberId}")
@@ -184,10 +214,12 @@ public class CheckInIntegrationTest {
     void findCheckInStatus_notFoundMember() {
         // given
         long invalidMemberId = 999L;
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("date", "2025-07-21")
                 .when().get("/api/check-ins/status/members/{memberId}")
@@ -198,9 +230,13 @@ public class CheckInIntegrationTest {
     @DisplayName("이긴 직관 내역을 조회한다")
     @Test
     void findCheckInWinHistory() {
+        // given
+        accessToken = TestSupport.getAccessToken("id_token");
+
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", 1L)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
@@ -214,10 +250,12 @@ public class CheckInIntegrationTest {
     void findCheckInWinHistory_notFoundMember() {
         // given
         long invalidMemberId = 999L;
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", invalidMemberId)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
@@ -229,9 +267,13 @@ public class CheckInIntegrationTest {
     @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율을 조회한다")
     @Test
     void findFanRatesByStadiums() {
+        // given
+        accessToken = TestSupport.getAccessToken("id_token");
+
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 1L)
                 .queryParam("date", TestFixture.getToday().toString())
                 .when().get("/api/check-ins/stadiums/fan-rates")
@@ -244,10 +286,12 @@ public class CheckInIntegrationTest {
     void findFanRatesByStadiums_notFoundMember() {
         // given
         long invalidMemberId = 999L;
+        accessToken = TestSupport.getAccessToken("id_token");
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", invalidMemberId)
                 .queryParam("date", "2025-07-21")
                 .when().get("/api/check-ins/stadiums/fan-rates")

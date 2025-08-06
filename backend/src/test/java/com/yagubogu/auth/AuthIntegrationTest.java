@@ -10,12 +10,9 @@ import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
-import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.Instant;
@@ -40,6 +37,8 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AuthIntegrationTest {
 
+    private static final String BEARER = "Bearer ";
+
     @LocalServerPort
     private int port;
 
@@ -48,9 +47,6 @@ public class AuthIntegrationTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private TeamRepository teamRepository;
 
     @BeforeEach
     void setUp() {
@@ -83,11 +79,14 @@ public class AuthIntegrationTest {
     @Test
     void refresh() {
         // given
-        String refreshToken = TestSupport.getRefreshToken("id_token");
+        LoginResponse loginResponse = TestSupport.loginResponse("id_token");
+        String accessToken = BEARER + loginResponse.accessToken();
+        String refreshToken = loginResponse.refreshToken();
 
         // when
         TokenResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(refreshToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
@@ -107,11 +106,13 @@ public class AuthIntegrationTest {
     @Test
     void refresh_tokenNotFound() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String nonExistToken = "non-exist-token";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(nonExistToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
@@ -122,9 +123,9 @@ public class AuthIntegrationTest {
     @Test
     void refresh_tokenInvalid() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String expiredToken = "expired-token";
-        Team team = teamRepository.save(TestFixture.getTeam());
-        Member member = memberRepository.save(TestFixture.getUser(team));
+        Member member = memberRepository.findById(1L).orElseThrow();
 
         RefreshToken refreshToken = new RefreshToken(
                 expiredToken,
@@ -137,6 +138,7 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(expiredToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
@@ -149,7 +151,7 @@ public class AuthIntegrationTest {
         // given
         String idToken = "id_token";
         LoginResponse loginResponse = TestSupport.loginResponse(idToken);
-        String accessToken = "Bearer " + loginResponse.accessToken();
+        String accessToken = BEARER + loginResponse.accessToken();
         String refreshTokenId = loginResponse.refreshToken();
 
         // when & then
@@ -166,11 +168,13 @@ public class AuthIntegrationTest {
     @Test
     void logout_tokenNotFound() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String nonExistTokenId = "non-exist-token";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new LogoutRequest(nonExistTokenId))
                 .when().post("/api/auth/logout")
                 .then().log().all()
@@ -181,9 +185,9 @@ public class AuthIntegrationTest {
     @Test
     void logout_tokenInvalid() {
         // given
+        String accessToken = TestSupport.getAccessToken("id_token");
         String expiredTokenId = "expired-token";
-        Team team = teamRepository.save(TestFixture.getTeam());
-        Member member = memberRepository.save(TestFixture.getUser(team));
+        Member member = memberRepository.findById(1L).orElseThrow();
 
         RefreshToken refreshToken = new RefreshToken(
                 expiredTokenId,
@@ -196,6 +200,7 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new LogoutRequest(expiredTokenId))
                 .when().post("/api/auth/logout")
                 .then().log().all()

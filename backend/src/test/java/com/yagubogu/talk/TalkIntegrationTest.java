@@ -3,6 +3,8 @@ package com.yagubogu.talk;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 
+import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.talk.dto.TalkRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -12,10 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
+@Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:talk-test-data.sql"
 })
@@ -26,9 +31,12 @@ public class TalkIntegrationTest {
     @LocalServerPort
     private int port;
 
+    private String accessToken;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        accessToken = TestSupport.getAccessToken("id_token");
     }
 
     @DisplayName("톡의 첫 페이지를 조회한다")
@@ -39,6 +47,8 @@ public class TalkIntegrationTest {
 
         // when & then
         RestAssured.given()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
@@ -57,7 +67,9 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        RestAssured.given()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("before", 25)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
@@ -77,7 +89,9 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        RestAssured.given()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("before", 6)
                 .queryParam("limit", 10)
                 .queryParam("memberId", 1)
@@ -97,7 +111,9 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        RestAssured.given()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("after", 47)
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
@@ -117,7 +133,9 @@ public class TalkIntegrationTest {
         long gameId = 1L;
 
         // when & then
-        RestAssured.given()
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("after", 52)
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
@@ -139,6 +157,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
@@ -161,6 +180,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
@@ -179,6 +199,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
                 .queryParam("memberId", 999)
                 .pathParam("gameId", gameId)
@@ -197,6 +218,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
                 .pathParam("talkId", talkId)
@@ -215,6 +237,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
                 .pathParam("talkId", talkId)
@@ -233,6 +256,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 1)
                 .pathParam("gameId", gameId)
                 .pathParam("talkId", talkId)
@@ -251,6 +275,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("memberId", 2)
                 .pathParam("gameId", gameId)
                 .pathParam("talkId", talkId)
@@ -268,6 +293,7 @@ public class TalkIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("reporterId", 2)
                 .pathParam("talkId", talkId)
                 .when().post("/api/talks/{talkId}/reports")

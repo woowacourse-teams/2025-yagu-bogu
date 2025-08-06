@@ -30,9 +30,12 @@ public class MemberIntegrationTest {
     @LocalServerPort
     private int port;
 
+    private String accessToken;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        accessToken = TestSupport.getAccessToken("id_token");
     }
 
     @DisplayName("멤버의 응원팀을 조회한다")
@@ -44,6 +47,7 @@ public class MemberIntegrationTest {
         // when
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", 1L)
                 .when().get("/api/members/{memberId}/favorites")
                 .then().log().all()

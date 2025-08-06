@@ -1,9 +1,9 @@
 package com.yagubogu.auth.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LogoutRequest;
-import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.service.AuthService;
@@ -30,6 +30,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @RequireRole
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(
             @RequestBody final TokenRequest request
@@ -39,9 +40,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @RequireRole
     @PostMapping("/logout")
     public ResponseEntity<TokenResponse> logout(
-            final MemberClaims memberClaims,
             @RequestBody final LogoutRequest request
     ) {
         authService.logout(request.refreshToken());
