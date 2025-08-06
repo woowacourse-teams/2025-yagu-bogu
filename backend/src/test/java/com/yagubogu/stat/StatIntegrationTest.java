@@ -109,11 +109,11 @@ public class StatIntegrationTest {
     void findAverageStatistic() {
         // given
         AverageStatisticResponse expected = new AverageStatisticResponse(
-                9.0,
-                6.3,
+                7.9,
+                6.0,
                 0.3,
-                12.3,
-                9.0
+                10.6,
+                8.3
         );
 
         // when

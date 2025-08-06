@@ -11,7 +11,6 @@ import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import com.yagubogu.team.domain.Team;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -71,9 +70,8 @@ public class StatService {
 
     public AverageStatisticResponse findAverageStatistic(final long memberId) {
         Member member = getMember(memberId);
-        Team team = member.getTeam();
 
-        AverageStatisticResponse response = checkInRepository.findAverageStatistic(member, team);
+        AverageStatisticResponse response = checkInRepository.findAverageStatistic(member);
 
         return AverageStatisticResponse.of(response);
     }

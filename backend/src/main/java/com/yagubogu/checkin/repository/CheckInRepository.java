@@ -196,43 +196,43 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             SELECT new com.yagubogu.stat.dto.AverageStatisticResponse(
                 AVG(
                     CASE
-                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.runs
-                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.runs
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.runs
                         ELSE 0.0
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = :team THEN g.awayScoreBoard.runs
-                        WHEN g.awayTeam = :team THEN g.homeScoreBoard.runs
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.runs
                         ELSE 0.0
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.errors
-                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.errors
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.errors
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.errors
                         ELSE 0.0
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = :team THEN g.homeScoreBoard.hits
-                        WHEN g.awayTeam = :team THEN g.awayScoreBoard.hits
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.hits
                         ELSE 0.0
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = :team THEN g.awayScoreBoard.hits
-                        WHEN g.awayTeam = :team THEN g.homeScoreBoard.hits
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.hits
                         ELSE 0.0
                     END
                 )
             )
             FROM CheckIn ci
             JOIN ci.game g
-            WHERE ci.member = :member AND ci.team = :team
+            WHERE ci.member = :member
             """)
-    AverageStatisticResponse findAverageStatistic(Member member, Team team);
+    AverageStatisticResponse findAverageStatistic(Member member);
 }
