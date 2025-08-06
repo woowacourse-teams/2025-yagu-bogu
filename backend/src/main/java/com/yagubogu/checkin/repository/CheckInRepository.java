@@ -3,11 +3,11 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
-import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
@@ -80,18 +80,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             """)
     int findFavoriteCheckInCountsByStadiumAndMember(Stadium stadium, Member member, int year);
 
-    int countByGame(Game game);
-
-    @Query("""
-            SELECT new com.yagubogu.checkin.dto.TeamCheckInCountResponse(m.team.id, m.team.shortName, COUNT(ci))
-            FROM CheckIn ci
-            JOIN ci.member m
-            WHERE ci.game = :game
-            GROUP BY m.team.id
-            ORDER BY COUNT(ci) DESC
-            """)
-    List<TeamCheckInCountResponse> countCheckInGroupByTeam(Game game);
-
     @Query("""
                 SELECT COUNT(c)
                 FROM CheckIn c
@@ -105,13 +93,13 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                     c.id,
                     g.stadium.fullName,
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                        g.homeTeam.id,
+                        g.homeTeam.teamCode,
                         g.homeTeam.shortName,
                         g.homeScore,
                         CASE WHEN g.homeTeam = :team THEN true ELSE false END
                     ),
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                        g.awayTeam.id,
+                        g.awayTeam.teamCode,
                         g.awayTeam.shortName,
                         g.awayScore,
                         CASE WHEN g.awayTeam = :team THEN true ELSE false END
@@ -156,13 +144,13 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 c.id,
                 g.stadium.fullName,
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                    g.homeTeam.id,
+                    g.homeTeam.teamCode,
                     g.homeTeam.shortName,
                     g.homeScore,
                     CASE WHEN g.homeTeam = :team THEN true ELSE false END
                 ),
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                    g.awayTeam.id,
+                    g.awayTeam.teamCode,
                     g.awayTeam.shortName,
                     g.awayScore,
                     CASE WHEN g.awayTeam = :team THEN true ELSE false END
@@ -190,4 +178,44 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE c.game = :game
             """)
     FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
+
+    @Query("""
+            SELECT new com.yagubogu.stat.dto.AverageStatistic(
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.runs
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.runs
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.runs
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.errors
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.errors
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.hits
+                    END
+                ),
+                AVG(
+                    CASE
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.hits
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.hits
+                    END
+                )
+            )
+            FROM CheckIn ci
+            JOIN ci.game g
+            WHERE ci.member = :member
+                AND (g.homeTeam = ci.team OR g.awayTeam = ci.team)
+            """)
+    AverageStatistic findAverageStatistic(Member member);
 }

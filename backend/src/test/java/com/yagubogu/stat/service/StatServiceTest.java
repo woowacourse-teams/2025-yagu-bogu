@@ -9,9 +9,12 @@ import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.AverageStatistic;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -184,5 +187,51 @@ class StatServiceTest {
 
         // then
         assertThat(luckyStadium.shortName()).isNull();
+    }
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회한다")
+    @Test
+    void findAverageStatistic() {
+        // given
+        long memberId = 1L;
+        AverageStatistic expected = new AverageStatistic(
+                9.0,
+                6.9,
+                0.3,
+                12.1,
+                9.4
+        );
+
+        // when
+        AverageStatisticResponse actual = statService.findAverageStatistic(memberId);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.averageRun()).isEqualTo(expected.averageRuns());
+            softAssertions.assertThat(actual.concededRuns()).isEqualTo(expected.averageConcededRuns());
+            softAssertions.assertThat(actual.averageErrors()).isEqualTo(expected.averageErrors());
+            softAssertions.assertThat(actual.averageHits()).isEqualTo(expected.averageHits());
+            softAssertions.assertThat(actual.concededHits()).isEqualTo(expected.averageConcededHits());
+        });
+    }
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회 시 해당되는게 하나도 없으면 null을 반환한다")
+    @Test
+    void findAverageStatistic_nullChecking() {
+        // given
+        long memberId = 11L;
+
+        // when
+        AverageStatisticResponse actual = statService.findAverageStatistic(memberId);
+
+        // then
+        assertThat(actual)
+                .satisfies(response -> {
+                    assertThat(response.averageRun()).isNull();
+                    assertThat(response.concededRuns()).isNull();
+                    assertThat(response.averageErrors()).isNull();
+                    assertThat(response.averageHits()).isNull();
+                    assertThat(response.concededHits()).isNull();
+                });
     }
 }
