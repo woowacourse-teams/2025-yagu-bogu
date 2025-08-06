@@ -6,15 +6,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="20dp"
+        android:paddingBottom="12dp"
         tools:context=".presentation.livetalk.LivetalkFragment">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_live_talk_stadium"
+            android:id="@+id/rv_livetalk_stadium"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:itemCount="5"
-            tools:listitem="@layout/item_livetalk_stadium"
-            />
+            tools:listitem="@layout/item_livetalk_stadium" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
