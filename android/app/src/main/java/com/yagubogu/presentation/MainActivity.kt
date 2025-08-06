@@ -14,7 +14,7 @@ import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.challenge.ChallengeFragment
 import com.yagubogu.presentation.home.HomeFragment
-import com.yagubogu.presentation.livetalk.LiveTalkFragment
+import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
 
 class MainActivity : AppCompatActivity() {
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.item_livetalk -> {
-                    switchFragment(LiveTalkFragment::class.java, itemId)
+                    switchFragment(LivetalkFragment::class.java, itemId)
                     true
                 }
 
