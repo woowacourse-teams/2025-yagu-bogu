@@ -2,7 +2,17 @@ package com.yagubogu.member.domain;
 
 public enum Role {
 
-    ADMIN,
-    USER,
+    USER(1),
+    ADMIN(2)
     ;
+
+    private final int level;
+
+    Role(int level) {
+        this.level = level;
+    }
+
+    public boolean hasPermission(Role required) {
+        return this.level >= required.level;
+    }
 }

@@ -6,9 +6,9 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
+import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
@@ -56,8 +56,8 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider, List.of(googleAuthValidator),
-                refreshTokenRepository, authTokenProperties);
+        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider,
+                List.of(googleAuthValidator), refreshTokenRepository, authTokenProperties);
     }
 
     @DisplayName("로그인을 수행한다")
