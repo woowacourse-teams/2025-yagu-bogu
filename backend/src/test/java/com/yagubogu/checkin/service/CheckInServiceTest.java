@@ -161,38 +161,38 @@ class CheckInServiceTest {
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 21)
                 ),
                 new CheckInGameResponse(2L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 5, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 5, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 20)
                 ),
                 new CheckInGameResponse(3L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 19)
                 ),
                 new CheckInGameResponse(4L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 18)
                 ),
                 new CheckInGameResponse(5L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
-                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
+                        new CheckInGameTeamResponse("HT", "기아", 9, true),
                         LocalDate.of(2025, 7, 17)
                 ),
                 new CheckInGameResponse(6L,
                         "대구 삼성라이온즈파크",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 16)
                 )
         );
@@ -310,32 +310,32 @@ class CheckInServiceTest {
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 21)
                 ),
                 new CheckInGameResponse(3L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 19)
                 ),
                 new CheckInGameResponse(4L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 18)
                 ),
                 new CheckInGameResponse(5L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
-                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
+                        new CheckInGameTeamResponse("HT", "기아", 9, true),
                         LocalDate.of(2025, 7, 17)
                 ),
                 new CheckInGameResponse(6L,
                         "대구 삼성라이온즈파크",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 16)
                 )
         );

@@ -3,7 +3,6 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.FanCountsByGameResponse;
-import com.yagubogu.checkin.dto.TeamCheckInCountResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
@@ -80,18 +79,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             """)
     int findFavoriteCheckInCountsByStadiumAndMember(Stadium stadium, Member member, int year);
 
-    int countByGame(Game game);
-
-    @Query("""
-            SELECT new com.yagubogu.checkin.dto.TeamCheckInCountResponse(m.team.id, m.team.shortName, COUNT(ci))
-            FROM CheckIn ci
-            JOIN ci.member m
-            WHERE ci.game = :game
-            GROUP BY m.team.id
-            ORDER BY COUNT(ci) DESC
-            """)
-    List<TeamCheckInCountResponse> countCheckInGroupByTeam(Game game);
-
     @Query("""
                 SELECT COUNT(c)
                 FROM CheckIn c
@@ -105,13 +92,13 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                     c.id,
                     g.stadium.fullName,
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                        g.homeTeam.id,
+                        g.homeTeam.teamCode,
                         g.homeTeam.shortName,
                         g.homeScore,
                         CASE WHEN g.homeTeam = :team THEN true ELSE false END
                     ),
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                        g.awayTeam.id,
+                        g.awayTeam.teamCode,
                         g.awayTeam.shortName,
                         g.awayScore,
                         CASE WHEN g.awayTeam = :team THEN true ELSE false END
@@ -156,13 +143,13 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 c.id,
                 g.stadium.fullName,
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                    g.homeTeam.id,
+                    g.homeTeam.teamCode,
                     g.homeTeam.shortName,
                     g.homeScore,
                     CASE WHEN g.homeTeam = :team THEN true ELSE false END
                 ),
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
-                    g.awayTeam.id,
+                    g.awayTeam.teamCode,
                     g.awayTeam.shortName,
                     g.awayScore,
                     CASE WHEN g.awayTeam = :team THEN true ELSE false END

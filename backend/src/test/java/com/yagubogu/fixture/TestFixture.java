@@ -13,6 +13,10 @@ public class TestFixture {
         return LocalDate.of(2025, 7, 21);
     }
 
+    public static LocalDate getYesterday() {
+        return getToday().minusDays(1);
+    }
+
     public static LocalDate getInvalidDate() {
         return LocalDate.of(1000, 6, 15);
     }

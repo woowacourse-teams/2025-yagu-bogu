@@ -112,7 +112,7 @@ public class TalkIntegrationTest {
 
     @DisplayName("새 톡을 가져온다")
     @Test
-    void pollTalks_existing() {
+    void findNewTalks_existing() {
         // given
         long gameId = 1L;
 
@@ -124,7 +124,7 @@ public class TalkIntegrationTest {
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling")
+                .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(5))
@@ -134,7 +134,7 @@ public class TalkIntegrationTest {
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
     @Test
-    void pollTalks_noExisting() {
+    void findNewTalks_noExisting() {
         // given
         long gameId = 1L;
 
@@ -146,7 +146,7 @@ public class TalkIntegrationTest {
                 .queryParam("limit", 10)
                 .pathParam("gameId", gameId)
                 .when()
-                .get("/api/talks/{gameId}/polling")
+                .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("content.size()", is(0))
@@ -173,6 +173,26 @@ public class TalkIntegrationTest {
                 .body("nickname", is("포라"))
                 .body("favorite", is("롯데"))
                 .body("content", is(content));
+    }
+
+    @DisplayName("예외: 신고를 기준보다 많이 받은 사용자는 톡을 생성할 수 없다")
+    @Test
+    void createTalk_blockedFromStadium() {
+        // given
+        long gameId = 1L;
+        long blockedMemberId = 2L;
+        String content = "오늘 야구보구 인증하구";
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TalkRequest(content))
+                .queryParam("memberId", blockedMemberId)
+                .pathParam("gameId", gameId)
+                .when()
+                .post("/api/talks/{gameId}")
+                .then().log().all()
+                .statusCode(403);
     }
 
     @DisplayName("예외: 존재하지 않는 gameId로 톡을 생성하면 에러가 발생한다")

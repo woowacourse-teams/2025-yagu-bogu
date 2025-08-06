@@ -7,9 +7,18 @@ VALUES ('롯데자이언츠', '롯데', 'LT'),
 
 -- 2. 멤버 생성 (ID 명시, team_id는 위에서 명시한 ID 참조)
 INSERT INTO members (team_id, nickname, email, provider, oauth_id, role, image_url)
-VALUES (1, '포라', 'pora@example.com', 'GOOGLE', 'sub-pora', 'USER', 'https://image.com/pora.png'),
-       (2, '누구', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://image.com/por.png');
-
+VALUES (1, '포라', 'fora@example.com', 'GOOGLE', 'sub-fora', 'USER', 'https://image.com/fora.png'),
+       (2, '파이브라', 'fivera@example.com', 'GOOGLE', 'sub-fivera', 'USER', 'https://image.com/fivera.png'),
+       (3, '식스라', 'sixra@example.com', 'GOOGLE', 'sub-sixra', 'USER', 'https://image.com/sixra.png'),
+       (4, '세븐라', 'sevenra@example.com', 'GOOGLE', 'sub-sevenra', 'USER', 'https://image.com/sevenra.png'),
+       (4, '에잇라', 'eightra@example.com', 'GOOGLE', 'sub-eightra', 'USER', 'https://image.com/eightra.png'),
+       (4, '나인라', 'ninera@example.com', 'GOOGLE', 'sub-ninera', 'USER', 'https://image.com/ninera.png'),
+       (4, '텐라', 'tenra@example.com', 'GOOGLE', 'sub-tenra', 'USER', 'https://image.com/tenra.png'),
+       (4, '일레븐라', 'elevenra@example.com', 'GOOGLE', 'sub-elevenra', 'USER', 'https://image.com/elevenra.png'),
+       (4, '트웰브라', 'twelvera@example.com', 'GOOGLE', 'sub-twelvera', 'USER', 'https://image.com/twelvera.png'),
+       (4, '써틴라', 'thirteenra@example.com', 'GOOGLE', 'sub-thirteenra', 'USER', 'https://image.com/thirteenra.png'),
+       (4, '포틴라', 'fourteenra@example.com', 'GOOGLE', 'sub-fourteenra', 'USER', 'https://image.com/fourteenra.png'),
+       (4, '피프틴라', 'fifteenra@example.com', 'GOOGLE', 'sub-fifteenra', 'USER', 'https://image.com/fifteenra.png');
 -- 3. 구장 생성 (ID 명시)
 INSERT INTO stadiums (full_name, short_name, location, latitude, longitude)
 VALUES ('사직야구장', '사직구장', '부산', 35.1943, 129.0615),
@@ -75,3 +84,15 @@ VALUES (1, 1, '메세지 1', '2025-07-25 15:00:00'),
        (1, 2, '메세지 50', '2025-07-25 15:49:00'),
        (1, 1, '메세지 51', '2025-07-25 15:50:00'),
        (1, 2, '메세지 52', '2025-07-25 15:51:00');
+
+INSERT INTO talk_reports (talk_id, reporter_id, reported_at)
+VALUES (12, 1, '2025-07-25 15:51:00'),
+       (12, 3, '2025-07-25 15:52:00'),
+       (12, 4, '2025-07-25 15:53:00'),
+       (12, 5, '2025-07-25 15:54:00'),
+       (12, 6, '2025-07-25 15:55:00'),
+       (12, 7, '2025-07-25 15:56:00'),
+       (12, 8, '2025-07-25 15:57:00'),
+       (12, 9, '2025-07-25 15:58:00'),
+       (12, 10, '2025-07-25 15:59:00'),
+       (12, 11, '2025-07-25 16:00:00');

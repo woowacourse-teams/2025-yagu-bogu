@@ -1,7 +1,7 @@
 package com.yagubogu.checkin.dto;
 
 public record CheckInGameTeamResponse(
-        Long id,
+        String code,
         String name,
         int score,
         boolean isMyTeam
