@@ -52,7 +52,6 @@ public class TalkIntegrationTest {
     void findTalks_firstPage() {
         // given
         long gameId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
 
         // when & then
         RestAssured.given()
@@ -115,6 +114,7 @@ public class TalkIntegrationTest {
     void findNewTalks_existing() {
         // given
         long gameId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(2L, authTokenProvider);
 
         // when & then
         RestAssured.given().log().all()
@@ -137,6 +137,7 @@ public class TalkIntegrationTest {
     void findNewTalks_noExisting() {
         // given
         long gameId = 1L;
+        accessToken = TestSupport.getAccessTokenByMemberId(2L, authTokenProvider);
 
         // when & then
         RestAssured.given().log().all()
@@ -181,13 +182,14 @@ public class TalkIntegrationTest {
         // given
         long gameId = 1L;
         long blockedMemberId = 2L;
+        accessToken = TestSupport.getAccessTokenByMemberId(blockedMemberId, authTokenProvider);
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
-                .queryParam("memberId", blockedMemberId)
                 .pathParam("gameId", gameId)
                 .when()
                 .post("/api/talks/{gameId}")
