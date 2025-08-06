@@ -28,6 +28,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".presentation.favorite.FavoriteTeamActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.MainActivity"
             android:exported="false" />
     </application>

@@ -61,3 +61,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
