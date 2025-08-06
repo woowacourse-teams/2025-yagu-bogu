@@ -2,6 +2,9 @@ package com.yagubogu
 
 import android.app.Application
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.yagubogu.common.YaguBoguDebugTree
+import com.yagubogu.common.YaguBoguReleaseTree
 import com.yagubogu.data.datasource.CheckInsRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
@@ -13,6 +16,7 @@ import com.yagubogu.data.repository.LocationDefaultRepository
 import com.yagubogu.data.repository.MemberDefaultRepository
 import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
+import timber.log.Timber
 
 class YaguBoguApplication : Application() {
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
@@ -30,4 +34,16 @@ class YaguBoguApplication : Application() {
 
     private val statsDataSource by lazy { StatsRemoteDataSource(RetrofitInstance.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
+
+    override fun onCreate() {
+        super.onCreate()
+        if (BuildConfig.DEBUG) {
+            // 개발 환경
+            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = false
+            Timber.plant(YaguBoguDebugTree())
+        } else {
+            // 운영 환경
+            Timber.plant(YaguBoguReleaseTree())
+        }
+    }
 }
