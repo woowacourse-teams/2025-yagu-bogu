@@ -7,16 +7,22 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.viewModels
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
-import com.yagubogu.domain.model.Team
-import java.time.LocalDate
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
+
+    private val viewModel: AttendanceHistoryViewModel by viewModels {
+        val app = requireActivity().application as YaguBoguApplication
+        AttendanceHistoryViewModelFactory(app.checkInsRepository)
+    }
+
+    private val attendanceHistoryAdapter = AttendanceHistoryAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +40,7 @@ class AttendanceHistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupSpinner()
+        setupObservers()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -46,13 +53,7 @@ class AttendanceHistoryFragment : Fragment() {
     }
 
     private fun setupBindings() {
-        val attendanceHistoryAdapter = AttendanceHistoryAdapter()
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvAttendanceHistory.apply {
-            adapter = attendanceHistoryAdapter
-            layoutManager = linearLayoutManager
-        }
-        attendanceHistoryAdapter.submitList(DUMMY_ATTENDANCE_HISTORY_ITEMS)
+        binding.rvAttendanceHistory.adapter = attendanceHistoryAdapter
     }
 
     private fun setupSpinner() {
@@ -71,8 +72,15 @@ class AttendanceHistoryFragment : Fragment() {
                         id: Long,
                     ) {
                         when (position) {
-                            0 -> {}
-                            1 -> {}
+                            0 -> {
+                                viewModel.clearAttendanceHistoryItems()
+                                viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_ALL)
+                            }
+
+                            1 -> {
+                                viewModel.clearAttendanceHistoryItems()
+                                viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_WIN)
+                            }
                         }
                     }
 
@@ -81,63 +89,14 @@ class AttendanceHistoryFragment : Fragment() {
         }
     }
 
+    private fun setupObservers() {
+        viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { attendanceHistoryItems: List<AttendanceHistoryItem> ->
+            attendanceHistoryAdapter.submitList(attendanceHistoryItems)
+        }
+    }
+
     companion object {
-        private val DUMMY_ATTENDANCE_HISTORY_ITEMS: List<AttendanceHistoryItem> =
-            listOf(
-                AttendanceHistoryItem(
-                    awayTeam =
-                        TeamItem(
-                            team = Team.HT,
-                            name = "KIA",
-                            score = 9,
-                            isMyTeam = true,
-                        ),
-                    homeTeam =
-                        TeamItem(
-                            team = Team.OB,
-                            name = "두산",
-                            score = 5,
-                            isMyTeam = false,
-                        ),
-                    attendanceDate = LocalDate.of(2025, 8, 1),
-                    stadiumName = "잠실 야구장",
-                ),
-                AttendanceHistoryItem(
-                    awayTeam =
-                        TeamItem(
-                            team = Team.WO,
-                            name = "키움",
-                            score = 7,
-                            isMyTeam = false,
-                        ),
-                    homeTeam =
-                        TeamItem(
-                            team = Team.HT,
-                            name = "KIA",
-                            score = 4,
-                            isMyTeam = true,
-                        ),
-                    attendanceDate = LocalDate.of(2025, 7, 31),
-                    stadiumName = "광주 KIA 챔피언스필드",
-                ),
-                AttendanceHistoryItem(
-                    awayTeam =
-                        TeamItem(
-                            team = Team.HT,
-                            name = "KIA",
-                            score = 20,
-                            isMyTeam = true,
-                        ),
-                    homeTeam =
-                        TeamItem(
-                            team = Team.LG,
-                            name = "LG",
-                            score = 8,
-                            isMyTeam = false,
-                        ),
-                    attendanceDate = LocalDate.of(2025, 7, 22),
-                    stadiumName = "잠실 야구장",
-                ),
-            )
+        private const val RESULT_TYPE_ALL = "ALL"
+        private const val RESULT_TYPE_WIN = "WIN"
     }
 }
