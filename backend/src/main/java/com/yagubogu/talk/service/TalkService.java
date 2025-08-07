@@ -9,6 +9,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.CursorResult;
+import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -34,7 +35,7 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
 
-    public CursorResult<TalkResponse> findTalksExcludingReported(
+    public TalkCursorResult findTalksExcludingReported(
             final long gameId,
             final Long cursorId,
             final int limit,
@@ -46,10 +47,19 @@ public class TalkService {
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
-        return new CursorResult<>(hiddenReportedTalks, nextCursorId, talkResponses.hasNext());
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException("Game not found"));
+        CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
+                talkResponses.hasNext());
+
+        return TalkCursorResult.from(
+                game.getStadium().getFullName(),
+                game.getHomeTeam().getShortName(),
+                game.getAwayTeam().getShortName(),
+                cursorResult
+        );
     }
 
-    public CursorResult<TalkResponse> findNewTalks(
+    public TalkCursorResult findNewTalks(
             final long gameId,
             final long cursorId,
             final long memberId,
@@ -60,8 +70,16 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException("Game not found"));
+        CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
+                nextCursorId, talkResponses.hasNext());
 
-        return new CursorResult<>(talkResponses.getContent(), nextCursorId, talkResponses.hasNext());
+        return TalkCursorResult.from(
+                game.getStadium().getFullName(),
+                game.getHomeTeam().getShortName(),
+                game.getAwayTeam().getShortName(),
+                cursorResult
+        );
     }
 
     public TalkResponse createTalk(
