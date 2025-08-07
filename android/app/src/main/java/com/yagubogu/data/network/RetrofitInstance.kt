@@ -86,15 +86,15 @@ class RetrofitInstance(
         baseRetrofit.create(StatsApiService::class.java)
     }
 
-    companion object {
-        private const val MEDIA_TYPE = "application/json; charset=UTF8"
-    }
-
     val gamesApiService: GamesApiService by lazy {
         baseRetrofit.create(GamesApiService::class.java)
     }
 
     val talksApiService: TalksApiService by lazy {
         baseRetrofit.create(TalksApiService::class.java)
+    }
+
+    companion object {
+        private const val MEDIA_TYPE = "application/json; charset=UTF8"
     }
 }

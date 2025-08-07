@@ -13,7 +13,7 @@ data class TalkResponse(
     @SerialName("awayTeamName")
     val awayTeamName: String, // 현장톡 채팅 화면의 어웨이팀명
     @SerialName("cursorResult")
-    val cursorResult: CursorResult, // 페이징징된 톡 메시지
+    val cursorResult: CursorResult, // 페이징된 톡 메시지
 ) {
     fun toPresentation(): LivetalkResponseItem =
         LivetalkResponseItem(

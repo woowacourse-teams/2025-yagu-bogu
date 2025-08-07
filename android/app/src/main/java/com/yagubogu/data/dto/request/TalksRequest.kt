@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TalksRequest(
     @SerialName("content")
-    val content: String, // 경기 아이디
+    val content: String, // 전송할 메시지 내용
 )
