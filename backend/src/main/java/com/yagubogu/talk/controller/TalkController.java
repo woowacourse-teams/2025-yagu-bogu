@@ -2,7 +2,7 @@ package com.yagubogu.talk.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.talk.dto.CursorResult;
+import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.service.TalkReportService;
@@ -30,25 +30,26 @@ public class TalkController {
     private final TalkReportService talkReportService;
 
     @GetMapping("/{gameId}")
-    public ResponseEntity<CursorResult<TalkResponse>> findTalks(
+    public ResponseEntity<TalkCursorResult> findTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "before", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        CursorResult<TalkResponse> response = talkService.findTalksExcludingReported(gameId, cursorId,
+        TalkCursorResult response = talkService.findTalksExcludingReported(gameId, cursorId,
                 limit, memberClaims.id());
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{gameId}/latest")
-    public ResponseEntity<CursorResult<TalkResponse>> findNewTalks(
+    public ResponseEntity<TalkCursorResult> findNewTalks(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        CursorResult<TalkResponse> response = talkService.findNewTalks(gameId, cursorId, limit);
+        TalkCursorResult response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
 
         return ResponseEntity.ok(response);
     }

@@ -7,7 +7,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.talk.dto.CursorResult;
+import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -56,18 +56,30 @@ class TalkServiceTest {
         int limit = 10;
         long memberId = 1L;
 
+        String expectedStadiumName = "사직야구장";
+        String expectedHomeTeamName = "롯데";
+        String expectedAwayTeamName = "한화";
         long expectedLatestTalkId = 52L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = 43L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
                 memberId);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            softAssertions.assertThat(actual.hasNext()).isTrue();
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+                    .isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+                    .isEqualTo(expectedImageUrl);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
         });
     }
 
@@ -80,18 +92,30 @@ class TalkServiceTest {
         int limit = 10;
         long memberId = 1L;
 
+        String expectedStadiumName = "사직야구장";
+        String expectedHomeTeamName = "롯데";
+        String expectedAwayTeamName = "한화";
         long expectedLatestTalkId = 42L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = 33L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
                 memberId);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            softAssertions.assertThat(actual.hasNext()).isTrue();
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+                    .isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+                    .isEqualTo(expectedImageUrl);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
         });
     }
 
@@ -104,18 +128,55 @@ class TalkServiceTest {
         int limit = 10;
         long memberId = 1L;
 
+        String expectedStadiumName = "사직야구장";
+        String expectedHomeTeamName = "롯데";
+        String expectedAwayTeamName = "한화";
         long expectedLatestTalkId = 2L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = null;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
                 memberId);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            softAssertions.assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+                    .isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+                    .isEqualTo(expectedImageUrl);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+        });
+    }
+
+    @DisplayName("가져온 톡 중 자신이 작성한 톡을 구분할 수 있다")
+    @Test
+    void findTalks_myTalk() {
+        // given
+        long gameId = 1L;
+        Long cursorId = 43L;
+        int limit = 20;
+        long memberId = 1L;
+
+        long expectedMyTalkCount = 10L;
+
+        // when
+        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberId);
+        long actualMyTalkCount = actual.cursorResult().content()
+                .stream()
+                .filter(TalkResponse::isMine)
+                .count();
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actualMyTalkCount).isEqualTo(expectedMyTalkCount);
         });
     }
 
@@ -125,20 +186,27 @@ class TalkServiceTest {
         // given
         long gameId = 1L;
         Long cursorId = 50L;
+        long memberId = 1L;
         int limit = 10;
 
+        String expectedStadiumName = "사직야구장";
+        String expectedHomeTeamName = "롯데";
+        String expectedAwayTeamName = "한화";
         long expectedLastTalkId = 52L;
         Long expectedNextCursorId = 52L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
+        TalkCursorResult actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.content()).hasSize(2);
-            softAssertions.assertThat(actual.content().getLast().id()).isEqualTo(expectedLastTalkId);
-            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
-            softAssertions.assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
+            softAssertions.assertThat(actual.cursorResult().content()).hasSize(2);
+            softAssertions.assertThat(actual.cursorResult().content().getLast().id()).isEqualTo(expectedLastTalkId);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 
@@ -148,16 +216,17 @@ class TalkServiceTest {
         // given
         long gameId = 1L;
         Long cursorId = 52L;
+        long memberId = 1L;
         int limit = 10;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
+        TalkCursorResult actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.content()).isEmpty();
-            softAssertions.assertThat(actual.nextCursorId()).isEqualTo(cursorId);
-            softAssertions.assertThat(actual.hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResult().content()).isEmpty();
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(cursorId);
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 

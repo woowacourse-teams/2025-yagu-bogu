@@ -6,9 +6,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestSupport;
-import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.dto.TalkRequest;
-import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,8 +61,11 @@ public class TalkIntegrationTest {
                 .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("content[0].id", is(52))
-                .body("nextCursorId", is(43));
+                .body("stadiumName", is("사직야구장"))
+                .body("homeTeamName", is("롯데"))
+                .body("awayTeamName", is("한화"))
+                .body("cursorResult.content[0].id", is(52))
+                .body("cursorResult.nextCursorId", is(43));
     }
 
     @DisplayName("톡의 중간 페이지를 조회한다")
@@ -84,8 +85,11 @@ public class TalkIntegrationTest {
                 .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("content[0].id", is(24))
-                .body("nextCursorId", is(15));
+                .body("stadiumName", is("사직야구장"))
+                .body("homeTeamName", is("롯데"))
+                .body("awayTeamName", is("한화"))
+                .body("cursorResult.content[0].id", is(24))
+                .body("cursorResult.nextCursorId", is(15));
     }
 
     @DisplayName("톡의 마지막 페이지를 조회한다")
@@ -105,8 +109,11 @@ public class TalkIntegrationTest {
                 .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("content[0].id", is(5))
-                .body("nextCursorId", is(nullValue()));
+                .body("stadiumName", is("사직야구장"))
+                .body("homeTeamName", is("롯데"))
+                .body("awayTeamName", is("한화"))
+                .body("cursorResult.content[0].id", is(5))
+                .body("cursorResult.nextCursorId", is(nullValue()));
     }
 
     @DisplayName("새 톡을 가져온다")
@@ -127,9 +134,9 @@ public class TalkIntegrationTest {
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("content.size()", is(5))
-                .body("content[-1].id", is(52))
-                .body("nextCursorId", is(52));
+                .body("cursorResult.content.size()", is(5))
+                .body("cursorResult.content[-1].id", is(52))
+                .body("cursorResult.nextCursorId", is(52));
     }
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
@@ -150,8 +157,8 @@ public class TalkIntegrationTest {
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("content.size()", is(0))
-                .body("nextCursorId", is(52));
+                .body("cursorResult.content.size()", is(0))
+                .body("cursorResult.nextCursorId", is(52));
     }
 
     @DisplayName("정상적으로 톡을 저장하고 응답을 반환한다")

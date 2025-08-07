@@ -79,6 +79,10 @@ public class Member {
         return role.equals(Role.ADMIN);
     }
 
+    public boolean isSameId(long memberId) {
+        return this.id.equals(memberId);
+    }
+
     public void updateFavorite(final Team team) {
         this.team = team;
     }
