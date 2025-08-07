@@ -27,8 +27,6 @@ class RetrofitInstance(
         }
     }
 
-    private val tokenInterceptor = TokenInterceptor(tokenManager)
-
     private val authClient: OkHttpClient by lazy {
         OkHttpClient()
             .newBuilder()
@@ -41,15 +39,15 @@ class RetrofitInstance(
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(authClient)
-            .addConverterFactory(
-                Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
-            ).build()
+            .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .build()
     }
 
     val authApiService: AuthApiService by lazy {
         authRetrofit.create(AuthApiService::class.java)
     }
 
+    private val tokenInterceptor = TokenInterceptor(tokenManager)
     private val tokenAuthenticator = TokenAuthenticator(tokenManager, authApiService)
 
     private val baseClient: OkHttpClient by lazy {
@@ -66,9 +64,8 @@ class RetrofitInstance(
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(baseClient)
-            .addConverterFactory(
-                Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
-            ).build()
+            .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .build()
     }
 
     val memberApiService: MemberApiService by lazy {
@@ -85,5 +82,9 @@ class RetrofitInstance(
 
     val statsApiService: StatsApiService by lazy {
         baseRetrofit.create(StatsApiService::class.java)
+    }
+
+    companion object {
+        private const val MEDIA_TYPE = "application/json; charset=UTF8"
     }
 }

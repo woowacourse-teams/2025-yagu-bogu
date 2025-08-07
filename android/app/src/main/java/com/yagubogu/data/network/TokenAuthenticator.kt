@@ -2,6 +2,7 @@ package com.yagubogu.data.network
 
 import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.service.AuthApiService
+import com.yagubogu.data.util.safeApiCall
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -16,41 +17,35 @@ class TokenAuthenticator(
         route: Route?,
         response: Response,
     ): Request? {
-        val urlPath: String = response.request.url.encodedPath
-        if (urlPath.contains(AUTH_REFRESH_ENDPOINT)) {
+        val requestUrl: String = response.request.url.encodedPath
+        if (requestUrl.endsWith(AUTH_REFRESH_ENDPOINT)) {
             return null
         }
 
-        val refreshToken: String = runBlocking { tokenManager.getRefreshToken() } ?: return null
-
-        // Retrofit Call 객체 동기 실행
-        val tokenResponse =
-            runBlocking {
-                authApiService
-                    .postRefresh(
-                        TokenRequest(refreshToken),
-                    )
+        return runBlocking {
+            val refreshToken: String = tokenManager.getRefreshToken() ?: return@runBlocking null
+            safeApiCall {
+                val tokenRequest = TokenRequest(refreshToken)
+                authApiService.postRefresh(tokenRequest)
+            }.onSuccess { (accessToken, refreshToken) ->
+                tokenManager.saveTokens(accessToken, refreshToken)
+                return@runBlocking response.request.addTokenHeader(accessToken)
             }
 
-        if (tokenResponse.isSuccessful) {
-            val newAccessToken = tokenResponse.body()?.accessToken ?: return null
-            val newRefreshToken = tokenResponse.body()?.refreshToken ?: return null
-
-            runBlocking {
-                tokenManager.saveTokens(newAccessToken, newRefreshToken)
-            }
-
-            return response.request
-                .newBuilder()
-                .header("Authorization", "Bearer $newAccessToken")
-                .build()
+            tokenManager.clearTokens()
+            return@runBlocking null
         }
-
-        runBlocking { tokenManager.clearTokens() }
-        return null
     }
+
+    private fun Request.addTokenHeader(accessToken: String): Request =
+        this
+            .newBuilder()
+            .addHeader(HEADER_AUTHORIZATION, "$HEADER_AUTHORIZATION_TYPE $accessToken")
+            .build()
 
     companion object {
         private const val AUTH_REFRESH_ENDPOINT = "/auth/refresh"
+        private const val HEADER_AUTHORIZATION = "Authorization"
+        private const val HEADER_AUTHORIZATION_TYPE = "Bearer"
     }
 }

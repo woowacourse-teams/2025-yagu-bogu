@@ -23,7 +23,7 @@ import timber.log.Timber
 
 class YaguBoguApplication : Application() {
     private val tokenManager by lazy { TokenManager(this) }
-    private val retrofit: RetrofitInstance by lazy { RetrofitInstance(tokenManager) }
+    private val retrofit by lazy { RetrofitInstance(tokenManager) }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
