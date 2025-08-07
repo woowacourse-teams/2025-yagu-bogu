@@ -57,6 +57,8 @@ class TalkServiceTest {
         long memberId = 1L;
 
         long expectedLatestTalkId = 52L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = 43L;
 
         // when
@@ -66,6 +68,8 @@ class TalkServiceTest {
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.content().getFirst().memberId()).isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.content().getFirst().imageUrl()).isEqualTo(expectedImageUrl);
             softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
             softAssertions.assertThat(actual.hasNext()).isTrue();
         });
@@ -81,6 +85,8 @@ class TalkServiceTest {
         long memberId = 1L;
 
         long expectedLatestTalkId = 42L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = 33L;
 
         // when
@@ -90,6 +96,8 @@ class TalkServiceTest {
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.content().getFirst().memberId()).isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.content().getFirst().imageUrl()).isEqualTo(expectedImageUrl);
             softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
             softAssertions.assertThat(actual.hasNext()).isTrue();
         });
@@ -105,6 +113,8 @@ class TalkServiceTest {
         long memberId = 1L;
 
         long expectedLatestTalkId = 2L;
+        long expectedMemberId = 2L;
+        String expectedImageUrl = "https://image.com/fivera.png";
         Long expectedNextCursorId = null;
 
         // when
@@ -114,6 +124,8 @@ class TalkServiceTest {
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.content().getFirst().memberId()).isEqualTo(expectedMemberId);
+            softAssertions.assertThat(actual.content().getFirst().imageUrl()).isEqualTo(expectedImageUrl);
             softAssertions.assertThat(actual.nextCursorId()).isEqualTo(expectedNextCursorId);
             softAssertions.assertThat(actual.hasNext()).isFalse();
         });

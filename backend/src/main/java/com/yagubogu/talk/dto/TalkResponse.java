@@ -8,6 +8,7 @@ public record TalkResponse(
         long memberId,
         String nickname,
         String favorite,
+        String imageUrl,
         String content,
         LocalDateTime createdAt,
         boolean isMine
@@ -19,6 +20,7 @@ public record TalkResponse(
                 talk.getMember().getId(),
                 talk.getMember().getNickname(),
                 talk.getMember().getTeam().getShortName(),
+                talk.getMember().getImageUrl(),
                 talk.getContent(),
                 talk.getCreatedAt(),
                 talk.getMember().getId().equals(memberId)
@@ -31,6 +33,7 @@ public record TalkResponse(
                 talkResponse.memberId(),
                 talkResponse.nickname(),
                 talkResponse.favorite(),
+                talkResponse.imageUrl(),
                 "숨김처리되었습니다",
                 talkResponse.createdAt(),
                 talkResponse.isMine()
