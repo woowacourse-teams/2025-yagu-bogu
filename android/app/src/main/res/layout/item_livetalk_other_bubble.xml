@@ -27,7 +27,8 @@
             app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
             app:strokeColor="@color/gray300"
             app:strokeWidth="1dp"
-            tools:src="@drawable/ic_google_g_logo" />
+            app:userProfileImage="@{livetalkChatItem.profileImageUrl}"
+            tools:src="@drawable/ic_users" />
 
         <TextView
             android:id="@+id/tv_user_nick_name"
