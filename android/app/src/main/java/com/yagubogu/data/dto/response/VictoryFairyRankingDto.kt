@@ -1,5 +1,6 @@
 package com.yagubogu.data.dto.response
 
+import com.yagubogu.presentation.home.ranking.VictoryFairyItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,4 +16,13 @@ data class VictoryFairyRankingDto(
     val teamShortName: String, // 팀 이름
     @SerialName("winPercent")
     val winPercent: Double, // 승률(%)
-)
+) {
+    fun toPresentation(): VictoryFairyItem =
+        VictoryFairyItem(
+            rank = ranking,
+            nickname = nickname,
+            profileImageUrl = profileImageUrl,
+            teamName = teamShortName,
+            winRate = winPercent,
+        )
+}
