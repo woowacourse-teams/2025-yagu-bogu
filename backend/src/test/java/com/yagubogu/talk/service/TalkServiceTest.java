@@ -119,19 +119,44 @@ class TalkServiceTest {
         });
     }
 
+    @DisplayName("가져온 톡 중 자신이 작성한 톡을 구분할 수 있다")
+    @Test
+    void findTalks_myTalk() {
+        // given
+        long gameId = 1L;
+        Long cursorId = 43L;
+        int limit = 20;
+        long memberId = 1L;
+
+        long expectedMyTalkCount = 10L;
+
+        // when
+        CursorResult<TalkResponse> actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberId);
+        long actualMyTalkCount = actual.content().stream()
+                .filter(TalkResponse::isMine)
+                .count();
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actualMyTalkCount).isEqualTo(expectedMyTalkCount);
+        });
+    }
+
     @DisplayName("새로운 메시지가 있을 때 polling으로 가져온다")
     @Test
     void findNewTalks_hasNewTalk() {
         // given
         long gameId = 1L;
         Long cursorId = 50L;
+        long memberId = 1L;
         int limit = 10;
 
         long expectedLastTalkId = 52L;
         Long expectedNextCursorId = 52L;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
 
         // then
         assertSoftly(softAssertions -> {
@@ -148,10 +173,11 @@ class TalkServiceTest {
         // given
         long gameId = 1L;
         Long cursorId = 52L;
+        long memberId = 1L;
         int limit = 10;
 
         // when
-        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
 
         // then
         assertSoftly(softAssertions -> {
