@@ -6,7 +6,6 @@ import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface StatsApiService {
@@ -26,7 +25,5 @@ interface StatsApiService {
     ): Response<StatsLuckyStadiumsResponse>
 
     @GET("/api/stats/me")
-    suspend fun getAverageStats(
-        @Header("Authorization") authorization: String,
-    ): Response<StatsMeResponse>
+    suspend fun getAverageStats(): Response<StatsMeResponse>
 }

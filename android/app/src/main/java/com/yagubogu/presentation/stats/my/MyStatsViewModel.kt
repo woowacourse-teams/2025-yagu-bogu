@@ -29,7 +29,7 @@ class MyStatsViewModel(
 
     fun fetchAll() {
         fetchMyStats(YEAR)
-        fetchMyAverageStats(TOKEN)
+        fetchMyAverageStats()
     }
 
     private fun fetchMyStats(year: Int) {
@@ -75,9 +75,9 @@ class MyStatsViewModel(
         }
     }
 
-    private fun fetchMyAverageStats(token: String) {
+    private fun fetchMyAverageStats() {
         viewModelScope.launch {
-            val myAverageStats: Result<MyAverageStats> = statsRepository.getAverageStats(token)
+            val myAverageStats: Result<MyAverageStats> = statsRepository.getAverageStats()
             myAverageStats.onSuccess { myAverageStats: MyAverageStats ->
                 _myAverageStats.value = myAverageStats
             }

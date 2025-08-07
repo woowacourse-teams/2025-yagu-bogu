@@ -10,5 +10,5 @@ interface StatsRepository {
 
     suspend fun getLuckyStadiums(year: Int): Result<String?>
 
-    suspend fun getAverageStats(token: String): Result<MyAverageStats>
+    suspend fun getAverageStats(): Result<MyAverageStats>
 }

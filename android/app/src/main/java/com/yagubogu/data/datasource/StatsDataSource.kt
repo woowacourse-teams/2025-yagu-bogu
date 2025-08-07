@@ -12,5 +12,5 @@ interface StatsDataSource {
 
     suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse>
 
-    suspend fun getAverageStats(token: String): Result<StatsMeResponse>
+    suspend fun getAverageStats(): Result<StatsMeResponse>
 }

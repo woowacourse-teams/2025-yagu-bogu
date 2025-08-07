@@ -25,8 +25,8 @@ class StatsRemoteDataSource(
             statsApiService.getLuckyStadiums(year)
         }
 
-    override suspend fun getAverageStats(token: String): Result<StatsMeResponse> =
+    override suspend fun getAverageStats(): Result<StatsMeResponse> =
         safeApiCall {
-            statsApiService.getAverageStats(token)
+            statsApiService.getAverageStats()
         }
 }

@@ -33,8 +33,8 @@ class StatsDefaultRepository(
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getAverageStats(token: String): Result<MyAverageStats> =
-        statsDataSource.getAverageStats(token).map { statsMeResponse: StatsMeResponse ->
+    override suspend fun getAverageStats(): Result<MyAverageStats> =
+        statsDataSource.getAverageStats().map { statsMeResponse: StatsMeResponse ->
             MyAverageStats(
                 averageRun = statsMeResponse.averageRun ?: 0.0,
                 concededRuns = statsMeResponse.concededRuns ?: 0.0,
