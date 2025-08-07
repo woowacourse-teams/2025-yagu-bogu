@@ -1,8 +1,10 @@
 package com.yagubogu.presentation.livetalk.chat
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 import java.time.LocalDateTime
 
@@ -11,11 +13,19 @@ class LivetalkChatActivity : AppCompatActivity() {
         ActivityLivetalkChatBinding.inflate(layoutInflater)
     }
 
+    private val viewModel: LivetalkChatViewModel by viewModels {
+        val app = application as YaguBoguApplication
+        LivetalkChatViewModelFactory(app.talksRepository)
+    }
+
+    private val adapter = LivetalkChatAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupRecyclerView()
         setupListener()
+        setupObservers()
     }
 
     private fun setupListener() {
@@ -31,8 +41,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 reverseLayout = true
             }
 
-        val adapter = LivetalkChatAdapter()
-        adapter.submitList(DUMMY_LIVETALK_CHAT_BUBBLE_ITEMS)
+//        adapter.submitList(DUMMY_LIVETALK_CHAT_BUBBLE_ITEMS)
 
         binding.rvChatMessages.apply {
             this.layoutManager = chatLayoutManager
@@ -40,6 +49,18 @@ class LivetalkChatActivity : AppCompatActivity() {
             setHasFixedSize(true)
             itemAnimator = null
             clipToPadding = false
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.livetalkChatItems.observe(this) { value: List<LivetalkChatItem> ->
+            val livetalkChatItems: List<LivetalkChatBubbleItem> =
+                value.map { livetalkChatItem: LivetalkChatItem ->
+                    LivetalkChatBubbleItem.of(
+                        livetalkChatItem,
+                    )
+                }
+            adapter.submitList(livetalkChatItems)
         }
     }
 

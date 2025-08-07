@@ -31,6 +31,7 @@ class LivetalkFragment : Fragment() {
                 override fun onItemClick(item: LivetalkStadiumItem) {
                     // Todo: 구장별 채팅 연동 필요
                     val intent = Intent(binding.root.context, LivetalkChatActivity::class.java)
+                    intent.putExtra("stadium", item.stadiumName)
                     binding.root.context.startActivity(intent)
                 }
             },
