@@ -9,19 +9,15 @@ import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
 @RestController
-public class AuthController {
+public class AuthController implements AuthControllerInterface {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @RequestBody final LoginRequest request
     ) {
@@ -30,7 +26,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(
             @RequestBody final TokenRequest request
     ) {
@@ -40,7 +35,6 @@ public class AuthController {
     }
 
     @RequireRole
-    @PostMapping("/logout")
     public ResponseEntity<TokenResponse> logout(
             @RequestBody final LogoutRequest request
     ) {

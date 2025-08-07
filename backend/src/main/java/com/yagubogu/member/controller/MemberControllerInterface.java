@@ -6,6 +6,7 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,7 @@ public interface MemberControllerInterface {
     @PatchMapping("/me/nickname")
     ResponseEntity<MemberNicknameResponse> patchNickname(
             @RequestBody MemberNicknameRequest request,
-            MemberClaims memberClaims
+            @Parameter(hidden = true) MemberClaims memberClaims
     );
 
     @Operation(summary = "회원 탈퇴", description = "현재 로그인된 회원의 계정을 삭제합니다.")
@@ -36,7 +37,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "204", description = "회원 삭제 성공")
     })
     @DeleteMapping("/me")
-    ResponseEntity<Void> removeMember(MemberClaims memberClaims);
+    ResponseEntity<Void> removeMember(@Parameter(hidden = true) MemberClaims memberClaims);
 
     @Operation(summary = "닉네임 조회", description = "현재 로그인된 회원의 닉네임을 조회합니다.")
     @ApiResponses({
@@ -44,7 +45,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
     })
     @GetMapping("/me/nickname")
-    ResponseEntity<MemberNicknameResponse> findNickname(MemberClaims memberClaims);
+    ResponseEntity<MemberNicknameResponse> findNickname(@Parameter(hidden = true) MemberClaims memberClaims);
 
     @Operation(summary = "응원팀 조회", description = "현재 로그인된 회원의 응원팀 정보를 조회합니다.")
     @ApiResponses({
@@ -52,7 +53,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "404", description = "회원 또는 팀을 찾을 수 없음")
     })
     @GetMapping("/favorites")
-    ResponseEntity<MemberFavoriteResponse> findFavorites(MemberClaims memberClaims);
+    ResponseEntity<MemberFavoriteResponse> findFavorites(@Parameter(hidden = true) MemberClaims memberClaims);
 
     @Operation(summary = "응원팀 수정", description = "현재 로그인된 회원의 응원팀 정보를 수정합니다.")
     @ApiResponses({
@@ -61,7 +62,7 @@ public interface MemberControllerInterface {
     })
     @PatchMapping("/favorites")
     ResponseEntity<MemberFavoriteResponse> patchFavorites(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody MemberFavoriteRequest request
     );
 }

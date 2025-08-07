@@ -3,6 +3,7 @@ package com.yagubogu.game.controller;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.game.dto.GameResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +25,7 @@ public interface GameControllerInterface {
     })
     @GetMapping
     ResponseEntity<GameResponse> findGamesByDate(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam LocalDate date
     );
 }

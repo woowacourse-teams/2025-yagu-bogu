@@ -6,6 +6,7 @@ import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +27,7 @@ public interface StatControllerInterface {
     })
     @GetMapping("/counts")
     ResponseEntity<StatCountsResponse> findStatCounts(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year
     );
 
@@ -38,7 +39,7 @@ public interface StatControllerInterface {
     })
     @GetMapping("/win-rate")
     ResponseEntity<WinRateResponse> findWinRate(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year
     );
 
@@ -50,7 +51,7 @@ public interface StatControllerInterface {
     })
     @GetMapping("/lucky-stadiums")
     ResponseEntity<LuckyStadiumResponse> findLuckyStadiums(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year
     );
 
@@ -60,5 +61,5 @@ public interface StatControllerInterface {
             @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
     })
     @GetMapping("/me")
-    ResponseEntity<AverageStatisticResponse> findAverageStatistic(MemberClaims memberClaims);
+    ResponseEntity<AverageStatisticResponse> findAverageStatistic(@Parameter(hidden = true) MemberClaims memberClaims);
 }

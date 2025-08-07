@@ -5,6 +5,7 @@ import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +30,7 @@ public interface TalkControllerInterface {
     })
     @GetMapping("/{gameId}")
     ResponseEntity<TalkCursorResult> findTalks(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam(value = "before", required = false) Long cursorId,
             @RequestParam("limit") int limit
@@ -42,7 +43,7 @@ public interface TalkControllerInterface {
     })
     @GetMapping("/{gameId}/latest")
     ResponseEntity<TalkCursorResult> findNewTalks(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("after") long cursorId,
             @RequestParam("limit") int limit
@@ -57,7 +58,7 @@ public interface TalkControllerInterface {
     })
     @PostMapping("/{gameId}")
     ResponseEntity<TalkResponse> createTalk(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestBody @Valid TalkRequest request
     );
@@ -70,7 +71,7 @@ public interface TalkControllerInterface {
     })
     @PostMapping("/{talkId}/reports")
     ResponseEntity<Void> reportTalk(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long talkId
     );
 
@@ -83,7 +84,7 @@ public interface TalkControllerInterface {
     })
     @DeleteMapping("/{gameId}/{talkId}")
     ResponseEntity<Void> removeTalk(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @PathVariable long talkId
     );

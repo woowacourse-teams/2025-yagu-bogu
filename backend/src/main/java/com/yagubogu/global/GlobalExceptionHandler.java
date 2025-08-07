@@ -86,10 +86,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
-        log.error("[RuntimeException]- {}", e.getMessage());
+    public ExceptionResponse handleRuntimeException() {
+        String message = "Unexpected server error is occurred";
+        log.error("[RuntimeException]- {}", message);
 
-        return new ExceptionResponse(e.getMessage());
+        return new ExceptionResponse(message);
     }
 
     /**
@@ -99,7 +100,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
         log.warn("[BadGatewayException]- {}", e.getMessage());
-        
+
         return new ExceptionResponse(e.getMessage());
     }
 }
