@@ -92,6 +92,8 @@ class AttendanceHistoryFragment : Fragment() {
     private fun setupObservers() {
         viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { attendanceHistoryItems: List<AttendanceHistoryItem> ->
             attendanceHistoryAdapter.submitList(attendanceHistoryItems)
+            binding.tvEmptyHistory.visibility =
+                if (attendanceHistoryItems.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
