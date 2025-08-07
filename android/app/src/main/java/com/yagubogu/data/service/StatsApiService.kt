@@ -10,19 +10,16 @@ import retrofit2.http.Query
 interface StatsApiService {
     @GET("/api/stats/win-rate")
     suspend fun getStatsWinRate(
-        @Query("memberId") memberId: Long,
         @Query("year") year: Int,
     ): Response<StatsWinRateResponse>
 
     @GET("/api/stats/counts")
     suspend fun getStatsCounts(
-        @Query("memberId") memberId: Long,
         @Query("year") year: Int,
     ): Response<StatsCountsResponse>
 
     @GET("/api/stats/lucky-stadiums")
     suspend fun getLuckyStadiums(
-        @Query("memberId") memberId: Long,
         @Query("year") year: Int,
     ): Response<StatsLuckyStadiumsResponse>
 }
