@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} [%level] %logger{36} - %msg%n"/>
+        </Console>
+
+        <RollingFile name="ProdFile" fileName="logs/prod.log"
+                     filePattern="logs/prod-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss} [%level] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}%X{action:+.%X{action}}] [%X{clientIp}] %logger{30} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
+
+        <RollingFile name="LocalFile" fileName="logs/local.log"
+                     filePattern="logs/local-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%X{traceId}] %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- ✅ prod 환경 -->
+        <SpringProfile name="prod">
+            <Root level="info">
+                <AppenderRef ref="ProdFile"/>
+                <AppenderRef ref="Console"/>
+            </Root>
+
+            <Logger name="org.springframework" level="warn"/>
+        </SpringProfile>
+
+        <!-- ✅ local 환경 -->
+        <SpringProfile name="local">
+            <Root level="info">
+                <AppenderRef ref="LocalFile"/>
+                <AppenderRef ref="Console"/>
+            </Root>
+
+            <Logger name="com.yagubogu" level="debug"/>
+            <Logger name="org.hibernate.SQL" level="debug"/>
+            <Logger name="sun.rmi" level="warn"/>
+            <Logger name="javax.management.remote.rmi" level="warn"/>
+        </SpringProfile>
+
+    </Loggers>
+</Configuration>

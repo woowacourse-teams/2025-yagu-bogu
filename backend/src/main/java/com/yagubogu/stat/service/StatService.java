@@ -15,8 +15,10 @@ import com.yagubogu.stat.dto.WinRateResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class StatService {
 
@@ -66,6 +68,7 @@ public class StatService {
                 luckyStadium = stadium;
             }
         }
+
         return LuckyStadiumResponse.from(luckyStadium);
     }
 
@@ -81,6 +84,7 @@ public class StatService {
             return 0;
         }
         double rate = (double) winCounts / favoriteCheckInCounts * 100;
+
         return Math.round(rate * 10) / 10.0;
     }
 
