@@ -41,7 +41,7 @@ public class TalkService {
             final long memberId
     ) {
         Pageable pageable = PageRequest.of(0, limit);
-        Slice<TalkResponse> talkResponses = getTalkResponses(gameId, cursorId, pageable);
+        Slice<TalkResponse> talkResponses = getTalkResponses(gameId, cursorId, memberId, pageable);
 
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
@@ -52,10 +52,12 @@ public class TalkService {
     public CursorResult<TalkResponse> findNewTalks(
             final long gameId,
             final long cursorId,
+            final long memberId,
             final int limit
     ) {
         Pageable pageable = PageRequest.of(0, limit);
-        Slice<TalkResponse> talkResponses = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
+        Slice<Talk> talks = talkRepository.fetchTalksAfterCursor(gameId, cursorId, pageable);
+        Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
 
@@ -65,7 +67,7 @@ public class TalkService {
     public TalkResponse createTalk(
             final long gameId,
             final TalkRequest request,
-            final long memberId // TODO: 나중에 삭제
+            final long memberId
     ) {
         Game game = getGame(gameId);
         Member member = getMember(memberId);
@@ -75,13 +77,13 @@ public class TalkService {
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
 
-        return TalkResponse.from(talk);
+        return TalkResponse.from(talk, memberId);
     }
 
     public void removeTalk(
             final long gameId,
             final long talkId,
-            final long memberId // TODO: 나중에 삭제
+            final long memberId
     ) {
         Talk talk = getTalk(talkId);
 
@@ -122,13 +124,15 @@ public class TalkService {
     private Slice<TalkResponse> getTalkResponses(
             final long gameId,
             final Long cursorId,
+            final long memberId,
             final Pageable pageable
     ) {
         if (cursorId == null) {
-            return talkRepository.fetchRecentTalks(gameId, pageable);
+            Slice<Talk> talks = talkRepository.fetchRecentTalks(gameId, pageable);
+            return talks.map(talk -> TalkResponse.from(talk, memberId));
         }
-
-        return talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
+        Slice<Talk> talks = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
+        return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 
     private Long getNextCursorIdOrNull(

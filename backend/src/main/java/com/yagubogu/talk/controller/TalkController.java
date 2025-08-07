@@ -44,11 +44,12 @@ public class TalkController {
 
     @GetMapping("/{gameId}/latest")
     public ResponseEntity<CursorResult<TalkResponse>> findNewTalks(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        CursorResult<TalkResponse> response = talkService.findNewTalks(gameId, cursorId, limit);
+        CursorResult<TalkResponse> response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
 
         return ResponseEntity.ok(response);
     }
