@@ -35,6 +35,7 @@ class LivetalkViewModel(
 
     companion object {
         private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-        private const val TOKEN = "액세스 토큰"
+        private const val TOKEN =
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDIyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTQ1Njk1NDUsImV4cCI6MTc1NDU3MDQ0NX0.yXHJVE1V7BvUmRczkSRAJA1VSxAM-OyU3bJ5tBAIrTU"
     }
 }

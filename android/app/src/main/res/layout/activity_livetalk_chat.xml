@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewmodel"
+            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -100,6 +104,7 @@
                 android:maxLines="4"
                 android:minHeight="16dp"
                 android:scrollHorizontally="false"
+                android:text="@={viewmodel.messageFormText}"
                 android:textColor="@color/gray900"
                 android:textColorHint="@color/gray500"
                 android:textSize="16sp"
@@ -118,6 +123,7 @@
             android:background="@drawable/bg_primary500_radius_12dp_ripple"
             android:clickable="true"
             android:focusable="true"
+            android:onClick="@{() -> viewmodel.sendMessage()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/constraint_input_message">
