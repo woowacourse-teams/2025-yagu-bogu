@@ -15,7 +15,7 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.MemberInfoUiModel
+import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -34,8 +34,8 @@ class HomeViewModel(
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
 ) : ViewModel() {
-    private val _memberInfoUiModel = MutableLiveData<MemberInfoUiModel>()
-    val memberInfoUiModel: LiveData<MemberInfoUiModel> get() = _memberInfoUiModel
+    private val _memberStatsUiModel = MutableLiveData<MemberStatsUiModel>()
+    val memberStatsUiModel: LiveData<MemberStatsUiModel> get() = _memberStatsUiModel
 
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
@@ -56,7 +56,7 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
-        fetchMemberInformation(YEAR)
+        fetchMemberStats(YEAR)
         fetchStadiumStats(DATE)
     }
 
@@ -89,7 +89,7 @@ class HomeViewModel(
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
-    private fun fetchMemberInformation(year: Int) {
+    private fun fetchMemberStats(year: Int) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String>> =
                 async { memberRepository.getFavoriteTeam() }
@@ -107,13 +107,13 @@ class HomeViewModel(
                 val attendanceCount: Int = attendanceCountResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
 
-                val memberInfoUiModel =
-                    MemberInfoUiModel(
+                val memberStatsUiModel =
+                    MemberStatsUiModel(
                         myTeam = myTeam,
                         attendanceCount = attendanceCount,
                         winRate = winRate.roundToInt(),
                     )
-                _memberInfoUiModel.value = memberInfoUiModel
+                _memberStatsUiModel.value = memberStatsUiModel
             } else {
                 val errors: List<String> =
                     listOf(myTeamResult, attendanceCountResult, winRateResult)
@@ -152,9 +152,9 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
-                _memberInfoUiModel.value =
-                    memberInfoUiModel.value?.let { currentMemberInfoUiModel: MemberInfoUiModel ->
-                        currentMemberInfoUiModel.copy(attendanceCount = currentMemberInfoUiModel.attendanceCount + 1)
+                _memberStatsUiModel.value =
+                    memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
+                        currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
                 _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
             }.onFailure { exception: Throwable ->
@@ -167,7 +167,7 @@ class HomeViewModel(
         val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
 
         return if (!isExpanded) {
-            val firstItem = items.firstOrNull()
+            val firstItem: StadiumFanRateItem? = items.firstOrNull()
             StadiumStatsUiModel(if (firstItem != null) listOf(firstItem) else emptyList())
         } else {
             StadiumStatsUiModel(items)
