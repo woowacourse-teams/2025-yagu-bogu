@@ -15,7 +15,7 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.MemberInfoUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -34,8 +34,8 @@ class HomeViewModel(
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
 ) : ViewModel() {
-    private val _homeUiModel = MutableLiveData<HomeUiModel>()
-    val homeUiModel: LiveData<HomeUiModel> get() = _homeUiModel
+    private val _memberInfoUiModel = MutableLiveData<MemberInfoUiModel>()
+    val memberInfoUiModel: LiveData<MemberInfoUiModel> get() = _memberInfoUiModel
 
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
@@ -107,13 +107,13 @@ class HomeViewModel(
                 val attendanceCount: Int = attendanceCountResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
 
-                val homeUiModel =
-                    HomeUiModel(
+                val memberInfoUiModel =
+                    MemberInfoUiModel(
                         myTeam = myTeam,
                         attendanceCount = attendanceCount,
                         winRate = winRate.roundToInt(),
                     )
-                _homeUiModel.value = homeUiModel
+                _memberInfoUiModel.value = memberInfoUiModel
             } else {
                 val errors: List<String> =
                     listOf(myTeamResult, attendanceCountResult, winRateResult)
@@ -152,9 +152,9 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
-                _homeUiModel.value =
-                    homeUiModel.value?.let { currentHomeUiModel: HomeUiModel ->
-                        currentHomeUiModel.copy(attendanceCount = currentHomeUiModel.attendanceCount + 1)
+                _memberInfoUiModel.value =
+                    memberInfoUiModel.value?.let { currentMemberInfoUiModel: MemberInfoUiModel ->
+                        currentMemberInfoUiModel.copy(attendanceCount = currentMemberInfoUiModel.attendanceCount + 1)
                     }
                 _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
             }.onFailure { exception: Throwable ->
