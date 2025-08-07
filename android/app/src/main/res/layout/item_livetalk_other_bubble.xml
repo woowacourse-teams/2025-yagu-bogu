@@ -83,8 +83,8 @@
             android:textColor="@color/gray500"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_chat_body"
-            app:timeAgo="@{livetalkChatItem.timestamp}"
-            tools:text="1시간 25분 전" />
+            app:timeStamp="@{livetalkChatItem.timestamp}"
+            tools:text="오후 01:25" />
 
         <ImageView
             android:id="@+id/iv_report_user_icon"

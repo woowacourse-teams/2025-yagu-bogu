@@ -9,6 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.yagubogu.R
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @BindingAdapter("setCustomChartDividerTint")
 fun ImageView.setCustomChartDividerTint(
@@ -72,8 +73,8 @@ fun TextView.setDateFormat(date: LocalDate?) {
     text = date.format(DateFormatter.yyyyMMdd)
 }
 
-@BindingAdapter("timeAgo")
-fun setTimeAgo(
+@BindingAdapter("timeStamp")
+fun setTimeStamp(
     textView: TextView,
     timestamp: LocalDateTime?,
 ) {
@@ -81,5 +82,9 @@ fun setTimeAgo(
         textView.text = ""
         return
     }
-    textView.text = timestamp.format(DateFormatter.amPmhhmm)
+    // Todo: 서버에서 보내주는 타임존 백엔드 합의 필요...?
+    val serverTime = timestamp.atZone(ZoneId.of("GMT+0"))
+    val localTime = serverTime.withZoneSameInstant(ZoneId.systemDefault())
+
+    textView.text = localTime.toLocalDateTime().format(DateFormatter.amPmhhmm)
 }
