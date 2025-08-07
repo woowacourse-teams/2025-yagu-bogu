@@ -11,25 +11,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequireRole
-@RequestMapping("/api/talks")
 @RestController
-public class TalkController {
+public class TalkController implements TalkControllerInterface {
 
     private final TalkService talkService;
     private final TalkReportService talkReportService;
 
-    @GetMapping("/{gameId}")
     public ResponseEntity<TalkCursorResult> findTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
@@ -42,7 +36,6 @@ public class TalkController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{gameId}/latest")
     public ResponseEntity<TalkCursorResult> findNewTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
@@ -54,7 +47,6 @@ public class TalkController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{gameId}")
     public ResponseEntity<TalkResponse> createTalk(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
@@ -65,7 +57,6 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{talkId}/reports")
     public ResponseEntity<Void> reportTalk(
             final MemberClaims memberClaims,
             @PathVariable final long talkId
@@ -75,7 +66,6 @@ public class TalkController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{gameId}/{talkId}")
     public ResponseEntity<Void> removeTalk(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,

@@ -1,6 +1,5 @@
 package com.yagubogu.global;
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -18,7 +17,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
-                             Object handler) throws Exception {
+                             Object handler) {
 
         MDC.clear();
         String traceId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
@@ -33,7 +32,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
             MDC.put("controller", handlerMethod.getBeanType().getSimpleName());
             MDC.put("action", handlerMethod.getMethod().getName());
         }
-        log.info("요청 시작");
+        log.info("Request is started");
 
         request.setAttribute("startTime", System.currentTimeMillis());
         return true;
@@ -43,7 +42,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Object handler,
-                                Exception ex) throws Exception {
+                                Exception ex) {
 
         try {
             Long startTime = (Long) request.getAttribute("startTime");
@@ -56,14 +55,14 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
             if (ex != null) {
                 MDC.put("exception", ex.getClass().getSimpleName());
-                log.error("요청 실패", ex);
+                log.error("Request is failed", ex);
                 return;
             }
             if (response.getStatus() >= HttpStatus.BAD_REQUEST.value()) {
-                log.warn("요청 에러");
+                log.warn("Request error");
                 return;
             }
-            log.info("요청 완료");
+            log.info("Request is completed ({}ms)", duration);
         } finally {
             MDC.clear();
         }
@@ -73,6 +72,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
         if (userAgent == null) {
             return "UNKNOWN";
         }
-        return userAgent.length() > 50 ? userAgent.substring(0, 50) + "..." : userAgent;
+        return userAgent.length() > 50 ? userAgent.substring(0, 50) + "…" : userAgent;
     }
 }

@@ -9,22 +9,16 @@ import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequireRole
-@RequestMapping("/api/members")
 @RestController
-public class MemberController {
+public class MemberController implements MemberControllerInterface {
 
     private final MemberService memberService;
 
-    @PatchMapping("/me/nickname")
     public ResponseEntity<MemberNicknameResponse> patchNickname(
             @RequestBody final MemberNicknameRequest request,
             final MemberClaims memberClaims
@@ -34,7 +28,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/me")
     public ResponseEntity<Void> removeMember(
             final MemberClaims memberClaims
     ) {
@@ -43,7 +36,6 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/me/nickname")
     public ResponseEntity<MemberNicknameResponse> findNickname(
             final MemberClaims memberClaims
     ) {
@@ -52,7 +44,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/favorites")
     public ResponseEntity<MemberFavoriteResponse> findFavorites(
             final MemberClaims memberClaims
     ) {
@@ -61,7 +52,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/favorites")
     public ResponseEntity<MemberFavoriteResponse> patchFavorites(
             final MemberClaims memberClaims,
             @RequestBody final MemberFavoriteRequest memberFavoriteRequest
