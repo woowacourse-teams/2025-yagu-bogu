@@ -14,14 +14,18 @@ class TokenInterceptor(
             if (accessToken != null) {
                 chain
                     .request()
-                    .newBuilder()
-                    .addHeader(HEADER_AUTHORIZATION, "$HEADER_AUTHORIZATION_TYPE $accessToken")
-                    .build()
+                    .addTokenHeader(accessToken)
             } else {
                 chain.request()
             }
         return chain.proceed(request)
     }
+
+    private fun Request.addTokenHeader(accessToken: String): Request =
+        this
+            .newBuilder()
+            .addHeader(HEADER_AUTHORIZATION, "$HEADER_AUTHORIZATION_TYPE $accessToken")
+            .build()
 
     companion object {
         private const val HEADER_AUTHORIZATION = "Authorization"
