@@ -72,12 +72,8 @@
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
 
-    <string name="livechat_time_just_now">방금 전</string>
-    <string name="livechat_time_seconds_ago">%d초 전</string>
-    <string name="livechat_time_minutes_ago">%d분 전</string>
-    <string name="livechat_time_hours_with_minutes_ago">%d시간 %d분 전</string>
-    <string name="livechat_time_days_ago">%d일 전</string>
-    <string name="livechat_time_months_ago">%d개월 전</string>
-    <string name="livechat_time_years_ago">%d년 전</string>
     <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
+    <string name="livetalk_away_home_name">%s vs %s</string>
+    <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
+    <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
 </resources>

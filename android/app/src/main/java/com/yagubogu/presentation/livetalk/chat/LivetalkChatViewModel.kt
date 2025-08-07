@@ -13,6 +13,9 @@ class LivetalkChatViewModel(
     private val gameId: Long,
     private val talksRepository: TalksRepository,
 ) : ViewModel() {
+    private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
+    val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
+
     private val _livetalkChatItems = MutableLiveData<List<LivetalkChatItem>>()
     val livetalkChatItems: LiveData<List<LivetalkChatItem>> get() = _livetalkChatItems
 
@@ -24,11 +27,12 @@ class LivetalkChatViewModel(
 
     fun fetchTalks(gameId: Long) {
         viewModelScope.launch {
-            val talksResult: Result<List<LivetalkChatItem>> =
+            val talksResult: Result<LivetalkResponseItem> =
                 talksRepository.getTalks(gameId, null, 10)
             talksResult
-                .onSuccess { livetalkChatItems: List<LivetalkChatItem> ->
-                    _livetalkChatItems.value = livetalkChatItems
+                .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
+                    _livetalkResponseItem.value = livetalkResponseItem
+                    _livetalkChatItems.value = livetalkResponseItem.cursor.chats
                     messageFormText.set("")
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")

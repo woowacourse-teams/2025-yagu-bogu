@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.response.talks.ContentDto
 import com.yagubogu.data.dto.response.talks.TalkResponse
 import com.yagubogu.domain.repository.TalksRepository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 
 class TalksDefaultRepository(
     private val talksDataSource: TalksDataSource,
@@ -13,14 +14,14 @@ class TalksDefaultRepository(
         gameId: Long,
         before: Long?,
         limit: Int,
-    ): Result<List<LivetalkChatItem>> =
+    ): Result<LivetalkResponseItem> =
         talksDataSource
             .getTalks(
                 gameId = gameId,
                 before = before,
                 limit = limit,
             ).map { talksResponse: TalkResponse ->
-                talksResponse.cursorResult.contents.map { it.toPresentation() }
+                talksResponse.toPresentation()
             }
 
     override suspend fun postTalks(
