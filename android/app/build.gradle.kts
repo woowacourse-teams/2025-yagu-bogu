@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -26,6 +27,11 @@ android {
             "String",
             "BASE_URL",
             "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL")}\"",
+        )
+        buildConfigField(
+            type = "String",
+            "WEB_CLIENT_ID",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}\"",
         )
     }
 
@@ -83,6 +89,11 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics.ndk)
+
+    // google credentials
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.googleid)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

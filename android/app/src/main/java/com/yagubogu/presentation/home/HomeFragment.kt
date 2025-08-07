@@ -20,7 +20,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
-import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
@@ -47,7 +46,7 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
-    private var isTeamOccupancyChartExpanded: Boolean = false
+    private var isStadiumStatsChartExpanded: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,7 +90,7 @@ class HomeFragment : Fragment() {
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
             val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-            viewModel.fetchStadiumStats(today)
+            viewModel.fetchStadiumStats(5009, today) // TODO: memberId, date 변경
             view
                 .animate()
                 .rotationBy(360f)
@@ -100,8 +99,8 @@ class HomeFragment : Fragment() {
         }
 
         binding.constraintShowMore.setOnClickListener {
-            isTeamOccupancyChartExpanded = !isTeamOccupancyChartExpanded
-            when (isTeamOccupancyChartExpanded) {
+            isStadiumStatsChartExpanded = !isStadiumStatsChartExpanded
+            when (isStadiumStatsChartExpanded) {
                 true -> {
                     binding.tvShowMore.text = getString(R.string.home_show_less)
                     binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
@@ -141,7 +140,7 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
-            binding.layoutTeamOccupancy.teamOccupancyRates = value.stadiumOccupancyRates.first()
+            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
         }
     }
 
@@ -217,7 +216,7 @@ class HomeFragment : Fragment() {
                 rank = 1,
                 profileImageUrl = "",
                 nickname = "이포르",
-                team = Team.KIA,
+                teamName = "KIA",
                 winRate = 100.0,
             )
 
@@ -228,28 +227,28 @@ class HomeFragment : Fragment() {
                     rank = 2,
                     profileImageUrl = "",
                     nickname = "닉네임",
-                    team = Team.SAMSUNG,
+                    teamName = "삼성",
                     winRate = 87.2,
                 ),
                 VictoryFairyItem(
                     rank = 3,
                     profileImageUrl = "",
                     nickname = "닉네임",
-                    team = Team.LOTTE,
+                    teamName = "롯데",
                     winRate = 75.0,
                 ),
                 VictoryFairyItem(
                     rank = 4,
                     profileImageUrl = "",
                     nickname = "닉네임",
-                    team = Team.DOOSAN,
+                    teamName = "두산",
                     winRate = 66.7,
                 ),
                 VictoryFairyItem(
                     rank = 982,
                     profileImageUrl = "",
                     nickname = "닉네임",
-                    team = Team.HANWHA,
+                    teamName = "한화",
                     winRate = 32.5,
                 ),
             )

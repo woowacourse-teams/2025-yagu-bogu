@@ -15,8 +15,8 @@ import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.StadiumFanRate
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.model.TeamOccupancyRates
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
@@ -48,8 +48,7 @@ class HomeViewModel(
 
     fun fetchAll() {
         fetchMemberInformation(MEMBER_ID, YEAR)
-        val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-        fetchStadiumStats(today)
+        fetchStadiumStats(MEMBER_ID, DATE)
     }
 
     fun checkIn() {
@@ -64,20 +63,17 @@ class HomeViewModel(
         )
     }
 
-    // TODO: API 변경되는 거에 따라서 수정해야 됨
-    fun fetchStadiumStats(date: LocalDate) {
+    fun fetchStadiumStats(
+        memberId: Long,
+        date: LocalDate,
+    ) {
         viewModelScope.launch {
-            val teamOccupancyRatesResult: Result<TeamOccupancyRates> =
-                statsRepository.getTeamOccupancyRates(2, date)
-            teamOccupancyRatesResult
-                .onSuccess { teamOccupancyRates: TeamOccupancyRates ->
+            val stadiumFanRatesResult: Result<List<StadiumFanRate>> =
+                checkInsRepository.getStadiumFanRates(memberId, date)
+            stadiumFanRatesResult
+                .onSuccess { stadiumFanRates: List<StadiumFanRate> ->
                     _stadiumStatsUiModel.value =
-                        StadiumStatsUiModel(
-                            stadiumOccupancyRates =
-                                listOf(
-                                    teamOccupancyRates,
-                                ),
-                        )
+                        StadiumStatsUiModel(stadiumFanRates = stadiumFanRates)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -164,5 +160,6 @@ class HomeViewModel(
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
+        private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
     }
 }
