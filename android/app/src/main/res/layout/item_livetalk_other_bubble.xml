@@ -5,30 +5,23 @@
 
     <data>
 
-        <import type="android.view.View" />
-
         <variable
             name="livetalkChatItem"
-            type="com.yagubogu.presentation.livetalk.LivetalkChatItem" />
+            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
-        android:background="@{livetalkChatItem.isMine ? @drawable/bg_primary050_radius_16dp : @drawable/bg_white_radius_16dp}"
-        android:padding="12dp"
-        app:conditionalMarginEnd="@{livetalkChatItem.isMine ? 0 : 30}"
-        app:conditionalMarginStart="@{livetalkChatItem.isMine ? 30 : 0}"
-        tools:background="@drawable/bg_white_radius_16dp"
-        tools:layout_marginEnd="30dp">
+        android:background="@drawable/bg_white_radius_16dp"
+        android:padding="12dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_profile"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginBottom="4dp"
-            android:visibility="@{livetalkChatItem.isMine ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toTopOf="@id/tv_chat_body"
             app:layout_constraintStart_toStartOf="parent"
             app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
@@ -44,7 +37,6 @@
             android:layout_marginStart="8dp"
             android:includeFontPadding="false"
             android:text="@{livetalkChatItem.nickname}"
-            android:visibility="@{livetalkChatItem.isMine ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/iv_profile"
             app:layout_constraintStart_toEndOf="@id/iv_profile"
             app:layout_constraintTop_toTopOf="@id/iv_profile"
@@ -59,7 +51,6 @@
             android:includeFontPadding="false"
             android:text="@{@string/all_fan(livetalkChatItem.teamName)}"
             android:textColor="@color/gray500"
-            android:visibility="@{livetalkChatItem.isMine ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/tv_user_nick_name"
             app:layout_constraintStart_toEndOf="@id/tv_user_nick_name"
             app:layout_constraintTop_toTopOf="@id/tv_user_nick_name"
@@ -78,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{livetalkChatItem.message}"
-            android:textColor="@{livetalkChatItem.isMine ? @color/primary900 : @color/gray900}"
+            android:textColor="@color/gray900"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/space_profile_bottom_spacing"
             tools:text="경기장 분위기 정말 뜨거웠어! 응원 열기가 장난 아니었지. 다음에도 꼭 직관 가야겠어." />
@@ -89,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@{livetalkChatItem.isMine ? @color/primary700 : @color/gray500}"
+            android:textColor="@color/gray500"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_chat_body"
             app:timeAgo="@{livetalkChatItem.timestamp}"
@@ -102,7 +93,6 @@
             android:layout_marginEnd="4dp"
             android:contentDescription="신고 깃발 아이콘"
             android:src="@drawable/ic_flag"
-            android:visibility="@{livetalkChatItem.isMine ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintStart_toStartOf="@id/tv_report_user"
             app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
@@ -117,38 +107,9 @@
             android:paddingStart="18dp"
             android:text="신고"
             android:textColor="@color/gray500"
-            android:visibility="@{livetalkChatItem.isMine ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_chat_write_time" />
-
-
-        <ImageView
-            android:id="@+id/iv_trash_icon"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="삭제 쓰레기통 아이콘"
-            android:src="@drawable/ic_trash"
-            android:visibility="@{livetalkChatItem.isMine ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
-            app:layout_constraintEnd_toStartOf="@id/tv_trash"
-            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
-            app:tint="@color/primary700" />
-
-        <TextView
-            android:id="@+id/tv_trash"
-            style="@style/TextView.Pretendard.Regular.12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:text="삭제"
-            android:textColor="@color/primary700"
-            android:visibility="@{livetalkChatItem.isMine ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
