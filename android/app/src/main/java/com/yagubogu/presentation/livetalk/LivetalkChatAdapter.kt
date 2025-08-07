@@ -8,7 +8,7 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatItem, LivetalkChatViewHolder
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): LivetalkChatViewHolder = LivetalkChatViewHolder.Companion.from(parent)
+    ): LivetalkChatViewHolder = LivetalkChatViewHolder.from(parent)
 
     override fun onBindViewHolder(
         holder: LivetalkChatViewHolder,
