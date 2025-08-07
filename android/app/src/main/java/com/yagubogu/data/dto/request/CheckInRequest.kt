@@ -6,8 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CheckInRequest(
-    @SerialName("memberId")
-    val memberId: Long,
     @SerialName("stadiumId")
     val stadiumId: Long,
     @SerialName("date")
