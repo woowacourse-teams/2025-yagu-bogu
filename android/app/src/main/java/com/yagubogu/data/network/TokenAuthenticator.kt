@@ -28,13 +28,16 @@ class TokenAuthenticator(
             safeApiCall {
                 val tokenRequest = TokenRequest(refreshToken)
                 authApiService.postRefresh(tokenRequest)
-            }.onSuccess { (accessToken, refreshToken) ->
-                tokenManager.saveTokens(accessToken, refreshToken)
-                return@runBlocking response.request.addTokenHeader(accessToken)
-            }
-
-            tokenManager.clearTokens()
-            return@runBlocking null
+            }.fold(
+                onSuccess = { (accessToken, refreshToken) ->
+                    tokenManager.saveTokens(accessToken, refreshToken)
+                    response.request.addTokenHeader(accessToken)
+                },
+                onFailure = {
+                    tokenManager.clearTokens()
+                    null
+                },
+            )
         }
     }
 
