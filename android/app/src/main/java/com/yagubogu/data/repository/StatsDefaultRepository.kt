@@ -7,7 +7,7 @@ import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.stats.my.MyAverageStats
+import com.yagubogu.presentation.stats.my.AverageStats
 
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
@@ -33,9 +33,9 @@ class StatsDefaultRepository(
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getAverageStats(): Result<MyAverageStats> =
+    override suspend fun getAverageStats(): Result<AverageStats> =
         statsDataSource.getAverageStats().map { statsMeResponse: StatsMeResponse ->
-            MyAverageStats(
+            AverageStats(
                 averageRun = statsMeResponse.averageRun ?: 0.0,
                 concededRuns = statsMeResponse.concededRuns ?: 0.0,
                 averageErrors = statsMeResponse.averageErrors ?: 0.0,

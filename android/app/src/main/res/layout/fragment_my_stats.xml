@@ -10,8 +10,8 @@
             type="com.yagubogu.presentation.stats.my.MyStatsUiModel" />
 
         <variable
-            name="myAverageStats"
-            type="com.yagubogu.presentation.stats.my.MyAverageStats" />
+            name="averageStats"
+            type="com.yagubogu.presentation.stats.my.AverageStats" />
     </data>
 
     <ScrollView
@@ -312,7 +312,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_score(myAverageStats.averageRun)}"
+                    android:text="@{@string/stats_average_score(averageStats.averageRun)}"
                     app:layout_constraintEnd_toStartOf="@id/tv_loss_score"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_gain_score_emoji"
@@ -357,7 +357,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_score(myAverageStats.concededRuns)}"
+                    android:text="@{@string/stats_average_score(averageStats.concededRuns)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_gain_score"
                     app:layout_constraintTop_toBottomOf="@id/tv_loss_score_emoji"
@@ -382,7 +382,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_count(myAverageStats.averageHits)}"
+                    android:text="@{@string/stats_average_count(averageStats.averageHits)}"
                     app:layout_constraintEnd_toStartOf="@id/tv_hit_allowed_count"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_gain_score_text"
@@ -416,7 +416,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_count(myAverageStats.concededHits)}"
+                    android:text="@{@string/stats_average_count(averageStats.concededHits)}"
                     app:layout_constraintEnd_toStartOf="@id/tv_error_count"
                     app:layout_constraintStart_toEndOf="@id/tv_hit_count"
                     app:layout_constraintTop_toTopOf="@id/tv_hit_count"
@@ -450,7 +450,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_count(myAverageStats.averageErrors)}"
+                    android:text="@{@string/stats_average_count(averageStats.averageErrors)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_hit_allowed_count"
                     app:layout_constraintTop_toBottomOf="@id/tv_gain_score_text"

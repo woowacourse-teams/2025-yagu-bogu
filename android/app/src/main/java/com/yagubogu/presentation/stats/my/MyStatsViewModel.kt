@@ -20,8 +20,8 @@ class MyStatsViewModel(
     private val _myStatsUiModel = MutableLiveData<MyStatsUiModel>()
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
-    private val _myAverageStats = MutableLiveData<MyAverageStats>()
-    val myAverageStats: LiveData<MyAverageStats> = _myAverageStats
+    private val _averageStats = MutableLiveData<AverageStats>()
+    val averageStats: LiveData<AverageStats> = _averageStats
 
     init {
         fetchAll()
@@ -77,9 +77,9 @@ class MyStatsViewModel(
 
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
-            val myAverageStats: Result<MyAverageStats> = statsRepository.getAverageStats()
-            myAverageStats.onSuccess { myAverageStats: MyAverageStats ->
-                _myAverageStats.value = myAverageStats
+            val averageStats: Result<AverageStats> = statsRepository.getAverageStats()
+            averageStats.onSuccess { averageStats: AverageStats ->
+                _averageStats.value = averageStats
             }
         }
     }

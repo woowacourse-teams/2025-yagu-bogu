@@ -1,7 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
-import com.yagubogu.presentation.stats.my.MyAverageStats
+import com.yagubogu.presentation.stats.my.AverageStats
 
 interface StatsRepository {
     suspend fun getStatsWinRate(year: Int): Result<Double>
@@ -10,5 +10,5 @@ interface StatsRepository {
 
     suspend fun getLuckyStadiums(year: Int): Result<String?>
 
-    suspend fun getAverageStats(): Result<MyAverageStats>
+    suspend fun getAverageStats(): Result<AverageStats>
 }
