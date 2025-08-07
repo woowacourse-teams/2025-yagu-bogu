@@ -1,5 +1,8 @@
 package com.yagubogu.game.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.fixture.TestFixture;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
@@ -17,9 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -48,18 +48,21 @@ class GameServiceTest {
         long memberId = 1L;
         List<GameWithCheckIn> expected = List.of(
                 new GameWithCheckIn(
+                        1L,
                         3L,
                         true,
                         new StadiumByGame(1L, "잠실 야구장"),
                         new TeamByGame(1L, "기아", "HT"),
                         new TeamByGame(2L, "롯데", "LT")),
                 new GameWithCheckIn(
+                        8L,
                         4L,
                         true,
                         new StadiumByGame(2L, "고척 스카이돔"),
                         new TeamByGame(3L, "삼성", "SS"),
                         new TeamByGame(4L, "두산", "OB")),
                 new GameWithCheckIn(
+                        9L,
                         4L,
                         false,
                         new StadiumByGame(3L, "인천 SSG 랜더스필드"),

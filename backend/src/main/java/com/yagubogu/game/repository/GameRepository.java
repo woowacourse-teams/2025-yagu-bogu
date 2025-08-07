@@ -25,6 +25,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
+                g.id,
                 COUNT(c),
                 CASE WHEN MAX(CASE WHEN c.member = :member THEN 1 ELSE 0 END) = 1
                              THEN true ELSE false END,
