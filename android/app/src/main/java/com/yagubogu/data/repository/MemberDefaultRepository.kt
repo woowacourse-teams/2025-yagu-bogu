@@ -9,12 +9,12 @@ class MemberDefaultRepository(
 ) : MemberRepository {
     private var cachedFavoriteTeam: String? = null
 
-    override suspend fun getFavoriteTeam(memberId: Long): Result<String> {
+    override suspend fun getFavoriteTeam(): Result<String> {
         cachedFavoriteTeam?.let { favoriteTeam: String ->
             return Result.success(favoriteTeam)
         }
         return memberDataSource
-            .getFavoriteTeam(memberId)
+            .getFavoriteTeam()
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
                 val favoriteTeam = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = favoriteTeam

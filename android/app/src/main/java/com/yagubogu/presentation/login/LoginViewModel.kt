@@ -16,9 +16,8 @@ class LoginViewModel(
 
     fun signIn() {
         viewModelScope.launch {
-//            val result: LoginResult = authRepository.signInWithGoogle()
-//            _loginResult.value = result
-            _loginResult.value = LoginResult.Success("")
+            val result: LoginResult = authRepository.signInWithGoogle()
+            _loginResult.value = result
         }
     }
 }
