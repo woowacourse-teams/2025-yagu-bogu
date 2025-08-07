@@ -213,30 +213,35 @@ class CheckInServiceTest {
                 new VictoryFairyRankingResponse(
                         1,
                         "구구",
+                        "https://image.com/gugu.png",
                         "KT",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         2,
                         "메다",
+                        "https://image.com/meda.png",
                         "LG",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         3,
                         "밍트",
+                        "https://image.com/mint.png",
                         "기아",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         4,
                         "크림",
+                        "https://image.com/cream.png",
                         "삼성",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         5,
                         "포르",
+                        "https://image.com/por.png",
                         "기아",
                         71.4
                 )
@@ -244,6 +249,7 @@ class CheckInServiceTest {
         VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
                 3,
                 "밍트",
+                "https://image.com/mint.png",
                 "기아",
                 100.0
         );
