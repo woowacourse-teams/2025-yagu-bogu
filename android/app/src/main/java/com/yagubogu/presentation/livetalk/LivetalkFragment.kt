@@ -1,6 +1,5 @@
 package com.yagubogu.presentation.livetalk
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,10 +28,8 @@ class LivetalkFragment : Fragment() {
         LivetalkStadiumAdapter(
             object : LivetalkStadiumViewHolder.Handler {
                 override fun onItemClick(item: LivetalkStadiumItem) {
-                    // Todo: 구장별 채팅 연동 필요
-                    val intent = Intent(binding.root.context, LivetalkChatActivity::class.java)
-                    intent.putExtra("stadium", item.stadiumName)
-                    binding.root.context.startActivity(intent)
+                    val intent = LivetalkChatActivity.newIntent(requireContext(), 1)
+                    startActivity(intent)
                 }
             },
         )

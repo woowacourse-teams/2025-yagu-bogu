@@ -9,19 +9,20 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LivetalkChatViewModel(
+    private val gameId: Long,
     private val talksRepository: TalksRepository,
 ) : ViewModel() {
     private val _livetalkChatItems = MutableLiveData<List<LivetalkChatItem>>()
     val livetalkChatItems: LiveData<List<LivetalkChatItem>> get() = _livetalkChatItems
 
     init {
-        fetchTalks()
+        fetchTalks(gameId)
     }
 
-    fun fetchTalks() {
+    fun fetchTalks(gameId: Long) {
         viewModelScope.launch {
             val talksResult: Result<List<LivetalkChatItem>> =
-                talksRepository.getTalks(TOKEN, 1, null, 10)
+                talksRepository.getTalks(TOKEN, gameId, null, 10)
             talksResult
                 .onSuccess { livetalkChatItems: List<LivetalkChatItem> ->
                     _livetalkChatItems.value = livetalkChatItems
@@ -32,7 +33,6 @@ class LivetalkChatViewModel(
     }
 
     companion object {
-        private const val TOKEN =
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDIyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTQ1NTM2ODMsImV4cCI6MTc1NDU1NDU4M30.opoqSwxBb9Eh4bL8c8HiI1hteV_usOPsuwLKcVs2ykA"
+        private const val TOKEN = "액세스 토큰"
     }
 }
