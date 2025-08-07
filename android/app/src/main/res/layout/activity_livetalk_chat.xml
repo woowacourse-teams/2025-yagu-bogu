@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/gray050"
-        tools:context=".presentation.livetalk.LivetalkChatActivity">
+        tools:context=".presentation.livetalk.chat.LivetalkChatActivity">
 
         <TextView
             android:id="@+id/tv_stadium_name"
@@ -61,7 +61,7 @@
             android:paddingVertical="12dp"
             app:layout_constraintBottom_toTopOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
-            tools:listitem="@layout/item_livetalk_chat" />
+            tools:listitem="@layout/item_livetalk_other_bubble" />
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider"
