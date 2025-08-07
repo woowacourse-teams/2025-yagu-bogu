@@ -5,9 +5,11 @@ import com.yagubogu.game.service.GameResultSyncService;
 import com.yagubogu.game.service.GameScheduleSyncService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class GameScheduler {
@@ -21,7 +23,7 @@ public class GameScheduler {
         try {
             gameScheduleSyncService.syncGameSchedule(today);
         } catch (GameSyncException e) {
-            // TODO: 예외 로깅
+            log.error("[GameSyncException]- {}", e.getMessage());
         }
     }
 
@@ -31,7 +33,7 @@ public class GameScheduler {
         try {
             gameResultSyncService.syncGameResult(yesterday);
         } catch (GameSyncException e) {
-            // TODO: 예외 로깅
+            log.error("[GameSyncException]- {}", e.getMessage());
         }
     }
 }
