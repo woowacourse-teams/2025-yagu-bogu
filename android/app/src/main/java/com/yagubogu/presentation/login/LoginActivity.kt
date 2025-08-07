@@ -15,8 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
@@ -32,8 +32,8 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
-        val authRepository = AuthDefaultRepository(googleCredentialManager)
-        LoginViewModelFactory(authRepository)
+        val app = application as YaguBoguApplication
+        LoginViewModelFactory(app.authRepository, googleCredentialManager)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

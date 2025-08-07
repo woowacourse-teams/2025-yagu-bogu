@@ -1,24 +1,15 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.auth.GoogleCredentialResult
-import com.yagubogu.domain.model.LoginResult
+import com.yagubogu.data.datasource.AuthDataSource
+import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.repository.AuthRepository
 
 class AuthDefaultRepository(
-    private val googleCredentialManager: GoogleCredentialManager,
+    private val authDataSource: AuthDataSource,
+    private val tokenManager: TokenManager,
 ) : AuthRepository {
-    override suspend fun signInWithGoogle(): LoginResult {
-        val googleCredentialResult: GoogleCredentialResult =
-            googleCredentialManager.getGoogleCredentialResult()
-
-        return when (googleCredentialResult) {
-            is GoogleCredentialResult.Success -> LoginResult.Success("로그인 성공")
-            is GoogleCredentialResult.Failure -> LoginResult.Failure(googleCredentialResult.exception)
-            GoogleCredentialResult.Suspending -> LoginResult.Failure(null)
-            GoogleCredentialResult.Cancel -> LoginResult.Cancel
+    override suspend fun signIn(idToken: String): Result<Unit> =
+        authDataSource.addLogin(idToken).map { (accessToken, refreshToken) ->
+            tokenManager.saveTokens(accessToken, refreshToken)
         }
-    }
-
-    override suspend fun signOutWithGoogle(): Result<Unit> = googleCredentialManager.signOut()
 }

@@ -1,6 +1,5 @@
 package com.yagubogu.data.network
 
-import android.content.Context
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInsApiService
@@ -15,7 +14,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 class RetrofitInstance(
-    context: Context,
+    tokenManager: TokenManager,
 ) {
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
@@ -28,41 +27,63 @@ class RetrofitInstance(
         }
     }
 
-    private val interceptorClient: OkHttpClient by lazy {
+    private val tokenInterceptor = TokenInterceptor(tokenManager)
+
+    private val authClient: OkHttpClient by lazy {
         OkHttpClient()
             .newBuilder()
-            .addInterceptor(TokenInterceptor(TokenManager(context)))
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 
-    private val retrofit: Retrofit by lazy {
+    private val authRetrofit: Retrofit by lazy {
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
-            .client(interceptorClient)
+            .client(authClient)
             .addConverterFactory(
                 Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
             ).build()
     }
 
     val authApiService: AuthApiService by lazy {
-        retrofit.create(AuthApiService::class.java)
+        authRetrofit.create(AuthApiService::class.java)
+    }
+
+    private val tokenAuthenticator = TokenAuthenticator(tokenManager, authApiService)
+
+    private val baseClient: OkHttpClient by lazy {
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(tokenInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
+    }
+
+    private val baseRetrofit: Retrofit by lazy {
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(baseClient)
+            .addConverterFactory(
+                Json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
+            ).build()
     }
 
     val memberApiService: MemberApiService by lazy {
-        retrofit.create(MemberApiService::class.java)
+        baseRetrofit.create(MemberApiService::class.java)
     }
 
     val stadiumApiService: StadiumApiService by lazy {
-        retrofit.create(StadiumApiService::class.java)
+        baseRetrofit.create(StadiumApiService::class.java)
     }
 
     val checkInsApiService: CheckInsApiService by lazy {
-        retrofit.create(CheckInsApiService::class.java)
+        baseRetrofit.create(CheckInsApiService::class.java)
     }
 
     val statsApiService: StatsApiService by lazy {
-        retrofit.create(StatsApiService::class.java)
+        baseRetrofit.create(StatsApiService::class.java)
     }
 }
