@@ -4,11 +4,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class LivetalkStadiumAdapter : ListAdapter<LivetalkStadiumItem, LivetalkStadiumViewHolder>(diffCallback) {
+class LivetalkStadiumAdapter(
+    private val handler: LivetalkStadiumViewHolder.Handler,
+) : ListAdapter<LivetalkStadiumItem, LivetalkStadiumViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): LivetalkStadiumViewHolder = LivetalkStadiumViewHolder.from(parent)
+    ): LivetalkStadiumViewHolder = LivetalkStadiumViewHolder.from(parent, handler)
 
     override fun onBindViewHolder(
         holder: LivetalkStadiumViewHolder,
