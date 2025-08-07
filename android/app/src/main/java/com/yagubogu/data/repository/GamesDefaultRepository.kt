@@ -9,11 +9,8 @@ import java.time.LocalDate
 class GamesDefaultRepository(
     private val gamesDataSource: GamesDataSource,
 ) : GamesRepository {
-    override suspend fun getGames(
-        token: String,
-        date: LocalDate,
-    ): Result<List<LivetalkStadiumItem>> =
-        gamesDataSource.getGames(token, date).map { gamesResponse: GamesResponse ->
+    override suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>> =
+        gamesDataSource.getGames(date).map { gamesResponse: GamesResponse ->
             gamesResponse.games.map { it.toPresentation() }
         }
 }

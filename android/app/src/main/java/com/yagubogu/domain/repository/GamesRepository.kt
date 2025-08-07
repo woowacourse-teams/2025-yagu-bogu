@@ -4,8 +4,5 @@ import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import java.time.LocalDate
 
 interface GamesRepository {
-    suspend fun getGames(
-        token: String,
-        date: LocalDate,
-    ): Result<List<LivetalkStadiumItem>>
+    suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>>
 }

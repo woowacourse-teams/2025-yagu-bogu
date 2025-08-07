@@ -23,7 +23,7 @@ class LivetalkViewModel(
     fun fetchGames() {
         viewModelScope.launch {
             val gamesResult: Result<List<LivetalkStadiumItem>> =
-                gamesRepository.getGames(TOKEN, DATE)
+                gamesRepository.getGames(DATE)
             gamesResult
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
                     _livetalkStadiumItems.value = livetalkStadiumItems
@@ -35,7 +35,5 @@ class LivetalkViewModel(
 
     companion object {
         private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
-        private const val TOKEN =
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDIyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTQ1Njk1NDUsImV4cCI6MTc1NDU3MDQ0NX0.yXHJVE1V7BvUmRczkSRAJA1VSxAM-OyU3bJ5tBAIrTU"
     }
 }
