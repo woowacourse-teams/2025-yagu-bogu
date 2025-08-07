@@ -47,8 +47,8 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
-        fetchMemberInformation(MEMBER_ID, YEAR)
-        fetchStadiumStats(MEMBER_ID, DATE)
+        fetchMemberInformation(YEAR)
+        fetchStadiumStats(DATE)
     }
 
     fun checkIn() {
@@ -63,13 +63,10 @@ class HomeViewModel(
         )
     }
 
-    fun fetchStadiumStats(
-        memberId: Long,
-        date: LocalDate,
-    ) {
+    fun fetchStadiumStats(date: LocalDate) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
-                checkInsRepository.getStadiumFanRates(memberId, date)
+                checkInsRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
                     _stadiumStatsUiModel.value = StadiumStatsUiModel(stadiumFanRates)
@@ -79,17 +76,14 @@ class HomeViewModel(
         }
     }
 
-    private fun fetchMemberInformation(
-        memberId: Long,
-        year: Int,
-    ) {
+    private fun fetchMemberInformation(year: Int) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String>> =
-                async { memberRepository.getFavoriteTeam(memberId) }
+                async { memberRepository.getFavoriteTeam() }
             val attendanceCountDeferred: Deferred<Result<Int>> =
-                async { checkInsRepository.getCheckInCounts(memberId, year) }
+                async { checkInsRepository.getCheckInCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
-                async { statsRepository.getStatsWinRate(memberId, year) }
+                async { statsRepository.getStatsWinRate(year) }
 
             val myTeamResult: Result<String> = myTeamDeferred.await()
             val attendanceCountResult: Result<Int> = attendanceCountDeferred.await()
@@ -143,7 +137,7 @@ class HomeViewModel(
 
         val today = LocalDate.now()
         checkInsRepository
-            .addCheckIn(MEMBER_ID, nearestStadium.id, today)
+            .addCheckIn(nearestStadium.id, today)
             .onSuccess {
                 _homeUiModel.value =
                     homeUiModel.value?.let { currentHomeUiModel: HomeUiModel ->
@@ -157,7 +151,6 @@ class HomeViewModel(
 
     companion object {
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
-        private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
         private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
     }

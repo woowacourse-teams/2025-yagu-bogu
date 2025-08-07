@@ -17,13 +17,11 @@ interface CheckInsApiService {
 
     @GET("/api/check-ins/counts")
     suspend fun getCheckInCounts(
-        @Query("memberId") id: Long,
         @Query("year") year: Int,
     ): Response<CheckInCountsResponse>
 
     @GET("/api/check-ins/stadiums/fan-rates")
     suspend fun getStadiumFanRates(
-        @Query("memberId") id: Long,
         @Query("date") date: String,
     ): Response<FanRateResponse>
 }

@@ -12,27 +12,20 @@ class CheckInsDefaultRepository(
     private val checkInsDataSource: CheckInsDataSource,
 ) : CheckInsRepository {
     override suspend fun addCheckIn(
-        memberId: Long,
         stadiumId: Long,
         date: LocalDate,
-    ): Result<Unit> = checkInsDataSource.addCheckIn(memberId, stadiumId, date)
+    ): Result<Unit> = checkInsDataSource.addCheckIn(stadiumId, date)
 
-    override suspend fun getCheckInCounts(
-        memberId: Long,
-        year: Int,
-    ): Result<Int> =
+    override suspend fun getCheckInCounts(year: Int): Result<Int> =
         checkInsDataSource
-            .getCheckInCounts(memberId, year)
+            .getCheckInCounts(year)
             .map { checkInCountsResponse: CheckInCountsResponse ->
                 checkInCountsResponse.checkInCounts
             }
 
-    override suspend fun getStadiumFanRates(
-        memberId: Long,
-        date: LocalDate,
-    ): Result<List<StadiumFanRateItem>> =
+    override suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>> =
         checkInsDataSource
-            .getStadiumFanRates(memberId, date)
+            .getStadiumFanRates(date)
             .map { fanRateResponse: FanRateResponse ->
                 fanRateResponse.fanRateByGames.map { fanRateByGameDto: FanRateByGameDto ->
                     fanRateByGameDto.toPresentation()

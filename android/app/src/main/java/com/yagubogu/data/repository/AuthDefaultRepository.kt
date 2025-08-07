@@ -1,24 +1,28 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.auth.GoogleCredentialResult
-import com.yagubogu.domain.model.LoginResult
+import com.yagubogu.data.datasource.AuthDataSource
+import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.repository.AuthRepository
 
 class AuthDefaultRepository(
-    private val googleCredentialManager: GoogleCredentialManager,
+    private val authDataSource: AuthDataSource,
+    private val tokenManager: TokenManager,
 ) : AuthRepository {
-    override suspend fun signInWithGoogle(): LoginResult {
-        val googleCredentialResult: GoogleCredentialResult =
-            googleCredentialManager.getGoogleCredentialResult()
+    override suspend fun login(idToken: String): Result<Unit> =
+        authDataSource.login(idToken).map { (accessToken, refreshToken) ->
+            tokenManager.saveTokens(accessToken, refreshToken)
+        }
 
-        return when (googleCredentialResult) {
-            is GoogleCredentialResult.Success -> LoginResult.Success("로그인 성공")
-            is GoogleCredentialResult.Failure -> LoginResult.Failure(googleCredentialResult.exception)
-            GoogleCredentialResult.Suspending -> LoginResult.Failure(null)
-            GoogleCredentialResult.Cancel -> LoginResult.Cancel
+    override suspend fun refreshTokens(): Result<Unit> {
+        val refreshToken: String =
+            tokenManager.getRefreshToken()
+                ?: return Result.failure(Exception(ERROR_NO_REFRESH_TOKEN))
+        return authDataSource.refreshTokens(refreshToken).map { (accessToken, refreshToken) ->
+            tokenManager.saveTokens(accessToken, refreshToken)
         }
     }
 
-    override suspend fun signOutWithGoogle(): Result<Unit> = googleCredentialManager.signOut()
+    companion object {
+        private const val ERROR_NO_REFRESH_TOKEN = "Refresh token is null"
+    }
 }

@@ -15,13 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.MainActivity
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
@@ -32,21 +32,31 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
-        val authRepository = AuthDefaultRepository(googleCredentialManager)
-        LoginViewModelFactory(authRepository)
+        val app = application as YaguBoguApplication
+        LoginViewModelFactory(app.authRepository, googleCredentialManager)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         super.onCreate(savedInstanceState)
+        handleAutoLogin()
         setupView()
         setupBindings()
-        performInitialization()
     }
 
     private fun setupSplash() {
         val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !isAppInitialized }
+    }
+
+    private fun handleAutoLogin() {
+        lifecycleScope.launch {
+            val isTokenValid: Boolean = viewModel.isTokenValid()
+            if (isTokenValid) {
+                navigateToMain()
+            }
+            isAppInitialized = true
+        }
     }
 
     private fun setupView() {
@@ -59,24 +69,18 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun performInitialization() {
-        lifecycleScope.launch {
-            try {
-                // Todo : 초기화 작업 수행, (LoginViewModel에서 초기 Api 요청, 데이터베이스 조회 등)
-            } catch (e: Exception) {
-                Timber.e(e, "초기화 실패")
-            } finally {
-                isAppInitialized = true
-            }
-        }
-    }
-
     private fun setupBindings() {
         binding.viewModel = viewModel
 
         viewModel.loginResult.observe(this) { value: LoginResult ->
             when (value) {
-                is LoginResult.Success -> navigateToMain()
+                LoginResult.Success -> {
+                    // TODO: 회원가입일 때 팀 선택 화면으로 이동
+                    val app = application as YaguBoguApplication
+                    lifecycleScope.launch { app.memberRepository.updateFavoriteTeam(Team.LG) }
+                    navigateToMain()
+                }
+
                 is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
                 LoginResult.Cancel -> Unit
             }
