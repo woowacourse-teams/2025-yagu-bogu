@@ -9,6 +9,7 @@ import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +32,7 @@ public interface CheckInControllerInterface {
     })
     @PostMapping
     ResponseEntity<Void> createCheckIn(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody CreateCheckInRequest request
     );
 
@@ -42,7 +43,7 @@ public interface CheckInControllerInterface {
     })
     @GetMapping("/counts")
     ResponseEntity<CheckInCountsResponse> findCheckInCounts(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam long year
     );
 
@@ -53,7 +54,7 @@ public interface CheckInControllerInterface {
     })
     @GetMapping("/members")
     ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year,
             @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter filter
     );
@@ -65,7 +66,7 @@ public interface CheckInControllerInterface {
     })
     @GetMapping("/stadiums/fan-rates")
     ResponseEntity<FanRateResponse> findFanRatesByStadiums(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam LocalDate date
     );
 
@@ -75,7 +76,7 @@ public interface CheckInControllerInterface {
     })
     @GetMapping("/victory-fairy/rankings")
     ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            MemberClaims memberClaims
+            @Parameter(hidden = true) MemberClaims memberClaims
     );
 
     @Operation(summary = "당일 인증 여부 조회", description = "해당 날짜에 사용자가 인증했는지 여부를 반환합니다.")
@@ -85,7 +86,7 @@ public interface CheckInControllerInterface {
     })
     @GetMapping("/status")
     ResponseEntity<CheckInStatusResponse> findCheckInStatus(
-            MemberClaims memberClaims,
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam LocalDate date
     );
 }
