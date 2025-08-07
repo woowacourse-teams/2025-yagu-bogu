@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource
 
-import com.yagubogu.data.dto.response.talks.TalksResponse
+import com.yagubogu.data.dto.response.talks.ContentDto
+import com.yagubogu.data.dto.response.talks.TalkResponse
 
 interface TalksDataSource {
     suspend fun getTalks(
@@ -8,5 +9,11 @@ interface TalksDataSource {
         gameId: Long,
         before: Long?,
         limit: Int,
-    ): Result<TalksResponse>
+    ): Result<TalkResponse>
+
+    suspend fun postTalks(
+        token: String,
+        gameId: Long,
+        content: String,
+    ): Result<ContentDto>
 }

@@ -9,4 +9,10 @@ interface TalksRepository {
         before: Long?,
         limit: Int,
     ): Result<List<LivetalkChatItem>>
+
+    suspend fun postTalks(
+        token: String,
+        gameId: Long,
+        content: String,
+    ): Result<LivetalkChatItem>
 }

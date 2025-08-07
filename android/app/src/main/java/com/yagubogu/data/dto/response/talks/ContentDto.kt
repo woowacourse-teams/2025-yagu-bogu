@@ -15,18 +15,21 @@ data class ContentDto(
     val nickname: String, // 작성자의 닉네임
     @SerialName("favorite")
     val favorite: String, // 작성자의 응원팀 이름
+    @SerialName("imageUrl")
+    val imageUrl: String, // 작성자의 프로필 이미지 URL
     @SerialName("content")
     val content: String, // 채팅 메시지 본문
     @SerialName("createdAt")
     val createdAt: String, // 메시지 작성 시간 (ISO 8601 형식) 예: "2025-07-30T12:00:00"
+    @SerialName("isMine")
+    val isMine: Boolean, // 내가 작성한 메시지인지 여부
 ) {
-    // Todo : isMine과 profileImageUrl 정상화 필요
     fun toPresentation(): LivetalkChatItem =
         LivetalkChatItem(
             chatId = id.toLong(),
-            isMine = false,
+            isMine = isMine,
             message = content,
-            profileImageUrl = "TODO()",
+            profileImageUrl = imageUrl,
             nickname = nickname,
             teamName = favorite,
             timestamp = LocalDateTime.parse(createdAt),
