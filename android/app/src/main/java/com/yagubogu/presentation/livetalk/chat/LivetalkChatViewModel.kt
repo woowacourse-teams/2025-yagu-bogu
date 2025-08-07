@@ -16,8 +16,8 @@ class LivetalkChatViewModel(
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
     val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
 
-    private val _livetalkChatItems = MutableLiveData<List<LivetalkChatItem>>()
-    val livetalkChatItems: LiveData<List<LivetalkChatItem>> get() = _livetalkChatItems
+    private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
+    val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
     val messageFormText = ObservableField<String>()
 
@@ -32,7 +32,10 @@ class LivetalkChatViewModel(
             talksResult
                 .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
                     _livetalkResponseItem.value = livetalkResponseItem
-                    _livetalkChatItems.value = livetalkResponseItem.cursor.chats
+                    _liveTalkChatBubbleItem.value =
+                        livetalkResponseItem.cursor.chats.map { livetalkChatItem: LivetalkChatItem ->
+                            LivetalkChatBubbleItem.of(livetalkChatItem)
+                        }
                     messageFormText.set("")
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")

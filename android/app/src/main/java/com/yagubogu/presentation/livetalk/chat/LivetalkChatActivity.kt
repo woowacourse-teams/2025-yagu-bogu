@@ -71,12 +71,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.livetalkChatItems.observe(this) { value: List<LivetalkChatItem> ->
-            val livetalkChatItems: List<LivetalkChatBubbleItem> =
-                value.map { livetalkChatItem: LivetalkChatItem ->
-                    LivetalkChatBubbleItem.of(livetalkChatItem)
-                }
-            livetalkChatAdapter.submitList(livetalkChatItems)
+        viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
+            livetalkChatAdapter.submitList(livetalkChatBubbleItems)
         }
     }
 
