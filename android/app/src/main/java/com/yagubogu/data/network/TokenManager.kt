@@ -30,7 +30,8 @@ class TokenManager(
 
     suspend fun clearTokens() {
         context.dataStore.edit { prefs: MutablePreferences ->
-            prefs.clear()
+            prefs.remove(ACCESS_TOKEN_KEY)
+            prefs.remove(REFRESH_TOKEN_KEY)
         }
     }
 
