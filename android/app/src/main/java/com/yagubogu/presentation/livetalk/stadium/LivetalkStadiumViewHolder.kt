@@ -7,9 +7,10 @@ import com.yagubogu.databinding.ItemLivetalkStadiumBinding
 
 class LivetalkStadiumViewHolder(
     private val binding: ItemLivetalkStadiumBinding,
+    private val handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.constraintLivetalkStadium
+        binding.handler = handler
     }
 
     fun bind(item: LivetalkStadiumItem) {
@@ -27,7 +28,7 @@ class LivetalkStadiumViewHolder(
         ): LivetalkStadiumViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemLivetalkStadiumBinding.inflate(inflater, parent, false)
-            return LivetalkStadiumViewHolder(binding)
+            return LivetalkStadiumViewHolder(binding, handler)
         }
     }
 }
