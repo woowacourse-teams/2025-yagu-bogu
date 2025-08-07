@@ -28,10 +28,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class CheckInService {
 
@@ -44,14 +42,12 @@ public class CheckInService {
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
 
-    @Transactional
-    public void createCheckIn(final CreateCheckInRequest request) {
+    public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
         long stadiumId = request.stadiumId();
         Stadium stadium = getStadiumById(stadiumId);
         LocalDate date = request.date();
         Game game = getGame(stadium, date);
 
-        long memberId = request.memberId();
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
@@ -114,13 +110,6 @@ public class CheckInService {
         return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
     }
 
-    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
-        Member member = getMember(memberId);
-        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
-
-        return new CheckInStatusResponse(isCheckIn);
-    }
-
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
         List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
 
@@ -154,6 +143,13 @@ public class CheckInService {
                 .filter(d -> d.memberId().equals(memberId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+        Member member = getMember(memberId);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+
+        return new CheckInStatusResponse(isCheckIn);
     }
 
     private Stadium getStadiumById(final long stadiumId) {

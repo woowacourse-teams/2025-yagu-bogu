@@ -7,6 +7,8 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.dto.AverageStatistic;
+import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
@@ -25,7 +27,7 @@ public class StatService {
     private final StadiumRepository stadiumRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
@@ -37,7 +39,7 @@ public class StatService {
     }
 
     public WinRateResponse findWinRate(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
@@ -49,7 +51,7 @@ public class StatService {
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
-        Member member = getById(memberId);
+        Member member = getMember(memberId);
         validateUser(member);
 
         List<Stadium> stadiums = stadiumRepository.findAll();
@@ -70,6 +72,13 @@ public class StatService {
         return LuckyStadiumResponse.from(luckyStadium);
     }
 
+    public AverageStatisticResponse findAverageStatistic(final long memberId) {
+        Member member = getMember(memberId);
+        AverageStatistic averageStatistic = checkInRepository.findAverageStatistic(member);
+
+        return AverageStatisticResponse.from(averageStatistic);
+    }
+
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
         if (favoriteCheckInCounts == 0) {
             return 0;
@@ -79,7 +88,7 @@ public class StatService {
         return Math.round(rate * 10) / 10.0;
     }
 
-    private Member getById(final long memberId) {
+    private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }

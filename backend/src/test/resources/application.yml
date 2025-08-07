@@ -26,17 +26,17 @@ oauth:
     read-timeout: 180s
 
 security:
-  jwt:
+  token:
     access-token:
       secret-key: this-is-secret-key
-      expire-length: 900      # 15분 (초)
+      expires-in: 900      # 15분 (초)
     refresh-token:
       secret-key: this-is-secret-key
-      expire-length: 1209600  # 14일 (초)
+      expires-in: 1209600  # 14일 (초)
 
 api:
   kbo:
-    base-url: https://www.koreabaseball.com/ws/Main.asmx
+    base-url: https://www.koreabaseball.com/ws
     connect-timeout: 5s
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8

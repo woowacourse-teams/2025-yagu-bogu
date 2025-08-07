@@ -51,12 +51,13 @@ VALUES
 
 
 -- 4. 경기 정보
-INSERT INTO games (game_id, stadium_id, home_team_id, away_team_id, date, start_at, game_code, home_score, away_score)
-VALUES (1, 1, 1, 10, '2025-07-24', '18:30', '20250724OBHT0', 5, 4),
-       (2, 1, 1, 10, '2025-07-25', '18:30', '20250725OBHT0', 5, 4),
-       (3, 6, 2, 6, '2025-07-25', '18:30', '20250725LTLG0', 3, 5),
-       (4, 2, 2, 1, '2025-07-24', '18:30', '20250724HTLG0', 10, 0),
-       (5, 2, 2, 1, '2025-07-25', '18:30', '20250725HTLG0', 10, 0);
+INSERT INTO games (game_id, stadium_id, home_team_id, away_team_id, date, start_at, game_code, home_score, away_score,
+                   game_state)
+VALUES (1, 1, 1, 10, '2025-07-24', '18:30', '20250724OBHT0', 5, 4, 'COMPLETED'),
+       (2, 1, 1, 10, '2025-07-25', '18:30', '20250725OBHT0', 5, 4, 'COMPLETED'),
+       (3, 6, 2, 6, '2025-07-25', '18:30', '20250725LTLG0', 3, 5, 'COMPLETED'),
+       (4, 2, 2, 1, '2025-07-24', '18:30', '20250724HTLG0', 10, 0, 'COMPLETED'),
+       (5, 2, 2, 1, '2025-07-25', '18:30', '20250725HTLG0', 10, 0, 'COMPLETED');
 -- 5. 체크인 정보
 INSERT INTO check_ins (member_id, game_id, team_id)
 VALUES

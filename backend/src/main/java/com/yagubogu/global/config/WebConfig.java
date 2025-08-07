@@ -1,7 +1,7 @@
-package com.yagubogu.global.config;
+package com.yagubogu.auth.config;
 
+import com.yagubogu.auth.interceptor.AuthInterceptor;
 import com.yagubogu.auth.support.MemberClaimsArgumentResolver;
-import com.yagubogu.global.LoggingInterceptor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final MemberClaimsArgumentResolver memberClaimsArgumentResolver;
-    private final LoggingInterceptor loggingInterceptor;
+    private final AuthInterceptor authInterceptor;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
@@ -23,6 +23,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
-        registry.addInterceptor(loggingInterceptor);
+        registry.addInterceptor(authInterceptor);
     }
 }

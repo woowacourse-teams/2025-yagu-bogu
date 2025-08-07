@@ -1,7 +1,11 @@
 package com.yagubogu.auth.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
+import com.yagubogu.auth.dto.LogoutRequest;
+import com.yagubogu.auth.dto.TokenRequest;
+import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +28,24 @@ public class AuthController {
         LoginResponse response = authService.login(request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(
+            @RequestBody final TokenRequest request
+    ) {
+        TokenResponse response = authService.refreshToken(request.refreshToken());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @RequireRole
+    @PostMapping("/logout")
+    public ResponseEntity<TokenResponse> logout(
+            @RequestBody final LogoutRequest request
+    ) {
+        authService.logout(request);
+
+        return ResponseEntity.noContent().build();
     }
 }

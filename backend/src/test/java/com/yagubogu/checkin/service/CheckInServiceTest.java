@@ -68,7 +68,8 @@ class CheckInServiceTest {
         LocalDate date = TestFixture.getToday();
 
         // when & then
-        assertThatCode(() -> checkInService.createCheckIn(new CreateCheckInRequest(memberId, stadiumId, date)))
+        assertThatCode(() -> checkInService.createCheckIn(memberId,
+                new CreateCheckInRequest(stadiumId, date)))
                 .doesNotThrowAnyException();
     }
 
@@ -80,9 +81,9 @@ class CheckInServiceTest {
         long validMemberId = 1L;
         LocalDate date = TestFixture.getToday();
 
-        CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, invalidStadiumId, date);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidStadiumId, date);
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(validMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Stadium is not found");
     }
@@ -94,10 +95,10 @@ class CheckInServiceTest {
         long validMemberId = 1L;
         long stadiumId = 1L;
         LocalDate invalidDate = TestFixture.getInvalidDate();
-        CreateCheckInRequest request = new CreateCheckInRequest(validMemberId, stadiumId, invalidDate);
+        CreateCheckInRequest request = new CreateCheckInRequest(stadiumId, invalidDate);
 
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(validMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Game is not found");
     }
@@ -109,10 +110,10 @@ class CheckInServiceTest {
         long invalidStadiumId = 1L;
         long invalidMemberId = 999L;
         LocalDate date = TestFixture.getToday();
-        CreateCheckInRequest request = new CreateCheckInRequest(invalidMemberId, invalidStadiumId, date);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidStadiumId, date);
 
         // when & then
-        assertThatThrownBy(() -> checkInService.createCheckIn(request))
+        assertThatThrownBy(() -> checkInService.createCheckIn(invalidMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }
@@ -123,7 +124,7 @@ class CheckInServiceTest {
         // given
         long memberId = 1L;
         int year = 2025;
-        int expected = 6;
+        int expected = 7;
 
         // when
         CheckInCountsResponse actual = checkInService.findCheckInCounts(memberId, year);
@@ -160,38 +161,38 @@ class CheckInServiceTest {
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 21)
                 ),
                 new CheckInGameResponse(2L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 5, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 5, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 20)
                 ),
                 new CheckInGameResponse(3L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 19)
                 ),
                 new CheckInGameResponse(4L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 18)
                 ),
                 new CheckInGameResponse(5L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
-                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
+                        new CheckInGameTeamResponse("HT", "기아", 9, true),
                         LocalDate.of(2025, 7, 17)
                 ),
                 new CheckInGameResponse(6L,
                         "대구 삼성라이온즈파크",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 16)
                 )
         );
@@ -212,37 +213,43 @@ class CheckInServiceTest {
                 new VictoryFairyRankingResponse(
                         1,
                         "구구",
+                        "https://image.com/gugu.png",
                         "KT",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         2,
                         "메다",
+                        "https://image.com/meda.png",
                         "LG",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         3,
                         "밍트",
+                        "https://image.com/mint.png",
                         "기아",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         4,
                         "크림",
+                        "https://image.com/cream.png",
                         "삼성",
                         100.0
                 ),
                 new VictoryFairyRankingResponse(
                         5,
                         "포르",
+                        "https://image.com/por.png",
                         "기아",
-                        83.3
+                        71.4
                 )
         );
         VictoryFairyRankingResponse expectedMemberRanking = new VictoryFairyRankingResponse(
                 3,
                 "밍트",
+                "https://image.com/mint.png",
                 "기아",
                 100.0
         );
@@ -309,32 +316,32 @@ class CheckInServiceTest {
         List<CheckInGameResponse> expected = List.of(
                 new CheckInGameResponse(1L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 21)
                 ),
                 new CheckInGameResponse(3L,
                         "잠실 야구장",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(3L, "삼성", 5, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 5, false),
                         LocalDate.of(2025, 7, 19)
                 ),
                 new CheckInGameResponse(4L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 18)
                 ),
                 new CheckInGameResponse(5L,
                         "광주 KIA 챔피언스필드",
-                        new CheckInGameTeamResponse(3L, "삼성", 1, false),
-                        new CheckInGameTeamResponse(1L, "기아", 9, true),
+                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
+                        new CheckInGameTeamResponse("HT", "기아", 9, true),
                         LocalDate.of(2025, 7, 17)
                 ),
                 new CheckInGameResponse(6L,
                         "대구 삼성라이온즈파크",
-                        new CheckInGameTeamResponse(1L, "기아", 10, true),
-                        new CheckInGameTeamResponse(2L, "롯데", 9, false),
+                        new CheckInGameTeamResponse("HT", "기아", 10, true),
+                        new CheckInGameTeamResponse("LT", "롯데", 9, false),
                         LocalDate.of(2025, 7, 16)
                 )
         );
@@ -362,13 +369,13 @@ class CheckInServiceTest {
                         ),
                         new FanRateByGameResponse(
                                 4L,
-                                new TeamFanRateResponse("LG", "LG", 75.0),
-                                new TeamFanRateResponse("KT", "KT", 25.0)
+                                new TeamFanRateResponse("삼성", "SS", 25.0),
+                                new TeamFanRateResponse("두산", "OB", 50.0)
                         ),
                         new FanRateByGameResponse(
-                                2L,
-                                new TeamFanRateResponse("삼성", "SS", 50.0),
-                                new TeamFanRateResponse("두산", "OB", 50.0)
+                                4L,
+                                new TeamFanRateResponse("LG", "LG", 75.0),
+                                new TeamFanRateResponse("KT", "KT", 25.0)
                         )
                 )
         );
