@@ -14,7 +14,7 @@ class StatsRemoteDataSource(
         year: Int,
     ): Result<StatsWinRateResponse> =
         safeApiCall {
-            statsApiService.getStatsWinRate(memberId, year)
+            statsApiService.getStatsWinRate(year)
         }
 
     override suspend fun getStatsCounts(
@@ -22,7 +22,7 @@ class StatsRemoteDataSource(
         year: Int,
     ): Result<StatsCountsResponse> =
         safeApiCall {
-            statsApiService.getStatsCounts(memberId, year)
+            statsApiService.getStatsCounts(year)
         }
 
     override suspend fun getLuckyStadiums(
@@ -30,6 +30,6 @@ class StatsRemoteDataSource(
         year: Int,
     ): Result<StatsLuckyStadiumsResponse> =
         safeApiCall {
-            statsApiService.getLuckyStadiums(memberId, year)
+            statsApiService.getLuckyStadiums(year)
         }
 }

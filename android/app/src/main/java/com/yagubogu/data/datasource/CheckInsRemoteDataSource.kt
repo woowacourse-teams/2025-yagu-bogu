@@ -18,7 +18,6 @@ class CheckInsRemoteDataSource(
     ): Result<Unit> {
         val checkInRequest =
             CheckInRequest(
-                memberId = memberId,
                 stadiumId = stadiumId,
                 date = KLocalDate.parse(date.toString()),
             )
@@ -32,7 +31,7 @@ class CheckInsRemoteDataSource(
         year: Int,
     ): Result<CheckInCountsResponse> =
         safeApiCall {
-            checkInsApiService.getCheckInCounts(memberId, year)
+            checkInsApiService.getCheckInCounts(year)
         }
 
     override suspend fun getStadiumFanRates(
@@ -40,6 +39,6 @@ class CheckInsRemoteDataSource(
         date: LocalDate,
     ): Result<FanRateResponse> =
         safeApiCall {
-            checkInsApiService.getStadiumFanRates(memberId, date.toString())
+            checkInsApiService.getStadiumFanRates(date.toString())
         }
 }

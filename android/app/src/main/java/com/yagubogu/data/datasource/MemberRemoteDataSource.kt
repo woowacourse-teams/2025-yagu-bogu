@@ -9,6 +9,6 @@ class MemberRemoteDataSource(
 ) : MemberDataSource {
     override suspend fun getFavoriteTeam(memberId: Long): Result<MemberFavoriteResponse> =
         safeApiCall {
-            memberApiService.getFavoriteTeam(memberId)
+            memberApiService.getFavoriteTeam()
         }
 }
