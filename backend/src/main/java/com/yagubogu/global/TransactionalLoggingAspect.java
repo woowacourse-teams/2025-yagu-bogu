@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +17,13 @@ public class TransactionalLoggingAspect {
             final ProceedingJoinPoint joinPoint,
             final Transactional transactional
     ) throws Throwable {
-        String traceId = MDC.get("traceId");
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
 
         long startTime = System.currentTimeMillis();
         if (!transactional.readOnly()) {
-            log.info("[{}] [{}] {} - [BEGIN TX]",
-                    traceId,
-                    className + "." + methodName,
-                    className);
+            log.info("[{}] - [BEGIN TX]",
+                    className + "." + methodName);
         }
 
         try {
@@ -37,10 +33,8 @@ public class TransactionalLoggingAspect {
         } finally {
             if (!transactional.readOnly()) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                log.info("[{}] [{}] {} - [END TX] ({}ms)",
-                        traceId,
+                log.info("[{}] - [END TX] ({}ms)",
                         className + "." + methodName,
-                        className,
                         elapsedTime);
             }
         }
