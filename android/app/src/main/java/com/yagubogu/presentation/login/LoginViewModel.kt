@@ -17,7 +17,9 @@ class LoginViewModel(
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> get() = _loginResult
 
-    fun signIn() {
+    suspend fun isTokenValid(): Boolean = authRepository.refreshTokens().isSuccess
+
+    fun signInWithGoogle() {
         viewModelScope.launch {
             val googleCredentialResult: GoogleCredentialResult =
                 googleCredentialManager.getGoogleCredentialResult()
@@ -27,7 +29,7 @@ class LoginViewModel(
                     is GoogleCredentialResult.Success -> {
                         val idToken: String = googleCredentialResult.idToken
                         authRepository.signIn(idToken)
-                        LoginResult.Success("로그인 성공")
+                        LoginResult.Success
                     }
 
                     is GoogleCredentialResult.Failure -> LoginResult.Failure(googleCredentialResult.exception)
