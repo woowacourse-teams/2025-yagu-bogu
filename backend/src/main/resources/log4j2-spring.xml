@@ -17,7 +17,7 @@
             <DefaultRolloverStrategy max="7"/>
         </RollingFile>
 
-        <RollingFile name="DevFile" fileName="logs/dev.log"
+        <RollingFile name="DevFile" fileName="/home/ubuntu/logs/dev.log"
                      filePattern="logs/dev-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%X{traceId}] - %msg%n"/>
             <Policies>
