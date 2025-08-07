@@ -10,32 +10,23 @@ import com.yagubogu.domain.repository.StatsRepository
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
 ) : StatsRepository {
-    override suspend fun getStatsWinRate(
-        memberId: Long,
-        year: Int,
-    ): Result<Double> =
+    override suspend fun getStatsWinRate(year: Int): Result<Double> =
         statsDataSource
-            .getStatsWinRate(memberId, year)
+            .getStatsWinRate(year)
             .map { statsWinRateResponse: StatsWinRateResponse ->
                 statsWinRateResponse.winPercent
             }
 
-    override suspend fun getStatsCounts(
-        memberId: Long,
-        year: Int,
-    ): Result<StatsCounts> =
+    override suspend fun getStatsCounts(year: Int): Result<StatsCounts> =
         statsDataSource
-            .getStatsCounts(memberId, year)
+            .getStatsCounts(year)
             .map { statsCountsResponse: StatsCountsResponse ->
                 statsCountsResponse.toDomain()
             }
 
-    override suspend fun getLuckyStadiums(
-        memberId: Long,
-        year: Int,
-    ): Result<String?> =
+    override suspend fun getLuckyStadiums(year: Int): Result<String?> =
         statsDataSource
-            .getLuckyStadiums(memberId, year)
+            .getLuckyStadiums(year)
             .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
                 statsLuckyStadiumsResponse.shortName
             }
