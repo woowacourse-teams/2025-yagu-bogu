@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
@@ -24,6 +25,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
