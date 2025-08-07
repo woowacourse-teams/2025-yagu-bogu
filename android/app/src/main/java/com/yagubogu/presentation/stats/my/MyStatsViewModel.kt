@@ -20,12 +20,16 @@ class MyStatsViewModel(
     private val _myStatsUiModel = MutableLiveData<MyStatsUiModel>()
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
+    private val _myAverageStats = MutableLiveData<MyAverageStats>()
+    val myAverageStats: LiveData<MyAverageStats> = _myAverageStats
+
     init {
         fetchAll()
     }
 
     fun fetchAll() {
         fetchMyStats(MEMBER_ID, YEAR)
+        fetchMyAverageStats(TOKEN)
     }
 
     private fun fetchMyStats(
@@ -74,8 +78,18 @@ class MyStatsViewModel(
         }
     }
 
+    private fun fetchMyAverageStats(token: String) {
+        viewModelScope.launch {
+            val myAverageStats: Result<MyAverageStats> = statsRepository.getAverageStats(token)
+            myAverageStats.onSuccess { myAverageStats: MyAverageStats ->
+                _myAverageStats.value = myAverageStats
+            }
+        }
+    }
+
     companion object {
         private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
+        private const val TOKEN = ""
     }
 }
