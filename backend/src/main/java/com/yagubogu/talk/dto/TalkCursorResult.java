@@ -1,5 +1,7 @@
 package com.yagubogu.talk.dto;
 
+import com.yagubogu.game.domain.Game;
+
 public record TalkCursorResult(
         String stadiumName,
         String homeTeamName,
@@ -8,15 +10,13 @@ public record TalkCursorResult(
 ) {
 
     public static TalkCursorResult from(
-            String stadiumName,
-            String homeTeamName,
-            String awayTeamName,
+            Game game,
             CursorResult<TalkResponse> cursorResult
     ) {
         return new TalkCursorResult(
-                stadiumName,
-                homeTeamName,
-                awayTeamName,
+                game.getStadium().getFullName(),
+                game.getHomeTeam().getShortName(),
+                game.getAwayTeam().getShortName(),
                 cursorResult
         );
     }

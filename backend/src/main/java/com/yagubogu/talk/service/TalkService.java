@@ -51,12 +51,7 @@ public class TalkService {
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
                 talkResponses.hasNext());
 
-        return TalkCursorResult.from(
-                game.getStadium().getFullName(),
-                game.getHomeTeam().getShortName(),
-                game.getAwayTeam().getShortName(),
-                cursorResult
-        );
+        return TalkCursorResult.from(game, cursorResult);
     }
 
     public TalkCursorResult findNewTalks(
@@ -74,12 +69,7 @@ public class TalkService {
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
-        return TalkCursorResult.from(
-                game.getStadium().getFullName(),
-                game.getHomeTeam().getShortName(),
-                game.getAwayTeam().getShortName(),
-                cursorResult
-        );
+        return TalkCursorResult.from(game, cursorResult);
     }
 
     public TalkResponse createTalk(
@@ -118,7 +108,7 @@ public class TalkService {
 
     public List<TalkResponse> hideReportedTalks(
             final List<TalkResponse> talks,
-            final long memberId // TODO: 나중에 삭제
+            final long memberId
     ) {
         if (talks.isEmpty()) {
             return talks;
