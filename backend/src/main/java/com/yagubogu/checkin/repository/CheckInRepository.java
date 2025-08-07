@@ -121,6 +121,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
                     ci.member.id,
                     ci.member.nickname,
+                    ci.member.imageUrl,
                     ci.member.team.shortName,
                     COUNT(ci),
                     ROUND(

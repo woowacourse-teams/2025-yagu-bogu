@@ -11,6 +11,7 @@ public record VictoryFairyRankingResponses(
     public record VictoryFairyRankingResponse(
             int ranking,
             String nickname,
+            String profileImageUrl,
             String teamShortName,
             double winPercent
     ) {
@@ -27,6 +28,7 @@ public record VictoryFairyRankingResponses(
             rankingResponses.add(new VictoryFairyRankingResponse(
                     i + 1,
                     data.nickname(),
+                    data.profileImageUrl(),
                     data.teamShortName(),
                     data.winPercent()
             ));
@@ -37,6 +39,7 @@ public record VictoryFairyRankingResponses(
             myRankingResponse = new VictoryFairyRankingResponse(
                     myRanking,
                     myRankingData.nickname(),
+                    myRankingData.profileImageUrl(),
                     myRankingData.teamShortName(),
                     myRankingData.winPercent()
             );
