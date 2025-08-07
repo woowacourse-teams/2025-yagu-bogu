@@ -10,14 +10,12 @@ class TalksDefaultRepository(
     private val talksDataSource: TalksDataSource,
 ) : TalksRepository {
     override suspend fun getTalks(
-        token: String,
         gameId: Long,
         before: Long?,
         limit: Int,
     ): Result<List<LivetalkChatItem>> =
         talksDataSource
             .getTalks(
-                token = token,
                 gameId = gameId,
                 before = before,
                 limit = limit,
@@ -26,13 +24,11 @@ class TalksDefaultRepository(
             }
 
     override suspend fun postTalks(
-        token: String,
         gameId: Long,
         content: String,
     ): Result<LivetalkChatItem> =
         talksDataSource
             .postTalks(
-                token = token,
                 gameId = gameId,
                 content = content,
             ).map { contentDto: ContentDto ->

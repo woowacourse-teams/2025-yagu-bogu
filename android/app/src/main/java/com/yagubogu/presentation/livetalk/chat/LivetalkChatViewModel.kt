@@ -25,7 +25,7 @@ class LivetalkChatViewModel(
     fun fetchTalks(gameId: Long) {
         viewModelScope.launch {
             val talksResult: Result<List<LivetalkChatItem>> =
-                talksRepository.getTalks(TOKEN, gameId, null, 10)
+                talksRepository.getTalks(gameId, null, 10)
             talksResult
                 .onSuccess { livetalkChatItems: List<LivetalkChatItem> ->
                     _livetalkChatItems.value = livetalkChatItems
@@ -43,17 +43,12 @@ class LivetalkChatViewModel(
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
-                talksRepository.postTalks(TOKEN, gameId, message.trim())
+                talksRepository.postTalks(gameId, message.trim())
             talksResult
                 .onSuccess { fetchTalks(gameId) }
                 .onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
-    }
-
-    companion object {
-        private const val TOKEN =
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDIyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTQ1Njk1NDUsImV4cCI6MTc1NDU3MDQ0NX0.yXHJVE1V7BvUmRczkSRAJA1VSxAM-OyU3bJ5tBAIrTU"
     }
 }

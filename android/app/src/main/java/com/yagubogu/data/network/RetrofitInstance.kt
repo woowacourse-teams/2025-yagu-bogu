@@ -91,10 +91,10 @@ class RetrofitInstance(
     }
 
     val gamesApiService: GamesApiService by lazy {
-        retrofit.create(GamesApiService::class.java)
+        baseRetrofit.create(GamesApiService::class.java)
     }
 
     val talksApiService: TalksApiService by lazy {
-        retrofit.create(TalksApiService::class.java)
+        baseRetrofit.create(TalksApiService::class.java)
     }
 }

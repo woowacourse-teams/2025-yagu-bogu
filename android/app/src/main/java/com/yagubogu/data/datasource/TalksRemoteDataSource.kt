@@ -10,21 +10,19 @@ class TalksRemoteDataSource(
     private val talksApiService: TalksApiService,
 ) : TalksDataSource {
     override suspend fun getTalks(
-        token: String,
         gameId: Long,
         before: Long?,
         limit: Int,
     ): Result<TalkResponse> =
         safeApiCall {
-            talksApiService.getGames(token, gameId, before, limit)
+            talksApiService.getGames(gameId, before, limit)
         }
 
     override suspend fun postTalks(
-        token: String,
         gameId: Long,
         content: String,
     ): Result<ContentDto> =
         safeApiCall {
-            talksApiService.postTalks(token, gameId, TalksRequest(content))
+            talksApiService.postTalks(gameId, TalksRequest(content))
         }
 }

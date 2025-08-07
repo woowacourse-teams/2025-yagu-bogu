@@ -48,10 +48,10 @@ class YaguBoguApplication : Application() {
     private val statsDataSource by lazy { StatsRemoteDataSource(retrofit.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
 
-    private val gamesDataSource by lazy { GamesRemoteDataSource(RetrofitInstance.gamesApiService) }
+    private val gamesDataSource by lazy { GamesRemoteDataSource(retrofit.gamesApiService) }
     val gamesRepository by lazy { GamesDefaultRepository(gamesDataSource) }
 
-    private val talksDataSource by lazy { TalksRemoteDataSource(RetrofitInstance.talksApiService) }
+    private val talksDataSource by lazy { TalksRemoteDataSource(retrofit.talksApiService) }
     val talksRepository by lazy { TalksDefaultRepository(talksDataSource) }
 
     override fun onCreate() {
