@@ -20,7 +20,6 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyItem
@@ -109,10 +108,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.homeUiModel.observe(viewLifecycleOwner) { value: HomeUiModel ->
-            binding.homeUiModel = value
-        }
-
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
@@ -124,9 +119,7 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
-            binding.stadiumStatsUiModel = value
             stadiumFanRateAdapter.submitList(value.stadiumFanRates)
-//            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
         }
     }
 
