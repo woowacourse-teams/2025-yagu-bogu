@@ -2,6 +2,7 @@ package com.yagubogu.data.network
 
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.service.CheckInsApiService
+import com.yagubogu.data.service.GamesApiService
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
@@ -55,5 +56,9 @@ object RetrofitInstance {
 
     val statsApiService: StatsApiService by lazy {
         retrofit.create(StatsApiService::class.java)
+    }
+
+    val gamesApiService: GamesApiService by lazy {
+        retrofit.create(GamesApiService::class.java)
     }
 }
