@@ -23,7 +23,7 @@ public record TalkResponse(
                 talk.getMember().getImageUrl(),
                 talk.getContent(),
                 talk.getCreatedAt(),
-                talk.getMember().getId().equals(memberId)
+                talk.getMember().isSameId(memberId)
         );
     }
 
