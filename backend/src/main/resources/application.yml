@@ -14,7 +14,7 @@ security:
   token:
     access-token:
       secret-key: ${ACCESS_TOKEN_SECRET_KEY}
-      expires-in: 900      # 15분 (초)
+      expires-in: 1209600      # 14일 (초)
     refresh-token:
       secret-key: ${REFRESH_TOKEN_SECRET_KEY}
       expires-in: 1209600  # 14일 (초)
