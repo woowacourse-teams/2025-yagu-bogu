@@ -6,20 +6,11 @@ import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 
 interface StatsDataSource {
-    suspend fun getStatsWinRate(
-        memberId: Long,
-        year: Int,
-    ): Result<StatsWinRateResponse>
+    suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse>
 
-    suspend fun getStatsCounts(
-        memberId: Long,
-        year: Int,
-    ): Result<StatsCountsResponse>
+    suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse>
 
-    suspend fun getLuckyStadiums(
-        memberId: Long,
-        year: Int,
-    ): Result<StatsLuckyStadiumsResponse>
+    suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse>
 
     suspend fun getAverageStats(token: String): Result<StatsMeResponse>
 }

@@ -1,9 +1,7 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.domain.model.LoginResult
-
 interface AuthRepository {
-    suspend fun signInWithGoogle(): LoginResult
+    suspend fun login(idToken: String): Result<Unit>
 
-    suspend fun signOutWithGoogle(): Result<Unit>
+    suspend fun refreshTokens(): Result<Unit>
 }

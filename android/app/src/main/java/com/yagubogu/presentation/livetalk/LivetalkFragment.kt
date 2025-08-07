@@ -1,5 +1,6 @@
 package com.yagubogu.presentation.livetalk
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yagubogu.databinding.FragmentLivetalkBinding
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 
 @Suppress("ktlint:standard:backing-property-naming")
 class LivetalkFragment : Fragment() {
@@ -34,7 +37,16 @@ class LivetalkFragment : Fragment() {
     }
 
     private fun setupBindings() {
-        val livetalkStadiumAdapter = LivetalkStadiumAdapter()
+        val livetalkStadiumAdapter =
+            LivetalkStadiumAdapter(
+                object : LivetalkStadiumViewHolder.Handler {
+                    override fun onItemClick(item: LivetalkStadiumItem) {
+                        // Todo: 구장별 채팅 연동 필요
+                        val intent = Intent(binding.root.context, LivetalkChatActivity::class.java)
+                        binding.root.context.startActivity(intent)
+                    }
+                },
+            )
         val linearLayoutManager = LinearLayoutManager(requireContext())
         binding.rvLivetalkStadium.apply {
             adapter = livetalkStadiumAdapter

@@ -1,9 +1,7 @@
 package com.yagubogu.domain.model
 
 sealed class LoginResult {
-    data class Success(
-        val message: String,
-    ) : LoginResult()
+    data object Success : LoginResult()
 
     data object Cancel : LoginResult()
 

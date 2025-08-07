@@ -28,23 +28,20 @@ class MyStatsViewModel(
     }
 
     fun fetchAll() {
-        fetchMyStats(MEMBER_ID, YEAR)
+        fetchMyStats(YEAR)
         fetchMyAverageStats(TOKEN)
     }
 
-    private fun fetchMyStats(
-        memberId: Long,
-        year: Int,
-    ) {
+    private fun fetchMyStats(year: Int) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
-                async { statsRepository.getStatsCounts(memberId, year) }
+                async { statsRepository.getStatsCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
-                async { statsRepository.getStatsWinRate(memberId, year) }
+                async { statsRepository.getStatsWinRate(year) }
             val myTeamDeferred: Deferred<Result<String>> =
-                async { memberRepository.getFavoriteTeam(memberId) }
+                async { memberRepository.getFavoriteTeam() }
             val luckyStadiumDeferred: Deferred<Result<String?>> =
-                async { statsRepository.getLuckyStadiums(memberId, year) }
+                async { statsRepository.getLuckyStadiums(year) }
 
             val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
             val winRateResult: Result<Double> = winRateDeferred.await()
@@ -88,8 +85,6 @@ class MyStatsViewModel(
     }
 
     companion object {
-        private const val MEMBER_ID = 5009L
         private const val YEAR = 2025
-        private const val TOKEN = ""
     }
 }
