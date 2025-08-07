@@ -3,9 +3,11 @@ package com.yagubogu.data.repository
 import com.yagubogu.data.datasource.StatsDataSource
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
+import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.stats.my.MyAverageStats
 
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
@@ -39,4 +41,15 @@ class StatsDefaultRepository(
             .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
                 statsLuckyStadiumsResponse.shortName
             }
+
+    override suspend fun getAverageStats(token: String): Result<MyAverageStats> =
+        statsDataSource.getAverageStats(token).map { statsMeResponse: StatsMeResponse ->
+            MyAverageStats(
+                averageRun = statsMeResponse.averageRun,
+                concededRuns = statsMeResponse.concededRuns,
+                averageErrors = statsMeResponse.averageErrors,
+                averageHits = statsMeResponse.averageHits,
+                concededHits = statsMeResponse.concededHits,
+            )
+        }
 }

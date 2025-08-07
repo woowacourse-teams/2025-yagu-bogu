@@ -1,6 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
+import com.yagubogu.presentation.stats.my.MyAverageStats
 
 interface StatsRepository {
     suspend fun getStatsWinRate(
@@ -17,4 +18,6 @@ interface StatsRepository {
         memberId: Long,
         year: Int,
     ): Result<String?>
+
+    suspend fun getAverageStats(token: String): Result<MyAverageStats>
 }
