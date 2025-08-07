@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.home
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,14 +37,19 @@ class HomeViewModel(
     private val _homeUiModel = MutableLiveData<HomeUiModel>()
     val homeUiModel: LiveData<HomeUiModel> get() = _homeUiModel
 
-    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
-
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
+    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
+
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
+        MediatorLiveData<StadiumStatsUiModel>().apply {
+            addSource(stadiumFanRateItems) { value = updateStadiumStats() }
+            addSource(_isStadiumStatsExpanded) { value = updateStadiumStats() }
+        }
 
     init {
         fetchAll()
@@ -72,7 +78,7 @@ class HomeViewModel(
                 checkInsRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
-                    _stadiumStatsUiModel.value = StadiumStatsUiModel(stadiumFanRates)
+                    stadiumFanRateItems.value = stadiumFanRates
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -154,6 +160,18 @@ class HomeViewModel(
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
             }
+    }
+
+    private fun updateStadiumStats(): StadiumStatsUiModel {
+        val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
+        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+
+        return if (!isExpanded) {
+            val firstItem = items.firstOrNull()
+            StadiumStatsUiModel(if (firstItem != null) listOf(firstItem) else emptyList())
+        } else {
+            StadiumStatsUiModel(items)
+        }
     }
 
     companion object {

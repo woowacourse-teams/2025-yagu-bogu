@@ -167,6 +167,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_white_radius_12dp"
                 android:paddingVertical="20dp"
+                android:visibility="@{viewModel.stadiumStatsUiModel.stadiumFanRates.isEmpty() ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/constraint_my_team">
@@ -239,7 +240,8 @@
                         app:layout_constraintEnd_toStartOf="@id/iv_arrow"
                         app:layout_constraintHorizontal_chainStyle="packed"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="더보기" />
 
                     <ImageView
                         android:id="@+id/iv_arrow"
@@ -250,8 +252,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tv_show_more"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/gray400" />
-
+                        app:tint="@color/gray400"
+                        tools:src="@drawable/ic_arrow_down" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
