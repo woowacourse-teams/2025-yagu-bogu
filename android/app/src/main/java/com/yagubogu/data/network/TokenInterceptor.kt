@@ -1,5 +1,6 @@
 package com.yagubogu.data.network
 
+import com.yagubogu.data.util.addTokenHeader
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -19,16 +20,5 @@ class TokenInterceptor(
                 chain.request()
             }
         return chain.proceed(request)
-    }
-
-    private fun Request.addTokenHeader(accessToken: String): Request =
-        this
-            .newBuilder()
-            .addHeader(HEADER_AUTHORIZATION, "$HEADER_AUTHORIZATION_TYPE $accessToken")
-            .build()
-
-    companion object {
-        private const val HEADER_AUTHORIZATION = "Authorization"
-        private const val HEADER_AUTHORIZATION_TYPE = "Bearer"
     }
 }

@@ -2,6 +2,7 @@ package com.yagubogu.data.network
 
 import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.service.AuthApiService
+import com.yagubogu.data.util.addTokenHeader
 import com.yagubogu.data.util.safeApiCall
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -37,15 +38,7 @@ class TokenAuthenticator(
         }
     }
 
-    private fun Request.addTokenHeader(accessToken: String): Request =
-        this
-            .newBuilder()
-            .addHeader(HEADER_AUTHORIZATION, "$HEADER_AUTHORIZATION_TYPE $accessToken")
-            .build()
-
     companion object {
         private const val AUTH_REFRESH_ENDPOINT = "/auth/refresh"
-        private const val HEADER_AUTHORIZATION = "Authorization"
-        private const val HEADER_AUTHORIZATION_TYPE = "Bearer"
     }
 }
