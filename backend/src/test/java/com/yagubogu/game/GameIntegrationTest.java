@@ -1,5 +1,7 @@
 package com.yagubogu.game;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.fixture.TestFixture;
@@ -24,8 +26,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
@@ -59,18 +59,21 @@ public class GameIntegrationTest {
         LocalDate date = TestFixture.getToday();
         List<GameWithCheckIn> expected = List.of(
                 new GameWithCheckIn(
+                        1L,
                         3L,
                         true,
                         new StadiumByGame(1L, "잠실 야구장"),
                         new TeamByGame(1L, "기아", "HT"),
                         new TeamByGame(2L, "롯데", "LT")),
                 new GameWithCheckIn(
+                        8L,
                         4L,
                         true,
                         new StadiumByGame(2L, "고척 스카이돔"),
                         new TeamByGame(3L, "삼성", "SS"),
                         new TeamByGame(4L, "두산", "OB")),
                 new GameWithCheckIn(
+                        9L,
                         4L,
                         false,
                         new StadiumByGame(3L, "인천 SSG 랜더스필드"),
