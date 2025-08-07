@@ -17,7 +17,7 @@
             <DefaultRolloverStrategy max="7"/>
         </RollingFile>
 
-        <RollingFile name="LocalFile" fileName="logs/local.log"
+        <RollingFile name="LocalFile" fileName="/home/ubuntu/log/yagubogu/local.log"
                      filePattern="logs/local-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%X{traceId}] %logger{36} - %msg%n"/>
             <Policies>
