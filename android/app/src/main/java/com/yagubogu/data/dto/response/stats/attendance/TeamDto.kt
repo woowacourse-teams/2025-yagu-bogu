@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TeamDto(
     @SerialName("code")
-    val code: String,
+    val code: String, // 팀 코드
     @SerialName("name")
-    val name: String,
+    val name: String, // 팀 이름
     @SerialName("score")
-    val score: Int,
+    val score: Int, // 팀 점수
     @SerialName("isMyTeam")
-    val isMyTeam: Boolean,
+    val isMyTeam: Boolean, // 내가 응원하는 팀 여부
 ) {
     fun toPresentation(): TeamItem =
         TeamItem(
