@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 
@@ -54,6 +55,19 @@ class LivetalkChatActivity : AppCompatActivity() {
             itemAnimator = null
             clipToPadding = false
         }
+
+        livetalkChatAdapter.registerAdapterDataObserver(
+            object :
+                RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(
+                    positionStart: Int,
+                    itemCount: Int,
+                ) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    binding.rvChatMessages.scrollToPosition(0)
+                }
+            },
+        )
     }
 
     private fun setupObservers() {
