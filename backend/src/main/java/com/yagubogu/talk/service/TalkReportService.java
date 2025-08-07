@@ -11,8 +11,10 @@ import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class TalkReportService {
 
@@ -20,6 +22,7 @@ public class TalkReportService {
     private final TalkRepository talkRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void reportTalk(
             final long talkId,
             final long reporterId // TODO: 나중에 삭제
