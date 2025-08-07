@@ -79,7 +79,7 @@ public class CheckInController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/status/members")
+    @GetMapping("/status")
     public ResponseEntity<CheckInStatusResponse> findCheckInStatus(
             final MemberClaims memberClaims,
             @RequestParam final LocalDate date
