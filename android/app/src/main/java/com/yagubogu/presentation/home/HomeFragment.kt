@@ -48,7 +48,6 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
-    private var isStadiumStatsChartExpanded: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,6 +80,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBindings() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
                 viewModel.checkIn()
@@ -103,21 +105,6 @@ class HomeFragment : Fragment() {
                 .rotationBy(360f)
                 .setDuration(1000L)
                 .start()
-        }
-
-        binding.constraintShowMore.setOnClickListener {
-            isStadiumStatsChartExpanded = !isStadiumStatsChartExpanded
-            when (isStadiumStatsChartExpanded) {
-                true -> {
-                    binding.tvShowMore.text = getString(R.string.home_show_less)
-                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
-                }
-
-                false -> {
-                    binding.tvShowMore.text = getString(R.string.home_show_more)
-                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_down)
-                }
-            }
         }
     }
 

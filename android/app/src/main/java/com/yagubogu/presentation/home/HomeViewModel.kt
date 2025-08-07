@@ -36,11 +36,14 @@ class HomeViewModel(
     private val _homeUiModel = MutableLiveData<HomeUiModel>()
     val homeUiModel: LiveData<HomeUiModel> get() = _homeUiModel
 
+    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
+
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
+    private val _isStadiumStatsExpanded = MutableLiveData(false)
+    val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
 
     init {
         fetchAll()
@@ -74,6 +77,10 @@ class HomeViewModel(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun toggleStadiumStats() {
+        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
     private fun fetchMemberInformation(year: Int) {
