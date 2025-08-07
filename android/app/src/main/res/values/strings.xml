@@ -29,8 +29,8 @@
     <string name="home_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
     <string name="home_check_in_success_message">직관 인증이 완료되었습니다!</string>
     <string name="home_check_in_failure_message">구장 근처에서만 인증할 수 있어요.</string>
-    <string name="home_team_occupancy_title">오늘 팬 현황</string>
-    <string name="home_team_occupancy_refresh_time">%02d:%02d 기준</string>
+    <string name="home_stadium_stats_title">오늘 팬 현황</string>
+    <string name="home_stadium_stats_refresh_time">%02d:%02d 기준</string>
     <string name="home_show_more">더보기</string>
     <string name="home_show_less">접기</string>
     <string name="home_victory_fairy_ranking">승리 요정 랭킹</string>

@@ -4,10 +4,10 @@ import androidx.annotation.ColorRes
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.util.getTeamColor
 
-data class TeamOccupancyRate(
+data class TeamFanRate(
     val team: Team,
     val teamName: String,
-    val occupancyRate: Double,
+    val fanRate: Double,
 ) {
     @ColorRes
     val teamColor: Int = team.getTeamColor()

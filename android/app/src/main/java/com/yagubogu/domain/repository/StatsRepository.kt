@@ -1,8 +1,6 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
-import com.yagubogu.presentation.home.model.TeamOccupancyRates
-import java.time.LocalDate
 
 interface StatsRepository {
     suspend fun getStatsWinRate(
@@ -19,9 +17,4 @@ interface StatsRepository {
         memberId: Long,
         year: Int,
     ): Result<String?>
-
-    suspend fun getTeamOccupancyRates(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<TeamOccupancyRates>
 }
