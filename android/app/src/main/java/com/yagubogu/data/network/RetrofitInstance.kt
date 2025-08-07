@@ -6,6 +6,7 @@ import com.yagubogu.data.service.GamesApiService
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
+import com.yagubogu.data.service.TalksApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -60,5 +61,9 @@ object RetrofitInstance {
 
     val gamesApiService: GamesApiService by lazy {
         retrofit.create(GamesApiService::class.java)
+    }
+
+    val talksApiService: TalksApiService by lazy {
+        retrofit.create(TalksApiService::class.java)
     }
 }
