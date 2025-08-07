@@ -29,10 +29,15 @@ class LoginViewModel(
                 when (googleCredentialResult) {
                     is GoogleCredentialResult.Success -> {
                         val idToken: String = googleCredentialResult.idToken
-                        authRepository.login(idToken).onFailure { exception: Throwable ->
-                            Timber.w(exception, "API 호출 실패")
-                        }
-                        LoginResult.Success
+                        authRepository
+                            .login(idToken)
+                            .fold(
+                                onSuccess = { LoginResult.Success },
+                                onFailure = { exception: Throwable ->
+                                    Timber.w(exception, "API 호출 실패")
+                                    LoginResult.Failure(exception)
+                                },
+                            )
                     }
 
                     is GoogleCredentialResult.Failure -> LoginResult.Failure(googleCredentialResult.exception)
