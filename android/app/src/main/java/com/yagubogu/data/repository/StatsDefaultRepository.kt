@@ -4,11 +4,8 @@ import com.yagubogu.data.datasource.StatsDataSource
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
-import com.yagubogu.data.dto.response.TeamOccupancyRatesResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.home.model.TeamOccupancyRates
-import java.time.LocalDate
 
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
@@ -41,15 +38,5 @@ class StatsDefaultRepository(
             .getLuckyStadiums(memberId, year)
             .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
                 statsLuckyStadiumsResponse.shortName
-            }
-
-    override suspend fun getTeamOccupancyRates(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<TeamOccupancyRates> =
-        statsDataSource
-            .getTeamOccupancyRates(stadiumId, date)
-            .map { teamOccupancyRatesResponse: TeamOccupancyRatesResponse ->
-                teamOccupancyRatesResponse.toPresentation()
             }
 }
