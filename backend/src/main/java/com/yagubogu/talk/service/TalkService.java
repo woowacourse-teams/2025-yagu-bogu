@@ -47,7 +47,7 @@ public class TalkService {
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException("Game not found"));
+        Game game = getGame(gameId);
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
                 talkResponses.hasNext());
 
@@ -70,7 +70,7 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException("Game not found"));
+        Game game = getGame(gameId);
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
