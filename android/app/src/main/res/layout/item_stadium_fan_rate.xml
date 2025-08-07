@@ -29,7 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:setConstraintWidthPercent="@{stadiumFanRate.awayTeamBias}"
+                app:setConstraintWidthPercent="@{stadiumFanRate.awayTeamChartRange}"
                 app:setCustomChartBackground="@{stadiumFanRate.awayTeamFanRate.teamColor}"
                 tools:background="@color/team_kia"
                 tools:layout_constraintWidth_percent="0.3" />
@@ -39,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:setConstraintWidthPercent="@{stadiumFanRate.homeTeamBias}"
+                app:setConstraintWidthPercent="@{stadiumFanRate.homeTeamChartRange}"
                 app:setCustomChartBackground="@{stadiumFanRate.homeTeamFanRate.teamColor}"
                 tools:background="@color/team_kiwoom"
                 tools:layout_constraintWidth_percent="0.7" />
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:setConstraintGuidePercent="@{stadiumFanRate.awayTeamBias}"
+                app:setConstraintGuidePercent="@{stadiumFanRate.awayTeamChartRange}"
                 tools:layout_constraintGuide_percent="0.3" />
 
             <View
