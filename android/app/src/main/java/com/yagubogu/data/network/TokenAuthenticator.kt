@@ -18,10 +18,10 @@ class TokenAuthenticator(
         route: Route?,
         response: Response,
     ): Request? {
+        if (responseCount(response) >= 2) return null
+
         val requestUrl: String = response.request.url.encodedPath
-        if (requestUrl.endsWith(AUTH_REFRESH_ENDPOINT)) {
-            return null
-        }
+        if (requestUrl.endsWith(AUTH_REFRESH_ENDPOINT)) return null
 
         return runBlocking {
             val refreshToken: String = tokenManager.getRefreshToken() ?: return@runBlocking null
@@ -36,6 +36,16 @@ class TokenAuthenticator(
             tokenManager.clearTokens()
             return@runBlocking null
         }
+    }
+
+    private fun responseCount(response: Response): Int {
+        var count = 1
+        var priorResponse: Response? = response.priorResponse
+        while (priorResponse != null) {
+            count++
+            priorResponse = priorResponse.priorResponse
+        }
+        return count
     }
 
     companion object {
