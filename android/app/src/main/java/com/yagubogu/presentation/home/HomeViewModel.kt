@@ -15,8 +15,8 @@ import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeUiModel
-import com.yagubogu.presentation.home.model.StadiumFanRate
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
@@ -68,12 +68,11 @@ class HomeViewModel(
         date: LocalDate,
     ) {
         viewModelScope.launch {
-            val stadiumFanRatesResult: Result<List<StadiumFanRate>> =
+            val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInsRepository.getStadiumFanRates(memberId, date)
             stadiumFanRatesResult
-                .onSuccess { stadiumFanRates: List<StadiumFanRate> ->
-                    _stadiumStatsUiModel.value =
-                        StadiumStatsUiModel(stadiumFanRates = stadiumFanRates)
+                .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
+                    _stadiumStatsUiModel.value = StadiumStatsUiModel(stadiumFanRates)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

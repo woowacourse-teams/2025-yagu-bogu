@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.presentation.home.stadium
 
 import androidx.annotation.ColorRes
 import com.yagubogu.domain.model.Team

@@ -210,14 +210,23 @@
                     app:layout_constraintTop_toTopOf="@id/tv_refresh_time"
                     app:tint="@color/gray400" />
 
-                <include
-                    android:id="@+id/layout_stadium_chart_bar"
-                    layout="@layout/item_stadium_chart_bar"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_stadium_fan_rate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toTopOf="@id/constraint_show_more"
                     app:layout_constraintTop_toBottomOf="@id/tv_stadium_stats_title" />
+
+                <!--                <include-->
+                <!--                    android:id="@+id/layout_stadium_chart_bar"-->
+                <!--                    layout="@layout/item_stadium_chart_bar"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_margin="20dp"-->
+                <!--                    app:layout_constraintBottom_toTopOf="@id/constraint_show_more"-->
+                <!--                    app:layout_constraintTop_toBottomOf="@id/tv_stadium_stats_title" />-->
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraint_show_more"
@@ -227,7 +236,7 @@
                     android:background="@drawable/bg_stroke_gray300_radius_12dp"
                     android:paddingVertical="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_stadium_chart_bar">
+                    app:layout_constraintTop_toBottomOf="@id/rv_stadium_fan_rate">
 
                     <TextView
                         android:id="@+id/tv_show_more"
@@ -293,6 +302,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintTop_toBottomOf="@id/tv_victory_fairy_ranking" />
 
                 <com.google.android.material.divider.MaterialDivider

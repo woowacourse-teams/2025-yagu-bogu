@@ -7,7 +7,7 @@
 
         <variable
             name="stadiumFanRate"
-            type="com.yagubogu.presentation.home.model.StadiumFanRate" />
+            type="com.yagubogu.presentation.home.stadium.StadiumFanRateItem" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/all_win_rate(stadiumFanRate.awayTeamFanRate.fanRate)}"
+                android:text="@{@string/all_win_rate(stadiumFanRate.awayTeamPercentage)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -178,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:text="@{@string/all_win_rate(stadiumFanRate.homeTeamFanRate.fanRate)}"
+                android:text="@{@string/all_win_rate(stadiumFanRate.homeTeamPercentage)}"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"

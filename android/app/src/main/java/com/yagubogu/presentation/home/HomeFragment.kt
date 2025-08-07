@@ -15,7 +15,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
@@ -25,6 +24,7 @@ import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyItem
+import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import java.time.LocalDate
 
@@ -46,6 +46,8 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
+    private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
+    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
     private var isStadiumStatsChartExpanded: Boolean = false
 
     override fun onCreateView(
@@ -87,6 +89,11 @@ class HomeFragment : Fragment() {
             }
         }
 
+        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
+        binding.rvVictoryFairy.adapter = victoryFairyAdapter
+        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
+        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
+
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
             val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
@@ -112,15 +119,6 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-
-        val victoryFairyAdapter = VictoryFairyAdapter()
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvVictoryFairy.apply {
-            adapter = victoryFairyAdapter
-            layoutManager = linearLayoutManager
-        }
-        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
-        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
     }
 
     private fun setupObservers() {
@@ -140,7 +138,8 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             binding.stadiumStatsUiModel = value
-            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
+            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
+//            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
         }
     }
 

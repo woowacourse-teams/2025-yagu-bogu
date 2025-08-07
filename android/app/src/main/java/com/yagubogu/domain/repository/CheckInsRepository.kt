@@ -1,6 +1,6 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.home.model.StadiumFanRate
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
 interface CheckInsRepository {
@@ -18,5 +18,5 @@ interface CheckInsRepository {
     suspend fun getStadiumFanRates(
         memberId: Long,
         date: LocalDate,
-    ): Result<List<StadiumFanRate>>
+    ): Result<List<StadiumFanRateItem>>
 }

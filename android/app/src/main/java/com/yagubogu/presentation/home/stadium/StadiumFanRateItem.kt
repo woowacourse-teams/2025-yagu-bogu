@@ -1,11 +1,16 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.presentation.home.stadium
 
-data class StadiumFanRate(
+data class StadiumFanRateItem(
     val awayTeamFanRate: TeamFanRate,
     val homeTeamFanRate: TeamFanRate,
 ) {
-    val awayTeamBias: Double = remapRange(awayTeamFanRate.fanRate)
-    val homeTeamBias: Double = remapRange(homeTeamFanRate.fanRate)
+    val awayTeamPercentage: Double =
+        awayTeamFanRate.fanRate / (awayTeamFanRate.fanRate + homeTeamFanRate.fanRate) * FULL_PERCENTAGE
+    val homeTeamPercentage: Double =
+        homeTeamFanRate.fanRate / (awayTeamFanRate.fanRate + homeTeamFanRate.fanRate) * FULL_PERCENTAGE
+
+    val awayTeamBias: Double = remapRange(awayTeamPercentage)
+    val homeTeamBias: Double = remapRange(homeTeamPercentage)
 
     private fun remapRange(value: Double): Double {
         val scalingFactor: Double = (FULL_PERCENTAGE - CHART_END_PADDING_SIZE * 2) / FULL_PERCENTAGE
