@@ -1,7 +1,5 @@
 package com.yagubogu.checkin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
@@ -25,6 +23,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
@@ -173,7 +173,7 @@ public class CheckInIntegrationTest {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", "2025-07-21")
-                .when().get("/api/check-ins/status/members")
+                .when().get("/api/check-ins/status")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
