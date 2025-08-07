@@ -19,20 +19,22 @@ import com.yagubogu.data.repository.StatsDefaultRepository
 import timber.log.Timber
 
 class YaguBoguApplication : Application() {
+    private val retrofit: RetrofitInstance by lazy { RetrofitInstance(this) }
+
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
     val locationRepository by lazy { LocationDefaultRepository(locationDataSource) }
 
-    private val memberDataSource by lazy { MemberRemoteDataSource(RetrofitInstance.memberApiService) }
+    private val memberDataSource by lazy { MemberRemoteDataSource(retrofit.memberApiService) }
     val memberRepository by lazy { MemberDefaultRepository(memberDataSource) }
 
-    private val stadiumDataSource by lazy { StadiumRemoteDataSource(RetrofitInstance.stadiumApiService) }
+    private val stadiumDataSource by lazy { StadiumRemoteDataSource(retrofit.stadiumApiService) }
     val stadiumRepository by lazy { StadiumDefaultRepository(stadiumDataSource) }
 
-    private val checkInsDataSource by lazy { CheckInsRemoteDataSource(RetrofitInstance.checkInsApiService) }
+    private val checkInsDataSource by lazy { CheckInsRemoteDataSource(retrofit.checkInsApiService) }
     val checkInsRepository by lazy { CheckInsDefaultRepository(checkInsDataSource) }
 
-    private val statsDataSource by lazy { StatsRemoteDataSource(RetrofitInstance.statsApiService) }
+    private val statsDataSource by lazy { StatsRemoteDataSource(retrofit.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
 
     override fun onCreate() {

@@ -1,5 +1,6 @@
 package com.yagubogu.data.network
 
+import android.content.Context
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInsApiService
@@ -13,7 +14,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
-object RetrofitInstance {
+class RetrofitInstance(
+    context: Context,
+) {
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level =
@@ -28,6 +31,7 @@ object RetrofitInstance {
     private val interceptorClient: OkHttpClient by lazy {
         OkHttpClient()
             .newBuilder()
+            .addInterceptor(TokenInterceptor(TokenManager(context)))
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }
