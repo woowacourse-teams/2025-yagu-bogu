@@ -79,4 +79,5 @@
     <string name="livechat_time_days_ago">%d일 전</string>
     <string name="livechat_time_months_ago">%d개월 전</string>
     <string name="livechat_time_years_ago">%d년 전</string>
+    <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
 </resources>

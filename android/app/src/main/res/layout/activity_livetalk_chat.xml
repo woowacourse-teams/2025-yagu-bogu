@@ -61,8 +61,6 @@
             android:paddingVertical="12dp"
             app:layout_constraintBottom_toTopOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
-            app:layout_constraintVertical_bias="1.0"
-            tools:layout_editor_absoluteX="0dp"
             tools:listitem="@layout/item_livetalk_chat" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -99,6 +97,7 @@
                 android:gravity="center_vertical"
                 android:hint="현재 고척돔은..."
                 android:inputType="textMultiLine"
+                android:maxLines="4"
                 android:minHeight="16dp"
                 android:scrollHorizontally="false"
                 android:textColor="@color/gray900"
@@ -127,8 +126,8 @@
                 android:id="@+id/iv_paper_airplane"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="메시지 전송 버튼 비행기 아이콘"
-                android:src="@drawable/ic_paper_airplane"
+                android:contentDescription="@string/livetalk_send_btn_description"
+                android:src="@drawable/ic_send"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
