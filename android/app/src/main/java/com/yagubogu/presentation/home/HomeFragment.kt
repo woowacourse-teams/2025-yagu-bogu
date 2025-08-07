@@ -22,7 +22,7 @@ import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
-import com.yagubogu.presentation.home.ranking.VictoryFairyItem
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import java.time.LocalDate
@@ -92,8 +92,6 @@ class HomeFragment : Fragment() {
 
         binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
         binding.rvVictoryFairy.adapter = victoryFairyAdapter
-        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
-        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
 
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
@@ -120,6 +118,11 @@ class HomeFragment : Fragment() {
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             stadiumFanRateAdapter.submitList(value.stadiumFanRates)
+        }
+
+        viewModel.victoryFairyRanking.observe(viewLifecycleOwner) { value: VictoryFairyRanking ->
+            victoryFairyAdapter.submitList(value.topRankings)
+            binding.layoutMyVictoryFairy.victoryFairyItem = value.myRanking
         }
     }
 
@@ -190,46 +193,5 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private val DUMMY_MY_VICTORY_FAIRY: VictoryFairyItem =
-            VictoryFairyItem(
-                rank = 1,
-                profileImageUrl = "",
-                nickname = "이포르",
-                teamName = "KIA",
-                winRate = 100.0,
-            )
-
-        private val DUMMY_VICTORY_FAIRY_ITEMS: List<VictoryFairyItem> =
-            listOf(
-                DUMMY_MY_VICTORY_FAIRY,
-                VictoryFairyItem(
-                    rank = 2,
-                    profileImageUrl = "",
-                    nickname = "닉네임",
-                    teamName = "삼성",
-                    winRate = 87.2,
-                ),
-                VictoryFairyItem(
-                    rank = 3,
-                    profileImageUrl = "",
-                    nickname = "닉네임",
-                    teamName = "롯데",
-                    winRate = 75.0,
-                ),
-                VictoryFairyItem(
-                    rank = 4,
-                    profileImageUrl = "",
-                    nickname = "닉네임",
-                    teamName = "두산",
-                    winRate = 66.7,
-                ),
-                VictoryFairyItem(
-                    rank = 982,
-                    profileImageUrl = "",
-                    nickname = "닉네임",
-                    teamName = "한화",
-                    winRate = 32.5,
-                ),
-            )
     }
 }

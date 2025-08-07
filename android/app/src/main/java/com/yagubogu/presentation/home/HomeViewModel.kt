@@ -17,6 +17,7 @@ import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberInfoUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -51,6 +52,9 @@ class HomeViewModel(
             addSource(_isStadiumStatsExpanded) { value = updateStadiumStats() }
         }
 
+    private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
+    val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
+
     init {
         fetchAll()
     }
@@ -58,6 +62,7 @@ class HomeViewModel(
     fun fetchAll() {
         fetchMemberInformation(YEAR)
         fetchStadiumStats(DATE)
+        fetchVictoryFairyRanking()
     }
 
     fun checkIn() {
@@ -121,6 +126,19 @@ class HomeViewModel(
                         .mapNotNull { it.exceptionOrNull()?.message }
                 Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
+        }
+    }
+
+    private fun fetchVictoryFairyRanking() {
+        viewModelScope.launch {
+            val victoryFairyRankingResult: Result<VictoryFairyRanking> =
+                checkInsRepository.getVictoryFairyRankings()
+            victoryFairyRankingResult
+                .onSuccess { ranking: VictoryFairyRanking ->
+                    _victoryFairyRanking.value = ranking
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
         }
     }
 
