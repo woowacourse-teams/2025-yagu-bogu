@@ -4,7 +4,7 @@ import com.yagubogu.data.dto.response.LoginResponse
 import com.yagubogu.data.dto.response.TokenResponse
 
 interface AuthDataSource {
-    suspend fun addLogin(idToken: String): Result<LoginResponse>
+    suspend fun login(idToken: String): Result<LoginResponse>
 
-    suspend fun addRefresh(refreshToken: String): Result<TokenResponse>
+    suspend fun refreshTokens(refreshToken: String): Result<TokenResponse>
 }

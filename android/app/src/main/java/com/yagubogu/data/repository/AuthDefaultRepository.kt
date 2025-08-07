@@ -8,8 +8,8 @@ class AuthDefaultRepository(
     private val authDataSource: AuthDataSource,
     private val tokenManager: TokenManager,
 ) : AuthRepository {
-    override suspend fun signIn(idToken: String): Result<Unit> =
-        authDataSource.addLogin(idToken).map { (accessToken, refreshToken) ->
+    override suspend fun login(idToken: String): Result<Unit> =
+        authDataSource.login(idToken).map { (accessToken, refreshToken) ->
             tokenManager.saveTokens(accessToken, refreshToken)
         }
 
@@ -17,7 +17,7 @@ class AuthDefaultRepository(
         val refreshToken: String =
             tokenManager.getRefreshToken()
                 ?: return Result.failure(Exception(ERROR_NO_REFRESH_TOKEN))
-        return authDataSource.addRefresh(refreshToken).map { (accessToken, refreshToken) ->
+        return authDataSource.refreshTokens(refreshToken).map { (accessToken, refreshToken) ->
             tokenManager.saveTokens(accessToken, refreshToken)
         }
     }

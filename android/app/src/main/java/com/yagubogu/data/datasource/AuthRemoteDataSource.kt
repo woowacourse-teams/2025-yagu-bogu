@@ -10,13 +10,13 @@ import com.yagubogu.data.util.safeApiCall
 class AuthRemoteDataSource(
     private val authApiService: AuthApiService,
 ) : AuthDataSource {
-    override suspend fun addLogin(idToken: String): Result<LoginResponse> =
+    override suspend fun login(idToken: String): Result<LoginResponse> =
         safeApiCall {
             val loginRequest = LoginRequest(idToken)
             authApiService.postLogin(loginRequest)
         }
 
-    override suspend fun addRefresh(refreshToken: String): Result<TokenResponse> =
+    override suspend fun refreshTokens(refreshToken: String): Result<TokenResponse> =
         safeApiCall {
             val tokenRequest = TokenRequest(refreshToken)
             authApiService.postRefresh(tokenRequest)

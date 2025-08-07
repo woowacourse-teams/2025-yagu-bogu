@@ -9,6 +9,7 @@ import com.yagubogu.data.auth.GoogleCredentialResult
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
@@ -28,7 +29,9 @@ class LoginViewModel(
                 when (googleCredentialResult) {
                     is GoogleCredentialResult.Success -> {
                         val idToken: String = googleCredentialResult.idToken
-                        authRepository.signIn(idToken)
+                        authRepository.login(idToken).onFailure { exception: Throwable ->
+                            Timber.w(exception, "API 호출 실패")
+                        }
                         LoginResult.Success
                     }
 
