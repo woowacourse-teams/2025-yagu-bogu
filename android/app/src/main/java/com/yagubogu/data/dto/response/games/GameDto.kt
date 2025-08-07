@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameDto(
     @SerialName("gameId")
-    val gameId: Int, // 경기 (톡방) 아이디
+    val gameId: Long, // 경기 (톡방) 아이디
     @SerialName("totalCheckIns")
     val totalCheckIns: Int, // 경기장에 인증한 사람 수
     @SerialName("isMyCheckIn")
@@ -19,9 +19,9 @@ data class GameDto(
     @SerialName("awayTeam")
     val awayTeam: TeamDto,
 ) {
-    // Todo: 경기 (톡방) 아이디 연결해서 넘겨야함미다...
     fun toPresentation(): LivetalkStadiumItem =
         LivetalkStadiumItem(
+            gameId = gameId,
             stadiumName = stadiumDto.name,
             userCount = totalCheckIns,
             awayTeam = awayTeam.toDomain(),

@@ -28,7 +28,7 @@ class LivetalkFragment : Fragment() {
         LivetalkStadiumAdapter(
             object : LivetalkStadiumViewHolder.Handler {
                 override fun onItemClick(item: LivetalkStadiumItem) {
-                    val intent = LivetalkChatActivity.newIntent(requireContext(), 1)
+                    val intent = LivetalkChatActivity.newIntent(requireContext(), item.gameId)
                     startActivity(intent)
                 }
             },
