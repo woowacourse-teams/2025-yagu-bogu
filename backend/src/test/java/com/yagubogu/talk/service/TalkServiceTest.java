@@ -169,7 +169,8 @@ class TalkServiceTest {
         // when
         TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
                 memberId);
-        long actualMyTalkCount = actual.cursorResult().content().stream()
+        long actualMyTalkCount = actual.cursorResult().content()
+                .stream()
                 .filter(TalkResponse::isMine)
                 .count();
 
