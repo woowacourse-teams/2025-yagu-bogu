@@ -87,7 +87,6 @@ public class AuthIntegrationTest {
         // when
         TokenResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(refreshToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
@@ -113,7 +112,6 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(nonExistToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
@@ -139,7 +137,6 @@ public class AuthIntegrationTest {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TokenRequest(expiredToken))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
