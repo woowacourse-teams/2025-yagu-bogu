@@ -30,7 +30,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @RequireRole
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(
             @RequestBody final TokenRequest request
