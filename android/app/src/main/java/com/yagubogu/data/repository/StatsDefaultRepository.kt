@@ -45,11 +45,11 @@ class StatsDefaultRepository(
     override suspend fun getAverageStats(token: String): Result<MyAverageStats> =
         statsDataSource.getAverageStats(token).map { statsMeResponse: StatsMeResponse ->
             MyAverageStats(
-                averageRun = statsMeResponse.averageRun,
-                concededRuns = statsMeResponse.concededRuns,
-                averageErrors = statsMeResponse.averageErrors,
-                averageHits = statsMeResponse.averageHits,
-                concededHits = statsMeResponse.concededHits,
+                averageRun = statsMeResponse.averageRun ?: 0.0,
+                concededRuns = statsMeResponse.concededRuns ?: 0.0,
+                averageErrors = statsMeResponse.averageErrors ?: 0.0,
+                averageHits = statsMeResponse.averageHits ?: 0.0,
+                concededHits = statsMeResponse.concededHits ?: 0.0,
             )
         }
 }
