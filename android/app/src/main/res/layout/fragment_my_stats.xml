@@ -312,7 +312,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="@{@string/stats_average_score(averageStats.averageRun)}"
+                    android:text="@{@string/stats_average_score(averageStats.averageRuns)}"
                     app:layout_constraintEnd_toStartOf="@id/tv_loss_score"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_gain_score_emoji"

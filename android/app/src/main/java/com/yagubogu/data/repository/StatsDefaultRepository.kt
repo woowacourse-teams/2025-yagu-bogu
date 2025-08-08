@@ -36,7 +36,7 @@ class StatsDefaultRepository(
     override suspend fun getAverageStats(): Result<AverageStats> =
         statsDataSource.getAverageStats().map { averageStatisticResponse: AverageStatisticResponse ->
             AverageStats(
-                averageRun = averageStatisticResponse.averageRun ?: 0.0,
+                averageRuns = averageStatisticResponse.averageRun ?: 0.0,
                 concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
                 averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
                 averageHits = averageStatisticResponse.averageHits ?: 0.0,
