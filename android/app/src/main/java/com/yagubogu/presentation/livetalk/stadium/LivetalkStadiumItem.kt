@@ -6,6 +6,7 @@ import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.presentation.util.getTeamColor
 
 data class LivetalkStadiumItem(
+    val gameId: Long,
     val stadiumName: String,
     val userCount: Int,
     val awayTeam: Team,

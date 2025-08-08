@@ -7,18 +7,22 @@ import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
 import com.yagubogu.data.datasource.AuthRemoteDataSource
 import com.yagubogu.data.datasource.CheckInsRemoteDataSource
+import com.yagubogu.data.datasource.GamesRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
 import com.yagubogu.data.datasource.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.StatsRemoteDataSource
+import com.yagubogu.data.datasource.TalksRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.data.repository.CheckInsDefaultRepository
+import com.yagubogu.data.repository.GamesDefaultRepository
 import com.yagubogu.data.repository.LocationDefaultRepository
 import com.yagubogu.data.repository.MemberDefaultRepository
 import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
+import com.yagubogu.data.repository.TalksDefaultRepository
 import timber.log.Timber
 
 class YaguBoguApplication : Application() {
@@ -43,6 +47,12 @@ class YaguBoguApplication : Application() {
 
     private val statsDataSource by lazy { StatsRemoteDataSource(retrofit.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
+
+    private val gamesDataSource by lazy { GamesRemoteDataSource(retrofit.gamesApiService) }
+    val gamesRepository by lazy { GamesDefaultRepository(gamesDataSource) }
+
+    private val talksDataSource by lazy { TalksRemoteDataSource(retrofit.talksApiService) }
+    val talksRepository by lazy { TalksDefaultRepository(talksDataSource) }
 
     override fun onCreate() {
         super.onCreate()

@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewmodel"
+            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/gray050"
+        android:fitsSystemWindows="true"
         tools:context=".presentation.livetalk.chat.LivetalkChatActivity">
 
         <TextView
@@ -20,11 +25,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="고척 스카이돔"
+            android:text="@{viewmodel.livetalkResponseItem.stadiumName}"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="고척 스카이돔" />
 
         <TextView
             android:id="@+id/tv_away_vs_home_name"
@@ -32,17 +38,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="두산 vs 키움"
+            android:text="@{@string/livetalk_away_home_name(viewmodel.livetalkResponseItem.awayTeamName, viewmodel.livetalkResponseItem.homeTeamName)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
+            tools:text="두산 vs 키움" />
 
         <ImageView
             android:id="@+id/iv_arrow_left"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="20dp"
-            android:contentDescription="현장톡 구장목록으로 돌아가기 아이콘"
+            android:contentDescription="@string/livetalk_return_stadiums_description"
             android:src="@drawable/ic_arrow_left"
             app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -95,18 +102,21 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:gravity="center_vertical"
-                android:hint="현재 고척돔은..."
+                android:hint="@{@string/livetalk_chat_input_hint(viewmodel.livetalkResponseItem.stadiumName)}"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxLines="4"
                 android:minHeight="16dp"
                 android:scrollHorizontally="false"
+                android:text="@={viewmodel.messageFormText}"
                 android:textColor="@color/gray900"
                 android:textColorHint="@color/gray500"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:hint="현재 고척돔은..." />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,6 +128,7 @@
             android:background="@drawable/bg_primary500_radius_12dp_ripple"
             android:clickable="true"
             android:focusable="true"
+            android:onClick="@{() -> viewmodel.sendMessage()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/constraint_input_message">
