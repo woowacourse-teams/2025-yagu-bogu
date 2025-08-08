@@ -35,6 +35,9 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
     }
 
     companion object {
+        private const val VIEW_TYPE_MY = 0
+        private const val VIEW_TYPE_OTHER = 1
+
         private val diffCallback =
             object : DiffUtil.ItemCallback<LivetalkChatBubbleItem>() {
                 override fun areItemsTheSame(
@@ -57,8 +60,5 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
                     newItem: LivetalkChatBubbleItem,
                 ): Boolean = oldItem == newItem
             }
-
-        private const val VIEW_TYPE_MY = 0
-        private const val VIEW_TYPE_OTHER = 1
     }
 }

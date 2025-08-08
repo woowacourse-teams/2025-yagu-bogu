@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.glide)
 
     // firebase
     implementation(platform(libs.firebase.bom))

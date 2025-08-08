@@ -27,7 +27,8 @@
             app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
             app:strokeColor="@color/gray300"
             app:strokeWidth="1dp"
-            tools:src="@drawable/ic_google_g_logo" />
+            app:userProfileImage="@{livetalkChatItem.profileImageUrl}"
+            tools:src="@drawable/ic_users" />
 
         <TextView
             android:id="@+id/tv_user_nick_name"
@@ -83,18 +84,18 @@
             android:textColor="@color/gray500"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_chat_body"
-            app:timeAgo="@{livetalkChatItem.timestamp}"
-            tools:text="1시간 25분 전" />
+            app:timeStamp="@{livetalkChatItem.timestamp}"
+            tools:text="오후 01:25" />
 
         <ImageView
             android:id="@+id/iv_report_user_icon"
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:layout_marginEnd="4dp"
-            android:contentDescription="신고 깃발 아이콘"
+            android:contentDescription="@string/livetalk_user_report_icon_description"
             android:src="@drawable/ic_flag"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
-            app:layout_constraintStart_toStartOf="@id/tv_report_user"
+            app:layout_constraintEnd_toStartOf="@id/tv_report_user"
             app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
             app:tint="@color/gray500" />
 
@@ -104,8 +105,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:paddingStart="18dp"
-            android:text="신고"
+            android:text="@string/livetalk_user_report_btn"
             android:textColor="@color/gray500"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintEnd_toEndOf="parent"
