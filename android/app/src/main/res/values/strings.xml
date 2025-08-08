@@ -56,6 +56,8 @@
     <string name="stats_hit">안타</string>
     <string name="stats_hit_allowed">피안타</string>
     <string name="stats_error">실책</string>
+    <string name="stats_average_score">%.1f점</string>
+    <string name="stats_average_count">%.1f개</string>
 
     <string name="stats_attendance_history_title">최근 직관 내역</string>
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
@@ -72,12 +74,13 @@
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
 
-    <string name="livechat_time_just_now">방금 전</string>
-    <string name="livechat_time_seconds_ago">%d초 전</string>
-    <string name="livechat_time_minutes_ago">%d분 전</string>
-    <string name="livechat_time_hours_with_minutes_ago">%d시간 %d분 전</string>
-    <string name="livechat_time_days_ago">%d일 전</string>
-    <string name="livechat_time_months_ago">%d개월 전</string>
-    <string name="livechat_time_years_ago">%d년 전</string>
     <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
+    <string name="livetalk_away_home_name">%s vs %s</string>
+    <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
+    <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
+    
+    <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
+    <string name="livetalk_trash_btn">삭제</string>
+    <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
+    <string name="livetalk_user_report_btn">신고</string>
 </resources>
