@@ -15,16 +15,15 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyItem
+import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import java.time.LocalDate
 
@@ -46,7 +45,8 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
-    private var isStadiumStatsChartExpanded: Boolean = false
+    private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
+    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +79,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBindings() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
                 viewModel.checkIn()
@@ -87,9 +90,14 @@ class HomeFragment : Fragment() {
             }
         }
 
+        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
+        binding.rvVictoryFairy.adapter = victoryFairyAdapter
+        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
+        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
+
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
-            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+            val today = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
             viewModel.fetchStadiumStats(today)
             view
                 .animate()
@@ -97,37 +105,9 @@ class HomeFragment : Fragment() {
                 .setDuration(1000L)
                 .start()
         }
-
-        binding.constraintShowMore.setOnClickListener {
-            isStadiumStatsChartExpanded = !isStadiumStatsChartExpanded
-            when (isStadiumStatsChartExpanded) {
-                true -> {
-                    binding.tvShowMore.text = getString(R.string.home_show_less)
-                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_up)
-                }
-
-                false -> {
-                    binding.tvShowMore.text = getString(R.string.home_show_more)
-                    binding.ivArrow.setImageResource(R.drawable.ic_arrow_down)
-                }
-            }
-        }
-
-        val victoryFairyAdapter = VictoryFairyAdapter()
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvVictoryFairy.apply {
-            adapter = victoryFairyAdapter
-            layoutManager = linearLayoutManager
-        }
-        victoryFairyAdapter.submitList(DUMMY_VICTORY_FAIRY_ITEMS)
-        binding.layoutMyVictoryFairy.victoryFairyItem = DUMMY_MY_VICTORY_FAIRY
     }
 
     private fun setupObservers() {
-        viewModel.homeUiModel.observe(viewLifecycleOwner) { value: HomeUiModel ->
-            binding.homeUiModel = value
-        }
-
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
@@ -139,8 +119,7 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
-            binding.stadiumStatsUiModel = value
-            binding.layoutStadiumChartBar.stadiumFanRate = value.stadiumFanRates.first()
+            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
         }
     }
 
