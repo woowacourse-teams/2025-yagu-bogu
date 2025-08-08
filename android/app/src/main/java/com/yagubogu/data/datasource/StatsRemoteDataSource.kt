@@ -1,8 +1,8 @@
 package com.yagubogu.data.datasource
 
+import com.yagubogu.data.dto.response.AverageStatisticResponse
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.util.safeApiCall
@@ -25,7 +25,7 @@ class StatsRemoteDataSource(
             statsApiService.getLuckyStadiums(year)
         }
 
-    override suspend fun getAverageStats(): Result<StatsMeResponse> =
+    override suspend fun getAverageStats(): Result<AverageStatisticResponse> =
         safeApiCall {
             statsApiService.getAverageStats()
         }

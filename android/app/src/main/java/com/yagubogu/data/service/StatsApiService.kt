@@ -1,8 +1,8 @@
 package com.yagubogu.data.service
 
+import com.yagubogu.data.dto.response.AverageStatisticResponse
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -25,5 +25,5 @@ interface StatsApiService {
     ): Response<StatsLuckyStadiumsResponse>
 
     @GET("/api/stats/me")
-    suspend fun getAverageStats(): Response<StatsMeResponse>
+    suspend fun getAverageStats(): Response<AverageStatisticResponse>
 }

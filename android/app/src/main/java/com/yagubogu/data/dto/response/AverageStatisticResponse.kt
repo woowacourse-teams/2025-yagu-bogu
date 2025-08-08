@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StatsMeResponse(
+data class AverageStatisticResponse(
     @SerialName("averageRun")
     val averageRun: Double?, // 평균 득점
     @SerialName("concededRuns")

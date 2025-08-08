@@ -1,9 +1,9 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.StatsDataSource
+import com.yagubogu.data.dto.response.AverageStatisticResponse
 import com.yagubogu.data.dto.response.StatsCountsResponse
 import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsMeResponse
 import com.yagubogu.data.dto.response.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
@@ -34,13 +34,13 @@ class StatsDefaultRepository(
             }
 
     override suspend fun getAverageStats(): Result<AverageStats> =
-        statsDataSource.getAverageStats().map { statsMeResponse: StatsMeResponse ->
+        statsDataSource.getAverageStats().map { averageStatisticResponse: AverageStatisticResponse ->
             AverageStats(
-                averageRun = statsMeResponse.averageRun ?: 0.0,
-                concededRuns = statsMeResponse.concededRuns ?: 0.0,
-                averageErrors = statsMeResponse.averageErrors ?: 0.0,
-                averageHits = statsMeResponse.averageHits ?: 0.0,
-                concededHits = statsMeResponse.concededHits ?: 0.0,
+                averageRun = averageStatisticResponse.averageRun ?: 0.0,
+                concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
+                averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
+                averageHits = averageStatisticResponse.averageHits ?: 0.0,
+                concededHits = averageStatisticResponse.concededHits ?: 0.0,
             )
         }
 }
