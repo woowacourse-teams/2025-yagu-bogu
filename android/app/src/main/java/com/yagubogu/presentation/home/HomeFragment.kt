@@ -97,7 +97,7 @@ class HomeFragment : Fragment() {
 
         binding.ivRefresh.setOnClickListener { view: View ->
 //            val today = LocalDate.now()
-            val today = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+            val today = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
             viewModel.fetchStadiumStats(today)
             view
                 .animate()

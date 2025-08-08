@@ -177,6 +177,6 @@ class HomeViewModel(
     companion object {
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val YEAR = 2025
-        private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+        private val DATE = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
     }
 }
