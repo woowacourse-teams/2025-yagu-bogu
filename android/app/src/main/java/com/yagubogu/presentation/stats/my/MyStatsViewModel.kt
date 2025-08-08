@@ -78,9 +78,12 @@ class MyStatsViewModel(
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
             val averageStats: Result<AverageStats> = statsRepository.getAverageStats()
-            averageStats.onSuccess { averageStats: AverageStats ->
-                _averageStats.value = averageStats
-            }
+            averageStats
+                .onSuccess { averageStats: AverageStats ->
+                    _averageStats.value = averageStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
         }
     }
 
