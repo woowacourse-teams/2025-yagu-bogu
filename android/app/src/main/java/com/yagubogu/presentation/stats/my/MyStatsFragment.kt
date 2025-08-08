@@ -59,6 +59,9 @@ class MyStatsFragment : Fragment() {
             binding.myStatsUiModel = value
             loadChartData(value)
         }
+        viewModel.averageStats.observe(viewLifecycleOwner) { value: AverageStats ->
+            binding.averageStats = value
+        }
     }
 
     private fun setupChart() {

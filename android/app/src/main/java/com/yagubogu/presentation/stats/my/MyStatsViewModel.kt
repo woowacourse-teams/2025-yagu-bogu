@@ -20,12 +20,16 @@ class MyStatsViewModel(
     private val _myStatsUiModel = MutableLiveData<MyStatsUiModel>()
     val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
 
+    private val _averageStats = MutableLiveData<AverageStats>()
+    val averageStats: LiveData<AverageStats> = _averageStats
+
     init {
         fetchAll()
     }
 
     fun fetchAll() {
         fetchMyStats(YEAR)
+        fetchMyAverageStats()
     }
 
     private fun fetchMyStats(year: Int) {
@@ -68,6 +72,18 @@ class MyStatsViewModel(
                         .mapNotNull { it.exceptionOrNull()?.message }
                 Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
+        }
+    }
+
+    private fun fetchMyAverageStats() {
+        viewModelScope.launch {
+            val averageStats: Result<AverageStats> = statsRepository.getAverageStats()
+            averageStats
+                .onSuccess { averageStats: AverageStats ->
+                    _averageStats.value = averageStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
         }
     }
 
