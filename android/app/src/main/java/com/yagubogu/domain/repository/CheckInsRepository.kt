@@ -1,7 +1,6 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.home.model.StadiumFanRate
-import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
 interface CheckInsRepository {
@@ -12,7 +11,7 @@ interface CheckInsRepository {
 
     suspend fun getCheckInCounts(year: Int): Result<Int>
 
-    suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRate>>
+    suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>>
 
     suspend fun getCheckInHistories(
         year: Int,

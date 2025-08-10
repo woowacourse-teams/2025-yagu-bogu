@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.home
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,9 +15,9 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeUiModel
-import com.yagubogu.presentation.home.model.StadiumFanRate
+import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
@@ -33,21 +34,29 @@ class HomeViewModel(
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
 ) : ViewModel() {
-    private val _homeUiModel = MutableLiveData<HomeUiModel>()
-    val homeUiModel: LiveData<HomeUiModel> get() = _homeUiModel
+    private val _memberStatsUiModel = MutableLiveData<MemberStatsUiModel>()
+    val memberStatsUiModel: LiveData<MemberStatsUiModel> get() = _memberStatsUiModel
 
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> = MutableLiveData()
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
+    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+
+    private val _isStadiumStatsExpanded = MutableLiveData(false)
+    val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
+
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
+        MediatorLiveData<StadiumStatsUiModel>().apply {
+            addSource(stadiumFanRateItems) { value = updateStadiumStats() }
+            addSource(_isStadiumStatsExpanded) { value = updateStadiumStats() }
+        }
 
     init {
         fetchAll()
     }
 
     fun fetchAll() {
-        fetchMemberInformation(YEAR)
+        fetchMemberStats(YEAR)
         fetchStadiumStats(DATE)
     }
 
@@ -65,19 +74,22 @@ class HomeViewModel(
 
     fun fetchStadiumStats(date: LocalDate) {
         viewModelScope.launch {
-            val stadiumFanRatesResult: Result<List<StadiumFanRate>> =
+            val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInsRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
-                .onSuccess { stadiumFanRates: List<StadiumFanRate> ->
-                    _stadiumStatsUiModel.value =
-                        StadiumStatsUiModel(stadiumFanRates = stadiumFanRates)
+                .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
+                    stadiumFanRateItems.value = stadiumFanRates
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
     }
 
-    private fun fetchMemberInformation(year: Int) {
+    fun toggleStadiumStats() {
+        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    private fun fetchMemberStats(year: Int) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String>> =
                 async { memberRepository.getFavoriteTeam() }
@@ -95,13 +107,13 @@ class HomeViewModel(
                 val attendanceCount: Int = attendanceCountResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
 
-                val homeUiModel =
-                    HomeUiModel(
+                val memberStatsUiModel =
+                    MemberStatsUiModel(
                         myTeam = myTeam,
                         attendanceCount = attendanceCount,
                         winRate = winRate.roundToInt(),
                     )
-                _homeUiModel.value = homeUiModel
+                _memberStatsUiModel.value = memberStatsUiModel
             } else {
                 val errors: List<String> =
                     listOf(myTeamResult, attendanceCountResult, winRateResult)
@@ -140,9 +152,9 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
-                _homeUiModel.value =
-                    homeUiModel.value?.let { currentHomeUiModel: HomeUiModel ->
-                        currentHomeUiModel.copy(attendanceCount = currentHomeUiModel.attendanceCount + 1)
+                _memberStatsUiModel.value =
+                    memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
+                        currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
                 _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
             }.onFailure { exception: Throwable ->
@@ -150,9 +162,21 @@ class HomeViewModel(
             }
     }
 
+    private fun updateStadiumStats(): StadiumStatsUiModel {
+        val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
+        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+
+        return if (!isExpanded) {
+            val firstItem: StadiumFanRateItem? = items.firstOrNull()
+            StadiumStatsUiModel(if (firstItem != null) listOf(firstItem) else emptyList())
+        } else {
+            StadiumStatsUiModel(items)
+        }
+    }
+
     companion object {
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
         private const val YEAR = 2025
-        private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+        private val DATE = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
     }
 }

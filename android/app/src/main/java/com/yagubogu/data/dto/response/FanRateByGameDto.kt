@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response
 
-import com.yagubogu.presentation.home.model.StadiumFanRate
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,8 +11,8 @@ data class FanRateByGameDto(
     @SerialName("awayTeam")
     val awayTeam: TeamFanRateDto, // 어웨이 팀
 ) {
-    fun toPresentation(): StadiumFanRate =
-        StadiumFanRate(
+    fun toPresentation(): StadiumFanRateItem =
+        StadiumFanRateItem(
             awayTeamFanRate = awayTeam.toPresentation(),
             homeTeamFanRate = homeTeam.toPresentation(),
         )

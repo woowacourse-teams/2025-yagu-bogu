@@ -6,8 +6,8 @@ import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.stats.attendance.CheckInHistoriesResponse
 import com.yagubogu.domain.repository.CheckInsRepository
-import com.yagubogu.presentation.home.model.StadiumFanRate
 import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
 class CheckInsDefaultRepository(
@@ -25,7 +25,7 @@ class CheckInsDefaultRepository(
                 checkInCountsResponse.checkInCounts
             }
 
-    override suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRate>> =
+    override suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>> =
         checkInsDataSource
             .getStadiumFanRates(date)
             .map { fanRateResponse: FanRateResponse ->
