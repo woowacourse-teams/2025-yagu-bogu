@@ -1,6 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
 import java.time.LocalDate
 
 interface CheckInsRepository {
