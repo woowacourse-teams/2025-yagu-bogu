@@ -36,9 +36,36 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupListener() {
+        viewModel.startChatPolling()
+
         binding.ivArrowLeft.setOnClickListener {
             finish()
         }
+
+        binding.rvChatMessages.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    // 스크롤을 위로 올렸고, 리스트의 최상단에 도달했으며, 로딩 중이 아닐 때
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        if (viewModel.isLoading.value == false) {
+                            viewModel.fetchBeforeTalks()
+                        }
+                    }
+                    // 스크롤을 아래로 내려 최하단에 도달하면 폴링 시작
+                    if (!recyclerView.canScrollVertically(1)) {
+                        viewModel.startChatPolling()
+                    } else {
+                        // 최하단이 아니면 폴링 중지
+                        viewModel.stopChatPolling()
+                    }
+                }
+            },
+        )
     }
 
     private fun setupRecyclerView() {
@@ -55,25 +82,32 @@ class LivetalkChatActivity : AppCompatActivity() {
             itemAnimator = null
             clipToPadding = false
         }
-
-        livetalkChatAdapter.registerAdapterDataObserver(
-            object :
-                RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(
-                    positionStart: Int,
-                    itemCount: Int,
-                ) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    binding.rvChatMessages.scrollToPosition(0)
-                }
-            },
-        )
     }
 
     private fun setupObservers() {
         viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
-            livetalkChatAdapter.submitList(livetalkChatBubbleItems)
+            val layoutManager = binding.rvChatMessages.layoutManager as LinearLayoutManager
+
+            val oldFirstItemId =
+                livetalkChatAdapter.currentList
+                    .firstOrNull()
+                    ?.livetalkChatItem
+                    ?.chatId
+
+            livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
+                val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
+                val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
+
+                if (isNewMessageArrived) {
+                    layoutManager.scrollToPosition(0)
+                }
+            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.stopChatPolling()
     }
 
     companion object {
