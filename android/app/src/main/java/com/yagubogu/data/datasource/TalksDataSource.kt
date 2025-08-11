@@ -10,6 +10,17 @@ interface TalksDataSource {
         limit: Int,
     ): Result<TalkResponse>
 
+    suspend fun getLatestTalks(
+        gameId: Long,
+        after: Long?,
+        limit: Int,
+    ): Result<TalkResponse>
+
+    suspend fun getLatestTalks(
+        gameId: Long,
+        limit: Int,
+    ): Result<TalkResponse>
+
     suspend fun postTalks(
         gameId: Long,
         content: String,

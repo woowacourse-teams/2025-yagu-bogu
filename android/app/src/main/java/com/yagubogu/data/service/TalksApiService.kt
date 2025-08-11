@@ -12,9 +12,22 @@ import retrofit2.http.Query
 
 interface TalksApiService {
     @GET("/api/talks/{gameId}")
-    suspend fun getGames(
+    suspend fun getTalks(
         @Path("gameId") gameId: Long,
         @Query("before") before: Long?,
+        @Query("limit") limit: Int,
+    ): Response<TalkResponse>
+
+    @GET("/api/talks/{gameId}")
+    suspend fun getLatestTalks(
+        @Path("gameId") gameId: Long,
+        @Query("limit") limit: Int,
+    ): Response<TalkResponse>
+
+    @GET("/api/talks/{gameId}/latest")
+    suspend fun getLatestTalks(
+        @Path("gameId") gameId: Long,
+        @Query("after") after: Long?,
         @Query("limit") limit: Int,
     ): Response<TalkResponse>
 

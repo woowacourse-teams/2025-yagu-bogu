@@ -10,7 +10,7 @@ import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 class TalksDefaultRepository(
     private val talksDataSource: TalksDataSource,
 ) : TalksRepository {
-    override suspend fun getTalks(
+    override suspend fun getBeforeTalks(
         gameId: Long,
         before: Long?,
         limit: Int,
@@ -23,6 +23,31 @@ class TalksDefaultRepository(
             ).map { talksResponse: TalkResponse ->
                 talksResponse.toPresentation()
             }
+
+    override suspend fun getAfterTalks(
+        gameId: Long,
+        after: Long?,
+        limit: Int,
+    ): Result<LivetalkResponseItem> {
+        if (after == null) {
+            return talksDataSource
+                .getLatestTalks(
+                    gameId = gameId,
+                    limit = limit,
+                ).map { talksResponse: TalkResponse ->
+                    talksResponse.toPresentation()
+                }
+        } else {
+            return talksDataSource
+                .getLatestTalks(
+                    gameId = gameId,
+                    after = after,
+                    limit = limit,
+                ).map { talksResponse: TalkResponse ->
+                    talksResponse.toPresentation()
+                }
+        }
+    }
 
     override suspend fun postTalks(
         gameId: Long,
