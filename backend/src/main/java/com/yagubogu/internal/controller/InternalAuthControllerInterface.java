@@ -20,5 +20,5 @@ public interface InternalAuthControllerInterface {
             @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음"),
     })
     @PostMapping("/token")
-    ResponseEntity<TokenResponse> issueToken(@RequestParam final long memberId);
+    ResponseEntity<TokenResponse> issueToken(@RequestParam long memberId);
 }

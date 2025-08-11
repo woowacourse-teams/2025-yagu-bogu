@@ -15,7 +15,7 @@ public class InternalAuthController implements InternalAuthControllerInterface {
 
     private final InternalAuthService internalAuthService;
 
-    public ResponseEntity<TokenResponse> issueToken(@RequestParam long memberId) {
+    public ResponseEntity<TokenResponse> issueToken(@RequestParam final long memberId) {
         TokenResponse response = internalAuthService.issueAccessToken(memberId);
 
         return ResponseEntity.ok(response);
