@@ -21,7 +21,7 @@ public class InternalAuthService {
     private final AuthTokenProvider jwtProvider;
     private final AuthService authService;
 
-    public TokenResponse issueAccessToken(long memberId) {
+    public TokenResponse issueAccessToken(final long memberId) {
         Member member = getMember(memberId);
 
         MemberClaims claims = MemberClaims.from(member);
