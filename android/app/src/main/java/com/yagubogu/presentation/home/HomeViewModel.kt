@@ -26,6 +26,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.math.roundToInt
 
 class HomeViewModel(
@@ -48,8 +49,8 @@ class HomeViewModel(
 
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
         MediatorLiveData<StadiumStatsUiModel>().apply {
-            addSource(stadiumFanRateItems) { value = updateStadiumStats() }
-            addSource(_isStadiumStatsExpanded) { value = updateStadiumStats() }
+            addSource(stadiumFanRateItems) { value = updateStadiumStats(isRefreshed = true) }
+            addSource(isStadiumStatsExpanded) { value = updateStadiumStats() }
         }
 
     private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
@@ -77,7 +78,7 @@ class HomeViewModel(
         )
     }
 
-    fun fetchStadiumStats(date: LocalDate) {
+    fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInsRepository.getStadiumFanRates(date)
@@ -180,15 +181,17 @@ class HomeViewModel(
             }
     }
 
-    private fun updateStadiumStats(): StadiumStatsUiModel {
+    private fun updateStadiumStats(isRefreshed: Boolean = false): StadiumStatsUiModel {
         val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
         val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+        val current: StadiumStatsUiModel =
+            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
 
-        return if (!isExpanded) {
-            val firstItem: StadiumFanRateItem? = items.firstOrNull()
-            StadiumStatsUiModel(if (firstItem != null) listOf(firstItem) else emptyList())
+        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
+        return if (isRefreshed) {
+            current.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
         } else {
-            StadiumStatsUiModel(items)
+            current.copy(stadiumFanRates = newItems)
         }
     }
 
