@@ -2,6 +2,7 @@ package com.yagubogu.presentation
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
@@ -37,6 +38,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setToolbarTitle(binding.bnvNavigation.selectedItemId)
+    }
+
+    fun setLoadingScreen(isLoading: Boolean) {
+        binding.viewOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.cpiCheckInLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     private fun setupView() {

@@ -14,11 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -64,6 +66,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupObservers()
+        setupFragmentResultListener()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -84,7 +87,7 @@ class HomeFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                viewModel.checkIn()
+                showCheckInConfirmDialog()
             } else {
                 requestLocationPermissions()
             }
@@ -121,6 +124,19 @@ class HomeFragment : Fragment() {
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
             stadiumFanRateAdapter.submitList(value.stadiumFanRates)
         }
+
+        viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
+            (requireActivity() as MainActivity).setLoadingScreen(value)
+        }
+    }
+
+    private fun setupFragmentResultListener() {
+        setFragmentResultListener(HomeCheckInConfirmFragment.KEY_REQUEST_SUCCESS) { _, bundle ->
+            val result: Boolean = bundle.getBoolean(HomeCheckInConfirmFragment.KEY_CONFIRM)
+            if (result) {
+                viewModel.checkIn()
+            }
+        }
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
@@ -131,7 +147,7 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> viewModel.checkIn()
+                isPermissionGranted -> showCheckInConfirmDialog()
                 shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
                 else -> showPermissionDeniedDialog()
             }
@@ -186,6 +202,11 @@ class HomeFragment : Fragment() {
                 data = Uri.fromParts(PACKAGE_SCHEME, requireContext().packageName, null)
             }
         startActivity(intent)
+    }
+
+    private fun showCheckInConfirmDialog() {
+        val dialog = HomeCheckInConfirmFragment.newInstance()
+        dialog.show(parentFragmentManager, dialog.tag)
     }
 
     companion object {
