@@ -19,8 +19,7 @@ class LivetalkChatActivity : AppCompatActivity() {
     private val viewModel: LivetalkChatViewModel by viewModels {
         val app = application as YaguBoguApplication
         val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
-        val isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
-        LivetalkChatViewModelFactory(gameId, isVerified, app.talksRepository)
+        LivetalkChatViewModelFactory(gameId, app.talksRepository)
     }
 
     private val livetalkChatAdapter = LivetalkChatAdapter()
@@ -29,11 +28,16 @@ class LivetalkChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        setupBinding()
         setupRecyclerView()
         setupListener()
         setupObservers()
+    }
+
+    private fun setupBinding() {
+        binding.viewmodel = viewModel
+        binding.isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        binding.lifecycleOwner = this
     }
 
     private fun setupListener() {

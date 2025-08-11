@@ -11,7 +11,6 @@ import timber.log.Timber
 
 class LivetalkChatViewModel(
     private val gameId: Long,
-    val isVerified: Boolean,
     private val talksRepository: TalksRepository,
 ) : ViewModel() {
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()

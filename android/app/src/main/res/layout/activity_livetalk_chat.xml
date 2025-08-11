@@ -9,6 +9,10 @@
             name="viewmodel"
             type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
 
+        <variable
+            name="isVerified"
+            type="boolean" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -101,9 +105,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:enabled="@{viewmodel.isVerified}"
+                android:enabled="@{isVerified}"
                 android:gravity="center_vertical"
-                android:hint="@{viewmodel.isVerified? @string/livetalk_chat_input_hint(viewmodel.livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
+                android:hint="@{isVerified? @string/livetalk_chat_input_hint(viewmodel.livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxLines="4"
@@ -126,8 +130,8 @@
             android:layout_height="40dp"
             android:layout_marginVertical="16dp"
             android:layout_marginEnd="20dp"
-            android:background="@{viewmodel.isVerified ? @drawable/bg_primary500_radius_12dp_ripple : @drawable/bg_gray400_radius_12dp}"
-            android:enabled="@{viewmodel.isVerified}"
+            android:background="@{isVerified ? @drawable/bg_primary500_radius_12dp_ripple : @drawable/bg_gray400_radius_12dp}"
+            android:enabled="@{isVerified}"
             android:onClick="@{() -> viewmodel.sendMessage()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +142,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@string/livetalk_send_btn_description"
-                android:src="@{viewmodel.isVerified ? @drawable/ic_send : @drawable/ic_lock}"
+                android:src="@{isVerified ? @drawable/ic_send : @drawable/ic_lock}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
