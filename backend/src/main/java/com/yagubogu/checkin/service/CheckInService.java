@@ -103,8 +103,9 @@ public class CheckInService {
     public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
         List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
 
+        Member member = getMember(memberId);
         int myRanking = findMyRankingIndex(sortedList, memberId);
-        VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);
+        VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId, member);
 
         List<VictoryFairyRankingEntryResponse> topRankings = sortedList.stream()
                 .limit(TOP_RANKINGS)
@@ -140,12 +141,13 @@ public class CheckInService {
 
     private VictoryFairyRankingEntryResponse findMyRanking(
             final List<VictoryFairyRankingEntryResponse> sortedList,
-            final long memberId
+            final long memberId,
+            final Member member
     ) {
         return sortedList.stream()
                 .filter(d -> d.memberId().equals(memberId))
                 .findFirst()
-                .orElse(null);
+                .orElse(VictoryFairyRankingEntryResponse.generateEmptyRankingFor(member));
     }
 
     public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {

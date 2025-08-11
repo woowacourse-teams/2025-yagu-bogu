@@ -1,5 +1,7 @@
 package com.yagubogu.checkin.dto;
 
+import com.yagubogu.member.domain.Member;
+
 public record VictoryFairyRankingEntryResponse(
         Long memberId,
         String nickname,
@@ -8,4 +10,15 @@ public record VictoryFairyRankingEntryResponse(
         Long totalCheckIns,
         double winPercent
 ) {
+
+    public static VictoryFairyRankingEntryResponse generateEmptyRankingFor(final Member member) {
+        return new VictoryFairyRankingEntryResponse(
+                member.getId(),
+                member.getNickname(),
+                member.getImageUrl(),
+                member.getTeam().getShortName(),
+                0L,
+                0.0
+        );
+    }
 }

@@ -34,16 +34,13 @@ public record VictoryFairyRankingResponses(
             ));
         }
 
-        VictoryFairyRankingResponse myRankingResponse = null;
-        if (myRankingData != null) {
-            myRankingResponse = new VictoryFairyRankingResponse(
-                    myRanking,
-                    myRankingData.nickname(),
-                    myRankingData.profileImageUrl(),
-                    myRankingData.teamShortName(),
-                    myRankingData.winPercent()
-            );
-        }
+        VictoryFairyRankingResponse myRankingResponse = new VictoryFairyRankingResponse(
+                myRanking,
+                myRankingData.nickname(),
+                myRankingData.profileImageUrl(),
+                myRankingData.teamShortName(),
+                myRankingData.winPercent()
+        );
 
         return new VictoryFairyRankingResponses(rankingResponses, myRankingResponse);
     }
