@@ -93,12 +93,14 @@ fun setTimeStamp(
 @BindingAdapter("userProfileImage")
 fun ImageView.loadImage(url: String?) {
     if (url.isNullOrEmpty()) {
-        setImageResource(R.drawable.ic_users)
+        setImageResource(R.drawable.ic_user)
+        imageTintList = context.getColorStateList(R.color.gray300)
     } else {
+        imageTintList = null
         Glide
             .with(this.context)
             .load(url)
-            .placeholder(R.drawable.ic_users)
+            .placeholder(R.drawable.ic_user)
             .circleCrop()
             .into(this)
     }
