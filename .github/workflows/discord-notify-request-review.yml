@@ -1,0 +1,72 @@
+name: Notify on PR review requested
+
+on:
+  pull_request_target:
+    types: [ review_requested ]
+    branches:
+      - dev-be
+      - dev-an
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify:
+    name: Send notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare message
+        id: prep
+        shell: bash
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_TITLE=${{ github.event.pull_request.title }}
+          PR_URL=${{ github.event.pull_request.html_url }}
+          SENDER=${{ github.sender.login }}
+          BASE=${{ github.event.pull_request.base.ref }}
+
+          REQUESTED_USER="${{ github.event.requested_reviewer.login }}"
+          REQUESTED_TEAM="${{ github.event.requested_team.slug }}"
+
+          REQUESTED="$REQUESTED_USER"
+          if [ -z "$REQUESTED" ] && [ -n "$REQUESTED_TEAM" ]; then
+            REQUESTED="team/${REQUESTED_TEAM}"
+          fi
+
+          MSG="[${BASE}] PR #${PR_NUMBER} 리뷰 요청\n제목: ${PR_TITLE}\n요청자: ${SENDER}\n대상: ${REQUESTED}\n링크: ${PR_URL}"
+
+          echo "msg<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$MSG" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Select Discord webhook by base branch
+        id: select
+        shell: bash
+        run: |
+          BASE=${{ github.event.pull_request.base.ref }}
+          URL=""
+          if [ "$BASE" = "dev-be" ]; then
+            URL='${{ secrets.DISCORD_WEBHOOK_URL_BE }}'
+          elif [ "$BASE" = "dev-an" ]; then
+            URL='${{ secrets.DISCORD_WEBHOOK_URL_AN }}'
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Generate payload
+        uses: actions/github-script@v7
+        id: generate-payload
+        env:
+          MSG: ${{ steps.prep.outputs.msg }}
+        with:
+          script: |
+            const msg = process.env.MSG;
+            const payload = { content: msg };
+            core.setOutput('payload', JSON.stringify(payload));
+
+      - name: Discord notify
+        if: ${{ steps.select.outputs.url != '' }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ steps.select.outputs.url }}
+        run: |
+          curl -s -X POST -H 'Content-type: application/json' --data "${{ steps.generate-payload.outputs.payload }}" "$DISCORD_WEBHOOK_URL"
