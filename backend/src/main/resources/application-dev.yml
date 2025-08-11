@@ -7,7 +7,7 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: never
 
   jpa:
     properties:
@@ -15,4 +15,3 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
-    defer-datasource-initialization: true
