@@ -83,6 +83,15 @@ public class AuthService {
         refreshToken.revoke();
     }
 
+    @Transactional
+    public String generateRefreshToken(final Member member) {
+        Instant expiresAt = calculateExpireAt();
+        RefreshToken refreshToken = RefreshToken.generate(member, expiresAt);
+        refreshTokenRepository.save(refreshToken);
+
+        return refreshToken.getId();
+    }
+
     private Member findOrCreateMember(
             final boolean isNew,
             final AuthResponse response,
@@ -123,14 +132,6 @@ public class AuthService {
         validateRefreshToken(refreshToken);
 
         return refreshToken;
-    }
-
-    private String generateRefreshToken(final Member member) {
-        Instant expiresAt = calculateExpireAt();
-        RefreshToken refreshToken = RefreshToken.generate(member, expiresAt);
-        refreshTokenRepository.save(refreshToken);
-
-        return refreshToken.getId();
     }
 
     private Instant calculateExpireAt() {
