@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Profile({"local", "dev"})
-@RestController
 @RequiredArgsConstructor
+@RestController
 public class InternalAuthController implements InternalAuthControllerInterface {
 
     private final InternalAuthService internalAuthService;

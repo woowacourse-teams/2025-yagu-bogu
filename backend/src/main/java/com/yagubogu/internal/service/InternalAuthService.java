@@ -24,7 +24,7 @@ public class InternalAuthService {
     public TokenResponse issueAccessToken(long memberId) {
         Member member = getMember(memberId);
 
-        MemberClaims claims = new MemberClaims(memberId, member.getRole());
+        MemberClaims claims = MemberClaims.from(member);
         String accessToken = jwtProvider.createAccessToken(claims);
         String refreshToken = authService.generateRefreshToken(member);
 
@@ -33,6 +33,6 @@ public class InternalAuthService {
 
     private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("member not found: " + memberId));
+                .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 }
