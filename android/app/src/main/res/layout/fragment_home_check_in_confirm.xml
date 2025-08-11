@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_check_in_confirm_message"
+            style="@style/TextView.Esamanru.Medium.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/home_check_in_confirm"
+            app:layout_constraintBottom_toTopOf="@id/tv_check_in_caution"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_check_in_caution"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="40dp"
+            android:paddingBottom="20dp"
+            android:text="@string/home_check_in_caution"
+            android:textColor="@color/gray500"
+            app:layout_constraintBottom_toTopOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="@id/tv_check_in_confirm_message"
+            app:layout_constraintStart_toStartOf="@id/tv_check_in_confirm_message"
+            app:layout_constraintTop_toBottomOf="@id/tv_check_in_confirm_message" />
+
+        <TextView
+            android:id="@+id/tv_negative_btn"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:paddingHorizontal="48dp"
+            android:paddingVertical="20dp"
+            android:text="@string/all_cancel"
+            android:textColor="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_check_in_caution" />
+
+        <TextView
+            android:id="@+id/tv_positive_btn"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="48dp"
+            android:paddingVertical="20dp"
+            android:text="@string/all_confirm"
+            android:textColor="@color/primary500"
+            app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
+            app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
