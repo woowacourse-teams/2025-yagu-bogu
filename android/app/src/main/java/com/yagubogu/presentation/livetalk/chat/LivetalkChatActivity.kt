@@ -19,7 +19,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     private val viewModel: LivetalkChatViewModel by viewModels {
         val app = application as YaguBoguApplication
         val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
-        LivetalkChatViewModelFactory(gameId, app.talksRepository)
+        val isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        LivetalkChatViewModelFactory(gameId, isVerified, app.talksRepository)
     }
 
     private val livetalkChatAdapter = LivetalkChatAdapter()
@@ -78,13 +79,16 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_GAME_ID = "gameId"
+        private const val KEY_IS_VERIFIED = "isVerified"
 
         fun newIntent(
             context: Context,
             gameId: Long,
+            isVerified: Boolean,
         ): Intent =
             Intent(context, LivetalkChatActivity::class.java).apply {
                 putExtra(KEY_GAME_ID, gameId)
+                putExtra(KEY_IS_VERIFIED, isVerified)
             }
     }
 }
