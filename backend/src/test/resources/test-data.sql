@@ -18,7 +18,7 @@ VALUES (1, '포르', 'por@example.com', 'GOOGLE', 'sub-por', 'USER', 'https://im
        (6, '구구', 'gugu@example.com', 'GOOGLE', 'sub-gugu', 'USER', 'https://image.com/gugu.png'),
        (6, '레나', 'lena@example.com', 'GOOGLE', 'sub-lena', 'USER', 'https://image.com/lena.png'),
        (1, '워니', 'woni@example.com', 'GOOGLE', 'sub-woni', 'USER', 'https://image.com/woni.png'),
-       (null, '제임스', 'james@example.com', 'GOOGLE', 'sub-james', 'USER', 'https://image.com/james.png');
+       (6, '제임스', 'james@example.com', 'GOOGLE', 'sub-james', 'USER', 'https://image.com/james.png');
 
 INSERT INTO stadiums (full_name, short_name, location, latitude, longitude)
 VALUES ('잠실 야구장', '잠실구장', '잠실', 37.512192, 127.072055),
