@@ -272,6 +272,32 @@ class CheckInServiceTest {
         );
     }
 
+    @DisplayName("승리 요정 랭킹 조회 중 회원이 인증한 정보가 없는 경우에 null이 아닌 회원 정보가 반환된다")
+    @Test
+    void findVictoryFairyRankings_notCheckInForMember() {
+        // given
+        long memberId = 12L;
+        VictoryFairyRankingResponse expected = new VictoryFairyRankingResponse(
+                0,
+                "제임스",
+                "https://image.com/james.png",
+                "KT",
+                0.0
+        );
+
+        // when
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(expected.ranking());
+            softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(expected.nickname());
+            softAssertions.assertThat(actual.myRanking().profileImageUrl()).isEqualTo(expected.profileImageUrl());
+            softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(expected.teamShortName());
+            softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(expected.winPercent());
+        });
+    }
+
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @ParameterizedTest
     @CsvSource(value = {
