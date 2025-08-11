@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.TalksRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -22,10 +23,11 @@ class LivetalkChatViewModel(
     val messageFormText = ObservableField<String>()
 
     init {
-        fetchTalks(gameId)
+        fetchTalks()
+        startChatPolling()
     }
 
-    fun fetchTalks(gameId: Long) {
+    fun fetchTalks(shouldClearChat: Boolean = false) {
         viewModelScope.launch {
             val talksResult: Result<LivetalkResponseItem> =
                 talksRepository.getTalks(gameId, null, 10)
@@ -36,7 +38,9 @@ class LivetalkChatViewModel(
                         livetalkResponseItem.cursor.chats.map { livetalkChatItem: LivetalkChatItem ->
                             LivetalkChatBubbleItem.of(livetalkChatItem)
                         }
-                    messageFormText.set("")
+                    if (shouldClearChat) {
+                        messageFormText.set("")
+                    }
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -52,10 +56,23 @@ class LivetalkChatViewModel(
             val talksResult: Result<LivetalkChatItem> =
                 talksRepository.postTalks(gameId, message.trim())
             talksResult
-                .onSuccess { fetchTalks(gameId) }
+                .onSuccess { fetchTalks(true) }
                 .onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun startChatPolling() {
+        viewModelScope.launch {
+            while (true) {
+                delay(POLLING_INTERVAL_MILLS)
+                fetchTalks()
+            }
+        }
+    }
+
+    companion object {
+        private const val POLLING_INTERVAL_MILLS = 10_000L
     }
 }
