@@ -2,7 +2,7 @@ name: Discord PR Notification
 
 on:
   pull_request:
-    types: [ opened, synchronize, closed ]
+    types: [ opened, closed ]
 
 jobs:
   # dev, dev-be, dev-an 대상 PR 알림
@@ -55,9 +55,6 @@ jobs:
             opened)
               EVENT_MSG="📌 새로운 PR이 생성되었습니다!"
               ;;
-            synchronize)
-              EVENT_MSG="📦 PR에 커밋이 추가되었습니다!"
-              ;;
             closed)
               if [[ "$MERGED" == "true" ]]; then
                 EVENT_MSG="✅ PR이 머지되었습니다!"
@@ -71,7 +68,7 @@ jobs:
           esac
           {
             echo 'msg_body<<EOF'
-            printf "%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s" \
+            printf "%s\n#️⃣ PR #%s  |  🌿 브랜치: %s → %s\n📝 커밋: %s  |  파일: %s  |  +%s / -%s\n🔖 제목: %s\n%s\n🙋 작성자: %s\n🔗 %s" \
               "$EVENT_MSG" "$NUMBER" "$HEAD" "$BASE" "$COMMITS" "$FILES" "$ADD" "$DEL" "$TITLE" "$LABEL_LINE" "$ACTOR" "$URL"
             echo ''
             echo 'EOF'

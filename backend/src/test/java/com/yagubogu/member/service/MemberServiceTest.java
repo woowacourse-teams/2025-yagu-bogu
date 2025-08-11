@@ -1,8 +1,5 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -18,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -111,7 +111,7 @@ public class MemberServiceTest {
     @Test
     void patchTeam() {
         // given
-        Long memberId = 12L;
+        Long memberId = 4L;
         String teamCode = "SS";
         MemberFavoriteRequest request = new MemberFavoriteRequest(teamCode);
 
@@ -121,8 +121,8 @@ public class MemberServiceTest {
         // then
         Member member = memberRepository.findById(memberId).orElseThrow();
         SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
             softAssertions.assertThat(member.getTeam()).isNotNull();
+            softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });
     }
 
