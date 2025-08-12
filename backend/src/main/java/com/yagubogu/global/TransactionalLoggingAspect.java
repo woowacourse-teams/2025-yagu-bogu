@@ -21,22 +21,13 @@ public class TransactionalLoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
 
         long startTime = System.currentTimeMillis();
-        if (!transactional.readOnly()) {
-            log.info("[{}] - [BEGIN TX]",
-                    className + "." + methodName);
-        }
+        log.info("[{}] - [BEGIN TX]", className + "." + methodName);
 
         try {
-            Object result = joinPoint.proceed();
-
-            return result;
+            return joinPoint.proceed();
         } finally {
-            if (!transactional.readOnly()) {
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                log.info("[{}] - [END TX] ({}ms)",
-                        className + "." + methodName,
-                        elapsedTime);
-            }
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            log.info("[{}] - [END TX] ({}ms)", className + "." + methodName, elapsedTime);
         }
     }
 }
