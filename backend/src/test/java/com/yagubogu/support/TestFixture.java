@@ -1,4 +1,4 @@
-package com.yagubogu.fixture;
+package com.yagubogu.support;
 
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;

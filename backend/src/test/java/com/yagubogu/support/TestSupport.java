@@ -1,4 +1,4 @@
-package com.yagubogu.fixture;
+package com.yagubogu.support;
 
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
