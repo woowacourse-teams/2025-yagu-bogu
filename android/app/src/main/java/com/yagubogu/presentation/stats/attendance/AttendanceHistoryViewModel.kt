@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInsRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 class AttendanceHistoryViewModel(
     private val checkInsRepository: CheckInsRepository,
@@ -20,8 +21,8 @@ class AttendanceHistoryViewModel(
     }
 
     fun fetchAttendanceHistoryItems(
-        year: Int,
-        filter: AttendanceHistoryFilter,
+        year: Int = LocalDate.now().year,
+        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
     ) {
         viewModelScope.launch {
             val attendanceHistories: Result<List<AttendanceHistoryItem>> =

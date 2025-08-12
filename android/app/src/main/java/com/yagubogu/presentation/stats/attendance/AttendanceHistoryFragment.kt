@@ -11,6 +11,8 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
+import com.yagubogu.presentation.stats.attendance.AttendanceHistoryFilter.ALL
+import com.yagubogu.presentation.stats.attendance.AttendanceHistoryFilter.WIN
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {
@@ -45,6 +47,7 @@ class AttendanceHistoryFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
+        viewModel.fetchAttendanceHistoryItems()
     }
 
     override fun onDestroyView() {
@@ -71,18 +74,9 @@ class AttendanceHistoryFragment : Fragment() {
                         position: Int,
                         id: Long,
                     ) {
-                        when (position) {
-                            0 ->
-                                viewModel.fetchAttendanceHistoryItems(
-                                    2025,
-                                    AttendanceHistoryFilter.ALL,
-                                )
-
-                            1 ->
-                                viewModel.fetchAttendanceHistoryItems(
-                                    2025,
-                                    AttendanceHistoryFilter.WIN,
-                                )
+                        when (AttendanceHistoryFilter.entries[position]) {
+                            ALL -> viewModel.fetchAttendanceHistoryItems(filter = ALL)
+                            WIN -> viewModel.fetchAttendanceHistoryItems(filter = WIN)
                         }
                     }
 
@@ -94,8 +88,7 @@ class AttendanceHistoryFragment : Fragment() {
     private fun setupObservers() {
         viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
             attendanceHistoryAdapter.submitList(value)
-            binding.tvEmptyHistory.visibility =
-                if (value.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvEmptyHistory.visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 }
