@@ -32,7 +32,7 @@ class LoginViewModel(
                         authRepository
                             .login(idToken)
                             .fold(
-                                onSuccess = { LoginResult.Success },
+                                onSuccess = { it },
                                 onFailure = { exception: Throwable ->
                                     Timber.w(exception, "API 호출 실패")
                                     LoginResult.Failure(exception)
