@@ -2,9 +2,11 @@ package com.yagubogu.presentation.favorite
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
 
@@ -13,10 +15,18 @@ class FavoriteTeamActivity : AppCompatActivity() {
         ActivityFavoriteTeamBinding.inflate(layoutInflater)
     }
 
+    private val viewModel: FavoriteTeamViewModel by viewModels {
+        val app = application as YaguBoguApplication
+        FavoriteTeamViewModelFactory(app.memberRepository)
+    }
+
+    private var selectedTeam: Team? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
         setupRecyclerView()
+        setupFragmentResultListener()
     }
 
     private fun setupView() {
@@ -33,18 +43,27 @@ class FavoriteTeamActivity : AppCompatActivity() {
         val adapter =
             FavoriteTeamAdapter(
                 object : FavoriteTeamViewHolder.Handler {
-                    override fun onItemClick(item: FavoriteTeamUiModel) {
+                    override fun onItemClick(item: FavoriteTeamItem) {
                         val dialog = FavoriteTeamConfirmFragment.newInstance(item)
                         dialog.show(supportFragmentManager, dialog.tag)
+                        selectedTeam = item.team
                     }
                 },
             )
         binding.rvFavoriteTeamList.adapter = adapter
-        adapter.submitList(DUMMY_FAVORITE_TEAMS)
+        val favoriteTeamItems: List<FavoriteTeamItem> = Team.entries.map { FavoriteTeamItem.of(it) }
+        adapter.submitList(favoriteTeamItems)
     }
 
-    companion object {
-        // TODO 어떻게 생성할 것인지 결정
-        private val DUMMY_FAVORITE_TEAMS = Team.entries.map { FavoriteTeamUiModel.of(it) }
+    private fun setupFragmentResultListener() {
+        supportFragmentManager.setFragmentResultListener(
+            FavoriteTeamConfirmFragment.KEY_REQUEST_SUCCESS,
+            this,
+        ) { _, bundle ->
+            val result: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (result) {
+                selectedTeam?.let { viewModel.saveFavoriteTeam(it) }
+            }
+        }
     }
 }
