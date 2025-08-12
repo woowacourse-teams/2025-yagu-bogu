@@ -1,5 +1,7 @@
 package com.yagubogu.auth;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -26,8 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
@@ -81,7 +81,6 @@ public class AuthIntegrationTest {
     void refresh() {
         // given
         LoginResponse loginResponse = TestSupport.loginResponse(ID_TOKEN);
-        String accessToken = BEARER + loginResponse.accessToken();
         String refreshToken = loginResponse.refreshToken();
 
         // when
@@ -106,7 +105,6 @@ public class AuthIntegrationTest {
     @Test
     void refresh_tokenNotFound() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
         String nonExistToken = "non-exist-token";
 
         // when & then
@@ -122,7 +120,6 @@ public class AuthIntegrationTest {
     @Test
     void refresh_tokenInvalid() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
         String expiredToken = "expired-token";
         Member member = memberRepository.findById(1L).orElseThrow();
 
@@ -147,8 +144,7 @@ public class AuthIntegrationTest {
     @Test
     void logout() {
         // given
-        String idToken = ID_TOKEN;
-        LoginResponse loginResponse = TestSupport.loginResponse(idToken);
+        LoginResponse loginResponse = TestSupport.loginResponse(ID_TOKEN);
         String accessToken = BEARER + loginResponse.accessToken();
         String refreshTokenId = loginResponse.refreshToken();
 
@@ -166,7 +162,7 @@ public class AuthIntegrationTest {
     @Test
     void logout_tokenNotFound() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
+        String accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
         String nonExistTokenId = "non-exist-token";
 
         // when & then
@@ -183,7 +179,7 @@ public class AuthIntegrationTest {
     @Test
     void logout_tokenInvalid() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
+        String accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
         String expiredTokenId = "expired-token";
         Member member = memberRepository.findById(1L).orElseThrow();
 

@@ -1,12 +1,19 @@
 package com.yagubogu.member;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.support.AuthTokenProvider;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,39 +29,39 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@Import(AuthTestConfig.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class MemberIntegrationTest {
-
-    private static final String ID_TOKEN = "ID_TOKEN";
 
     @LocalServerPort
     private int port;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
+    private MemberFactory memberFactory;
 
-    private String accessToken;
+    @Autowired
+    private AuthFactory authFactory;
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
     }
 
     @DisplayName("멤버의 응원팀을 조회한다")
     @Test
     void findFavorites() {
         // given
-        String accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
-        String expected = "기아";
+        String teamCode = "HT";
+        Team team = teamRepository.findByTeamCode(teamCode).orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // when
         MemberFavoriteResponse actual = RestAssured.given().log().all()
@@ -67,15 +74,16 @@ public class MemberIntegrationTest {
                 .as(MemberFavoriteResponse.class);
 
         // then
-        assertThat(actual.favorite()).isEqualTo(expected);
+        assertThat(actual.favorite()).isEqualTo(member.getTeam().getShortName());
     }
 
     @DisplayName("멤버의 닉네임을 조회한다")
     @Test
     void findNickName() {
         // given
-        String accessToken = TestSupport.getAccessToken("id_token");
-        String expected = "test-user";
+        String nickname = "user";
+        Member member = memberFactory.save(builder -> builder.nickname(nickname));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // when
         MemberNicknameResponse actual = RestAssured.given().log().all()
@@ -88,21 +96,23 @@ public class MemberIntegrationTest {
                 .as(MemberNicknameResponse.class);
 
         // then
-        assertThat(actual.nickname()).isEqualTo(expected);
+        assertThat(actual.nickname()).isEqualTo(nickname);
     }
 
     @DisplayName("멤버의 닉네임을 수정한다")
     @Test
     void patchNickname() {
         // given
-        String accessToken = TestSupport.getAccessToken("id_token");
-        String expected = "바꾼닉";
+        String oldNickname = "두리";
+        Member member = memberFactory.save(builder -> builder.nickname(oldNickname));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+        String newNickname = "둘리";
 
         // when
         MemberNicknameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new MemberNicknameRequest("바꾼닉"))
+                .body(new MemberNicknameRequest(newNickname))
                 .when().patch("/api/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
@@ -110,12 +120,17 @@ public class MemberIntegrationTest {
                 .as(MemberNicknameResponse.class);
 
         // then
-        assertThat(actual.nickname()).isEqualTo(expected);
+        assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
     @DisplayName("회원 탈퇴한다")
     @Test
     void removeMember() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
@@ -124,16 +139,21 @@ public class MemberIntegrationTest {
                 .statusCode(204);
     }
 
-    @DisplayName("팀을 갱신한다")
+    @DisplayName("팀을 변경한다")
     @Test
     void updateTeam() {
         // given
-        String accessToken = TestSupport.getAccessToken("id_token");
-        MemberFavoriteRequest request = new MemberFavoriteRequest("SS");
+        String teamCode = "HT";
+        Team team = teamRepository.findByTeamCode(teamCode).orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        String expected = "삼성";
+        String changedTeamCode = "SS";
+        MemberFavoriteRequest request = new MemberFavoriteRequest(changedTeamCode);
 
-        // when & then
+        String changedTeamShortName = "삼성";
+
+        // when
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
@@ -144,6 +164,7 @@ public class MemberIntegrationTest {
                 .extract()
                 .as(MemberFavoriteResponse.class);
 
-        assertThat(actual.favorite()).isEqualTo(expected);
+        // then
+        assertThat(actual.favorite()).isEqualTo(changedTeamShortName);
     }
 }
