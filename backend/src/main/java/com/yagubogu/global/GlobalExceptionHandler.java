@@ -86,9 +86,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException() {
+    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
         String message = "Unexpected server error is occurred";
-        log.error("[RuntimeException]- {}", message);
+        log.error("[RuntimeException] Unhandled runtime exception", runtimeException);
+        log.error("[RuntimeException] Message", runtimeException.getMessage());
 
         return new ExceptionResponse(message);
     }
