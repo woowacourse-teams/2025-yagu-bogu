@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole
 @RestController
 public class CheckInController implements CheckInControllerInterface {
 
     private final CheckInService checkInService;
 
-    @RequireRole
     public ResponseEntity<Void> createCheckIn(
             final MemberClaims memberClaims,
             @RequestBody final CreateCheckInRequest request
