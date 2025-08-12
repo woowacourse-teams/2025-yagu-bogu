@@ -25,7 +25,6 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
-import java.time.LocalDate
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -94,9 +93,7 @@ class HomeFragment : Fragment() {
         binding.rvVictoryFairy.adapter = victoryFairyAdapter
 
         binding.ivRefresh.setOnClickListener { view: View ->
-//            val today = LocalDate.now()
-            val today = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
-            viewModel.fetchStadiumStats(today)
+            viewModel.fetchStadiumStats()
             view
                 .animate()
                 .rotationBy(360f)
@@ -122,7 +119,14 @@ class HomeFragment : Fragment() {
 
         viewModel.victoryFairyRanking.observe(viewLifecycleOwner) { value: VictoryFairyRanking ->
             victoryFairyAdapter.submitList(value.topRankings)
-            binding.layoutMyVictoryFairy.victoryFairyItem = value.myRanking
+            binding.layoutMyVictoryFairy.victoryFairyItem =
+                value.myRanking.copy(
+                    nickname =
+                        getString(
+                            R.string.home_victory_fairy_my_nickname,
+                            value.myRanking.nickname,
+                        ),
+                )
         }
     }
 

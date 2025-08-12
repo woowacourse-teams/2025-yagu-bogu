@@ -61,8 +61,8 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
-        fetchMemberStats(YEAR)
-        fetchStadiumStats(DATE)
+        fetchMemberStats()
+        fetchStadiumStats()
         fetchVictoryFairyRanking()
     }
 
@@ -95,7 +95,7 @@ class HomeViewModel(
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
-    private fun fetchMemberStats(year: Int) {
+    private fun fetchMemberStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String>> =
                 async { memberRepository.getFavoriteTeam() }
@@ -197,7 +197,5 @@ class HomeViewModel(
 
     companion object {
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
-        private const val YEAR = 2025
-        private val DATE = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
     }
 }
