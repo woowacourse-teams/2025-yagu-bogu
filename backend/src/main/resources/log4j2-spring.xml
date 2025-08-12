@@ -13,7 +13,7 @@
                      filePattern="/var/log/yagubogu/prod-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
                     disableAnsi="false"
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green}] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green}] [%X{traceId}] [%X{params}] [%X{clientIp}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>
@@ -25,7 +25,7 @@
                      filePattern="/var/log/yagubogu/dev-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
                     disableAnsi="false"
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{traceId}] [%X{params}] [%X{clientIp}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>
@@ -37,7 +37,7 @@
                      filePattern="log/local-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
                     disableAnsi="false"
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%thread] [%X{traceId}] - %msg%n"/>
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{params}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>

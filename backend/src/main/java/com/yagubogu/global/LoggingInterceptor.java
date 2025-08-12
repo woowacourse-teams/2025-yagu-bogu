@@ -2,6 +2,7 @@ package com.yagubogu.global;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -15,10 +16,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) {
-
+    public boolean preHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler
+    ) {
         MDC.clear();
         String traceId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
 
@@ -27,6 +29,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
         MDC.put("uri", request.getRequestURI());
         MDC.put("clientIp", request.getRemoteAddr());
         MDC.put("userAgent", shortenUserAgent(request.getHeader("User-Agent")));
+
+        String params = getParameterString(request);
+        MDC.put("params", params);
 
         if (handler instanceof final HandlerMethod handlerMethod) {
             MDC.put("controller", handlerMethod.getBeanType().getSimpleName());
@@ -38,11 +43,30 @@ public class LoggingInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    private String getParameterString(final HttpServletRequest request) {
+        Map<String, String[]> paramMap = request.getParameterMap();
+        if (paramMap.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        paramMap.forEach((key, values) -> {
+            String joinedValues = String.join(",", values);
+            sb.append(key).append("=").append(joinedValues).append("&");
+        });
+
+        if (!sb.isEmpty()) {
+            sb.setLength(sb.length() - 1);
+        }
+
+        return sb.toString();
+    }
+
     @Override
-    public void afterCompletion(HttpServletRequest request,
-                                HttpServletResponse response,
-                                Object handler,
-                                Exception ex) {
+    public void afterCompletion(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception ex) {
 
         try {
             Long startTime = (Long) request.getAttribute("startTime");
@@ -68,7 +92,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
     }
 
-    private String shortenUserAgent(String userAgent) {
+    private String shortenUserAgent(final String userAgent) {
         if (userAgent == null) {
             return "UNKNOWN";
         }
