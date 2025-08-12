@@ -5,7 +5,7 @@ import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
-import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
@@ -49,7 +49,7 @@ class CheckInsDefaultRepository(
     ): Result<List<AttendanceHistoryItem>> =
         checkInsDataSource
             .getCheckInHistories(year, filter)
-            .map { checkInHistoriesResponse: CheckInHistoriesResponse ->
-                checkInHistoriesResponse.checkInHistories.map { it.toPresentation() }
+            .map { checkInHistoryResponse: CheckInHistoryResponse ->
+                checkInHistoryResponse.checkInHistory.map { it.toPresentation() }
             }
 }

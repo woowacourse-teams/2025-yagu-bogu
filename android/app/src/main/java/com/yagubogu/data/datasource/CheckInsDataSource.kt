@@ -3,7 +3,7 @@ package com.yagubogu.data.datasource
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
-import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import java.time.LocalDate
 
 interface CheckInsDataSource {
@@ -21,5 +21,5 @@ interface CheckInsDataSource {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
-    ): Result<CheckInHistoriesResponse>
+    ): Result<CheckInHistoryResponse>
 }

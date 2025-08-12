@@ -4,7 +4,7 @@ import com.yagubogu.data.dto.request.CheckInRequest
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
-import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -34,5 +34,5 @@ interface CheckInsApiService {
     suspend fun getCheckInHistories(
         @Query("year") year: Int,
         @Query("result") result: String,
-    ): Response<CheckInHistoriesResponse>
+    ): Response<CheckInHistoryResponse>
 }
