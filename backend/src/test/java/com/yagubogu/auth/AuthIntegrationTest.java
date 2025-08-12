@@ -1,7 +1,5 @@
 package com.yagubogu.auth;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -10,9 +8,9 @@ import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
-import com.yagubogu.fixture.TestSupport;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.support.TestSupport;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.Instant;
@@ -28,6 +26,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {

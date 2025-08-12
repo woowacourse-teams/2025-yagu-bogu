@@ -1,11 +1,8 @@
 package com.yagubogu.talk;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
-import com.yagubogu.fixture.TestSupport;
+import com.yagubogu.support.TestSupport;
 import com.yagubogu.talk.dto.TalkRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -21,6 +18,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
