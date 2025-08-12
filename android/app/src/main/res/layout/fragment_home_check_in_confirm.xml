@@ -5,28 +5,41 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="24dp">
 
         <TextView
-            android:id="@+id/tv_check_in_confirm_message"
-            style="@style/TextView.Esamanru.Medium.20"
+            android:id="@+id/tv_stadium_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="20dp"
-            android:text="@string/home_check_in_confirm"
-            app:layout_constraintBottom_toTopOf="@id/tv_check_in_caution"
+            android:text="@string/home_check_in_stadium_emoji"
+            android:textSize="48dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_check_in_confirm_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_check_in_caution"
-            style="@style/TextView.Pretendard.Medium.16"
+            android:id="@+id/tv_check_in_confirm_message"
+            style="@style/TextView.Pretendard.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="40dp"
-            android:paddingBottom="20dp"
+            android:layout_marginVertical="16dp"
+            android:text="@string/home_check_in_confirm"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_check_in_caution"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_stadium_emoji" />
+
+        <TextView
+            android:id="@+id/tv_check_in_caution"
+            style="@style/TextView.Pretendard.Medium"
+            android:textSize="14sp"
+            android:layout_width="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/home_check_in_caution"
             android:textColor="@color/gray500"
             app:layout_constraintBottom_toTopOf="@id/tv_negative_btn"
@@ -36,12 +49,15 @@
 
         <TextView
             android:id="@+id/tv_negative_btn"
-            style="@style/TextView.Pretendard.Medium.16"
-            android:layout_width="wrap_content"
+            style="@style/TextView.Pretendard.Bold.16"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:paddingHorizontal="48dp"
-            android:paddingVertical="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_gray100_radius_12dp_ripple"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
             android:text="@string/all_cancel"
             android:textColor="@color/gray500"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,13 +67,16 @@
 
         <TextView
             android:id="@+id/tv_positive_btn"
-            style="@style/TextView.Pretendard.Medium.16"
-            android:layout_width="wrap_content"
+            style="@style/TextView.Pretendard.Bold.16"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="48dp"
-            android:paddingVertical="20dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_primary500_radius_12dp_ripple"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
             android:text="@string/all_confirm"
-            android:textColor="@color/primary500"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
