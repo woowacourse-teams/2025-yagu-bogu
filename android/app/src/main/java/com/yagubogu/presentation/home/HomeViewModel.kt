@@ -17,6 +17,7 @@ import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -25,6 +26,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.math.roundToInt
 
 class HomeViewModel(
@@ -47,9 +49,12 @@ class HomeViewModel(
 
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
         MediatorLiveData<StadiumStatsUiModel>().apply {
-            addSource(stadiumFanRateItems) { value = updateStadiumStats() }
-            addSource(_isStadiumStatsExpanded) { value = updateStadiumStats() }
+            addSource(stadiumFanRateItems) { value = updateStadiumStats(isRefreshed = true) }
+            addSource(isStadiumStatsExpanded) { value = updateStadiumStats() }
         }
+
+    private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
+    val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
 
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
@@ -59,8 +64,9 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
-        fetchMemberStats(YEAR)
-        fetchStadiumStats(DATE)
+        fetchMemberStats()
+        fetchStadiumStats()
+        fetchVictoryFairyRanking()
     }
 
     fun checkIn() {
@@ -76,7 +82,7 @@ class HomeViewModel(
         )
     }
 
-    fun fetchStadiumStats(date: LocalDate) {
+    fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInsRepository.getStadiumFanRates(date)
@@ -93,7 +99,7 @@ class HomeViewModel(
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
-    private fun fetchMemberStats(year: Int) {
+    private fun fetchMemberStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String>> =
                 async { memberRepository.getFavoriteTeam() }
@@ -125,6 +131,19 @@ class HomeViewModel(
                         .mapNotNull { it.exceptionOrNull()?.message }
                 Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
+        }
+    }
+
+    private fun fetchVictoryFairyRanking() {
+        viewModelScope.launch {
+            val victoryFairyRankingResult: Result<VictoryFairyRanking> =
+                checkInsRepository.getVictoryFairyRankings()
+            victoryFairyRankingResult
+                .onSuccess { ranking: VictoryFairyRanking ->
+                    _victoryFairyRanking.value = ranking
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
         }
     }
 
@@ -168,21 +187,21 @@ class HomeViewModel(
             }
     }
 
-    private fun updateStadiumStats(): StadiumStatsUiModel {
+    private fun updateStadiumStats(isRefreshed: Boolean = false): StadiumStatsUiModel {
         val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
         val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+        val currentStadiumStats: StadiumStatsUiModel =
+            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
 
-        return if (!isExpanded) {
-            val firstItem: StadiumFanRateItem? = items.firstOrNull()
-            StadiumStatsUiModel(if (firstItem != null) listOf(firstItem) else emptyList())
+        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
+        return if (isRefreshed) {
+            currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
         } else {
-            StadiumStatsUiModel(items)
+            currentStadiumStats.copy(stadiumFanRates = newItems)
         }
     }
 
     companion object {
         private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
-        private const val YEAR = 2025
-        private val DATE = LocalDate.of(2025, 8, 8) // TODO: LocalDate.now()로 변경
     }
 }

@@ -36,7 +36,8 @@
     <string name="home_stadium_stats_refresh_time">%02d:%02d 기준</string>
     <string name="home_show_more">더보기</string>
     <string name="home_show_less">접기</string>
-    <string name="home_victory_fairy_ranking">승리 요정 랭킹</string>
+    <string name="home_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="home_victory_fairy_my_nickname">나 (%s)</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_attendance_history">직관 내역</string>
