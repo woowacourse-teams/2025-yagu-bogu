@@ -36,10 +36,10 @@ class CheckInsDefaultRepository(
 
     override suspend fun getCheckInHistories(
         year: Int,
-        result: String,
+        filter: String,
     ): Result<List<AttendanceHistoryItem>> =
         checkInsDataSource
-            .getCheckInHistories(year, result)
+            .getCheckInHistories(year, filter)
             .map { checkInHistoriesResponse: CheckInHistoriesResponse ->
                 checkInHistoriesResponse.checkInHistories.map { it.toPresentation() }
             }

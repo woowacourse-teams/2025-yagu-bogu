@@ -16,16 +16,16 @@ class AttendanceHistoryViewModel(
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> get() = _attendanceHistoryItems
 
     init {
-        fetchAttendanceHistoryItems(2025, "ALL")
+        fetchAttendanceHistoryItems(2025, AttendanceHistoryFilter.ALL)
     }
 
     fun fetchAttendanceHistoryItems(
         year: Int,
-        result: String,
+        filter: AttendanceHistoryFilter,
     ) {
         viewModelScope.launch {
             val attendanceHistories: Result<List<AttendanceHistoryItem>> =
-                checkInsRepository.getCheckInHistories(year, result)
+                checkInsRepository.getCheckInHistories(year, filter.name)
             attendanceHistories
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
                     _attendanceHistoryItems.value = attendanceHistoryItems

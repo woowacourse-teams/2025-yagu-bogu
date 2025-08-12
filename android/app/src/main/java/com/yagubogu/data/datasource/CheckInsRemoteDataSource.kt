@@ -38,9 +38,9 @@ class CheckInsRemoteDataSource(
 
     override suspend fun getCheckInHistories(
         year: Int,
-        result: String,
+        filter: String,
     ): Result<CheckInHistoriesResponse> =
         safeApiCall {
-            checkInsApiService.getCheckInHistories(year, result)
+            checkInsApiService.getCheckInHistories(year, filter)
         }
 }

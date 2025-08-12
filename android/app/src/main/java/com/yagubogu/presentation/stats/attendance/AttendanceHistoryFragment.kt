@@ -72,8 +72,17 @@ class AttendanceHistoryFragment : Fragment() {
                         id: Long,
                     ) {
                         when (position) {
-                            0 -> viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_ALL)
-                            1 -> viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_WIN)
+                            0 ->
+                                viewModel.fetchAttendanceHistoryItems(
+                                    2025,
+                                    AttendanceHistoryFilter.ALL,
+                                )
+
+                            1 ->
+                                viewModel.fetchAttendanceHistoryItems(
+                                    2025,
+                                    AttendanceHistoryFilter.WIN,
+                                )
                         }
                     }
 
@@ -88,10 +97,5 @@ class AttendanceHistoryFragment : Fragment() {
             binding.tvEmptyHistory.visibility =
                 if (value.isEmpty()) View.VISIBLE else View.GONE
         }
-    }
-
-    companion object {
-        private const val RESULT_TYPE_ALL = "ALL"
-        private const val RESULT_TYPE_WIN = "WIN"
     }
 }
