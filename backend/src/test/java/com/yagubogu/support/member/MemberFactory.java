@@ -8,9 +8,7 @@ public class MemberFactory {
 
     private final MemberRepository memberRepository;
 
-    public MemberFactory(
-            final MemberRepository memberRepository
-    ) {
+    public MemberFactory(final MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
