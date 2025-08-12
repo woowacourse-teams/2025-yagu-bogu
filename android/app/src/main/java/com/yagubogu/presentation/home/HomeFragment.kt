@@ -96,8 +96,8 @@ class HomeFragment : Fragment() {
             viewModel.fetchStadiumStats()
             view
                 .animate()
-                .rotationBy(360f)
-                .setDuration(1000L)
+                .rotationBy(REFRESH_ANIMATION_ROTATION)
+                .setDuration(REFRESH_ANIMATION_DURATION)
                 .start()
         }
     }
@@ -197,5 +197,7 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private const val REFRESH_ANIMATION_ROTATION = 360f
+        private const val REFRESH_ANIMATION_DURATION = 1000L
     }
 }
