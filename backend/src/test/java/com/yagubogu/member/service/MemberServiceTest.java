@@ -7,6 +7,9 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
+@Import(MemberFactory.class)
 @DataJpaTest
 public class MemberServiceTest {
 
@@ -33,6 +38,9 @@ public class MemberServiceTest {
     @Autowired
     private TeamRepository teamRepository;
 
+    @Autowired
+    private MemberFactory memberFactory;
+
     @BeforeEach
     void setUp() {
         memberService = new MemberService(memberRepository, teamRepository);
@@ -42,11 +50,13 @@ public class MemberServiceTest {
     @Test
     void findFavorite() {
         // given
-        long memberId = 1L;
+        Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
+
         String expected = "기아";
 
         // when
-        MemberFavoriteResponse actual = memberService.findFavorite(memberId);
+        MemberFavoriteResponse actual = memberService.findFavorite(member.getId());
 
         // then
         assertThat(actual.favorite()).isEqualTo(expected);
@@ -56,27 +66,28 @@ public class MemberServiceTest {
     @Test
     void findNickname() {
         // given
-        long memberId = 1L;
-        String expected = "포르";
+        String nickname = "우가";
+        Member member = memberFactory.save(builder -> builder.nickname(nickname));
 
         // when
-        MemberNicknameResponse actual = memberService.findNickname(memberId);
+        MemberNicknameResponse actual = memberService.findNickname(member.getId());
 
         // then
-        assertThat(actual.nickname()).isEqualTo(expected);
+        assertThat(actual.nickname()).isEqualTo(nickname);
     }
 
     @DisplayName("멤버의 닉네임을 수정한다")
     @Test
     void patchNickname() {
         // given
-        long memberId = 1L;
-        String oldNickname = "기존닉";
-        memberService.patchNickname(memberId, new MemberNicknameRequest(oldNickname));
-        String newNickname = "변경닉";
+        String oldNickname = "두리";
+        Member member = memberFactory.save(builder -> builder.nickname(oldNickname));
+
+        String newNickname = "둘이";
 
         // when
-        MemberNicknameResponse actual = memberService.patchNickname(memberId, new MemberNicknameRequest(newNickname));
+        MemberNicknameResponse actual = memberService.patchNickname(member.getId(),
+                new MemberNicknameRequest(newNickname));
 
         // then
         assertThat(actual.nickname()).isEqualTo(newNickname);
@@ -98,7 +109,8 @@ public class MemberServiceTest {
     @Test
     void removeMember() {
         // given
-        Long memberId = 1L;
+        Member member = memberFactory.save(MemberBuilder::build);
+        Long memberId = member.getId();
 
         // when
         memberService.removeMember(memberId);
@@ -111,15 +123,15 @@ public class MemberServiceTest {
     @Test
     void patchTeam() {
         // given
-        Long memberId = 4L;
+        Member member = memberFactory.save(MemberBuilder::build);
+
         String teamCode = "SS";
         MemberFavoriteRequest request = new MemberFavoriteRequest(teamCode);
 
         // when
-        memberService.updateFavorite(memberId, request);
+        memberService.updateFavorite(member.getId(), request);
 
         // then
-        Member member = memberRepository.findById(memberId).orElseThrow();
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.getTeam()).isNotNull();
             softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
@@ -130,19 +142,20 @@ public class MemberServiceTest {
     @Test
     void modifyTeam() {
         // given
-        Long memberId = 1L;
-        String beforeTeamCode = memberService.findFavorite(memberId).favorite();
-        String newTeamCode = "SS";
-        MemberFavoriteRequest request = new MemberFavoriteRequest(newTeamCode);
+        String beforeTeamCode = "HT";
+        Team team = teamRepository.findByTeamCode(beforeTeamCode).orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
+
+        String teamCode = "SS";
+        MemberFavoriteRequest request = new MemberFavoriteRequest(teamCode);
 
         // when
-        memberService.updateFavorite(memberId, request);
+        memberService.updateFavorite(member.getId(), request);
 
         // then
-        Member member = memberRepository.findById(memberId).orElseThrow();
         SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(newTeamCode);
-            softAssertions.assertThat(member.getTeam().getShortName()).isNotEqualTo(beforeTeamCode);
+            softAssertions.assertThat(member.getTeam().getTeamCode()).isNotEqualTo(beforeTeamCode);
+            softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });
     }
 
@@ -150,12 +163,13 @@ public class MemberServiceTest {
     @Test
     void updateTeam_notFoundTeamCode() {
         // given
-        Long memberId = 1L;
+        Member member = memberFactory.save(MemberBuilder::build);
+
         String invalidTeamCode = "유효하지않은팀코드";
         MemberFavoriteRequest request = new MemberFavoriteRequest(invalidTeamCode);
 
         // when & then
-        assertThatThrownBy(() -> memberService.updateFavorite(memberId, request))
+        assertThatThrownBy(() -> memberService.updateFavorite(member.getId(), request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Team is not found");
     }
