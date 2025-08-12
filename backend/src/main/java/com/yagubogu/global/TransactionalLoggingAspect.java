@@ -5,18 +5,14 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
 @Aspect
 public class TransactionalLoggingAspect {
 
-    @Around("@annotation(transactional)")
-    public Object logWritableTransactions(
-            final ProceedingJoinPoint joinPoint,
-            final Transactional transactional
-    ) throws Throwable {
+    @Around("@within(org.springframework.stereotype.Service)")
+    public Object logWritableTransactions(final ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
 
