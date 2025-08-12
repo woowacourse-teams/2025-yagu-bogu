@@ -1,5 +1,6 @@
 package com.yagubogu.presentation.favorite
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -9,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.MainActivity
 
 class FavoriteTeamActivity : AppCompatActivity() {
     private val binding: ActivityFavoriteTeamBinding by lazy {
@@ -60,10 +62,16 @@ class FavoriteTeamActivity : AppCompatActivity() {
             FavoriteTeamConfirmFragment.KEY_REQUEST_SUCCESS,
             this,
         ) { _, bundle ->
-            val result: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
-            if (result) {
+            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (isConfirmed) {
                 selectedTeam?.let { viewModel.saveFavoriteTeam(it) }
+                navigateToMain()
             }
         }
+    }
+
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }
