@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.stats.attendance
+package com.yagubogu.data.dto.response.checkIns
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CheckInHistoriesResponse(
     @SerialName("checkInHistory")
-    val checkInHistoryDto: List<CheckInHistoryDto>,
+    val checkInHistories: List<CheckInHistoryDto>,
 )

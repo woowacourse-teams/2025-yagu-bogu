@@ -3,7 +3,7 @@ package com.yagubogu.data.datasource
 import com.yagubogu.data.dto.request.CheckInRequest
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.stats.attendance.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
 import com.yagubogu.data.service.CheckInsApiService
 import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate

@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.stats.attendance
+package com.yagubogu.data.dto.response.checkIns
 
 import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
 import kotlinx.serialization.SerialName

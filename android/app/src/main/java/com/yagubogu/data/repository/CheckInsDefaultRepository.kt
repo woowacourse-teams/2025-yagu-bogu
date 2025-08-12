@@ -4,10 +4,10 @@ import com.yagubogu.data.datasource.CheckInsDataSource
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.stats.attendance.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
 import com.yagubogu.domain.repository.CheckInsRepository
-import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
 import java.time.LocalDate
 
 class CheckInsDefaultRepository(
@@ -41,6 +41,6 @@ class CheckInsDefaultRepository(
         checkInsDataSource
             .getCheckInHistories(year, result)
             .map { checkInHistoriesResponse: CheckInHistoriesResponse ->
-                checkInHistoriesResponse.checkInHistoryDto.map { it.toPresentation() }
+                checkInHistoriesResponse.checkInHistories.map { it.toPresentation() }
             }
 }

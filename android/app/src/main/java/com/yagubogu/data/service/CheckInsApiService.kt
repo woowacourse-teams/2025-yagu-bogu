@@ -3,7 +3,7 @@ package com.yagubogu.data.service
 import com.yagubogu.data.dto.request.CheckInRequest
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.stats.attendance.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.stats.attendance
+package com.yagubogu.data.dto.response.checkIns
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.stats.attendance.TeamItem

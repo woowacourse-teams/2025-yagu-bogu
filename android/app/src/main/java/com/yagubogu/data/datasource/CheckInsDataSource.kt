@@ -2,7 +2,7 @@ package com.yagubogu.data.datasource
 
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.stats.attendance.CheckInHistoriesResponse
+import com.yagubogu.data.dto.response.checkIns.CheckInHistoriesResponse
 import java.time.LocalDate
 
 interface CheckInsDataSource {
