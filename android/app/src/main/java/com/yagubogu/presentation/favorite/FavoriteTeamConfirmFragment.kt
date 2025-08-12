@@ -11,7 +11,7 @@ import com.yagubogu.presentation.util.getParcelableCompat
 class FavoriteTeamConfirmFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val favoriteTeam: FavoriteTeamItem =
-            arguments?.getParcelableCompat(ARG_FAVORITE_TEAM)
+            arguments?.getParcelableCompat(KEY_FAVORITE_TEAM)
                 ?: return super.onCreateDialog(savedInstanceState)
 
         val binding: FragmentFavoriteTeamConfirmBinding =
@@ -34,7 +34,7 @@ class FavoriteTeamConfirmFragment : DialogFragment() {
     }
 
     companion object {
-        private const val ARG_FAVORITE_TEAM = "favorite_team"
+        private const val KEY_FAVORITE_TEAM = "favorite_team"
         const val KEY_REQUEST_SUCCESS = "success"
         const val KEY_CONFIRM = "confirm"
 
@@ -42,7 +42,7 @@ class FavoriteTeamConfirmFragment : DialogFragment() {
             FavoriteTeamConfirmFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putParcelable(ARG_FAVORITE_TEAM, favoriteTeam)
+                        putParcelable(KEY_FAVORITE_TEAM, favoriteTeam)
                     }
             }
     }
