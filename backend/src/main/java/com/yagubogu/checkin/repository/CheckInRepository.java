@@ -111,6 +111,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE c.member = :member
                   AND (g.homeTeam = :team OR g.awayTeam = :team)
                   AND YEAR(g.date) = :year
+                  AND g.gameState = 'COMPLETED'
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
