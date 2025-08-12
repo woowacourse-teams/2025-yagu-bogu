@@ -4,7 +4,9 @@ import com.yagubogu.data.datasource.CheckInsDataSource
 import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
+import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
@@ -30,5 +32,12 @@ class CheckInsDefaultRepository(
                 fanRateResponse.fanRateByGames.map { fanRateByGameDto: FanRateByGameDto ->
                     fanRateByGameDto.toPresentation()
                 }
+            }
+
+    override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking> =
+        checkInsDataSource
+            .getVictoryFairyRankings()
+            .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
+                victoryFairyRankingResponse.toPresentation()
             }
 }

@@ -41,7 +41,8 @@
             app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
             app:strokeColor="@color/gray300"
             app:strokeWidth="1dp"
-            tools:src="@drawable/ic_launcher_background" />
+            app:userProfileImage="@{victoryFairyItem.profileImageUrl}"
+            tools:src="@drawable/ic_user" />
 
         <TextView
             android:id="@+id/tv_nickname"
