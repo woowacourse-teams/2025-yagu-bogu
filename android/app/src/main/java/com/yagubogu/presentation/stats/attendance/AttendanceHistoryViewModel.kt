@@ -19,10 +19,6 @@ class AttendanceHistoryViewModel(
         fetchAttendanceHistoryItems(2025, "ALL")
     }
 
-    fun clearAttendanceHistoryItems() {
-        _attendanceHistoryItems.value = emptyList()
-    }
-
     fun fetchAttendanceHistoryItems(
         year: Int,
         result: String,

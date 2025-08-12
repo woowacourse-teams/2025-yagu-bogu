@@ -72,15 +72,8 @@ class AttendanceHistoryFragment : Fragment() {
                         id: Long,
                     ) {
                         when (position) {
-                            0 -> {
-                                viewModel.clearAttendanceHistoryItems()
-                                viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_ALL)
-                            }
-
-                            1 -> {
-                                viewModel.clearAttendanceHistoryItems()
-                                viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_WIN)
-                            }
+                            0 -> viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_ALL)
+                            1 -> viewModel.fetchAttendanceHistoryItems(2025, RESULT_TYPE_WIN)
                         }
                     }
 
@@ -90,10 +83,10 @@ class AttendanceHistoryFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { attendanceHistoryItems: List<AttendanceHistoryItem> ->
-            attendanceHistoryAdapter.submitList(attendanceHistoryItems)
+        viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
+            attendanceHistoryAdapter.submitList(value)
             binding.tvEmptyHistory.visibility =
-                if (attendanceHistoryItems.isEmpty()) View.VISIBLE else View.GONE
+                if (value.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
