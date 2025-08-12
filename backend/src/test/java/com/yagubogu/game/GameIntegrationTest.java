@@ -48,7 +48,7 @@ public class GameIntegrationTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        accessToken = TestSupport.getAccessToken(ID_TOKEN);
+        accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
     }
 
     @DisplayName("경기하고 있는 모든 구장, 팀을 조회한다")
