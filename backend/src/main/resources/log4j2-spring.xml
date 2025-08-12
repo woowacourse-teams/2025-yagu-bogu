@@ -3,13 +3,17 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] - %msg%n"/>
+            <PatternLayout
+                    disableAnsi="false"
+                    noConsoleNoAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] - %msg%n"/>
         </Console>
 
         <RollingFile name="ProdFile" fileName="/var/log/yagubogu/prod.log"
                      filePattern="/var/log/yagubogu/prod-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green}] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>
@@ -20,7 +24,8 @@
         <RollingFile name="DevFile" fileName="/var/log/yagubogu/dev.log"
                      filePattern="/var/log/yagubogu/dev-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{traceId}] [%X{method} %X{uri}] [%X{controller}.%X{action}] [%X{clientIp}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>
@@ -30,7 +35,9 @@
 
         <RollingFile name="LocalFile" fileName="log/local.log"
                      filePattern="log/local-%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] [%X{traceId}] - %msg%n"/>
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%thread] [%X{traceId}] - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="10MB"/>
