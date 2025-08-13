@@ -80,41 +80,41 @@ class StatServiceTest {
         Team SS = teamRepository.findByTeamCode("SS").orElseThrow();
         Member member = memberFactory.save(b -> b.team(HT));
 
-        Stadium KIA = stadiumRepository.findById(5L).orElseThrow();
-        Stadium SAM = stadiumRepository.findById(6L).orElseThrow();
-        Stadium LOT = stadiumRepository.findById(9L).orElseThrow();
+        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
+        Stadium sam = stadiumRepository.findById(6L).orElseThrow();
+        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 16))
                 .homeScore(10).awayScore(9)
                 .gameState(GameState.COMPLETED));
 
-        Game g2 = gameFactory.save(b -> b.stadium(LOT)
+        Game g2 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 17))
                 .homeScore(5).awayScore(10)
                 .gameState(GameState.COMPLETED));
 
-        Game g3 = gameFactory.save(b -> b.stadium(KIA)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(SS)
                 .date(LocalDate.of(2025, 7, 18))
                 .homeScore(9).awayScore(4)
                 .gameState(GameState.COMPLETED));
 
-        Game g4 = gameFactory.save(b -> b.stadium(SAM)
+        Game g4 = gameFactory.save(b -> b.stadium(sam)
                 .homeTeam(SS).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 19))
                 .homeScore(3).awayScore(8)
                 .gameState(GameState.COMPLETED));
 
-        Game g5 = gameFactory.save(b -> b.stadium(KIA)
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 20))
                 .homeScore(7).awayScore(6)
                 .gameState(GameState.COMPLETED));
 
-        Game g6 = gameFactory.save(b -> b.stadium(LOT)
+        Game g6 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 21))
                 .homeScore(5).awayScore(5)
@@ -149,9 +149,9 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium LOT = stadiumRepository.findById(9L).orElseThrow();
+        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
 
-        Game drawGame = gameFactory.save(b -> b.stadium(LOT)
+        Game drawGame = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 21))
                 .homeScore(5).awayScore(5)
@@ -181,9 +181,9 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium LOT = stadiumRepository.findById(9L).orElseThrow();
+        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
 
-        Game drawGame = gameFactory.save(b -> b.stadium(LOT)
+        Game drawGame = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 21))
                 .homeScore(4).awayScore(5)
@@ -242,44 +242,44 @@ class StatServiceTest {
 
         Member member = memberFactory.save(b -> b.team(HT));
 
-        Stadium KIA = stadiumRepository.findById(5L).orElseThrow();
-        Stadium LOT = stadiumRepository.findById(9L).orElseThrow();
-        Stadium SAM = stadiumRepository.findById(6L).orElseThrow();
+        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
+        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
+        Stadium sam = stadiumRepository.findById(6L).orElseThrow();
 
         // 챔피언스필드: 3승 0패
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
                 .gameState(GameState.COMPLETED));
 
-        Game g2 = gameFactory.save(b -> b.stadium(KIA)
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(SS)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(7).awayScore(3)
                 .gameState(GameState.COMPLETED));
 
-        Game g3 = gameFactory.save(b -> b.stadium(KIA)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(4)
                 .gameState(GameState.COMPLETED));
 
         // 사직구장: 1승 1패
-        Game g4 = gameFactory.save(b -> b.stadium(LOT)
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(4).awayScore(6) // 승
                 .gameState(GameState.COMPLETED));
 
-        Game g5 = gameFactory.save(b -> b.stadium(LOT)
+        Game g5 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(7).awayScore(3) // 패
                 .gameState(GameState.COMPLETED));
 
         // 라이온즈파크: 1승 0패
-        Game g6 = gameFactory.save(b -> b.stadium(SAM)
+        Game g6 = gameFactory.save(b -> b.stadium(sam)
                 .homeTeam(SS).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 15))
                 .homeScore(2).awayScore(5) // 승
@@ -309,12 +309,12 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
 
         Member member = memberFactory.save(b -> b.team(HT));
-        Stadium KIA = stadiumRepository.findById(5L).orElseThrow();
+        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
-                .homeScore(6).awayScore(3) // KIA 승
+                .homeScore(6).awayScore(3) // kia 승
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.game(g1).member(member).team(HT));
@@ -334,8 +334,8 @@ class StatServiceTest {
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium KIA = stadiumRepository.findById(5L).orElseThrow();
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(6).awayScore(3)

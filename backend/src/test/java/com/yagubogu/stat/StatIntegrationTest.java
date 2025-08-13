@@ -67,65 +67,65 @@ public class StatIntegrationTest {
 
     private String accessToken;
 
-    private Team HT, LT, SS;
-    private Stadium KIA, LOT, SAM;
+    private Team ht, lt, ss;
+    private Stadium kia, lot, sam;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        HT = teamRepository.findByTeamCode("HT").orElseThrow();
-        LT = teamRepository.findByTeamCode("LT").orElseThrow();
-        SS = teamRepository.findByTeamCode("SS").orElseThrow();
+        ht = teamRepository.findByTeamCode("HT").orElseThrow();
+        lt = teamRepository.findByTeamCode("LT").orElseThrow();
+        ss = teamRepository.findByTeamCode("SS").orElseThrow();
 
-        KIA = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
-        LOT = stadiumRepository.findByShortName("사직구장").orElseThrow();
-        SAM = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
+        kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
     }
 
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
     @Test
     void findStatCounts() {
-        // given: HT 즐겨찾기 멤버 + 2025년 6경기(HT 기준 5승 1무) + 체크인 6건
-        Member member = memberFactory.save(b -> b.team(HT));
+        // given: ht 즐겨찾기 멤버 + 2025년 6경기(ht 기준 5승 1무) + 체크인 6건
+        Member member = memberFactory.save(b -> b.team(ht));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 16))
                 .homeScore(10).awayScore(9)
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(LOT)
-                .homeTeam(LT).awayTeam(HT)
+        Game g2 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 17))
                 .homeScore(5).awayScore(10)
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(SS)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
                 .date(LocalDate.of(2025, 7, 18))
                 .homeScore(9).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        Game g4 = gameFactory.save(b -> b.stadium(SAM)
-                .homeTeam(SS).awayTeam(HT)
+        Game g4 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 19))
                 .homeScore(3).awayScore(8)
                 .gameState(GameState.COMPLETED));
-        Game g5 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 20))
                 .homeScore(7).awayScore(6)
                 .gameState(GameState.COMPLETED));
-        Game g6 = gameFactory.save(b -> b.stadium(LOT)
-                .homeTeam(LT).awayTeam(HT)
+        Game g6 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 21))
                 .homeScore(5).awayScore(5)
                 .gameState(GameState.COMPLETED)); // 무
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g4).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g5).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g6).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
 
         // when
         StatCountsResponse actual = RestAssured.given().log().all()
@@ -145,47 +145,47 @@ public class StatIntegrationTest {
     @DisplayName("직관 승률을 조회한다")
     @Test
     void findWinRate() {
-        // given: HT 즐겨찾기 멤버 + 2025년 6경기(5승 1패) + 체크인 6건 → 83.3%
-        Member member = memberFactory.save(b -> b.team(HT));
+        // given: ht 즐겨찾기 멤버 + 2025년 6경기(5승 1패) + 체크인 6건 → 83.3%
+        Member member = memberFactory.save(b -> b.team(ht));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(SS)
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(7).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        Game g4 = gameFactory.save(b -> b.stadium(LOT)
-                .homeTeam(LT).awayTeam(HT)
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(4).awayScore(6)
                 .gameState(GameState.COMPLETED)); // 승
-        Game g5 = gameFactory.save(b -> b.stadium(LOT)
-                .homeTeam(LT).awayTeam(HT)
+        Game g5 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(7).awayScore(3)
                 .gameState(GameState.COMPLETED)); // 패
-        Game g6 = gameFactory.save(b -> b.stadium(SAM)
-                .homeTeam(SS).awayTeam(HT)
+        Game g6 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 15))
                 .homeScore(2).awayScore(5)
                 .gameState(GameState.COMPLETED)); // 승
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g4).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g5).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g6).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
 
         // when
         WinRateResponse actual = RestAssured.given().log().all()
@@ -221,17 +221,17 @@ public class StatIntegrationTest {
     @Test
     void findLuckyStadium() {
         // given: 챔피언스필드에서 최소 1승
-        Member member = memberFactory.save(b -> b.team(HT));
+        Member member = memberFactory.save(b -> b.team(ht));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(6).awayScore(3)
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.game(g1)
                 .member(member)
-                .team(HT));
+                .team(ht));
 
         // when
         LuckyStadiumResponse actual = RestAssured.given().log().all()
@@ -252,33 +252,33 @@ public class StatIntegrationTest {
     @Test
     void findAverageStatistic() {
         // given: 3경기 간단 시드(서비스에서 소수1자리 반올림 가정 → 7.7, 5.3, 0.3, 12.0, 9.0)
-        Member member = memberFactory.save(b -> b.team(HT));
+        Member member = memberFactory.save(b -> b.team(ht));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
                 .homeScoreBoard(new ScoreBoard(8, 12, 0, 0))
                 .awayScoreBoard(new ScoreBoard(5, 9, 1, 0))
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(KIA).homeTeam(LT).awayTeam(HT)
+        Game g2 = gameFactory.save(b -> b.stadium(kia).homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(4).awayScore(10)
                 .homeScoreBoard(new ScoreBoard(4, 8, 0, 0))
                 .awayScoreBoard(new ScoreBoard(10, 13, 0, 0))
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(KIA)
-                .homeTeam(HT).awayTeam(LT)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(7)
                 .homeScoreBoard(new ScoreBoard(5, 11, 1, 0))
                 .awayScoreBoard(new ScoreBoard(7, 10, 0, 0))
                 .gameState(GameState.COMPLETED));
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
-        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
 
         // when
         AverageStatisticResponse actual = RestAssured.given().log().all()
