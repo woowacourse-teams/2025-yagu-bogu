@@ -34,6 +34,6 @@ class LivetalkViewModel(
     }
 
     companion object {
-        private val DATE = LocalDate.of(2025, 7, 25) // TODO: LocalDate.now()로 변경
+        private val DATE = LocalDate.now()
     }
 }
