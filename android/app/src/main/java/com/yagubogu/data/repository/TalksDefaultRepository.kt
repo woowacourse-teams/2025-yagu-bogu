@@ -1,8 +1,8 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.TalksDataSource
-import com.yagubogu.data.dto.response.talks.ContentDto
-import com.yagubogu.data.dto.response.talks.TalkResponse
+import com.yagubogu.data.dto.response.talks.TalkCursorResponse
+import com.yagubogu.data.dto.response.talks.TalkDto
 import com.yagubogu.domain.repository.TalksRepository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
@@ -20,7 +20,7 @@ class TalksDefaultRepository(
                 gameId = gameId,
                 before = before,
                 limit = limit,
-            ).map { talksResponse: TalkResponse ->
+            ).map { talksResponse: TalkCursorResponse ->
                 talksResponse.toPresentation()
             }
 
@@ -34,7 +34,7 @@ class TalksDefaultRepository(
                 .getLatestTalks(
                     gameId = gameId,
                     limit = limit,
-                ).map { talksResponse: TalkResponse ->
+                ).map { talksResponse: TalkCursorResponse ->
                     talksResponse.toPresentation()
                 }
         } else {
@@ -43,7 +43,7 @@ class TalksDefaultRepository(
                     gameId = gameId,
                     after = after,
                     limit = limit,
-                ).map { talksResponse: TalkResponse ->
+                ).map { talksResponse: TalkCursorResponse ->
                     talksResponse.toPresentation()
                 }
         }
@@ -57,7 +57,7 @@ class TalksDefaultRepository(
             .postTalks(
                 gameId = gameId,
                 content = content,
-            ).map { contentDto: ContentDto ->
-                contentDto.toPresentation()
+            ).map { talkDto: TalkDto ->
+                talkDto.toPresentation()
             }
 }
