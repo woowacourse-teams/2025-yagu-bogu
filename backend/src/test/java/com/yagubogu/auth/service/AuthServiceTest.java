@@ -1,5 +1,8 @@
 package com.yagubogu.auth.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
@@ -14,6 +17,9 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.TestFixture;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.refreshtoken.RefreshTokenFactory;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +28,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DataJpaTest
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
-})
 @Import(AuthTestConfig.class)
 class AuthServiceTest {
 
@@ -53,6 +52,12 @@ class AuthServiceTest {
 
     @Autowired
     private AuthTokenProperties authTokenProperties;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private RefreshTokenFactory refreshTokenFactory;
 
     @BeforeEach
     void setUp() {
@@ -83,10 +88,9 @@ class AuthServiceTest {
     @Test
     void refreshToken() {
         // given
-        String refreshTokenId = "id";
-        Member member = memberRepository.findById(1L).orElseThrow();
-        RefreshToken refreshToken = new RefreshToken(refreshTokenId, member, TestFixture.getAfter60Minutes());
-        refreshTokenRepository.save(refreshToken);
+        Member member = memberFactory.save(MemberBuilder::build);
+        RefreshToken refreshToken = refreshTokenFactory.save(builder -> builder.member(member));
+        String refreshTokenId = refreshToken.getId();
 
         // when
         TokenResponse response = authService.refreshToken(refreshTokenId);
@@ -111,18 +115,39 @@ class AuthServiceTest {
                 .hasMessage("Refresh token not exist");
     }
 
-    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @DisplayName("예외: refresh token이 만료되었으면 예외가 발생한다")
     @Test
-    void refresh_Token_tokenInvalid() {
+    void refresh_Token_tokenExpired() {
         // given
-        String refreshTokenId = "expired-token";
         Instant expiresAt = Instant.now().minusSeconds(10);
-        Member member = memberRepository.findById(1L).orElseThrow();
-        RefreshToken expiredToken = new RefreshToken(refreshTokenId, member, expiresAt);
-        refreshTokenRepository.save(expiredToken);
+        Member member = memberFactory.save(MemberBuilder::build);
+        RefreshToken expiredToken = refreshTokenFactory.save(
+                builder -> builder
+                        .member(member)
+                        .expiresAt(expiresAt)
+        );
+        String expiredTokenId = expiredToken.getId();
 
         // when & then
-        assertThatThrownBy(() -> authService.refreshToken(refreshTokenId))
+        assertThatThrownBy(() -> authService.refreshToken(expiredTokenId))
+                .isExactlyInstanceOf(UnAuthorizedException.class)
+                .hasMessage("Refresh token is invalid or expired");
+    }
+
+    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @Test
+    void refresh_Token_tokenRevoked() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        RefreshToken revokedToken = refreshTokenFactory.save(
+                builder -> builder.member(member)
+                        .expiresAt(TestFixture.getAfter60Minutes())
+                        .isRevoked(true)
+        );
+        String revokedTokenId = revokedToken.getId();
+
+        // when & then
+        assertThatThrownBy(() -> authService.refreshToken(revokedTokenId))
                 .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Refresh token is invalid or expired");
     }

@@ -9,6 +9,7 @@ public class RefreshTokenBuilder {
 
     private Member member;
     private Instant expiresAt = TestFixture.getAfter60Minutes();
+    private Boolean isRevoked = false;
 
     public RefreshTokenBuilder member(final Member member) {
         this.member = member;
@@ -22,7 +23,18 @@ public class RefreshTokenBuilder {
         return this;
     }
 
+    public RefreshTokenBuilder isRevoked(final Boolean isRevoked) {
+        this.isRevoked = isRevoked;
+
+        return this;
+    }
+
     public RefreshToken build() {
-        return RefreshToken.generate(member, expiresAt);
+        RefreshToken refreshToken = RefreshToken.generate(member, expiresAt);
+        if (this.isRevoked) {
+            refreshToken.revoke();
+        }
+
+        return refreshToken;
     }
 }
