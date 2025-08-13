@@ -11,8 +11,6 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
-import com.yagubogu.presentation.stats.attendance.AttendanceHistoryFilter.ALL
-import com.yagubogu.presentation.stats.attendance.AttendanceHistoryFilter.WIN
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {
@@ -74,9 +72,12 @@ class AttendanceHistoryFragment : Fragment() {
                         position: Int,
                         id: Long,
                     ) {
-                        when (AttendanceHistoryFilter.entries[position]) {
-                            ALL -> viewModel.fetchAttendanceHistoryItems(filter = ALL)
-                            WIN -> viewModel.fetchAttendanceHistoryItems(filter = WIN)
+                        when (val filter = AttendanceHistoryFilter.entries[position]) {
+                            AttendanceHistoryFilter.ALL ->
+                                viewModel.fetchAttendanceHistoryItems(filter = filter)
+
+                            AttendanceHistoryFilter.WIN ->
+                                viewModel.fetchAttendanceHistoryItems(filter = filter)
                         }
                     }
 
