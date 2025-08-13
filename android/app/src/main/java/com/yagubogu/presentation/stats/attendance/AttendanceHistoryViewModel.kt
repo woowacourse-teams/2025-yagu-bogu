@@ -17,7 +17,7 @@ class AttendanceHistoryViewModel(
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> get() = _attendanceHistoryItems
 
     init {
-        fetchAttendanceHistoryItems(2025, AttendanceHistoryFilter.ALL)
+        fetchAttendanceHistoryItems()
     }
 
     fun fetchAttendanceHistoryItems(
