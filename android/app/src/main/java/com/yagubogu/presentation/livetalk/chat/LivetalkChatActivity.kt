@@ -36,8 +36,6 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupListener() {
-        viewModel.startChatPolling()
-
         binding.ivArrowLeft.setOnClickListener {
             finish()
         }
@@ -50,18 +48,9 @@ class LivetalkChatActivity : AppCompatActivity() {
                     dy: Int,
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
-                    // 스크롤을 위로 올렸고, 리스트의 최상단에 도달했으며, 로딩 중이 아닐 때
+                    // 스크롤이 최상단에 도달했을 때만 과거 메시지 로드
                     if (!recyclerView.canScrollVertically(-1)) {
-                        if (viewModel.isLoading.value == false) {
-                            viewModel.fetchBeforeTalks()
-                        }
-                    }
-                    // 스크롤을 아래로 내려 최하단에 도달하면 폴링 시작
-                    if (!recyclerView.canScrollVertically(1)) {
-                        viewModel.startChatPolling()
-                    } else {
-                        // 최하단이 아니면 폴링 중지
-                        viewModel.stopChatPolling()
+                        viewModel.fetchBeforeTalks()
                     }
                 }
             },
@@ -105,8 +94,13 @@ class LivetalkChatActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+        viewModel.startChatPolling()
+    }
+
+    override fun onPause() {
+        super.onPause()
         viewModel.stopChatPolling()
     }
 
