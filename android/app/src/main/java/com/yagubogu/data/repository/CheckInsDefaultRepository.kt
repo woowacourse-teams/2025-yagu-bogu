@@ -5,9 +5,11 @@ import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
+import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
 import java.time.LocalDate
 
 class CheckInsDefaultRepository(
@@ -39,5 +41,15 @@ class CheckInsDefaultRepository(
             .getVictoryFairyRankings()
             .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
                 victoryFairyRankingResponse.toPresentation()
+            }
+
+    override suspend fun getCheckInHistories(
+        year: Int,
+        filter: String,
+    ): Result<List<AttendanceHistoryItem>> =
+        checkInsDataSource
+            .getCheckInHistories(year, filter)
+            .map { checkInHistoryResponse: CheckInHistoryResponse ->
+                checkInHistoryResponse.checkInHistory.map { it.toPresentation() }
             }
 }
