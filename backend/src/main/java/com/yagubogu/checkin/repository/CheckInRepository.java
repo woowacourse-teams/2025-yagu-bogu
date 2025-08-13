@@ -124,15 +124,26 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                     ci.member.nickname,
                     ci.member.imageUrl,
                     ci.member.team.shortName,
-                    COUNT(ci),
+                    COUNT(
+                        CASE
+                            WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id
+                            THEN 1
+                        END
+                    ),
                     ROUND(
                         (1.0 * SUM(
                             CASE
                                 WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
                                     OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
                                 THEN 1 ELSE 0
-                                END
-                        ) / COUNT(ci)) * 100, 1
+                            END
+                        ) /
+                        COUNT(
+                            CASE
+                                WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id
+                                THEN 1
+                            END
+                        )) * 100, 1
                     )
                 )
                 from CheckIn ci
