@@ -1,17 +1,30 @@
 package com.yagubogu.game;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.support.AuthTokenProvider;
+import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.checkin.CheckInFactory;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +37,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
@@ -43,6 +54,21 @@ public class GameIntegrationTest {
     @Autowired
     private AuthTokenProvider authTokenProvider;
 
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
+    @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private CheckInFactory checkInFactory;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
     private String accessToken;
 
     @BeforeEach
@@ -55,30 +81,30 @@ public class GameIntegrationTest {
     @Test
     void findGamesByDate() {
         // given
-        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
         LocalDate date = TestFixture.getToday();
+
+        Game game1 = makeGame(date, "HT", "LT", "잠실구장");
+        Game game2 = makeGame(date, "WO", "HH", "고척돔");
+        Game game3 = makeGame(date, "SK", "SS", "랜더스필드");
+
+        Team team = getTeamByCode("SS");
+        Member member = makeMember(team);
+        accessToken = TestSupport.getAccessTokenByMemberId(member.getId(), authTokenProvider);
+
+        // game1 등록
+        makeCheckIn(game1, team, member);
+        makeCheckIns(game1, team, 2);
+
+        // game2 등록
+        makeCheckIns(game2, team, 4);
+
+        // game3
+        makeCheckIns(game3, team, 5);
+
         List<GameWithCheckIn> expected = List.of(
-                new GameWithCheckIn(
-                        1L,
-                        3L,
-                        true,
-                        new StadiumByGame(1L, "잠실 야구장"),
-                        new TeamByGame(1L, "기아", "HT"),
-                        new TeamByGame(2L, "롯데", "LT")),
-                new GameWithCheckIn(
-                        8L,
-                        4L,
-                        true,
-                        new StadiumByGame(2L, "고척 스카이돔"),
-                        new TeamByGame(3L, "삼성", "SS"),
-                        new TeamByGame(4L, "두산", "OB")),
-                new GameWithCheckIn(
-                        9L,
-                        4L,
-                        false,
-                        new StadiumByGame(3L, "인천 SSG 랜더스필드"),
-                        new TeamByGame(5L, "LG", "LG"),
-                        new TeamByGame(6L, "KT", "KT"))
+                toDto(game1, 3L, true),
+                toDto(game2, 4L, false),
+                toDto(game3, 5L, false)
         );
 
         // when
@@ -100,7 +126,9 @@ public class GameIntegrationTest {
     @Test
     void findGamesByDate_WhenDateIsInFuture() {
         // given
-        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
+        Team team = getTeamByCode("SS");
+        Member member = makeMember(team);
+        accessToken = TestSupport.getAccessTokenByMemberId(member.getId(), authTokenProvider);
         LocalDate invalidDate = LocalDate.of(3000, 12, 12);
 
         // when & then
@@ -111,5 +139,60 @@ public class GameIntegrationTest {
                 .when().get("/api/games")
                 .then().log().all()
                 .statusCode(422);
+    }
+
+    private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
+        Team homeTeam = getTeamByCode(homeCode);
+        Team awayTeam = getTeamByCode(awayCode);
+        Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+        return gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(date)
+        );
+    }
+
+
+    private void makeCheckIns(Game game, Team team, int count) {
+        makeMembers(count, team).forEach(member ->
+                makeCheckIn(game, team, member)
+        );
+    }
+
+    private CheckIn makeCheckIn(final Game game, final Team team, final Member member) {
+        return checkInFactory.save(builder -> builder
+                .game(game)
+                .member(member)
+                .team(team)
+        );
+    }
+
+    private List<Member> makeMembers(int n, Team team) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> makeMember(team))
+                .toList();
+    }
+
+    private Member makeMember(Team team) {
+        return memberFactory.save(b -> b.team(team));
+    }
+
+
+    private Team getTeamByCode(String code) {
+        return teamRepository.findByTeamCode(code).orElseThrow();
+    }
+
+    private GameWithCheckIn toDto(Game game, Long totalCheckIns, boolean isMine) {
+        return new GameWithCheckIn(
+                game.getId(),
+                totalCheckIns,
+                isMine,
+                new StadiumByGame(game.getStadium().getId(), game.getStadium().getFullName()),
+                new TeamByGame(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
+                        game.getHomeTeam().getTeamCode()),
+                new TeamByGame(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
+                        game.getAwayTeam().getTeamCode())
+        );
     }
 }
