@@ -66,7 +66,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                       (c.member.team = c.game.awayTeam AND c.game.awayScore > c.game.homeScore)
                   )
             """)
-    int findWinCountsByStadiumAndMember(Stadium stadium, Member member, int year);
+    int countWinsFavoriteTeamByStadiumAndMember(Stadium stadium, Member member, int year);
 
     @Query("""
                 SELECT COUNT(c)
@@ -78,7 +78,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                       c.member.team = c.game.homeTeam OR c.member.team = c.game.awayTeam
                   )
             """)
-    int findFavoriteCheckInCountsByStadiumAndMember(Stadium stadium, Member member, int year);
+    int countTotalFavoriteTeamGamesByStadiumAndMember(Stadium stadium, Member member, int year);
 
     @Query("""
                 SELECT COUNT(c)
