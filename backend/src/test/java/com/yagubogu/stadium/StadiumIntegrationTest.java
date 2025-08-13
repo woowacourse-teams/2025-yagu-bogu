@@ -41,7 +41,6 @@ public class StadiumIntegrationTest {
         // when
         StadiumsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .queryParams("memberId", 1L, "year", 2025)
                 .when().get("/api/stadiums")
                 .then().log().all()
                 .statusCode(200)
