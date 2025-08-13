@@ -8,7 +8,7 @@ import java.time.LocalDate
 @Serializable
 data class CheckInGameDto(
     @SerialName("checkInId")
-    val checkInId: Int, // 직관 ID
+    val checkInId: Long, // 직관 ID
     @SerialName("stadiumFullName")
     val stadiumFullName: String, // 경기장 전체 이름
     @SerialName("homeTeam")
