@@ -1,14 +1,28 @@
 package com.yagubogu.stat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.support.AuthTokenProvider;
+import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.checkin.CheckInFactory;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +36,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -36,24 +48,86 @@ public class StatIntegrationTest {
     private int port;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
+    private AuthFactory authFactory;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private CheckInFactory checkInFactory;
+
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
 
     private String accessToken;
+
+    private Team HT, LT, SS;
+    private Stadium KIA, LOT, SAM;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        SS = teamRepository.findByTeamCode("SS").orElseThrow();
+
+        KIA = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        LOT = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        SAM = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
     }
 
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
     @Test
     void findStatCounts() {
-        // when
-        StatCountsResponse expected = new StatCountsResponse(5, 1, 0, 6);
+        // given: HT 즐겨찾기 멤버 + 2025년 6경기(HT 기준 5승 1무) + 체크인 6건
+        Member member = memberFactory.save(b -> b.team(HT));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        // given
+        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 16))
+                .homeScore(10).awayScore(9)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(LOT)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 17))
+                .homeScore(5).awayScore(10)
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(SS)
+                .date(LocalDate.of(2025, 7, 18))
+                .homeScore(9).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g4 = gameFactory.save(b -> b.stadium(SAM)
+                .homeTeam(SS).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 19))
+                .homeScore(3).awayScore(8)
+                .gameState(GameState.COMPLETED));
+        Game g5 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 20))
+                .homeScore(7).awayScore(6)
+                .gameState(GameState.COMPLETED));
+        Game g6 = gameFactory.save(b -> b.stadium(LOT)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 21))
+                .homeScore(5).awayScore(5)
+                .gameState(GameState.COMPLETED)); // 무
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g6).member(member).team(HT));
+
+        // when
         StatCountsResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
@@ -65,14 +139,53 @@ public class StatIntegrationTest {
                 .as(StatCountsResponse.class);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new StatCountsResponse(5, 1, 0, 6));
     }
 
     @DisplayName("직관 승률을 조회한다")
     @Test
     void findWinRate() {
-        // given
-        WinRateResponse expected = new WinRateResponse(83.3);
+        // given: HT 즐겨찾기 멤버 + 2025년 6경기(5승 1패) + 체크인 6건 → 83.3%
+        Member member = memberFactory.save(b -> b.team(HT));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(8).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(SS)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(5).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g4 = gameFactory.save(b -> b.stadium(LOT)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 13))
+                .homeScore(4).awayScore(6)
+                .gameState(GameState.COMPLETED)); // 승
+        Game g5 = gameFactory.save(b -> b.stadium(LOT)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 14))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+        Game g6 = gameFactory.save(b -> b.stadium(SAM)
+                .homeTeam(SS).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 15))
+                .homeScore(2).awayScore(5)
+                .gameState(GameState.COMPLETED)); // 승
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g6).member(member).team(HT));
 
         // when
         WinRateResponse actual = RestAssured.given().log().all()
@@ -86,13 +199,14 @@ public class StatIntegrationTest {
                 .as(WinRateResponse.class);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new WinRateResponse(83.3));
     }
 
     @DisplayName("예외: 관리자일 경우 직관 승률을 조회하면 예외가 발생한다")
     @Test
     void findWinRate_whenAdmin() {
-        accessToken = TestSupport.getAccessTokenByMemberId(4L, authTokenProvider);
+        Member admin = memberFactory.save(b -> b.role(Role.ADMIN));
+        accessToken = authFactory.getAccessTokenByMemberId(admin.getId(), Role.ADMIN);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -106,8 +220,18 @@ public class StatIntegrationTest {
     @DisplayName("행운의 구장을 조회한다")
     @Test
     void findLuckyStadium() {
-        // given
-        LuckyStadiumResponse expected = new LuckyStadiumResponse("챔피언스필드");
+        // given: 챔피언스필드에서 최소 1승
+        Member member = memberFactory.save(b -> b.team(HT));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(6).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1)
+                .member(member)
+                .team(HT));
 
         // when
         LuckyStadiumResponse actual = RestAssured.given().log().all()
@@ -121,21 +245,40 @@ public class StatIntegrationTest {
                 .as(LuckyStadiumResponse.class);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new LuckyStadiumResponse("챔피언스필드"));
     }
-
 
     @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
     @Test
     void findAverageStatistic() {
-        // given
-        AverageStatisticResponse expected = new AverageStatisticResponse(
-                9.0,
-                6.9,
-                0.3,
-                12.1,
-                9.4
-        );
+        // given: 3경기 간단 시드(서비스에서 소수1자리 반올림 가정 → 7.7, 5.3, 0.3, 12.0, 9.0)
+        Member member = memberFactory.save(b -> b.team(HT));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        Game g1 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(8).awayScore(5)
+                .homeScoreBoard(new ScoreBoard(8, 12, 0, 0))
+                .awayScoreBoard(new ScoreBoard(5, 9, 1, 0))
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(KIA).homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(4).awayScore(10)
+                .homeScoreBoard(new ScoreBoard(4, 8, 0, 0))
+                .awayScoreBoard(new ScoreBoard(10, 13, 0, 0))
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(KIA)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(5).awayScore(7)
+                .homeScoreBoard(new ScoreBoard(5, 11, 1, 0))
+                .awayScoreBoard(new ScoreBoard(7, 10, 0, 0))
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
 
         // when
         AverageStatisticResponse actual = RestAssured.given().log().all()
@@ -144,10 +287,9 @@ public class StatIntegrationTest {
                 .when().get("/api/stats/me")
                 .then().log().all()
                 .statusCode(200)
-                .extract()
-                .as(AverageStatisticResponse.class);
+                .extract().as(AverageStatisticResponse.class);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new AverageStatisticResponse(7.7, 5.3, 0.3, 12.0, 9.0));
     }
 }
