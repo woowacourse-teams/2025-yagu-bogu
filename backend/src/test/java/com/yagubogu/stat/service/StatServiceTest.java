@@ -27,7 +27,6 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
 @Import(AuthTestConfig.class)
 @DataJpaTest
@@ -80,9 +79,9 @@ class StatServiceTest {
         Team SS = teamRepository.findByTeamCode("SS").orElseThrow();
         Member member = memberFactory.save(b -> b.team(HT));
 
-        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
-        Stadium sam = stadiumRepository.findById(6L).orElseThrow();
-        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        Stadium sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
 
         Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
@@ -149,7 +148,7 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
 
         Game drawGame = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
@@ -181,7 +180,7 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
 
         Game drawGame = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
@@ -242,9 +241,9 @@ class StatServiceTest {
 
         Member member = memberFactory.save(b -> b.team(HT));
 
-        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
-        Stadium lot = stadiumRepository.findById(9L).orElseThrow();
-        Stadium sam = stadiumRepository.findById(6L).orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Stadium sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
 
         // 챔피언스필드: 3승 0패
         Game g1 = gameFactory.save(b -> b.stadium(kia)
@@ -309,7 +308,7 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
 
         Member member = memberFactory.save(b -> b.team(HT));
-        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
         Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
@@ -334,7 +333,7 @@ class StatServiceTest {
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(LT));
-        Stadium kia = stadiumRepository.findById(5L).orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
         Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
@@ -372,9 +371,9 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
 
         Member member = memberFactory.save(b -> b.team(HT));
-        Stadium kiaStadium = stadiumRepository.findById(5L).orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
-        Game g1 = gameFactory.save(b -> b.stadium(kiaStadium)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
@@ -382,7 +381,7 @@ class StatServiceTest {
                 .awayScoreBoard(new ScoreBoard(5, 9, 1, 0))
                 .gameState(GameState.COMPLETED));
 
-        Game g2 = gameFactory.save(b -> b.stadium(kiaStadium)
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(4).awayScore(10)
@@ -390,7 +389,7 @@ class StatServiceTest {
                 .awayScoreBoard(new ScoreBoard(10, 13, 0, 0))
                 .gameState(GameState.COMPLETED));
 
-        Game g3 = gameFactory.save(b -> b.stadium(kiaStadium)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(7)
@@ -406,7 +405,7 @@ class StatServiceTest {
         AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
 
         // then
-        SoftAssertions.assertSoftly(softly -> {
+        assertSoftly(softly -> {
             softly.assertThat(actual.averageRun()).isEqualTo(7.7);
             softly.assertThat(actual.concededRuns()).isEqualTo(5.3);
             softly.assertThat(actual.averageErrors()).isEqualTo(0.3);

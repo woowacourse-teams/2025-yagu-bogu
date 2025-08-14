@@ -38,7 +38,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
