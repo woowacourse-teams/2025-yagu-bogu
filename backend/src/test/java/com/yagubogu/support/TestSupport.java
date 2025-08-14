@@ -23,21 +23,14 @@ public class TestSupport {
                 .as(LoginResponse.class);
     }
 
-    public static String getAccessToken(String idToken) {
+    public static String getAccessTokenByMemberId(String idToken) {
         return BEARER + loginResponse(idToken).accessToken();
     }
 
     public static String getAccessTokenByMemberId(long memberId, AuthTokenProvider jwtProvider) {
-        Role role = getRoleByMemberId(memberId);
-        MemberClaims claims = new MemberClaims(memberId, role);
+        MemberClaims claims = new MemberClaims(memberId, Role.USER);
         String jwt = jwtProvider.createAccessToken(claims);
-        return BEARER + jwt;
-    }
 
-    private static Role getRoleByMemberId(long memberId) {
-        if (memberId == 4L) {
-            return Role.ADMIN;
-        }
-        return Role.USER;
+        return BEARER + jwt;
     }
 }

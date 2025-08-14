@@ -1,5 +1,11 @@
 package com.yagubogu.game.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
+import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
@@ -11,8 +17,11 @@ import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
+import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,16 +33,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
+@Import(AuthTestConfig.class)
 @DataJpaTest
 class GameScheduleSyncServiceTest {
 
@@ -48,6 +54,9 @@ class GameScheduleSyncServiceTest {
 
     @Autowired
     private StadiumRepository stadiumRepository;
+
+    @Autowired
+    private GameFactory gameFactory;
 
     @Mock
     private KboGameSyncClient kboGameSyncClient;
@@ -141,6 +150,7 @@ class GameScheduleSyncServiceTest {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721OBLG0";
+        Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
@@ -160,7 +170,6 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
         SoftAssertions.assertSoftly((softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
             softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
@@ -174,6 +183,7 @@ class GameScheduleSyncServiceTest {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
+        Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
@@ -185,7 +195,6 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.LIVE);
             softAssertions.assertThat(game.getHomeScore()).isNull();
@@ -199,6 +208,7 @@ class GameScheduleSyncServiceTest {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         String gameCode = "20250721LTSS0";
+        Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
@@ -210,7 +220,6 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        Game game = gameRepository.findByGameCode(gameCode).orElseThrow();
         SoftAssertions.assertSoftly(soft -> {
             soft.assertThat(game.getGameState()).isEqualTo(GameState.CANCELED);
             soft.assertThat(game.getHomeScore()).isNull();
@@ -236,5 +245,29 @@ class GameScheduleSyncServiceTest {
 
         // then
         assertThat(gameRepository.findByGameCode(unknownGameCode)).isEmpty();
+    }
+
+    private Game makeGame(
+            LocalDate date,
+            String homeCode,
+            String awayCode,
+            String stadiumShortName,
+            String gameCode
+    ) {
+        Team homeTeam = getTeamByCode(homeCode);
+        Team awayTeam = getTeamByCode(awayCode);
+        Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+
+        return gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(date)
+                .gameCode(gameCode)
+        );
+    }
+
+    private Team getTeamByCode(String code) {
+        return teamRepository.findByTeamCode(code).orElseThrow();
     }
 }

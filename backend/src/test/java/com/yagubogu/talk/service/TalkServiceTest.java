@@ -1,34 +1,68 @@
 package com.yagubogu.talk.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
+import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.ForbiddenException;
+import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.talk.TalkFactory;
+import com.yagubogu.support.talk.TalkReportFactory;
+import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:talk-test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
+@Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @DataJpaTest
 class TalkServiceTest {
 
     private TalkService talkService;
+
+    @Autowired
+    private TalkFactory talkFactory;
+
+    @Autowired
+    private TalkReportFactory talkReportFactory;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private TalkRepository talkRepository;
@@ -47,110 +81,152 @@ class TalkServiceTest {
         talkService = new TalkService(talkRepository, gameRepository, memberRepository, talkReportRepository);
     }
 
-    @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다")
+    @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다 - 다음 페이지가 없는 경우")
     @Test
-    void findTalks_firstPage() {
+    void findFirstPage_whenNoCursor_noNextPage() {
         // given
-        long gameId = 1L;
+        int limit = 10;
         Long cursorId = null;
-        int limit = 10;
-        long memberId = 1L;
+        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
 
-        String expectedStadiumName = "사직야구장";
-        String expectedHomeTeamName = "롯데";
-        String expectedAwayTeamName = "한화";
-        long expectedLatestTalkId = 52L;
-        long expectedMemberId = 2L;
-        String expectedImageUrl = "https://image.com/fivera.png";
-        Long expectedNextCursorId = 43L;
+        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team expectedAwayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(expectedHomeTeam)
+                .awayTeam(expectedAwayTeam)
+                .stadium(expectedStadium));
+
+        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
+        Talk expectedTalk = talkFactory.save(builder ->
+                builder.member(expectedMessageWriter)
+                        .game(game)
+        );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
-                memberId);
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
+                game.getId(),
+                cursorId,
+                limit,
+                firstEnterMember.getId()
+        );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
-            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
-            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadium.getFullName());
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeam.getShortName());
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeam.getShortName());
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedTalk.getId());
+            softAssertions.assertThat(actual.cursorResult().content().size()).isOne();
             softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
-                    .isEqualTo(expectedMemberId);
+                    .isEqualTo(expectedTalk.getMember().getId());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
-                    .isEqualTo(expectedImageUrl);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+                    .isEqualTo(expectedTalk.getMember().getImageUrl());
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+        });
+    }
+
+    @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다 - 다음 페이지가 있는 경우")
+    @Test
+    void findFirstPage_whenNoCursor_nextPageExists() {
+        // given
+        int limit = 1;
+        Long cursorId = null;
+        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
+
+        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team expectedAwayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(expectedHomeTeam)
+                .awayTeam(expectedAwayTeam)
+                .stadium(expectedStadium));
+
+        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
+        Talk expectedFirstPageTalk = talkFactory.save(builder ->
+                builder.member(expectedMessageWriter)
+                        .game(game)
+        );
+        Talk expectedSecondPageTalk = talkFactory.save(builder ->
+                builder.member(expectedMessageWriter)
+                        .game(game)
+        );
+
+        // when
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
+                game.getId(),
+                cursorId,
+                limit,
+                firstEnterMember.getId()
+        );
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadium.getFullName());
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeam.getShortName());
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeam.getShortName());
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
+                    .isEqualTo(expectedSecondPageTalk.getId());
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+                    .isEqualTo(expectedFirstPageTalk.getMember().getId());
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+                    .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedSecondPageTalk.getId());
             softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
         });
     }
 
-    @DisplayName("커서가 주어진 경우 해당 커서 다음 페이지를 조회한다")
+    @DisplayName("위로 슬라이드 하는 과정에서 이전 채팅 기록 가져오기")
     @Test
-    void findTalks_middlePage() {
+    void findFirstPage_whenCursorExists_returnsPreviousTalks() {
         // given
-        long gameId = 1L;
-        Long cursorId = 43L;
-        int limit = 10;
-        long memberId = 1L;
+        int limit = 1;
+        Long cursorId = null;
+        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
 
-        String expectedStadiumName = "사직야구장";
-        String expectedHomeTeamName = "롯데";
-        String expectedAwayTeamName = "한화";
-        long expectedLatestTalkId = 42L;
-        long expectedMemberId = 2L;
-        String expectedImageUrl = "https://image.com/fivera.png";
-        Long expectedNextCursorId = 33L;
+        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team expectedAwayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(expectedHomeTeam)
+                .awayTeam(expectedAwayTeam)
+                .stadium(expectedStadium));
+
+        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
+        Talk expectedFirstPageTalk = talkFactory.save(builder ->
+                builder.member(expectedMessageWriter)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(expectedMessageWriter)
+                        .game(game)
+        );
+
+        TalkCursorResult result = talkService.findTalksExcludingReported(
+                game.getId(),
+                cursorId,
+                limit,
+                firstEnterMember.getId()
+        );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
-                memberId);
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
+                game.getId(),
+                result.cursorResult().nextCursorId(),
+                limit,
+                firstEnterMember.getId()
+        );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
-            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
-            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadium.getFullName());
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeam.getShortName());
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeam.getShortName());
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
+                    .isEqualTo(expectedFirstPageTalk.getId());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
-                    .isEqualTo(expectedMemberId);
+                    .isEqualTo(expectedFirstPageTalk.getMember().getId());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
-                    .isEqualTo(expectedImageUrl);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
-        });
-    }
-
-    @DisplayName("마지막 페이지 조회 시 hasNext가 false이고 nextCursorId가 null이다")
-    @Test
-    void findTalks_lastPage() {
-        // given
-        long gameId = 1L;
-        Long cursorId = 3L;
-        int limit = 10;
-        long memberId = 1L;
-
-        String expectedStadiumName = "사직야구장";
-        String expectedHomeTeamName = "롯데";
-        String expectedAwayTeamName = "한화";
-        long expectedLatestTalkId = 2L;
-        long expectedMemberId = 2L;
-        String expectedImageUrl = "https://image.com/fivera.png";
-        Long expectedNextCursorId = null;
-
-        // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
-                memberId);
-
-        // then
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
-            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
-            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedLatestTalkId);
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
-                    .isEqualTo(expectedMemberId);
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
-                    .isEqualTo(expectedImageUrl);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+                    .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
             softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
@@ -159,17 +235,46 @@ class TalkServiceTest {
     @Test
     void findTalks_myTalk() {
         // given
-        long gameId = 1L;
-        Long cursorId = 43L;
-        int limit = 20;
-        long memberId = 1L;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+        Member other = memberFactory.save(builder -> builder.team(team));
 
-        long expectedMyTalkCount = 10L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+        Long cursorId = 5L;
+        int limit = 4;
+        long expectedMyTalkCount = 3L;
+
+        talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(gameId, cursorId, limit,
-                memberId);
-        long actualMyTalkCount = actual.cursorResult().content()
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
+                game.getId(),
+                cursorId,
+                limit,
+                me.getId()
+        );
+        long actualMyTalkCount = actual.cursorResult()
+                .content()
                 .stream()
                 .filter(TalkResponse::isMine)
                 .count();
@@ -184,28 +289,58 @@ class TalkServiceTest {
     @Test
     void findNewTalks_hasNewTalk() {
         // given
-        long gameId = 1L;
-        Long cursorId = 50L;
-        long memberId = 1L;
-        int limit = 10;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+        Member other = memberFactory.save(builder -> builder.team(team));
 
-        String expectedStadiumName = "사직야구장";
-        String expectedHomeTeamName = "롯데";
-        String expectedAwayTeamName = "한화";
-        long expectedLastTalkId = 52L;
-        Long expectedNextCursorId = 52L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Long cursorId = 2L;
+        int limit = 2;
+
+        talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
+        Talk thirdTalk = talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        Talk fourthTalk = talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when
-        TalkCursorResult actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
+        TalkCursorResult actual = talkService.findNewTalks(
+                game.getId(),
+                cursorId,
+                me.getId(),
+                limit
+        );
+
+        List<TalkResponse> expectedCursorResult = List.of(
+                TalkResponse.from(thirdTalk, me.getId()),
+                TalkResponse.from(fourthTalk, me.getId())
+        );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadiumName);
-            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(expectedHomeTeamName);
-            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(expectedAwayTeamName);
-            softAssertions.assertThat(actual.cursorResult().content()).hasSize(2);
-            softAssertions.assertThat(actual.cursorResult().content().getLast().id()).isEqualTo(expectedLastTalkId);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedNextCursorId);
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(stadium.getFullName());
+            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(homeTeam.getShortName());
+            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(awayTeam.getShortName());
+            softAssertions.assertThat(actual.cursorResult().content()).hasSize(expectedCursorResult.size());
+            softAssertions.assertThat(actual.cursorResult().content()).containsExactlyElementsOf(expectedCursorResult);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(fourthTalk.getId());
             softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
@@ -214,18 +349,30 @@ class TalkServiceTest {
     @Test
     void findNewTalks_hasNoNewTalk() {
         // given
-        long gameId = 1L;
-        Long cursorId = 52L;
-        long memberId = 1L;
-        int limit = 10;
+        int limit = 1;
+
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk fristTalk = talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
 
         // when
-        TalkCursorResult actual = talkService.findNewTalks(gameId, cursorId, memberId, limit);
+        TalkCursorResult actual = talkService.findNewTalks(game.getId(), fristTalk.getId(), me.getId(), limit);
 
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.cursorResult().content()).isEmpty();
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(cursorId);
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(fristTalk.getId());
             softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
@@ -234,19 +381,27 @@ class TalkServiceTest {
     @Test
     void createTalk() {
         // given
-        long gameId = 1L;
-        long memberId = 1L;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
         String content = "오늘 야구 재밌겠당";
         TalkRequest request = new TalkRequest(content);
 
         // when
-        TalkResponse response = talkService.createTalk(gameId, request, memberId);
+        TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());
 
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(response.content()).isEqualTo(content);
-            softAssertions.assertThat(response.memberId()).isEqualTo(memberId);
-            softAssertions.assertThat(response.id()).isEqualTo(53L);
+            softAssertions.assertThat(response.memberId()).isEqualTo(me.getId());
+            softAssertions.assertThat(response.id()).isEqualTo(1L);
         });
     }
 
@@ -254,13 +409,78 @@ class TalkServiceTest {
     @Test
     void createTalk_blockedFromStadium() {
         // given
-        long gameId = 1L;
-        long blockedMemberId = 2L;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member kindMember1 = memberFactory.save(MemberBuilder::build);
+        Member kindMember2 = memberFactory.save(MemberBuilder::build);
+        Member kindMember3 = memberFactory.save(MemberBuilder::build);
+        Member kindMember4 = memberFactory.save(MemberBuilder::build);
+        Member kindMember5 = memberFactory.save(MemberBuilder::build);
+        Member kindMember6 = memberFactory.save(MemberBuilder::build);
+        Member kindMember7 = memberFactory.save(MemberBuilder::build);
+        Member kindMember8 = memberFactory.save(MemberBuilder::build);
+        Member kindMember9 = memberFactory.save(MemberBuilder::build);
+        Member kindMember10 = memberFactory.save(MemberBuilder::build);
+
+        Member blockedMember = memberFactory.save(builder -> builder.team(team));
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk blockedTalk = talkFactory.save(builder ->
+                builder.member(blockedMember)
+                        .game(game)
+        );
+
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember1)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember2)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember3)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember4)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember5)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember6)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember7)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember8)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember9)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember10)
+        );
+
         String content = "오늘 야구 재밌겠당";
         TalkRequest request = new TalkRequest(content);
 
         // when & then
-        assertThatThrownBy(() -> talkService.createTalk(gameId, request, blockedMemberId))
+        assertThatThrownBy(() -> talkService.createTalk(game.getId(), request, blockedMember.getId()))
                 .isExactlyInstanceOf(ForbiddenException.class)
                 .hasMessage("Cannot chat due to multiple user reports");
     }
@@ -269,33 +489,49 @@ class TalkServiceTest {
     @Test
     void removeTalk() {
         // given
-        long gameId = 1L;
-        long talkId = 9L;
-        long memberId = 1L;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
 
-        // pre-condition check
-        assertThat(talkRepository.findById(talkId)).isPresent();
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk talk = talkFactory.save(builder ->
+                builder.member(member)
+                        .game(game)
+        );
 
         // when
-        talkService.removeTalk(gameId, talkId, memberId);
+        talkService.removeTalk(game.getId(), talk.getId(), member.getId());
 
         // then
-        assertThat(talkRepository.findById(talkId)).isNotPresent();
+        assertThat(talkRepository.findById(talk.getId())).isNotPresent();
     }
 
     @DisplayName("예외: 다른 사람이 작성한 톡을 삭제하려고 하면 예외가 발생한다")
     @Test
     void removeTalk_ByOtherUser() {
         // given
-        long gameId = 1L;
-        long talkId = 10L;
-        long memberId = 1L;
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+        Member other = memberFactory.save(builder -> builder.team(team));
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
 
-        // pre-condition check
-        assertThat(talkRepository.findById(talkId)).isPresent();
+        Talk myTalk = talkFactory.save(builder ->
+                builder.member(me)
+                        .game(game)
+        );
 
         // when & then
-        assertThatThrownBy(() -> talkService.removeTalk(gameId, talkId, memberId))
+        assertThatThrownBy(() -> talkService.removeTalk(game.getId(), myTalk.getId(), other.getId()))
                 .isExactlyInstanceOf(ForbiddenException.class)
                 .hasMessage("Invalid memberId for the talk");
     }

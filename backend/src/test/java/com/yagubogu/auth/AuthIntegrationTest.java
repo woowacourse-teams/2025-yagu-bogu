@@ -1,5 +1,7 @@
 package com.yagubogu.auth;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -7,10 +9,12 @@ import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
-import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.refreshtoken.RefreshTokenFactory;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.Instant;
@@ -25,14 +29,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
-})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AuthIntegrationTest {
@@ -44,10 +42,10 @@ public class AuthIntegrationTest {
     private int port;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberFactory memberFactory;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenFactory refreshTokenFactory;
 
     @BeforeEach
     void setUp() {
@@ -81,7 +79,6 @@ public class AuthIntegrationTest {
     void refresh() {
         // given
         LoginResponse loginResponse = TestSupport.loginResponse(ID_TOKEN);
-        String accessToken = BEARER + loginResponse.accessToken();
         String refreshToken = loginResponse.refreshToken();
 
         // when
@@ -106,7 +103,6 @@ public class AuthIntegrationTest {
     @Test
     void refresh_tokenNotFound() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
         String nonExistToken = "non-exist-token";
 
         // when & then
@@ -118,26 +114,41 @@ public class AuthIntegrationTest {
                 .statusCode(401);
     }
 
-    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @DisplayName("예외: refresh token이 만료되었으면 예외가 발생한다")
     @Test
-    void refresh_tokenInvalid() {
+    void refresh_tokenExpired() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
-        String expiredToken = "expired-token";
-        Member member = memberRepository.findById(1L).orElseThrow();
-
-        RefreshToken refreshToken = new RefreshToken(
-                expiredToken,
-                member,
-                Instant.now().minusSeconds(1)
-        );
-        refreshToken.revoke();
-        refreshTokenRepository.save(refreshToken);
+        Member member = memberFactory.save(MemberBuilder::build);
+        RefreshToken expiredRefreshToken = refreshTokenFactory.save(builder -> builder.member(member)
+                .expiresAt(Instant.now().minusSeconds(1)));
+        String expiredRefreshTokenId = expiredRefreshToken.getId();
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(expiredToken))
+                .body(new TokenRequest(expiredRefreshTokenId))
+                .when().post("/api/auth/refresh")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("예외: refresh token이 폐기되었으면 예외가 발생한다")
+    @Test
+    void refresh_tokenRevoked() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        RefreshToken revokedRefreshToken = refreshTokenFactory.save(
+                builder -> builder
+                        .member(member)
+                        .expiresAt(TestFixture.getAfter60Minutes())
+                        .isRevoked(true)
+        );
+        String revokedRefreshTokenId = revokedRefreshToken.getId();
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new TokenRequest(revokedRefreshTokenId))
                 .when().post("/api/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
@@ -147,8 +158,7 @@ public class AuthIntegrationTest {
     @Test
     void logout() {
         // given
-        String idToken = ID_TOKEN;
-        LoginResponse loginResponse = TestSupport.loginResponse(idToken);
+        LoginResponse loginResponse = TestSupport.loginResponse(ID_TOKEN);
         String accessToken = BEARER + loginResponse.accessToken();
         String refreshTokenId = loginResponse.refreshToken();
 
@@ -166,7 +176,7 @@ public class AuthIntegrationTest {
     @Test
     void logout_tokenNotFound() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
+        String accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
         String nonExistTokenId = "non-exist-token";
 
         // when & then
@@ -179,27 +189,50 @@ public class AuthIntegrationTest {
                 .statusCode(401);
     }
 
-    @DisplayName("예외: refresh token이 만료되었거나 폐기되었으면 예외가 발생한다")
+    @DisplayName("예외: refresh token이 만료되었으면 예외가 발생한다")
     @Test
-    void logout_tokenInvalid() {
+    void logout_tokenExpired() {
         // given
-        String accessToken = TestSupport.getAccessToken(ID_TOKEN);
-        String expiredTokenId = "expired-token";
-        Member member = memberRepository.findById(1L).orElseThrow();
+        String accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
+        Member member = memberFactory.save(MemberBuilder::build);
 
-        RefreshToken refreshToken = new RefreshToken(
-                expiredTokenId,
-                member,
-                Instant.now().minusSeconds(1)
+        RefreshToken refreshToken = refreshTokenFactory.save(
+                builder -> builder
+                        .expiresAt(Instant.now().minusSeconds(1))
+                        .member(member)
         );
-        refreshToken.revoke();
-        refreshTokenRepository.save(refreshToken);
+        String expiredTokenId = refreshToken.getId();
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new LogoutRequest(expiredTokenId))
+                .when().post("/api/auth/logout")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("예외: refresh token이 폐기되었으면 예외가 발생한다")
+    @Test
+    void logout_tokenRevoked() {
+        // given
+        String accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
+        Member member = memberFactory.save(MemberBuilder::build);
+
+        RefreshToken refreshToken = refreshTokenFactory.save(
+                builder -> builder
+                        .expiresAt(TestFixture.getAfter60Minutes())
+                        .member(member)
+                        .isRevoked(true)
+        );
+        String revokedTokenId = refreshToken.getId();
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new LogoutRequest(revokedTokenId))
                 .when().post("/api/auth/logout")
                 .then().log().all()
                 .statusCode(401);
