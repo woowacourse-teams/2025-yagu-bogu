@@ -319,6 +319,39 @@ class CheckInServiceTest {
         });
     }
 
+    @DisplayName("회원이 응원하는 팀의 경기를 한번도 관람하지 않은 경우 승률이 0이다")
+    @Test
+    void findVictoryFairyRankings_noFavoriteCheckIn() {
+        // given
+        Member por = memberFactory.save(b -> b.team(samsung).nickname("포르"));
+
+        LocalDate startDate = LocalDate.of(2025, 7, 21);
+        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate));
+        checkInFactory.save(builder -> builder
+                .team(samsung)
+                .member(por)
+                .game(game)
+        );
+
+        // when
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId());
+
+        // then
+        assertSoftly(softAssertions -> {
+                    softAssertions.assertThat(actual.topRankings())
+                            .extracting("nickname")
+                            .containsExactly("포르");
+                    softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
+                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("삼성");
+                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
+                }
+        );
+    }
+
+
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @Test
     void findCheckInStatus() {
