@@ -55,6 +55,8 @@ class LivetalkChatViewModel(
     }
 
     fun fetchBeforeTalks() {
+        if (!hasNext) return
+
         viewModelScope.launch {
             fetchLock.withLock {
                 val result =
@@ -135,6 +137,6 @@ class LivetalkChatViewModel(
 
     companion object {
         private const val POLLING_INTERVAL_MILLS = 10_000L
-        private const val CHAT_LOAD_LIMIT = 30
+        private const val CHAT_LOAD_LIMIT = 15
     }
 }
