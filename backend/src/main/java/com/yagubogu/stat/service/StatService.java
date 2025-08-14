@@ -58,11 +58,11 @@ public class StatService {
         double lowestWinRate = 0;
         Stadium luckyStadium = null;
         for (Stadium stadium : stadiums) {
-            int winCounts = checkInRepository.findWinCountsByStadiumAndMember(stadium, member, year);
-            int favoriteCheckInCounts = checkInRepository.findFavoriteCheckInCountsByStadiumAndMember(stadium, member,
+            int winCounts = checkInRepository.countWinsFavoriteTeamByStadiumAndMember(stadium, member, year);
+            int totalCounts = checkInRepository.countTotalFavoriteTeamGamesByStadiumAndMember(stadium, member,
                     year);
 
-            double currentWinRate = calculateWinRate(winCounts, favoriteCheckInCounts);
+            double currentWinRate = calculateWinRate(winCounts, totalCounts);
             if (currentWinRate > lowestWinRate) {
                 lowestWinRate = currentWinRate;
                 luckyStadium = stadium;

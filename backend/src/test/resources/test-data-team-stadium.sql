@@ -10,6 +10,7 @@ VALUES ('KIA 타이거즈', 'KIA', 'HT'),
        ('NC 다이노스', 'NC', 'NC'),
        ('한화 이글스', '한화', 'HH'),
        ('두산 베어스', '두산', 'OB');
+
 -- 2. 구장 데이터
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude)
 VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.8889),
