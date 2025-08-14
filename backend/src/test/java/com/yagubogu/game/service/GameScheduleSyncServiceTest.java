@@ -257,6 +257,7 @@ class GameScheduleSyncServiceTest {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
         Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+
         return gameFactory.save(builder -> builder
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)

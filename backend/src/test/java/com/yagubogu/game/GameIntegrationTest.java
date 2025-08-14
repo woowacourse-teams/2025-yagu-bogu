@@ -3,7 +3,6 @@ package com.yagubogu.game;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
@@ -11,10 +10,11 @@ import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
-import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -52,9 +52,6 @@ public class GameIntegrationTest {
     private int port;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
-
-    @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
@@ -69,12 +66,12 @@ public class GameIntegrationTest {
     @Autowired
     private MemberFactory memberFactory;
 
-    private String accessToken;
+    @Autowired
+    private AuthFactory authFactory;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
     }
 
     @DisplayName("경기하고 있는 모든 구장, 팀을 조회한다")
@@ -89,7 +86,7 @@ public class GameIntegrationTest {
 
         Team team = getTeamByCode("SS");
         Member member = makeMember(team);
-        accessToken = TestSupport.getAccessTokenByMemberId(member.getId(), authTokenProvider);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // game1 등록
         makeCheckIn(game1, team, member);
@@ -128,7 +125,7 @@ public class GameIntegrationTest {
         // given
         Team team = getTeamByCode("SS");
         Member member = makeMember(team);
-        accessToken = TestSupport.getAccessTokenByMemberId(member.getId(), authTokenProvider);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
         LocalDate invalidDate = LocalDate.of(3000, 12, 12);
 
         // when & then
@@ -145,6 +142,7 @@ public class GameIntegrationTest {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
         Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+
         return gameFactory.save(builder -> builder
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)
@@ -152,7 +150,6 @@ public class GameIntegrationTest {
                 .date(date)
         );
     }
-
 
     private void makeCheckIns(Game game, Team team, int count) {
         makeMembers(count, team).forEach(member ->
