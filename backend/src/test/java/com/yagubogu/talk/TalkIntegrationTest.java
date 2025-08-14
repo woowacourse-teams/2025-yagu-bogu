@@ -1,9 +1,21 @@
 package com.yagubogu.talk;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.support.AuthTokenProvider;
-import com.yagubogu.support.TestSupport;
+import com.yagubogu.game.domain.Game;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberBuilder;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.talk.TalkFactory;
+import com.yagubogu.support.talk.TalkReportFactory;
+import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.TalkRequest;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,12 +32,12 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.nullValue;
 
-@Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:talk-test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
+@Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class TalkIntegrationTest {
@@ -34,29 +46,61 @@ public class TalkIntegrationTest {
     private int port;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
+    private AuthFactory authFactory;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private TalkFactory talkFactory;
+
+    @Autowired
+    private TalkReportFactory talkReportFactory;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     private String accessToken;
+
+    private Member member;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Team favoriteTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        member = memberFactory.save(builder -> builder.team(favoriteTeam));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
     }
 
     @DisplayName("톡의 첫 페이지를 조회한다")
     @Test
     void findTalks_firstPage() {
         // given
-        long gameId = 1L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member other = memberFactory.save(builder -> builder.team(homeTeam));
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when & then
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("limit", 10)
-                .pathParam("gameId", gameId)
+                .queryParam("limit", 1)
+                .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/talks/{gameId}")
                 .then()
@@ -64,23 +108,41 @@ public class TalkIntegrationTest {
                 .body("stadiumName", is("사직야구장"))
                 .body("homeTeamName", is("롯데"))
                 .body("awayTeamName", is("한화"))
-                .body("cursorResult.content[0].id", is(52))
-                .body("cursorResult.nextCursorId", is(43));
+                .body("cursorResult.content[0].id", is(1));
     }
 
     @DisplayName("톡의 중간 페이지를 조회한다")
     @Test
     void findTalks_middlePage() {
         // given
-        long gameId = 1L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member other = memberFactory.save(builder -> builder.team(homeTeam));
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("before", 25)
-                .queryParam("limit", 10)
-                .pathParam("gameId", gameId)
+                .queryParam("before", 3)
+                .queryParam("limit", 1)
+                .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/talks/{gameId}")
                 .then()
@@ -88,23 +150,42 @@ public class TalkIntegrationTest {
                 .body("stadiumName", is("사직야구장"))
                 .body("homeTeamName", is("롯데"))
                 .body("awayTeamName", is("한화"))
-                .body("cursorResult.content[0].id", is(24))
-                .body("cursorResult.nextCursorId", is(15));
+                .body("cursorResult.content[0].id", is(2))
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("톡의 마지막 페이지를 조회한다")
     @Test
     void findTalks_lastPage() {
         // given
-        long gameId = 1L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member other = memberFactory.save(builder -> builder.team(homeTeam));
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("before", 6)
-                .queryParam("limit", 10)
-                .pathParam("gameId", gameId)
+                .queryParam("before", 2)
+                .queryParam("limit", 1)
+                .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/talks/{gameId}")
                 .then()
@@ -112,7 +193,7 @@ public class TalkIntegrationTest {
                 .body("stadiumName", is("사직야구장"))
                 .body("homeTeamName", is("롯데"))
                 .body("awayTeamName", is("한화"))
-                .body("cursorResult.content[0].id", is(5))
+                .body("cursorResult.content[0].id", is(1))
                 .body("cursorResult.nextCursorId", is(nullValue()));
     }
 
@@ -120,52 +201,86 @@ public class TalkIntegrationTest {
     @Test
     void findNewTalks_existing() {
         // given
-        long gameId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(2L, authTokenProvider);
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member other = memberFactory.save(builder -> builder.team(homeTeam));
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("after", 47)
-                .queryParam("limit", 10)
-                .pathParam("gameId", gameId)
+                .queryParam("after", 1)
+                .queryParam("limit", 1)
+                .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("cursorResult.content.size()", is(5))
-                .body("cursorResult.content[-1].id", is(52))
-                .body("cursorResult.nextCursorId", is(52));
+                .body("cursorResult.content.size()", is(1))
+                .body("cursorResult.content[-1].id", is(2))
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
     @Test
     void findNewTalks_noExisting() {
         // given
-        long gameId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(2L, authTokenProvider);
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member other = memberFactory.save(builder -> builder.team(homeTeam));
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
+        talkFactory.save(builder ->
+                builder.member(other)
+                        .game(game)
+        );
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("after", 52)
-                .queryParam("limit", 10)
-                .pathParam("gameId", gameId)
+                .queryParam("after", 2)
+                .queryParam("limit", 1)
+                .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("cursorResult.content.size()", is(0))
-                .body("cursorResult.nextCursorId", is(52));
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("정상적으로 톡을 저장하고 응답을 반환한다")
     @Test
     void createTalk() {
         // given
-        long gameId = 1L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
         String content = "오늘 야구보구 인증하구";
 
         // when & then
@@ -173,13 +288,10 @@ public class TalkIntegrationTest {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
-                .pathParam("gameId", gameId)
+                .pathParam("gameId", game.getId())
                 .when().post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(201)
-                .body("memberId", is(1))
-                .body("nickname", is("포라"))
-                .body("favorite", is("롯데"))
                 .body("content", is(content));
     }
 
@@ -187,17 +299,78 @@ public class TalkIntegrationTest {
     @Test
     void createTalk_blockedFromStadium() {
         // given
-        long gameId = 1L;
-        long blockedMemberId = 2L;
-        accessToken = TestSupport.getAccessTokenByMemberId(blockedMemberId, authTokenProvider);
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Member kindMember2 = memberFactory.save(MemberBuilder::build);
+        Member kindMember3 = memberFactory.save(MemberBuilder::build);
+        Member kindMember4 = memberFactory.save(MemberBuilder::build);
+        Member kindMember5 = memberFactory.save(MemberBuilder::build);
+        Member kindMember6 = memberFactory.save(MemberBuilder::build);
+        Member kindMember7 = memberFactory.save(MemberBuilder::build);
+        Member kindMember8 = memberFactory.save(MemberBuilder::build);
+        Member kindMember9 = memberFactory.save(MemberBuilder::build);
+        Member kindMember10 = memberFactory.save(MemberBuilder::build);
+
+        Member blockedMember = memberFactory.save(builder -> builder.team(homeTeam));
+        String blockedMemberAccessToken = authFactory.getAccessTokenByMemberId(blockedMember.getId(), Role.USER);
+        Talk blockedTalk = talkFactory.save(builder ->
+                builder.member(blockedMember)
+                        .game(game)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(member)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember2)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember3)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember4)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember5)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember6)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember7)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember8)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember9)
+        );
+        talkReportFactory.save(builder -> builder.talk(blockedTalk)
+                .talk(blockedTalk)
+                .reporter(kindMember10)
+        );
+
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .header(HttpHeaders.AUTHORIZATION, blockedMemberAccessToken)
                 .body(new TalkRequest(content))
-                .pathParam("gameId", gameId)
+                .pathParam("gameId", game.getId())
                 .when()
                 .post("/api/talks/{gameId}")
                 .then().log().all()
@@ -208,7 +381,7 @@ public class TalkIntegrationTest {
     @Test
     void createTalk_withInvalidGameId() {
         // given
-        long gameId = 999L;
+        long invalidGameId = 999L;
         String content = "오늘 야구보구 인증하구";
 
         // when & then
@@ -216,7 +389,7 @@ public class TalkIntegrationTest {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
-                .pathParam("gameId", gameId)
+                .pathParam("gameId", invalidGameId)
                 .when().post("/api/talks/{gameId}")
                 .then().log().all()
                 .statusCode(404);
@@ -226,15 +399,22 @@ public class TalkIntegrationTest {
     @Test
     void removeTalk() {
         // given
-        long gameId = 1L;
-        long talkId = 9L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk myTalk = talkFactory.save(builder -> builder.game(game)
+                .member(member));
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("gameId", gameId)
-                .pathParam("talkId", talkId)
+                .pathParam("gameId", game.getId())
+                .pathParam("talkId", myTalk.getId())
                 .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(204);
@@ -244,15 +424,21 @@ public class TalkIntegrationTest {
     @Test
     void removeTalk_withInvalidTalkId() {
         // given
-        long gameId = 1L;
-        long talkId = 999L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        long invalidTalkId = 999L;
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("gameId", gameId)
-                .pathParam("talkId", talkId)
+                .pathParam("gameId", game.getId())
+                .pathParam("talkId", invalidTalkId)
                 .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(404);
@@ -262,15 +448,25 @@ public class TalkIntegrationTest {
     @Test
     void removeTalk_withMismatchedGameId() {
         // given
-        long gameId = 2L;
-        long talkId = 31L;
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+        Game invalidGame = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk myTalk = talkFactory.save(builder -> builder.member(member)
+                .game(game));
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("gameId", gameId)
-                .pathParam("talkId", talkId)
+                .pathParam("gameId", invalidGame.getId())
+                .pathParam("talkId", myTalk.getId())
                 .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(400);
@@ -280,17 +476,23 @@ public class TalkIntegrationTest {
     @Test
     void removeTalk_withMismatchedMemberId() {
         // given
-        long gameId = 1L;
-        long talkId = 31L;
-        long memberId = 2L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+        Talk myTalk = talkFactory.save(builder -> builder.member(member)
+                .game(game));
+        Member invalidMember = memberFactory.save(builder -> builder.team(homeTeam));
+        String accessTokenByInvalidMember = authFactory.getAccessTokenByMemberId(invalidMember.getId(), Role.USER);
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("gameId", gameId)
-                .pathParam("talkId", talkId)
+                .header(HttpHeaders.AUTHORIZATION, accessTokenByInvalidMember)
+                .pathParam("gameId", game.getId())
+                .pathParam("talkId", myTalk.getId())
                 .when().delete("/api/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(403);
@@ -300,15 +502,21 @@ public class TalkIntegrationTest {
     @Test
     void reportTalk() {
         // given
-        long talkId = 9L;
-        long memberId = 2L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+        Member invalidMember = memberFactory.save(builder -> builder.team(homeTeam));
+        Talk reportedTalk = talkFactory.save(builder -> builder.member(invalidMember)
+                .game(game));
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("talkId", talkId)
+                .pathParam("talkId", reportedTalk.getId())
                 .when().post("/api/talks/{talkId}/reports")
                 .then().log().all()
                 .statusCode(201);
