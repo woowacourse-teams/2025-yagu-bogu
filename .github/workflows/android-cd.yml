@@ -1,0 +1,70 @@
+name: YaguBogu Android CD
+
+on:
+  pull_request:
+    branches: [ "dev-an" ]
+    paths:
+      - 'android/**'
+      
+env:
+  BASE_URL: ${{ secrets.BASE_URL }}
+  WEB_CLIENT_ID: ${{ secrets.WEB_CLIENT_ID }}
+  GOOGLE_SERVICES_JSON_DEBUG: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+  GOOGLE_SERVICES_JSON_RELEASE: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+  KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }} 
+  KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Add Local Properties
+        run: |
+          echo "BASE_URL=$BASE_URL" >> ./local.properties
+          echo "WEB_CLIENT_ID=$WEB_CLIENT_ID" >> ./local.properties 
+
+      - name: Create google-services.json for debug
+        run: |
+          mkdir -p ./app/src/debug
+          echo "$GOOGLE_SERVICES_JSON_DEBUG" | base64 --decode > ./app/src/debug/google-services.json
+      
+      - name: Create google-services.json for release
+        run: |
+          mkdir -p ./app/src/release
+          echo "$GOOGLE_SERVICES_JSON_RELEASE" | base64 --decode > ./app/src/release/google-services.json
+
+      - name: Decode Keystore file
+        run: |
+          mkdir -p ./app
+          echo "$KEYSTORE_BASE64" | base64 --decode > ./app/yagubogu-keystore
+
+      - name: Create keystore.properties
+        run: |
+          echo "$KEYSTORE_PROPERTIES" > ./keystore.properties
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace --info
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/app-release.apk
+          overwrite: 'true'
