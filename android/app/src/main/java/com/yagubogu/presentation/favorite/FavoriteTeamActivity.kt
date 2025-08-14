@@ -22,12 +22,11 @@ class FavoriteTeamActivity : AppCompatActivity() {
         FavoriteTeamViewModelFactory(app.memberRepository)
     }
 
-    private var selectedTeam: Team? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
         setupRecyclerView()
+        setupObservers()
         setupFragmentResultListener()
     }
 
@@ -48,13 +47,19 @@ class FavoriteTeamActivity : AppCompatActivity() {
                     override fun onItemClick(item: FavoriteTeamItem) {
                         val dialog = FavoriteTeamConfirmFragment.newInstance(item)
                         dialog.show(supportFragmentManager, dialog.tag)
-                        selectedTeam = item.team
+                        viewModel.selectTeam(item.team)
                     }
                 },
             )
         binding.rvFavoriteTeamList.adapter = adapter
         val favoriteTeamItems: List<FavoriteTeamItem> = Team.entries.map { FavoriteTeamItem.of(it) }
         adapter.submitList(favoriteTeamItems)
+    }
+
+    private fun setupObservers() {
+        viewModel.favoriteTeamUpdateEvent.observe(this) {
+            navigateToMain()
+        }
     }
 
     private fun setupFragmentResultListener() {
@@ -64,8 +69,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
         ) { _, bundle ->
             val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
             if (isConfirmed) {
-                selectedTeam?.let { viewModel.saveFavoriteTeam(it) }
-                navigateToMain()
+                viewModel.saveFavoriteTeam()
             }
         }
     }
