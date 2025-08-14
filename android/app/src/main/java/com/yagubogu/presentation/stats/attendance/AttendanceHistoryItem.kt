@@ -6,8 +6,8 @@ import com.yagubogu.domain.model.GameResult
 import java.time.LocalDate
 
 data class AttendanceHistoryItem(
-    val awayTeam: TeamItem,
-    val homeTeam: TeamItem,
+    val awayTeam: CheckInGameTeamItem,
+    val homeTeam: CheckInGameTeamItem,
     val attendanceDate: LocalDate,
     val stadiumName: String,
 ) {
@@ -19,8 +19,8 @@ data class AttendanceHistoryItem(
 
     @ColorRes
     private fun determineTeamColorRes(
-        thisTeam: TeamItem,
-        otherTeam: TeamItem,
+        thisTeam: CheckInGameTeamItem,
+        otherTeam: CheckInGameTeamItem,
     ): Int {
         val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
         return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {

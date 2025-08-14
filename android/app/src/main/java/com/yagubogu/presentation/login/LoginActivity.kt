@@ -77,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
                 LoginResult.Success -> {
                     // TODO: 회원가입일 때 팀 선택 화면으로 이동
                     val app = application as YaguBoguApplication
-                    lifecycleScope.launch { app.memberRepository.updateFavoriteTeam(Team.LG) }
+                    lifecycleScope.launch { app.memberRepository.updateFavoriteTeam(Team.OB) }
                     navigateToMain()
                 }
 
