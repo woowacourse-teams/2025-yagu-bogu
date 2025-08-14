@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-checkin.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
 @Import(AuthTestConfig.class)
 @DataJpaTest
@@ -294,7 +294,7 @@ class CheckInServiceTest {
                             .extracting("nickname")
                             .containsExactly("밍트", "포르", "포라", "두리", "우가");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
-                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("기아");
+                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("KIA");
                     softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(100.0);
                 }
         );
@@ -479,7 +479,7 @@ class CheckInServiceTest {
         FanRateResponse expected = new FanRateResponse(List.of(
                 new FanRateByGameResponse(
                         30L,
-                        new TeamFanRateResponse("기아", "HT", 66.7),
+                        new TeamFanRateResponse("KIA", "HT", 66.7),
                         new TeamFanRateResponse("KT", "KT", 33.3)),
                 new FanRateByGameResponse(
                         14L,
