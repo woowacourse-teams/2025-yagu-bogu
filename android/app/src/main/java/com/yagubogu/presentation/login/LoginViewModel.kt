@@ -8,17 +8,21 @@ import com.yagubogu.data.auth.GoogleCredentialManager
 import com.yagubogu.data.auth.GoogleCredentialResult
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
+import com.yagubogu.domain.repository.MemberRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
+    private val memberRepository: MemberRepository,
     private val googleCredentialManager: GoogleCredentialManager,
 ) : ViewModel() {
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> get() = _loginResult
 
     suspend fun isTokenValid(): Boolean = authRepository.refreshTokens().isSuccess
+
+    suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
 
     fun signInWithGoogle() {
         viewModelScope.launch {

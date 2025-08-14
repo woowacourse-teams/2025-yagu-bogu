@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
         val app = application as YaguBoguApplication
-        LoginViewModelFactory(app.authRepository, googleCredentialManager)
+        LoginViewModelFactory(app.authRepository, app.memberRepository, googleCredentialManager)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +51,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleAutoLogin() {
         lifecycleScope.launch {
-            val isTokenValid: Boolean = viewModel.isTokenValid()
-            if (isTokenValid) {
+            if (!viewModel.isTokenValid()) {
+                isAppInitialized = true
+                return@launch
+            }
+
+            if (viewModel.isNewUser()) {
+                navigateToFavoriteTeam()
+            } else {
                 navigateToMain()
             }
             isAppInitialized = true
