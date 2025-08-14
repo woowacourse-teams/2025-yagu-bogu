@@ -1,16 +1,30 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
+import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
-import com.yagubogu.support.TestSupport;
+import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.checkin.CheckInFactory;
+import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,45 +38,79 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Import(AuthTestConfig.class)
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CheckInIntegrationTest {
 
-    private static final String ID_TOKEN = "ID_TOKEN";
-
     @LocalServerPort
     private int port;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
+    private AuthFactory authFactory;
 
-    private String accessToken;
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private CheckInFactory checkInFactory;
+
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
+    private Team kia, kt, lg, samsung, doosan, lotte;
+    private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        accessToken = TestSupport.getAccessTokenByMemberId(ID_TOKEN);
+
+        kia = teamRepository.findByTeamCode("HT").orElseThrow();
+        kt = teamRepository.findByTeamCode("KT").orElseThrow();
+        lg = teamRepository.findByTeamCode("LG").orElseThrow();
+        samsung = teamRepository.findByTeamCode("SS").orElseThrow();
+        doosan = teamRepository.findByTeamCode("OB").orElseThrow();
+        lotte = teamRepository.findByTeamCode("LT").orElseThrow();
+
+        stadiumJamsil = stadiumRepository.findById(1L).orElseThrow();
+        stadiumGocheok = stadiumRepository.findById(2L).orElseThrow();
+        stadiumIncheon = stadiumRepository.findById(3L).orElseThrow();
     }
 
     @DisplayName("인증을 저장한다")
     @Test
     void createCheckIn() {
         // given
-        accessToken = TestSupport.getAccessTokenByMemberId(5L, authTokenProvider);
-        long stadiumId = 1L;
-        LocalDate date = LocalDate.of(2025, 7, 19);
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreateCheckInRequest(stadiumId, date))
+                .body(new CreateCheckInRequest(stadiumJamsil.getId(), date))
                 .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(201);
@@ -72,7 +120,29 @@ public class CheckInIntegrationTest {
     @Test
     void findCheckInCounts() {
         // given
-        accessToken = TestSupport.getAccessTokenByMemberId(1L, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
 
         // when
         CheckInCountsResponse actual = RestAssured.given().log().all()
@@ -86,17 +156,18 @@ public class CheckInIntegrationTest {
                 .as(CheckInCountsResponse.class);
 
         // then
-        assertThat(actual.checkInCounts()).isEqualTo(7);
+        assertThat(actual.checkInCounts()).isEqualTo(3);
     }
 
     @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundStadium() {
         // given
-        long memberId = 1L;
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
         long invalidStadiumId = 999L;
-        LocalDate date = LocalDate.of(2025, 7, 21);
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        LocalDate date = LocalDate.of(2025, 7, 25);
 
         // when & then
         RestAssured.given().log().all()
@@ -112,10 +183,11 @@ public class CheckInIntegrationTest {
     @Test
     void createCheckIn_notFoundGame() {
         // given
-        long memberId = 1L;
-        long stadiumId = 1L;
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        long stadiumId = kia.getId();
         LocalDate invalidDate = LocalDate.of(1000, 7, 21);
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
 
         // when & then
         RestAssured.given().log().all()
@@ -131,8 +203,29 @@ public class CheckInIntegrationTest {
     @Test
     void findCheckInHistory() {
         // given
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
 
         // when & then
         RestAssured.given().log().all()
@@ -149,8 +242,47 @@ public class CheckInIntegrationTest {
     @Test
     void findVictoryFairyRankings() {
         // given
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        memberFactory.save(b -> b.team(kt).nickname("포르"));
+        memberFactory.save(b -> b.team(lg).nickname("두리"));
+        memberFactory.save(b -> b.team(kia).nickname("밍트"));
+        memberFactory.save(b -> b.team(samsung).nickname("우가"));
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(1)));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(2)));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kt).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(3)));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kt).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(4)));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(lg).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(5)));
+
+        List<Member> members = memberRepository.findAll();
+        List<Game> games = gameRepository.findAll();
+        for (Member m : members) {
+            for (Game g : games) {
+                checkInFactory.save(b -> b.member(m).team(m.getTeam()).game(g));
+            }
+        }
 
         // when & then
         RestAssured.given().log().all()
@@ -165,14 +297,23 @@ public class CheckInIntegrationTest {
     @Test
     void findCheckInStatus() {
         // given
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game).team(kia).member(fora));
 
         // when
         CheckInStatusResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("date", "2025-07-21")
+                .queryParam("date", date.toString())
                 .when().get("/api/check-ins/status")
                 .then().log().all()
                 .statusCode(200)
@@ -187,8 +328,29 @@ public class CheckInIntegrationTest {
     @Test
     void findCheckInWinHistory() {
         // given
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
 
         // when & then
         RestAssured.given().log().all()
@@ -205,8 +367,23 @@ public class CheckInIntegrationTest {
     @Test
     void findFanRatesByStadiums() {
         // given
-        long memberId = 1L;
-        accessToken = TestSupport.getAccessTokenByMemberId(memberId, authTokenProvider);
+        Member fora = memberFactory.save(b -> b.team(kt).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        Game gameAandB = gameFactory.save(
+                b -> b.stadium(stadiumJamsil).homeTeam(kia).awayTeam(kt).date(startDate));
+        Game gameCandD = gameFactory.save(
+                b -> b.stadium(stadiumGocheok).homeTeam(lg).awayTeam(samsung).date(startDate));
+        Game gameEandF = gameFactory.save(
+                b -> b.stadium(stadiumIncheon).homeTeam(doosan).awayTeam(lotte).date(startDate));
+
+        createCheckInsForGame(kia, gameAandB, 20);
+        createCheckInsForGame(kt, gameAandB, 10);
+        createCheckInsForGame(lg, gameCandD, 10);
+        createCheckInsForGame(samsung, gameCandD, 4);
+        createCheckInsForGame(doosan, gameEandF, 6);
+        createCheckInsForGame(lotte, gameEandF, 1);
 
         // when & then
         RestAssured.given().log().all()
@@ -216,5 +393,12 @@ public class CheckInIntegrationTest {
                 .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    private void createCheckInsForGame(Team team, Game game, int count) {
+        for (int i = 0; i < count; i++) {
+            Member member = memberFactory.save(b -> b.team(team));
+            checkInFactory.save(b -> b.member(member).team(team).game(game));
+        }
     }
 }
