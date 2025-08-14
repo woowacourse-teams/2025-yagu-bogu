@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data.sql"
+        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
 })
 @Import(AuthTestConfig.class)
 @DataJpaTest
