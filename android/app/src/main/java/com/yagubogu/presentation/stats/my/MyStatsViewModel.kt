@@ -11,6 +11,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 import kotlin.math.roundToInt
 
 class MyStatsViewModel(
@@ -28,11 +29,11 @@ class MyStatsViewModel(
     }
 
     fun fetchAll() {
-        fetchMyStats(YEAR)
+        fetchMyStats()
         fetchMyAverageStats()
     }
 
-    private fun fetchMyStats(year: Int) {
+    private fun fetchMyStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                 async { statsRepository.getStatsCounts(year) }
@@ -77,17 +78,13 @@ class MyStatsViewModel(
 
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
-            val averageStats: Result<AverageStats> = statsRepository.getAverageStats()
-            averageStats
+            val averageStatsResult: Result<AverageStats> = statsRepository.getAverageStats()
+            averageStatsResult
                 .onSuccess { averageStats: AverageStats ->
                     _averageStats.value = averageStats
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
-    }
-
-    companion object {
-        private const val YEAR = 2025
     }
 }
