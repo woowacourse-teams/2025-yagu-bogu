@@ -2,6 +2,7 @@ package com.yagubogu.auth.config;
 
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.gateway.FakeAuthGateway;
+import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -11,6 +12,7 @@ import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.refreshtoken.RefreshTokenFactory;
 import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -66,5 +68,10 @@ public class AuthTestConfig {
     @Bean
     public TalkReportFactory talkReportFactory(final TalkReportRepository talkRepository) {
         return new TalkReportFactory(talkRepository);
+    }
+
+    @Bean
+    public RefreshTokenFactory refreshTokenFactory(final RefreshTokenRepository refreshTokenRepository) {
+        return new RefreshTokenFactory(refreshTokenRepository);
     }
 }
