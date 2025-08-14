@@ -28,7 +28,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
         MDC.put("method", request.getMethod());
         MDC.put("uri", request.getRequestURI());
         MDC.put("clientIp", request.getRemoteAddr());
-        MDC.put("userAgent", shortenUserAgent(request.getHeader("User-Agent")));
 
         String params = getParameterString(request);
         MDC.put("params", params);
