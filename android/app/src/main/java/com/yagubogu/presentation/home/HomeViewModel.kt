@@ -97,19 +97,19 @@ class HomeViewModel(
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
-            val myTeamDeferred: Deferred<Result<String>> =
+            val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
             val attendanceCountDeferred: Deferred<Result<Int>> =
                 async { checkInsRepository.getCheckInCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
 
-            val myTeamResult: Result<String> = myTeamDeferred.await()
+            val myTeamResult: Result<String?> = myTeamDeferred.await()
             val attendanceCountResult: Result<Int> = attendanceCountDeferred.await()
             val winRateResult: Result<Double> = winRateDeferred.await()
 
             if (myTeamResult.isSuccess && attendanceCountResult.isSuccess && winRateResult.isSuccess) {
-                val myTeam: String = myTeamResult.getOrThrow()
+                val myTeam: String? = myTeamResult.getOrThrow()
                 val attendanceCount: Int = attendanceCountResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
 

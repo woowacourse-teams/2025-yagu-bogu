@@ -38,20 +38,20 @@ class MyStatsViewModel(
                 async { statsRepository.getStatsCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
-            val myTeamDeferred: Deferred<Result<String>> =
+            val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
             val luckyStadiumDeferred: Deferred<Result<String?>> =
                 async { statsRepository.getLuckyStadiums(year) }
 
             val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
             val winRateResult: Result<Double> = winRateDeferred.await()
-            val myTeamResult: Result<String> = myTeamDeferred.await()
+            val myTeamResult: Result<String?> = myTeamDeferred.await()
             val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
 
             if (statsCountsResult.isSuccess && winRateResult.isSuccess && myTeamResult.isSuccess && luckyStadiumResult.isSuccess) {
                 val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
-                val myTeam: String = myTeamResult.getOrThrow()
+                val myTeam: String? = myTeamResult.getOrThrow()
                 val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
                 val myStatsUiModel =
