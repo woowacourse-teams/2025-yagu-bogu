@@ -1,10 +1,14 @@
 package com.yagubogu.data.network
 
 import com.yagubogu.data.dto.request.TokenRequest
+import com.yagubogu.data.dto.response.TokenResponse
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.util.addTokenHeader
+import com.yagubogu.data.util.getTokenFromHeader
 import com.yagubogu.data.util.safeApiCall
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -14,30 +18,41 @@ class TokenAuthenticator(
     private val tokenManager: TokenManager,
     private val authApiService: AuthApiService,
 ) : Authenticator {
+    private val mutex = Mutex()
+
     override fun authenticate(
         route: Route?,
         response: Response,
     ): Request? {
         if (responseCount(response) >= 2) return null
 
-        val requestUrl: String = response.request.url.encodedPath
-        if (requestUrl.endsWith(AUTH_REFRESH_ENDPOINT)) return null
+        val request: Request = response.request
+        if (request.url.encodedPath.endsWith(AUTH_REFRESH_ENDPOINT)) return null
 
         return runBlocking {
-            val refreshToken: String = tokenManager.getRefreshToken() ?: return@runBlocking null
-            safeApiCall {
-                val tokenRequest = TokenRequest(refreshToken)
-                authApiService.postRefresh(tokenRequest)
-            }.fold(
-                onSuccess = { (accessToken, refreshToken) ->
-                    tokenManager.saveTokens(accessToken, refreshToken)
-                    response.request.addTokenHeader(accessToken)
-                },
-                onFailure = {
-                    tokenManager.clearTokens()
-                    null
-                },
-            )
+            mutex.withLock {
+                val invalidToken: String? = request.getTokenFromHeader()
+                val currentToken: String? = tokenManager.getAccessToken()
+
+                if (currentToken != null && currentToken != invalidToken) {
+                    return@withLock request.addTokenHeader(currentToken)
+                }
+
+                val (newAccessToken: String, newRefreshToken: String) =
+                    refreshAccessToken() ?: return@withLock null
+                tokenManager.saveTokens(newAccessToken, newRefreshToken)
+                request.addTokenHeader(newAccessToken)
+            }
+        }
+    }
+
+    private suspend fun refreshAccessToken(): TokenResponse? {
+        val refreshToken: String = tokenManager.getRefreshToken() ?: return null
+        return safeApiCall {
+            authApiService.postRefresh(TokenRequest(refreshToken))
+        }.getOrElse {
+            tokenManager.clearTokens()
+            null
         }
     }
 
