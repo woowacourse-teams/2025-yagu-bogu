@@ -13,6 +13,10 @@ import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.support.refreshtoken.RefreshTokenFactory;
+import com.yagubogu.support.talk.TalkFactory;
+import com.yagubogu.support.talk.TalkReportFactory;
+import com.yagubogu.talk.repository.TalkReportRepository;
+import com.yagubogu.talk.repository.TalkRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +58,16 @@ public class AuthTestConfig {
     @Bean
     public CheckInFactory checkInFactory(final CheckInRepository checkInRepository) {
         return new CheckInFactory(checkInRepository);
+    }
+
+    @Bean
+    public TalkFactory talkFactory(final TalkRepository talkRepository) {
+        return new TalkFactory(talkRepository);
+    }
+
+    @Bean
+    public TalkReportFactory talkReportFactory(final TalkReportRepository talkRepository) {
+        return new TalkReportFactory(talkRepository);
     }
 
     @Bean
