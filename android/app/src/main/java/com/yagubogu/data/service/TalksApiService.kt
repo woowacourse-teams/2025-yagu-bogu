@@ -18,16 +18,10 @@ interface TalksApiService {
         @Query("limit") limit: Int,
     ): Response<TalkCursorResponse>
 
-    @GET("/api/talks/{gameId}")
-    suspend fun getLatestTalks(
-        @Path("gameId") gameId: Long,
-        @Query("limit") limit: Int,
-    ): Response<TalkCursorResponse>
-
     @GET("/api/talks/{gameId}/latest")
     suspend fun getLatestTalks(
         @Path("gameId") gameId: Long,
-        @Query("after") after: Long?,
+        @Query("after") after: Long,
         @Query("limit") limit: Int,
     ): Response<TalkCursorResponse>
 

@@ -16,11 +16,6 @@ interface TalksDataSource {
         limit: Int,
     ): Result<TalkCursorResponse>
 
-    suspend fun getLatestTalks(
-        gameId: Long,
-        limit: Int,
-    ): Result<TalkCursorResponse>
-
     suspend fun postTalks(
         gameId: Long,
         content: String,

@@ -23,16 +23,16 @@ class TalksRemoteDataSource(
         after: Long?,
         limit: Int,
     ): Result<TalkCursorResponse> =
-        safeApiCall {
-            talksApiService.getLatestTalks(gameId, after, limit)
-        }
+        when (after) {
+            null ->
+                safeApiCall {
+                    talksApiService.getTalks(gameId, null, limit)
+                }
 
-    override suspend fun getLatestTalks(
-        gameId: Long,
-        limit: Int,
-    ): Result<TalkCursorResponse> =
-        safeApiCall {
-            talksApiService.getLatestTalks(gameId, limit)
+            else ->
+                safeApiCall {
+                    talksApiService.getLatestTalks(gameId, after, limit)
+                }
         }
 
     override suspend fun postTalks(

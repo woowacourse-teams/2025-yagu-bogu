@@ -28,26 +28,15 @@ class TalksDefaultRepository(
         gameId: Long,
         after: Long?,
         limit: Int,
-    ): Result<LivetalkResponseItem> {
-        if (after == null) {
-            return talksDataSource
-                .getLatestTalks(
-                    gameId = gameId,
-                    limit = limit,
-                ).map { talksResponse: TalkCursorResponse ->
-                    talksResponse.toPresentation()
-                }
-        } else {
-            return talksDataSource
-                .getLatestTalks(
-                    gameId = gameId,
-                    after = after,
-                    limit = limit,
-                ).map { talksResponse: TalkCursorResponse ->
-                    talksResponse.toPresentation()
-                }
-        }
-    }
+    ): Result<LivetalkResponseItem> =
+        talksDataSource
+            .getLatestTalks(
+                gameId = gameId,
+                after = after,
+                limit = limit,
+            ).map { talksResponse: TalkCursorResponse ->
+                talksResponse.toPresentation()
+            }
 
     override suspend fun postTalks(
         gameId: Long,
