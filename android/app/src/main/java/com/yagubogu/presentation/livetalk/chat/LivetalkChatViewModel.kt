@@ -56,6 +56,40 @@ class LivetalkChatViewModel(
         }
     }
 
+    fun sendMessage() {
+        val message = messageFormText.value ?: ""
+        Timber.d(message)
+        if (message.isBlank()) return
+
+        viewModelScope.launch {
+            val talksResult: Result<LivetalkChatItem> =
+                talksRepository.postTalks(gameId, message.trim())
+            talksResult
+                .onSuccess {
+                    fetchAfterTalks()
+                    messageFormText.value = ""
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    fun startChatPolling() {
+        if (pollingJob?.isActive == true) return
+        pollingJob =
+            viewModelScope.launch {
+                while (true) {
+                    fetchAfterTalks()
+                    delay(POLLING_INTERVAL_MILLS)
+                }
+            }
+    }
+
+    fun stopChatPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
+
     private fun fetchInitialTalks() {
         viewModelScope.launch {
             fetchLock.withLock {
@@ -97,40 +131,6 @@ class LivetalkChatViewModel(
                     }
             }
         }
-    }
-
-    fun sendMessage() {
-        val message = messageFormText.value ?: ""
-        Timber.d(message)
-        if (message.isBlank()) return
-
-        viewModelScope.launch {
-            val talksResult: Result<LivetalkChatItem> =
-                talksRepository.postTalks(gameId, message.trim())
-            talksResult
-                .onSuccess {
-                    fetchAfterTalks()
-                    messageFormText.value = ""
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
-        }
-    }
-
-    fun startChatPolling() {
-        if (pollingJob?.isActive == true) return
-        pollingJob =
-            viewModelScope.launch {
-                while (true) {
-                    fetchAfterTalks()
-                    delay(POLLING_INTERVAL_MILLS)
-                }
-            }
-    }
-
-    fun stopChatPolling() {
-        pollingJob?.cancel()
-        pollingJob = null
     }
 
     override fun onCleared() {
