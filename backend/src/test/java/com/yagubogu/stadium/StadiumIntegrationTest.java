@@ -1,5 +1,7 @@
 package com.yagubogu.stadium;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
 import io.restassured.RestAssured;
@@ -13,13 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
-})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class StadiumIntegrationTest {

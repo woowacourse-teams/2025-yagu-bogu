@@ -4,6 +4,10 @@ spring:
     url: jdbc:h2:mem:database;
     username: sa
     password:
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:test-data-team-stadium.sql
   h2:
     console:
       enabled: true
