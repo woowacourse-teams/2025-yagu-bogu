@@ -36,12 +36,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
 
 @Import(AuthTestConfig.class)
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
-})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class GameIntegrationTest {

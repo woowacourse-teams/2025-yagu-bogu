@@ -34,11 +34,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
-})
 @Import(AuthTestConfig.class)
 @DataJpaTest
 class GameScheduleSyncServiceTest {

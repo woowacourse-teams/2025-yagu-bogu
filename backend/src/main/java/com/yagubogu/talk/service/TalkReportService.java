@@ -25,7 +25,7 @@ public class TalkReportService {
     @Transactional
     public void reportTalk(
             final long talkId,
-            final long reporterId // TODO: 나중에 삭제
+            final long reporterId
     ) {
         Talk talk = getTalk(talkId);
         Member member = getMember(reporterId);

@@ -1,5 +1,10 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
@@ -38,16 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
-})
 @Import(AuthTestConfig.class)
 @DataJpaTest
 class CheckInServiceTest {
@@ -318,6 +314,39 @@ class CheckInServiceTest {
             softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
         });
     }
+
+    @DisplayName("회원이 응원하는 팀의 경기를 한번도 관람하지 않은 경우 승률이 0이다")
+    @Test
+    void findVictoryFairyRankings_noFavoriteCheckIn() {
+        // given
+        Member por = memberFactory.save(b -> b.team(samsung).nickname("포르"));
+
+        LocalDate startDate = LocalDate.of(2025, 7, 21);
+        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate));
+        checkInFactory.save(builder -> builder
+                .team(samsung)
+                .member(por)
+                .game(game)
+        );
+
+        // when
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId());
+
+        // then
+        assertSoftly(softAssertions -> {
+                    softAssertions.assertThat(actual.topRankings())
+                            .extracting("nickname")
+                            .containsExactly("포르");
+                    softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
+                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("삼성");
+                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
+                }
+        );
+    }
+
 
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @Test
