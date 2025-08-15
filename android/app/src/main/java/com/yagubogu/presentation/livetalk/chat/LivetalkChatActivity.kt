@@ -35,7 +35,7 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupBinding() {
-        binding.viewmodel = viewModel
+        binding.viewModel = viewModel
         binding.isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
         binding.lifecycleOwner = this
     }
