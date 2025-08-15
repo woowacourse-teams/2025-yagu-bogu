@@ -11,7 +11,7 @@ public class FanRateGameEntry implements Comparable<FanRateGameEntry> {
     private final FanRateByGameResponse response;
 
     @Override
-    public int compareTo(FanRateGameEntry other) {
+    public int compareTo(final FanRateGameEntry other) {
         return Long.compare(other.totalCheckInCounts, this.totalCheckInCounts);
     }
 }

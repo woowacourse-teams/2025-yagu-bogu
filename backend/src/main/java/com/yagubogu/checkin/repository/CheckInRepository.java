@@ -2,9 +2,8 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.FanCountsByGameResponse;
+import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
-import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stat.dto.AverageStatistic;
@@ -153,6 +152,22 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
 
     @Query("""
+            SELECT new com.yagubogu.checkin.dto.GameWithFanCountsResponse(
+                g,
+                COUNT(c),
+                SUM(CASE WHEN c.team = g.homeTeam THEN 1 ELSE 0 END),
+                SUM(CASE WHEN c.team = g.awayTeam THEN 1 ELSE 0 END)
+            )
+            FROM Game g
+            JOIN FETCH g.homeTeam
+            JOIN FETCH g.awayTeam
+            LEFT JOIN CheckIn c ON c.game = g
+            WHERE g.date = :date
+            GROUP BY g
+            """)
+    List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date);
+
+    @Query("""
             SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(
                 c.id,
                 g.stadium.fullName,
@@ -180,17 +195,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
-
-    @Query("""
-                SELECT new com.yagubogu.checkin.dto.FanCountsByGameResponse(
-                    COUNT(c),
-                    COALESCE(SUM(CASE WHEN c.team = :homeTeam THEN 1 ELSE 0 END), 0),
-                    COALESCE(SUM(CASE WHEN c.team = :awayTeam THEN 1 ELSE 0 END), 0)
-                )
-                FROM CheckIn c
-                WHERE c.game = :game
-            """)
-    FanCountsByGameResponse countTotalAndHomeTeamAndAwayTeam(Game game, Team homeTeam, Team awayTeam);
 
     @Query("""
             SELECT new com.yagubogu.stat.dto.AverageStatistic(

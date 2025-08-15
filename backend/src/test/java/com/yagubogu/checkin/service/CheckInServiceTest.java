@@ -1,10 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
@@ -44,6 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
@@ -490,6 +490,23 @@ class CheckInServiceTest {
                         new TeamFanRateResponse("두산", "OB", 85.7),
                         new TeamFanRateResponse("롯데", "LT", 14.3))
         ));
+
+        // when
+        FanRateResponse actual = checkInService.findFanRatesByGames(memberId, startDate);
+
+        // then
+        assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected.fanRateByGames());
+    }
+
+    @DisplayName("오늘 경기 구장별 팬 점유율 조회 – 경기가 없으면 null이 아닌 빈 리스트를 반환한다")
+    @Test
+    void findFanRatesByGames_returnsEmptyListWhenNoMyTeamGames() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kt).nickname("포라"));
+        long memberId = fora.getId();
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+
+        FanRateResponse expected = new FanRateResponse(List.of());
 
         // when
         FanRateResponse actual = checkInService.findFanRatesByGames(memberId, startDate);
