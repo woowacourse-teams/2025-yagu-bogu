@@ -41,8 +41,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Unit Tests
+      - name: Run Tests
         run: ./gradlew test
 
-      - name: Assemble Build
+      - name: Build
         run: ./gradlew build -x test
