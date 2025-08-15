@@ -42,10 +42,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Unit Tests
+      - name: Run Tests
         run: ./gradlew test
 
-      - name: Assemble Build
+      - name: Build
         run: ./gradlew build -x test
 
       - name: Set up Docker Buildx
@@ -61,9 +61,9 @@ jobs:
         run: |
           TAG_SHA="dev-${{ github.sha }}"
           TAG_LATEST="dev-latest"
-          # Dockerfile 경로: backend/Dockerfile.dev (필요시 이름/경로 조정)
+          # Dockerfile 경로: backend/Dockerfile
           docker buildx build \
-            -f Dockerfile.dev \
+            -f Dockerfile \
             --platform linux/arm64 \
             -t $IMAGE:$TAG_SHA \
             -t $IMAGE:$TAG_LATEST \
