@@ -88,7 +88,7 @@ class LivetalkChatViewModel(
                         val newChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
                         if (newChats.isNotEmpty()) {
                             val currentList = _liveTalkChatBubbleItem.value ?: emptyList()
-                            _liveTalkChatBubbleItem.value = newChats.reversed() + currentList
+                            _liveTalkChatBubbleItem.value = newChats + currentList
 
                             newestMessageCursor = newChats.last().livetalkChatItem.chatId
                         }
