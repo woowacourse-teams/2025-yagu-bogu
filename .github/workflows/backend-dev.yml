@@ -45,9 +45,6 @@ jobs:
       - name: Run Tests
         run: ./gradlew test
 
-      - name: Build
-        run: ./gradlew build -x test
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -112,7 +109,7 @@ jobs:
           docker run -d \
             --name $NAME \
             --restart unless-stopped \
-            --network yagubogu-net \   
+            --network yagubogu-net \ 
             -p 80:8080 \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e DB_URL="${{ secrets.DB_URL }}" \
