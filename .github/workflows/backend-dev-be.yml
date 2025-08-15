@@ -41,5 +41,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build (prod profile)
-        run: ./gradlew clean build
+      - name: Run Tests
+        run: ./gradlew test
+
+      - name: Build
+        run: ./gradlew build -x test

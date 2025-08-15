@@ -1,22 +1,24 @@
-name: YaguBogu Backend dev
+name: YaguBogu Backend Dev
 
-# 0. workflow 실행 트리거
 on:
   push:
     branches: [ "dev" ]
-    path:
-      - 'backend/**'
+    paths:
+      - "backend/**"
   workflow_dispatch:
 
-# 1. 배포
+env:
+  IMAGE: yagubogu/yagubogu-backend
+
 jobs:
-  build:
-    runs-on:
-      - self-hosted
-      - develop
+  ci:
+    runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        shell: bash
+        working-directory: ./backend
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -40,36 +42,93 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build (prod profile)
-        run: ./gradlew clean build
+      - name: Run Unit Tests
+        run: ./gradlew test
 
-      - name: Rename and move jar to /home/ubuntu/deploy
+      - name: Assemble Build
+        run: ./gradlew build -x test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
+
+      - name: Docker Image Build & Push (multi-arch)
         run: |
-          mkdir -p /home/ubuntu/deploy
-          mv $(ls ./build/libs/*SNAPSHOT.jar | head -n 1) /home/ubuntu/deploy/backend-build.jar
+          TAG_SHA="dev-${{ github.sha }}"
+          TAG_LATEST="dev-latest"
+          # Dockerfile 경로: backend/Dockerfile.dev (필요시 이름/경로 조정)
+          docker buildx build \
+            -f Dockerfile.dev \
+            --platform linux/arm64 \
+            -t $IMAGE:$TAG_SHA \
+            -t $IMAGE:$TAG_LATEST \
+            --push \
+            .
 
-  # dev.yml의 deploy job 일부
-  deploy:
-    runs-on: self-hosted
-    needs: build
+  cd:
+    needs: ci
+    runs-on: [ self-hosted, develop ]
     env:
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      ACCESS_TOKEN_SECRET_KEY: ${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
-      REFRESH_TOKEN_SECRET_KEY: ${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
+      IMAGE: yagubogu/yagubogu-backend
+      TAG: dev-${{ github.sha }}
     steps:
-      - name: Kill existing process on port 80
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
+
+      - name: Pull Docker image
         run: |
+          echo "Docker 이미지 pull 시작"
+          docker pull $IMAGE:$TAG
+          echo "Docker 이미지 pull 완료"
+
+      - name: Stop & Remove existing container (by name)
+        run: |
+          set -e
+          NAME="yagubogu-backend"
+          if [ "$(docker ps -q -f name=^/${NAME}$)" ]; then
+            echo "실행중 컨테이너 중지: $NAME"
+            docker stop $NAME
+          fi
+          if [ "$(docker ps -aq -f name=^/${NAME}$)" ]; then
+            echo "기존 컨테이너 제거: $NAME"
+            docker rm $NAME
+          fi
+          echo "포트 80 점유 프로세스 확인 및 정리"
           sudo fuser -k -n tcp 80 || true
 
-      - name: Start server
+      - name: Run docker container
         run: |
-          cd /home/ubuntu/deploy
-          sudo -E nohup java \
-            -Dspring.profiles.active=dev \
-            -Dserver.port=80 \
-            -jar ./backend-build.jar >> output.log 2>&1 &
+          set -e
+          NAME="yagubogu-backend"
+          echo "새 Docker 컨테이너 실행..."
+          docker run -d \
+            --name $NAME \
+            --restart unless-stopped \
+            --network yagubogu-net \   
+            -p 80:8080 \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            -e DB_URL="${{ secrets.DB_URL }}" \
+            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
+            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
+            $IMAGE:$TAG
+          
+          echo "컨테이너 실행 완료. 헬스체크 시작(간이)"
           sleep 5
-          pgrep -f backend-build.jar || (echo "서버 실행 실패" && exit 1)
+          curl -fsS http://localhost:80/actuator/health || (echo "Healthcheck failed" && docker logs $NAME && exit 1)  
+
+      - name: Docker image Prune
+        run: |
+          echo "사용하지 않는 Docker 이미지 정리 중..."
+          docker image prune -af || true
+          echo "이미지 정리 완료"
