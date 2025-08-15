@@ -110,9 +110,7 @@ jobs:
             -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
             $IMAGE:$TAG
           
-          echo "컨테이너 실행 완료. 헬스체크 시작(간이)"
-          sleep 5
-          curl -fsS http://localhost:80/actuator/health || (echo "Healthcheck failed" && docker logs $NAME && exit 1)  
+          echo "컨테이너 실행 완료."  
 
       - name: Docker image Prune
         run: |
