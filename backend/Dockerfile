@@ -1,5 +1,5 @@
 # --- Build stage ---
-FROM eclipse-temurin:21-jdk AS build
+FROM amazoncorretto:21 AS build
 WORKDIR /workspace
 
 # Gradle 캐시 최적화: wrapper/gradle 관련 파일을 먼저 복사
@@ -17,7 +17,7 @@ COPY src src
 RUN ./gradlew clean bootJar --no-daemon
 
 # --- Run stage ---
-FROM eclipse-temurin:21-jre
+FROM amazoncorretto:21-alpine
 
 # 환경 변수 설정
 # Dockerfile에는 JVM 옵션, 프로필 정도만 기본값으로
