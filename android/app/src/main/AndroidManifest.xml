@@ -41,6 +41,15 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="false" />
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
+            tools:replace="android:theme" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
+            tools:replace="android:theme" />
     </application>
 
 </manifest>

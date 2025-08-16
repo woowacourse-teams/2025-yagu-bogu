@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
 
@@ -60,6 +61,9 @@ class SettingActivity : AppCompatActivity() {
         }
         binding.layoutPrivacyPolicy.constraintSettingMenu.setOnClickListener {
             openUrl("https://sites.google.com/view/yagubogu-privacy-policy/%ED%99%88?authuser=4")
+        }
+        binding.layoutOpenSourceLicense.constraintSettingMenu.setOnClickListener {
+            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
         }
     }
 

@@ -75,6 +75,7 @@
                         app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
                         app:strokeColor="@color/gray300"
                         app:strokeWidth="1dp"
+                        app:userProfileImage="@{`https://avatars.githubusercontent.com/u/66577?v=4`}"
                         tools:src="@drawable/ic_users" />
 
                     <TextView
