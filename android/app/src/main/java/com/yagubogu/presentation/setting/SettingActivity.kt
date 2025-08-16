@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.yagubogu.YaguBoguApplication
@@ -26,6 +27,7 @@ class SettingActivity : AppCompatActivity() {
         setupView()
         setupBindings()
         setupListener()
+        setupIntents()
     }
 
     private fun setupView() {
@@ -47,6 +49,23 @@ class SettingActivity : AppCompatActivity() {
         binding.ivArrowLeft.setOnClickListener {
             finish()
         }
+    }
+
+    private fun setupIntents() {
+        binding.layoutNotice.constraintSettingMenu.setOnClickListener {
+            openUrl("https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74")
+        }
+        binding.layoutContactUs.constraintSettingMenu.setOnClickListener {
+            openUrl("https://forms.gle/wBhXjfTLyobZa19K8")
+        }
+        binding.layoutPrivacyPolicy.constraintSettingMenu.setOnClickListener {
+            openUrl("https://sites.google.com/view/yagubogu-privacy-policy/%ED%99%88?authuser=4")
+        }
+    }
+
+    private fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        startActivity(intent)
     }
 
     companion object {
