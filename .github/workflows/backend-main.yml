@@ -44,11 +44,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      - name: Docker Image Build & Push (multi-arch)
+      - name: Docker Image Build & Push (arm64)
         run: |
           TAG_SHA="prod-${{ github.sha }}"
           TAG_LATEST="prod-latest"
-          # Dockerfile 경로: backend/Dockerfile
           docker buildx build \
             -f Dockerfile \
             --platform linux/arm64 \
@@ -72,35 +71,40 @@ jobs:
 
       - name: Pull Docker image
         run: |
-          echo "Docker 이미지 pull 시작"
           docker pull $IMAGE:$TAG
-          echo "Docker 이미지 pull 완료"
 
-      - name: Stop & Remove existing container (by name)
-        run: |
-          set -e
-          NAME="yagubogu-backend"
-          if [ "$(docker ps -q -f name=^/${NAME}$)" ]; then
-            echo "실행중 컨테이너 중지: $NAME"
-            docker stop $NAME
-          fi
-          if [ "$(docker ps -aq -f name=^/${NAME}$)" ]; then
-            echo "기존 컨테이너 제거: $NAME"
-            docker rm $NAME
-          fi
-          echo "포트 80 점유 프로세스 확인 및 정리"
-          sudo fuser -k -n tcp 80 || true
+      - name: Ensure network
+        run: docker network create yagubogu-net 2>/dev/null || true
 
-      - name: Run docker container
+      - name: Deploy new container (Blue-Green with drain & graceful)
+        shell: bash
         run: |
-          set -e
-          NAME="yagubogu-backend"
-          echo "새 Docker 컨테이너 실행..."
+          set -euo pipefail
+
+          BLUE="yagubogu-backend-blue"
+          GREEN="yagubogu-backend-green"
+
+          # 현재 살아있는 컨테이너를 OLD로 간주
+          if docker ps --format '{{.Names}}' | grep -qx "$BLUE"; then
+            OLD="$BLUE";  NEW="$GREEN"; PORT=8082
+          else
+            OLD="$GREEN"; NEW="$BLUE";  PORT=8081
+          fi
+          echo "OLD=${OLD:-none}, NEW=$NEW, PORT=$PORT"
+
+          # 같은 이름이 잔존 상태이면 제거(이전 실패 잔재 방지)
+          if docker ps -a --format '{{.Names}}' | grep -qx "$NEW"; then
+            docker rm -f "$NEW" || true
+          fi
+
+          # NEW 기동 (★ graceful 종료 옵션 포함)
           docker run -d \
-            --name $NAME \
-            --restart unless-stopped \
+            --name "$NEW" \
             --network yagubogu-net \
-            -p 80:8080 \
+            -p "$PORT:8080" \
+            --restart unless-stopped \
+            --stop-signal=SIGTERM \
+            --stop-timeout=30 \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e DB_URL="${{ secrets.DB_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
@@ -108,12 +112,37 @@ jobs:
             -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
             -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
             -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-            $IMAGE:$TAG
-          
-          echo "컨테이너 실행 완료."  
+            "$IMAGE:$TAG"
+
+          # 헬스체크 (최대 60초) ★ 실패 시 즉시 중단
+          ok=""
+          for i in {1..30}; do
+            if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
+              echo "NEW healthy"
+              ok=1
+              break
+            fi
+            echo "waiting health... ($i/30)"
+            sleep 2
+          done
+          if [ -z "${ok}" ]; then
+            echo "NEW failed to become healthy"
+            docker logs "$NEW" || true
+            exit 1
+          fi
+
+          # (선택) 워밍업
+          curl -fsS "http://127.0.0.1:$PORT/" >/dev/null || true
+
+          # 드레인 대기 ★ 진행 중 요청 마무리 시간
+          sleep 20
+
+          # OLD graceful 종료 ★ 시간 보장
+          if [ -n "${OLD:-}" ] && docker ps --format '{{.Names}}' | grep -qx "$OLD"; then
+            echo "Gracefully stopping $OLD"
+            docker stop --time=30 "$OLD" || true
+            docker rm "$OLD" || true
+          fi
 
       - name: Docker image Prune
-        run: |
-          echo "사용하지 않는 Docker 이미지 정리 중..."
-          docker image prune -af || true
-          echo "이미지 정리 완료"
+        run: docker image prune -af || true
