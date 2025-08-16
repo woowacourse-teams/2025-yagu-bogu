@@ -1,5 +1,7 @@
 package com.yagubogu.presentation.setting
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
+        setupListener()
     }
 
     private fun setupView() {
@@ -22,8 +25,18 @@ class SettingActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivitySettingRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun setupListener() {
+        binding.ivArrowLeft.setOnClickListener {
+            finish()
+        }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, SettingActivity::class.java)
     }
 }
