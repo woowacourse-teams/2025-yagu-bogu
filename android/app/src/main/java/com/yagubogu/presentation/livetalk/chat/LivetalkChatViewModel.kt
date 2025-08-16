@@ -151,6 +151,6 @@ class LivetalkChatViewModel(
 
     companion object {
         private const val POLLING_INTERVAL_MILLS = 10_000L
-        private const val CHAT_LOAD_LIMIT = 15
+        private const val CHAT_LOAD_LIMIT = 30
     }
 }
