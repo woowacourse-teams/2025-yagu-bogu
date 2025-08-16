@@ -37,7 +37,7 @@
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
-    <string name="stats_tab_attendance_history">직관 내역</string>
+    <string name="stats_tab_detail_stats">상세 통계</string>
 
     <string name="stats_my_pie_chart_title">직관 승률</string>
     <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
@@ -59,6 +59,7 @@
     <string name="stats_error">실책</string>
     <string name="stats_average_score">%.1f점</string>
     <string name="stats_average_count">%.1f개</string>
+    <string name="stats_vs_team_stats">%d승 %d무 %d패</string>
 
     <string name="stats_attendance_history_title">최근 직관 내역</string>
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
@@ -79,7 +80,7 @@
     <string name="livetalk_away_home_name">%s vs %s</string>
     <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
     <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
-    
+
     <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
     <string name="livetalk_trash_btn">삭제</string>
     <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
