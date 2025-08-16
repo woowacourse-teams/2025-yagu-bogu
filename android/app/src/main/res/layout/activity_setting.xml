@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.setting.SettingViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -79,6 +83,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:text="@{viewModel.nickname}"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/iv_my_profile"
@@ -90,11 +95,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:text="가입한 날, 프사 받는 api가 없서용"
                         android:textColor="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_my_nick_name"
-                        tools:text="가입한 날 : 2025.08.14" />
+                        app:layout_constraintTop_toBottomOf="@id/tv_my_nick_name" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
