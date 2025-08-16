@@ -1,5 +1,9 @@
 package com.yagubogu.talk.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -30,15 +34,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
-@TestPropertySource(properties = {
-        "spring.sql.init.data-locations=classpath:test-data-team-stadium.sql"
-})
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @DataJpaTest
@@ -329,18 +325,20 @@ class TalkServiceTest {
         );
 
         List<TalkResponse> expectedCursorResult = List.of(
-                TalkResponse.from(thirdTalk, me.getId()),
-                TalkResponse.from(fourthTalk, me.getId())
+                TalkResponse.from(fourthTalk, me.getId()),
+                TalkResponse.from(thirdTalk, me.getId())
         );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(stadium.getFullName());
-            softAssertions.assertThat(actual.homeTeamName()).isEqualTo(homeTeam.getShortName());
-            softAssertions.assertThat(actual.awayTeamName()).isEqualTo(awayTeam.getShortName());
+            softAssertions.assertThat(actual.stadiumName()).isEqualTo(thirdTalk.getGame().getStadium().getFullName());
+            softAssertions.assertThat(actual.homeTeamName())
+                    .isEqualTo(thirdTalk.getGame().getHomeTeam().getShortName());
+            softAssertions.assertThat(actual.awayTeamName())
+                    .isEqualTo(thirdTalk.getGame().getAwayTeam().getShortName());
             softAssertions.assertThat(actual.cursorResult().content()).hasSize(expectedCursorResult.size());
             softAssertions.assertThat(actual.cursorResult().content()).containsExactlyElementsOf(expectedCursorResult);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(fourthTalk.getId());
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(thirdTalk.getId());
             softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }

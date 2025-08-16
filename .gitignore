@@ -3,6 +3,8 @@
 # Compiled class file
 *.class
 
+backend/.env
+
 # Log file
 *.log
 
