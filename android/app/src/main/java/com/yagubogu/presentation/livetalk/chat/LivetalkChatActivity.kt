@@ -52,7 +52,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                     dy: Int,
                 ) {
                     super.onScrolled(recyclerView, dx, dy)
-                    // 스크롤이 최상단에 도달했을 때만 과거 메시지 로드
+                    // 화면 최상단에 스크롤이 도달했을 때 과거 메시지 로드
                     if (!recyclerView.canScrollVertically(-1)) {
                         viewModel.fetchBeforeTalks()
                     }
