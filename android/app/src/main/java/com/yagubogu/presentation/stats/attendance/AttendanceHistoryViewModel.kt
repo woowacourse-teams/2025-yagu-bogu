@@ -16,10 +16,6 @@ class AttendanceHistoryViewModel(
     private val _attendanceHistoryItems = MutableLiveData<List<AttendanceHistoryItem>>()
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> get() = _attendanceHistoryItems
 
-    init {
-        fetchAttendanceHistoryItems()
-    }
-
     fun fetchAttendanceHistoryItems(
         year: Int = LocalDate.now().year,
         filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,

@@ -5,5 +5,7 @@ import okhttp3.Request
 fun Request.addTokenHeader(accessToken: String): Request =
     this
         .newBuilder()
-        .addHeader("Authorization", "Bearer $accessToken")
+        .header("Authorization", "Bearer $accessToken")
         .build()
+
+fun Request.getTokenFromHeader(): String? = this.header("Authorization")?.removePrefix("Bearer ")
