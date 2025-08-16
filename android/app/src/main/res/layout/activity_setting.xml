@@ -9,6 +9,10 @@
             name="viewModel"
             type="com.yagubogu.presentation.setting.SettingViewModel" />
 
+        <variable
+            name="appVersion"
+            type="String" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -209,6 +213,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="30dp"
+                    android:text="@{@string/setting_app_version(appVersion)}"
                     android:textColor="@color/gray500"
                     tools:text="앱 버전: 1.0.0" />
 

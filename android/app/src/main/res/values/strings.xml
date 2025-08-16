@@ -96,4 +96,6 @@
     <string name="setting_contact_us">문의하기</string>
     <string name="setting_privacy_policy">개인 정보 처리방침</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
+
+    <string name="setting_app_version">앱 버전: %s</string>
 </resources>
