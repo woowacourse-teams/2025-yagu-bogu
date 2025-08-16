@@ -24,6 +24,10 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private val livetalkChatAdapter = LivetalkChatAdapter()
 
+    private val chatLinearLayoutManager by lazy {
+        binding.rvChatMessages.layoutManager as LinearLayoutManager
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -75,7 +79,6 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
-            val layoutManager = binding.rvChatMessages.layoutManager as LinearLayoutManager
 
             val oldFirstItemId =
                 livetalkChatAdapter.currentList
@@ -83,12 +86,14 @@ class LivetalkChatActivity : AppCompatActivity() {
                     ?.livetalkChatItem
                     ?.chatId
 
+            val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
+
             livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
                 val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
                 val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
 
-                if (isNewMessageArrived) {
-                    layoutManager.scrollToPosition(0)
+                if (isNewMessageArrived && firstVisibleItemPosition == 0) {
+                    chatLinearLayoutManager.scrollToPosition(0)
                 }
             }
         }
