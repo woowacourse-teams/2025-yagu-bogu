@@ -58,6 +58,20 @@ public class MemberServiceTest {
         assertThat(actual.favorite()).isEqualTo(expected);
     }
 
+    @DisplayName("멤버가 응원하는 팀이 없다면 null을 반환한다")
+    @Test
+    void findFavorite_null() {
+        // given
+        Team team = null;
+        Member member = memberFactory.save(builder -> builder.team(team));
+
+        // when
+        MemberFavoriteResponse actual = memberService.findFavorite(member.getId());
+
+        // then
+        assertThat(actual.favorite()).isEqualTo(null);
+    }
+
     @DisplayName("멤버의 닉네임을 조회한다")
     @Test
     void findNickname() {
