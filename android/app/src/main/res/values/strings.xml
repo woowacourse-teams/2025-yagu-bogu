@@ -79,9 +79,21 @@
     <string name="livetalk_away_home_name">%s vs %s</string>
     <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
     <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
-    
+
     <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
     <string name="livetalk_trash_btn">삭제</string>
     <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
     <string name="livetalk_user_report_btn">신고</string>
+
+    <string name="setting_edit_favorite_team">응원팀 수정</string>
+    <string name="setting_edit_nickname">닉네임 수정</string>
+    <string name="setting_manage_account">계정 관리</string>
+
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_delete_account">탈퇴하기</string>
+
+    <string name="setting_notice">공지사항</string>
+    <string name="setting_contact_us">문의하기</string>
+    <string name="setting_privacy_policy">개인 정보 처리방침</string>
+    <string name="setting_open_source_license">오픈소스 라이선스</string>
 </resources>
