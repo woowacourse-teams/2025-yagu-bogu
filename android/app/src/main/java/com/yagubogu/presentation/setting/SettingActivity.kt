@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
+import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -53,6 +54,9 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun setupIntents() {
+        binding.layoutEditFavoriteTeam.constraintSettingMenu.setOnClickListener {
+            startActivity(Intent(this, FavoriteTeamActivity::class.java))
+        }
         binding.layoutNotice.constraintSettingMenu.setOnClickListener {
             openUrl("https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74")
         }

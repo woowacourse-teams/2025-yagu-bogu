@@ -14,8 +14,12 @@ class SettingViewModel(
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> get() = _nickname
 
+    private val _favoriteTeam = MutableLiveData<String>()
+    val favoriteTeam: LiveData<String> get() = _favoriteTeam
+
     init {
         fetchNickname()
+        fetchFavoriteTeam()
     }
 
     private fun fetchNickname() {
@@ -25,7 +29,19 @@ class SettingViewModel(
                 .onSuccess { nickname: String ->
                     _nickname.value = nickname
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    Timber.w(exception, "닉네임 조회 API 호출 실패")
+                }
+        }
+    }
+
+    private fun fetchFavoriteTeam() {
+        viewModelScope.launch {
+            memberRepository
+                .getFavoriteTeam()
+                .onSuccess { favoriteTeam: String ->
+                    _favoriteTeam.value = favoriteTeam
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "응원팀 조회 API 호출 실패")
                 }
         }
     }

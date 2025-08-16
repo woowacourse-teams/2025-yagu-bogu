@@ -5,10 +5,17 @@
 
     <data>
 
+        <import type="android.view.View" />
+
+        <import type="android.text.TextUtils" />
+
         <variable
             name="menuTitle"
             type="String" />
 
+        <variable
+            name="additionalInfo"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,9 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:includeFontPadding="false"
+            android:text="@{additionalInfo}"
             android:textColor="@color/gray500"
-            android:visibility="gone"
+            android:visibility="@{TextUtils.isEmpty(additionalInfo) ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_arrow_right"
             app:layout_constraintTop_toTopOf="parent"
