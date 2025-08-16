@@ -25,6 +25,7 @@ class LivetalkChatViewModel(
     val messageFormText = MutableLiveData<String>()
 
     private val fetchLock = Mutex()
+    private val pollingControlLock = Mutex()
     private var oldestMessageCursor: Long? = null
     private var newestMessageCursor: Long? = null
     private var hasNext: Boolean = true
@@ -66,7 +67,8 @@ class LivetalkChatViewModel(
                 talksRepository.postTalks(gameId, message.trim())
             talksResult
                 .onSuccess {
-                    fetchAfterTalks()
+                    stopChatPolling()
+                    startChatPolling()
                     messageFormText.value = ""
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -75,19 +77,28 @@ class LivetalkChatViewModel(
     }
 
     fun startChatPolling() {
-        if (pollingJob?.isActive == true) return
-        pollingJob =
-            viewModelScope.launch {
-                while (true) {
-                    fetchAfterTalks()
-                    delay(POLLING_INTERVAL_MILLS)
-                }
+        viewModelScope.launch {
+            pollingControlLock.withLock {
+                if (pollingJob?.isActive == true) return@launch
+
+                pollingJob =
+                    launch {
+                        while (true) {
+                            fetchAfterTalks()
+                            delay(POLLING_INTERVAL_MILLS)
+                        }
+                    }
             }
+        }
     }
 
     fun stopChatPolling() {
-        pollingJob?.cancel()
-        pollingJob = null
+        viewModelScope.launch {
+            pollingControlLock.withLock {
+                pollingJob?.cancel()
+                pollingJob = null
+            }
+        }
     }
 
     private fun fetchInitialTalks() {
@@ -124,7 +135,7 @@ class LivetalkChatViewModel(
                             val currentList = _liveTalkChatBubbleItem.value ?: emptyList()
                             _liveTalkChatBubbleItem.value = newChats + currentList
 
-                            newestMessageCursor = newChats.last().livetalkChatItem.chatId
+                            newestMessageCursor = newChats.first().livetalkChatItem.chatId
                         }
                     }.onFailure { exception ->
                         Timber.w(exception, "최신 메시지 API 호출 실패")
