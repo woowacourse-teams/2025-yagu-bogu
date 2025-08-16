@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_edit_nickname_title"
+            style="@style/TextView.Esamanru.Medium.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="@string/setting_edit_nickname_dialog_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_edit_nickname_field"
+            style="@style/TextView.Pretendard.SemiBold.16"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="30dp"
+            android:hint="@string/setting_edit_nickname_dialog_hint"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_edit_nickname_title" />
+
+        <TextView
+            android:id="@+id/tv_negative_btn"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:paddingHorizontal="48dp"
+            android:paddingVertical="20dp"
+            android:text="@string/all_cancel"
+            android:textColor="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_edit_nickname_field" />
+
+        <TextView
+            android:id="@+id/tv_positive_btn"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="48dp"
+            android:paddingVertical="20dp"
+            android:text="@string/all_confirm"
+            android:textColor="@color/primary500"
+            app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
+            app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

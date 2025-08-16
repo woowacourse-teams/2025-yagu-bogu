@@ -3,6 +3,7 @@ package com.yagubogu.presentation.setting
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -11,6 +12,8 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.android.material.snackbar.Snackbar
+import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
@@ -31,6 +34,7 @@ class SettingActivity : AppCompatActivity() {
         setupView()
         setupBindings()
         setupListener()
+        setupObservers()
         setupIntents()
     }
 
@@ -54,22 +58,41 @@ class SettingActivity : AppCompatActivity() {
         binding.ivArrowLeft.setOnClickListener {
             finish()
         }
+
+        SettingNicknameEditFragment.setResultListener(
+            supportFragmentManager,
+            this,
+        ) { newNickname: String ->
+            viewModel.updateNickname(newNickname)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.nicknameEditedEvent.observe(this) { newNickname: String ->
+            showSnackbar(getString(R.string.setting_edited_nickname_alert, newNickname))
+        }
     }
 
     private fun setupIntents() {
-        binding.layoutEditFavoriteTeam.constraintSettingMenu.setOnClickListener {
+        binding.layoutEditFavoriteTeam.root.setOnClickListener {
             startActivity(Intent(this, FavoriteTeamActivity::class.java))
         }
-        binding.layoutNotice.constraintSettingMenu.setOnClickListener {
+        binding.layoutEditNickname.root.setOnClickListener {
+            val currentNickname = binding.tvMyNickName.text.toString()
+            SettingNicknameEditFragment
+                .newInstance(currentNickname)
+                .show(supportFragmentManager, "SettingNicknameEditFragment")
+        }
+        binding.layoutNotice.root.setOnClickListener {
             openUrl("https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74")
         }
-        binding.layoutContactUs.constraintSettingMenu.setOnClickListener {
+        binding.layoutContactUs.root.setOnClickListener {
             openUrl("https://forms.gle/wBhXjfTLyobZa19K8")
         }
-        binding.layoutPrivacyPolicy.constraintSettingMenu.setOnClickListener {
+        binding.layoutPrivacyPolicy.root.setOnClickListener {
             openUrl("https://sites.google.com/view/yagubogu-privacy-policy/%ED%99%88?authuser=4")
         }
-        binding.layoutOpenSourceLicense.constraintSettingMenu.setOnClickListener {
+        binding.layoutOpenSourceLicense.root.setOnClickListener {
             startActivity(Intent(this, OssLicensesMenuActivity::class.java))
         }
     }
@@ -87,6 +110,14 @@ class SettingActivity : AppCompatActivity() {
             Timber.d("앱 버전 로드 실패 ${e.message}")
             DEFAULT_VERSION_NAME
         }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
+            setBackgroundTint(Color.DKGRAY)
+            setTextColor(context.getColor(R.color.white))
+            show()
+        }
+    }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, SettingActivity::class.java)

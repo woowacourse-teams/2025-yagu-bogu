@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
+import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -17,9 +19,25 @@ class SettingViewModel(
     private val _favoriteTeam = MutableLiveData<String>()
     val favoriteTeam: LiveData<String> get() = _favoriteTeam
 
+    private val _nicknameEditedEvent = MutableSingleLiveData<String>()
+    val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
+
     init {
         fetchNickname()
         fetchFavoriteTeam()
+    }
+
+    fun updateNickname(newNickname: String) {
+        viewModelScope.launch {
+            memberRepository
+                .updateNickname(newNickname)
+                .onSuccess {
+                    _nickname.value = newNickname
+                    _nicknameEditedEvent.setValue(newNickname)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "닉네임 변경 API 호출 실패")
+                }
+        }
     }
 
     private fun fetchNickname() {
