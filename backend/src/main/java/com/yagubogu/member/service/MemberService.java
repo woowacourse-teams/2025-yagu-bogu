@@ -45,7 +45,7 @@ public class MemberService {
         Team team = member.getTeam();
 
         if (team == null) {
-            return null;
+            return MemberFavoriteResponse.empty();
         }
 
         return MemberFavoriteResponse.from(team);

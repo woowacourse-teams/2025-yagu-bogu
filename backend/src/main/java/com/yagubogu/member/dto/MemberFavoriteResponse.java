@@ -9,4 +9,8 @@ public record MemberFavoriteResponse(
     public static MemberFavoriteResponse from(final Team team) {
         return new MemberFavoriteResponse(team.getShortName());
     }
+
+    public static MemberFavoriteResponse empty() {
+        return new MemberFavoriteResponse(null);
+    }
 }
