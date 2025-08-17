@@ -18,4 +18,7 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
+
+# MPAndroidChart 라이브러리의 모든 클래스와 멤버를 유지
+-keep class com.github.mikephil.charting.** { *; }

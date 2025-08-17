@@ -45,7 +45,9 @@ class AttendanceHistoryFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        viewModel.fetchAttendanceHistoryItems()
+        if (!hidden) {
+            viewModel.fetchAttendanceHistoryItems()
+        }
     }
 
     override fun onDestroyView() {
