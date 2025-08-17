@@ -7,7 +7,7 @@
 
         <variable
             name="vsTeamStat"
-            type="com.yagubogu.presentation.stats.detail.VsTeamStat" />
+            type="com.yagubogu.presentation.stats.detail.VsTeamStatItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

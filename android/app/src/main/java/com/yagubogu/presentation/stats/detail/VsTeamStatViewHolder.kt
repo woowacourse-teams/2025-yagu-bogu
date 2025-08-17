@@ -8,7 +8,7 @@ import com.yagubogu.databinding.ItemVsTeamStatBinding
 class VsTeamStatViewHolder(
     private val binding: ItemVsTeamStatBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: VsTeamStat) {
+    fun bind(item: VsTeamStatItem) {
         binding.vsTeamStat = item
     }
 

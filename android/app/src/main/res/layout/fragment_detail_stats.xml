@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.stats.detail.DetailStatsViewModel" />
+    </data>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -48,9 +55,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:background="@drawable/bg_stroke_gray300_radius_12dp"
+                    android:onClick="@{() -> viewModel.toggleVsTeamStats()}"
                     android:paddingVertical="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rv_vs_team_winning_percentage">
+                    app:layout_constraintTop_toBottomOf="@id/rv_vs_team_winning_percentage"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:layout_editor_absoluteX="40dp">
 
                     <TextView
                         android:id="@+id/tv_show_more"
@@ -58,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
-                        android:text="@string/home_show_more"
+                        android:text="@{viewModel.isVsTeamStatsExpanded ? @string/home_show_less : @string/home_show_more}"
                         android:textColor="@color/gray400"
                         android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -72,7 +82,7 @@
                         android:id="@+id/iv_arrow"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_down"
+                        android:src="@{viewModel.isVsTeamStatsExpanded ? @drawable/ic_arrow_up : @drawable/ic_arrow_down}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tv_show_more"

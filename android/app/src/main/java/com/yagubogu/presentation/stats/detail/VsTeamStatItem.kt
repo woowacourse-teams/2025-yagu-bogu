@@ -3,7 +3,7 @@ package com.yagubogu.presentation.stats.detail
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.util.getEmoji
 
-data class VsTeamStat(
+data class VsTeamStatItem(
     val rank: Int,
     val name: String,
     val team: Team,

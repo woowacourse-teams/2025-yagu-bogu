@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class VsTeamStatAdapter : ListAdapter<VsTeamStat, VsTeamStatViewHolder>(diffCallback) {
+class VsTeamStatAdapter : ListAdapter<VsTeamStatItem, VsTeamStatViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -14,21 +14,21 @@ class VsTeamStatAdapter : ListAdapter<VsTeamStat, VsTeamStatViewHolder>(diffCall
         holder: VsTeamStatViewHolder,
         position: Int,
     ) {
-        val item: VsTeamStat = getItem(position)
+        val item: VsTeamStatItem = getItem(position)
         holder.bind(item)
     }
 
     companion object {
         private val diffCallback =
-            object : DiffUtil.ItemCallback<VsTeamStat>() {
+            object : DiffUtil.ItemCallback<VsTeamStatItem>() {
                 override fun areItemsTheSame(
-                    oldItem: VsTeamStat,
-                    newItem: VsTeamStat,
+                    oldItem: VsTeamStatItem,
+                    newItem: VsTeamStatItem,
                 ): Boolean = oldItem.rank == newItem.rank
 
                 override fun areContentsTheSame(
-                    oldItem: VsTeamStat,
-                    newItem: VsTeamStat,
+                    oldItem: VsTeamStatItem,
+                    newItem: VsTeamStatItem,
                 ): Boolean = oldItem == newItem
             }
     }
