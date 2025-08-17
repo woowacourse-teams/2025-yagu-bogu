@@ -5,14 +5,6 @@
 
     <data>
 
-        <variable
-            name="viewModel"
-            type="com.yagubogu.presentation.setting.SettingViewModel" />
-
-        <variable
-            name="appVersion"
-            type="String" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,179 +37,15 @@
             app:layout_constraintTop_toTopOf="@id/iv_arrow_left" />
 
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fcv_setting"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_arrow_left">
+            app:layout_constraintTop_toBottomOf="@id/iv_arrow_left" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="30dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraint_my_profile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_white_radius_12dp"
-                    android:paddingVertical="30dp">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/iv_my_profile"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
-                        app:strokeColor="@color/gray300"
-                        app:strokeWidth="1dp"
-                        app:userProfileImage="@{`https://avatars.githubusercontent.com/u/66577?v=4`}"
-                        tools:src="@drawable/ic_users" />
-
-                    <TextView
-                        android:id="@+id/tv_my_nick_name"
-                        style="@style/TextView.Pretendard.SemiBold.24"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@{viewModel.nickname}"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/iv_my_profile"
-                        tools:text="이지윤" />
-
-                    <TextView
-                        android:id="@+id/tv_sign_up_date"
-                        style="@style/TextView.Pretendard.Medium.12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="가입한 날, 프사 받는 api가 없서용"
-                        android:textColor="@color/gray500"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_my_nick_name" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraint_setting_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_white_radius_12dp"
-                    android:padding="20dp">
-
-                    <include
-                        android:id="@+id/layout_edit_favorite_team"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:additionalInfo="@{viewModel.favoriteTeam}"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:menuTitle="@{@string/setting_edit_favorite_team}" />
-
-                    <include
-                        android:id="@+id/layout_edit_nickname"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_edit_favorite_team"
-                        app:menuTitle="@{@string/setting_edit_nickname}" />
-
-                    <include
-                        android:id="@+id/layout_manage_account"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_edit_nickname"
-                        app:menuTitle="@{@string/setting_manage_account}" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraint_setting_general"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_white_radius_12dp"
-                    android:padding="20dp">
-
-                    <include
-                        android:id="@+id/layout_notice"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:menuTitle="@{@string/setting_notice}" />
-
-                    <include
-                        android:id="@+id/layout_contact_us"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_notice"
-                        app:menuTitle="@{@string/setting_contact_us}" />
-
-                    <include
-                        android:id="@+id/layout_privacy_policy"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_contact_us"
-                        app:menuTitle="@{@string/setting_privacy_policy}" />
-
-                    <include
-                        android:id="@+id/layout_open_source_license"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_privacy_policy"
-                        app:menuTitle="@{@string/setting_open_source_license}" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <TextView
-                    android:id="@+id/tv_app_version"
-                    style="@style/TextView.Pretendard.Medium.12"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="30dp"
-                    android:text="@{@string/setting_app_version(appVersion)}"
-                    android:textColor="@color/gray500"
-                    tools:text="앱 버전: 1.0.0" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
