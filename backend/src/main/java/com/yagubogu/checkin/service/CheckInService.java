@@ -67,23 +67,13 @@ public class CheckInService {
 
         for (GameWithFanCountsResponse gameWithFanCount : gameWithFanCounts) {
             Game game = gameWithFanCount.game();
-            Long totalCheckInCounts = gameWithFanCount.totalCheckInCounts();
-            Long homeTeamCheckInCounts = gameWithFanCount.homeTeamCheckInCounts();
-            Long awayTeamCheckInCounts = gameWithFanCount.awayTeamCheckInCounts();
+            FanRateByGameResponse response = createFanRateByGameResponse(gameWithFanCount);
 
-            if (totalCheckInCounts == null || homeTeamCheckInCounts == null || awayTeamCheckInCounts == null) {
-                continue;
-            }
             if (game.hasTeam(myTeam)) {
                 myFanRateByGame = createFanRateByGameResponse(gameWithFanCount);
                 continue;
             }
-            fanRatesByGames.add(
-                    new FanRateGameEntry(
-                            totalCheckInCounts,
-                            createFanRateByGameResponse(gameWithFanCount)
-                    )
-            );
+            fanRatesByGames.add(new FanRateGameEntry(gameWithFanCount.totalCheckInCounts(), response));
         }
 
         return FanRateResponse.from(myFanRateByGame, fanRatesByGames);
@@ -180,15 +170,15 @@ public class CheckInService {
     }
 
     private FanRateByGameResponse createFanRateByGameResponse(final GameWithFanCountsResponse gameWithFanCounts) {
-        long total = gameWithFanCounts.totalCheckInCounts();
+        Long total = gameWithFanCounts.totalCheckInCounts();
         double homeRate = calculateRoundRate(gameWithFanCounts.homeTeamCheckInCounts(), total);
         double awayRate = calculateRoundRate(gameWithFanCounts.awayTeamCheckInCounts(), total);
 
         return FanRateByGameResponse.from(gameWithFanCounts.game(), total, homeRate, awayRate);
     }
 
-    private double calculateRoundRate(final long checkInCounts, final long total) {
-        if (total == 0) {
+    private double calculateRoundRate(final Long checkInCounts, final Long total) {
+        if (total == 0 || checkInCounts == 0) {
             return 0.0;
         }
 
