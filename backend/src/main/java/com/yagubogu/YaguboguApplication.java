@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class YaguboguApplication {
 
     public static void main(String[] args) {
-        System.out.println("?");
         SpringApplication.run(YaguboguApplication.class, args);
     }
 }

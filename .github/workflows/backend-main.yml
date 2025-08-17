@@ -11,53 +11,31 @@ env:
   IMAGE: yagubogu/yagubogu-backend
 
 jobs:
-  ci:
+  promote:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./backend
-    permissions:
-      contents: read
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'corretto'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Run Tests
-        run: ./gradlew test
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
         with:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      - name: Docker Image Build & Push (arm64)
+      # dev 빌드 산출물 존재 확인 (없으면 실패 처리 or 빌드 fallback)
+      - name: Ensure dev image exists
         run: |
-          TAG_SHA="prod-${{ github.sha }}"
-          TAG_LATEST="prod-latest"
-          docker buildx build \
-            -f Dockerfile \
-            --platform linux/arm64 \
-            -t $IMAGE:$TAG_SHA \
-            -t $IMAGE:$TAG_LATEST \
-            --push \
-            .
+          set -e
+          docker buildx imagetools inspect $IMAGE:dev-${{ github.sha }} > /dev/null
+
+      # dev-${SHA} → prod-${SHA}, prod-latest 승급 (재빌드/재푸시 없음)
+      - name: Promote dev tag to prod tags
+        run: |
+          docker buildx imagetools create \
+            -t $IMAGE:prod-${{ github.sha }} \
+            -t $IMAGE:prod-latest \
+            $IMAGE:dev-${{ github.sha }}
 
   cd:
-    needs: ci
+    needs: promote
     runs-on: [ self-hosted, production ]
     env:
       IMAGE: yagubogu/yagubogu-backend
@@ -105,10 +83,7 @@ jobs:
             --restart unless-stopped \
             --stop-signal=SIGTERM \
             --stop-timeout=30 \
-            --log-driver=awslogs \
-            --log-opt awslogs-region=ap-northeast-2 \
-            --log-opt awslogs-group=yagu-bogu-log-dev \
-            --log-opt awslogs-stream=yagu-bogu-backend-dev \
+            -v /var/log/yagubogu:/var/log/yagubogu \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e DB_URL="${{ secrets.DB_PROD_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
