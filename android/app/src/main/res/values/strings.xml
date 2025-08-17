@@ -95,6 +95,10 @@
     <string name="setting_logout">로그아웃</string>
     <string name="setting_logout_alert">로그아웃 되었습니다.</string>
     <string name="setting_delete_account">탈퇴하기</string>
+    <string name="Setting_delete_account_illustration_description">구단을 떠나는 선수 일러스트</string>
+    <string name="setting_delete_account_question">정말 떠나실 건가요?</string>
+    <string name="setting_delete_account_confirm">탈퇴하기</string>
+    <string name="setting_delete_account_cancel">잔류하기</string>
 
     <string name="setting_notice">공지사항</string>
     <string name="setting_contact_us">문의하기</string>

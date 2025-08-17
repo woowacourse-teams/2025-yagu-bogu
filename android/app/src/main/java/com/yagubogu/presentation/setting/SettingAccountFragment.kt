@@ -44,6 +44,18 @@ class SettingAccountFragment : Fragment() {
         binding.layoutLogout.root.setOnClickListener {
             viewModel.logout()
         }
+        binding.layoutDeleteAccount.root.setOnClickListener {
+            showDeleteAccountFragment()
+        }
+    }
+
+    private fun showDeleteAccountFragment() {
+        parentFragmentManager
+            .beginTransaction()
+            .setReorderingAllowed(true)
+            .replace(R.id.fcv_setting, SettingDeleteAccountFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onResume() {
