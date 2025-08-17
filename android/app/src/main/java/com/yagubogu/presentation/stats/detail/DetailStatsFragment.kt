@@ -17,6 +17,10 @@ class DetailStatsFragment : Fragment() {
 
     private val vsTeamStatAdapter: VsTeamStatAdapter by lazy { VsTeamStatAdapter() }
 
+    private val barChartManager: BarChartManager by lazy {
+        BarChartManager(requireContext(), binding.barChart)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,18 +37,33 @@ class DetailStatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupObservers()
+        barChartManager.setupChart()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchAll()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupBindings() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-
         binding.rvVsTeamWinningPercentage.adapter = vsTeamStatAdapter
     }
 
     private fun setupObservers() {
         viewModel.vsTeamStats.observe(viewLifecycleOwner) { value: List<VsTeamStatItem> ->
             vsTeamStatAdapter.submitList(value)
+        }
+        viewModel.stadiumVisitCounts.observe(viewLifecycleOwner) { value: List<StadiumVisitCount> ->
+            barChartManager.loadData(value)
         }
     }
 }

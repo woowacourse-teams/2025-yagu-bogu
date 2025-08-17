@@ -13,22 +13,35 @@ class DetailStatsViewModel : ViewModel() {
     private var _vsTeamStatItems: List<VsTeamStatItem> = emptyList()
     val vsTeamStatItems: List<VsTeamStatItem> get() = _vsTeamStatItems.toList()
 
+    private val _stadiumVisitCounts = MutableLiveData<List<StadiumVisitCount>>()
+    val stadiumVisitCounts: LiveData<List<StadiumVisitCount>> get() = _stadiumVisitCounts
+
     val vsTeamStats: LiveData<List<VsTeamStatItem>> =
         MediatorLiveData<List<VsTeamStatItem>>().apply {
             addSource(isVsTeamStatsExpanded) { value = updateVsTeamStats() }
         }
 
     init {
-        fetchVsTeamStats()
+        fetchAll()
     }
 
-    fun fetchVsTeamStats() {
-        // TODO: API 연결 후 DUMMY 제거
-        _vsTeamStatItems = DUMMY_VS_TEAM_STATS
+    fun fetchAll() {
+        fetchVsTeamStats()
+        fetchStadiumVisitCounts()
     }
 
     fun toggleVsTeamStats() {
         _isVsTeamStatsExpanded.value = isVsTeamStatsExpanded.value?.not() ?: true
+    }
+
+    private fun fetchVsTeamStats() {
+        // TODO: API 연결 후 DUMMY 제거
+        _vsTeamStatItems = DUMMY_VS_TEAM_STATS
+    }
+
+    private fun fetchStadiumVisitCounts() {
+        // TODO: API 연결 후 DUMMY 제거
+        _stadiumVisitCounts.value = DUMMY_STADIUM_VISIT_COUNTS
     }
 
     private fun updateVsTeamStats(): List<VsTeamStatItem> {
@@ -120,6 +133,19 @@ class DetailStatsViewModel : ViewModel() {
                     loseCounts = 0,
                     winningPercentage = 0.0,
                 ),
+            )
+
+        private val DUMMY_STADIUM_VISIT_COUNTS =
+            listOf(
+                StadiumVisitCount("잠실", 12),
+                StadiumVisitCount("인천", 4),
+                StadiumVisitCount("고척", 4),
+                StadiumVisitCount("수원", 3),
+                StadiumVisitCount("대구", 2),
+                StadiumVisitCount("부산", 2),
+                StadiumVisitCount("수원", 1),
+                StadiumVisitCount("대전", 0),
+                StadiumVisitCount("광주", 0),
             )
     }
 }
