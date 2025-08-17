@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
-                R.id.item_challenge -> {
+                R.id.item_attendance_history -> {
                     switchFragment(ChallengeFragment::class.java, itemId)
                     true
                 }
@@ -107,8 +107,8 @@ class MainActivity : AppCompatActivity() {
             when (selectedItemId) {
                 R.id.item_home -> R.string.app_name
                 R.id.item_stats -> R.string.bottom_navigation_stats
+                R.id.item_attendance_history -> R.string.bottom_navigation_attendance_history
                 R.id.item_livetalk -> R.string.bottom_navigation_livetalk
-                R.id.item_challenge -> R.string.bottom_navigation_challenge
                 else -> R.string.app_name
             }
         binding.tvToolbarTitle.text = getString(titleResId)
