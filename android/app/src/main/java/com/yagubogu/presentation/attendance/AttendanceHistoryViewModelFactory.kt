@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.attendance
+package com.yagubogu.presentation.attendance
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

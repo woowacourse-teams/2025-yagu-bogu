@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
-import com.yagubogu.presentation.challenge.ChallengeFragment
+import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.item_attendance_history -> {
-                    switchFragment(ChallengeFragment::class.java, itemId)
+                    switchFragment(AttendanceHistoryFragment::class.java, itemId)
                     true
                 }
 
