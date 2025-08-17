@@ -29,9 +29,5 @@ WORKDIR /app
 # 빌드 결과 복사
 COPY --from=build /workspace/build/libs/*SNAPSHOT.jar /app/app.jar
 
-# 헬스체크
-HEALTHCHECK --interval=15s --timeout=3s --retries=5 \
-  CMD wget -qO- http://localhost:${SERVER_PORT}/actuator/health || exit 1
-
 # 실행
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]

@@ -110,7 +110,7 @@ jobs:
             --log-opt awslogs-group=yagu-bogu-log-dev \
             --log-opt awslogs-stream=yagu-bogu-backend-dev \
             -e SPRING_PROFILES_ACTIVE=prod \
-            -e DB_URL="${{ secrets.DB_URL }}" \
+            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
