@@ -29,7 +29,7 @@
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_edit_nickname_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_edit_nickname_title" />
 
         <TextView
             android:id="@+id/tv_negative_btn"
