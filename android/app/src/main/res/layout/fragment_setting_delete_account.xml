@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.setting.SettingViewModel" />
+
     </data>
 
     <FrameLayout
@@ -57,22 +61,24 @@
                     android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:onClick="@{() -> viewModel.deleteAccount()}"
                     android:text="@string/setting_delete_account_confirm"
                     android:textSize="18sp"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_cancel"
+                    app:layout_constraintEnd_toStartOf="@id/btn_cancel"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_delete_account_question" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_cancel"
                     style="@style/Widget.App.Button.Positive.Pretendard.Medium"
                     android:layout_width="130dp"
                     android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.cancelDeleteAccount()}"
                     android:text="@string/setting_delete_account_cancel"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/btn_confirm"
-                    app:layout_constraintTop_toTopOf="@+id/btn_confirm" />
+                    app:layout_constraintStart_toEndOf="@id/btn_confirm"
+                    app:layout_constraintTop_toTopOf="@id/btn_confirm" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

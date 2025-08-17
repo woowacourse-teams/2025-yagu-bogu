@@ -28,6 +28,12 @@ class SettingViewModel(
     private val _logoutEvent = MutableSingleLiveData<Unit>()
     val logoutEvent: SingleLiveData<Unit> get() = _logoutEvent
 
+    private val _deleteAccountEvent = MutableSingleLiveData<Unit>()
+    val deleteAccountEvent: SingleLiveData<Unit> get() = _deleteAccountEvent
+
+    private val _deleteAccountCancelEvent = MutableSingleLiveData<Unit>()
+    val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
+
     init {
         fetchNickname()
         fetchFavoriteTeam()
@@ -60,6 +66,22 @@ class SettingViewModel(
                     Timber.w(exception, "로그아웃 API 호출 실패")
                 }
         }
+    }
+
+    fun deleteAccount() {
+        viewModelScope.launch {
+            memberRepository
+                .deleteMember()
+                .onSuccess {
+                    _deleteAccountEvent.setValue(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "계정 삭제 API 호출 실패")
+                }
+        }
+    }
+
+    fun cancelDeleteAccount() {
+        _deleteAccountCancelEvent.setValue(Unit)
     }
 
     private fun fetchNickname() {

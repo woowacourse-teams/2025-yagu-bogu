@@ -81,6 +81,14 @@ class SettingActivity : AppCompatActivity() {
             showToast(getString(R.string.setting_logout_alert))
             navigateToLogin()
         }
+        viewModel.deleteAccountEvent.observe(this) {
+            showToast(getString(R.string.setting_delete_account_confirm_select_alert))
+            navigateToLogin()
+        }
+        viewModel.deleteAccountCancelEvent.observe(this) {
+            showToast(getString(R.string.setting_delete_account_cancel_select_alert))
+            finish()
+        }
     }
 
     private fun navigateToLogin() {
