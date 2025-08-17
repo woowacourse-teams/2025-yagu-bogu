@@ -77,7 +77,6 @@ jobs:
             --name "$NEW" \
             --network yagubogu-net \
             -p "$PORT:8080" \
-            --restart unless-stopped \
             --stop-signal=SIGTERM \
             --stop-timeout=30 \
             -v /var/log/yagubogu:/var/log/yagubogu \
