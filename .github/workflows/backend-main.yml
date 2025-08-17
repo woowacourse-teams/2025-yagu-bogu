@@ -20,19 +20,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      # dev 빌드 산출물 존재 확인 (없으면 실패 처리 or 빌드 fallback)
-      - name: Ensure dev image exists
-        run: |
-          set -e
-          docker buildx imagetools inspect $IMAGE:dev-${{ github.sha }} > /dev/null
+      - name: Ensure dev-latest exists
+        run: docker buildx imagetools inspect $IMAGE:dev-latest > /dev/null
 
-      # dev-${SHA} → prod-${SHA}, prod-latest 승급 (재빌드/재푸시 없음)
-      - name: Promote dev tag to prod tags
+      - name: Promote dev-latest -> prod tags
         run: |
           docker buildx imagetools create \
             -t $IMAGE:prod-${{ github.sha }} \
             -t $IMAGE:prod-latest \
-            $IMAGE:dev-${{ github.sha }}
+            $IMAGE:dev-latest
 
   cd:
     needs: promote
