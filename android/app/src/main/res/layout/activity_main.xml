@@ -73,7 +73,9 @@
             android:id="@+id/view_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/gray_overlay"
+            android:background="@color/dimming050"
+            android:clickable="true"
+            android:focusable="true"
             android:visibility="gone" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator

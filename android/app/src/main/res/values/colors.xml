@@ -48,7 +48,4 @@
     <color name="gold">#FFC9B037</color>
     <color name="silver">#FFB4B4B4</color>
     <color name="bronze">#FFAD8A56</color>
-
-    <!-- Overlay -->
-    <color name="gray_overlay">#80000000</color>
 </resources>
