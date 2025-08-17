@@ -10,4 +10,8 @@ interface MemberRepository {
     suspend fun getFavoriteTeam(): Result<String>
 
     suspend fun updateFavoriteTeam(team: Team): Result<String>
+
+    suspend fun logout(): Result<Unit>
+
+    suspend fun deleteMember(): Result<Unit>
 }
