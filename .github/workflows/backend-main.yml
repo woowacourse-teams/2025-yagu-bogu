@@ -5,6 +5,7 @@ on:
     branches: [ "chore/356" ]
     paths:
       - "backend/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 env:
