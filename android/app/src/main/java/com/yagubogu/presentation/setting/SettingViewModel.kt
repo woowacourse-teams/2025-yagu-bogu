@@ -13,6 +13,9 @@ import timber.log.Timber
 class SettingViewModel(
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
+    private val _settingTitle = MutableLiveData<String>()
+    val settingTitle: LiveData<String> get() = _settingTitle
+
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> get() = _nickname
 
@@ -25,6 +28,10 @@ class SettingViewModel(
     init {
         fetchNickname()
         fetchFavoriteTeam()
+    }
+
+    fun setSettingTitle(title: String) {
+        _settingTitle.value = title
     }
 
     fun updateNickname(newNickname: String) {

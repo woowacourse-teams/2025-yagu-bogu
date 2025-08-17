@@ -34,6 +34,7 @@ class SettingActivity : AppCompatActivity() {
                 .commit()
         }
 
+        setupBindings()
         setupListener()
         setupObservers()
     }
@@ -46,6 +47,11 @@ class SettingActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun setupBindings() {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
     }
 
     private fun setupListener() {

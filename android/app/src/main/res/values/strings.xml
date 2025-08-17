@@ -85,14 +85,13 @@
     <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
     <string name="livetalk_user_report_btn">신고</string>
 
+    <string name="setting_main_title">설정</string>
     <string name="setting_edit_favorite_team">응원팀 수정</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
-    <string name="setting_edit_nickname_dialog_title">닉네임 변경</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
 
     <string name="setting_manage_account">계정 관리</string>
-
     <string name="setting_logout">로그아웃</string>
     <string name="setting_delete_account">탈퇴하기</string>
 
@@ -102,4 +101,5 @@
     <string name="setting_open_source_license">오픈소스 라이선스</string>
 
     <string name="setting_app_version">앱 버전: %s</string>
+
 </resources>

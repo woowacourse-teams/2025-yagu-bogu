@@ -13,7 +13,6 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingMainBinding
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.livetalk.LivetalkFragment
 import timber.log.Timber
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -40,6 +39,11 @@ class SettingMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setSettingTitle(getString(R.string.setting_main_title))
     }
 
     private fun setupBindings() {
@@ -80,7 +84,7 @@ class SettingMainFragment : Fragment() {
         parentFragmentManager
             .beginTransaction()
             .setReorderingAllowed(true)
-            .add(R.id.fcv_setting, LivetalkFragment())
+            .replace(R.id.fcv_setting, SettingAccountFragment())
             .addToBackStack(null)
             .commit()
     }
