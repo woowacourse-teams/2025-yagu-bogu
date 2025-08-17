@@ -11,6 +11,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 import kotlin.math.roundToInt
 
 class MyStatsViewModel(
@@ -28,30 +29,30 @@ class MyStatsViewModel(
     }
 
     fun fetchAll() {
-        fetchMyStats(YEAR)
+        fetchMyStats()
         fetchMyAverageStats()
     }
 
-    private fun fetchMyStats(year: Int) {
+    private fun fetchMyStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                 async { statsRepository.getStatsCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
-            val myTeamDeferred: Deferred<Result<String>> =
+            val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
             val luckyStadiumDeferred: Deferred<Result<String?>> =
                 async { statsRepository.getLuckyStadiums(year) }
 
             val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
             val winRateResult: Result<Double> = winRateDeferred.await()
-            val myTeamResult: Result<String> = myTeamDeferred.await()
+            val myTeamResult: Result<String?> = myTeamDeferred.await()
             val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
 
             if (statsCountsResult.isSuccess && winRateResult.isSuccess && myTeamResult.isSuccess && luckyStadiumResult.isSuccess) {
                 val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
                 val winRate: Double = winRateResult.getOrThrow()
-                val myTeam: String = myTeamResult.getOrThrow()
+                val myTeam: String? = myTeamResult.getOrThrow()
                 val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
                 val myStatsUiModel =
@@ -77,17 +78,13 @@ class MyStatsViewModel(
 
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
-            val averageStats: Result<AverageStats> = statsRepository.getAverageStats()
-            averageStats
+            val averageStatsResult: Result<AverageStats> = statsRepository.getAverageStats()
+            averageStatsResult
                 .onSuccess { averageStats: AverageStats ->
                     _averageStats.value = averageStats
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
-    }
-
-    companion object {
-        private const val YEAR = 2025
     }
 }

@@ -6,17 +6,14 @@ import com.yagubogu.presentation.util.getEmoji
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class FavoriteTeamUiModel(
-    val id: Long,
-    val name: String,
+data class FavoriteTeamItem(
+    val team: Team,
     val emoji: String,
 ) : Parcelable {
     companion object {
-        fun of(team: Team): FavoriteTeamUiModel {
-            val id: Long = team.ordinal.toLong()
-            val name: String = team.nickname
+        fun of(team: Team): FavoriteTeamItem {
             val emoji: String = team.getEmoji()
-            return FavoriteTeamUiModel(id, name, emoji)
+            return FavoriteTeamItem(team, emoji)
         }
     }
 }
