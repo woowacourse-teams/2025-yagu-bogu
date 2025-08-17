@@ -25,6 +25,9 @@ class SettingViewModel(
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
 
+    private val _logoutEvent = MutableSingleLiveData<Unit>()
+    val logoutEvent: SingleLiveData<Unit> get() = _logoutEvent
+
     init {
         fetchNickname()
         fetchFavoriteTeam()
@@ -43,6 +46,18 @@ class SettingViewModel(
                     _nicknameEditedEvent.setValue(newNickname)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
+                }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            memberRepository
+                .logout()
+                .onSuccess {
+                    _logoutEvent.setValue(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "로그아웃 API 호출 실패")
                 }
         }
     }

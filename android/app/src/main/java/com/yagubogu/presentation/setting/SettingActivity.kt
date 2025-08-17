@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
+import com.yagubogu.presentation.login.LoginActivity
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -75,6 +77,19 @@ class SettingActivity : AppCompatActivity() {
         viewModel.nicknameEditedEvent.observe(this) { newNickname: String ->
             showSnackbar(getString(R.string.setting_edited_nickname_alert, newNickname))
         }
+        viewModel.logoutEvent.observe(this) {
+            showToast(getString(R.string.setting_logout_alert))
+            navigateToLogin()
+        }
+    }
+
+    private fun navigateToLogin() {
+        val intent =
+            Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun showSnackbar(message: String) {
@@ -83,6 +98,10 @@ class SettingActivity : AppCompatActivity() {
             setTextColor(context.getColor(R.color.white))
             show()
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

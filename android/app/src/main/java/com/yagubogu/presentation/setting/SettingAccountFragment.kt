@@ -26,8 +26,33 @@ class SettingAccountFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        setupBindings()
+        setupListeners()
+    }
+
+    private fun setupBindings() {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+    }
+
+    private fun setupListeners() {
+        binding.layoutLogout.root.setOnClickListener {
+            viewModel.logout()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.setSettingTitle(getString(R.string.setting_manage_account))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

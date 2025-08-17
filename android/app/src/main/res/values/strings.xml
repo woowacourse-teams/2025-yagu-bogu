@@ -93,6 +93,7 @@
 
     <string name="setting_manage_account">계정 관리</string>
     <string name="setting_logout">로그아웃</string>
+    <string name="setting_logout_alert">로그아웃 되었습니다.</string>
     <string name="setting_delete_account">탈퇴하기</string>
 
     <string name="setting_notice">공지사항</string>
