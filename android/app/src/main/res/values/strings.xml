@@ -37,7 +37,7 @@
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
-    <string name="stats_tab_attendance_history">직관 내역</string>
+    <string name="stats_tab_stats_detail">상세 통계</string>
 
     <string name="stats_my_pie_chart_title">직관 승률</string>
     <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
