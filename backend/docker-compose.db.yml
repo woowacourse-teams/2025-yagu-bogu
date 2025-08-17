@@ -1,0 +1,31 @@
+version: "3.9"
+
+networks:
+  yagubogu-net:
+    name: yagubogu-net
+
+volumes:
+  db-data:
+
+services:
+  db:
+    image: mysql:8.1
+    container_name: yagubogu-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yagubogu
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u\"$DB_USER\" -p\"$DB_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - yagubogu-net
