@@ -105,6 +105,10 @@ jobs:
             --restart unless-stopped \
             --stop-signal=SIGTERM \
             --stop-timeout=30 \
+            --log-driver=awslogs \
+            --log-opt awslogs-region=ap-northeast-2 \
+            --log-opt awslogs-group=yagu-bogu-log-dev \
+            --log-opt awslogs-stream=yagu-bogu-backend-dev \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e DB_URL="${{ secrets.DB_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
