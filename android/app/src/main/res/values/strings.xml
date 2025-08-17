@@ -60,7 +60,6 @@
     <string name="stats_average_score">%.1f점</string>
     <string name="stats_average_count">%.1f개</string>
 
-    <string name="stats_attendance_history_title">최근 직관 내역</string>
     <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
     <string-array name="stats_attendance_history_filter">
         <item name="all">전체 경기</item>
