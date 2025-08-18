@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.AttendanceHistoryItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
