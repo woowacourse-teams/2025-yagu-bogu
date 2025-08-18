@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.yagubogu.presentation.stats.detail.DetailStatsViewModel" />
+            type="com.yagubogu.presentation.stats.detail.StatsDetailViewModel" />
     </data>
 
     <ScrollView
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            tools:context=".presentation.stats.detail.DetailStatsFragment">
+            tools:context=".presentation.stats.detail.StatsDetailFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_vs_team_winning_percentage"

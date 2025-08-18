@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yagubogu.domain.model.Team
 
-class DetailStatsViewModel : ViewModel() {
+class StatsDetailViewModel : ViewModel() {
     private val _isVsTeamStatsExpanded = MutableLiveData(false)
     val isVsTeamStatsExpanded: LiveData<Boolean> get() = _isVsTeamStatsExpanded
 
