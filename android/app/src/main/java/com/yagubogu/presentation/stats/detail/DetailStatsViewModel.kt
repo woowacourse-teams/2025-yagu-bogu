@@ -137,7 +137,7 @@ class DetailStatsViewModel : ViewModel() {
 
         private val DUMMY_STADIUM_VISIT_COUNTS =
             listOf(
-                StadiumVisitCount("잠실", 12),
+                StadiumVisitCount("잠실", 30),
                 StadiumVisitCount("인천", 4),
                 StadiumVisitCount("고척", 4),
                 StadiumVisitCount("수원", 3),
