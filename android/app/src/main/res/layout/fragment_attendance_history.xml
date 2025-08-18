@@ -55,11 +55,13 @@
             android:layout_height="140dp"
             android:contentDescription="@string/stats_empty_scoreboard_illustration_description"
             android:src="@drawable/img_baseball_scoreboard"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/tv_empty_history"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_empty_history"
@@ -72,10 +74,12 @@
             android:text="@string/stats_empty_attendance_history_description"
             android:textColor="@color/gray400"
             android:textSize="18sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_empty_history"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
