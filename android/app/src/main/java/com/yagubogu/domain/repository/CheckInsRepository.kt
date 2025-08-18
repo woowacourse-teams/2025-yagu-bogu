@@ -1,6 +1,6 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate

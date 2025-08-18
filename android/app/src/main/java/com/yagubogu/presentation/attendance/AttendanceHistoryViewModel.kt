@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate

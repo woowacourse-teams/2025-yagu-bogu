@@ -3,6 +3,7 @@ package com.yagubogu.presentation.attendance
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
 class AttendanceHistoryAdapter :
     ListAdapter<AttendanceHistoryItem, AttendanceHistoryViewHolder>(

@@ -11,6 +11,8 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {

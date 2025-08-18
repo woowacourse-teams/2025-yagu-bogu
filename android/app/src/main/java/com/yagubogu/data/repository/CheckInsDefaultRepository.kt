@@ -7,7 +7,7 @@ import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.domain.repository.CheckInsRepository
-import com.yagubogu.presentation.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate

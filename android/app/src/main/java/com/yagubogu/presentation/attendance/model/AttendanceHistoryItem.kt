@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.attendance
+package com.yagubogu.presentation.attendance.model
 
 import androidx.annotation.ColorRes
 import com.yagubogu.R
@@ -6,8 +6,8 @@ import com.yagubogu.domain.model.GameResult
 import java.time.LocalDate
 
 data class AttendanceHistoryItem(
-    val awayTeam: CheckInGameTeamItem,
-    val homeTeam: CheckInGameTeamItem,
+    val awayTeam: AttendanceHistoryTeamItem,
+    val homeTeam: AttendanceHistoryTeamItem,
     val attendanceDate: LocalDate,
     val stadiumName: String,
 ) {
@@ -19,8 +19,8 @@ data class AttendanceHistoryItem(
 
     @ColorRes
     private fun determineTeamColorRes(
-        thisTeam: CheckInGameTeamItem,
-        otherTeam: CheckInGameTeamItem,
+        thisTeam: AttendanceHistoryTeamItem,
+        otherTeam: AttendanceHistoryTeamItem,
     ): Int {
         val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
         return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {
