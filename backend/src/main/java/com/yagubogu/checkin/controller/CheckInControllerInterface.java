@@ -7,6 +7,7 @@ import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -88,5 +89,15 @@ public interface CheckInControllerInterface {
     ResponseEntity<CheckInStatusResponse> findCheckInStatus(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam LocalDate date
+    );
+
+    @Operation(summary = "구장별 방문 횟수 조회", description = "사용자의 현재 연도 기준 구장별 체크인 횟수를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "구장별 체크인 횟수 조회 성공"),
+    })
+    @GetMapping("/stadiums/counts")
+    ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam int year
     );
 }

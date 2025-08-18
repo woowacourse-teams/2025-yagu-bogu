@@ -8,6 +8,7 @@ import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
@@ -78,4 +79,14 @@ public class CheckInController implements CheckInControllerInterface {
 
         return ResponseEntity.ok(response);
     }
+
+    public ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
+            final MemberClaims memberClaims,
+            @RequestParam final int year
+    ) {
+        StadiumCheckInCountsResponse response = checkInService.findStadiumCheckInCounts(memberClaims.id(), year);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
