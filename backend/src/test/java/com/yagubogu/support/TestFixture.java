@@ -1,6 +1,6 @@
 package com.yagubogu.support;
 
-import com.yagubogu.game.domain.ScoreBoardSummary;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
@@ -8,6 +8,7 @@ import com.yagubogu.team.domain.Team;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class TestFixture {
 
@@ -27,12 +28,14 @@ public class TestFixture {
         return LocalTime.of(18, 30);
     }
 
-    public static ScoreBoardSummary getHomeScoreBoard() {
-        return new ScoreBoardSummary(10, 10, 10, 10);
+    public static ScoreBoard getHomeScoreBoard() {
+        return new ScoreBoard(10, 10, 10, 10,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
     }
 
-    public static ScoreBoardSummary getAwayScoreBoard() {
-        return new ScoreBoardSummary(1, 1, 1, 1);
+    public static ScoreBoard getAwayScoreBoard() {
+        return new ScoreBoard(1, 1, 1, 1,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
     }
 
     public static Member getUser(Team team) {

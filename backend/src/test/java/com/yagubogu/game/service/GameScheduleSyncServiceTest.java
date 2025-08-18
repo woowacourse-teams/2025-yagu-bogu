@@ -8,10 +8,9 @@ import static org.mockito.BDDMockito.given;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoardSummary;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameSummaryResultResponse;
-import com.yagubogu.game.dto.KboGameSummaryResultResponse.KboScoreBoardSummaryResponse;
+import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
@@ -148,19 +147,36 @@ class GameScheduleSyncServiceTest {
         String gameCode = "20250721OBLG0";
         Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
+        // 1. kboGameSyncClient Mocking (경기 목록 조회)
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
-        KboScoreBoardSummaryResponse home = new KboScoreBoardSummaryResponse(5, 8, 1, 3);
-        KboScoreBoardSummaryResponse away = new KboScoreBoardSummaryResponse(3, 6, 2, 4);
-        given(kboGameResultClient.fetchGameResult(any(Game.class)))
-                .willReturn(new KboGameSummaryResultResponse("100", "success", home, away));
+        // 2. kboGameResultClient Mocking (상세 경기 결과 조회)
+        ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
+        ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
+        String winningPitcher = "이포라";
+        String losingPitcher = "송우가";
+        String savePitcher = "감밍트";
+        String holdPitcher = "차두리";
 
-        ScoreBoardSummary homeScoreBoardSummaryExpected = home.toScoreBoard();
-        ScoreBoardSummary awayScoreBoardSummaryExpected = away.toScoreBoard();
+        KboGameResultResponse mockGameResult = new KboGameResultResponse(
+                homeScoreBoard,
+                awayScoreBoard,
+                winningPitcher,
+                losingPitcher,
+                savePitcher,
+                holdPitcher
+        );
+        given(kboGameResultClient.fetchGameResult(any(Game.class)))
+                .willReturn(mockGameResult);
+
+        ScoreBoard homeScoreBoardExpected = mockGameResult.homeScoreBoard();
+        ScoreBoard awayScoreBoardExpected = mockGameResult.awayScoreBoard();
 
         // when
         gameResultSyncService.syncGameResult(yesterday);
@@ -168,8 +184,12 @@ class GameScheduleSyncServiceTest {
         // then
         SoftAssertions.assertSoftly((softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
-            softAssertions.assertThat(game.getHomeScoreBoardSummary()).isEqualTo(homeScoreBoardSummaryExpected);
-            softAssertions.assertThat(game.getAwayScoreBoardSummary()).isEqualTo(awayScoreBoardSummaryExpected);
+            softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
+            softAssertions.assertThat(game.getAwayScoreBoard()).isEqualTo(awayScoreBoardExpected);
+            softAssertions.assertThat(game.getPitchers().getWinningPitcher()).isEqualTo(winningPitcher);
+            softAssertions.assertThat(game.getPitchers().getLosingPitcher()).isEqualTo(losingPitcher);
+            softAssertions.assertThat(game.getPitchers().getSavePitcher()).isEqualTo(savePitcher);
+            softAssertions.assertThat(game.getPitchers().getHoldPitcher()).isEqualTo(holdPitcher);
         }));
     }
 

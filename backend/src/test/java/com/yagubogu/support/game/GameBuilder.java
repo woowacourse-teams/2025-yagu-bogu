@@ -2,7 +2,8 @@ package com.yagubogu.support.game;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoardSummary;
+import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.dto.Pitchers;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
@@ -19,9 +20,10 @@ public class GameBuilder {
     private String gameCode = UUID.randomUUID().toString();
     private Integer homeScore;
     private Integer awayScore;
-    private ScoreBoardSummary homeScoreBoardSummary;
-    private ScoreBoardSummary awayScoreBoardSummary;
     private GameState gameState = GameState.SCHEDULED;
+    private ScoreBoard homeScoreBoard;
+    private ScoreBoard awayScoreBoard;
+    private Pitchers pitchers;
 
     public GameBuilder stadium(final Stadium stadium) {
         this.stadium = stadium;
@@ -71,14 +73,20 @@ public class GameBuilder {
         return this;
     }
 
-    public GameBuilder homeScoreBoardSummary(final ScoreBoardSummary homeScoreBoardSummary) {
-        this.homeScoreBoardSummary = homeScoreBoardSummary;
+    public GameBuilder pitchers(final Pitchers pitchers) {
+        this.pitchers = pitchers;
 
         return this;
     }
 
-    public GameBuilder awayScoreBoardSummary(final ScoreBoardSummary awayScoreBoardSummary) {
-        this.awayScoreBoardSummary = awayScoreBoardSummary;
+    public GameBuilder homeScoreBoard(final ScoreBoard homeScoreBoard) {
+        this.homeScoreBoard = homeScoreBoard;
+
+        return this;
+    }
+
+    public GameBuilder awayScoreBoard(final ScoreBoard awayScoreBoard) {
+        this.awayScoreBoard = awayScoreBoard;
 
         return this;
     }
@@ -99,8 +107,9 @@ public class GameBuilder {
                 gameCode,
                 homeScore,
                 awayScore,
-                homeScoreBoardSummary,
-                awayScoreBoardSummary,
+                homeScoreBoard,
+                awayScoreBoard,
+                pitchers,
                 gameState
         );
     }

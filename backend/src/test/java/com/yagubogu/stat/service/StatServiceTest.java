@@ -8,7 +8,7 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoardSummary;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -27,6 +27,7 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -373,24 +374,30 @@ class StatServiceTest {
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
-                .homeScoreBoardSummary(new ScoreBoardSummary(8, 12, 0, 0))
-                .awayScoreBoardSummary(new ScoreBoardSummary(5, 9, 1, 0))
+                .homeScoreBoard(new ScoreBoard(8, 12, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(5, 9, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
 
         Game g2 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(4).awayScore(10)
-                .homeScoreBoardSummary(new ScoreBoardSummary(4, 8, 0, 0))
-                .awayScoreBoardSummary(new ScoreBoardSummary(10, 13, 0, 0))
+                .homeScoreBoard(new ScoreBoard(4, 8, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(10, 13, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
 
         Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(7)
-                .homeScoreBoardSummary(new ScoreBoardSummary(5, 11, 1, 0))
-                .awayScoreBoardSummary(new ScoreBoardSummary(7, 10, 0, 0))
+                .homeScoreBoard(new ScoreBoard(5, 11, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(7, 10, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.game(g1).member(member).team(HT));

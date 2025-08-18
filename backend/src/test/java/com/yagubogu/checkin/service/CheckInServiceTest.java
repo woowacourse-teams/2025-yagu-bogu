@@ -100,8 +100,8 @@ class CheckInServiceTest {
         Member member = memberFactory.save(builder -> builder.team(lotte));
         Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         CreateCheckInRequest request = new CreateCheckInRequest(stadiumJamsil.getId(), game.getDate());
 
         // when & then
@@ -167,8 +167,8 @@ class CheckInServiceTest {
             Game game = gameFactory.save(gameBuilder ->
                     gameBuilder.date(startDate.plusDays(index))
                             .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
+                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
                             .gameState(GameState.COMPLETED)
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
@@ -196,8 +196,8 @@ class CheckInServiceTest {
             Game game = gameFactory.save(gameBuilder ->
                     gameBuilder.date(startDate.plusDays(index))
                             .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
+                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
                             .gameState(GameState.COMPLETED)
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
@@ -360,8 +360,8 @@ class CheckInServiceTest {
                 .awayTeam(kt)
                 .homeScore(10)
                 .awayScore(1)
-                .homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                .awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayScoreBoard(TestFixture.getAwayScoreBoard())
                 .date(date));
 
         checkInFactory.save(checkInBuilder -> checkInBuilder

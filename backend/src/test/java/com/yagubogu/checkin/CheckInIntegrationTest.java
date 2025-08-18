@@ -99,8 +99,8 @@ public class CheckInIntegrationTest {
         gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         // when & then
         RestAssured.given().log().all()
@@ -123,18 +123,18 @@ public class CheckInIntegrationTest {
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
         checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
@@ -206,18 +206,18 @@ public class CheckInIntegrationTest {
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
         checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
@@ -300,8 +300,8 @@ public class CheckInIntegrationTest {
         Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         checkInFactory.save(b -> b.game(game).team(kia).member(fora));
 
@@ -331,18 +331,18 @@ public class CheckInIntegrationTest {
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
-                        .homeTeam(kt).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
-                        .homeTeam(kia).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
-                        .awayTeam(samsung).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
         checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
         checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
