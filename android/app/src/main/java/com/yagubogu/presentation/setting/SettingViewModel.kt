@@ -100,11 +100,15 @@ class SettingViewModel(
         viewModelScope.launch {
             memberRepository
                 .getFavoriteTeam()
-                .onSuccess { favoriteTeam: String ->
-                    _favoriteTeam.value = favoriteTeam
+                .onSuccess { favoriteTeam: String? ->
+                    _favoriteTeam.value = favoriteTeam ?: NULL_FAVORITE_TEAM_NAME
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "응원팀 조회 API 호출 실패")
                 }
         }
+    }
+
+    companion object {
+        private const val NULL_FAVORITE_TEAM_NAME = "-"
     }
 }
