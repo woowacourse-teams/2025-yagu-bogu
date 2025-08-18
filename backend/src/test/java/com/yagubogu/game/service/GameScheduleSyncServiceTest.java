@@ -10,8 +10,8 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardSummaryResponse;
+import com.yagubogu.game.dto.KboGameSummaryResultResponse;
+import com.yagubogu.game.dto.KboGameSummaryResultResponse.KboScoreBoardSummaryResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
@@ -157,7 +157,7 @@ class GameScheduleSyncServiceTest {
         KboScoreBoardSummaryResponse home = new KboScoreBoardSummaryResponse(5, 8, 1, 3);
         KboScoreBoardSummaryResponse away = new KboScoreBoardSummaryResponse(3, 6, 2, 4);
         given(kboGameResultClient.fetchGameResult(any(Game.class)))
-                .willReturn(new KboGameResultResponse("100", "success", home, away));
+                .willReturn(new KboGameSummaryResultResponse("100", "success", home, away));
 
         ScoreBoardSummary homeScoreBoardSummaryExpected = home.toScoreBoard();
         ScoreBoardSummary awayScoreBoardSummaryExpected = away.toScoreBoard();

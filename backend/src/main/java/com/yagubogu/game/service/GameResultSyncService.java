@@ -3,7 +3,7 @@ package com.yagubogu.game.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameResultResponse;
+import com.yagubogu.game.dto.KboGameSummaryResultResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
@@ -40,7 +40,7 @@ public class GameResultSyncService {
             return;
         }
 
-        KboGameResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
+        KboGameSummaryResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
         ScoreBoardSummary homeScoreBoardSummary = gameResult.homeScoreBoard().toScoreBoard();
         ScoreBoardSummary awayScoreBoardSummary = gameResult.awayScoreBoard().toScoreBoard();
 

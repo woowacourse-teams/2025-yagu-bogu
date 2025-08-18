@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardSummaryResponse;
+import com.yagubogu.game.dto.KboGameSummaryResultResponse;
+import com.yagubogu.game.dto.KboGameSummaryResultResponse.KboScoreBoardSummaryResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class KboGameResultClient {
     private final RestClient kboRestClient;
     private final KboClientExceptionHandler kboClientExceptionHandler;
 
-    public KboGameResultResponse fetchGameResult(final Game game) {
+    public KboGameSummaryResultResponse fetchGameResult(final Game game) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("leId", "1");
         param.add("srId", "0");
@@ -38,7 +38,7 @@ public class KboGameResultClient {
                     .retrieve()
                     .onStatus(kboClientExceptionHandler)
                     .body(String.class);
-            KboGameResultResponse response = parseToKboResultResponse(responseBody);
+            KboGameSummaryResultResponse response = parseToKboResultResponse(responseBody);
             validateGameResultResponse(response);
 
             return response;
@@ -47,7 +47,7 @@ public class KboGameResultClient {
         }
     }
 
-    private KboGameResultResponse parseToKboResultResponse(final String responseBody)
+    private KboGameSummaryResultResponse parseToKboResultResponse(final String responseBody)
             throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         JsonNode root = om.readTree(responseBody);
@@ -69,7 +69,7 @@ public class KboGameResultClient {
         int homeE = homeRow.path(2).path("Text").asInt();
         int homeB = homeRow.path(3).path("Text").asInt();
 
-        return new KboGameResultResponse(
+        return new KboGameSummaryResultResponse(
                 code,
                 msg,
                 new KboScoreBoardSummaryResponse(
@@ -87,7 +87,7 @@ public class KboGameResultClient {
         );
     }
 
-    private void validateGameResultResponse(final KboGameResultResponse response) {
+    private void validateGameResultResponse(final KboGameSummaryResultResponse response) {
         if (isResponseErrorCode(response.statusCode())) {
             throw new GameSyncException("Unexpected response code from Kbo api: " + response.msg());
         }
