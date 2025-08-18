@@ -70,6 +70,8 @@
 
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
+    <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
+    <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
 
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 
