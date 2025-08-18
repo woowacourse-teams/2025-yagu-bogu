@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-        <variable
-            name="attendanceHistoryItem"
-            type="com.yagubogu.presentation.attendance.AttendanceHistoryItem" />
-    </data>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,6 +11,7 @@
         android:paddingVertical="24dp">
 
         <include
+            android:id="@+id/layout_attendance_history"
             layout="@layout/layout_attendance_history"
             app:layout_constraintTop_toTopOf="parent" />
 

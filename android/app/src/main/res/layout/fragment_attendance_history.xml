@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:lineSpacingExtra="8dp"
-            android:text="@string/stats_empty_attendance_history_description"
+            android:text="@string/attendance_history_empty_description"
             android:textColor="@color/gray400"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"

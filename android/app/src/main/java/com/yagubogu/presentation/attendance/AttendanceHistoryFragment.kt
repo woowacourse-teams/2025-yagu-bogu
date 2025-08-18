@@ -61,7 +61,7 @@ class AttendanceHistoryFragment : Fragment() {
 
     private fun setupSpinner() {
         val spinnerItems: Array<String> =
-            resources.getStringArray(R.array.stats_attendance_history_filter)
+            resources.getStringArray(R.array.attendance_history_filter)
         val spinnerAdapter: ArrayAdapter<String> =
             ArrayAdapter(requireContext(), R.layout.item_spinner_attendance_history, spinnerItems)
         binding.spinnerAttendanceHistoryFilter.apply {
