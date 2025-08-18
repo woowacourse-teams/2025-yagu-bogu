@@ -42,7 +42,8 @@ public interface MemberControllerInterface {
 
     @Operation(summary = "회원 정보 조회", description = "현재 로그인된 회원의 정보를 조회합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공")
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
     })
     @GetMapping("/me")
     ResponseEntity<MemberInfoResponse> findMember(@Parameter(hidden = true) MemberClaims memberClaims);

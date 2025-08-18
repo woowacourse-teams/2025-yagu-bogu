@@ -12,7 +12,6 @@ import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +21,7 @@ import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(MemberFactory.class)
 @DataJpaTest
@@ -143,7 +143,7 @@ public class MemberServiceTest {
         memberService.updateFavorite(member.getId(), request);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.getTeam()).isNotNull();
             softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });
@@ -164,7 +164,7 @@ public class MemberServiceTest {
         memberService.updateFavorite(member.getId(), request);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.getTeam().getTeamCode()).isNotEqualTo(beforeTeamCode);
             softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });
@@ -197,11 +197,23 @@ public class MemberServiceTest {
         MemberInfoResponse actual = memberService.findMember(member.getId());
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
         });
+    }
+
+    @DisplayName("예외: 회원 정보를 조회하는데 해당하는 회원이 없으면 예외가 발생한다")
+    @Test
+    void findMember_notFoundMember() {
+        // given
+        long invalidMemberId = 999L;
+
+        // when & then
+        assertThatThrownBy(() -> memberService.findMember(invalidMemberId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Member is not found");
     }
 }

@@ -1,12 +1,11 @@
 package com.yagubogu.member;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.support.auth.AuthFactory;
@@ -27,6 +26,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Import(AuthTestConfig.class)
@@ -162,5 +164,35 @@ public class MemberIntegrationTest {
 
         // then
         assertThat(actual.favorite()).isEqualTo(changedTeamShortName);
+    }
+
+    @DisplayName("멤버의 정보를 조회한다")
+    @Test
+    void findMember() {
+        // given
+        Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+        Member member = memberFactory.save(builder ->
+                builder.nickname("우가")
+                        .team(team)
+        );
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when
+        MemberInfoResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/members/me")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(MemberInfoResponse.class);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
+            softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
+            softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
+        });
     }
 }
