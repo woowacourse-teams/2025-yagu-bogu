@@ -1,7 +1,7 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.repository.GameRepository;
@@ -41,9 +41,9 @@ public class GameResultSyncService {
         }
 
         KboGameResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
-        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard().toScoreBoard();
-        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard().toScoreBoard();
+        ScoreBoardSummary homeScoreBoardSummary = gameResult.homeScoreBoard().toScoreBoard();
+        ScoreBoardSummary awayScoreBoardSummary = gameResult.awayScoreBoard().toScoreBoard();
 
-        game.updateScoreBoard(homeScoreBoard, awayScoreBoard);
+        game.updateScoreBoard(homeScoreBoardSummary, awayScoreBoardSummary);
     }
 }

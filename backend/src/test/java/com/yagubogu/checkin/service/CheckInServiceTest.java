@@ -1,5 +1,10 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
@@ -38,11 +43,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
 @DataJpaTest
@@ -100,8 +100,8 @@ class CheckInServiceTest {
         Member member = memberFactory.save(builder -> builder.team(lotte));
         Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard()));
         CreateCheckInRequest request = new CreateCheckInRequest(stadiumJamsil.getId(), game.getDate());
 
         // when & then
@@ -167,8 +167,8 @@ class CheckInServiceTest {
             Game game = gameFactory.save(gameBuilder ->
                     gameBuilder.date(startDate.plusDays(index))
                             .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                            .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
+                            .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
                             .gameState(GameState.COMPLETED)
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
@@ -196,8 +196,8 @@ class CheckInServiceTest {
             Game game = gameFactory.save(gameBuilder ->
                     gameBuilder.date(startDate.plusDays(index))
                             .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                            .homeTeam(lotte).homeScore(10).homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
+                            .awayTeam(kia).awayScore(1).awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
                             .gameState(GameState.COMPLETED)
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
@@ -360,8 +360,8 @@ class CheckInServiceTest {
                 .awayTeam(kt)
                 .homeScore(10)
                 .awayScore(1)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoardSummary(TestFixture.getHomeScoreBoard())
+                .awayScoreBoardSummary(TestFixture.getAwayScoreBoard())
                 .date(date));
 
         checkInFactory.save(checkInBuilder -> checkInBuilder

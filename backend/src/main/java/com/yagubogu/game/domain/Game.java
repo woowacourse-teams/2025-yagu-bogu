@@ -67,7 +67,7 @@ public class Game {
             @AttributeOverride(name = "basesOnBalls", column = @Column(name = "home_bases_on_balls"))
     })
     @Embedded
-    private ScoreBoard homeScoreBoard;
+    private ScoreBoardSummary homeScoreBoardSummary;
 
     @AttributeOverrides({
             @AttributeOverride(name = "runs", column = @Column(name = "away_runs")),
@@ -76,7 +76,7 @@ public class Game {
             @AttributeOverride(name = "basesOnBalls", column = @Column(name = "away_bases_on_balls"))
     })
     @Embedded
-    private ScoreBoard awayScoreBoard;
+    private ScoreBoardSummary awayScoreBoardSummary;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "game_state")
@@ -91,8 +91,8 @@ public class Game {
             final String gameCode,
             final Integer homeScore,
             final Integer awayScore,
-            final ScoreBoard homeScoreBoard,
-            final ScoreBoard awayScoreBoard,
+            final ScoreBoardSummary homeScoreBoardSummary,
+            final ScoreBoardSummary awayScoreBoardSummary,
             final GameState gameState
     ) {
         this.stadium = stadium;
@@ -103,8 +103,8 @@ public class Game {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.gameCode = gameCode;
-        this.homeScoreBoard = homeScoreBoard;
-        this.awayScoreBoard = awayScoreBoard;
+        this.homeScoreBoardSummary = homeScoreBoardSummary;
+        this.awayScoreBoardSummary = awayScoreBoardSummary;
         this.gameState = gameState;
     }
 
@@ -112,12 +112,13 @@ public class Game {
         this.gameState = gameState;
     }
 
-    public void updateScoreBoard(final ScoreBoard homeScoreBoard, final ScoreBoard awayScoreBoard) {
+    public void updateScoreBoard(final ScoreBoardSummary homeScoreBoardSummary,
+                                 final ScoreBoardSummary awayScoreBoardSummary) {
         // TODO: homeScore과 homeScoreBoard의 runs가 중복되므로 homeScore 제거
-        this.homeScore = homeScoreBoard.getRuns();
-        this.awayScore = awayScoreBoard.getRuns();
-        this.homeScoreBoard = homeScoreBoard;
-        this.awayScoreBoard = awayScoreBoard;
+        this.homeScore = homeScoreBoardSummary.getRuns();
+        this.awayScore = awayScoreBoardSummary.getRuns();
+        this.homeScoreBoardSummary = homeScoreBoardSummary;
+        this.awayScoreBoardSummary = awayScoreBoardSummary;
     }
 
     public boolean hasTeam(final Team team) {

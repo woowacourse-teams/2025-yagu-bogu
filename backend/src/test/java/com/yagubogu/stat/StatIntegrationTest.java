@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
@@ -255,21 +255,21 @@ public class StatIntegrationTest {
                 .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
-                .homeScoreBoard(new ScoreBoard(8, 12, 0, 0))
-                .awayScoreBoard(new ScoreBoard(5, 9, 1, 0))
+                .homeScoreBoardSummary(new ScoreBoardSummary(8, 12, 0, 0))
+                .awayScoreBoardSummary(new ScoreBoardSummary(5, 9, 1, 0))
                 .gameState(GameState.COMPLETED));
         Game g2 = gameFactory.save(b -> b.stadium(kia).homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(4).awayScore(10)
-                .homeScoreBoard(new ScoreBoard(4, 8, 0, 0))
-                .awayScoreBoard(new ScoreBoard(10, 13, 0, 0))
+                .homeScoreBoardSummary(new ScoreBoardSummary(4, 8, 0, 0))
+                .awayScoreBoardSummary(new ScoreBoardSummary(10, 13, 0, 0))
                 .gameState(GameState.COMPLETED));
         Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(ht).awayTeam(lt)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(7)
-                .homeScoreBoard(new ScoreBoard(5, 11, 1, 0))
-                .awayScoreBoard(new ScoreBoard(7, 10, 0, 0))
+                .homeScoreBoardSummary(new ScoreBoardSummary(5, 11, 1, 0))
+                .awayScoreBoardSummary(new ScoreBoardSummary(7, 10, 0, 0))
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.game(g1).member(member).team(ht));

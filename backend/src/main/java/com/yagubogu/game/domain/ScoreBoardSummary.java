@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Embeddable
-public class ScoreBoard {
+public class ScoreBoardSummary {
 
     private Integer runs;
     private Integer hits;

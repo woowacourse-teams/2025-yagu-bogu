@@ -2,7 +2,7 @@ package com.yagubogu.support.game;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
@@ -19,8 +19,8 @@ public class GameBuilder {
     private String gameCode = UUID.randomUUID().toString();
     private Integer homeScore;
     private Integer awayScore;
-    private ScoreBoard homeScoreBoard;
-    private ScoreBoard awayScoreBoard;
+    private ScoreBoardSummary homeScoreBoardSummary;
+    private ScoreBoardSummary awayScoreBoardSummary;
     private GameState gameState = GameState.SCHEDULED;
 
     public GameBuilder stadium(final Stadium stadium) {
@@ -71,14 +71,14 @@ public class GameBuilder {
         return this;
     }
 
-    public GameBuilder homeScoreBoard(final ScoreBoard homeScoreBoard) {
-        this.homeScoreBoard = homeScoreBoard;
+    public GameBuilder homeScoreBoardSummary(final ScoreBoardSummary homeScoreBoardSummary) {
+        this.homeScoreBoardSummary = homeScoreBoardSummary;
 
         return this;
     }
 
-    public GameBuilder awayScoreBoard(final ScoreBoard awayScoreBoard) {
-        this.awayScoreBoard = awayScoreBoard;
+    public GameBuilder awayScoreBoardSummary(final ScoreBoardSummary awayScoreBoardSummary) {
+        this.awayScoreBoardSummary = awayScoreBoardSummary;
 
         return this;
     }
@@ -99,8 +99,8 @@ public class GameBuilder {
                 gameCode,
                 homeScore,
                 awayScore,
-                homeScoreBoard,
-                awayScoreBoard,
+                homeScoreBoardSummary,
+                awayScoreBoardSummary,
                 gameState
         );
     }

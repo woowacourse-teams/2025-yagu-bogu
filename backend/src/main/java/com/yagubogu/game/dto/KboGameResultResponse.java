@@ -1,23 +1,23 @@
 package com.yagubogu.game.dto;
 
-import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.domain.ScoreBoardSummary;
 
 public record KboGameResultResponse(
         String statusCode,
         String msg,
-        KboScoreBoardResponse homeScoreBoard,
-        KboScoreBoardResponse awayScoreBoard
+        KboScoreBoardSummaryResponse homeScoreBoard,
+        KboScoreBoardSummaryResponse awayScoreBoard
 ) {
 
-    public record KboScoreBoardResponse(
+    public record KboScoreBoardSummaryResponse(
             int runs,
             int hits,
             int errors,
             int basesOnBalls
     ) {
 
-        public ScoreBoard toScoreBoard() {
-            return new ScoreBoard(runs, hits, errors, basesOnBalls);
+        public ScoreBoardSummary toScoreBoard() {
+            return new ScoreBoardSummary(runs, hits, errors, basesOnBalls);
         }
     }
 }

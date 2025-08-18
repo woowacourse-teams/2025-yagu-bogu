@@ -8,10 +8,10 @@ import static org.mockito.BDDMockito.given;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.domain.ScoreBoardSummary;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
+import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardSummaryResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
@@ -154,13 +154,13 @@ class GameScheduleSyncServiceTest {
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
-        KboScoreBoardResponse home = new KboScoreBoardResponse(5, 8, 1, 3);
-        KboScoreBoardResponse away = new KboScoreBoardResponse(3, 6, 2, 4);
+        KboScoreBoardSummaryResponse home = new KboScoreBoardSummaryResponse(5, 8, 1, 3);
+        KboScoreBoardSummaryResponse away = new KboScoreBoardSummaryResponse(3, 6, 2, 4);
         given(kboGameResultClient.fetchGameResult(any(Game.class)))
                 .willReturn(new KboGameResultResponse("100", "success", home, away));
 
-        ScoreBoard homeScoreBoardExpected = home.toScoreBoard();
-        ScoreBoard awayScoreBoardExpected = away.toScoreBoard();
+        ScoreBoardSummary homeScoreBoardSummaryExpected = home.toScoreBoard();
+        ScoreBoardSummary awayScoreBoardSummaryExpected = away.toScoreBoard();
 
         // when
         gameResultSyncService.syncGameResult(yesterday);
@@ -168,8 +168,8 @@ class GameScheduleSyncServiceTest {
         // then
         SoftAssertions.assertSoftly((softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
-            softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
-            softAssertions.assertThat(game.getAwayScoreBoard()).isEqualTo(awayScoreBoardExpected);
+            softAssertions.assertThat(game.getHomeScoreBoardSummary()).isEqualTo(homeScoreBoardSummaryExpected);
+            softAssertions.assertThat(game.getAwayScoreBoardSummary()).isEqualTo(awayScoreBoardSummaryExpected);
         }));
     }
 

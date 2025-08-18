@@ -197,32 +197,32 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             SELECT new com.yagubogu.stat.dto.AverageStatistic(
                 AVG(
                     CASE
-                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.runs
-                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.runs
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoardSummary.runs
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoardSummary.runs
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.runs
-                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.runs
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoardSummary.runs
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoardSummary.runs
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.errors
-                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.errors
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoardSummary.errors
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoardSummary.errors
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoard.hits
-                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoard.hits
+                        WHEN g.homeTeam = ci.team THEN g.homeScoreBoardSummary.hits
+                        WHEN g.awayTeam = ci.team THEN g.awayScoreBoardSummary.hits
                     END
                 ),
                 AVG(
                     CASE
-                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoard.hits
-                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoard.hits
+                        WHEN g.homeTeam = ci.team THEN g.awayScoreBoardSummary.hits
+                        WHEN g.awayTeam = ci.team THEN g.homeScoreBoardSummary.hits
                     END
                 )
             )

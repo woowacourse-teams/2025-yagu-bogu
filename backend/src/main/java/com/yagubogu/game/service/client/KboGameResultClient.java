@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
+import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardSummaryResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
@@ -72,13 +72,13 @@ public class KboGameResultClient {
         return new KboGameResultResponse(
                 code,
                 msg,
-                new KboScoreBoardResponse(
+                new KboScoreBoardSummaryResponse(
                         homeR,
                         homeH,
                         homeE,
                         homeB
                 ),
-                new KboScoreBoardResponse(
+                new KboScoreBoardSummaryResponse(
                         awayR,
                         awayH,
                         awayE,
