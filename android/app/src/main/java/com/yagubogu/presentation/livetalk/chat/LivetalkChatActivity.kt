@@ -32,11 +32,16 @@ class LivetalkChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        setupBinding()
         setupRecyclerView()
         setupListener()
         setupObservers()
+    }
+
+    private fun setupBinding() {
+        binding.viewModel = viewModel
+        binding.isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        binding.lifecycleOwner = this
     }
 
     private fun setupListener() {
@@ -111,13 +116,16 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_GAME_ID = "gameId"
+        private const val KEY_IS_VERIFIED = "isVerified"
 
         fun newIntent(
             context: Context,
             gameId: Long,
+            isVerified: Boolean,
         ): Intent =
             Intent(context, LivetalkChatActivity::class.java).apply {
                 putExtra(KEY_GAME_ID, gameId)
+                putExtra(KEY_IS_VERIFIED, isVerified)
             }
     }
 }

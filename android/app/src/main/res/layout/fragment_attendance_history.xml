@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp"
-        tools:context=".presentation.stats.attendance.AttendanceHistoryFragment">
+        tools:context=".presentation.attendance.AttendanceHistoryFragment">
 
         <TextView
             android:id="@+id/tv_attendance_history_title"
