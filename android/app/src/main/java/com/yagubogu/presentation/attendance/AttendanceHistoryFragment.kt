@@ -53,9 +53,7 @@ class AttendanceHistoryFragment : Fragment() {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
-            val selectedFilterPosition: Int =
-                binding.spinnerAttendanceHistoryFilter.selectedItemPosition
-            viewModel.fetchAttendanceHistoryItems(filter = AttendanceHistoryFilter.entries[selectedFilterPosition])
+            viewModel.fetchAttendanceHistoryItems()
         }
     }
 
@@ -86,13 +84,8 @@ class AttendanceHistoryFragment : Fragment() {
                         position: Int,
                         id: Long,
                     ) {
-                        when (val filter = AttendanceHistoryFilter.entries[position]) {
-                            AttendanceHistoryFilter.ALL ->
-                                viewModel.fetchAttendanceHistoryItems(filter = filter)
-
-                            AttendanceHistoryFilter.WIN ->
-                                viewModel.fetchAttendanceHistoryItems(filter = filter)
-                        }
+                        val filter = AttendanceHistoryFilter.entries[position]
+                        viewModel.updateAttendanceHistoryFilter(filter)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit

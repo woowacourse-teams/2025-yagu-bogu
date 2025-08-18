@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistorySort
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -17,24 +18,29 @@ class AttendanceHistoryViewModel(
 ) : ViewModel(),
     AttendanceHistorySummaryViewHolder.Handler,
     AttendanceHistoryDetailViewHolder.Handler {
-    // TODO : 페이지네이션 적용
-    private val items = MutableLiveData<List<AttendanceHistoryItem.Detail>>(emptyList())
+    private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
+    private val attendanceHistorySort = MutableLiveData(AttendanceHistorySort.NEWEST)
+
+    private val items: MutableLiveData<List<AttendanceHistoryItem.Detail>> =
+        MediatorLiveData<List<AttendanceHistoryItem.Detail>>().apply {
+            addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
+            addSource(attendanceHistorySort) { fetchAttendanceHistoryItems() }
+        }
     private val detailItemIndex = MutableLiveData<Int?>()
 
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> =
         MediatorLiveData<List<AttendanceHistoryItem>>().apply {
             addSource(items) {
                 detailItemIndex.value = FIRST_INDEX
-                value = updateAttendanceHistoryItems()
+                value = buildAttendanceHistoryItems()
             }
-            addSource(detailItemIndex) { value = updateAttendanceHistoryItems() }
+            addSource(detailItemIndex) { value = buildAttendanceHistoryItems() }
         }
 
-    fun fetchAttendanceHistoryItems(
-        year: Int = LocalDate.now().year,
-        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
-    ) {
+    fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
+            val filter: AttendanceHistoryFilter =
+                attendanceHistoryFilter.value ?: AttendanceHistoryFilter.ALL
             val attendanceHistories: Result<List<AttendanceHistoryItem.Detail>> =
                 checkInsRepository.getCheckInHistories(year, filter.name)
             attendanceHistories
@@ -44,6 +50,10 @@ class AttendanceHistoryViewModel(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun updateAttendanceHistoryFilter(filter: AttendanceHistoryFilter) {
+        attendanceHistoryFilter.value = filter
     }
 
     override fun onItemClick(item: AttendanceHistoryItem.Summary) {
@@ -60,7 +70,7 @@ class AttendanceHistoryViewModel(
         }
     }
 
-    private fun updateAttendanceHistoryItems(): List<AttendanceHistoryItem> {
+    private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> {
         val currentItems: List<AttendanceHistoryItem.Detail> = items.value.orEmpty()
         return currentItems.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
             if (index == detailItemIndex.value) item else item.summary
