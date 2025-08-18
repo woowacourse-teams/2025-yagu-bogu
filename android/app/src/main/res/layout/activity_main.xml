@@ -37,7 +37,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical|end"
-                android:onClick=""
+                android:contentDescription="@string/setting_icon_description"
                 android:src="@drawable/ic_settings" />
         </androidx.appcompat.widget.Toolbar>
 

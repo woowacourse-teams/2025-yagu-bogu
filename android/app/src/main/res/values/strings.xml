@@ -88,6 +88,7 @@
     <string name="livetalk_user_report_btn">신고</string>
 
     <string name="setting_main_title">설정</string>
+    <string name="setting_icon_description">설정 아이콘</string>
     <string name="setting_edit_favorite_team">응원팀 수정</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
