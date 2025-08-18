@@ -20,5 +20,5 @@ interface CheckInsRepository {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
-    ): Result<List<AttendanceHistoryItem>>
+    ): Result<List<AttendanceHistoryItem.Detail>>
 }

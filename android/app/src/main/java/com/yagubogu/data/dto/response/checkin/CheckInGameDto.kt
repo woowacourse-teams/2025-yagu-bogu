@@ -18,7 +18,7 @@ data class CheckInGameDto(
     @SerialName("attendanceDate")
     val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
 ) {
-    fun toPresentation(): AttendanceHistoryItem {
+    fun toPresentation(): AttendanceHistoryItem.Detail {
         val summary =
             AttendanceHistoryItem.Summary(
                 attendanceDate = LocalDate.parse(attendanceDate),
@@ -26,6 +26,6 @@ data class CheckInGameDto(
                 awayTeam = awayTeam.toPresentation(),
                 homeTeam = homeTeam.toPresentation(),
             )
-        return AttendanceHistoryItem.Detail(summary)
+        return AttendanceHistoryItem.Detail(summary = summary)
     }
 }
