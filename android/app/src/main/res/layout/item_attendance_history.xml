@@ -7,7 +7,7 @@
 
         <variable
             name="attendanceHistoryItem"
-            type="com.yagubogu.presentation.stats.attendance.AttendanceHistoryItem" />
+            type="com.yagubogu.presentation.attendance.AttendanceHistoryItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

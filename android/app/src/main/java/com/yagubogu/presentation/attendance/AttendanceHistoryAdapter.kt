@@ -1,10 +1,13 @@
-package com.yagubogu.presentation.stats.attendance
+package com.yagubogu.presentation.attendance
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class AttendanceHistoryAdapter : ListAdapter<AttendanceHistoryItem, AttendanceHistoryViewHolder>(diffCallback) {
+class AttendanceHistoryAdapter :
+    ListAdapter<AttendanceHistoryItem, AttendanceHistoryViewHolder>(
+        diffCallback,
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

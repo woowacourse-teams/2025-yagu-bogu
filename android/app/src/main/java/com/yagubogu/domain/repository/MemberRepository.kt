@@ -7,9 +7,9 @@ interface MemberRepository {
 
     suspend fun updateNickname(nickname: String): Result<String>
 
-    suspend fun getFavoriteTeam(): Result<String>
+    suspend fun getFavoriteTeam(): Result<String?>
 
-    suspend fun updateFavoriteTeam(team: Team): Result<String>
+    suspend fun updateFavoriteTeam(team: Team): Result<Unit>
 
     suspend fun logout(): Result<Unit>
 

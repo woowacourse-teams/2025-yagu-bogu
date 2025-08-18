@@ -32,26 +32,25 @@ class MemberDefaultRepository(
                 nickname
             }
 
-    override suspend fun getFavoriteTeam(): Result<String> {
+    override suspend fun getFavoriteTeam(): Result<String?> {
         cachedFavoriteTeam?.let { favoriteTeam: String ->
             return Result.success(favoriteTeam)
         }
         return memberDataSource
             .getFavoriteTeam()
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
-                val favoriteTeam = memberFavoriteResponse.favorite
+                val favoriteTeam: String? = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = favoriteTeam
                 favoriteTeam
             }
     }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<String> =
+    override suspend fun updateFavoriteTeam(team: Team): Result<Unit> =
         memberDataSource
             .updateFavoriteTeam(team)
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
-                val favoriteTeam = memberFavoriteResponse.favorite
+                val favoriteTeam: String? = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = favoriteTeam
-                favoriteTeam
             }
 
     override suspend fun logout(): Result<Unit> {
