@@ -1,12 +1,10 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
@@ -21,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import(MemberFactory.class)
 @DataJpaTest
@@ -182,5 +183,25 @@ public class MemberServiceTest {
         assertThatThrownBy(() -> memberService.updateFavorite(member.getId(), request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Team is not found");
+    }
+
+    @DisplayName("회원 정보를 조회한다")
+    @Test
+    void findMember() {
+        // given
+        Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.nickname("우가")
+                .team(favoriteTeam));
+
+        // when
+        MemberInfoResponse actual = memberService.findMember(member.getId());
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
+            softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
+            softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
+        });
     }
 }

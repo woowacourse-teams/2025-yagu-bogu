@@ -3,6 +3,7 @@ package com.yagubogu.member.controller;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,13 @@ public interface MemberControllerInterface {
     })
     @DeleteMapping("/me")
     ResponseEntity<Void> removeMember(@Parameter(hidden = true) MemberClaims memberClaims);
+
+    @Operation(summary = "회원 정보 조회", description = "현재 로그인된 회원의 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공")
+    })
+    @GetMapping("/me")
+    ResponseEntity<MemberInfoResponse> findMember(@Parameter(hidden = true) MemberClaims memberClaims);
 
     @Operation(summary = "닉네임 조회", description = "현재 로그인된 회원의 닉네임을 조회합니다.")
     @ApiResponses({
