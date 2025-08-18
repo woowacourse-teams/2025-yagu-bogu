@@ -3,10 +3,10 @@ package com.yagubogu.presentation.attendance
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.yagubogu.databinding.ItemAttendanceHistoryBinding
+import com.yagubogu.databinding.ItemAttendanceHistorySummaryBinding
 
 class AttendanceHistoryViewHolder(
-    private val binding: ItemAttendanceHistoryBinding,
+    private val binding: ItemAttendanceHistorySummaryBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: AttendanceHistoryItem) {
         binding.attendanceHistoryItem = item
@@ -15,7 +15,7 @@ class AttendanceHistoryViewHolder(
     companion object {
         fun from(parent: ViewGroup): AttendanceHistoryViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val binding = ItemAttendanceHistoryBinding.inflate(inflater, parent, false)
+            val binding = ItemAttendanceHistorySummaryBinding.inflate(inflater, parent, false)
             return AttendanceHistoryViewHolder(binding)
         }
     }
