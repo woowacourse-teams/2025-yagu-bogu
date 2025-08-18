@@ -13,7 +13,9 @@ import java.time.LocalDate
 
 class AttendanceHistoryViewModel(
     private val checkInsRepository: CheckInsRepository,
-) : ViewModel() {
+) : ViewModel(),
+    AttendanceHistorySummaryViewHolder.Handler,
+    AttendanceHistoryDetailViewHolder.Handler {
     // TODO : 페이지네이션 적용
     private val _attendanceHistoryItems = MutableLiveData<List<AttendanceHistoryItem>>()
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> get() = _attendanceHistoryItems
@@ -32,5 +34,11 @@ class AttendanceHistoryViewModel(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    override fun onItemClick(item: AttendanceHistoryItem.Summary) {
+    }
+
+    override fun onItemClick(item: AttendanceHistoryItem.Detail) {
     }
 }

@@ -18,11 +18,14 @@ data class CheckInGameDto(
     @SerialName("attendanceDate")
     val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
 ) {
-    fun toPresentation(): AttendanceHistoryItem =
-        AttendanceHistoryItem.Summary(
-            attendanceDate = LocalDate.parse(attendanceDate),
-            stadiumName = stadiumFullName,
-            awayTeam = awayTeam.toPresentation(),
-            homeTeam = homeTeam.toPresentation(),
-        )
+    fun toPresentation(): AttendanceHistoryItem {
+        val summary =
+            AttendanceHistoryItem.Summary(
+                attendanceDate = LocalDate.parse(attendanceDate),
+                stadiumName = stadiumFullName,
+                awayTeam = awayTeam.toPresentation(),
+                homeTeam = homeTeam.toPresentation(),
+            )
+        return AttendanceHistoryItem.Detail(summary)
+    }
 }

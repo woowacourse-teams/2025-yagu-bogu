@@ -6,14 +6,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
-class AttendanceHistoryAdapter : ListAdapter<AttendanceHistoryItem, RecyclerView.ViewHolder>(diffCallback) {
+class AttendanceHistoryAdapter(
+    private val attendanceHistorySummaryHandler: AttendanceHistorySummaryViewHolder.Handler,
+    private val attendanceHistoryDetailHandler: AttendanceHistoryDetailViewHolder.Handler,
+) : ListAdapter<AttendanceHistoryItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (AttendanceHistoryItem.ViewType.entries[viewType]) {
-            AttendanceHistoryItem.ViewType.SUMMARY -> AttendanceHistorySummaryViewHolder.from(parent)
-            AttendanceHistoryItem.ViewType.DETAIL -> AttendanceHistoryDetailViewHolder.from(parent)
+            AttendanceHistoryItem.ViewType.SUMMARY ->
+                AttendanceHistorySummaryViewHolder.from(parent, attendanceHistorySummaryHandler)
+
+            AttendanceHistoryItem.ViewType.DETAIL ->
+                AttendanceHistoryDetailViewHolder.from(parent, attendanceHistoryDetailHandler)
         }
 
     override fun onBindViewHolder(
@@ -21,11 +27,15 @@ class AttendanceHistoryAdapter : ListAdapter<AttendanceHistoryItem, RecyclerView
         position: Int,
     ) {
         when (val item: AttendanceHistoryItem = getItem(position)) {
-            is AttendanceHistoryItem.Summary -> (holder as AttendanceHistorySummaryViewHolder).bind(item)
+            is AttendanceHistoryItem.Summary ->
+                (holder as AttendanceHistorySummaryViewHolder).bind(item)
+
             is AttendanceHistoryItem.Detail ->
                 (holder as AttendanceHistoryDetailViewHolder).bind(item)
         }
     }
+
+    override fun getItemViewType(position: Int): Int = getItem(position).type.ordinal
 
     companion object {
         // TODO: diffCallback 수정

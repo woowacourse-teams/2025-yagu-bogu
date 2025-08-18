@@ -8,16 +8,28 @@ import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
 class AttendanceHistoryDetailViewHolder(
     private val binding: ItemAttendanceHistoryDetailBinding,
+    handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.handler = handler
+    }
+
     fun bind(item: AttendanceHistoryItem.Detail) {
-        binding.layoutAttendanceHistory.attendanceHistoryItem = item.summary
+        binding.attendanceHistoryItem = item
+    }
+
+    interface Handler {
+        fun onItemClick(item: AttendanceHistoryItem.Detail)
     }
 
     companion object {
-        fun from(parent: ViewGroup): AttendanceHistoryDetailViewHolder {
+        fun from(
+            parent: ViewGroup,
+            handler: Handler,
+        ): AttendanceHistoryDetailViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemAttendanceHistoryDetailBinding.inflate(inflater, parent, false)
-            return AttendanceHistoryDetailViewHolder(binding)
+            return AttendanceHistoryDetailViewHolder(binding, handler)
         }
     }
 }

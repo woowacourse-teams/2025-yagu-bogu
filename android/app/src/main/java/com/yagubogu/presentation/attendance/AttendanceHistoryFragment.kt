@@ -24,7 +24,12 @@ class AttendanceHistoryFragment : Fragment() {
         AttendanceHistoryViewModelFactory(app.checkInsRepository)
     }
 
-    private val attendanceHistoryAdapter = AttendanceHistoryAdapter()
+    private val attendanceHistoryAdapter by lazy {
+        AttendanceHistoryAdapter(
+            attendanceHistorySummaryHandler = viewModel,
+            attendanceHistoryDetailHandler = viewModel,
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

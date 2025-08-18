@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="attendanceHistoryItem"
+            type="com.yagubogu.presentation.attendance.model.AttendanceHistoryItem.Detail" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.attendance.AttendanceHistoryDetailViewHolder.Handler" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,6 +25,7 @@
         <include
             android:id="@+id/layout_attendance_history"
             layout="@layout/layout_attendance_history"
+            app:attendanceHistoryItem="@{attendanceHistoryItem.summary}"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
