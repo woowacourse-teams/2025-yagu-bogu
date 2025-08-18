@@ -1,9 +1,9 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.ScoreBoardSummary;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameSummaryResultResponse;
+import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
@@ -40,10 +40,14 @@ public class GameResultSyncService {
             return;
         }
 
-        KboGameSummaryResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
-        ScoreBoardSummary homeScoreBoardSummary = gameResult.homeScoreBoard().toScoreBoard();
-        ScoreBoardSummary awayScoreBoardSummary = gameResult.awayScoreBoard().toScoreBoard();
+        KboGameResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
+        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard();
+        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard();
+        String winningPitcher = gameResult.winningPitcher();
+        String losingPitcher = gameResult.losingPitcher();
+        String savePitcher = gameResult.savePitcher();
+        String holdPitcher = gameResult.holdPitchers();
 
-        game.updateScoreBoard(homeScoreBoardSummary, awayScoreBoardSummary);
+        game.updateScoreBoard(homeScoreBoard, awayScoreBoard, winningPitcher, losingPitcher, savePitcher, holdPitcher);
     }
 }
