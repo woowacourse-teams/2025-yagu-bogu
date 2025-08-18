@@ -124,17 +124,17 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="Widget.App.Button.Positive.Pretendard.Medium" parent="Widget.App.Button.Positive">
-        <item name="android:fontFamily">@font/pretendard_medium</item>
+    <style name="Widget.App.Button.Positive.Pretendard.Bold" parent="Widget.App.Button.Positive">
+        <item name="android:fontFamily">@font/pretendard_bold</item>
     </style>
 
-    <style name="Widget.App.Button.Negative" parent="Widget.App.Button">
-        <item name="android:backgroundTint">@color/primary050</item>
-        <item name="android:textColor">@color/primary700</item>
+    <style name="Widget.App.Button.CancelMembership" parent="Widget.App.Button">
+        <item name="android:backgroundTint">@color/gray100</item>
+        <item name="android:textColor">@color/gray400</item>
     </style>
 
-    <style name="Widget.App.Button.Negative.Pretendard.Medium" parent="Widget.App.Button.Negative">
-        <item name="android:fontFamily">@font/pretendard_medium</item>
+    <style name="Widget.App.Button.CancelMembership.Pretendard.Bold" parent="Widget.App.Button.CancelMembership">
+        <item name="android:fontFamily">@font/pretendard_bold</item>
     </style>
 
 </resources>
