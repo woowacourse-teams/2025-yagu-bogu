@@ -1,6 +1,8 @@
 package com.yagubogu.game.service;
 
+import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.GameResultResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
@@ -33,9 +35,27 @@ public class GameService {
         return new GameResponse(gameWithCheckIns);
     }
 
+    public GameResultResponse findScoreBoard(final Long gameId) {
+        Game game = getGame(gameId);
+        validateScoreBoard(game);
+
+        return GameResultResponse.from(game);
+    }
+
+    private static void validateScoreBoard(final Game game) {
+        if (game.getHomeScoreBoard() == null || game.getAwayScoreBoard() == null || game.getPitchers() == null) {
+            throw new NotFoundException("ScoreBoard not found");
+        }
+    }
+
     private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
+    }
+
+    private Game getGame(final Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new NotFoundException("Game not found"));
     }
 
     private void validateIsNotFuture(final LocalDate date) {

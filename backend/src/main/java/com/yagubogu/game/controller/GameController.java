@@ -3,10 +3,12 @@ package com.yagubogu.game.controller;
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.GameResultResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +24,14 @@ public class GameController implements GameControllerInterface {
             @RequestParam final LocalDate date
     ) {
         GameResponse response = gameService.findGamesByDate(date, memberClaims.id());
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<GameResultResponse> findGameScoreBoard(
+            @PathVariable long gameId
+    ) {
+        GameResultResponse response = gameService.findScoreBoard(gameId);
 
         return ResponseEntity.ok(response);
     }
