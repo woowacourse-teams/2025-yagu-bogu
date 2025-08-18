@@ -118,20 +118,45 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/constraint_attendance_history_summary">
 
+            <TextView
+                android:id="@+id/tv_away_team_pitcher"
+                style="@style/TextView.Pretendard.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="20dp"
+                android:text="승 - 이의리"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_home_team_pitcher"
+                style="@style/TextView.Pretendard.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="패 - 김택연"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_away_team_pitcher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_away_team_pitcher" />
+
             <TableLayout
                 android:id="@+id/table_scoreboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:background="@color/white"
                 android:stretchColumns="0,2,3,4,5,6,7,8,9,10,11,12,14"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/tv_away_team_pitcher">
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.4dp"
                     android:background="@color/gray300" />
 
-                <!-- 헤더 행 -->
+                <!-- 헤더 -->
                 <TableRow>
 
                     <TextView
@@ -202,7 +227,7 @@
                     android:layout_height="0.4dp"
                     android:background="@color/gray300" />
 
-                <!-- 원정팀 행 -->
+                <!-- 원정팀 -->
                 <TableRow>
 
                     <TextView
@@ -273,7 +298,7 @@
                     android:layout_height="0.4dp"
                     android:background="@color/gray300" />
 
-                <!-- 홈팀 행 -->
+                <!-- 홈팀 -->
                 <TableRow>
 
                     <TextView
@@ -344,6 +369,111 @@
                     android:layout_height="0.4dp"
                     android:background="@color/gray300" />
             </TableLayout>
+
+            <TableLayout
+                android:id="@+id/table_record"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/table_scoreboard">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:background="@color/gray300" />
+
+                <!-- 헤더 -->
+                <TableRow android:background="@color/primary050">
+
+                    <TextView
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="KIA"
+                        android:textSize="12dp" />
+
+                    <TextView
+                        style="@style/TextView.Record.Title"
+                        android:text="팀 기록" />
+
+                    <TextView
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="두산"
+                        android:textSize="12dp" />
+                </TableRow>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:background="@color/gray300" />
+
+                <!-- 안타 -->
+                <TableRow>
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="13" />
+
+                    <TextView
+                        style="@style/TextView.Record.Title"
+                        android:text="안타" />
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="9" />
+                </TableRow>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:background="@color/gray300" />
+
+                <!-- 실책 -->
+                <TableRow>
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="0" />
+
+                    <TextView
+                        style="@style/TextView.Record.Title"
+                        android:text="실책" />
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="2" />
+                </TableRow>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:background="@color/gray300" />
+
+                <!-- 사사구 -->
+                <TableRow>
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="5" />
+
+                    <TextView
+                        style="@style/TextView.Record.Title"
+                        android:text="사사구" />
+
+                    <TextView
+                        style="@style/TextView.Record.Content"
+                        android:text="3" />
+                </TableRow>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:background="@color/gray300" />
+            </TableLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
