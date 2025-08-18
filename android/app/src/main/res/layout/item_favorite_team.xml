@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="favoriteTeamUiModel"
-            type="com.yagubogu.presentation.favorite.FavoriteTeamUiModel" />
+            name="favoriteTeamItem"
+            type="com.yagubogu.presentation.favorite.FavoriteTeamItem" />
 
         <variable
             name="handler"
@@ -19,14 +19,14 @@
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
         android:background="@drawable/bg_white_stroke_gray100_radius_12dp"
-        android:onClick="@{() -> handler.onItemClick(favoriteTeamUiModel)}">
+        android:onClick="@{() -> handler.onItemClick(favoriteTeamItem)}">
 
         <TextView
             android:id="@+id/tv_team_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@{favoriteTeamUiModel.emoji}"
+            android:text="@{favoriteTeamItem.emoji}"
             android:textSize="32sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="24dp"
-            android:text="@{favoriteTeamUiModel.name}"
+            android:text="@{favoriteTeamItem.team.nickname}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
