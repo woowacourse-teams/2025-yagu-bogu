@@ -36,8 +36,8 @@ class SettingNicknameEditFragment : DialogFragment() {
     }
 
     companion object {
-        const val REQUEST_KEY = "nicknameEditRequest"
-        const val BUNDLE_KEY_NICKNAME = "newNickname"
+        private const val REQUEST_KEY = "nicknameEditRequest"
+        private const val BUNDLE_KEY_NICKNAME = "newNickname"
         private const val ARG_CURRENT_NICKNAME = "current_nickname"
 
         fun newInstance(currentNickname: String): SettingNicknameEditFragment =
