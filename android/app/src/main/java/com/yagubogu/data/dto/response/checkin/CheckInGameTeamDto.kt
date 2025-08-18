@@ -1,7 +1,7 @@
 package com.yagubogu.data.dto.response.checkin
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.stats.attendance.CheckInGameTeamItem
+import com.yagubogu.presentation.attendance.CheckInGameTeamItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
-import com.yagubogu.presentation.challenge.ChallengeFragment
+import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.stats.StatsFragment
@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
-                R.id.item_challenge -> {
-                    switchFragment(ChallengeFragment::class.java, itemId)
+                R.id.item_attendance_history -> {
+                    switchFragment(AttendanceHistoryFragment::class.java, itemId)
                     true
                 }
 
@@ -107,8 +107,8 @@ class MainActivity : AppCompatActivity() {
             when (selectedItemId) {
                 R.id.item_home -> R.string.app_name
                 R.id.item_stats -> R.string.bottom_navigation_stats
+                R.id.item_attendance_history -> R.string.bottom_navigation_attendance_history
                 R.id.item_livetalk -> R.string.bottom_navigation_livetalk
-                R.id.item_challenge -> R.string.bottom_navigation_challenge
                 else -> R.string.app_name
             }
         binding.tvToolbarTitle.text = getString(titleResId)
