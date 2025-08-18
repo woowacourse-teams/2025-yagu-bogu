@@ -4,7 +4,9 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.LifecycleOwner
 import com.yagubogu.databinding.FragmentHomeCheckInConfirmBinding
 
 class HomeCheckInConfirmFragment : DialogFragment() {
@@ -28,9 +30,22 @@ class HomeCheckInConfirmFragment : DialogFragment() {
     }
 
     companion object {
-        const val KEY_REQUEST_SUCCESS = "success"
-        const val KEY_CONFIRM = "confirm"
+        private const val KEY_REQUEST_SUCCESS = "success"
+        private const val KEY_CONFIRM = "confirm"
 
         fun newInstance(): HomeCheckInConfirmFragment = HomeCheckInConfirmFragment()
+
+        fun setResultListener(
+            fragmentManager: FragmentManager,
+            lifecycleOwner: LifecycleOwner,
+            onResult: (Boolean) -> Unit,
+        ) {
+            fragmentManager.setFragmentResultListener(
+                KEY_REQUEST_SUCCESS,
+                lifecycleOwner,
+            ) { _, bundle ->
+                onResult(bundle.getBoolean(KEY_CONFIRM))
+            }
+        }
     }
 }

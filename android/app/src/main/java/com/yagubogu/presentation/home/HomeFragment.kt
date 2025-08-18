@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
@@ -138,8 +137,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupFragmentResultListener() {
-        setFragmentResultListener(HomeCheckInConfirmFragment.KEY_REQUEST_SUCCESS) { _, bundle ->
-            val result: Boolean = bundle.getBoolean(HomeCheckInConfirmFragment.KEY_CONFIRM)
+        HomeCheckInConfirmFragment.setResultListener(
+            parentFragmentManager,
+            viewLifecycleOwner,
+        ) { result: Boolean ->
             if (result) {
                 viewModel.checkIn()
             }
