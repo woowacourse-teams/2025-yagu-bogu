@@ -24,7 +24,7 @@ class AttendanceHistoryViewModel(
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> =
         MediatorLiveData<List<AttendanceHistoryItem>>().apply {
             addSource(items) {
-                detailItemIndex.value = 0
+                detailItemIndex.value = FIRST_INDEX
                 value = updateAttendanceHistoryItems()
             }
             addSource(detailItemIndex) { value = updateAttendanceHistoryItems() }
@@ -65,5 +65,9 @@ class AttendanceHistoryViewModel(
         return currentItems.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
             if (index == detailItemIndex.value) item else item.summary
         }
+    }
+
+    companion object {
+        private const val FIRST_INDEX = 0
     }
 }

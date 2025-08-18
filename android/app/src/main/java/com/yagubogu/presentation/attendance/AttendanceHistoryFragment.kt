@@ -65,7 +65,10 @@ class AttendanceHistoryFragment : Fragment() {
     }
 
     private fun setupBindings() {
-        binding.rvAttendanceHistory.adapter = attendanceHistoryAdapter
+        binding.rvAttendanceHistory.apply {
+            adapter = attendanceHistoryAdapter
+            itemAnimator = null
+        }
     }
 
     private fun setupSpinner() {
