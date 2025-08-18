@@ -6,18 +6,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemAttendanceHistorySummaryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
-class AttendanceHistoryViewHolder(
+class AttendanceHistorySummaryViewHolder(
     private val binding: ItemAttendanceHistorySummaryBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: AttendanceHistoryItem) {
+    fun bind(item: AttendanceHistoryItem.Summary) {
         binding.layoutAttendanceHistory.attendanceHistoryItem = item
     }
 
     companion object {
-        fun from(parent: ViewGroup): AttendanceHistoryViewHolder {
+        fun from(parent: ViewGroup): AttendanceHistorySummaryViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemAttendanceHistorySummaryBinding.inflate(inflater, parent, false)
-            return AttendanceHistoryViewHolder(binding)
+            return AttendanceHistorySummaryViewHolder(binding)
         }
     }
 }
