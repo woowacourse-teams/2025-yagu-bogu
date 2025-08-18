@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.attendance.AttendanceHistoryViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,11 +43,13 @@
             style="@style/TextView.Pretendard.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{() -> viewModel.switchAttendanceHistorySort()}"
+            android:paddingEnd="20dp"
             android:textColor="@color/gray500"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/spinner_attendance_history_filter"
-            app:layout_constraintEnd_toStartOf="@id/iv_attendance_history_switch"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/spinner_attendance_history_filter"
             tools:text="최신순" />
 
@@ -50,7 +59,7 @@
             android:layout_height="16dp"
             android:src="@drawable/ic_switch"
             app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_sort"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tv_attendance_history_sort"
             app:layout_constraintTop_toTopOf="@id/tv_attendance_history_sort"
             app:tint="@color/gray500" />
 

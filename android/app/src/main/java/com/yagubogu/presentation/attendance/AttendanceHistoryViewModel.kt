@@ -19,12 +19,13 @@ class AttendanceHistoryViewModel(
     AttendanceHistorySummaryViewHolder.Handler,
     AttendanceHistoryDetailViewHolder.Handler {
     private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
-    private val attendanceHistorySort = MutableLiveData(AttendanceHistorySort.NEWEST)
+    private val _attendanceHistorySort = MutableLiveData(AttendanceHistorySort.NEWEST)
+    val attendanceHistorySort: LiveData<AttendanceHistorySort> get() = _attendanceHistorySort
 
     private val items: MutableLiveData<List<AttendanceHistoryItem.Detail>> =
         MediatorLiveData<List<AttendanceHistoryItem.Detail>>().apply {
             addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
-            addSource(attendanceHistorySort) { fetchAttendanceHistoryItems() }
+            addSource(_attendanceHistorySort) { fetchAttendanceHistoryItems() }
         }
     private val detailItemIndex = MutableLiveData<Int?>()
 
@@ -54,6 +55,15 @@ class AttendanceHistoryViewModel(
 
     fun updateAttendanceHistoryFilter(filter: AttendanceHistoryFilter) {
         attendanceHistoryFilter.value = filter
+    }
+
+    fun switchAttendanceHistorySort() {
+        _attendanceHistorySort.value =
+            if (attendanceHistorySort.value == AttendanceHistorySort.NEWEST) {
+                AttendanceHistorySort.OLDEST
+            } else {
+                AttendanceHistorySort.NEWEST
+            }
     }
 
     override fun onItemClick(item: AttendanceHistoryItem.Summary) {
