@@ -86,6 +86,7 @@
     <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
     <string name="livetalk_away_home_name">%s vs %s</string>
     <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
+    <string name="livetalk_chat_input_hint_unverified">직관 인증을 먼저 해주세요</string>
     <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
 
     <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
