@@ -14,7 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
+import com.yagubogu.presentation.setting.SettingAccountFragment.Companion.KEY_LOGIN_REQUEST_DIALOG
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -70,6 +72,16 @@ class SettingActivity : AppCompatActivity() {
             this,
         ) { newNickname: String ->
             viewModel.updateNickname(newNickname)
+        }
+
+        supportFragmentManager.setFragmentResultListener(
+            KEY_LOGIN_REQUEST_DIALOG,
+            this,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.logout()
+            }
         }
     }
 

@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingAccountBinding
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DialogDefaultUiModel
 
 @Suppress("ktlint:standard:backing-property-naming")
 class SettingAccountFragment : Fragment() {
@@ -45,8 +47,19 @@ class SettingAccountFragment : Fragment() {
 
     private fun setupListeners() {
         binding.layoutLogout.root.setOnClickListener {
-            viewModel.logout()
+            val logoutDialogUiModel =
+                DialogDefaultUiModel(
+                    emoji = null,
+                    title = getString(R.string.setting_logout),
+                    message = getString(R.string.setting_logout_dialog_message),
+                    negativeText = null,
+                    positiveText = getString(R.string.setting_logout),
+                )
+            DefaultDialogFragment
+                .newInstance(KEY_LOGIN_REQUEST_DIALOG, logoutDialogUiModel)
+                .show(parentFragmentManager, "logoutDialog")
         }
+
         binding.layoutDeleteAccount.root.setOnClickListener {
             showDeleteAccountFragment()
         }
@@ -59,5 +72,9 @@ class SettingAccountFragment : Fragment() {
             .replace(R.id.fcv_setting, SettingDeleteAccountFragment())
             .addToBackStack(null)
             .commit()
+    }
+
+    companion object {
+        const val KEY_LOGIN_REQUEST_DIALOG = "logoutRequest"
     }
 }
