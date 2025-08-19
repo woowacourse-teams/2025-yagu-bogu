@@ -2,9 +2,7 @@ package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.LoginRequest
 import com.yagubogu.data.dto.request.MemberLogoutRequest
-import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.dto.response.LoginResponse
-import com.yagubogu.data.dto.response.TokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -19,9 +17,4 @@ interface AuthApiService {
     suspend fun logout(
         @Body body: MemberLogoutRequest,
     ): Response<Unit>
-
-    @POST("/api/auth/refresh")
-    suspend fun postRefresh(
-        @Body body: TokenRequest,
-    ): Response<TokenResponse>
 }
