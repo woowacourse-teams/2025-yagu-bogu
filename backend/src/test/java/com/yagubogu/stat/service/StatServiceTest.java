@@ -18,6 +18,8 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.support.checkin.CheckInFactory;
@@ -27,6 +29,7 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +66,7 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
+        statService = new StatService(checkInRepository, memberRepository, stadiumRepository, teamRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -429,5 +432,171 @@ class StatServiceTest {
                     assertThat(response.averageHits()).isNull();
                     assertThat(response.concededHits()).isNull();
                 });
+    }
+
+    @DisplayName("상대팀별 승률을 계산하여 승률 내림차순, 이름 오름차순으로 정렬해 반환하며 미대결 팀은 0.0으로 포함한다")
+    @Test
+    void findOpponentWinRate_sorted() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team SS = teamRepository.findByTeamCode("SS").orElseThrow();
+        Team NC = teamRepository.findByTeamCode("NC").orElseThrow();
+
+        Member member = memberFactory.save(b -> b.team(HT));
+
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        Stadium sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
+
+        // 2025-07: HT vs SS → 2전 2승 (100.0)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(SS)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(SS).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(2).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        // 2025-07: HT vs LT → 2전 1승 1패 (50.0)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 13))
+                .homeScore(7).awayScore(1)
+                .gameState(GameState.COMPLETED));
+
+        // 2025-07: HT vs NC → 1전 0승 1무 (0.0, 무는 분모 포함)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(NC)
+                .date(LocalDate.of(2025, 7, 14))
+                .homeScore(4).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        int year = 2025;
+
+        // when
+        OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), year);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            // 전체 상대팀(내 팀 제외) 9개
+            softAssertions.assertThat(actual.opponents()).hasSize(9);
+
+            softAssertions.assertThat(actual.opponents().get(0))
+                    .satisfies(it -> {
+                        assertThat(it.teamCode()).isEqualTo("SS");
+                        assertThat(it.winRate()).isEqualTo(100.0);
+                    });
+            softAssertions.assertThat(actual.opponents().get(1))
+                    .satisfies(it -> {
+                        assertThat(it.teamCode()).isEqualTo("LT");
+                        assertThat(it.winRate()).isEqualTo(50.0);
+                    });
+
+            // 미대결 팀들은 0.0 포함
+            var zeroTeamCodes = actual.opponents().stream()
+                    .filter(r -> r.winRate() == 0.0)
+                    .map(OpponentWinRateTeamResponse::teamCode)
+                    .toList();
+
+            softAssertions.assertThat(zeroTeamCodes)
+                    .containsExactly("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+        });
+    }
+
+    @DisplayName("연도 범위를 벗어난 경기는 집계에서 제외되며 미대결 팀은 0.0으로 포함된다")
+    @Test
+    void findOpponentWinRate_excludes_other_year_and_includes_unplayed() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // 2024(제외)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2024, 9, 1))
+                .homeScore(10).awayScore(1)
+                .gameState(GameState.COMPLETED));
+
+        // 2025(포함, 승)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 9, 1))
+                .homeScore(3).awayScore(2)
+                .gameState(GameState.COMPLETED));
+
+        // when
+        OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
+
+        // then: 내 팀 제외 9팀 모두 포함, LT만 100.0, 나머지는 0.0
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.opponents()).hasSize(9);
+            softAssertions.assertThat(actual.opponents().stream()
+                    .filter(it -> it.teamCode().equals("LT"))
+                    .findFirst().orElseThrow().winRate()).isEqualTo(100.0);
+            softAssertions.assertThat(actual.opponents().stream()
+                    .filter(it -> !it.teamCode().equals("LT"))
+                    .allMatch(it -> it.winRate() == 0.0)).isTrue();
+        });
+    }
+
+    @DisplayName("회원에 팀이 없으면 NotFoundException을 던진다")
+    @Test
+    void findOpponentWinRate_member_without_team() {
+        // given
+        Member member = memberFactory.save(b -> b.build());
+
+        // when & then
+        assertThatThrownBy(() -> statService.findOpponentWinRate(member.getId(), 2025))
+                .isExactlyInstanceOf(NotFoundException.class)
+                .hasMessage("Team not exist");
+    }
+
+    @DisplayName("점수 미기록 경기는 제외되며 그 외 미대결 팀은 0.0으로 포함된다")
+    @Test
+    void findOpponentWinRate_ignores_null_scores_and_includes_unplayed() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // 미기록(제외)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 30))
+                .homeScore(null).awayScore(null)
+                .gameState(GameState.SCHEDULED));
+
+        // 기록(포함, 승)
+        gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 8, 2))
+                .homeScore(2).awayScore(1)
+                .gameState(GameState.COMPLETED));
+
+        // when
+        OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
+
+        // then: 9팀 모두 포함, LT는 100.0, 나머지 0.0
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.opponents()).hasSize(9);
+            softAssertions.assertThat(actual.opponents().stream()
+                    .filter(it -> it.teamCode().equals("LT"))
+                    .findFirst().orElseThrow().winRate()).isEqualTo(100.0);
+            softAssertions.assertThat(actual.opponents().stream()
+                    .filter(it -> !it.teamCode().equals("LT"))
+                    .allMatch(it -> it.winRate() == 0.0)).isTrue();
+        });
     }
 }

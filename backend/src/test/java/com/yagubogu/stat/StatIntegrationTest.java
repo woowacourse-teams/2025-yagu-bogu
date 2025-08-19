@@ -12,6 +12,7 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.support.auth.AuthFactory;
@@ -23,6 +24,8 @@ import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.util.List;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -287,5 +290,103 @@ public class StatIntegrationTest {
 
         // then
         assertThat(actual).isEqualTo(new AverageStatisticResponse(7.7, 5.3, 0.3, 12.0, 9.0));
+    }
+
+    @DisplayName("상대팀별 승률을 계산해 반환하며, 승률 내림차순 → name(String) 오름차순으로 정렬하고 미대결 팀은 0.0으로 포함한다")
+    @Test
+    void findOpponentWinRate_opponents_sorted_and_includes_unplayed() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // SS와는 2전 2승 → 100.0
+        Game s1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game s2 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(2).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        // LT와는 2전 1승 1패 → 50.0
+        Game l1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game l2 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 13))
+                .homeScore(7).awayScore(1)
+                .gameState(GameState.COMPLETED));
+
+        // NC와는 1전 0승 1무 → 0.0 (무는 분모 포함)
+        Team nc = teamRepository.findByTeamCode("NC").orElseThrow();
+        Game n1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(nc)
+                .date(LocalDate.of(2025, 7, 14))
+                .homeScore(4).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        // 체크인(전부 즐겨찾기팀 HT로)
+        checkInFactory.save(b -> b.game(s1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(s2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(l1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(l2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(n1).member(member).team(ht));
+
+        // when
+        var actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/stats/win-rate/opponents")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.opponents()).hasSize(9);
+            softAssertions.assertThat(actual.opponents().get(0))
+                    .extracting(
+                            OpponentWinRateTeamResponse::teamCode,
+                            OpponentWinRateTeamResponse::winRate
+                    )
+                    .containsExactly("SS", 100.0);
+            softAssertions.assertThat(actual.opponents().get(1))
+                    .extracting(
+                            OpponentWinRateTeamResponse::teamCode,
+                            OpponentWinRateTeamResponse::winRate
+                    )
+                    .containsExactly("LT", 50.0);
+            List<String> zeros = actual.opponents().stream()
+                    .filter(r -> r.winRate() == 0.0)
+                    .map(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::teamCode)
+                    .toList();
+            softAssertions.assertThat(zeros)
+                    .containsExactly("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+        });
+    }
+
+    @DisplayName("예외: 상대팀별 승률 조회시 응원팀이 없으면 404를 반환한다")
+    @Test
+    void findOpponentWinRate_memberWithoutTeam_notFound() {
+        // given
+        Member member = memberFactory.save(b -> b.team(null));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/stats/win-rate/opponents")
+                .then().log().all()
+                .statusCode(404);
     }
 }
