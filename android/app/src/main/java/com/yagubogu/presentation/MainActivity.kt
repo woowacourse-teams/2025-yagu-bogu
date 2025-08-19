@@ -41,8 +41,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setLoadingScreen(isLoading: Boolean) {
-        binding.viewOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
-        binding.cpiCheckInLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
+        val visibility = if (isLoading) View.GONE else View.VISIBLE
+        binding.viewOverlay.visibility = visibility
+        binding.cpiCheckInLoading.visibility = visibility
     }
 
     private fun setupView() {
