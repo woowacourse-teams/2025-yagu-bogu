@@ -18,10 +18,10 @@ jobs:
     permissions:
       contents: write
     outputs:
-      version:  ${{ steps.semver.outputs.next_version }}     # 1.0.1
-      ver_tag:  ${{ steps.ver.outputs.ver_tag }}             # v1.0.1
-      digest:   ${{ steps.capture.outputs.digest }}          # sha256:...
-      img_tag:  ${{ steps.alias.outputs.image_tag }}         # v1.0.1-abcdef12
+      version: ${{ steps.semver.outputs.next_version }}     # 1.0.1
+      ver_tag: ${{ steps.ver.outputs.ver_tag }}             # v1.0.1
+      digest: ${{ steps.capture.outputs.digest }}          # sha256:...
+      img_tag: ${{ steps.alias.outputs.image_tag }}         # v1.0.1-abcdef12
     steps:
       - name: Checkout (with tags)
         uses: actions/checkout@v4
@@ -116,7 +116,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SHORT="${DIGEST#sha256:}"; SHORT="${SHORT:0:8}"
+          DIGEST='${{ steps.capture.outputs.digest }}'
+          SHORT="${DIGEST#sha256:}"; 
+          SHORT="${SHORT:0:8}"
           READABLE="${VER}-${SHORT}"
           docker buildx imagetools create \
             -t "$IMAGE:$READABLE" \
@@ -128,10 +130,10 @@ jobs:
     needs: release
     runs-on: [ self-hosted, production ]
     env:
-      IMAGE:   yagubogu/yagubogu-backend
+      IMAGE: yagubogu/yagubogu-backend
       VERSION: ${{ needs.release.outputs.version }}   # 1.0.1
-      VER:     ${{ needs.release.outputs.ver_tag }}   # v1.0.1
-      DIGEST:  ${{ needs.release.outputs.digest }}    # sha256:...
+      VER: ${{ needs.release.outputs.ver_tag }}   # v1.0.1
+      DIGEST: ${{ needs.release.outputs.digest }}    # sha256:...
       IMG_TAG: ${{ needs.release.outputs.img_tag }}   # v1.0.1-abcdef12
     steps:
       - name: Login to Docker Hub
