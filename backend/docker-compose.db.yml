@@ -1,9 +1,5 @@
 version: "3.9"
 
-networks:
-  yagubogu-net:
-    name: yagubogu-net
-
 volumes:
   db-data:
 
@@ -22,10 +18,8 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u\"$DB_USER\" -p\"$DB_PASSWORD\" --silent"]
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u\"$DB_USER\" -p\"$DB_PASSWORD\" --silent" ]
       interval: 10s
       timeout: 5s
       retries: 10
     restart: unless-stopped
-    networks:
-      - yagubogu-net
