@@ -7,21 +7,29 @@ on:
 #  pull_request_target:
 #    types: [ closed ]
 #    branches: [ "main" ]   # 운영 브랜치로 조정
+
 env:
   IMAGE: yagubogu/yagubogu-backend
 
 jobs:
   release:
-    #    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
-      version: ${{ steps.semver.outputs.next_version }}
-      digest: ${{ steps.capture.outputs.digest }}
+      version:  ${{ steps.semver.outputs.next_version }}     # 1.0.1
+      ver_tag:  ${{ steps.ver.outputs.ver_tag }}             # v1.0.1
+      digest:   ${{ steps.capture.outputs.digest }}          # sha256:...
+      img_tag:  ${{ steps.alias.outputs.image_tag }}         # v1.0.1-abcdef12
     steps:
       - name: Checkout (with tags)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
@@ -39,11 +47,10 @@ jobs:
           set -euo pipefail
           labels_raw="$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' || true)"
           labels="$(sed -E 's/^[^[:alnum:]]+[ ]*//;t;:a;s/^[^[:alnum:]]+[ ]*//;ta' <<<"$labels_raw")"
-          
           if   grep -qi '^semver:major$' <<<"$labels"; then bump="major"
           elif grep -qi '^semver:minor$' <<<"$labels"; then bump="minor"
           else bump="patch"; fi
-          
+
           git fetch --tags --force
           last_tag="$(git tag -l --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
           [ -n "$last_tag" ] || last_tag="0.0.0"
@@ -55,45 +62,77 @@ jobs:
             patch) PA=$((PA+1));;
           esac
           next="$MA.$MI.$PA"
-          echo "last=$last_tag, next=$next"
-
           echo "next_version=$next" >> "$GITHUB_OUTPUT"
-          echo "bump=$bump" >> "$GITHUB_OUTPUT"
 
-      - name: Create Git tag
+      - id: ver
+        name: Export v-prefixed VER
         shell: bash
         run: |
           set -euo pipefail
-          VER='${{ steps.semver.outputs.next_version }}'
+          VER="v${{ steps.semver.outputs.next_version }}"
+          echo "VER=$VER" >> "$GITHUB_ENV"
+          echo "ver_tag=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag (v-prefixed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${VER:?VER not set}"   # v1.0.1
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$VER" -m "Release $VER (auto bump from PR #${{ github.event.pull_request.number }})"
-          git push origin "$VER" || true   # ✅ 태그 충돌 시에도 실패하지 않음
+          if git rev-parse -q --verify "refs/tags/$VER" >/dev/null; then
+            echo "Tag $VER already exists. Skip."
+          else
+            git tag -a "$VER" -m "Release $VER (auto)"
+            git push origin "$VER"
+          fi
 
-      - name: Promote dev-latest -> versioned tags
+      - name: Promote dev-latest -> $VER
         shell: bash
         run: |
-          VER='${{ steps.semver.outputs.next_version }}'
+          set -euo pipefail
           docker buildx imagetools create \
-          -t $IMAGE:$VER \
-          $IMAGE:dev-latest
+            -t "$IMAGE:$VER" \
+            "$IMAGE:dev-latest"
 
       - id: capture
-        name: Capture image digest of ${{ steps.semver.outputs.next_version }}
+        name: Capture image digest of $VER
         shell: bash
         run: |
-          VER='${{ steps.semver.outputs.next_version }}'
-          DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          set -euo pipefail
+          DIGEST=""
+          # 레지스트리 전파 지연 대비(최대 10회, 3초 간격)
+          for i in {1..10}; do
+            DIGEST="$(docker buildx imagetools inspect "$IMAGE:$VER" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
+            [ -n "$DIGEST" ] && break
+            echo "waiting manifest... ($i/10)"; sleep 3
+          done
+          [ -n "$DIGEST" ] || { echo "Digest not found for $IMAGE:$VER" >&2; exit 1; }
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "Captured digest: $DIGEST"
 
+      - id: alias
+        name: Create readable alias tag <VER>-<short>
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT="${DIGEST#sha256:}"; SHORT="${SHORT:0:8}"
+          READABLE="${VER}-${SHORT}"
+          docker buildx imagetools create \
+            -t "$IMAGE:$READABLE" \
+            "$IMAGE:$VER"
+          echo "image_tag=$READABLE" >> "$GITHUB_OUTPUT"
+          echo "Created alias: $IMAGE:$READABLE"
 
   cd:
     needs: release
     runs-on: [ self-hosted, production ]
     env:
-      IMAGE: yagubogu/yagubogu-backend
-      VERSION: ${{ needs.release.outputs.version }}
-      DIGEST: ${{ needs.release.outputs.digest }}
+      IMAGE:   yagubogu/yagubogu-backend
+      VERSION: ${{ needs.release.outputs.version }}   # 1.0.1
+      VER:     ${{ needs.release.outputs.ver_tag }}   # v1.0.1
+      DIGEST:  ${{ needs.release.outputs.digest }}    # sha256:...
+      IMG_TAG: ${{ needs.release.outputs.img_tag }}   # v1.0.1-abcdef12
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
@@ -101,8 +140,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      - name: Pull by digest
-        run: docker pull $IMAGE@${DIGEST}
+      - name: Pull by digest (pinned)
+        run: docker pull "$IMAGE@${DIGEST}"
 
       - name: Ensure network
         run: docker network create yagubogu-net 2>/dev/null || true
@@ -113,62 +152,64 @@ jobs:
           set -euo pipefail
           BLUE="yagubogu-backend-blue"
           GREEN="yagubogu-backend-green"
-          
+
           if docker ps --format '{{.Names}}' | grep -qx "$BLUE"; then
-          OLD="$BLUE";  NEW="$GREEN"; PORT=8082; COLOR=green
+            OLD="$BLUE";  NEW="$GREEN"; PORT=8082; COLOR=green
           else
-          OLD="$GREEN"; NEW="$BLUE";  PORT=8081; COLOR=blue
+            OLD="$GREEN"; NEW="$BLUE";  PORT=8081; COLOR=blue
           fi
           echo "OLD=${OLD:-none}, NEW=$NEW, PORT=$PORT, COLOR=$COLOR"
-          
+
           if docker ps -a --format '{{.Names}}' | grep -qx "$NEW"; then
-          docker rm -f "$NEW" || true
+            docker rm -f "$NEW" || true
           fi
+
           docker run -d \
-          --name "$NEW" \
-          --network yagubogu-net \
-          -p "$PORT:8080" \
-          --stop-signal=SIGTERM \
-          --stop-timeout=30 \
-          -v /var/log/yagubogu:/var/log/yagubogu \
-          -e SPRING_PROFILES_ACTIVE=prod \
-          -e DB_URL="${{ secrets.DB_PROD_URL }}" \
-          -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-          -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-          -l app=yagubogu-backend \
-          -l release.version="${VERSION}" \
-          -l release.digest="${DIGEST}" \
-          "$IMAGE@${DIGEST}"
-          
+            --name "$NEW" \
+            --network yagubogu-net \
+            -p "$PORT:8080" \
+            --stop-signal=SIGTERM \
+            --stop-timeout=30 \
+            -v /var/log/yagubogu:/var/log/yagubogu \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
+            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -l app=yagubogu-backend \
+            -l release.version="${VER}" \
+            -l release.digest="${DIGEST}" \
+            -l release.alias="${IMG_TAG}" \
+            "$IMAGE@${DIGEST}"
+
+          # Health check: 10초 간격, 최대 12회(120초)
+          sleep 10;
           for i in {1..30}; do
           if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
           echo "NEW healthy"; break; fi
           echo "waiting health... ($i/30)"; sleep 2
           done
-          
+
           if [ "$COLOR" = "blue" ]; then
-          TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
+            TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
           else
-          TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
+            TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
           fi
           sudo ln -sf "$TARGET" /etc/nginx/sites-enabled/app.conf
           sudo nginx -t
           sudo nginx -s reload
-          
+
           sleep 20
-          
+
           if [ -n "${OLD:-}" ] && docker ps --format '{{.Names}}' | grep -qx "$OLD"; then
-          docker stop --time=30 "$OLD" || true
+            docker stop --time=30 "$OLD" || true
           fi
-          
+
           LOG_DIR="/var/log/yagubogu"
           sudo mkdir -p "$LOG_DIR"
-          echo "$(date -Is) release=${VERSION} digest=${DIGEST} color=${COLOR} port=${PORT}" \
-          | sudo tee -a "$LOG_DIR/deployments.log"
-          echo "${VERSION} ${DIGEST} ${COLOR} ${PORT}" | sudo tee "$LOG_DIR/current.release" >/dev/null
+          echo "$(date -Is) release=${VER} version=${VERSION} digest=${DIGEST} alias=${IMG_TAG} color=${COLOR} port=${PORT}" \
+            | sudo tee -a "$LOG_DIR/deployments.log"
+          echo "${VER} ${VERSION} ${DIGEST} ${IMG_TAG} ${COLOR} ${PORT}" | sudo tee "$LOG_DIR/current.release" >/dev/null
 
-      - name: Prune old images (keep last 5 versions)
+      - name: Prune old images (local)
         shell: bash
-        run: |
-          set -euo pipefail
-          docker image prune -af || true
+        run: docker image prune -af || true
