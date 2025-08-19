@@ -74,7 +74,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.setFragmentResultListener(
-            SettingAccountFragment.KEY_LOGIN_REQUEST_DIALOG,
+            SettingAccountFragment.KEY_LOGOUT_REQUEST_DIALOG,
             this,
         ) { _, bundle ->
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)

@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.setting
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -57,7 +58,7 @@ class SettingMainFragment : Fragment() {
 
     private fun setupListeners() {
         binding.layoutEditNickname.root.setOnClickListener {
-            val currentNickname = binding.tvMyNickname.text.toString()
+            val currentNickname: String = viewModel.nickname.value.toString()
             SettingNicknameEditFragment
                 .newInstance(currentNickname)
                 .show(parentFragmentManager, "SettingNicknameEditFragment")
@@ -93,7 +94,7 @@ class SettingMainFragment : Fragment() {
 
     private fun getAppVersion(): String =
         try {
-            val packageInfo =
+            val packageInfo: PackageInfo =
                 requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             packageInfo.versionName ?: DEFAULT_VERSION_NAME
         } catch (e: PackageManager.NameNotFoundException) {

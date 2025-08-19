@@ -56,7 +56,7 @@ class SettingAccountFragment : Fragment() {
                         positiveText = getString(R.string.setting_logout),
                     )
                 logoutDialog =
-                    DefaultDialogFragment.newInstance(KEY_LOGIN_REQUEST_DIALOG, dialogUiModel)
+                    DefaultDialogFragment.newInstance(KEY_LOGOUT_REQUEST_DIALOG, dialogUiModel)
             }
 
             logoutDialog?.show(parentFragmentManager, "logoutDialog")
@@ -77,6 +77,6 @@ class SettingAccountFragment : Fragment() {
     }
 
     companion object {
-        const val KEY_LOGIN_REQUEST_DIALOG = "logoutRequest"
+        const val KEY_LOGOUT_REQUEST_DIALOG = "logoutRequest"
     }
 }

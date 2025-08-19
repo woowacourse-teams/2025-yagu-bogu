@@ -8,26 +8,25 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
-import com.yagubogu.databinding.FragmentEditNicknameConfirmBinding
+import com.yagubogu.databinding.FragmentSettingNicknameEditBinding
 
 class SettingNicknameEditFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val currentNickname = arguments?.getString(ARG_CURRENT_NICKNAME) ?: ""
+        val currentNickname: String =
+            arguments?.getString(ARG_CURRENT_NICKNAME)
+                ?: return super.onCreateDialog(savedInstanceState)
 
-        val binding: FragmentEditNicknameConfirmBinding =
-            FragmentEditNicknameConfirmBinding.inflate(layoutInflater)
+        val binding: FragmentSettingNicknameEditBinding =
+            FragmentSettingNicknameEditBinding.inflate(layoutInflater)
 
         binding.etEditNicknameField.setText(currentNickname)
 
-        binding.tvNegativeBtn.setOnClickListener {
-            dismiss()
-        }
-
         binding.tvPositiveBtn.setOnClickListener {
-            val newNickname = binding.etEditNicknameField.text.toString()
+            val newNickname: String = binding.etEditNicknameField.text.toString()
             setFragmentResult(REQUEST_KEY, bundleOf(BUNDLE_KEY_NICKNAME to newNickname))
             dismiss()
         }
+        binding.tvNegativeBtn.setOnClickListener { dismiss() }
 
         return AlertDialog
             .Builder(requireActivity())
