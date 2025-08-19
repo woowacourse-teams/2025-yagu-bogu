@@ -12,13 +12,14 @@ public record FanRateResponse(
             List<FanRateGameEntry> exceptMyTeam
     ) {
         List<FanRateByGameResponse> fanRateByGameResponses = new ArrayList<>();
-        fanRateByGameResponses.add(myTeamResponse);
+        if (myTeamResponse != null) {
+            fanRateByGameResponses.add(myTeamResponse);
+        }
 
         List<FanRateByGameResponse> sortedOthers = exceptMyTeam.stream()
                 .map(FanRateGameEntry::getResponse)
                 .sorted()
                 .toList();
-
         fanRateByGameResponses.addAll(sortedOthers);
 
         return new FanRateResponse(fanRateByGameResponses);

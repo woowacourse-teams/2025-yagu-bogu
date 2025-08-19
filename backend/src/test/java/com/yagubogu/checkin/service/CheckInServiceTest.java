@@ -1,10 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
@@ -43,6 +38,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
 @DataJpaTest
@@ -525,6 +525,54 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected.fanRateByGames());
+    }
+
+    @DisplayName("오늘 경기 구장별 팬 점유율 조회 – 경기가 없으면 null이 아닌 빈 리스트를 반환한다")
+    @Test
+    void findFanRatesByGames_returnsEmptyListWhenNoMyTeamGames() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kt).nickname("포라"));
+        long memberId = fora.getId();
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+
+        FanRateResponse expected = new FanRateResponse(List.of());
+
+        // when
+        FanRateResponse actual = checkInService.findFanRatesByGames(memberId, startDate);
+
+        // then
+        assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected.fanRateByGames());
+    }
+
+    @DisplayName("오늘 경기 구장별 팬 점유율 조회 - 직관한 사람이 없는 경기도 반환한다")
+    @Test
+    void findFanRatesByGames_noCheckInsButReturnGames() {
+        // given
+        Member wooga = memberFactory.save(b -> b.team(doosan).nickname("우가"));
+        long memberId = wooga.getId();
+
+        LocalDate gameDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(
+                b -> b.stadium(stadiumJamsil).homeTeam(kia).awayTeam(kt).date(gameDate));
+        gameFactory.save(
+                b -> b.stadium(stadiumIncheon).homeTeam(doosan).awayTeam(lotte).date(gameDate));
+
+        List<FanRateByGameResponse> expected = List.of(
+                new FanRateByGameResponse(
+                        0L,
+                        new TeamFanRateResponse("두산", "OB", 0),
+                        new TeamFanRateResponse("롯데", "LT", 0)),
+                new FanRateByGameResponse(
+                        0L,
+                        new TeamFanRateResponse("KIA", "HT", 0),
+                        new TeamFanRateResponse("KT", "KT", 0))
+        );
+
+        // when
+        FanRateResponse actual = checkInService.findFanRatesByGames(memberId, gameDate);
+
+        // then
+        assertThat(actual.fanRateByGames()).containsExactlyElementsOf(expected);
     }
 
     private void createCheckInsForGame(Team team, Game game, int count) {

@@ -6,10 +6,10 @@ import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.FanCountsByGameResponse;
 import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateGameEntry;
 import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -60,23 +60,23 @@ public class CheckInService {
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
         Team myTeam = member.getTeam();
-        List<Game> games = gameRepository.findGameByDate(date);
 
-        List<FanRateGameEntry> fanRateGameEntries = new ArrayList<>();
-        FanRateByGameResponse myTeamGame = null;
+        List<FanRateGameEntry> fanRatesByGames = new ArrayList<>();
+        FanRateByGameResponse myFanRateByGame = null;
+        List<GameWithFanCountsResponse> gameWithFanCounts = checkInRepository.findGamesWithFanCountsByDate(date);
 
-        for (Game game : games) {
-            FanCountsByGameResponse counts = getFanCountsForGame(game);
-            FanRateByGameResponse fanRateByGameResponse = createFanRateByGameResponse(game, counts);
+        for (GameWithFanCountsResponse gameWithFanCount : gameWithFanCounts) {
+            Game game = gameWithFanCount.game();
+            FanRateByGameResponse response = createFanRateByGameResponse(gameWithFanCount);
 
             if (game.hasTeam(myTeam)) {
-                myTeamGame = fanRateByGameResponse;
+                myFanRateByGame = createFanRateByGameResponse(gameWithFanCount);
                 continue;
             }
-            fanRateGameEntries.add(new FanRateGameEntry(counts.totalCheckInCounts(), fanRateByGameResponse));
+            fanRatesByGames.add(new FanRateGameEntry(gameWithFanCount.totalCheckInCounts(), response));
         }
 
-        return FanRateResponse.from(myTeamGame, fanRateGameEntries);
+        return FanRateResponse.from(myFanRateByGame, fanRatesByGames);
     }
 
     public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
@@ -169,27 +169,16 @@ public class CheckInService {
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 
-    private FanCountsByGameResponse getFanCountsForGame(final Game game) {
-        return checkInRepository.countTotalAndHomeTeamAndAwayTeam(
-                game,
-                game.getHomeTeam(),
-                game.getAwayTeam()
-        );
+    private FanRateByGameResponse createFanRateByGameResponse(final GameWithFanCountsResponse gameWithFanCounts) {
+        Long total = gameWithFanCounts.totalCheckInCounts();
+        double homeRate = calculateRoundRate(gameWithFanCounts.homeTeamCheckInCounts(), total);
+        double awayRate = calculateRoundRate(gameWithFanCounts.awayTeamCheckInCounts(), total);
+
+        return FanRateByGameResponse.from(gameWithFanCounts.game(), total, homeRate, awayRate);
     }
 
-    private FanRateByGameResponse createFanRateByGameResponse(
-            final Game game,
-            final FanCountsByGameResponse counts
-    ) {
-        long total = counts.totalCheckInCounts();
-        double homeRate = calculateRoundRate(counts.homeTeamCheckInCounts(), total);
-        double awayRate = calculateRoundRate(counts.awayTeamCheckInCounts(), total);
-
-        return FanRateByGameResponse.from(game, total, homeRate, awayRate);
-    }
-
-    private double calculateRoundRate(final long checkInCounts, final long total) {
-        if (total == 0) {
+    private double calculateRoundRate(final Long checkInCounts, final Long total) {
+        if (total == 0 || checkInCounts == 0) {
             return 0.0;
         }
 
