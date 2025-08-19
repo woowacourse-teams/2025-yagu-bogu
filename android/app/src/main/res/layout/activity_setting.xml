@@ -22,34 +22,33 @@
             android:id="@+id/iv_arrow_left"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginVertical="12dp"
             android:layout_marginStart="20dp"
             android:src="@drawable/ic_arrow_left"
+            app:layout_constraintBottom_toBottomOf="@id/tv_setting"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/gray500" />
+            app:layout_constraintTop_toTopOf="@id/tv_setting" />
 
         <TextView
             android:id="@+id/tv_setting"
-            style="@style/TextView.Pretendard.SemiBold.20"
+            style="@style/TextView.Pretendard.Bold.20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="12dp"
             android:text="@{viewModel.settingTitle}"
-            app:layout_constraintBottom_toBottomOf="@id/iv_arrow_left"
+            app:layout_constraintBottom_toTopOf="@id/fcv_setting"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_arrow_left" />
-
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="설정" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fcv_setting"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_arrow_left" />
+            app:layout_constraintTop_toBottomOf="@id/tv_setting" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
