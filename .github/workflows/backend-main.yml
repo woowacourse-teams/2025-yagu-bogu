@@ -84,6 +84,8 @@ jobs:
         run: |
           VER='${{ steps.semver.outputs.next_version }}'
           DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
 
   cd:
     needs: release
