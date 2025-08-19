@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tv_stadium_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_check_in_stadium_emoji"
+            android:textSize="48dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_check_in_confirm_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_check_in_confirm_message"
+            style="@style/TextView.Pretendard.Bold.24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="16dp"
+            android:text="@string/home_check_in_confirm"
+            app:layout_constraintBottom_toTopOf="@id/tv_check_in_caution"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_stadium_emoji" />
+
+        <TextView
+            android:id="@+id/tv_check_in_caution"
+            style="@style/TextView.Pretendard.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/home_check_in_caution"
+            android:textColor="@color/gray500"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="@id/tv_check_in_confirm_message"
+            app:layout_constraintStart_toStartOf="@id/tv_check_in_confirm_message"
+            app:layout_constraintTop_toBottomOf="@id/tv_check_in_confirm_message" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_negative_btn"
+            style="@style/Widget.App.Button.Negative.Pretendard.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
+            android:text="@string/all_cancel"
+            android:textColor="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_check_in_caution" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_positive_btn"
+            style="@style/Widget.App.Button.Positive.Pretendard.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
+            android:text="@string/all_confirm"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
+            app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

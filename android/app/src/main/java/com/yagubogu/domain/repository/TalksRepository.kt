@@ -4,9 +4,15 @@ import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 
 interface TalksRepository {
-    suspend fun getTalks(
+    suspend fun getBeforeTalks(
         gameId: Long,
         before: Long?,
+        limit: Int,
+    ): Result<LivetalkResponseItem>
+
+    suspend fun getAfterTalks(
+        gameId: Long,
+        after: Long?,
         limit: Int,
     ): Result<LivetalkResponseItem>
 

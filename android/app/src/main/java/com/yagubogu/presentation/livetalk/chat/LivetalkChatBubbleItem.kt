@@ -1,12 +1,14 @@
 package com.yagubogu.presentation.livetalk.chat
 
 sealed class LivetalkChatBubbleItem {
+    abstract val livetalkChatItem: LivetalkChatItem
+
     data class MyBubbleItem(
-        val livetalkChatItem: LivetalkChatItem,
+        override val livetalkChatItem: LivetalkChatItem,
     ) : LivetalkChatBubbleItem()
 
     data class OtherBubbleItem(
-        val livetalkChatItem: LivetalkChatItem,
+        override val livetalkChatItem: LivetalkChatItem,
     ) : LivetalkChatBubbleItem()
 
     companion object {

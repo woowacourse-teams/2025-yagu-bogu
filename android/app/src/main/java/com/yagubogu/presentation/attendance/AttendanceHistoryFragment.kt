@@ -100,7 +100,9 @@ class AttendanceHistoryFragment : Fragment() {
     private fun setupObservers() {
         viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
             attendanceHistoryAdapter.submitList(value)
-            binding.tvEmptyHistory.visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
+            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
+            binding.ivEmptyHistory.visibility = visibility
+            binding.tvEmptyHistory.visibility = visibility
         }
 
         viewModel.attendanceHistorySort.observe(viewLifecycleOwner) { value: AttendanceHistorySort ->
