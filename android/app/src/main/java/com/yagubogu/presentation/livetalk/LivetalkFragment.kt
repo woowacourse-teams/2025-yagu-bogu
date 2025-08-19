@@ -63,6 +63,13 @@ class LivetalkFragment : Fragment() {
         _binding = null
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchGames()
+        }
+    }
+
     private fun setupBindings() {
         val linearLayoutManager = LinearLayoutManager(requireContext())
         binding.rvLivetalkStadium.apply {
