@@ -4,9 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.LifecycleOwner
 import com.yagubogu.databinding.FragmentDefaultConfirmBinding
 import com.yagubogu.presentation.util.getParcelableCompat
 
@@ -30,34 +28,27 @@ class DefaultDialogFragment : DialogFragment() {
     }
 
     private fun setResultAndDismiss(isConfirmed: Boolean) {
+        val requestKey = arguments?.getString(KEY_REQUEST) ?: return
         val bundle = Bundle().apply { putBoolean(KEY_CONFIRM, isConfirmed) }
-        setFragmentResult(KEY_REQUEST_SUCCESS, bundle)
+        setFragmentResult(requestKey, bundle)
         dismiss()
     }
 
     companion object {
         private const val KEY_DEFAULT_DIALOG_UI_MODEL = "defaultDialogUiModel"
-        private const val BUNDLE_RESULT_YN = "resultBoolean"
-        private const val REQUEST_KEY = "defaultDialogRequest"
-        const val KEY_REQUEST_SUCCESS = "success"
+        private const val KEY_REQUEST = "requestKey"
         const val KEY_CONFIRM = "confirm"
 
-        fun newInstance(dialogDefaultUiModel: DialogDefaultUiModel): DefaultDialogFragment =
+        fun newInstance(
+            requestKey: String,
+            dialogDefaultUiModel: DialogDefaultUiModel,
+        ): DefaultDialogFragment =
             DefaultDialogFragment().apply {
                 arguments =
                     Bundle().apply {
+                        putString(KEY_REQUEST, requestKey)
                         putParcelable(KEY_DEFAULT_DIALOG_UI_MODEL, dialogDefaultUiModel)
                     }
             }
-
-        fun setResultListener(
-            fragmentManager: FragmentManager,
-            lifecycleOwner: LifecycleOwner,
-            listener: (Boolean) -> Unit,
-        ) {
-            fragmentManager.setFragmentResultListener(REQUEST_KEY, lifecycleOwner) { _, bundle ->
-                bundle.getBoolean(BUNDLE_RESULT_YN).let(listener)
-            }
-        }
     }
 }
