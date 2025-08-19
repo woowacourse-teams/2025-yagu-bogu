@@ -74,7 +74,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_cancel"
-                style="@style/Widget.App.Button.Positive.Pretendard.Bold"
+                style="@style/Widget.App.Button.Positive"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -88,11 +88,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_confirm"
-                style="@style/Widget.App.Button.CancelMembership.Pretendard.Bold"
+                style="@style/Widget.App.Button.Negative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/gray100"
                 android:paddingVertical="16dp"
                 android:text="@string/setting_delete_account"
+                android:textColor="@color/gray400"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
