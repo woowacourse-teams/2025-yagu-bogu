@@ -10,8 +10,19 @@ inline fun <T> safeApiCall(apiCall: () -> Response<T>): Result<T> =
     runCatching {
         val response: Response<T> = apiCall()
         if (response.isSuccessful) {
-            response.body() as T
+            if (response.code() == 204) {
+                Unit as T
+            } else {
+                response.body() as T
+            }
         } else {
-            throw HttpException(response)
+            val errorBody = response.errorBody()?.string()
+            when (response.code()) {
+                400 -> throw BadRequestException(errorBody)
+                401 -> throw UnauthorizedException(errorBody)
+                403 -> throw ForbiddenException(errorBody)
+                404 -> throw NotFoundException(errorBody)
+                else -> throw HttpException(response)
+            }
         }
     }
