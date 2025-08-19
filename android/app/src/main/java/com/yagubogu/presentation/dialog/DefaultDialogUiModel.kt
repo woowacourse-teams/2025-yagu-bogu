@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class DialogDefaultUiModel(
+data class DefaultDialogUiModel(
     val emoji: String?,
     val title: String,
     val message: String?,

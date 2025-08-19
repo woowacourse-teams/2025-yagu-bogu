@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="dialogDefaultUiModel"
-            type="com.yagubogu.presentation.dialog.DialogDefaultUiModel" />
+            name="dialogUiModel"
+            type="com.yagubogu.presentation.dialog.DefaultDialogUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,9 +22,9 @@
             android:id="@+id/tv_dialog_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{dialogDefaultUiModel.emoji}"
+            android:text="@{dialogUiModel.emoji}"
             android:textSize="48dp"
-            android:visibility="@{dialogDefaultUiModel.emoji==null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{dialogUiModel.emoji==null ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -36,7 +36,7 @@
             android:id="@+id/space_emoji_margin"
             android:layout_width="match_parent"
             android:layout_height="12dp"
-            android:visibility="@{dialogDefaultUiModel.emoji==null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{dialogUiModel.emoji==null ? View.GONE : View.VISIBLE}"
             app:layout_constraintTop_toBottomOf="@id/tv_dialog_emoji" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{dialogDefaultUiModel.title}"
+            android:text="@{dialogUiModel.title}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/space_emoji_margin"
@@ -58,11 +58,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="40dp"
-            android:text="@{dialogDefaultUiModel.message}"
+            android:text="@{dialogUiModel.message}"
             android:textAlignment="center"
             android:textColor="@color/gray700"
             android:textSize="14sp"
-            android:visibility="@{dialogDefaultUiModel.message==null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{dialogUiModel.message==null ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_dialog_title"
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
-            android:text="@{dialogDefaultUiModel.negativeText==null ? @string/all_cancel : dialogDefaultUiModel.negativeText}"
+            android:text="@{dialogUiModel.negativeText==null ? @string/all_cancel : dialogUiModel.negativeText}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,7 +90,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@{dialogDefaultUiModel.positiveText==null ? @string/all_confirm : dialogDefaultUiModel.positiveText}"
+            android:text="@{dialogUiModel.positiveText==null ? @string/all_confirm : dialogUiModel.positiveText}"
             app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_negative_btn"

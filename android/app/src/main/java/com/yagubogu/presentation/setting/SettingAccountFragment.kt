@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingAccountBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
-import com.yagubogu.presentation.dialog.DialogDefaultUiModel
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 
 @Suppress("ktlint:standard:backing-property-naming")
 class SettingAccountFragment : Fragment() {
@@ -48,7 +48,7 @@ class SettingAccountFragment : Fragment() {
     private fun setupListeners() {
         binding.layoutLogout.root.setOnClickListener {
             val logoutDialogUiModel =
-                DialogDefaultUiModel(
+                DefaultDialogUiModel(
                     emoji = null,
                     title = getString(R.string.setting_logout),
                     message = getString(R.string.setting_logout_dialog_message),

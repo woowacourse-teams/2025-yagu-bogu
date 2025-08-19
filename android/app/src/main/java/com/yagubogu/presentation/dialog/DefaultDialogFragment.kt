@@ -10,14 +10,14 @@ import com.yagubogu.presentation.util.getParcelableCompat
 
 class DefaultDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialogDefaultUiModel: DialogDefaultUiModel =
+        val defaultDialogUiModel: DefaultDialogUiModel =
             arguments?.getParcelableCompat(KEY_DEFAULT_DIALOG_UI_MODEL)
                 ?: return super.onCreateDialog(savedInstanceState)
 
         val binding: FragmentDefaultConfirmBinding =
             FragmentDefaultConfirmBinding.inflate(layoutInflater)
 
-        binding.dialogDefaultUiModel = dialogDefaultUiModel
+        binding.dialogUiModel = defaultDialogUiModel
         binding.tvPositiveBtn.setOnClickListener { setResultAndDismiss(true) }
         binding.tvNegativeBtn.setOnClickListener { setResultAndDismiss(false) }
 
@@ -41,13 +41,13 @@ class DefaultDialogFragment : DialogFragment() {
 
         fun newInstance(
             requestKey: String,
-            dialogDefaultUiModel: DialogDefaultUiModel,
+            defaultDialogUiModel: DefaultDialogUiModel,
         ): DefaultDialogFragment =
             DefaultDialogFragment().apply {
                 arguments =
                     Bundle().apply {
                         putString(KEY_REQUEST, requestKey)
-                        putParcelable(KEY_DEFAULT_DIALOG_UI_MODEL, dialogDefaultUiModel)
+                        putParcelable(KEY_DEFAULT_DIALOG_UI_MODEL, defaultDialogUiModel)
                     }
             }
     }

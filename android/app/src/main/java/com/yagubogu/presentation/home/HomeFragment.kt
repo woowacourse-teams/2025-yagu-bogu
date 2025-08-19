@@ -21,7 +21,7 @@ import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
-import com.yagubogu.presentation.dialog.DialogDefaultUiModel
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -218,7 +218,7 @@ class HomeFragment : Fragment() {
 
     private fun showCheckInConfirmDialog() {
         val logoutDialogUiModel =
-            DialogDefaultUiModel(
+            DefaultDialogUiModel(
                 emoji = getString(R.string.home_check_in_stadium_emoji),
                 title = getString(R.string.home_check_in_confirm),
                 message = getString(R.string.home_check_in_caution),

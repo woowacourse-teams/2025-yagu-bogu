@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingDeleteAccountBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
-import com.yagubogu.presentation.dialog.DialogDefaultUiModel
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 
 @Suppress("ktlint:standard:backing-property-naming")
 class SettingDeleteAccountFragment : Fragment() {
@@ -51,7 +51,7 @@ class SettingDeleteAccountFragment : Fragment() {
     private fun setupListeners() {
         binding.btnConfirm.setOnClickListener {
             val deleteAccountDialogUiModel =
-                DialogDefaultUiModel(
+                DefaultDialogUiModel(
                     emoji = null,
                     title = getString(R.string.setting_delete_account_dialog_title),
                     message = getString(R.string.setting_delete_account_dialog_message),
