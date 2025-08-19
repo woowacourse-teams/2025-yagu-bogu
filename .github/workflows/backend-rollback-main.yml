@@ -15,14 +15,6 @@ jobs:
   rollback:
     runs-on: [ self-hosted, production ]
     steps:
-      - name: Ensure main branch
-        shell: bash
-        run: |
-          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
-          if [ "$CURRENT_BRANCH" != "main" ]; then
-            echo "This workflow can only run on main branch."
-            exit 1
-          fi
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
         with:
