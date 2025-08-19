@@ -32,7 +32,6 @@
             android:id="@+id/tv_arrow_right"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:contentDescription="@string/livetalk_stadium_select_arrow_description"
             android:src="@drawable/ic_arrow_right"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -7,7 +7,6 @@
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
     <string name="all_fan">%s 팬</string>
-    <string name="all_none">없음</string>
 
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
@@ -97,7 +96,6 @@
 
     <string name="setting_main_title">설정</string>
     <string name="setting_icon_description">설정 아이콘</string>
-    <string name="setting_edit_favorite_team">응원팀 수정</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
@@ -119,9 +117,7 @@
 
     <string name="setting_notice">공지사항</string>
     <string name="setting_contact_us">문의하기</string>
-    <string name="setting_privacy_policy">개인 정보 처리방침</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
-
     <string name="setting_app_version">앱 버전: %s</string>
 
 </resources>

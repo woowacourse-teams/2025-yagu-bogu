@@ -16,7 +16,6 @@ import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
-import com.yagubogu.presentation.setting.SettingAccountFragment.Companion.KEY_LOGIN_REQUEST_DIALOG
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -75,7 +74,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.setFragmentResultListener(
-            KEY_LOGIN_REQUEST_DIALOG,
+            SettingAccountFragment.KEY_LOGIN_REQUEST_DIALOG,
             this,
         ) { _, bundle ->
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
