@@ -65,7 +65,7 @@
             android:visibility="@{dialogDefaultUiModel.message==null ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_dialog_title"
             tools:text="엄청나게\n긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트"
             tools:visibility="visible" />
 
