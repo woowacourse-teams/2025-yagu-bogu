@@ -155,6 +155,7 @@ class HomeViewModel(
                     checkInIfWithinThreshold(currentCoordinate, stadiums)
                 }.onFailure {
                     Timber.w(stadiumsResult.exceptionOrNull(), "API 호출 실패")
+                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
                 }
             _isCheckInLoading.value = false
         }
@@ -168,7 +169,7 @@ class HomeViewModel(
             stadiums.findNearestTo(currentCoordinate, locationRepository::getDistanceInMeters)
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-            _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
             return
         }
 
@@ -180,10 +181,10 @@ class HomeViewModel(
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
-                _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
+                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
-                _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+                _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
             }
     }
 

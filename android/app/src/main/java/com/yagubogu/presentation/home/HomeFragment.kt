@@ -110,9 +110,10 @@ class HomeFragment : Fragment() {
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
-                    is CheckInUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
-                    CheckInUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
-                    CheckInUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
+                    is CheckInUiEvent.Success -> R.string.home_check_in_success_message
+                    CheckInUiEvent.OutOfRange -> R.string.home_check_in_out_of_range_message
+                    CheckInUiEvent.LocationFetchFailed -> R.string.home_check_in_location_fetch_failed_message
+                    CheckInUiEvent.NetworkFailed -> R.string.home_check_in_network_failed_message
                 },
             )
         }
