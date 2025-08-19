@@ -17,6 +17,7 @@ class SettingAccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SettingViewModel by activityViewModels()
+    private var logoutDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,15 +48,18 @@ class SettingAccountFragment : Fragment() {
 
     private fun setupListeners() {
         binding.layoutLogout.root.setOnClickListener {
-            val logoutDialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.setting_logout),
-                    message = getString(R.string.setting_logout_dialog_message),
-                    positiveText = getString(R.string.setting_logout),
-                )
-            DefaultDialogFragment
-                .newInstance(KEY_LOGIN_REQUEST_DIALOG, logoutDialogUiModel)
-                .show(parentFragmentManager, "logoutDialog")
+            if (logoutDialog == null) {
+                val dialogUiModel =
+                    DefaultDialogUiModel(
+                        title = getString(R.string.setting_logout),
+                        message = getString(R.string.setting_logout_dialog_message),
+                        positiveText = getString(R.string.setting_logout),
+                    )
+                logoutDialog =
+                    DefaultDialogFragment.newInstance(KEY_LOGIN_REQUEST_DIALOG, dialogUiModel)
+            }
+
+            logoutDialog?.show(parentFragmentManager, "logoutDialog")
         }
 
         binding.layoutDeleteAccount.root.setOnClickListener {

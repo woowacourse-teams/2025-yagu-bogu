@@ -17,6 +17,7 @@ class SettingDeleteAccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SettingViewModel by activityViewModels()
+    private var deleteAccountDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,15 +50,19 @@ class SettingDeleteAccountFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnConfirm.setOnClickListener {
-            val deleteAccountDialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.setting_delete_account_dialog_title),
-                    message = getString(R.string.setting_delete_account_dialog_message),
-                    positiveText = getString(R.string.setting_delete_account),
-                )
-            DefaultDialogFragment
-                .newInstance(KEY_DELETE_ACCOUNT_REQUEST_DIALOG, deleteAccountDialogUiModel)
-                .show(parentFragmentManager, "deleteAccountDialog")
+            if (deleteAccountDialog == null) {
+                val dialogUiModel =
+                    DefaultDialogUiModel(
+                        title = getString(R.string.setting_delete_account_dialog_title),
+                        message = getString(R.string.setting_delete_account_dialog_message),
+                        positiveText = getString(R.string.setting_delete_account),
+                    )
+                deleteAccountDialog =
+                    DefaultDialogFragment
+                        .newInstance(KEY_DELETE_ACCOUNT_REQUEST_DIALOG, dialogUiModel)
+            }
+
+            deleteAccountDialog?.show(parentFragmentManager, "deleteAccountDialog")
         }
     }
 
@@ -74,6 +79,6 @@ class SettingDeleteAccountFragment : Fragment() {
     }
 
     companion object {
-        const val KEY_DELETE_ACCOUNT_REQUEST_DIALOG = "deleteAccountRequest"
+        private const val KEY_DELETE_ACCOUNT_REQUEST_DIALOG = "deleteAccountRequest"
     }
 }
