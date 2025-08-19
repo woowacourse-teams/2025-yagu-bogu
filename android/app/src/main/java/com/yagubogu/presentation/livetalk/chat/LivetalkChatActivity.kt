@@ -22,7 +22,9 @@ class LivetalkChatActivity : AppCompatActivity() {
         LivetalkChatViewModelFactory(gameId, app.talksRepository)
     }
 
-    private val livetalkChatAdapter = LivetalkChatAdapter()
+    private val livetalkChatAdapter by lazy {
+        LivetalkChatAdapter(viewModel)
+    }
 
     private val chatLinearLayoutManager by lazy {
         binding.rvChatMessages.layoutManager as LinearLayoutManager

@@ -76,6 +76,18 @@ class LivetalkChatViewModel(
         }
     }
 
+    fun deleteMessage(chatId: Long) {
+        viewModelScope.launch {
+            talksRepository.deleteTalks(gameId, chatId)
+        }
+    }
+
+    fun reportMessage(chatId: Long) {
+        viewModelScope.launch {
+            talksRepository.reportTalks(chatId)
+        }
+    }
+
     fun startChatPolling() {
         viewModelScope.launch {
             pollingControlLock.withLock {

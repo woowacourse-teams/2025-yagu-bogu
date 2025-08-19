@@ -5,7 +5,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.ViewHolder>(diffCallback) {
+class LivetalkChatAdapter(
+    val viewModel: LivetalkChatViewModel,
+) : ListAdapter<LivetalkChatBubbleItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun getItemViewType(position: Int): Int =
         when (getItem(position)) {
             is LivetalkChatBubbleItem.MyBubbleItem -> VIEW_TYPE_MY
@@ -17,8 +19,8 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (viewType) {
-            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent)
-            else -> LivetalkOtherBubbleViewHolder.from(parent)
+            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent, viewModel)
+            else -> LivetalkOtherBubbleViewHolder.from(parent, viewModel)
         }
 
     override fun onBindViewHolder(

@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
+
+        <variable
             name="livetalkChatItem"
             type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
     </data>
@@ -60,6 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
+            android:onClick="@{() -> viewModel.deleteMessage(livetalkChatItem.chatId)}"
             android:text="@string/livetalk_trash_btn"
             android:textColor="@color/primary700"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
