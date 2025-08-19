@@ -74,28 +74,6 @@ jobs:
           echo "VER=$VER" >> "$GITHUB_ENV"
           echo "ver_tag=$VER" >> "$GITHUB_OUTPUT"
 
-      - name: Create Git tag (v-prefixed)
-        shell: bash
-        run: |
-          set -euo pipefail
-          VER="${VER:?VER not set}"   # v1.0.1
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git rev-parse -q --verify "refs/tags/$VER" >/dev/null; then
-            echo "Tag $VER already exists. Skip."
-          else
-            git tag -a "$VER" -m "Release $VER (auto)"
-            git push origin "$VER"
-          fi
-
-      - name: Promote dev-latest -> $VER
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker buildx imagetools create \
-            -t "$IMAGE:$VER" \
-            "$IMAGE:dev-latest"
-
       - id: capture
         name: Capture image digest of $VER
         shell: bash
@@ -117,15 +95,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DIGEST='${{ steps.capture.outputs.digest }}'
-          SHORT="${DIGEST#sha256:}"; 
+          DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          SHORT="${DIGEST#sha256:}"
           SHORT="${SHORT:0:8}"
-          READABLE="${VER}-${SHORT}"
+          READABLE="v${{ steps.semver.outputs.next_version }}-${SHORT}"
           docker buildx imagetools create \
             -t "$IMAGE:$READABLE" \
-            "$IMAGE:$VER"
+            "$IMAGE:dev-latest"
           echo "image_tag=$READABLE" >> "$GITHUB_OUTPUT"
-          echo "Created alias: $IMAGE:$READABLE"
 
   cd:
     needs: release
