@@ -56,6 +56,9 @@ class HomeViewModel(
     private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
     val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
 
+    private val _isCheckInLoading = MutableLiveData<Boolean>()
+    val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
+
     init {
         fetchAll()
     }
@@ -67,6 +70,7 @@ class HomeViewModel(
     }
 
     fun checkIn() {
+        _isCheckInLoading.value = true
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
                 handleCheckIn(currentCoordinate)
@@ -74,6 +78,7 @@ class HomeViewModel(
             onFailure = { exception: Exception ->
                 Timber.w(exception, "위치 불러오기 실패")
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
+                _isCheckInLoading.value = false
             },
         )
     }
@@ -151,6 +156,8 @@ class HomeViewModel(
                     checkInIfWithinThreshold(currentCoordinate, stadiums)
                 }.onFailure {
                     Timber.w(stadiumsResult.exceptionOrNull(), "API 호출 실패")
+                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    _isCheckInLoading.value = false
                 }
         }
     }
@@ -163,7 +170,8 @@ class HomeViewModel(
             stadiums.findNearestTo(currentCoordinate, locationRepository::getDistanceInMeters)
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-            _checkInUiEvent.setValue(CheckInUiEvent.CheckInFailure)
+            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
+            _isCheckInLoading.value = false
             return
         }
 
@@ -175,9 +183,12 @@ class HomeViewModel(
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
-                _checkInUiEvent.setValue(CheckInUiEvent.CheckInSuccess(nearestStadium))
+                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
+                _isCheckInLoading.value = false
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
+                _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                _isCheckInLoading.value = false
             }
     }
 
