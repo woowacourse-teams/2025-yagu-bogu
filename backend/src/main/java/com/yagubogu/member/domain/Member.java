@@ -19,8 +19,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE member_id = ?")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("is_deleted = false")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "members")
 @Entity
