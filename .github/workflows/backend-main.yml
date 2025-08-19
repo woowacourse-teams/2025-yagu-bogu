@@ -1,20 +1,25 @@
-name: YaguBogu Backend Main
+name: Release & Deploy (Auto SemVer)
 
 on:
-  push:
-    branches: [ "chore/356" ]
-    paths:
-      - "backend/**"
-      - ".github/workflows/**"
-  workflow_dispatch:
-
+  pull_request_target:
+    types: [ closed ]
+    branches: [ "main" ]   # 운영 브랜치로 조정
 env:
   IMAGE: yagubogu/yagubogu-backend
 
 jobs:
-  promote:
+  release:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semver.outputs.next_version }}
+      digest: ${{ steps.capture.outputs.digest }}
     steps:
+      - name: Checkout (with tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
         with:
@@ -24,19 +29,71 @@ jobs:
       - name: Ensure dev-latest exists
         run: docker buildx imagetools inspect $IMAGE:dev-latest > /dev/null
 
-      - name: Promote dev-latest -> prod tags
+      - id: semver
+        name: Decide bump from PR labels -> compute next version
+        shell: bash
         run: |
+          set -euo pipefail
+          labels="$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' || true)"
+          bump="patch"
+          if grep -qi '^🧟‍♀️ semver:major$' <<<"$labels"; then bump="major"
+          elif grep -qi '^👩🏿‍🌾 semver:minor$' <<<"$labels"; then bump="minor"
+          elif grep -qi '^🧑🏻‍🔧 semver:patch$' <<<"$labels"; then bump="patch"; fi
+          echo "bump=$bump"
+
+          git fetch --tags --force
+          last_tag="$(git tag -l --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+          [ -n "$last_tag" ] || last_tag="0.0.0"
+          IFS='.' read -r MA MI PA <<<"$last_tag"
+
+          case "$bump" in
+            major) MA=$((MA+1)); MI=0; PA=0;;
+            minor) MI=$((MI+1)); PA=0;;
+            patch) PA=$((PA+1));;
+          esac
+          next="$MA.$MI.$PA"
+          echo "last=$last_tag, next=$next"
+
+          echo "next_version=$next" >> "$GITHUB_OUTPUT"
+          echo "bump=$bump" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER='${{ steps.semver.outputs.next_version }}'
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$VER" -m "Release $VER (auto bump from PR #${{ github.event.pull_request.number }})"
+          git push origin "$VER" || true   # ✅ 태그 충돌 시에도 실패하지 않음
+
+      - name: Promote dev-latest -> versioned tags
+        shell: bash
+        run: |
+          VER='${{ steps.semver.outputs.next_version }}'
+          # Capture digest
+          DIGEST_FULL="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          DIGEST_SHORT="${DIGEST_FULL:7:8}"  # sha256:abcdef12345 -> abcdef12
+          
           docker buildx imagetools create \
-            -t $IMAGE:prod-${{ github.sha }} \
-            -t $IMAGE:prod-latest \
-            $IMAGE:dev-latest
+          -t $IMAGE:$VER-$DIGEST_SHORT \
+          $IMAGE:dev-latest
+
+      - id: capture
+        name: Capture image digest of ${{ steps.semver.outputs.next_version }}
+        shell: bash
+        run: |
+          VER='${{ steps.semver.outputs.next_version }}'
+          DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
   cd:
-    needs: promote
+    needs: release
     runs-on: [ self-hosted, production ]
     env:
       IMAGE: yagubogu/yagubogu-backend
-      TAG: prod-latest
+      VERSION: ${{ needs.release.outputs.version }}
+      DIGEST: ${{ needs.release.outputs.digest }}
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
@@ -44,88 +101,96 @@ jobs:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      - name: Pull Docker image
-        run: |
-          docker pull $IMAGE:$TAG
+      - name: Pull by digest
+        run: docker pull $IMAGE@${DIGEST}
 
       - name: Ensure network
         run: docker network create yagubogu-net 2>/dev/null || true
 
-      - name: Deploy new container (Blue-Green with drain & graceful)
+      - name: Blue-Green deploy (pinned by digest)
         shell: bash
         run: |
           set -euo pipefail
-
           BLUE="yagubogu-backend-blue"
           GREEN="yagubogu-backend-green"
-
-          # 현재 살아있는 컨테이너를 OLD로 간주
+          
           if docker ps --format '{{.Names}}' | grep -qx "$BLUE"; then
-            OLD="$BLUE";  NEW="$GREEN"; PORT=8082; COLOR=green
+          OLD="$BLUE";  NEW="$GREEN"; PORT=8082; COLOR=green
           else
-            OLD="$GREEN"; NEW="$BLUE";  PORT=8081; COLOR=blue
+          OLD="$GREEN"; NEW="$BLUE";  PORT=8081; COLOR=blue
           fi
           echo "OLD=${OLD:-none}, NEW=$NEW, PORT=$PORT, COLOR=$COLOR"
-
-          # 같은 이름이 잔존 상태이면 제거(이전 실패 잔재 방지)
+          
           if docker ps -a --format '{{.Names}}' | grep -qx "$NEW"; then
-            docker rm -f "$NEW" || true
-          fi
-
-          # NEW 기동 (★ graceful 종료 옵션 포함)
-          docker run -d \
-            --name "$NEW" \
-            --network yagubogu-net \
-            -p "$PORT:8080" \
-            --stop-signal=SIGTERM \
-            --stop-timeout=30 \
-            -v /var/log/yagubogu:/var/log/yagubogu \
-            -e SPRING_PROFILES_ACTIVE=prod \
-            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
-            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
-            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
-            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-            "$IMAGE:$TAG"
-
-          # 헬스체크 (최대 60초) ★ 실패 시 즉시 중단
-          ok=""
-          for i in {1..30}; do
-            if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
-              echo "NEW healthy"
-              ok=1
-              break
-            fi
-            echo "waiting health... ($i/30)"
-            sleep 2
-          done
-          if [ -z "${ok}" ]; then
-            echo "NEW failed to become healthy"
-            docker logs "$NEW" || true
-            exit 1
+          docker rm -f "$NEW" || true
           fi
           
-          # 심볼릭 링크 전환 -> Nginx graceful reload
+          #          docker run -d \
+          #            --name "$NEW" \
+          #            --network yagubogu-net \
+          #            -p "$PORT:8080" \
+          #            --stop-signal=SIGTERM \
+          #            --stop-timeout=30 \
+          #            -v /var/log/yagubogu:/var/log/yagubogu \
+          #            -e SPRING_PROFILES_ACTIVE=prod \
+          #            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
+          #            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+          #            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+          #            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+          #            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
+          #            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
+          #            -l app=yagubogu-backend \
+          #            -l release.version="${VERSION}" \
+          #            -l release.digest="${DIGEST}" \
+          #            "$IMAGE@${DIGEST}"
+          docker run -d \
+          --name "$NEW" \
+          --network yagubogu-net \
+          -p "$PORT:8080" \
+          --stop-signal=SIGTERM \
+          --stop-timeout=30 \
+          -v /var/log/yagubogu:/var/log/yagubogu \
+          -e SPRING_PROFILES_ACTIVE=prod \
+          -e DB_URL="${{ secrets.DB_PROD_URL }}" \
+          -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+          -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+          -l app=yagubogu-backend \
+          -l release.version="${VERSION}" \
+          -l release.digest="${DIGEST_SHORT}" \
+          $IMAGE:$VERSION-$DIGEST_SHORT
+          
+          for i in {1..30}; do
+          if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
+          echo "NEW healthy"; break; fi
+          echo "waiting health... ($i/30)"; sleep 2
+          done
+          
           if [ "$COLOR" = "blue" ]; then
-            TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
+          TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
           else
-            TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
+          TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
           fi
-          echo "Switching symlink to: $TARGET"
           sudo ln -sf "$TARGET" /etc/nginx/sites-enabled/app.conf
           sudo nginx -t
           sudo nginx -s reload
-
-          # 드레인 대기 ★ 진행 중 요청 마무리 시간
+          
           sleep 20
-
-          # OLD graceful 종료 ★ 시간 보장
+          
           if [ -n "${OLD:-}" ] && docker ps --format '{{.Names}}' | grep -qx "$OLD"; then
-            echo "Gracefully stopping $OLD"
-            docker stop --time=30 "$OLD" || true
-            docker rm "$OLD" || true
+          docker stop --time=30 "$OLD" || true
           fi
+          
+          LOG_DIR="/var/log/yagubogu"
+          sudo mkdir -p "$LOG_DIR"
+          echo "$(date -Is) release=${VERSION} digest=${DIGEST} color=${COLOR} port=${PORT}" \
+          | sudo tee -a "$LOG_DIR/deployments.log"
+          echo "${VERSION} ${DIGEST} ${COLOR} ${PORT}" | sudo tee "$LOG_DIR/current.release" >/dev/null
 
-      - name: Docker image Prune
-        run: docker image prune -af || true
+      - name: Prune old images (keep last 5 versions)
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT_TAG="$VERSION-$DIGEST_SHORT"
+          docker images --format '{{.Repository}}:{{.Tag}}' $IMAGE \
+            | grep -v "$CURRENT_TAG" \
+            | xargs -r docker rmi -f

@@ -1,0 +1,106 @@
+name: Backend Rollback Main
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '롤백할 SemVer (예: 1.0.1)'
+        required: true
+        type: string
+
+env:
+  IMAGE: yagubogu/yagubogu-backend
+
+jobs:
+  rollback:
+    runs-on: [ self-hosted, production ]
+    steps:
+      #      TODO: main 브랜치로 변경
+      - name: Ensure chore/356 branch
+        shell: bash
+        run: |
+          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$CURRENT_BRANCH" != "chore/356" ]; then
+            echo "This workflow can only run on chore/356 branch."
+            exit 1
+          fi
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
+
+      - id: digest
+        name: Resolve digest from version tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER='${{ github.event.inputs.version }}'
+          DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+          [ -n "$DIGEST" ] || { echo "해당 버전 이미지 없음: $VER" >&2; exit 1; }
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Pull image
+        run: docker pull $IMAGE@${{ steps.digest.outputs.digest }}
+
+      - name: Blue-Green switch to target (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIGEST='${{ steps.digest.outputs.digest }}'
+          VER='${{ github.event.inputs.version }}'
+          BLUE="yagubogu-backend-blue"
+          GREEN="yagubogu-backend-green"
+
+          if docker ps --format '{{.Names}}' | grep -qx "$BLUE"; then
+            ACTIVE="$BLUE"; INACTIVE="$GREEN"; PORT=8082; COLOR=green
+          else
+            ACTIVE="$GREEN"; INACTIVE="$BLUE"; PORT=8081; COLOR=blue
+          fi
+
+          if docker ps -a --format '{{.Names}}' | grep -qx "$INACTIVE"; then
+            docker rm -f "$INACTIVE" || true
+          fi
+
+          docker run -d \
+            --name "$INACTIVE" \
+            --network yagubogu-net \
+            -p "$PORT:8080" \
+            --stop-signal=SIGTERM \
+            --stop-timeout=30 \
+            -v /var/log/yagubogu:/var/log/yagubogu \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
+            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
+            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
+            -l app=yagubogu-backend \
+            -l release.version="$VER" \
+            -l release.digest="$DIGEST" \
+            "$IMAGE@$DIGEST"
+
+          for i in {1..30}; do
+            if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
+              echo "healthy"; break; fi
+            echo "waiting ($i/30)"; sleep 2
+          done
+
+          if [ "$COLOR" = "blue" ]; then
+            TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
+          else
+            TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
+          fi
+          sudo ln -sf "$TARGET" /etc/nginx/sites-enabled/app.conf
+          sudo nginx -t
+          sudo nginx -s reload
+
+          sleep 15
+
+          if [ -n "${ACTIVE:-}" ] && docker ps --format '{{.Names}}' | grep -qx "$ACTIVE"; then
+            docker stop --time=30 "$ACTIVE" || true
+          fi
+
+          echo "$(date -Is) ROLLBACK release=$VER digest=$DIGEST color=$COLOR port=$PORT" \
+            | sudo tee -a /var/log/yagubogu/deployments.log
