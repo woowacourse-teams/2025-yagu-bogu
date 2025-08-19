@@ -2,7 +2,7 @@ name: YaguBogu Backend Dev
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "chore/382" ]
     paths:
       - "backend/**"
   workflow_dispatch:
