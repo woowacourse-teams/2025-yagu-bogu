@@ -11,7 +11,5 @@ interface MemberRepository {
 
     suspend fun updateFavoriteTeam(team: Team): Result<Unit>
 
-    suspend fun logout(): Result<Unit>
-
     suspend fun deleteMember(): Result<Unit>
 }

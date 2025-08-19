@@ -13,7 +13,5 @@ interface MemberDataSource {
 
     suspend fun updateFavoriteTeam(team: Team): Result<MemberFavoriteResponse>
 
-    suspend fun logout(refreshToken: String): Result<Unit>
-
     suspend fun deleteMember(): Result<Unit>
 }

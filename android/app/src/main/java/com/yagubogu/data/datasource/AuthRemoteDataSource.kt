@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource
 
 import com.yagubogu.data.dto.request.LoginRequest
+import com.yagubogu.data.dto.request.MemberLogoutRequest
 import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.dto.response.LoginResponse
 import com.yagubogu.data.dto.response.TokenResponse
@@ -14,6 +15,12 @@ class AuthRemoteDataSource(
         safeApiCall {
             val loginRequest = LoginRequest(idToken)
             authApiService.postLogin(loginRequest)
+        }
+
+    override suspend fun logout(refreshToken: String): Result<Unit> =
+        safeApiCall {
+            val request = MemberLogoutRequest(refreshToken)
+            authApiService.logout(request)
         }
 
     override suspend fun refreshTokens(refreshToken: String): Result<TokenResponse> =

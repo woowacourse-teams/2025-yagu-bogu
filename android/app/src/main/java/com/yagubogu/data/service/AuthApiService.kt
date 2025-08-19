@@ -1,6 +1,7 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.LoginRequest
+import com.yagubogu.data.dto.request.MemberLogoutRequest
 import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.dto.response.LoginResponse
 import com.yagubogu.data.dto.response.TokenResponse
@@ -13,6 +14,11 @@ interface AuthApiService {
     suspend fun postLogin(
         @Body body: LoginRequest,
     ): Response<LoginResponse>
+
+    @POST("/api/auth/logout")
+    suspend fun logout(
+        @Body body: MemberLogoutRequest,
+    ): Response<Unit>
 
     @POST("/api/auth/refresh")
     suspend fun postRefresh(

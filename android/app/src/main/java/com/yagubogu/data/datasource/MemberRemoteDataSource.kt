@@ -1,7 +1,6 @@
 package com.yagubogu.data.datasource
 
 import com.yagubogu.data.dto.request.MemberFavoriteRequest
-import com.yagubogu.data.dto.request.MemberLogoutRequest
 import com.yagubogu.data.dto.request.MemberNicknameRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -32,12 +31,6 @@ class MemberRemoteDataSource(
         safeApiCall {
             val request = MemberFavoriteRequest(team.name)
             memberApiService.patchFavoriteTeam(request)
-        }
-
-    override suspend fun logout(refreshToken: String): Result<Unit> =
-        safeApiCall {
-            val request = MemberLogoutRequest(refreshToken)
-            memberApiService.logout(request)
         }
 
     override suspend fun deleteMember(): Result<Unit> =

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -12,15 +13,13 @@ import timber.log.Timber
 
 class SettingViewModel(
     private val memberRepository: MemberRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
 
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> get() = _nickname
-
-    private val _favoriteTeam = MutableLiveData<String>()
-    val favoriteTeam: LiveData<String> get() = _favoriteTeam
 
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
@@ -36,7 +35,6 @@ class SettingViewModel(
 
     init {
         fetchNickname()
-        fetchFavoriteTeam()
     }
 
     fun setSettingTitle(title: String) {
@@ -58,7 +56,7 @@ class SettingViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            memberRepository
+            authRepository
                 .logout()
                 .onSuccess {
                     _logoutEvent.setValue(Unit)
@@ -94,21 +92,5 @@ class SettingViewModel(
                     Timber.w(exception, "닉네임 조회 API 호출 실패")
                 }
         }
-    }
-
-    private fun fetchFavoriteTeam() {
-        viewModelScope.launch {
-            memberRepository
-                .getFavoriteTeam()
-                .onSuccess { favoriteTeam: String? ->
-                    _favoriteTeam.value = favoriteTeam ?: NULL_FAVORITE_TEAM_NAME
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "응원팀 조회 API 호출 실패")
-                }
-        }
-    }
-
-    companion object {
-        private const val NULL_FAVORITE_TEAM_NAME = "-"
     }
 }
