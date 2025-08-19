@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingDeleteAccountBinding
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DialogDefaultUiModel
 
 @Suppress("ktlint:standard:backing-property-naming")
 class SettingDeleteAccountFragment : Fragment() {
@@ -31,6 +34,8 @@ class SettingDeleteAccountFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
+        setupListeners()
+        setupFragmentResultListener()
     }
 
     override fun onDestroyView() {
@@ -41,5 +46,37 @@ class SettingDeleteAccountFragment : Fragment() {
     private fun setupBindings() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
+    }
+
+    private fun setupListeners() {
+        binding.btnConfirm.setOnClickListener {
+            val deleteAccountDialogUiModel =
+                DialogDefaultUiModel(
+                    emoji = null,
+                    title = getString(R.string.setting_delete_account_dialog_title),
+                    message = getString(R.string.setting_delete_account_dialog_message),
+                    negativeText = null,
+                    positiveText = getString(R.string.setting_delete_account),
+                )
+            DefaultDialogFragment
+                .newInstance(KEY_DELETE_ACCOUNT_REQUEST_DIALOG, deleteAccountDialogUiModel)
+                .show(parentFragmentManager, "deleteAccountDialog")
+        }
+    }
+
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            KEY_DELETE_ACCOUNT_REQUEST_DIALOG,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.deleteAccount()
+            }
+        }
+    }
+
+    companion object {
+        const val KEY_DELETE_ACCOUNT_REQUEST_DIALOG = "deleteAccountRequest"
     }
 }

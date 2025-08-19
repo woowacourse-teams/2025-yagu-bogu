@@ -70,7 +70,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/iv_delete_account_illustration"
                 app:layout_constraintVertical_chainStyle="packed"
-                tools:text="@string/setting_remember_message"/>
+                tools:text="@string/setting_remember_message" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_cancel"
@@ -91,9 +91,8 @@
                 style="@style/Widget.App.Button.CancelMembership.Pretendard.Bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.deleteAccount()}"
                 android:paddingVertical="16dp"
-                android:text="@string/setting_delete_account_confirm"
+                android:text="@string/setting_delete_account"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

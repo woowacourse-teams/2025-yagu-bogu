@@ -111,7 +111,8 @@
     <string name="setting_delete_account_question_title">정말 떠나실 건가요?</string>
     <string name="setting_delete_account_question_message">계정을 삭제하면 더 이상 직관 기록을 볼 수 없어요.</string>
     <string name="setting_remember_message">%s님,\n야구보구와 함께한 %d일을 소중히 기억할게요.</string>
-    <string name="setting_delete_account_confirm">탈퇴하기</string>
+    <string name="setting_delete_account_dialog_title">정말 탈퇴 하시겠습니까?</string>
+    <string name="setting_delete_account_dialog_message">이 작업은 되돌릴 수 없습니다.</string>
     <string name="setting_delete_account_confirm_select_alert">지금까지 야구보구를\n이용해주셔서 감사합니다.</string>
     <string name="setting_delete_account_cancel">잔류하기</string>
     <string name="setting_delete_account_cancel_select_alert">앞으로도 잘 부탁드립니다!</string>
