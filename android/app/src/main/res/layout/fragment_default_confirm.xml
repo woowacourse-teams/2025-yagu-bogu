@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="dialogDefaultUiModel"
+            type="com.yagubogu.presentation.util.DialogDefaultUiModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="40dp">
+
+        <TextView
+            android:id="@+id/tv_dialog_title"
+            style="@style/TextView.Esamanru.Medium.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{dialogDefaultUiModel.title}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="다이얼로그 제목" />
+
+        <TextView
+            android:id="@+id/tv_dialog_message"
+            style="@style/TextView.Pretendard.Medium.16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="40dp"
+            android:text="@{dialogDefaultUiModel.message}"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title"
+            tools:text="엄청나게\n긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트엄청나게긴텍스트" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_negative_btn"
+            style="@style/Widget.App.Button.Negative.Pretendard.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
+            android:text="@{dialogDefaultUiModel.negativeText==null ? @string/all_cancel : dialogDefaultUiModel.negativeText}"
+            android:textColor="@color/gray500"
+
+            app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_dialog_message" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_positive_btn"
+            style="@style/Widget.App.Button.Positive.Pretendard.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="12dp"
+            android:text="@{dialogDefaultUiModel.positiveText==null ? @string/all_ok : dialogDefaultUiModel.positiveText}"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
+            app:layout_constraintTop_toTopOf="@id/tv_negative_btn" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

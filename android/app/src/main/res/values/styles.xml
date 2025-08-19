@@ -113,7 +113,6 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
-
     <!-- Material Button-->
     <style name="Widget.App.Button" parent="Widget.Material3.Button">
         <item name="cornerRadius">12dp</item>
@@ -125,6 +124,15 @@
     </style>
 
     <style name="Widget.App.Button.Positive.Pretendard.Bold" parent="Widget.App.Button.Positive">
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+    </style>
+
+    <style name="Widget.App.Button.Negative" parent="Widget.App.Button">
+        <item name="android:backgroundTint">@color/gray200</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="Widget.App.Button.Negative.Pretendard.Bold" parent="Widget.App.Button.Negative">
         <item name="android:fontFamily">@font/pretendard_bold</item>
     </style>
 
