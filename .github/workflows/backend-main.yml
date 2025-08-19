@@ -75,18 +75,18 @@ jobs:
           echo "ver_tag=$VER" >> "$GITHUB_OUTPUT"
 
       - id: capture
-        name: Capture image digest of $VER
+        name: Capture image digest of dev-latest
         shell: bash
         run: |
           set -euo pipefail
           DIGEST=""
           # 레지스트리 전파 지연 대비(최대 10회, 3초 간격)
           for i in {1..10}; do
-            DIGEST="$(docker buildx imagetools inspect "$IMAGE:$VER" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
+            DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
             [ -n "$DIGEST" ] && break
             echo "waiting manifest... ($i/10)"; sleep 3
           done
-          [ -n "$DIGEST" ] || { echo "Digest not found for $IMAGE:$VER" >&2; exit 1; }
+          [ -n "$DIGEST" ] || { echo "Digest not found for $IMAGE:dev-latest" >&2; exit 1; }
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
           echo "Captured digest: $DIGEST"
 
@@ -162,13 +162,22 @@ jobs:
             -l release.alias="${IMG_TAG}" \
             "$IMAGE@${DIGEST}"
 
-          # Health check: 10초 간격, 최대 12회(120초)
+          # Health check (exit if failed)
           sleep 10;
+          healthy=false
           for i in {1..30}; do
-          if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
-          echo "NEW healthy"; break; fi
-          echo "waiting health... ($i/30)"; sleep 2
+            if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
+              echo "NEW healthy"; healthy=true; break;
+            fi
+            echo "waiting health... ($i/30)"; sleep 2
           done
+
+          if [ "$healthy" != true ]; then
+            echo "Health check failed after 30 attempts. Aborting deploy." >&2
+            docker logs "$NEW" || true
+            docker rm -f "$NEW" || true
+            exit 1
+          fi
 
           if [ "$COLOR" = "blue" ]; then
             TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
