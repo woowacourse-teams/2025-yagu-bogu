@@ -7,12 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
@@ -35,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
         val app = application as YaguBoguApplication
         LoginViewModelFactory(app.authRepository, app.memberRepository, googleCredentialManager)
     }
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
@@ -55,6 +60,7 @@ class LoginActivity : AppCompatActivity() {
                 isAppInitialized = true
                 return@launch
             }
+            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
 
             if (viewModel.isNewUser()) {
                 navigateToFavoriteTeam()
@@ -80,9 +86,22 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel.loginResult.observe(this) { value: LoginResult ->
             when (value) {
-                LoginResult.SignUp -> navigateToFavoriteTeam()
-                LoginResult.SignIn -> navigateToMain()
-                is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
+                LoginResult.SignUp -> {
+                    navigateToFavoriteTeam()
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+                }
+
+                LoginResult.SignIn -> {
+                    navigateToMain()
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+                }
+
+                is LoginResult.Failure -> {
+                    showSnackbar(R.string.login_failed_message)
+                    val bundle = bundleOf("reason" to "${value.exception}")
+                    firebaseAnalytics.logEvent("login_failure", bundle)
+                }
+
                 LoginResult.Cancel -> Unit
             }
         }
