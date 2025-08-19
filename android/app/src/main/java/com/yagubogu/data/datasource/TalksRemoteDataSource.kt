@@ -37,4 +37,17 @@ class TalksRemoteDataSource(
         safeApiCall {
             talksApiService.postTalks(gameId, TalksRequest(content))
         }
+
+    override suspend fun deleteTalks(
+        gameId: Long,
+        talkId: Long,
+    ): Result<Unit> =
+        safeApiCall {
+            talksApiService.deleteTalks(gameId, talkId)
+        }
+
+    override suspend fun reportTalks(talkId: Long): Result<Unit> =
+        safeApiCall {
+            talksApiService.reportTalks(talkId)
+        }
 }

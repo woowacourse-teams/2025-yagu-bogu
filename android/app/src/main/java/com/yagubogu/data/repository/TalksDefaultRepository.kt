@@ -49,4 +49,20 @@ class TalksDefaultRepository(
             ).map { talkDto: TalkDto ->
                 talkDto.toPresentation()
             }
+
+    override suspend fun deleteTalks(
+        gameId: Long,
+        talkId: Long,
+    ): Result<Unit> =
+        talksDataSource
+            .deleteTalks(
+                gameId = gameId,
+                talkId = talkId,
+            )
+
+    override suspend fun reportTalks(talkId: Long): Result<Unit> =
+        talksDataSource
+            .reportTalks(
+                talkId = talkId,
+            )
 }

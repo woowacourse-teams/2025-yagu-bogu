@@ -20,4 +20,11 @@ interface TalksDataSource {
         gameId: Long,
         content: String,
     ): Result<TalkDto>
+
+    suspend fun deleteTalks(
+        gameId: Long,
+        talkId: Long,
+    ): Result<Unit>
+
+    suspend fun reportTalks(talkId: Long): Result<Unit>
 }
