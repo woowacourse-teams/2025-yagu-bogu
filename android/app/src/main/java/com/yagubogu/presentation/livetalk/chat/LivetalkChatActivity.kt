@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 
@@ -27,6 +30,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     private val chatLinearLayoutManager by lazy {
         binding.rvChatMessages.layoutManager as LinearLayoutManager
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +69,14 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             },
         )
+
+        // TODO : 채팅 메시지가 비어있을 경우 버튼 비활성화 로직 추가
+        binding.constraintBtnSend.setOnClickListener {
+            viewModel.sendMessage()
+            if (binding.editMessage.text.isNotBlank()) {
+                firebaseAnalytics.logEvent("livetalk_send_message", null)
+            }
+        }
     }
 
     private fun setupRecyclerView() {

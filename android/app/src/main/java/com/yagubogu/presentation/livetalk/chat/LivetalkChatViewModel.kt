@@ -59,7 +59,6 @@ class LivetalkChatViewModel(
 
     fun sendMessage() {
         val message = messageFormText.value ?: ""
-        Timber.d(message)
         if (message.isBlank()) return
 
         viewModelScope.launch {
