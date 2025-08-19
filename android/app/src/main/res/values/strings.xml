@@ -66,7 +66,8 @@
     <string name="stats_average_count">%.1f개</string>
 
     <string name="stats_attendance_history_title">최근 직관 내역</string>
-    <string name="stats_empty_attendance_history_description">직관 내역이 아직 없어요.</string>
+    <string name="stats_empty_attendance_history_description">직관 내역이 없어요</string>
+    <string name="stats_empty_scoreboard_illustration_description">비어있는 스코어보드 일러스트</string>
     <string-array name="stats_attendance_history_filter">
         <item name="all">전체 경기</item>
         <item name="win">승리한 경기</item>
@@ -74,6 +75,8 @@
 
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
+    <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
+    <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
 
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 
