@@ -68,9 +68,6 @@ class SettingMainFragment : Fragment() {
         binding.layoutContactUs.root.setOnClickListener {
             openUrl("https://forms.gle/wBhXjfTLyobZa19K8")
         }
-        binding.layoutPrivacyPolicy.root.setOnClickListener {
-            openUrl("https://sites.google.com/view/yagubogu-privacy-policy/%ED%99%88?authuser=4")
-        }
         binding.layoutOpenSourceLicense.root.setOnClickListener {
             startActivity(Intent(requireContext(), OssLicensesMenuActivity::class.java))
         }

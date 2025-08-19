@@ -143,16 +143,6 @@
                         app:layout_constraintTop_toBottomOf="@id/layout_notice"
                         app:menuTitle="@{@string/setting_contact_us}" />
 
-                    <include
-                        android:id="@+id/layout_privacy_policy"
-                        layout="@layout/item_setting_menu"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_contact_us"
-                        app:menuTitle="@{@string/setting_privacy_policy}" />
 
                     <include
                         android:id="@+id/layout_open_source_license"
@@ -162,7 +152,7 @@
                         android:layout_marginTop="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layout_privacy_policy"
+                        app:layout_constraintTop_toBottomOf="@id/layout_contact_us"
                         app:menuTitle="@{@string/setting_open_source_license}" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
