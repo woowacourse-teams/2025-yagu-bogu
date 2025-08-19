@@ -5,16 +5,8 @@
 
     <data>
 
-        <import type="android.view.View" />
-
-        <import type="android.text.TextUtils" />
-
         <variable
             name="menuTitle"
-            type="String" />
-
-        <variable
-            name="additionalInfo"
             type="String" />
     </data>
 
@@ -22,7 +14,6 @@
         android:id="@+id/constraint_setting_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
         android:paddingVertical="10dp">
 
         <TextView
@@ -35,23 +26,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="응원팀 수정" />
-
-
-        <TextView
-            android:id="@+id/tv_additional_info"
-            style="@style/TextView.Esamanru.Medium.16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:text="@{additionalInfo}"
-            android:textColor="@color/gray500"
-            android:visibility="@{TextUtils.isEmpty(additionalInfo) ? View.GONE : View.VISIBLE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_arrow_right"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="KIA"
-            tools:visibility="visible" />
+            tools:text="닉네임 수정" />
 
         <ImageView
             android:id="@+id/tv_arrow_right"
