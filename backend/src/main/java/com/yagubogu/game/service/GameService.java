@@ -35,7 +35,7 @@ public class GameService {
         return new GameResponse(gameWithCheckIns);
     }
 
-    public GameResultResponse findScoreBoard(final Long gameId) {
+    public GameResultResponse findScoreBoard(final long gameId) {
         Game game = getGame(gameId);
         validateScoreBoard(game);
 

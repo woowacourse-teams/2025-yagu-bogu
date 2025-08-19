@@ -6,8 +6,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.GameResultResponse;
+import com.yagubogu.game.dto.GameResultResponse.ScoreBoardResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
+import com.yagubogu.game.dto.Pitchers;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
 import com.yagubogu.game.repository.GameRepository;
@@ -131,6 +135,28 @@ class GameServiceTest {
                 .hasMessage("Member is not found");
     }
 
+    @DisplayName("끝난 게임의 스코어보드를 조회한다")
+    @Test
+    void findGameScoreBoard() {
+        // given
+        long gameId = 1L;
+        LocalDate date = TestFixture.getToday();
+
+        makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
+
+        GameResultResponse expected = new GameResultResponse(
+                ScoreBoardResponse.from(expectedHomeScoreBoard()),
+                ScoreBoardResponse.from(expectedAwayScoreBoard()),
+                "1", "1", "1", "1"
+        );
+
+        // when
+        GameResultResponse scoreBoard = gameService.findScoreBoard(gameId);
+
+        // then
+        assertThat(scoreBoard).isEqualTo(expected);
+    }
+
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
@@ -141,6 +167,41 @@ class GameServiceTest {
                 .awayTeam(awayTeam)
                 .stadium(stadium)
                 .date(date)
+        );
+    }
+
+    private void makeGameWithScoreBoard(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
+        Team homeTeam = getTeamByCode(homeCode);
+        Team awayTeam = getTeamByCode(awayCode);
+        Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+        ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
+        ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
+        Pitchers pitchers = new Pitchers("1", "1", "1", "1");
+
+        gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(date)
+                .homeScoreBoard(homeScoreBoard)
+                .awayScoreBoard(awayScoreBoard)
+                .pitchers(pitchers)
+        );
+    }
+
+    private ScoreBoard expectedHomeScoreBoard() {
+        return new ScoreBoard(
+                5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")
+        );
+    }
+
+    private ScoreBoard expectedAwayScoreBoard() {
+        return new ScoreBoard(
+                3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")
         );
     }
 
