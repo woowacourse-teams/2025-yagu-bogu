@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.util.BadRequestException
+import com.yagubogu.data.util.ForbiddenException
+import com.yagubogu.data.util.NotFoundException
 import com.yagubogu.domain.repository.TalksRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -78,7 +81,33 @@ class LivetalkChatViewModel(
 
     fun deleteMessage(chatId: Long) {
         viewModelScope.launch {
-            talksRepository.deleteTalks(gameId, chatId)
+            fetchLock.withLock {
+                talksRepository
+                    .deleteTalks(gameId, chatId)
+                    .onSuccess {
+                        val currentChats = _liveTalkChatBubbleItem.value ?: emptyList()
+                        val deletedChats = currentChats.filter { it.livetalkChatItem.chatId != chatId }
+                        newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
+                        oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
+                        _liveTalkChatBubbleItem.value = deletedChats
+                        Timber.d("현장톡 정상 삭제")
+                    }.onFailure { exception: Throwable ->
+                        when (exception) {
+                            is BadRequestException -> {
+                                Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
+                            }
+                            is ForbiddenException -> {
+                                Timber.d("타인의 현장톡 삭제 시도")
+                            }
+                            is NotFoundException -> {
+                                Timber.d("존재하지 않는 현장톡 삭제 시도")
+                            }
+                            else -> {
+                                Timber.d("기타 네트워크 에러")
+                            }
+                        }
+                    }
+            }
         }
     }
 
