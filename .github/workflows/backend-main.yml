@@ -1,19 +1,16 @@
-name: Release & Deploy (Auto SemVer)
+name: YaguBogu Backend Release & Deploy (Auto SemVer)
 
 on:
-  push:
-    branches: [ "chore/356" ]
-#on:
-#  pull_request_target:
-#    types: [ closed ]
-#    branches: [ "main" ]   # 운영 브랜치로 조정
+  pull_request_target:
+    types: [ closed ]
+    branches: [ "main" ]
 
 env:
   IMAGE: yagubogu/yagubogu-backend
 
 jobs:
   release:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
