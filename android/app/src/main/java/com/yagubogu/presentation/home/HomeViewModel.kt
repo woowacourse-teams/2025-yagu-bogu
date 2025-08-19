@@ -78,6 +78,7 @@ class HomeViewModel(
             onFailure = { exception: Exception ->
                 Timber.w(exception, "위치 불러오기 실패")
                 _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
+                _isCheckInLoading.value = false
             },
         )
     }
@@ -156,8 +157,8 @@ class HomeViewModel(
                 }.onFailure {
                     Timber.w(stadiumsResult.exceptionOrNull(), "API 호출 실패")
                     _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    _isCheckInLoading.value = false
                 }
-            _isCheckInLoading.value = false
         }
     }
 
@@ -170,6 +171,7 @@ class HomeViewModel(
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
             _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
+            _isCheckInLoading.value = false
             return
         }
 
@@ -182,9 +184,11 @@ class HomeViewModel(
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
                 _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
+                _isCheckInLoading.value = false
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
                 _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                _isCheckInLoading.value = false
             }
     }
 
