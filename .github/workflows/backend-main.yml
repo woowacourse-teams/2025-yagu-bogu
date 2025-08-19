@@ -103,6 +103,7 @@ jobs:
             -t "$IMAGE:$READABLE" \
             "$IMAGE:dev-latest"
           echo "image_tag=$READABLE" >> "$GITHUB_OUTPUT"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
   cd:
     needs: release
