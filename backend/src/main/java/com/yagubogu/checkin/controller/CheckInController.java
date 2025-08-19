@@ -2,6 +2,7 @@ package com.yagubogu.checkin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -43,12 +44,19 @@ public class CheckInController implements CheckInControllerInterface {
         return ResponseEntity.ok(response);
     }
 
+    @Override
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             final MemberClaims memberClaims,
             @RequestParam final int year,
-            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter filter
+            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
+            @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
     ) {
-        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberClaims.id(), year, filter);
+        CheckInHistoryResponse response = checkInService.findCheckInHistory(
+                memberClaims.id(),
+                year,
+                resultFilter,
+                orderFilter
+        );
 
         return ResponseEntity.ok(response);
     }
