@@ -39,7 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:lineSpacingExtra="8dp"
             android:text="@string/livetalk_empty_game_description"
             android:textColor="@color/gray400"
             android:textSize="18sp"
