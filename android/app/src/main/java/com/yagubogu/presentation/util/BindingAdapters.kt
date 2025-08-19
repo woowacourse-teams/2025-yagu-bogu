@@ -83,8 +83,7 @@ fun setTimeStamp(
         textView.text = ""
         return
     }
-    // Todo: 서버에서 보내주는 타임존 백엔드 합의 필요...?
-    val serverTime = timestamp.atZone(ZoneId.of("GMT+0"))
+    val serverTime = timestamp.atZone(ZoneId.of("GMT+9"))
     val localTime = serverTime.withZoneSameInstant(ZoneId.systemDefault())
 
     textView.text = localTime.toLocalDateTime().format(DateFormatter.amPmhhmm)

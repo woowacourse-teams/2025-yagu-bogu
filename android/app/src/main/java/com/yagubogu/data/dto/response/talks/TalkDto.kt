@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-data class ContentDto(
+data class TalkDto(
     @SerialName("id")
     val id: Int, // 톡 메시지 ID
     @SerialName("memberId")
