@@ -8,97 +8,87 @@
         <variable
             name="viewModel"
             type="com.yagubogu.presentation.setting.SettingViewModel" />
-
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_delete_account"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="40dp"
         tools:context=".presentation.setting.SettingDeleteAccountFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_delete_account"
+        <TextView
+            android:id="@+id/tv_delete_account_question_title"
+            style="@style/TextView.Pretendard.Bold.24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_delete_account_question_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_delete_account_question_message"
+            style="@style/TextView.Pretendard.Regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/setting_delete_account_question_message"
+            android:textColor="@color/gray400"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/tv_delete_account_question_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_title" />
+
+        <ImageView
+            android:id="@+id/iv_delete_account_illustration"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="60dp">
+            android:layout_height="200dp"
+            android:contentDescription="@string/Setting_delete_account_illustration_description"
+            android:src="@drawable/img_baseball_leave_stadium"
+            app:layout_constraintBottom_toTopOf="@id/tv_remember_message"
+            app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_message"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-            <TextView
-                android:id="@+id/tv_delete_account_question_title"
-                style="@style/TextView.Pretendard.Bold.20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_delete_account_question_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/tv_remember_message"
+            style="@style/TextView.Pretendard.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:lineSpacingExtra="4dp"
+            android:text="@{@string/setting_remember_message(viewModel.nickname, 9999)}"
+            android:textAlignment="center"
+            android:textColor="@color/gray500"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_delete_account_illustration"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@string/setting_remember_message" />
 
-            <TextView
-                android:id="@+id/tv_delete_account_question_message"
-                style="@style/TextView.Pretendard.Regular.16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/setting_delete_account_question_message"
-                android:textColor="@color/gray400"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_title" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.App.Button.Positive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:onClick="@{() -> viewModel.cancelDeleteAccount()}"
+            android:paddingVertical="16dp"
+            android:text="@string/setting_delete_account_cancel"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_confirm" />
 
-            <ImageView
-                android:id="@+id/iv_delete_account_illustration"
-                android:layout_width="match_parent"
-                android:layout_height="183dp"
-                android:contentDescription="@string/Setting_delete_account_illustration_description"
-                android:scaleType="centerInside"
-                android:src="@drawable/img_baseball_leave_stadium"
-                app:layout_constraintBottom_toTopOf="@id/tv_delete_account_question"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_message"
-                app:layout_constraintVertical_chainStyle="packed" />
-
-            <TextView
-                android:id="@+id/tv_delete_account_question"
-                style="@style/TextView.Pretendard.Medium.16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="@{@string/setting_remember_message(viewModel.nickname, 9999)}"
-                android:textAlignment="center"
-                app:layout_constraintBottom_toTopOf="@id/btn_cancel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_delete_account_illustration"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="@string/setting_remember_message" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_cancel"
-                style="@style/Widget.App.Button.Positive"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:onClick="@{() -> viewModel.cancelDeleteAccount()}"
-                android:paddingVertical="16dp"
-                android:text="@string/setting_delete_account_cancel"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toTopOf="@id/btn_confirm"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_confirm"
-                style="@style/Widget.App.Button.Negative"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/gray100"
-                android:paddingVertical="16dp"
-                android:text="@string/setting_delete_account"
-                android:textColor="@color/gray400"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            style="@style/Widget.App.Button.Negative"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray100"
+            android:paddingVertical="12dp"
+            android:text="@string/setting_delete_account"
+            android:textColor="@color/gray400"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

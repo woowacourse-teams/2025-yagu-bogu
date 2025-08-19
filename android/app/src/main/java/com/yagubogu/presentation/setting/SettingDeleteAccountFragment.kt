@@ -22,9 +22,8 @@ class SettingDeleteAccountFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentSettingDeleteAccountBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
