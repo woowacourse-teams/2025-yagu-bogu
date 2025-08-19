@@ -5,9 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DefaultDialogUiModel(
-    val emoji: String?,
     val title: String,
-    val message: String?,
-    val negativeText: String?,
-    val positiveText: String?,
+    val emoji: String? = null,
+    val message: String? = null,
+    val negativeText: String? = null,
+    val positiveText: String? = null,
 ) : Parcelable

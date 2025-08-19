@@ -52,10 +52,8 @@ class SettingDeleteAccountFragment : Fragment() {
         binding.btnConfirm.setOnClickListener {
             val deleteAccountDialogUiModel =
                 DefaultDialogUiModel(
-                    emoji = null,
                     title = getString(R.string.setting_delete_account_dialog_title),
                     message = getString(R.string.setting_delete_account_dialog_message),
-                    negativeText = null,
                     positiveText = getString(R.string.setting_delete_account),
                 )
             DefaultDialogFragment

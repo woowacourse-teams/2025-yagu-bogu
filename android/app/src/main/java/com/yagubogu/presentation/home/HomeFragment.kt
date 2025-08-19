@@ -219,11 +219,9 @@ class HomeFragment : Fragment() {
     private fun showCheckInConfirmDialog() {
         val logoutDialogUiModel =
             DefaultDialogUiModel(
-                emoji = getString(R.string.home_check_in_stadium_emoji),
                 title = getString(R.string.home_check_in_confirm),
+                emoji = getString(R.string.home_check_in_stadium_emoji),
                 message = getString(R.string.home_check_in_caution),
-                negativeText = null,
-                positiveText = null,
             )
         DefaultDialogFragment
             .newInstance(KEY_CHECK_IN_REQUEST_DIALOG, logoutDialogUiModel)

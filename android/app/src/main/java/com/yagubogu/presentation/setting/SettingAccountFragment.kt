@@ -49,10 +49,8 @@ class SettingAccountFragment : Fragment() {
         binding.layoutLogout.root.setOnClickListener {
             val logoutDialogUiModel =
                 DefaultDialogUiModel(
-                    emoji = null,
                     title = getString(R.string.setting_logout),
                     message = getString(R.string.setting_logout_dialog_message),
-                    negativeText = null,
                     positiveText = getString(R.string.setting_logout),
                 )
             DefaultDialogFragment
