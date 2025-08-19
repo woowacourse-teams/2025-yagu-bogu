@@ -5,7 +5,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import com.yagubogu.databinding.FragmentDefaultConfirmBinding
+import com.yagubogu.databinding.FragmentDefaultDialogBinding
 import com.yagubogu.presentation.util.getParcelableCompat
 
 class DefaultDialogFragment : DialogFragment() {
@@ -14,8 +14,8 @@ class DefaultDialogFragment : DialogFragment() {
             arguments?.getParcelableCompat(KEY_DEFAULT_DIALOG_UI_MODEL)
                 ?: return super.onCreateDialog(savedInstanceState)
 
-        val binding: FragmentDefaultConfirmBinding =
-            FragmentDefaultConfirmBinding.inflate(layoutInflater)
+        val binding: FragmentDefaultDialogBinding =
+            FragmentDefaultDialogBinding.inflate(layoutInflater)
 
         binding.dialogUiModel = defaultDialogUiModel
         binding.tvPositiveBtn.setOnClickListener { setResultAndDismiss(true) }
@@ -28,7 +28,7 @@ class DefaultDialogFragment : DialogFragment() {
     }
 
     private fun setResultAndDismiss(isConfirmed: Boolean) {
-        val requestKey = arguments?.getString(KEY_REQUEST) ?: return
+        val requestKey: String = arguments?.getString(KEY_REQUEST) ?: return
         val bundle = Bundle().apply { putBoolean(KEY_CONFIRM, isConfirmed) }
         setFragmentResult(requestKey, bundle)
         dismiss()
