@@ -105,9 +105,17 @@ jobs:
             docker logs "$NEW" || true
             exit 1
           fi
-
-          # (선택) 워밍업
-          curl -fsS "http://127.0.0.1:$PORT/" >/dev/null || true
+          
+          # 심볼릭 링크 전환 -> Nginx graceful reload
+          if [ "$COLOR" = "blue" ]; then
+            TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
+          else
+            TARGET="/etc/nginx/sites-available/yagubogu-green.conf"
+          fi
+          echo "Switching symlink to: $TARGET"
+          sudo ln -sf "$TARGET" /etc/nginx/sites-enabled/app.conf
+          sudo nginx -t
+          sudo nginx -s reload
 
           # 드레인 대기 ★ 진행 중 요청 마무리 시간
           sleep 20
