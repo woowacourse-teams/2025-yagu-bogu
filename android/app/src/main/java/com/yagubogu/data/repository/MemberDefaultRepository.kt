@@ -20,19 +20,18 @@ class MemberDefaultRepository(
         return memberDataSource
             .getNickname()
             .map { memberNicknameResponse: MemberNicknameResponse ->
-                val nickname = memberNicknameResponse.nickname
+                val nickname: String = memberNicknameResponse.nickname
                 cachedNickname = nickname
                 nickname
             }
     }
 
-    override suspend fun updateNickname(nickname: String): Result<String> =
+    override suspend fun updateNickname(nickname: String): Result<Unit> =
         memberDataSource
             .updateNickname(nickname)
             .map { memberNicknameResponse: MemberNicknameResponse ->
-                val newNickname = memberNicknameResponse.nickname
+                val newNickname: String = memberNicknameResponse.nickname
                 cachedNickname = newNickname
-                newNickname
             }
 
     override suspend fun getFavoriteTeam(): Result<String?> {

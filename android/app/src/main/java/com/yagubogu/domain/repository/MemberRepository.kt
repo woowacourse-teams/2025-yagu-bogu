@@ -5,7 +5,7 @@ import com.yagubogu.domain.model.Team
 interface MemberRepository {
     suspend fun getNickname(): Result<String>
 
-    suspend fun updateNickname(nickname: String): Result<String>
+    suspend fun updateNickname(nickname: String): Result<Unit>
 
     suspend fun getFavoriteTeam(): Result<String?>
 
