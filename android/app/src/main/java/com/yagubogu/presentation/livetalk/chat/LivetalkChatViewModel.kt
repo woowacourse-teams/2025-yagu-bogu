@@ -8,6 +8,9 @@ import com.yagubogu.data.util.BadRequestException
 import com.yagubogu.data.util.ForbiddenException
 import com.yagubogu.data.util.NotFoundException
 import com.yagubogu.domain.repository.TalksRepository
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
+import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,6 +29,9 @@ class LivetalkChatViewModel(
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
     val messageFormText = MutableLiveData<String>()
+
+    private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
+    val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
 
     private val fetchLock = Mutex()
     private val pollingControlLock = Mutex()
@@ -113,7 +119,25 @@ class LivetalkChatViewModel(
 
     fun reportMessage(chatId: Long) {
         viewModelScope.launch {
-            talksRepository.reportTalks(chatId)
+            talksRepository
+                .reportTalks(chatId)
+                .onSuccess {
+                    _livetalkReportEvent.setValue(LivetalkReportEvent.Success)
+                    Timber.d("현장톡 정상 신고")
+                }.onFailure { exception: Throwable ->
+                    when (exception) {
+                        is BadRequestException -> {
+                            _livetalkReportEvent.setValue(LivetalkReportEvent.DuplicatedReport)
+                            Timber.d("스스로 신고하거나 중복 신고인 경우")
+                        }
+                        is ForbiddenException -> {
+                            Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                        }
+                        else -> {
+                            Timber.d("기타 네트워크 에러")
+                        }
+                    }
+                }
         }
     }
 

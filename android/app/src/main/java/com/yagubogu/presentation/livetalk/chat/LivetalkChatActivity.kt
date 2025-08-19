@@ -2,14 +2,19 @@ package com.yagubogu.presentation.livetalk.chat
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -35,8 +40,8 @@ class LivetalkChatActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
         setupBinding()
-        setupRecyclerView()
         setupListener()
+        setupRecyclerView()
         setupObservers()
     }
 
@@ -104,16 +109,22 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             }
         }
+        viewModel.livetalkReportEvent.observe(this) { livetalkReportEvent: LivetalkReportEvent ->
+            when (livetalkReportEvent) {
+                LivetalkReportEvent.DuplicatedReport -> showSnackbar(R.string.livetalk_already_reported)
+                LivetalkReportEvent.Success -> showSnackbar(R.string.livetalk_report_succeed)
+            }
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.startChatPolling()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.stopChatPolling()
+    private fun showSnackbar(
+        @StringRes message: Int,
+    ) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
+            setBackgroundTint(Color.DKGRAY)
+            setTextColor(context.getColor(R.color.white))
+            show()
+        }
     }
 
     companion object {
