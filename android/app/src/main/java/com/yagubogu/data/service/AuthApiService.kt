@@ -1,7 +1,7 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.LoginRequest
-import com.yagubogu.data.dto.request.MemberLogoutRequest
+import com.yagubogu.data.dto.request.LogoutRequest
 import com.yagubogu.data.dto.response.LoginResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,6 +15,6 @@ interface AuthApiService {
 
     @POST("/api/auth/logout")
     suspend fun logout(
-        @Body body: MemberLogoutRequest,
+        @Body body: LogoutRequest,
     ): Response<Unit>
 }
