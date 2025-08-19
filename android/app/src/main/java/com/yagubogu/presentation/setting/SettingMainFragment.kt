@@ -25,9 +25,8 @@ class SettingMainFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentSettingMainBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -43,6 +42,11 @@ class SettingMainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.setSettingTitle(getString(R.string.setting_main_title))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupBindings() {
@@ -96,11 +100,6 @@ class SettingMainFragment : Fragment() {
             Timber.d("앱 버전 로드 실패 ${e.message}")
             DEFAULT_VERSION_NAME
         }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     companion object {
         private const val DEFAULT_VERSION_NAME = "x.x.x"

@@ -20,9 +20,8 @@ class SettingAccountFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentSettingAccountBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -31,13 +30,17 @@ class SettingAccountFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupBindings()
         setupListeners()
     }
 
-    private fun setupBindings() {
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+    override fun onResume() {
+        super.onResume()
+        viewModel.setSettingTitle(getString(R.string.setting_manage_account))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupListeners() {
@@ -56,15 +59,5 @@ class SettingAccountFragment : Fragment() {
             .replace(R.id.fcv_setting, SettingDeleteAccountFragment())
             .addToBackStack(null)
             .commit()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.setSettingTitle(getString(R.string.setting_manage_account))
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
