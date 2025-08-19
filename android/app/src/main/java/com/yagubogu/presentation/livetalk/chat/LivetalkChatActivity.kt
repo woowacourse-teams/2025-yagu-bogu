@@ -24,6 +24,10 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private val livetalkChatAdapter = LivetalkChatAdapter()
 
+    private val chatLinearLayoutManager by lazy {
+        binding.rvChatMessages.layoutManager as LinearLayoutManager
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -44,6 +48,22 @@ class LivetalkChatActivity : AppCompatActivity() {
         binding.ivArrowLeft.setOnClickListener {
             finish()
         }
+
+        binding.rvChatMessages.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    // 화면 최상단에 스크롤이 도달했을 때 과거 메시지 로드
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        viewModel.fetchBeforeTalks()
+                    }
+                }
+            },
+        )
     }
 
     private fun setupRecyclerView() {
@@ -60,25 +80,38 @@ class LivetalkChatActivity : AppCompatActivity() {
             itemAnimator = null
             clipToPadding = false
         }
-
-        livetalkChatAdapter.registerAdapterDataObserver(
-            object :
-                RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(
-                    positionStart: Int,
-                    itemCount: Int,
-                ) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    binding.rvChatMessages.scrollToPosition(0)
-                }
-            },
-        )
     }
 
     private fun setupObservers() {
         viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
-            livetalkChatAdapter.submitList(livetalkChatBubbleItems)
+
+            val oldFirstItemId =
+                livetalkChatAdapter.currentList
+                    .firstOrNull()
+                    ?.livetalkChatItem
+                    ?.chatId
+
+            val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
+
+            livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
+                val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
+                val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
+
+                if (isNewMessageArrived && firstVisibleItemPosition == 0) {
+                    chatLinearLayoutManager.scrollToPosition(0)
+                }
+            }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.startChatPolling()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.stopChatPolling()
     }
 
     companion object {
