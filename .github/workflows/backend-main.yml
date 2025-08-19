@@ -61,11 +61,11 @@ jobs:
 
           # 현재 살아있는 컨테이너를 OLD로 간주
           if docker ps --format '{{.Names}}' | grep -qx "$BLUE"; then
-            OLD="$BLUE";  NEW="$GREEN"; PORT=8082
+            OLD="$BLUE";  NEW="$GREEN"; PORT=8082; COLOR=green
           else
-            OLD="$GREEN"; NEW="$BLUE";  PORT=8081
+            OLD="$GREEN"; NEW="$BLUE";  PORT=8081; COLOR=blue
           fi
-          echo "OLD=${OLD:-none}, NEW=$NEW, PORT=$PORT"
+          echo "OLD=${OLD:-none}, NEW=$NEW, PORT=$PORT, COLOR=$COLOR"
 
           # 같은 이름이 잔존 상태이면 제거(이전 실패 잔재 방지)
           if docker ps -a --format '{{.Names}}' | grep -qx "$NEW"; then
