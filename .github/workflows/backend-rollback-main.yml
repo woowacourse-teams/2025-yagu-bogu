@@ -1,4 +1,4 @@
-name: Backend Rollback Main
+name: YaguBogu Backend Rollback Main
 
 on:
   workflow_dispatch:
@@ -31,14 +31,48 @@ jobs:
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
       - id: digest
-        name: Resolve digest from version tag
+        name: Resolve digest for input version
         shell: bash
         run: |
           set -euo pipefail
-          VER='${{ github.event.inputs.version }}'
-          DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
-          [ -n "$DIGEST" ] || { echo "해당 버전 이미지 없음: $VER" >&2; exit 1; }
+          INPUT='${{ github.event.inputs.version }}'
+
+          # v 접두사 정규화
+          if [[ "$INPUT" =~ ^v ]]; then
+            V="$INPUT"
+            P="${INPUT#v}"
+          else
+            P="$INPUT"
+            V="v$INPUT"
+          fi
+
+          LOG="/var/log/yagubogu/deployments.log"
+
+          # 1) 운영 로그에서 다이제스트 우선 검색 (최근 행 우선)
+          DIGEST=""
+          if sudo test -f "$LOG"; then
+            # release/alias/전달 포맷 모두 수용
+            DIGEST="$(sudo tac "$LOG" | awk -v v="$V" -v p="$P" '
+              tolower($0) ~ ("release=" v) || tolower($0) ~ ("version=" p) {
+                for (i=1; i<=NF; i++) if ($i ~ /^digest=/) { sub(/^digest=/,"",$i); print $i; exit }
+              }')"
+          fi
+
+          # 2) 로그에 없으면 레지스트리 태그 조회 (vX.Y.Z 우선, 실패 시 X.Y.Z도 시도)
+          if [ -z "${DIGEST:-}" ]; then
+            for TAG in "$V" "$P"; do
+              if docker buildx imagetools inspect "$IMAGE:$TAG" >/dev/null 2>&1; then
+                DIGEST="$(docker buildx imagetools inspect "$IMAGE:$TAG" \
+                  | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
+                [ -n "$DIGEST" ] && break
+              fi
+            done
+          fi
+
+          [ -n "${DIGEST:-}" ] || { echo "해당 버전의 다이제스트를 찾을 수 없음: $INPUT" >&2; exit 1; }
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "VER=$V" >> "$GITHUB_OUTPUT"
+          echo "Resolved digest: $DIGEST (input=$INPUT)"
 
       - name: Pull image
         run: docker pull $IMAGE@${{ steps.digest.outputs.digest }}
