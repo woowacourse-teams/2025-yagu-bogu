@@ -74,6 +74,7 @@ jobs:
         shell: bash
         run: |
           VER='${{ steps.semver.outputs.next_version }}'
+          docker pull $IMAGE:dev-latest
           # Capture digest
           DIGEST_FULL="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
           DIGEST_SHORT="${DIGEST_FULL:7:8}"  # sha256:abcdef12345 -> abcdef12
@@ -127,25 +128,6 @@ jobs:
           if docker ps -a --format '{{.Names}}' | grep -qx "$NEW"; then
           docker rm -f "$NEW" || true
           fi
-          
-          #          docker run -d \
-          #            --name "$NEW" \
-          #            --network yagubogu-net \
-          #            -p "$PORT:8080" \
-          #            --stop-signal=SIGTERM \
-          #            --stop-timeout=30 \
-          #            -v /var/log/yagubogu:/var/log/yagubogu \
-          #            -e SPRING_PROFILES_ACTIVE=prod \
-          #            -e DB_URL="${{ secrets.DB_PROD_URL }}" \
-          #            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-          #            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-          #            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
-          #            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
-          #            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-          #            -l app=yagubogu-backend \
-          #            -l release.version="${VERSION}" \
-          #            -l release.digest="${DIGEST}" \
-          #            "$IMAGE@${DIGEST}"
           docker run -d \
           --name "$NEW" \
           --network yagubogu-net \
