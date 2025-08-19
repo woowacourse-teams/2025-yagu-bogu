@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupBinding()
+        setupBindings()
         setupView()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
@@ -41,15 +41,11 @@ class MainActivity : AppCompatActivity() {
         setToolbarTitle(binding.bnvNavigation.selectedItemId)
     }
 
-    fun setupBinding() {
+    private fun setupBindings() {
         binding.ivSettings.setOnClickListener {
-            openSettingActivity()
+            val intent = SettingActivity.newIntent(this)
+            startActivity(intent)
         }
-    }
-
-    private fun openSettingActivity() {
-        val intent = SettingActivity.newIntent(this)
-        startActivity(intent)
     }
 
     private fun setupView() {
