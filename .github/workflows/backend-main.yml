@@ -52,7 +52,8 @@ jobs:
           else bump="patch"; fi
 
           git fetch --tags --force
-          last_tag="$(git tag -l --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+          last_tag="$(git tag -l --sort=-v:refname | grep -E '^(v)?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+          last_tag="${last_tag#v}"
           [ -n "$last_tag" ] || last_tag="0.0.0"
           IFS='.' read -r MA MI PA <<<"$last_tag"
 
