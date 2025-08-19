@@ -53,7 +53,7 @@ class SettingMainFragment : Fragment() {
 
     private fun setupListeners() {
         binding.layoutEditNickname.root.setOnClickListener {
-            val currentNickname = binding.tvMyNickName.text.toString()
+            val currentNickname = binding.tvMyNickname.text.toString()
             SettingNicknameEditFragment
                 .newInstance(currentNickname)
                 .show(parentFragmentManager, "SettingNicknameEditFragment")
