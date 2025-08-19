@@ -33,8 +33,6 @@ class HomeCheckInConfirmFragment : DialogFragment() {
         private const val KEY_REQUEST_SUCCESS = "success"
         private const val KEY_CONFIRM = "confirm"
 
-        fun newInstance(): HomeCheckInConfirmFragment = HomeCheckInConfirmFragment()
-
         fun setResultListener(
             fragmentManager: FragmentManager,
             lifecycleOwner: LifecycleOwner,

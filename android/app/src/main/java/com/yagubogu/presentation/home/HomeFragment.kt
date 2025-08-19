@@ -48,6 +48,8 @@ class HomeFragment : Fragment() {
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
 
+    private val checkInConfirmDialog by lazy { HomeCheckInConfirmFragment() }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -213,7 +215,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showCheckInConfirmDialog() {
-        val dialog = HomeCheckInConfirmFragment.newInstance()
+        val dialog = checkInConfirmDialog
         dialog.show(parentFragmentManager, dialog.tag)
     }
 
