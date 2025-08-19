@@ -37,13 +37,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          labels="$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' || true)"
-          bump="patch"
-          if grep -qi '^🧟‍♀️ semver:major$' <<<"$labels"; then bump="major"
-          elif grep -qi '^👩🏿‍🌾 semver:minor$' <<<"$labels"; then bump="minor"
-          elif grep -qi '^🧑🏻‍🔧 semver:patch$' <<<"$labels"; then bump="patch"; fi
-          echo "bump=$bump"
-
+          labels_raw="$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' || true)"
+          labels="$(sed -E 's/^[^[:alnum:]]+[ ]*//;t;:a;s/^[^[:alnum:]]+[ ]*//;ta' <<<"$labels_raw")"
+          
+          if   grep -qi '^semver:major$' <<<"$labels"; then bump="major"
+          elif grep -qi '^semver:minor$' <<<"$labels"; then bump="minor"
+          else bump="patch"; fi
+          
           git fetch --tags --force
           last_tag="$(git tag -l --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
           [ -n "$last_tag" ] || last_tag="0.0.0"
@@ -74,13 +74,8 @@ jobs:
         shell: bash
         run: |
           VER='${{ steps.semver.outputs.next_version }}'
-          docker pull $IMAGE:dev-latest
-          # Capture digest
-          DIGEST_FULL="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
-          DIGEST_SHORT="${DIGEST_FULL:7:8}"  # sha256:abcdef12345 -> abcdef12
-          
           docker buildx imagetools create \
-          -t $IMAGE:$VER-$DIGEST_SHORT \
+          -t $IMAGE:$VER \
           $IMAGE:dev-latest
 
       - id: capture
@@ -89,7 +84,6 @@ jobs:
         run: |
           VER='${{ steps.semver.outputs.next_version }}'
           DIGEST="$(docker buildx imagetools inspect $IMAGE:$VER | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
   cd:
     needs: release
@@ -141,8 +135,8 @@ jobs:
           -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
           -l app=yagubogu-backend \
           -l release.version="${VERSION}" \
-          -l release.digest="${DIGEST_SHORT}" \
-          $IMAGE:$VERSION-$DIGEST_SHORT
+          -l release.digest="${DIGEST}" \
+          "$IMAGE@${DIGEST}"
           
           for i in {1..30}; do
           if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
@@ -175,7 +169,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CURRENT_TAG="$VERSION-$DIGEST_SHORT"
-          docker images --format '{{.Repository}}:{{.Tag}}' $IMAGE \
-            | grep -v "$CURRENT_TAG" \
-            | xargs -r docker rmi -f
+          docker image prune -af || true
