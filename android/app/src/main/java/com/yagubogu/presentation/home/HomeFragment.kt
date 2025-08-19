@@ -16,6 +16,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -49,6 +52,8 @@ class HomeFragment : Fragment() {
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
 
     private val checkInConfirmDialog by lazy { HomeCheckInConfirmFragment() }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,6 +108,7 @@ class HomeFragment : Fragment() {
                 .rotationBy(REFRESH_ANIMATION_ROTATION)
                 .setDuration(REFRESH_ANIMATION_DURATION)
                 .start()
+            firebaseAnalytics.logEvent("fan_rate_refresh", null)
         }
     }
 
@@ -146,6 +152,7 @@ class HomeFragment : Fragment() {
         ) { result: Boolean ->
             if (result) {
                 viewModel.checkIn()
+                firebaseAnalytics.logEvent("check_in", null)
             }
         }
     }
