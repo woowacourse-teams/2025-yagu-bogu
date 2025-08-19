@@ -70,7 +70,7 @@
             android:gravity="center"
             android:paddingHorizontal="40dp"
             android:paddingVertical="12dp"
-            android:text="@{dialogDefaultUiModel.positiveText==null ? @string/all_ok : dialogDefaultUiModel.positiveText}"
+            android:text="@{dialogDefaultUiModel.positiveText==null ? @string/all_confirm : dialogDefaultUiModel.positiveText}"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
             app:layout_constraintEnd_toEndOf="parent"
