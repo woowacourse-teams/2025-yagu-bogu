@@ -6,6 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="24dp">
 
         <TextView
@@ -46,14 +47,13 @@
             app:layout_constraintStart_toStartOf="@id/tv_check_in_confirm_message"
             app:layout_constraintTop_toBottomOf="@id/tv_check_in_confirm_message" />
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/tv_negative_btn"
-            style="@style/TextView.Pretendard.Bold.16"
+            style="@style/Widget.App.Button.Negative.Pretendard.Bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_gray100_radius_12dp_ripple"
             android:gravity="center"
             android:paddingHorizontal="40dp"
             android:paddingVertical="12dp"
@@ -64,13 +64,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_check_in_caution" />
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/tv_positive_btn"
-            style="@style/TextView.Pretendard.Bold.16"
+            style="@style/Widget.App.Button.Positive.Pretendard.Bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:background="@drawable/bg_primary500_radius_12dp_ripple"
             android:gravity="center"
             android:paddingHorizontal="40dp"
             android:paddingVertical="12dp"
