@@ -12,14 +12,19 @@ class MemberDefaultRepository(
     private var cachedFavoriteTeam: String? = null
     private var cachedNickname: String? = null
 
-    override suspend fun getNickname(): Result<String> =
-        memberDataSource
+    override suspend fun getNickname(): Result<String> {
+        cachedNickname?.let { nickname: String ->
+            return Result.success(nickname)
+        }
+
+        return memberDataSource
             .getNickname()
             .map { memberNicknameResponse: MemberNicknameResponse ->
                 val nickname = memberNicknameResponse.nickname
                 cachedNickname = nickname
                 nickname
             }
+    }
 
     override suspend fun updateNickname(nickname: String): Result<String> =
         memberDataSource
@@ -34,6 +39,7 @@ class MemberDefaultRepository(
         cachedFavoriteTeam?.let { favoriteTeam: String ->
             return Result.success(favoriteTeam)
         }
+
         return memberDataSource
             .getFavoriteTeam()
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
@@ -47,8 +53,8 @@ class MemberDefaultRepository(
         memberDataSource
             .updateFavoriteTeam(team)
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
-                val favoriteTeam: String? = memberFavoriteResponse.favorite
-                cachedFavoriteTeam = favoriteTeam
+                val newFavoriteTeam: String? = memberFavoriteResponse.favorite
+                cachedFavoriteTeam = newFavoriteTeam
             }
 
     override suspend fun deleteMember(): Result<Unit> = memberDataSource.deleteMember()
