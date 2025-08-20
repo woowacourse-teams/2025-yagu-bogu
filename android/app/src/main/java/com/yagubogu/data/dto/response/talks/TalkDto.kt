@@ -33,6 +33,6 @@ data class TalkDto(
             nickname = nickname,
             teamName = favorite,
             timestamp = LocalDateTime.parse(createdAt),
-            reported = content.contains("숨김처리되었습니다"),
+            reported = content.contains("숨김처리되었습니다"), // TODO : 추후 백엔드에서 신고된 메시지 보내주는 방식 변경 필요
         )
 }
