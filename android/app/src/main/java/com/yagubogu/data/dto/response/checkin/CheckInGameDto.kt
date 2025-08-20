@@ -21,6 +21,7 @@ data class CheckInGameDto(
     fun toPresentation(): AttendanceHistoryItem.Detail {
         val summary =
             AttendanceHistoryItem.Summary(
+                id = checkInId,
                 attendanceDate = LocalDate.parse(attendanceDate),
                 stadiumName = stadiumFullName,
                 awayTeam = awayTeam.toPresentation(),

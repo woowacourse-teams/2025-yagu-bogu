@@ -4,13 +4,12 @@ import androidx.annotation.ColorRes
 import com.yagubogu.R
 import com.yagubogu.domain.model.GameResult
 import java.time.LocalDate
-import kotlin.random.Random
 
 sealed class AttendanceHistoryItem(
     val type: ViewType,
 ) {
     data class Summary(
-        val id: Long = Random.nextLong(), // TODO: 서버에서 id 받으면 삭제
+        val id: Long,
         val attendanceDate: LocalDate,
         val stadiumName: String,
         val awayTeam: AttendanceHistoryTeamItem,
@@ -37,7 +36,6 @@ sealed class AttendanceHistoryItem(
     }
 
     data class Detail(
-        val id: Long = Random.nextLong(), // TODO: 서버에서 id 받으면 삭제
         val summary: Summary,
     ) : AttendanceHistoryItem(ViewType.DETAIL)
 

@@ -38,7 +38,6 @@ class AttendanceHistoryAdapter(
     override fun getItemViewType(position: Int): Int = getItem(position).type.ordinal
 
     companion object {
-        // TODO: diffCallback 수정
         private val diffCallback =
             object : DiffUtil.ItemCallback<AttendanceHistoryItem>() {
                 override fun areItemsTheSame(
@@ -48,11 +47,11 @@ class AttendanceHistoryAdapter(
                     when {
                         oldItem is AttendanceHistoryItem.Summary &&
                             newItem is AttendanceHistoryItem.Summary ->
-                            oldItem == newItem
+                            oldItem.id == newItem.id
 
                         oldItem is AttendanceHistoryItem.Detail &&
                             newItem is AttendanceHistoryItem.Detail ->
-                            oldItem == newItem
+                            oldItem.summary.id == newItem.summary.id
 
                         else -> false
                     }
