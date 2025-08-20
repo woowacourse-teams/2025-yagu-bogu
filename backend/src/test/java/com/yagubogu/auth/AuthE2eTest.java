@@ -10,6 +10,7 @@ import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
 import com.yagubogu.support.member.MemberBuilder;
@@ -22,18 +23,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 @Import(AuthTestConfig.class)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class AuthE2eTest {
+public class AuthE2eTest extends E2eTestBase {
 
     private static final String BEARER = "Bearer ";
     private static final String ID_TOKEN = "ID_TOKEN";

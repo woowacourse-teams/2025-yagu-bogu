@@ -4,21 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.support.E2eTestBase;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StadiumE2eTest {
+public class StadiumE2eTest extends E2eTestBase {
 
     @LocalServerPort
     private int port;
