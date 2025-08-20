@@ -18,4 +18,13 @@ public record MemberInfoResponse(
                 member.getImageUrl()
         );
     }
+
+    public static MemberInfoResponse fromNullableTeam(final Member member) {
+        return new MemberInfoResponse(
+                member.getNickname(),
+                member.getCreatedAt().toLocalDate(),
+                null,
+                member.getImageUrl()
+        );
+    }
 }

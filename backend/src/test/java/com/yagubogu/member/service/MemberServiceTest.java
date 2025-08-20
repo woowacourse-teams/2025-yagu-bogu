@@ -207,6 +207,24 @@ public class MemberServiceTest {
         });
     }
 
+    @DisplayName("응원하는 팀이 없는 회원의 정보를 조회한다")
+    @Test
+    void findMember_nullTeam() {
+        // given
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+
+        // when
+        MemberInfoResponse actual = memberService.findMember(member.getId());
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.favoriteTeam()).isNull();
+            softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
+            softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
+        });
+    }
+
     @DisplayName("예외: 회원 정보를 조회하는데 해당하는 회원이 없으면 예외가 발생한다")
     @Test
     void findMember_notFoundMember() {
