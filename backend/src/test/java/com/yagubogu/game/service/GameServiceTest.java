@@ -139,10 +139,9 @@ class GameServiceTest {
     @Test
     void findGameScoreBoard() {
         // given
-        long gameId = 1L;
         LocalDate date = TestFixture.getToday();
-
-        makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
+        Game game = makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
+        long gameId = game.getId();
 
         GameResultResponse expected = new GameResultResponse(
                 ScoreBoardResponse.from(expectedHomeScoreBoard()),
@@ -170,7 +169,7 @@ class GameServiceTest {
         );
     }
 
-    private void makeGameWithScoreBoard(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
+    private Game makeGameWithScoreBoard(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
         Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
@@ -180,7 +179,7 @@ class GameServiceTest {
                 List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
         Pitchers pitchers = new Pitchers("1", "1", "1", "1");
 
-        gameFactory.save(builder -> builder
+        return gameFactory.save(builder -> builder
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)
                 .stadium(stadium)
