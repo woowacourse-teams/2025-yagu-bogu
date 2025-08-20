@@ -7,15 +7,13 @@
 
         <variable
             name="attendanceHistoryItem"
-            type="com.yagubogu.presentation.attendance.AttendanceHistoryItem" />
+            type="com.yagubogu.presentation.attendance.model.AttendanceHistoryItem.Summary" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
-        android:background="@drawable/bg_white_radius_12dp"
-        android:padding="24dp">
+        android:paddingHorizontal="4dp">
 
         <TextView
             style="@style/TextView.Esamanru.Bold"

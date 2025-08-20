@@ -2,7 +2,7 @@ package com.yagubogu.data.network
 
 import com.yagubogu.data.dto.request.TokenRequest
 import com.yagubogu.data.dto.response.TokenResponse
-import com.yagubogu.data.service.AuthApiService
+import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.util.addTokenHeader
 import com.yagubogu.data.util.getTokenFromHeader
 import com.yagubogu.data.util.safeApiCall
@@ -26,7 +26,7 @@ import okhttp3.Route
  */
 class TokenAuthenticator(
     private val tokenManager: TokenManager,
-    private val authApiService: AuthApiService,
+    private val tokenApiService: TokenApiService,
 ) : Authenticator {
     private val mutex = Mutex()
 
@@ -71,7 +71,7 @@ class TokenAuthenticator(
     private suspend fun refreshAccessToken(): TokenResponse? {
         val refreshToken: String = tokenManager.getRefreshToken() ?: return null
         return safeApiCall {
-            authApiService.postRefresh(TokenRequest(refreshToken))
+            tokenApiService.postRefresh(TokenRequest(refreshToken))
         }.getOrElse {
             tokenManager.clearTokens()
             null

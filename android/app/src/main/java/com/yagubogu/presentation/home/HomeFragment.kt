@@ -19,6 +19,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.MainActivity
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -46,6 +49,7 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
+    private var checkInDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +67,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupObservers()
+        setupFragmentResultListener()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -83,7 +88,7 @@ class HomeFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                viewModel.checkIn()
+                showCheckInConfirmDialog()
             } else {
                 requestLocationPermissions()
             }
@@ -106,9 +111,10 @@ class HomeFragment : Fragment() {
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             showSnackbar(
                 when (value) {
-                    is CheckInUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
-                    CheckInUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
-                    CheckInUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
+                    is CheckInUiEvent.Success -> R.string.home_check_in_success_message
+                    CheckInUiEvent.OutOfRange -> R.string.home_check_in_out_of_range_message
+                    CheckInUiEvent.LocationFetchFailed -> R.string.home_check_in_location_fetch_failed_message
+                    CheckInUiEvent.NetworkFailed -> R.string.home_check_in_network_failed_message
                 },
             )
         }
@@ -128,6 +134,22 @@ class HomeFragment : Fragment() {
                         ),
                 )
         }
+
+        viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
+            (requireActivity() as MainActivity).setLoadingScreen(value)
+        }
+    }
+
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            KEY_CHECK_IN_REQUEST_DIALOG,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.checkIn()
+            }
+        }
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
@@ -138,7 +160,7 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> viewModel.checkIn()
+                isPermissionGranted -> showCheckInConfirmDialog()
                 shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
                 else -> showPermissionDeniedDialog()
             }
@@ -195,8 +217,23 @@ class HomeFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun showCheckInConfirmDialog() {
+        if (checkInDialog == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.home_check_in_confirm),
+                    emoji = getString(R.string.home_check_in_stadium_emoji),
+                    message = getString(R.string.home_check_in_caution),
+                )
+            checkInDialog = DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
+        }
+
+        checkInDialog?.show(parentFragmentManager, "checkInDialog")
+    }
+
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
     }

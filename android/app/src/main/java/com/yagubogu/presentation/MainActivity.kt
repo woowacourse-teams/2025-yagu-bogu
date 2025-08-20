@@ -2,6 +2,7 @@ package com.yagubogu.presentation
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
+import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.stats.StatsFragment
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupBindings()
         setupView()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
@@ -37,6 +40,19 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setToolbarTitle(binding.bnvNavigation.selectedItemId)
+    }
+
+    fun setLoadingScreen(isLoading: Boolean) {
+        val visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.viewOverlay.visibility = visibility
+        binding.cpiCheckInLoading.visibility = visibility
+    }
+
+    private fun setupBindings() {
+        binding.ivSettings.setOnClickListener {
+            val intent = SettingActivity.newIntent(this)
+            startActivity(intent)
+        }
     }
 
     private fun setupView() {

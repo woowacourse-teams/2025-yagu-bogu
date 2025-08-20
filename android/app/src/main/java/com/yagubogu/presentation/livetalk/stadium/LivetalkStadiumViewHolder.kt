@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemLivetalkStadiumBinding
 
-class LivetalkStadiumViewHolder(
+class LivetalkStadiumViewHolder private constructor(
     private val binding: ItemLivetalkStadiumBinding,
-    private val handler: Handler,
+    handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.handler = handler

@@ -58,6 +58,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextView.Pretendard.SemiBold.24" parent="TextView.Pretendard.SemiBold">
+        <item name="android:textSize">24sp</item>
+    </style>
+
     <style name="TextView.Pretendard.Bold" parent="TextView.Pretendard">
         <item name="android:fontFamily">@font/pretendard_bold</item>
         <item name="android:textColor">@color/black</item>
@@ -69,6 +73,10 @@
 
     <style name="TextView.Pretendard.Bold.20" parent="TextView.Pretendard.Bold">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextView.Pretendard.Bold.24" parent="TextView.Pretendard.Bold">
+        <item name="android:textSize">24sp</item>
     </style>
 
     <style name="TextView.Pretendard.Bold.32" parent="TextView.Pretendard.Bold">
@@ -92,6 +100,10 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Esamanru.Medium.16" parent="TextView.Esamanru.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextView.Esamanru.Medium.20" parent="TextView.Esamanru.Medium">
         <item name="android:textSize">20sp</item>
     </style>
@@ -105,4 +117,57 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="TextView.Scoreboard.Header" parent="TextView">
+        <item name="android:background">@color/primary050</item>
+        <item name="android:fontFamily">@font/pretendard_regular</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">10dp</item>
+    </style>
+
+    <style name="TextView.Scoreboard.Body" parent="TextView">
+        <item name="android:fontFamily">@font/pretendard_medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="TextView.Record.Title" parent="TextView">
+        <item name="android:fontFamily">@font/pretendard_medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingVertical">8dp</item>
+        <item name="android:textColor">@color/primary900</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="TextView.Record.Content" parent="TextView">
+        <item name="android:fontFamily">@font/pretendard_medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingVertical">8dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <!-- Material Button-->
+    <style name="Widget.App.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">12dp</item>
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.App.Button.Positive" parent="Widget.App.Button">
+        <item name="android:backgroundTint">@color/primary500</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Widget.App.Button.Negative" parent="Widget.App.Button">
+        <item name="android:backgroundTint">@color/gray200</item>
+        <item name="android:textColor">@color/gray500</item>
+    </style>
 </resources>

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemStadiumFanRateBinding
 
-class StadiumFanRateViewHolder(
+class StadiumFanRateViewHolder private constructor(
     private val binding: ItemStadiumFanRateBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: StadiumFanRateItem) {

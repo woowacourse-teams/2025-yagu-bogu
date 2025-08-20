@@ -1,12 +1,15 @@
 package com.yagubogu.presentation.livetalk.chat
 
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.TalksRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 class LivetalkChatViewModel(
@@ -19,32 +22,43 @@ class LivetalkChatViewModel(
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
-    val messageFormText = ObservableField<String>()
+    val messageFormText = MutableLiveData<String>()
+
+    private val fetchLock = Mutex()
+    private val pollingControlLock = Mutex()
+    private var oldestMessageCursor: Long? = null
+    private var newestMessageCursor: Long? = null
+    private var hasNext: Boolean = true
+    private var pollingJob: Job? = null
 
     init {
-        fetchTalks(gameId)
+        fetchInitialTalks()
     }
 
-    fun fetchTalks(gameId: Long) {
+    fun fetchBeforeTalks() {
+        if (!hasNext) return
+
         viewModelScope.launch {
-            val talksResult: Result<LivetalkResponseItem> =
-                talksRepository.getTalks(gameId, null, 10)
-            talksResult
-                .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
-                    _livetalkResponseItem.value = livetalkResponseItem
-                    _liveTalkChatBubbleItem.value =
-                        livetalkResponseItem.cursor.chats.map { livetalkChatItem: LivetalkChatItem ->
-                            LivetalkChatBubbleItem.of(livetalkChatItem)
-                        }
-                    messageFormText.set("")
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
+            fetchLock.withLock {
+                val result =
+                    talksRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                result
+                    .onSuccess { response ->
+                        val pastChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+                        val currentList = _liveTalkChatBubbleItem.value ?: emptyList()
+                        _liveTalkChatBubbleItem.value = currentList + pastChats
+
+                        hasNext = response.cursor.hasNext
+                        oldestMessageCursor = response.cursor.nextCursorId
+                    }.onFailure { exception ->
+                        Timber.w(exception, "과거 메시지 API 호출 실패")
+                    }
+            }
         }
     }
 
     fun sendMessage() {
-        val message = messageFormText.get() ?: ""
+        val message = messageFormText.value ?: ""
         Timber.d(message)
         if (message.isBlank()) return
 
@@ -52,10 +66,91 @@ class LivetalkChatViewModel(
             val talksResult: Result<LivetalkChatItem> =
                 talksRepository.postTalks(gameId, message.trim())
             talksResult
-                .onSuccess { fetchTalks(gameId) }
-                .onFailure { exception: Throwable ->
+                .onSuccess {
+                    stopChatPolling()
+                    startChatPolling()
+                    messageFormText.value = ""
+                }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun startChatPolling() {
+        viewModelScope.launch {
+            pollingControlLock.withLock {
+                if (pollingJob?.isActive == true) return@launch
+
+                pollingJob =
+                    launch {
+                        while (true) {
+                            fetchAfterTalks()
+                            delay(POLLING_INTERVAL_MILLS)
+                        }
+                    }
+            }
+        }
+    }
+
+    fun stopChatPolling() {
+        viewModelScope.launch {
+            pollingControlLock.withLock {
+                pollingJob?.cancel()
+                pollingJob = null
+            }
+        }
+    }
+
+    private fun fetchInitialTalks() {
+        viewModelScope.launch {
+            fetchLock.withLock {
+                val result = talksRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
+                result
+                    .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
+                        _livetalkResponseItem.value = livetalkResponseItem
+                        val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
+                            livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+                        _liveTalkChatBubbleItem.value = livetalkChatBubbleItem
+
+                        hasNext = livetalkResponseItem.cursor.hasNext
+                        oldestMessageCursor = livetalkResponseItem.cursor.nextCursorId
+                        newestMessageCursor =
+                            livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
+                    }.onFailure { exception ->
+                        Timber.w(exception, "초기 메시지 API 호출 실패")
+                    }
+            }
+        }
+    }
+
+    private fun fetchAfterTalks() {
+        viewModelScope.launch {
+            fetchLock.withLock {
+                val result =
+                    talksRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                result
+                    .onSuccess { response ->
+                        val newChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+                        if (newChats.isNotEmpty()) {
+                            val currentList = _liveTalkChatBubbleItem.value ?: emptyList()
+                            _liveTalkChatBubbleItem.value = newChats + currentList
+
+                            newestMessageCursor = newChats.first().livetalkChatItem.chatId
+                        }
+                    }.onFailure { exception ->
+                        Timber.w(exception, "최신 메시지 API 호출 실패")
+                    }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopChatPolling()
+    }
+
+    companion object {
+        private const val POLLING_INTERVAL_MILLS = 10_000L
+        private const val CHAT_LOAD_LIMIT = 30
     }
 }

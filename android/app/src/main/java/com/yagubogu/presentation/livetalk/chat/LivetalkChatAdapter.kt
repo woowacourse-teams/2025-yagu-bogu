@@ -43,17 +43,7 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
                 override fun areItemsTheSame(
                     oldItem: LivetalkChatBubbleItem,
                     newItem: LivetalkChatBubbleItem,
-                ): Boolean {
-                    return when {
-                        oldItem is LivetalkChatBubbleItem.MyBubbleItem && newItem is LivetalkChatBubbleItem.MyBubbleItem ->
-                            return oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
-
-                        oldItem is LivetalkChatBubbleItem.OtherBubbleItem && newItem is LivetalkChatBubbleItem.OtherBubbleItem ->
-                            return oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
-
-                        else -> false
-                    }
-                }
+                ): Boolean = oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
 
                 override fun areContentsTheSame(
                     oldItem: LivetalkChatBubbleItem,

@@ -1,8 +1,8 @@
 package com.yagubogu.data.datasource
 
 import com.yagubogu.data.dto.request.TalksRequest
-import com.yagubogu.data.dto.response.talks.ContentDto
-import com.yagubogu.data.dto.response.talks.TalkResponse
+import com.yagubogu.data.dto.response.talks.TalkCursorResponse
+import com.yagubogu.data.dto.response.talks.TalkDto
 import com.yagubogu.data.service.TalksApiService
 import com.yagubogu.data.util.safeApiCall
 
@@ -13,15 +13,27 @@ class TalksRemoteDataSource(
         gameId: Long,
         before: Long?,
         limit: Int,
-    ): Result<TalkResponse> =
+    ): Result<TalkCursorResponse> =
         safeApiCall {
-            talksApiService.getGames(gameId, before, limit)
+            talksApiService.getTalks(gameId, before, limit)
+        }
+
+    override suspend fun getLatestTalks(
+        gameId: Long,
+        after: Long?,
+        limit: Int,
+    ): Result<TalkCursorResponse> =
+        safeApiCall {
+            when (after) {
+                null -> talksApiService.getTalks(gameId, null, limit)
+                else -> talksApiService.getLatestTalks(gameId, after, limit)
+            }
         }
 
     override suspend fun postTalks(
         gameId: Long,
         content: String,
-    ): Result<ContentDto> =
+    ): Result<TalkDto> =
         safeApiCall {
             talksApiService.postTalks(gameId, TalksRequest(content))
         }

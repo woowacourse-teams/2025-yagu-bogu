@@ -19,6 +19,9 @@
         android:theme="@style/Theme.YaguBogu"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.setting.SettingActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.livetalk.chat.LivetalkChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -38,6 +41,15 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
+            tools:replace="android:theme" />
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
+            tools:replace="android:theme" />
     </application>
 
 </manifest>

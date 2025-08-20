@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="attendanceHistoryItem"
+            type="com.yagubogu.presentation.attendance.model.AttendanceHistoryItem.Summary" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.attendance.AttendanceHistorySummaryViewHolder.Handler" />
+
+        <variable
+            name="bindingPosition"
+            type="int" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/bg_white_radius_12dp"
+        android:onClick="@{() -> handler.onSummaryItemClick(bindingPosition)}"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="24dp">
+
+        <include
+            android:id="@+id/layout_attendance_history"
+            layout="@layout/layout_attendance_history"
+            app:attendanceHistoryItem="@{attendanceHistoryItem}"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
