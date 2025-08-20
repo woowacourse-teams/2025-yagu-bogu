@@ -67,16 +67,13 @@ public class ScoreBoard {
     @Column(name = "inning_11_score", nullable = true)
     private Integer inning11Score;
 
-    @Column(name = "inning_12_score", nullable = true)
-    private Integer inning12Score;
-
     public ScoreBoard(final Integer runs, final Integer hits, final Integer errors, final Integer basesOnBalls,
                       final Integer inning1Score,
                       final Integer inning2Score, final Integer inning3Score, final Integer inning4Score,
                       final Integer inning5Score,
                       final Integer inning6Score, final Integer inning7Score, final Integer inning8Score,
                       final Integer inning9Score,
-                      final Integer inning10Score, final Integer inning11Score, final Integer inning12Score
+                      final Integer inning10Score, final Integer inning11Score
     ) {
         this.runs = runs;
         this.hits = hits;
@@ -93,7 +90,6 @@ public class ScoreBoard {
         this.inning9Score = inning9Score;
         this.inning10Score = inning10Score;
         this.inning11Score = inning11Score;
-        this.inning12Score = inning12Score;
     }
 
     public ScoreBoard(
@@ -118,7 +114,6 @@ public class ScoreBoard {
         this.inning9Score = parseScore(innings, 8);
         this.inning10Score = parseScore(innings, 9);
         this.inning11Score = parseScore(innings, 10);
-        this.inning12Score = parseScore(innings, 11);
     }
 
     private Integer parseScore(List<String> innings, int index) {

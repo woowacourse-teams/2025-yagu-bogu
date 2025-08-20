@@ -38,8 +38,7 @@ public record GameResultResponse(
             String inning8Score,
             String inning9Score,
             String inning10Score,
-            String inning11Score,
-            String inning12Score
+            String inning11Score
     ) {
 
         public static ScoreBoardResponse from(ScoreBoard sb) {
@@ -61,8 +60,7 @@ public record GameResultResponse(
                     safe(sb.getInning8Score()),
                     safe(sb.getInning9Score()),
                     safe(sb.getInning10Score()),
-                    safe(sb.getInning11Score()),
-                    safe(sb.getInning12Score())
+                    safe(sb.getInning11Score())
             );
         }
 
