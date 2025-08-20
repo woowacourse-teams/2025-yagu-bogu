@@ -1,5 +1,7 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
@@ -36,12 +38,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class CheckInIntegrationTest {
+public class CheckInE2eTest {
 
     @LocalServerPort
     private int port;

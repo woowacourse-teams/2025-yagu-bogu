@@ -18,7 +18,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StadiumIntegrationTest {
+public class StadiumE2eTest {
 
     @LocalServerPort
     private int port;

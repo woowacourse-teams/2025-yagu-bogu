@@ -38,7 +38,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class StatIntegrationTest {
+public class StatE2eTest {
 
     @LocalServerPort
     private int port;
