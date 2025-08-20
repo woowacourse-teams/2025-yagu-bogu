@@ -195,11 +195,12 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
+                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
+                _hasAlreadyCheckedIn.value = true
                 _memberStatsUiModel.value =
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
-                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
                 _isCheckInLoading.value = false
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
