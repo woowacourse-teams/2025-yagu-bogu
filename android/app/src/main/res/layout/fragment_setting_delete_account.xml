@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:lineSpacingExtra="4dp"
-            android:text="@{@string/setting_remember_message(viewModel.nickname, 9999)}"
+            android:text="@{@string/setting_remember_message(viewModel.nickname, viewModel.memberPeriod)}"
             android:textAlignment="center"
             android:textColor="@color/gray500"
             android:textSize="14sp"

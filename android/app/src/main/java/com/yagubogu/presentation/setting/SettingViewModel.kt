@@ -1,9 +1,11 @@
 package com.yagubogu.presentation.setting
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -21,6 +23,13 @@ class SettingViewModel(
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> get() = _nickname
 
+    private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
+    val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
+
+    val memberPeriod: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            addSource(myMemberInfoItem) { value = it.memberPeriod }
+        }
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
 
@@ -35,6 +44,7 @@ class SettingViewModel(
 
     init {
         fetchNickname()
+        fetchMemberInfo()
     }
 
     fun setSettingTitle(title: String) {
@@ -90,6 +100,18 @@ class SettingViewModel(
                     _nickname.value = nickname
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 조회 API 호출 실패")
+                }
+        }
+    }
+
+    private fun fetchMemberInfo() {
+        viewModelScope.launch {
+            memberRepository
+                .getMemberInfo()
+                .onSuccess { memberInfoResponse: MemberInfoResponse ->
+                    _myMemberInfoItem.value = memberInfoResponse.toPresentation()
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "회원 정보 조회 API 호출 실패")
                 }
         }
     }

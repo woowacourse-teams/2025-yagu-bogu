@@ -44,7 +44,7 @@
                     app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
                     app:strokeColor="@color/gray300"
                     app:strokeWidth="1dp"
-                    app:userProfileImage="@{`https://avatars.githubusercontent.com/u/66577?v=4`}"
+                    app:userProfileImage="@{viewModel.myMemberInfoItem.profileImageUrl}"
                     tools:src="@drawable/ic_user" />
 
                 <TextView
@@ -65,8 +65,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="가입한 날, 프사 받는 api가 없서용"
                     android:textColor="@color/gray500"
+                    app:joinDateFormat="@{viewModel.myMemberInfoItem.createdAt}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_my_nickname" />
