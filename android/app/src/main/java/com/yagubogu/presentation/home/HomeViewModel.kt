@@ -67,10 +67,10 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
+        fetchCheckInStatus()
         fetchMemberStats()
         fetchStadiumStats()
         fetchVictoryFairyRanking()
-        fetchCheckInStatus()
     }
 
     fun checkIn() {
@@ -102,6 +102,18 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+        viewModelScope.launch {
+            val checkInStatusResult: Result<Boolean> = checkInsRepository.getCheckInStatus(date)
+            checkInStatusResult
+                .onSuccess { checkInStatus: Boolean ->
+                    _hasAlreadyCheckedIn.value = checkInStatus
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {
@@ -207,18 +219,6 @@ class HomeViewModel(
             currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
         } else {
             currentStadiumStats.copy(stadiumFanRates = newItems)
-        }
-    }
-
-    private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
-        viewModelScope.launch {
-            val checkInStatusResult: Result<Boolean> = checkInsRepository.getCheckInStatus(date)
-            checkInStatusResult
-                .onSuccess { checkInStatus: Boolean ->
-                    _hasAlreadyCheckedIn.value = checkInStatus
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
         }
     }
 
