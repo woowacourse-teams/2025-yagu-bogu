@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
@@ -27,15 +28,15 @@ class AttendanceHistoryViewModel(
             addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
             addSource(_attendanceHistorySort) { fetchAttendanceHistoryItems() }
         }
-    private val detailItemIndex = MutableLiveData<Int?>()
+    private val detailItemPosition = MutableLiveData<Int?>()
 
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> =
         MediatorLiveData<List<AttendanceHistoryItem>>().apply {
             addSource(items) {
-                detailItemIndex.value = FIRST_INDEX
+                detailItemPosition.value = FIRST_INDEX
                 value = buildAttendanceHistoryItems()
             }
-            addSource(detailItemIndex) { value = buildAttendanceHistoryItems() }
+            addSource(detailItemPosition) { value = buildAttendanceHistoryItems() }
         }
 
     fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
@@ -66,24 +67,20 @@ class AttendanceHistoryViewModel(
             }
     }
 
-    override fun onItemClick(item: AttendanceHistoryItem.Summary) {
-        val index: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
-        if (index != -1) {
-            detailItemIndex.value = index
-        }
+    override fun onSummaryItemClick(position: Int) {
+        if (position == RecyclerView.NO_POSITION) return
+        detailItemPosition.value = position
     }
 
-    override fun onItemClick(item: AttendanceHistoryItem.Detail) {
-        val index: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
-        if (index != -1) {
-            detailItemIndex.value = null
-        }
+    override fun onDetailItemClick(position: Int) {
+        if (position == RecyclerView.NO_POSITION) return
+        detailItemPosition.value = null
     }
 
     private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> {
         val currentItems: List<AttendanceHistoryItem.Detail> = items.value.orEmpty()
         return currentItems.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
-            if (index == detailItemIndex.value) item else item.summary
+            if (index == detailItemPosition.value) item else item.summary
         }
     }
 

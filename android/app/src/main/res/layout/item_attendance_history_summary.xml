@@ -11,6 +11,10 @@
         <variable
             name="handler"
             type="com.yagubogu.presentation.attendance.AttendanceHistorySummaryViewHolder.Handler" />
+
+        <variable
+            name="bindingPosition"
+            type="int" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
         android:background="@drawable/bg_white_radius_12dp"
-        android:onClick="@{() -> handler.onItemClick(attendanceHistoryItem)}"
+        android:onClick="@{() -> handler.onSummaryItemClick(bindingPosition)}"
         android:paddingHorizontal="20dp"
         android:paddingVertical="24dp">
 
