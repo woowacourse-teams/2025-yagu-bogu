@@ -49,7 +49,7 @@ public class CheckInController implements CheckInControllerInterface {
             final MemberClaims memberClaims,
             @RequestParam final int year,
             @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
-            @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
+            @RequestParam(name = "order", defaultValue = "LATEST") final CheckInOrderFilter orderFilter
     ) {
         CheckInHistoryResponse response = checkInService.findCheckInHistory(
                 memberClaims.id(),
