@@ -49,6 +49,8 @@ CREATE TABLE games
     away_team_id        BIGINT       NOT NULL,
     home_score          INT,
     away_score          INT,
+    home_runs           INT,
+    away_runs           INT,
     home_hits           INT,
     away_hits           INT,
     home_errors         INT,
