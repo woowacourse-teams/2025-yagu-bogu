@@ -10,11 +10,7 @@ inline fun <T> safeApiCall(apiCall: () -> Response<T>): Result<T> =
     runCatching {
         val response: Response<T> = apiCall()
         if (response.isSuccessful) {
-            if (response.code() == 204) {
-                Unit as T
-            } else {
-                response.body() as T
-            }
+            response.body() as T
         } else {
             val errorBody = response.errorBody()?.string()
             when (response.code()) {
