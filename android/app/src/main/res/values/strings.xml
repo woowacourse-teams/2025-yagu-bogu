@@ -66,6 +66,7 @@
     <string name="stats_average_count">%.1f개</string>
     <string name="stats_vs_team_stats">%d승 %d무 %d패</string>
     <string name="stats_vs_team_winning_percentage">VS 팀 승률</string>
+    <string name="stats_winning_percentage">직관 승률</string>
     <string name="stats_stadium_visit_count">구장 방문 횟수</string>
 
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>

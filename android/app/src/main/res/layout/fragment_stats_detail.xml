@@ -38,6 +38,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <TextView
+                    style="@style/TextView.Pretendard.Medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stats_winning_percentage"
+                    android:textColor="@color/gray400"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_vs_team_winning_percentage"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_vs_team_winning_percentage" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_vs_team_winning_percentage"
                     android:layout_width="match_parent"
