@@ -13,6 +13,7 @@ import com.yagubogu.data.datasource.MemberRemoteDataSource
 import com.yagubogu.data.datasource.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.StatsRemoteDataSource
 import com.yagubogu.data.datasource.TalksRemoteDataSource
+import com.yagubogu.data.datasource.TokenRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
@@ -23,6 +24,7 @@ import com.yagubogu.data.repository.MemberDefaultRepository
 import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
 import com.yagubogu.data.repository.TalksDefaultRepository
+import com.yagubogu.data.repository.TokenDefaultRepository
 import timber.log.Timber
 
 class YaguBoguApplication : Application() {
@@ -32,6 +34,9 @@ class YaguBoguApplication : Application() {
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
     val locationRepository by lazy { LocationDefaultRepository(locationDataSource) }
+
+    private val tokenDataSource by lazy { TokenRemoteDataSource(retrofit.tokenApiService) }
+    val tokenRepository by lazy { TokenDefaultRepository(tokenDataSource, tokenManager) }
 
     private val authDataSource by lazy { AuthRemoteDataSource(retrofit.authApiService) }
     val authRepository by lazy { AuthDefaultRepository(authDataSource, tokenManager) }

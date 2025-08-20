@@ -18,6 +18,7 @@ material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 ktlint = "13.0.0"
+playServicesOssLicenses = "17.2.2"
 retrofit = "3.0.0"
 timber = "5.0.1"
 viewpager2 = "1.1.0"
@@ -27,6 +28,7 @@ googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.5"
 googleidVersion = "1.1.1"
 glide = "4.16.0"
+googleOssLicenses = "0.10.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
+play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 google-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleidVersion" }
@@ -66,3 +69,4 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
+google-oss-licenses-plugin = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "googleOssLicenses" }
