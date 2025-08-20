@@ -1,6 +1,7 @@
 package com.yagubogu.checkin.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -56,7 +57,8 @@ public interface CheckInControllerInterface {
     ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year,
-            @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter filter
+            @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter resultFilter,
+            @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
     );
 
     @Operation(summary = "구장별 팬 점유율 조회", description = "해당 날짜의 구장별 팬 점유율을 조회합니다.")
