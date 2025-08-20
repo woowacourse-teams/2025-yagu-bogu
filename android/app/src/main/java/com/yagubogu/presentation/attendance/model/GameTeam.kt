@@ -4,7 +4,7 @@ import androidx.annotation.ColorRes
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.util.getTeamColor
 
-data class AttendanceHistoryTeamItem(
+data class GameTeam(
     val team: Team,
     val name: String,
     val score: Int,

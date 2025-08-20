@@ -1,7 +1,7 @@
 package com.yagubogu.data.dto.response.checkin
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryTeamItem
+import com.yagubogu.presentation.attendance.model.GameTeam
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,8 +16,8 @@ data class CheckInGameTeamDto(
     @SerialName("isMyTeam")
     val isMyTeam: Boolean, // 내가 응원하는 팀 여부
 ) {
-    fun toPresentation(): AttendanceHistoryTeamItem =
-        AttendanceHistoryTeamItem(
+    fun toPresentation(): GameTeam =
+        GameTeam(
             team = Team.getByCode(code),
             name = name,
             score = score,

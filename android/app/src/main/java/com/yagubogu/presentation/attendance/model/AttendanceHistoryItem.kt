@@ -13,8 +13,8 @@ sealed class AttendanceHistoryItem(
         val id: Long,
         val attendanceDate: LocalDate,
         val stadiumName: String,
-        val awayTeam: AttendanceHistoryTeamItem,
-        val homeTeam: AttendanceHistoryTeamItem,
+        val awayTeam: GameTeam,
+        val homeTeam: GameTeam,
     ) : AttendanceHistoryItem(ViewType.SUMMARY) {
         @ColorRes
         val awayTeamColorRes: Int = determineTeamColorRes(awayTeam, homeTeam)
@@ -24,8 +24,8 @@ sealed class AttendanceHistoryItem(
 
         @ColorRes
         private fun determineTeamColorRes(
-            thisTeam: AttendanceHistoryTeamItem,
-            otherTeam: AttendanceHistoryTeamItem,
+            thisTeam: GameTeam,
+            otherTeam: GameTeam,
         ): Int {
             val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
             return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {
@@ -49,8 +49,8 @@ sealed class AttendanceHistoryItem(
 
         @StringRes
         private fun determineTeamPitcher(
-            thisTeam: AttendanceHistoryTeamItem,
-            otherTeam: AttendanceHistoryTeamItem,
+            thisTeam: GameTeam,
+            otherTeam: GameTeam,
         ): Int {
             val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
             return when (gameResult) {
