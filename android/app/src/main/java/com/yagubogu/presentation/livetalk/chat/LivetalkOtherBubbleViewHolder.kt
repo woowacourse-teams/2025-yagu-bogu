@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemLivetalkOtherBubbleBinding
 
-class LivetalkOtherBubbleViewHolder(
+class LivetalkOtherBubbleViewHolder private constructor(
     private val binding: ItemLivetalkOtherBubbleBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: LivetalkChatItem) {

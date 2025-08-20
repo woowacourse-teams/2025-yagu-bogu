@@ -11,6 +11,9 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistorySort
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {
@@ -22,7 +25,12 @@ class AttendanceHistoryFragment : Fragment() {
         AttendanceHistoryViewModelFactory(app.checkInsRepository)
     }
 
-    private val attendanceHistoryAdapter = AttendanceHistoryAdapter()
+    private val attendanceHistoryAdapter by lazy {
+        AttendanceHistoryAdapter(
+            attendanceHistorySummaryHandler = viewModel,
+            attendanceHistoryDetailHandler = viewModel,
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,12 +64,18 @@ class AttendanceHistoryFragment : Fragment() {
     }
 
     private fun setupBindings() {
-        binding.rvAttendanceHistory.adapter = attendanceHistoryAdapter
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
+        binding.rvAttendanceHistory.apply {
+            adapter = attendanceHistoryAdapter
+            itemAnimator = null
+        }
     }
 
     private fun setupSpinner() {
         val spinnerItems: Array<String> =
-            resources.getStringArray(R.array.stats_attendance_history_filter)
+            resources.getStringArray(R.array.attendance_history_filter)
         val spinnerAdapter: ArrayAdapter<String> =
             ArrayAdapter(requireContext(), R.layout.item_spinner_attendance_history, spinnerItems)
         binding.spinnerAttendanceHistoryFilter.apply {
@@ -74,13 +88,8 @@ class AttendanceHistoryFragment : Fragment() {
                         position: Int,
                         id: Long,
                     ) {
-                        when (val filter = AttendanceHistoryFilter.entries[position]) {
-                            AttendanceHistoryFilter.ALL ->
-                                viewModel.fetchAttendanceHistoryItems(filter = filter)
-
-                            AttendanceHistoryFilter.WIN ->
-                                viewModel.fetchAttendanceHistoryItems(filter = filter)
-                        }
+                        val filter = AttendanceHistoryFilter.entries[position]
+                        viewModel.updateAttendanceHistoryFilter(filter)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -94,6 +103,16 @@ class AttendanceHistoryFragment : Fragment() {
             val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
             binding.ivEmptyHistory.visibility = visibility
             binding.tvEmptyHistory.visibility = visibility
+        }
+
+        viewModel.attendanceHistorySort.observe(viewLifecycleOwner) { value: AttendanceHistorySort ->
+            binding.tvAttendanceHistorySort.text =
+                getString(
+                    when (value) {
+                        AttendanceHistorySort.NEWEST -> R.string.attendance_history_newest
+                        AttendanceHistorySort.OLDEST -> R.string.attendance_history_oldest
+                    },
+                )
         }
     }
 }
