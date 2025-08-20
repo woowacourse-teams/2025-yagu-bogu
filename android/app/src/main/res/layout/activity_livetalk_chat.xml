@@ -111,6 +111,7 @@
                 android:hint="@{isVerified? @string/livetalk_chat_input_hint(viewModel.livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
+                android:maxLength="200"
                 android:maxLines="4"
                 android:minHeight="16dp"
                 android:scrollHorizontally="false"
