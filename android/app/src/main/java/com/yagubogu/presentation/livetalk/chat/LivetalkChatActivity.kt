@@ -31,16 +31,20 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private var talkDeleteDialog: DefaultDialogFragment? = null
+
+    private var pendingDeleteMessageId: Long? = null
+    private var pendingReportMessageId: Long? = null
+
     private val livetalkChatAdapter by lazy {
         LivetalkChatAdapter { event ->
             when (event) {
                 is LivetalkChatEvent.Delete -> {
-                    viewModel.pendingDeleteMessageId = event.livetalkChatItem.chatId
+                    pendingDeleteMessageId = event.livetalkChatItem.chatId
                     showTalkDeleteDialog()
                 }
 
                 is LivetalkChatEvent.Report -> {
-                    viewModel.pendingReportMessageId = event.livetalkChatItem.chatId
+                    pendingReportMessageId = event.livetalkChatItem.chatId
                     showTalkReportDialog(
                         event.livetalkChatItem.nickname ?: getString(R.string.all_null_nick_name),
                     )
@@ -127,7 +131,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         ) { _, bundle ->
             val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
             if (isConfirmed) {
-                viewModel.deleteMessage()
+                viewModel.deleteMessage(pendingDeleteMessageId ?: return@setFragmentResultListener)
             }
         }
 
@@ -137,7 +141,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         ) { _, bundle ->
             val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
             if (isConfirmed) {
-                viewModel.reportMessage()
+                viewModel.reportMessage(pendingReportMessageId ?: return@setFragmentResultListener)
             }
         }
     }

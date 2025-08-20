@@ -36,9 +36,6 @@ class LivetalkChatViewModel(
     private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
     val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
-    var pendingDeleteMessageId: Long? = null
-    var pendingReportMessageId: Long? = null
-
     private val fetchLock = Mutex()
     private val pollingControlLock = Mutex()
     private var oldestMessageCursor: Long? = null
@@ -91,8 +88,7 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun deleteMessage() {
-        val chatId = pendingDeleteMessageId ?: return
+    fun deleteMessage(chatId: Long) {
         viewModelScope.launch {
             fetchLock.withLock {
                 talksRepository
@@ -129,8 +125,7 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun reportMessage() {
-        val chatId = pendingReportMessageId ?: return
+    fun reportMessage(chatId: Long) {
         viewModelScope.launch {
             talksRepository
                 .reportTalks(chatId)
