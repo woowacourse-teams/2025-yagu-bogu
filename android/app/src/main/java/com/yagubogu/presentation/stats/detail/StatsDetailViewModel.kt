@@ -10,8 +10,7 @@ class StatsDetailViewModel : ViewModel() {
     private val _isVsTeamStatsExpanded = MutableLiveData(false)
     val isVsTeamStatsExpanded: LiveData<Boolean> get() = _isVsTeamStatsExpanded
 
-    private var _vsTeamStatItems: List<VsTeamStatItem> = emptyList()
-    val vsTeamStatItems: List<VsTeamStatItem> get() = _vsTeamStatItems.toList()
+    private var vsTeamStatItems: List<VsTeamStatItem> = emptyList()
 
     private val _stadiumVisitCounts = MutableLiveData<List<StadiumVisitCount>>()
     val stadiumVisitCounts: LiveData<List<StadiumVisitCount>> get() = _stadiumVisitCounts
@@ -36,7 +35,7 @@ class StatsDetailViewModel : ViewModel() {
 
     private fun fetchVsTeamStats() {
         // TODO: API 연결 후 DUMMY 제거
-        _vsTeamStatItems = DUMMY_VS_TEAM_STATS
+        vsTeamStatItems = DUMMY_VS_TEAM_STATS
     }
 
     private fun fetchStadiumVisitCounts() {
@@ -46,10 +45,12 @@ class StatsDetailViewModel : ViewModel() {
 
     private fun updateVsTeamStats(): List<VsTeamStatItem> {
         val isExpanded: Boolean = isVsTeamStatsExpanded.value ?: false
-        return if (!isExpanded) vsTeamStatItems.subList(0, 5) else vsTeamStatItems
+        return if (!isExpanded) vsTeamStatItems.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStatItems
     }
 
     companion object {
+        private const val DEFAULT_TEAM_STATS_COUNT = 5
+
         private val DUMMY_VS_TEAM_STATS =
             listOf(
                 VsTeamStatItem(
