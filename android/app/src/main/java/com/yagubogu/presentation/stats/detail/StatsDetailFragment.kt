@@ -6,17 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.yagubogu.databinding.FragmentDetailStatsBinding
+import com.yagubogu.databinding.FragmentStatsDetailBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StatsDetailFragment : Fragment() {
-    private var _binding: FragmentDetailStatsBinding? = null
+    private var _binding: FragmentStatsDetailBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: StatsDetailViewModel by viewModels { StatsDetailViewModelFactory() }
 
     private val vsTeamStatAdapter: VsTeamStatAdapter by lazy { VsTeamStatAdapter() }
-
     private val barChartManager: BarChartManager by lazy {
         BarChartManager(requireContext(), binding.barChart)
     }
@@ -26,7 +25,7 @@ class StatsDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentDetailStatsBinding.inflate(inflater, container, false)
+        _binding = FragmentStatsDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
