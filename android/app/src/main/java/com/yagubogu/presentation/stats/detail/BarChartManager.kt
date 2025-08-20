@@ -78,8 +78,15 @@ class BarChartManager(
                 valueFormatter =
                     object : ValueFormatter() {
                         override fun getBarLabel(e: BarEntry?): String {
-                            val v = e?.y?.toInt() ?: 0
-                            return if (v == 0) "-" else v.toString()
+                            val visitCount: Int = e?.y?.toInt() ?: 0
+                            return if (visitCount == 0) {
+                                "-"
+                            } else {
+                                context.getString(
+                                    R.string.all_count,
+                                    visitCount,
+                                )
+                            }
                         }
                     }
             }
