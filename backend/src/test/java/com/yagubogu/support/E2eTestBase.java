@@ -1,12 +1,9 @@
 package com.yagubogu.support;
 
-import com.yagubogu.auth.config.AuthTestConfig;
-import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -16,12 +13,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(AuthTestConfig.class)
 @ActiveProfiles("e2e")
 public abstract class E2eTestBase {
 
     @Autowired
-    private DataSource dataSource;
+    private Flyway flyway;
 
     @Container
     protected static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
@@ -38,14 +34,16 @@ public abstract class E2eTestBase {
 
     @BeforeEach
     void resetDatabase() {
-        Flyway.configure()
-                .dataSource(dataSource)
-                .cleanDisabled(false)
-                .load()
-                .clean();
-        Flyway.configure()
-                .dataSource(dataSource)
-                .load()
-                .migrate();
+        flyway.clean();
+        flyway.migrate();
+//        Flyway.configure()
+//                .dataSource(dataSource)
+//                .cleanDisabled(false)
+//                .load()
+//                .clean();
+//        Flyway.configure()
+//                .dataSource(dataSource)
+//                .load()
+//                .migrate();
     }
 }

@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: integration
+  flyway:
+    enabled: false
 
 ---
 spring:
