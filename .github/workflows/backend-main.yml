@@ -3,7 +3,7 @@ name: YaguBogu Backend Release & Deploy (Auto SemVer)
 on:
   pull_request_target:
     types: [ closed ]
-    branches: [ "dev-be" ]
+    branches: [ "main" ]
 
 env:
   IMAGE: yagubogu/yagubogu-backend
