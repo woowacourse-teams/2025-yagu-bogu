@@ -12,7 +12,7 @@ env:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-arm
     defaults:
       run:
         shell: bash
@@ -49,11 +49,13 @@ jobs:
           TAG_LATEST="dev-latest"
           # Dockerfile 경로: backend/Dockerfile
           docker buildx build \
-            -f Dockerfile \
-            --platform linux/arm64 \
-            -t $IMAGE:$TAG_LATEST \
-            --push \
-            .
+          --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max
+          --cache-from=type=registry,ref=$IMAGE:build-cache
+          -f Dockerfile \
+          --platform linux/arm64 \
+          -t $IMAGE:$TAG_LATEST \
+          --push \
+          .
 
   cd:
     needs: ci
