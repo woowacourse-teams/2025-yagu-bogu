@@ -39,12 +39,12 @@
             app:tint="@color/gray500" />
 
         <TextView
-            android:id="@+id/tv_attendance_history_sort"
+            android:id="@+id/tv_attendance_history_order"
             style="@style/TextView.Pretendard.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:onClick="@{() -> viewModel.switchAttendanceHistorySort()}"
+            android:onClick="@{() -> viewModel.switchAttendanceHistoryOrder()}"
             android:paddingEnd="20dp"
             android:textColor="@color/gray500"
             android:textSize="14sp"
@@ -58,9 +58,9 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_switch"
-            app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_sort"
-            app:layout_constraintEnd_toEndOf="@id/tv_attendance_history_sort"
-            app:layout_constraintTop_toTopOf="@id/tv_attendance_history_sort"
+            app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_order"
+            app:layout_constraintEnd_toEndOf="@id/tv_attendance_history_order"
+            app:layout_constraintTop_toTopOf="@id/tv_attendance_history_order"
             app:tint="@color/gray500" />
 
         <androidx.recyclerview.widget.RecyclerView

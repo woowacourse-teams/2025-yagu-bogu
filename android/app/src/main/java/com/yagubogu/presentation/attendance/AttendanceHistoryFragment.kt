@@ -13,7 +13,7 @@ import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.attendance.model.AttendanceHistorySort
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
 
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment : Fragment() {
@@ -105,12 +105,12 @@ class AttendanceHistoryFragment : Fragment() {
             binding.tvEmptyHistory.visibility = visibility
         }
 
-        viewModel.attendanceHistorySort.observe(viewLifecycleOwner) { value: AttendanceHistorySort ->
-            binding.tvAttendanceHistorySort.text =
+        viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
+            binding.tvAttendanceHistoryOrder.text =
                 getString(
                     when (value) {
-                        AttendanceHistorySort.NEWEST -> R.string.attendance_history_newest
-                        AttendanceHistorySort.OLDEST -> R.string.attendance_history_oldest
+                        AttendanceHistoryOrder.LATEST -> R.string.attendance_history_latest
+                        AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
                     },
                 )
         }

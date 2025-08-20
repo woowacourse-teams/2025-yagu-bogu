@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.attendance.model.AttendanceHistorySort
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -20,13 +20,13 @@ class AttendanceHistoryViewModel(
     AttendanceHistorySummaryViewHolder.Handler,
     AttendanceHistoryDetailViewHolder.Handler {
     private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
-    private val _attendanceHistorySort = MutableLiveData(AttendanceHistorySort.NEWEST)
-    val attendanceHistorySort: LiveData<AttendanceHistorySort> get() = _attendanceHistorySort
+    private val _attendanceHistoryOrder = MutableLiveData(AttendanceHistoryOrder.LATEST)
+    val attendanceHistoryOrder: LiveData<AttendanceHistoryOrder> get() = _attendanceHistoryOrder
 
     private val items: MutableLiveData<List<AttendanceHistoryItem.Detail>> =
         MediatorLiveData<List<AttendanceHistoryItem.Detail>>().apply {
             addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
-            addSource(_attendanceHistorySort) { fetchAttendanceHistoryItems() }
+            addSource(_attendanceHistoryOrder) { fetchAttendanceHistoryItems() }
         }
     private val detailItemPosition = MutableLiveData<Int?>()
 
@@ -58,12 +58,12 @@ class AttendanceHistoryViewModel(
         attendanceHistoryFilter.value = filter
     }
 
-    fun switchAttendanceHistorySort() {
-        _attendanceHistorySort.value =
-            if (attendanceHistorySort.value == AttendanceHistorySort.NEWEST) {
-                AttendanceHistorySort.OLDEST
+    fun switchAttendanceHistoryOrder() {
+        _attendanceHistoryOrder.value =
+            if (attendanceHistoryOrder.value == AttendanceHistoryOrder.LATEST) {
+                AttendanceHistoryOrder.OLDEST
             } else {
-                AttendanceHistorySort.NEWEST
+                AttendanceHistoryOrder.LATEST
             }
     }
 
