@@ -43,8 +43,11 @@ class AttendanceHistoryViewModel(
         viewModelScope.launch {
             val filter: AttendanceHistoryFilter =
                 attendanceHistoryFilter.value ?: AttendanceHistoryFilter.ALL
+            val order: AttendanceHistoryOrder =
+                attendanceHistoryOrder.value ?: AttendanceHistoryOrder.LATEST
+
             val attendanceHistories: Result<List<AttendanceHistoryItem.Detail>> =
-                checkInsRepository.getCheckInHistories(year, filter.name)
+                checkInsRepository.getCheckInHistories(year, filter.name, order.name)
             attendanceHistories
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem.Detail> ->
                     items.value = attendanceHistoryItems

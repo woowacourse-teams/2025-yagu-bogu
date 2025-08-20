@@ -20,5 +20,6 @@ interface CheckInsRepository {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
+        order: String,
     ): Result<List<AttendanceHistoryItem.Detail>>
 }
