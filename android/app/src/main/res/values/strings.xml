@@ -101,8 +101,11 @@
 
     <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
     <string name="livetalk_trash_btn">삭제</string>
+    <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
+    <string name="livetalk_delete_succeed">메시지가 삭제되었습니다.</string>
     <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
     <string name="livetalk_user_report_btn">신고</string>
+    <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
 
@@ -115,7 +118,7 @@
     <string name="setting_manage_account">계정 관리</string>
     <string name="setting_logout">로그아웃</string>
     <string name="setting_logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
-    <string name="setting_logout_alert">로그아웃 되었습니다.</string>
+    <string name="setting_logout_alert">로그아웃 되었아아 아이시아습니다.</string>
     <string name="setting_delete_account">탈퇴하기</string>
     <string name="Setting_delete_account_illustration_description">구단을 떠나는 선수 일러스트</string>
     <string name="setting_delete_account_question_title">정말 떠나실 건가요?</string>
@@ -131,8 +134,5 @@
     <string name="setting_contact_us">문의하기</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
     <string name="setting_app_version">앱 버전: %s</string>
-    <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
-    <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
-
 
 </resources>

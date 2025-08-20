@@ -33,6 +33,9 @@ class LivetalkChatViewModel(
     private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
     val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
 
+    private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
+    val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
+
     var pendingDeleteMessageId: Long? = null
     var pendingReportMessageId: Long? = null
 
@@ -101,6 +104,7 @@ class LivetalkChatViewModel(
                         newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
                         oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
                         _liveTalkChatBubbleItem.value = deletedChats
+                        _livetalkDeleteEvent.setValue(Unit)
                         Timber.d("현장톡 정상 삭제")
                     }.onFailure { exception: Throwable ->
                         when (exception) {

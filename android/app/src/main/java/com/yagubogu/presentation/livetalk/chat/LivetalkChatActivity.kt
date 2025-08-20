@@ -184,6 +184,10 @@ class LivetalkChatActivity : AppCompatActivity() {
                 LivetalkReportEvent.Success -> showSnackbar(R.string.livetalk_report_succeed)
             }
         }
+
+        viewModel.livetalkDeleteEvent.observe(this) {
+            showSnackbar(R.string.livetalk_delete_succeed)
+        }
     }
 
     private fun showSnackbar(
@@ -192,6 +196,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
             setBackgroundTint(Color.DKGRAY)
             setTextColor(context.getColor(R.color.white))
+            setAnchorView(binding.divider)
             show()
         }
     }
