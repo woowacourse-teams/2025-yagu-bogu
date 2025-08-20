@@ -71,6 +71,20 @@ jobs:
           echo "VER=$VER" >> "$GITHUB_ENV"
           echo "ver_tag=$VER" >> "$GITHUB_OUTPUT"
 
+      - name: Create Git tag (v-prefixed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${{ steps.ver.outputs.ver_tag }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/$VER" >/dev/null; then
+            echo "Tag $VER already exists. Skip."
+          else
+            git tag -a "$VER" -m "Release $VER (auto)"
+            git push origin "$VER"
+          fi
+
       - id: capture
         name: Capture image digest of dev-latest
         shell: bash
@@ -95,7 +109,7 @@ jobs:
           DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
           SHORT="${DIGEST#sha256:}"
           SHORT="${SHORT:0:8}"
-          READABLE="v${{ steps.semver.outputs.next_version }}-${SHORT}"
+          READABLE="${{ steps.ver.outputs.ver_tag }}-${SHORT}"
           docker buildx imagetools create \
             -t "$IMAGE:$READABLE" \
             "$IMAGE:dev-latest"
