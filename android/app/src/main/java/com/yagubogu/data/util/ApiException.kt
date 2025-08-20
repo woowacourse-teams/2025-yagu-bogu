@@ -1,21 +1,23 @@
 package com.yagubogu.data.util
 
-open class ApiException(
-    message: String? = null,
-) : Exception(message)
+sealed interface ApiException {
+    data class BadRequest(
+        override val message: String?,
+    ) : Exception(message),
+        ApiException // 400
 
-class BadRequestException(
-    message: String?,
-) : ApiException(message) // 400
+    data class Unauthorized(
+        override val message: String?,
+    ) : Exception(message),
+        ApiException // 401
 
-class UnauthorizedException(
-    message: String?,
-) : ApiException(message) // 401
+    data class Forbidden(
+        override val message: String?,
+    ) : Exception(message),
+        ApiException // 403
 
-class ForbiddenException(
-    message: String?,
-) : ApiException(message) // 403
-
-class NotFoundException(
-    message: String?,
-) : ApiException(message) // 404
+    data class NotFound(
+        override val message: String?,
+    ) : Exception(message),
+        ApiException // 404
+}

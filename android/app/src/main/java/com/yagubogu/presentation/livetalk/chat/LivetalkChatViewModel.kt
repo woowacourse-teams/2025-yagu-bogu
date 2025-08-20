@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.util.BadRequestException
-import com.yagubogu.data.util.ForbiddenException
-import com.yagubogu.data.util.NotFoundException
+import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.TalksRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -104,9 +102,9 @@ class LivetalkChatViewModel(
                         Timber.d("현장톡 정상 삭제")
                     }.onFailure { exception: Throwable ->
                         when (exception) {
-                            is BadRequestException -> Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
-                            is ForbiddenException -> Timber.d("타인의 현장톡 삭제 시도")
-                            is NotFoundException -> Timber.d("존재하지 않는 현장톡 삭제 시도")
+                            is ApiException.BadRequest -> Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
+                            is ApiException.Forbidden -> Timber.d("타인의 현장톡 삭제 시도")
+                            is ApiException.NotFound -> Timber.d("존재하지 않는 현장톡 삭제 시도")
                             else -> Timber.d(exception)
                         }
                     }
@@ -139,12 +137,12 @@ class LivetalkChatViewModel(
                     Timber.d("현장톡 정상 신고")
                 }.onFailure { exception: Throwable ->
                     when (exception) {
-                        is BadRequestException -> {
+                        is ApiException.BadRequest -> {
                             _livetalkReportEvent.setValue(LivetalkReportEvent.DuplicatedReport)
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
-                        is ForbiddenException -> Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                        is ApiException.Forbidden -> Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
                         else -> Timber.d(exception)
                     }
                 }

@@ -14,10 +14,10 @@ inline fun <T> safeApiCall(apiCall: () -> Response<T>): Result<T> =
         } else {
             val errorBody = response.errorBody()?.string()
             when (response.code()) {
-                400 -> throw BadRequestException(errorBody)
-                401 -> throw UnauthorizedException(errorBody)
-                403 -> throw ForbiddenException(errorBody)
-                404 -> throw NotFoundException(errorBody)
+                400 -> throw ApiException.BadRequest(errorBody)
+                401 -> throw ApiException.Unauthorized(errorBody)
+                403 -> throw ApiException.Forbidden(errorBody)
+                404 -> throw ApiException.NotFound(errorBody)
                 else -> throw HttpException(response)
             }
         }
