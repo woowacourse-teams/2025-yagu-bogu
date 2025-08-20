@@ -1,7 +1,5 @@
 package com.yagubogu.auth;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -9,6 +7,7 @@ import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
@@ -30,7 +29,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@Import(AuthTestConfig.class)
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AuthIntegrationTest {

@@ -1,6 +1,7 @@
 package com.yagubogu.member;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@Import(AuthTestConfig.class)
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class MemberIntegrationTest {
 

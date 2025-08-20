@@ -1,5 +1,7 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -23,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-@Import(MemberFactory.class)
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 public class MemberServiceTest {
 
