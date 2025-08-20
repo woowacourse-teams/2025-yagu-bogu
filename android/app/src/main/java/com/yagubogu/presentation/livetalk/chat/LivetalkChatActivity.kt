@@ -28,7 +28,17 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private val livetalkChatAdapter by lazy {
-        LivetalkChatAdapter(viewModel)
+        LivetalkChatAdapter { event ->
+            when (event) {
+                is LivetalkChatEvent.Delete -> {
+                    viewModel.deleteMessage(event.chatId)
+                }
+
+                is LivetalkChatEvent.Report -> {
+                    viewModel.reportMessage(event.chatId)
+                }
+            }
+        }
     }
 
     private val chatLinearLayoutManager by lazy {

@@ -6,10 +6,6 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
-
-        <variable
             name="livetalkChatItem"
             type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
     </data>
@@ -102,7 +98,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_white_radius_12dp_ripple"
-            android:onClick="@{() -> viewModel.reportMessage(livetalkChatItem.chatId)}"
             android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintEnd_toEndOf="parent"

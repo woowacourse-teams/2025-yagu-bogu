@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class LivetalkChatAdapter(
-    val viewModel: LivetalkChatViewModel,
+    private val livetalkChatEventHandler: LivetalkChatEventHandler,
 ) : ListAdapter<LivetalkChatBubbleItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun getItemViewType(position: Int): Int =
         when (getItem(position)) {
@@ -19,8 +19,8 @@ class LivetalkChatAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (viewType) {
-            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent, viewModel)
-            else -> LivetalkOtherBubbleViewHolder.from(parent, viewModel)
+            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent, livetalkChatEventHandler)
+            else -> LivetalkOtherBubbleViewHolder.from(parent, livetalkChatEventHandler)
         }
 
     override fun onBindViewHolder(
@@ -28,11 +28,15 @@ class LivetalkChatAdapter(
         position: Int,
     ) {
         when (holder) {
-            is LivetalkMyBubbleViewHolder ->
-                holder.bind((getItem(position) as LivetalkChatBubbleItem.MyBubbleItem).livetalkChatItem)
+            is LivetalkMyBubbleViewHolder -> {
+                val item = getItem(position) as LivetalkChatBubbleItem.MyBubbleItem
+                holder.bind(item.livetalkChatItem)
+            }
 
-            is LivetalkOtherBubbleViewHolder ->
-                holder.bind((getItem(position) as LivetalkChatBubbleItem.OtherBubbleItem).livetalkChatItem)
+            is LivetalkOtherBubbleViewHolder -> {
+                val item = getItem(position) as LivetalkChatBubbleItem.OtherBubbleItem
+                holder.bind(item.livetalkChatItem)
+            }
         }
     }
 

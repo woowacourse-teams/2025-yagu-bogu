@@ -92,7 +92,8 @@ class LivetalkChatViewModel(
                     .deleteTalks(gameId, chatId)
                     .onSuccess {
                         val currentChats = _liveTalkChatBubbleItem.value ?: emptyList()
-                        val deletedChats = currentChats.filter { it.livetalkChatItem.chatId != chatId }
+                        val deletedChats =
+                            currentChats.filter { it.livetalkChatItem.chatId != chatId }
                         newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
                         oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
                         _liveTalkChatBubbleItem.value = deletedChats
@@ -102,12 +103,15 @@ class LivetalkChatViewModel(
                             is BadRequestException -> {
                                 Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
                             }
+
                             is ForbiddenException -> {
                                 Timber.d("타인의 현장톡 삭제 시도")
                             }
+
                             is NotFoundException -> {
                                 Timber.d("존재하지 않는 현장톡 삭제 시도")
                             }
+
                             else -> {
                                 Timber.d("기타 네트워크 에러")
                             }
@@ -130,9 +134,11 @@ class LivetalkChatViewModel(
                             _livetalkReportEvent.setValue(LivetalkReportEvent.DuplicatedReport)
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
+
                         is ForbiddenException -> {
                             Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
                         }
+
                         else -> {
                             Timber.d("기타 네트워크 에러")
                         }

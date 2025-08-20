@@ -7,21 +7,25 @@ import com.yagubogu.databinding.ItemLivetalkOtherBubbleBinding
 
 class LivetalkOtherBubbleViewHolder(
     private val binding: ItemLivetalkOtherBubbleBinding,
-    private val viewModel: LivetalkChatViewModel,
+    private val livetalkChatEventHandler: LivetalkChatEventHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: LivetalkChatItem) {
         binding.livetalkChatItem = item
-        binding.viewModel = viewModel
+
+        binding.constraintReportContainer.setOnClickListener {
+            livetalkChatEventHandler.onEvent(LivetalkChatEvent.Report(item.chatId))
+        }
+        binding.executePendingBindings()
     }
 
     companion object {
         fun from(
             parent: ViewGroup,
-            viewModel: LivetalkChatViewModel,
+            livetalkChatEventHandler: LivetalkChatEventHandler,
         ): LivetalkOtherBubbleViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemLivetalkOtherBubbleBinding.inflate(inflater, parent, false)
-            return LivetalkOtherBubbleViewHolder(binding, viewModel)
+            return LivetalkOtherBubbleViewHolder(binding, livetalkChatEventHandler)
         }
     }
 }
