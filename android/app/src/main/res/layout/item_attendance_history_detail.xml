@@ -311,7 +311,7 @@
                         style="@style/TextView.Pretendard.Regular"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="KIA"
+                        android:text="@{attendanceHistoryItem.summary.awayTeam.name}"
                         android:textSize="12dp" />
 
                     <TextView
@@ -322,7 +322,7 @@
                         style="@style/TextView.Pretendard.Regular"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="두산"
+                        android:text="@{attendanceHistoryItem.summary.homeTeam.name}"
                         android:textSize="12dp" />
                 </TableRow>
 

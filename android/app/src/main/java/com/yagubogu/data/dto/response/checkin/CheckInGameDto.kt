@@ -1,6 +1,7 @@
 package com.yagubogu.data.dto.response.checkin
 
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.GameScoreBoard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
@@ -27,6 +28,12 @@ data class CheckInGameDto(
                 awayTeam = awayTeam.toPresentation(),
                 homeTeam = homeTeam.toPresentation(),
             )
-        return AttendanceHistoryItem.Detail(summary = summary)
+        val awayTeamScoreBoard = GameScoreBoard.DUMMY_DATA
+        val homeTeamScoreBoard = GameScoreBoard.DUMMY_DATA
+        return AttendanceHistoryItem.Detail(
+            summary = summary,
+            awayTeamScoreBoard = awayTeamScoreBoard,
+            homeTeamScoreBoard = homeTeamScoreBoard,
+        )
     }
 }

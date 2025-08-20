@@ -38,6 +38,8 @@ sealed class AttendanceHistoryItem(
 
     data class Detail(
         val summary: Summary,
+        val awayTeamScoreBoard: GameScoreBoard,
+        val homeTeamScoreBoard: GameScoreBoard,
     ) : AttendanceHistoryItem(ViewType.DETAIL) {
         @StringRes
         val awayTeamPitcherRes: Int = determineTeamPitcher(summary.awayTeam, summary.homeTeam)
