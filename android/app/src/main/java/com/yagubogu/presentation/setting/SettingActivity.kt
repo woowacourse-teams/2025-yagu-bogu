@@ -3,7 +3,6 @@ package com.yagubogu.presentation.setting
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +14,7 @@ import com.yagubogu.databinding.ActivitySettingBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.presentation.util.showToast
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -93,15 +93,15 @@ class SettingActivity : AppCompatActivity() {
             )
         }
         viewModel.logoutEvent.observe(this) {
-            showToast(getString(R.string.setting_logout_alert))
+            showToast(R.string.setting_logout_alert)
             navigateToLogin()
         }
         viewModel.deleteAccountEvent.observe(this) {
-            showToast(getString(R.string.setting_delete_account_confirm_select_alert))
+            showToast(R.string.setting_delete_account_confirm_select_alert)
             navigateToLogin()
         }
         viewModel.deleteAccountCancelEvent.observe(this) {
-            showToast(getString(R.string.setting_delete_account_cancel_select_alert))
+            showToast(R.string.setting_delete_account_cancel_select_alert)
             finish()
         }
     }
@@ -113,10 +113,6 @@ class SettingActivity : AppCompatActivity() {
             }
         startActivity(intent)
         finish()
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

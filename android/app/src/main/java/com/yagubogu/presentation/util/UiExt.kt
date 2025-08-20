@@ -1,7 +1,9 @@
 package com.yagubogu.presentation.util
 
+import android.content.Context
 import android.graphics.Color
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
@@ -29,4 +31,14 @@ fun View.showSnackbar(
         anchorViewId?.let { setAnchorView(it) }
         show()
     }
+}
+
+fun Context.showToast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+fun Context.showToast(
+    @StringRes message: Int,
+) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
