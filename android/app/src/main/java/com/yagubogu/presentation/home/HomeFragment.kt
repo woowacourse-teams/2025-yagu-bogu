@@ -20,6 +20,8 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -47,8 +49,7 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
-
-    private val checkInConfirmDialog by lazy { HomeCheckInConfirmFragment() }
+    private var checkInDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -140,11 +141,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupFragmentResultListener() {
-        HomeCheckInConfirmFragment.setResultListener(
-            parentFragmentManager,
+        parentFragmentManager.setFragmentResultListener(
+            KEY_CHECK_IN_REQUEST_DIALOG,
             viewLifecycleOwner,
-        ) { result: Boolean ->
-            if (result) {
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
                 viewModel.checkIn()
             }
         }
@@ -216,12 +218,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun showCheckInConfirmDialog() {
-        val dialog = checkInConfirmDialog
-        dialog.show(parentFragmentManager, dialog.tag)
+        if (checkInDialog == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.home_check_in_confirm),
+                    emoji = getString(R.string.home_check_in_stadium_emoji),
+                    message = getString(R.string.home_check_in_caution),
+                )
+            checkInDialog = DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
+        }
+
+        checkInDialog?.show(parentFragmentManager, "checkInDialog")
     }
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
     }

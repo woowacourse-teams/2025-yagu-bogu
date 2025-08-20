@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.google.oss.licenses.plugin)
 }
 
 android {
@@ -86,6 +87,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.glide)
+    implementation(libs.play.services.oss.licenses)
 
     // firebase
     implementation(platform(libs.firebase.bom))

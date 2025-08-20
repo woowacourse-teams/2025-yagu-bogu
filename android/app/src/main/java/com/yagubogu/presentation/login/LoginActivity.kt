@@ -33,7 +33,12 @@ class LoginActivity : AppCompatActivity() {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
         val app = application as YaguBoguApplication
-        LoginViewModelFactory(app.authRepository, app.memberRepository, googleCredentialManager)
+        LoginViewModelFactory(
+            app.tokenRepository,
+            app.authRepository,
+            app.memberRepository,
+            googleCredentialManager,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
