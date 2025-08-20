@@ -109,14 +109,16 @@ class HomeFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
-            showSnackbar(
-                when (value) {
-                    is CheckInUiEvent.Success -> R.string.home_check_in_success_message
-                    CheckInUiEvent.OutOfRange -> R.string.home_check_in_out_of_range_message
-                    CheckInUiEvent.LocationFetchFailed -> R.string.home_check_in_location_fetch_failed_message
-                    CheckInUiEvent.NetworkFailed -> R.string.home_check_in_network_failed_message
-                },
-            )
+            when (value) {
+                is CheckInUiEvent.Success ->
+                    showSnackbar(
+                        getString(R.string.home_check_in_success_message, value.stadium.fullName),
+                    )
+
+                CheckInUiEvent.OutOfRange -> showSnackbar(R.string.home_check_in_out_of_range_message)
+                CheckInUiEvent.LocationFetchFailed -> showSnackbar(R.string.home_check_in_location_fetch_failed_message)
+                CheckInUiEvent.NetworkFailed -> showSnackbar(R.string.home_check_in_network_failed_message)
+            }
         }
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
@@ -186,6 +188,15 @@ class HomeFragment : Fragment() {
         )
     }
 
+    private fun showSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
+            setBackgroundTint(Color.DKGRAY)
+            setTextColor(context.getColor(R.color.white))
+            setAnchorView(R.id.bnv_navigation)
+            show()
+        }
+    }
+
     private fun showSnackbar(
         @StringRes message: Int,
     ) {
@@ -225,7 +236,8 @@ class HomeFragment : Fragment() {
                     emoji = getString(R.string.home_check_in_stadium_emoji),
                     message = getString(R.string.home_check_in_caution),
                 )
-            checkInDialog = DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
+            checkInDialog =
+                DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
         }
 
         checkInDialog?.show(parentFragmentManager, "checkInDialog")
