@@ -14,6 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
+import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 
 class LivetalkChatActivity : AppCompatActivity() {
@@ -27,18 +30,54 @@ class LivetalkChatActivity : AppCompatActivity() {
         LivetalkChatViewModelFactory(gameId, app.talksRepository)
     }
 
+    private var talkDeleteDialog: DefaultDialogFragment? = null
     private val livetalkChatAdapter by lazy {
         LivetalkChatAdapter { event ->
             when (event) {
                 is LivetalkChatEvent.Delete -> {
-                    viewModel.deleteMessage(event.chatId)
+                    viewModel.pendingDeleteMessageId = event.livetalkChatItem.chatId
+                    showTalkDeleteDialog()
                 }
 
                 is LivetalkChatEvent.Report -> {
-                    viewModel.reportMessage(event.chatId)
+                    viewModel.pendingReportMessageId = event.livetalkChatItem.chatId
+                    showTalkReportDialog(
+                        event.livetalkChatItem.nickname ?: getString(R.string.all_null_nick_name),
+                    )
                 }
             }
         }
+    }
+
+    private fun showTalkDeleteDialog() {
+        if (talkDeleteDialog == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.livetalk_trash_btn),
+                    message = getString(R.string.livetalk_trash_dialog_message),
+                    positiveText = getString(R.string.livetalk_trash_btn),
+                )
+            talkDeleteDialog =
+                DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
+        }
+
+        talkDeleteDialog?.show(supportFragmentManager, "talkDeleteDialog")
+    }
+
+    private fun showTalkReportDialog(reportTalkNickName: String) {
+        val dialogUiModel =
+            DefaultDialogUiModel(
+                title = getString(R.string.livetalk_user_report_btn),
+                message =
+                    getString(
+                        R.string.livetalk_user_report_dialog_message,
+                        reportTalkNickName,
+                    ),
+                positiveText = getString(R.string.livetalk_user_report_btn),
+            )
+        val talkReportDialog =
+            DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
+        talkReportDialog.show(supportFragmentManager, "talkDeleteDialog")
     }
 
     private val chatLinearLayoutManager by lazy {
@@ -81,6 +120,26 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             },
         )
+
+        supportFragmentManager.setFragmentResultListener(
+            KEY_TALK_DELETE_DIALOG,
+            this,
+        ) { _, bundle ->
+            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.deleteMessage()
+            }
+        }
+
+        supportFragmentManager.setFragmentResultListener(
+            KEY_TALK_REPORT_DIALOG,
+            this,
+        ) { _, bundle ->
+            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.reportMessage()
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -140,6 +199,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     companion object {
         private const val KEY_GAME_ID = "gameId"
         private const val KEY_IS_VERIFIED = "isVerified"
+        private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
+        private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
 
         fun newIntent(
             context: Context,

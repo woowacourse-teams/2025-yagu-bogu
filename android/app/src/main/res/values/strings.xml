@@ -7,6 +7,7 @@
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
     <string name="all_fan">%s 팬</string>
+    <string name="all_null_nick_name">(알 수 없음)</string>
 
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
@@ -130,5 +131,8 @@
     <string name="setting_contact_us">문의하기</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
     <string name="setting_app_version">앱 버전: %s</string>
+    <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
+    <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
+
 
 </resources>

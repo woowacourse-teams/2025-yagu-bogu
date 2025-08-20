@@ -13,7 +13,7 @@ class LivetalkMyBubbleViewHolder private constructor(
         binding.livetalkChatItem = item
 
         binding.constraintDeleteTalkContainer.setOnClickListener {
-            livetalkChatEventHandler.onEvent(LivetalkChatEvent.Delete(item.chatId))
+            livetalkChatEventHandler.onEvent(LivetalkChatEvent.Delete(item))
         }
         binding.executePendingBindings()
     }
