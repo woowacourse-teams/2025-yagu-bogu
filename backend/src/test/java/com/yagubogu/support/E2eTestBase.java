@@ -9,20 +9,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("e2e")
 public abstract class E2eTestBase {
 
-    @Container
-    protected static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
+    protected static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("yagubogu_test_db_mysql")
             .withUsername("yagu")
-            .withPassword("bogu");
+            .withPassword("bogu")
+            .waitingFor(
+                    org.testcontainers.containers.wait.strategy.Wait
+                            .forLogMessage(".*ready for connections.*", 2)
+                            .withStartupTimeout(java.time.Duration.ofMinutes(2))
+            )
+            .withStartupTimeout(java.time.Duration.ofMinutes(3))
+            .withReuse(true);
+
+    static {
+        // Start container once for the whole test JVM
+        mysql.start();
+    }
 
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
@@ -36,19 +45,26 @@ public abstract class E2eTestBase {
         flyway.migrate(); // DDL 한 번만 실행
     }
 
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
+    private TransactionTemplate txTemplate;
+
     @AfterEach
-    void cleanData(final EntityManager em) {
-        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+    void cleanData() {
+        txTemplate.executeWithoutResult(status -> {
+            em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
 
-        em.createNativeQuery("TRUNCATE TABLE members").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE teams").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE stadiums").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE refresh_tokens").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE talk_reports").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE check_ins").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE members").executeUpdate();
-        em.createNativeQuery("TRUNCATE TABLE talks").executeUpdate();
+            // Keep lookup tables (teams, stadiums) seeded by Flyway
+            em.createNativeQuery("TRUNCATE TABLE members").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE games").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE refresh_tokens").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE talk_reports").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE check_ins").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE talks").executeUpdate();
 
-        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+            em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+        });
     }
 }
