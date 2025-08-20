@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@{dialogUiModel.emoji}"
             android:textSize="48dp"
-            android:visibility="@{dialogUiModel.emoji==null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{dialogUiModel.emoji == null ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
