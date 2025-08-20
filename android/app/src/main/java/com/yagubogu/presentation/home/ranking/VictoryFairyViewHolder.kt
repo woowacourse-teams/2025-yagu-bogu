@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemVictoryFairyBinding
 
-class VictoryFairyViewHolder(
+class VictoryFairyViewHolder private constructor(
     private val binding: ItemVictoryFairyBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: VictoryFairyItem) {

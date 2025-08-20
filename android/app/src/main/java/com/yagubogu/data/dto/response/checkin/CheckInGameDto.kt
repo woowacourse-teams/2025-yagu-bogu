@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.presentation.attendance.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
@@ -18,11 +18,15 @@ data class CheckInGameDto(
     @SerialName("attendanceDate")
     val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
 ) {
-    fun toPresentation(): AttendanceHistoryItem =
-        AttendanceHistoryItem(
-            awayTeam = awayTeam.toPresentation(),
-            homeTeam = homeTeam.toPresentation(),
-            attendanceDate = LocalDate.parse(attendanceDate),
-            stadiumName = stadiumFullName,
-        )
+    fun toPresentation(): AttendanceHistoryItem.Detail {
+        val summary =
+            AttendanceHistoryItem.Summary(
+                id = checkInId,
+                attendanceDate = LocalDate.parse(attendanceDate),
+                stadiumName = stadiumFullName,
+                awayTeam = awayTeam.toPresentation(),
+                homeTeam = homeTeam.toPresentation(),
+            )
+        return AttendanceHistoryItem.Detail(summary = summary)
+    }
 }
