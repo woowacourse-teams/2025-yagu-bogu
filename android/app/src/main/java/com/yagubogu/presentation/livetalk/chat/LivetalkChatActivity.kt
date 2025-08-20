@@ -36,7 +36,7 @@ class LivetalkChatActivity : AppCompatActivity() {
     private var pendingReportMessageId: Long? = null
 
     private val livetalkChatAdapter by lazy {
-        LivetalkChatAdapter { event ->
+        LivetalkChatAdapter { event: LivetalkChatEvent ->
             when (event) {
                 is LivetalkChatEvent.Delete -> {
                     pendingDeleteMessageId = event.livetalkChatItem.chatId
