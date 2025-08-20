@@ -7,6 +7,7 @@
     <string name="all_rounded_win_rate">%d%%</string>
     <string name="all_win_rate">%.1f%%</string>
     <string name="all_fan">%s 팬</string>
+    <string name="all_count">%d회</string>
 
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
@@ -64,6 +65,10 @@
     <string name="stats_error">실책</string>
     <string name="stats_average_score">%.1f점</string>
     <string name="stats_average_count">%.1f개</string>
+    <string name="stats_vs_team_stats">%d승 %d무 %d패</string>
+    <string name="stats_vs_team_winning_percentage">VS 팀 승률</string>
+    <string name="stats_winning_percentage">직관 승률</string>
+    <string name="stats_stadium_visit_count">구장 방문 횟수</string>
 
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>
     <string name="attendance_history_empty_scoreboard_illustration_description">비어있는 스코어보드 일러스트</string>
