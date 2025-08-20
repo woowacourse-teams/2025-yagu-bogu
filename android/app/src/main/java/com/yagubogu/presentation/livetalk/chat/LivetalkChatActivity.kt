@@ -19,7 +19,11 @@ class LivetalkChatActivity : AppCompatActivity() {
     private val viewModel: LivetalkChatViewModel by viewModels {
         val app = application as YaguBoguApplication
         val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
-        LivetalkChatViewModelFactory(gameId, app.talksRepository)
+        LivetalkChatViewModelFactory(
+            gameId,
+            app.talksRepository,
+            intent.getBooleanExtra(KEY_IS_VERIFIED, false),
+        )
     }
 
     private val livetalkChatAdapter = LivetalkChatAdapter()
