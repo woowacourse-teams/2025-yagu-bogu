@@ -33,5 +33,6 @@ data class TalkDto(
             nickname = nickname,
             teamName = favorite,
             timestamp = LocalDateTime.parse(createdAt),
+            reported = content.contains("숨김처리되었습니다"),
         )
 }

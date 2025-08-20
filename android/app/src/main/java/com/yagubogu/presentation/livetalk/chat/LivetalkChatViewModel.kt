@@ -131,6 +131,22 @@ class LivetalkChatViewModel(
             talksRepository
                 .reportTalks(chatId)
                 .onSuccess {
+                    val currentChats: List<LivetalkChatBubbleItem> =
+                        _liveTalkChatBubbleItem.value ?: emptyList()
+                    val updatedChats: List<LivetalkChatBubbleItem> =
+                        currentChats.map { chatBubbleItem: LivetalkChatBubbleItem ->
+                            if (chatBubbleItem.livetalkChatItem.chatId == chatId) {
+                                val updatedChatItem =
+                                    chatBubbleItem.livetalkChatItem.copy(
+                                        reported = true,
+                                        message = "숨김처리되었습니다",
+                                    )
+                                LivetalkChatBubbleItem.OtherBubbleItem(updatedChatItem)
+                            } else {
+                                chatBubbleItem
+                            }
+                        }
+                    _liveTalkChatBubbleItem.value = updatedChats
                     _livetalkReportEvent.setValue(LivetalkReportEvent.Success)
                     Timber.d("현장톡 정상 신고")
                 }.onFailure { exception: Throwable ->
