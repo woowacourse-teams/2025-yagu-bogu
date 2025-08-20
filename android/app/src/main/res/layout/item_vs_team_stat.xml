@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="10dp">
+        android:paddingVertical="8dp">
 
         <TextView
             android:id="@+id/tv_rank"
@@ -34,15 +34,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:padding="2dp"
             android:text="@{vsTeamStat.teamEmoji}"
             android:textSize="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_rank"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
-            app:strokeColor="@color/gray300"
-            app:strokeWidth="1dp"
             tools:text="\uD83D\uDC3B" />
 
         <TextView
@@ -51,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="@{vsTeamStat.name}"
+            android:text="@{vsTeamStat.teamName}"
             app:layout_constraintStart_toEndOf="@id/tv_team_emoji"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="두산" />
@@ -61,13 +57,12 @@
             style="@style/TextView.Pretendard.Medium.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="@{@string/stats_vs_team_stats(vsTeamStat.winCounts, vsTeamStat.drawCounts, vsTeamStat.loseCounts)}"
             android:textColor="@color/gray400"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_team_name"
             app:layout_constraintTop_toBottomOf="@id/tv_team_name"
-            tools:text="4승 0무 0패" />
+            tools:text="4승 1무 2패" />
 
         <TextView
             style="@style/TextView.Pretendard.Regular.16"

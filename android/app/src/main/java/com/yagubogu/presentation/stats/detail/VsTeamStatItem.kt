@@ -5,8 +5,8 @@ import com.yagubogu.presentation.util.getEmoji
 
 data class VsTeamStatItem(
     val rank: Int,
-    val name: String,
     val team: Team,
+    val teamName: String,
     val winCounts: Int,
     val drawCounts: Int,
     val loseCounts: Int,

@@ -54,7 +54,7 @@ class StatsDetailViewModel : ViewModel() {
             listOf(
                 VsTeamStatItem(
                     rank = 1,
-                    name = "두산",
+                    teamName = "두산",
                     team = Team.OB,
                     winCounts = 4,
                     drawCounts = 0,
@@ -63,7 +63,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 2,
-                    name = "LG",
+                    teamName = "LG",
                     team = Team.LG,
                     winCounts = 3,
                     drawCounts = 1,
@@ -72,7 +72,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 3,
-                    name = "키움",
+                    teamName = "키움",
                     team = Team.WO,
                     winCounts = 2,
                     drawCounts = 0,
@@ -81,7 +81,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 4,
-                    name = "KT",
+                    teamName = "KT",
                     team = Team.KT,
                     winCounts = 2,
                     drawCounts = 0,
@@ -90,7 +90,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 5,
-                    name = "삼성",
+                    teamName = "삼성",
                     team = Team.SS,
                     winCounts = 1,
                     drawCounts = 0,
@@ -99,7 +99,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 6,
-                    name = "NC",
+                    teamName = "NC",
                     team = Team.NC,
                     winCounts = 1,
                     drawCounts = 1,
@@ -108,7 +108,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 7,
-                    name = "롯데",
+                    teamName = "롯데",
                     team = Team.LT,
                     winCounts = 1,
                     drawCounts = 0,
@@ -117,7 +117,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 8,
-                    name = "SSG",
+                    teamName = "SSG",
                     team = Team.SK,
                     winCounts = 0,
                     drawCounts = 0,
@@ -126,7 +126,7 @@ class StatsDetailViewModel : ViewModel() {
                 ),
                 VsTeamStatItem(
                     rank = 9,
-                    name = "한화",
+                    teamName = "한화",
                     team = Team.HH,
                     winCounts = 0,
                     drawCounts = 0,
