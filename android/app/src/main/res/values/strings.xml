@@ -74,6 +74,7 @@
     <string name="attendance_history_newest">최신순</string>
     <string name="attendance_history_oldest">오래된순</string>
     <string name="attendance_history_winning_pitcher">승 - %s</string>
+    <string name="attendance_history_draw_pitcher">무 - %s</string>
     <string name="attendance_history_losing_pitcher">패 - %s</string>
     <string name="attendance_history_team_name">팀명</string>
     <string name="attendance_history_team_record">팀 기록</string>

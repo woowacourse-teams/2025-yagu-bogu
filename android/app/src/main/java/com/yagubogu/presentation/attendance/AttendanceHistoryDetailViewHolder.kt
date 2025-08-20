@@ -17,6 +17,10 @@ class AttendanceHistoryDetailViewHolder private constructor(
     fun bind(item: AttendanceHistoryItem.Detail) {
         binding.attendanceHistoryItem = item
         binding.bindingPosition = bindingAdapterPosition
+        binding.tvAwayTeamPitcher.text =
+            itemView.context.getString(item.awayTeamPitcherRes, item.awayTeamPitcherName)
+        binding.tvHomeTeamPitcher.text =
+            itemView.context.getString(item.homeTeamPitcherRes, item.homeTeamPitcherName)
     }
 
     interface Handler {
