@@ -64,7 +64,7 @@ public class Member {
     private boolean isDeleted = false;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
