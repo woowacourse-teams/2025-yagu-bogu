@@ -22,6 +22,7 @@
     <string name="login_button_google_account">Google 계정으로 계속하기</string>
 
     <string name="home_check_in">직관 인증하기</string>
+    <string name="home_already_checked_in">오늘 인증했어요!</string>
     <string name="home_check_in_stadium_emoji">🏟️</string>
     <string name="home_check_in_confirm">직관 인증 할까요?</string>
     <string name="home_check_in_caution">직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.</string>
