@@ -1,6 +1,13 @@
 spring:
   profiles:
     active: local
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
 
 oauth:
   google:
