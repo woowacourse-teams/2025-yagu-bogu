@@ -153,65 +153,41 @@
 
                     <TextView
                         style="@style/TextView.Scoreboard.Body"
-                        android:text="KIA" />
+                        tools:text="KIA" />
 
                     <View
                         android:layout_width="0.4dp"
                         android:layout_height="match_parent"
                         android:background="@color/gray300" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="1" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="4" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="2" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="2" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="-" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="-" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
                     <View
                         android:layout_width="0.4dp"
                         android:layout_height="match_parent"
                         android:background="@color/gray300" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="9" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
                 </TableRow>
 
                 <View
@@ -224,65 +200,41 @@
 
                     <TextView
                         style="@style/TextView.Scoreboard.Body"
-                        android:text="두산" />
+                        tools:text="두산" />
 
                     <View
                         android:layout_width="0.4dp"
                         android:layout_height="match_parent"
                         android:background="@color/gray300" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="2" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="1" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="1" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="1" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="0" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="-" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="-" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
 
                     <View
                         android:layout_width="0.4dp"
                         android:layout_height="match_parent"
                         android:background="@color/gray300" />
 
-                    <TextView
-                        style="@style/TextView.Scoreboard.Body"
-                        android:text="5" />
+                    <TextView style="@style/TextView.Scoreboard.Body" />
                 </TableRow>
 
                 <View
@@ -338,15 +290,17 @@
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="13" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.awayTeamScoreBoard.hits)}"
+                        tools:text="13" />
 
                     <TextView
                         style="@style/TextView.Record.Title"
-                        android:text="@string/attendance_history_hit" />
+                        android:text="@string/attendance_history_hits" />
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="9" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.homeTeamScoreBoard.hits)}"
+                        tools:text="9" />
                 </TableRow>
 
                 <View
@@ -359,15 +313,17 @@
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="0" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.awayTeamScoreBoard.errors)}"
+                        tools:text="0" />
 
                     <TextView
                         style="@style/TextView.Record.Title"
-                        android:text="@string/attendance_history_error" />
+                        android:text="@string/attendance_history_errors" />
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="2" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.homeTeamScoreBoard.errors)}"
+                        tools:text="2" />
                 </TableRow>
 
                 <View
@@ -380,15 +336,17 @@
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="5" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.awayTeamScoreBoard.basesOnBalls)}"
+                        tools:text="5" />
 
                     <TextView
                         style="@style/TextView.Record.Title"
-                        android:text="@string/attendance_history_ball" />
+                        android:text="@string/attendance_history_balls" />
 
                     <TextView
                         style="@style/TextView.Record.Content"
-                        android:text="3" />
+                        android:text="@{String.valueOf(attendanceHistoryItem.homeTeamScoreBoard.basesOnBalls)}"
+                        tools:text="3" />
                 </TableRow>
 
                 <View
@@ -398,6 +356,5 @@
             </TableLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

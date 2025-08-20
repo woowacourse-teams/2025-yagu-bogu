@@ -78,9 +78,9 @@
     <string name="attendance_history_losing_pitcher">패 - %s</string>
     <string name="attendance_history_team_name">팀명</string>
     <string name="attendance_history_team_record">팀 기록</string>
-    <string name="attendance_history_hit">안타</string>
-    <string name="attendance_history_error">실책</string>
-    <string name="attendance_history_ball">사사구</string>
+    <string name="attendance_history_hits">안타</string>
+    <string name="attendance_history_errors">실책</string>
+    <string name="attendance_history_balls">사사구</string>
 
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
