@@ -48,7 +48,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tv_positive_btn"
-            style="@style/Widget.App.Button"
+            style="@style/Widget.App.Button.Positive"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
