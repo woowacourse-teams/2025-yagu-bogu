@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.setting.SettingViewModel" />
+
+        <variable
+            name="appVersion"
+            type="String" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.setting.SettingMainFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="30dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_my_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:paddingVertical="30dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/iv_my_profile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
+                    app:strokeColor="@color/gray300"
+                    app:strokeWidth="1dp"
+                    app:userProfileImage="@{`https://avatars.githubusercontent.com/u/66577?v=4`}"
+                    tools:src="@drawable/ic_user" />
+
+                <TextView
+                    android:id="@+id/tv_my_nickname"
+                    style="@style/TextView.Pretendard.SemiBold.24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@{viewModel.nickname}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_my_profile"
+                    tools:text="이지윤" />
+
+                <TextView
+                    android:id="@+id/tv_sign_up_date"
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="가입한 날, 프사 받는 api가 없서용"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_my_nickname" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_setting_account"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:padding="20dp">
+
+                <include
+                    android:id="@+id/layout_edit_nickname"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:menuTitle="@{@string/setting_edit_nickname}" />
+
+                <include
+                    android:id="@+id/layout_manage_account"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_edit_nickname"
+                    app:menuTitle="@{@string/setting_manage_account}" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_setting_general"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:padding="20dp">
+
+                <include
+                    android:id="@+id/layout_notice"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:menuTitle="@{@string/setting_notice}" />
+
+                <include
+                    android:id="@+id/layout_contact_us"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_notice"
+                    app:menuTitle="@{@string/setting_contact_us}" />
+
+                <include
+                    android:id="@+id/layout_open_source_license"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_contact_us"
+                    app:menuTitle="@{@string/setting_open_source_license}" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_app_version"
+                style="@style/TextView.Pretendard.Medium.12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:text="@{@string/setting_app_version(appVersion)}"
+                android:textColor="@color/gray400"
+                tools:text="앱 버전: 1.0.0" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

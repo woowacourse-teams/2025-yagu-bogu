@@ -20,12 +20,13 @@ class AuthDefaultRepository(
             }
         }
 
-    override suspend fun refreshTokens(): Result<Unit> {
+    override suspend fun logout(): Result<Unit> {
         val refreshToken: String =
             tokenManager.getRefreshToken()
                 ?: return Result.failure(Exception(ERROR_NO_REFRESH_TOKEN))
-        return authDataSource.refreshTokens(refreshToken).map { (accessToken, refreshToken) ->
-            tokenManager.saveTokens(accessToken, refreshToken)
+
+        return authDataSource.logout(refreshToken).map {
+            tokenManager.clearTokens()
         }
     }
 

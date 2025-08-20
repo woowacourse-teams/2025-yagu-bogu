@@ -8,6 +8,7 @@ import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalksApiService
+import com.yagubogu.data.service.TokenApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -29,28 +30,28 @@ class RetrofitInstance(
         }
     }
 
-    private val authClient: OkHttpClient by lazy {
+    private val tokenClient: OkHttpClient by lazy {
         OkHttpClient()
             .newBuilder()
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 
-    private val authRetrofit: Retrofit by lazy {
+    private val tokenRetrofit: Retrofit by lazy {
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
-            .client(authClient)
+            .client(tokenClient)
             .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
     }
 
-    val authApiService: AuthApiService by lazy {
-        authRetrofit.create(AuthApiService::class.java)
+    val tokenApiService: TokenApiService by lazy {
+        tokenRetrofit.create(TokenApiService::class.java)
     }
 
     private val tokenInterceptor = TokenInterceptor(tokenManager)
-    private val tokenAuthenticator = TokenAuthenticator(tokenManager, authApiService)
+    private val tokenAuthenticator = TokenAuthenticator(tokenManager, tokenApiService)
 
     private val baseClient: OkHttpClient by lazy {
         OkHttpClient()
@@ -68,6 +69,10 @@ class RetrofitInstance(
             .client(baseClient)
             .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
+    }
+
+    val authApiService: AuthApiService by lazy {
+        baseRetrofit.create(AuthApiService::class.java)
     }
 
     val memberApiService: MemberApiService by lazy {

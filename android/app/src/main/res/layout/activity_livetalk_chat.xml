@@ -53,6 +53,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="20dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/livetalk_return_stadiums_description"
             android:src="@drawable/ic_arrow_left"
             app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
