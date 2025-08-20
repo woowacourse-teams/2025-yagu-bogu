@@ -2,6 +2,7 @@ package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.MemberDataSource
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
+import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
@@ -11,6 +12,15 @@ class MemberDefaultRepository(
 ) : MemberRepository {
     private var cachedFavoriteTeam: String? = null
     private var cachedNickname: String? = null
+
+    override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
+        memberDataSource
+            .getMemberInfo()
+            .map { memberInfoResponse: MemberInfoResponse ->
+                cachedNickname = memberInfoResponse.nickname
+                cachedFavoriteTeam = memberInfoResponse.favoriteTeam
+                memberInfoResponse
+            }
 
     override suspend fun getNickname(): Result<String> {
         cachedNickname?.let { nickname: String ->
