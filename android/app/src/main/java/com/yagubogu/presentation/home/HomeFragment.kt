@@ -225,10 +225,11 @@ class HomeFragment : Fragment() {
                     emoji = getString(R.string.home_check_in_stadium_emoji),
                     message = getString(R.string.home_check_in_caution),
                 )
-            checkInDialog = DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
+            checkInDialog =
+                DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
         }
 
-        checkInDialog?.show(parentFragmentManager, "checkInDialog")
+        checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
     }
 
     companion object {

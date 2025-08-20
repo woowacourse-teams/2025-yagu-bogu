@@ -65,7 +65,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
         }
 
-        talkDeleteDialog?.show(supportFragmentManager, "talkDeleteDialog")
+        talkDeleteDialog?.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
     }
 
     private fun showTalkReportDialog(reportTalkNickName: String) {
@@ -81,7 +81,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             )
         val talkReportDialog =
             DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
-        talkReportDialog.show(supportFragmentManager, "talkDeleteDialog")
+        talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
     }
 
     private val chatLinearLayoutManager by lazy {
