@@ -43,13 +43,11 @@
             android:exported="false" />
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-            android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
-            tools:replace="android:theme" />
+            android:theme="@style/Theme.YaguBogu.OssLicenseTheme" />
 
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
-            android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
-            tools:replace="android:theme" />
+            android:theme="@style/Theme.YaguBogu.OssLicenseTheme" />
     </application>
 
 </manifest>
