@@ -85,6 +85,20 @@ jobs:
             git push origin "$VER"
           fi
 
+      - name: Create Git tag (v-prefixed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${{ steps.ver.outputs.ver_tag }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/$VER" >/dev/null; then
+            echo "Tag $VER already exists. Skip."
+          else
+            git tag -a "$VER" -m "Release $VER (auto)"
+            git push origin "$VER"
+          fi
+
       - id: capture
         name: Capture image digest of dev-latest
         shell: bash
