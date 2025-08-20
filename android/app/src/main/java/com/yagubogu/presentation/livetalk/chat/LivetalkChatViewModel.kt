@@ -104,21 +104,10 @@ class LivetalkChatViewModel(
                         Timber.d("현장톡 정상 삭제")
                     }.onFailure { exception: Throwable ->
                         when (exception) {
-                            is BadRequestException -> {
-                                Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
-                            }
-
-                            is ForbiddenException -> {
-                                Timber.d("타인의 현장톡 삭제 시도")
-                            }
-
-                            is NotFoundException -> {
-                                Timber.d("존재하지 않는 현장톡 삭제 시도")
-                            }
-
-                            else -> {
-                                Timber.d("기타 네트워크 에러")
-                            }
+                            is BadRequestException -> Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
+                            is ForbiddenException -> Timber.d("타인의 현장톡 삭제 시도")
+                            is NotFoundException -> Timber.d("존재하지 않는 현장톡 삭제 시도")
+                            else -> Timber.d(exception)
                         }
                     }
             }
@@ -155,13 +144,8 @@ class LivetalkChatViewModel(
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
-                        is ForbiddenException -> {
-                            Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
-                        }
-
-                        else -> {
-                            Timber.d("기타 네트워크 에러")
-                        }
+                        is ForbiddenException -> Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                        else -> Timber.d(exception)
                     }
                 }
         }
