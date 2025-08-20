@@ -28,6 +28,7 @@
             android:hint="@string/setting_edit_nickname_dialog_hint"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
+            android:maxLength="12"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_edit_nickname_title" />
