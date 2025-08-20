@@ -24,7 +24,7 @@ class VsTeamStatAdapter : ListAdapter<VsTeamStatItem, VsTeamStatViewHolder>(diff
                 override fun areItemsTheSame(
                     oldItem: VsTeamStatItem,
                     newItem: VsTeamStatItem,
-                ): Boolean = oldItem.rank == newItem.rank
+                ): Boolean = oldItem.team == newItem.team
 
                 override fun areContentsTheSame(
                     oldItem: VsTeamStatItem,
