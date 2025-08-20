@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemFavoriteTeamBinding
 
-class FavoriteTeamViewHolder(
+class FavoriteTeamViewHolder private constructor(
     private val binding: ItemFavoriteTeamBinding,
     handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
