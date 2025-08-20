@@ -2,7 +2,6 @@ package com.yagubogu.presentation.setting
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -10,12 +9,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
+import com.yagubogu.presentation.util.showSnackbar
 
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
@@ -86,7 +85,12 @@ class SettingActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.nicknameEditedEvent.observe(this) { newNickname: String ->
-            showSnackbar(getString(R.string.setting_edited_nickname_alert, newNickname))
+            binding.root.showSnackbar(
+                getString(
+                    R.string.setting_edited_nickname_alert,
+                    newNickname,
+                ),
+            )
         }
         viewModel.logoutEvent.observe(this) {
             showToast(getString(R.string.setting_logout_alert))
@@ -109,14 +113,6 @@ class SettingActivity : AppCompatActivity() {
             }
         startActivity(intent)
         finish()
-    }
-
-    private fun showSnackbar(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            show()
-        }
     }
 
     private fun showToast(message: String) {
