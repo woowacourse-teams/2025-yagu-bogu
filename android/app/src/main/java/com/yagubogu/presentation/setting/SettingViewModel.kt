@@ -6,12 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
+import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 class SettingViewModel(
     private val memberRepository: MemberRepository,
@@ -44,7 +46,8 @@ class SettingViewModel(
 
     init {
         fetchNickname()
-        fetchMemberInfo()
+        // fetchMemberInfo()
+        setDummyMemberInfo() // TODO: 내 정보 API 구현시 더미 제거
     }
 
     fun setSettingTitle(title: String) {
@@ -114,5 +117,15 @@ class SettingViewModel(
                     Timber.w(exception, "회원 정보 조회 API 호출 실패")
                 }
         }
+    }
+
+    private fun setDummyMemberInfo() {
+        _myMemberInfoItem.value =
+            MemberInfoItem(
+                nickName = nickname.value.orEmpty(),
+                createdAt = LocalDate.of(2025, 8, 20),
+                favoriteTeam = Team.KT,
+                profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
+            )
     }
 }
