@@ -14,12 +14,12 @@ import timber.log.Timber
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
-class MyStatsViewModel(
+class StatsMyViewModel(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-    private val _myStatsUiModel = MutableLiveData<MyStatsUiModel>()
-    val myStatsUiModel: LiveData<MyStatsUiModel> get() = _myStatsUiModel
+    private val _statsMyUiModel = MutableLiveData<StatsMyUiModel>()
+    val statsMyUiModel: LiveData<StatsMyUiModel> get() = _statsMyUiModel
 
     private val _averageStats = MutableLiveData<AverageStats>()
     val averageStats: LiveData<AverageStats> = _averageStats
@@ -55,8 +55,8 @@ class MyStatsViewModel(
                 val myTeam: String? = myTeamResult.getOrThrow()
                 val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
-                val myStatsUiModel =
-                    MyStatsUiModel(
+                val statsMyUiModel =
+                    StatsMyUiModel(
                         winCount = statsCounts.winCounts,
                         drawCount = statsCounts.drawCounts,
                         loseCount = statsCounts.loseCounts,
@@ -65,7 +65,7 @@ class MyStatsViewModel(
                         myTeam = myTeam,
                         luckyStadium = luckyStadium,
                     )
-                _myStatsUiModel.value = myStatsUiModel
+                _statsMyUiModel.value = statsMyUiModel
             } else {
                 val errors: List<String> =
                     listOf(statsCountsResult, winRateResult, luckyStadiumResult)

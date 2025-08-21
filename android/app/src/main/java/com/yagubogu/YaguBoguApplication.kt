@@ -29,7 +29,11 @@ import timber.log.Timber
 
 class YaguBoguApplication : Application() {
     private val tokenManager by lazy { TokenManager(this) }
-    private val retrofit by lazy { RetrofitInstance(tokenManager) }
+    private val retrofit by lazy {
+        val baseUrl =
+            if (BuildConfig.DEBUG) BuildConfig.BASE_URL_DEBUG else BuildConfig.BASE_URL_RELEASE
+        RetrofitInstance(baseUrl, tokenManager)
+    }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }

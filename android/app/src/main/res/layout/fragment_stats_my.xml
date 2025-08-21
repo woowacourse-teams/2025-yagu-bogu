@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="myStatsUiModel"
-            type="com.yagubogu.presentation.stats.my.MyStatsUiModel" />
+            name="statsMyUiModel"
+            type="com.yagubogu.presentation.stats.my.StatsMyUiModel" />
 
         <variable
             name="averageStats"
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        tools:context=".presentation.stats.my.MyStatsFragment">
+        tools:context=".presentation.stats.my.StatsMyFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
-                    android:text="@{@string/all_rounded_win_rate(myStatsUiModel.winningPercentage)}"
+                    android:text="@{@string/all_rounded_win_rate(statsMyUiModel.winningPercentage)}"
                     android:textColor="@color/primary500"
                     app:layout_constraintBottom_toTopOf="@id/tv_total_attendance_count"
                     app:layout_constraintEnd_toEndOf="@id/pie_chart"
@@ -74,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
-                    android:text="@{@string/stats_my_pie_chart_attendance_count(myStatsUiModel.totalCount)}"
+                    android:text="@{@string/stats_my_pie_chart_attendance_count(statsMyUiModel.totalCount)}"
                     android:textColor="@color/gray500"
                     app:layout_constraintBottom_toBottomOf="@id/pie_chart"
                     app:layout_constraintEnd_toEndOf="@id/pie_chart"
@@ -107,7 +107,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@{String.valueOf(myStatsUiModel.winCount)}"
+                        android:text="@{String.valueOf(statsMyUiModel.winCount)}"
                         android:textColor="@color/primary500"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -140,7 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@{String.valueOf(myStatsUiModel.drawCount)}"
+                        android:text="@{String.valueOf(statsMyUiModel.drawCount)}"
                         android:textColor="@color/gray400"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -173,7 +173,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@{String.valueOf(myStatsUiModel.loseCount)}"
+                        android:text="@{String.valueOf(statsMyUiModel.loseCount)}"
                         android:textColor="@color/red"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -209,7 +209,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="@{myStatsUiModel.myTeam}"
+                    android:text="@{statsMyUiModel.myTeam}"
                     app:layout_constraintEnd_toStartOf="@id/tv_lucky_stadium_name"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_my_team_emoji"
@@ -254,7 +254,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="@{myStatsUiModel.luckyStadium != null ? myStatsUiModel.luckyStadium : @string/stats_my_no_lucky_stadium}"
+                    android:text="@{statsMyUiModel.luckyStadium != null ? statsMyUiModel.luckyStadium : @string/stats_my_no_lucky_stadium}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_my_team_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_lucky_stadium_emoji"
