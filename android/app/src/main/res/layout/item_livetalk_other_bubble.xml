@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="livetalkChatItem"
             type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
@@ -14,8 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/bg_white_radius_16dp"
-        android:padding="12dp">
+        android:paddingStart="12dp"
+        android:paddingTop="12dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_profile"
@@ -67,13 +71,15 @@
         <TextView
             android:id="@+id/tv_chat_body"
             style="@style/TextView.Pretendard.Regular.16"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
             android:text="@{livetalkChatItem.message}"
-            android:textColor="@color/gray900"
+            android:textColor="@{livetalkChatItem.reported ? @color/gray400 : @color/gray900}"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/space_profile_bottom_spacing"
-            tools:text="경기장 분위기 정말 뜨거웠어! 응원 열기가 장난 아니었지. 다음에도 꼭 직관 가야겠어." />
+            tools:text="경기장 분위기 정말 뜨거웠어!\n응원 열기가 장난 아니었지.\n다음에도 꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭꼭 직관 가야겠어." />
 
         <TextView
             android:id="@+id/tv_chat_write_time"
@@ -81,35 +87,48 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
             android:textColor="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_chat_body"
             app:timeStamp="@{livetalkChatItem.timestamp}"
             tools:text="오후 01:25" />
 
-        <ImageView
-            android:id="@+id/iv_report_user_icon"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="@string/livetalk_user_report_icon_description"
-            android:src="@drawable/ic_flag"
-            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
-            app:layout_constraintEnd_toStartOf="@id/tv_report_user"
-            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time"
-            app:tint="@color/gray500" />
-
-        <TextView
-            android:id="@+id/tv_report_user"
-            style="@style/TextView.Pretendard.Regular.12"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_report_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:text="@string/livetalk_user_report_btn"
-            android:textColor="@color/gray500"
+            android:background="@drawable/bg_white_radius_12dp_ripple"
+            android:padding="12dp"
+            android:visibility="@{livetalkChatItem.reported? View.GONE: View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time" />
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time">
 
+            <ImageView
+                android:id="@+id/iv_report_user_icon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/livetalk_user_report_icon_description"
+                android:src="@drawable/ic_flag"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_report_user"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/gray500" />
+
+            <TextView
+                android:id="@+id/tv_report_user"
+                style="@style/TextView.Pretendard.Regular.12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/livetalk_user_report_btn"
+                android:textColor="@color/gray500"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 
 class FavoriteTeamAdapter(
     private val handler: FavoriteTeamViewHolder.Handler,
-) : ListAdapter<FavoriteTeamUiModel, FavoriteTeamViewHolder>(diffCallback) {
+) : ListAdapter<FavoriteTeamItem, FavoriteTeamViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -16,21 +16,21 @@ class FavoriteTeamAdapter(
         holder: FavoriteTeamViewHolder,
         position: Int,
     ) {
-        val item = getItem(position)
+        val item: FavoriteTeamItem = getItem(position)
         holder.bind(item)
     }
 
     companion object {
         private val diffCallback =
-            object : DiffUtil.ItemCallback<FavoriteTeamUiModel>() {
+            object : DiffUtil.ItemCallback<FavoriteTeamItem>() {
                 override fun areItemsTheSame(
-                    oldItem: FavoriteTeamUiModel,
-                    newItem: FavoriteTeamUiModel,
-                ): Boolean = oldItem.id == newItem.id
+                    oldItem: FavoriteTeamItem,
+                    newItem: FavoriteTeamItem,
+                ): Boolean = oldItem.team == newItem.team
 
                 override fun areContentsTheSame(
-                    oldItem: FavoriteTeamUiModel,
-                    newItem: FavoriteTeamUiModel,
+                    oldItem: FavoriteTeamItem,
+                    newItem: FavoriteTeamItem,
                 ): Boolean = oldItem == newItem
             }
     }

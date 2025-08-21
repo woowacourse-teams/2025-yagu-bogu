@@ -6,17 +6,18 @@
     <data>
 
         <variable
-            name="favoriteTeamUiModel"
-            type="com.yagubogu.presentation.favorite.FavoriteTeamUiModel" />
+            name="favoriteTeamItem"
+            type="com.yagubogu.presentation.favorite.FavoriteTeamItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/tv_selection_confirm_message"
-            style="@style/TextView.Esamanru.Medium.20"
+            style="@style/TextView.Pretendard.Bold.24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -31,7 +32,7 @@
             android:id="@+id/tv_favorite_team_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{favoriteTeamUiModel.emoji}"
+            android:text="@{favoriteTeamItem.emoji}"
             android:textSize="32sp"
             app:layout_constraintBottom_toTopOf="@id/tv_favorite_team_name"
             app:layout_constraintEnd_toEndOf="@id/tv_selection_confirm_message"
@@ -45,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="16dp"
-            android:text="@{favoriteTeamUiModel.name}"
+            android:text="@{favoriteTeamItem.team.nickname}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_favorite_team_emoji"

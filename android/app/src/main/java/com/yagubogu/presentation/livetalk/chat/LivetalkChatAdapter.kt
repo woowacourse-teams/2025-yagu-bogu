@@ -5,7 +5,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.ViewHolder>(diffCallback) {
+class LivetalkChatAdapter(
+    private val livetalkChatEventHandler: LivetalkChatEventHandler,
+) : ListAdapter<LivetalkChatBubbleItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun getItemViewType(position: Int): Int =
         when (getItem(position)) {
             is LivetalkChatBubbleItem.MyBubbleItem -> VIEW_TYPE_MY
@@ -17,8 +19,8 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (viewType) {
-            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent)
-            else -> LivetalkOtherBubbleViewHolder.from(parent)
+            VIEW_TYPE_MY -> LivetalkMyBubbleViewHolder.from(parent, livetalkChatEventHandler)
+            else -> LivetalkOtherBubbleViewHolder.from(parent, livetalkChatEventHandler)
         }
 
     override fun onBindViewHolder(
@@ -26,11 +28,15 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
         position: Int,
     ) {
         when (holder) {
-            is LivetalkMyBubbleViewHolder ->
-                holder.bind((getItem(position) as LivetalkChatBubbleItem.MyBubbleItem).livetalkChatItem)
+            is LivetalkMyBubbleViewHolder -> {
+                val item = getItem(position) as LivetalkChatBubbleItem.MyBubbleItem
+                holder.bind(item.livetalkChatItem)
+            }
 
-            is LivetalkOtherBubbleViewHolder ->
-                holder.bind((getItem(position) as LivetalkChatBubbleItem.OtherBubbleItem).livetalkChatItem)
+            is LivetalkOtherBubbleViewHolder -> {
+                val item = getItem(position) as LivetalkChatBubbleItem.OtherBubbleItem
+                holder.bind(item.livetalkChatItem)
+            }
         }
     }
 
@@ -43,17 +49,7 @@ class LivetalkChatAdapter : ListAdapter<LivetalkChatBubbleItem, RecyclerView.Vie
                 override fun areItemsTheSame(
                     oldItem: LivetalkChatBubbleItem,
                     newItem: LivetalkChatBubbleItem,
-                ): Boolean {
-                    return when {
-                        oldItem is LivetalkChatBubbleItem.MyBubbleItem && newItem is LivetalkChatBubbleItem.MyBubbleItem ->
-                            return oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
-
-                        oldItem is LivetalkChatBubbleItem.OtherBubbleItem && newItem is LivetalkChatBubbleItem.OtherBubbleItem ->
-                            return oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
-
-                        else -> false
-                    }
-                }
+                ): Boolean = oldItem.livetalkChatItem.chatId == newItem.livetalkChatItem.chatId
 
                 override fun areContentsTheSame(
                     oldItem: LivetalkChatBubbleItem,

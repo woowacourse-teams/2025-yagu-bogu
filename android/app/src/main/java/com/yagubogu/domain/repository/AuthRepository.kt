@@ -1,7 +1,9 @@
 package com.yagubogu.domain.repository
 
-interface AuthRepository {
-    suspend fun login(idToken: String): Result<Unit>
+import com.yagubogu.domain.model.LoginResult
 
-    suspend fun refreshTokens(): Result<Unit>
+interface AuthRepository {
+    suspend fun login(idToken: String): Result<LoginResult>
+
+    suspend fun logout(): Result<Unit>
 }

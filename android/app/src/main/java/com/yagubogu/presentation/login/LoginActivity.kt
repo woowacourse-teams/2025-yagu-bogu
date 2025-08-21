@@ -1,26 +1,24 @@
 package com.yagubogu.presentation.login
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.data.auth.GoogleCredentialManager
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
-import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.MainActivity
+import com.yagubogu.presentation.favorite.FavoriteTeamActivity
+import com.yagubogu.presentation.util.showSnackbar
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -33,7 +31,12 @@ class LoginActivity : AppCompatActivity() {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
         val app = application as YaguBoguApplication
-        LoginViewModelFactory(app.authRepository, googleCredentialManager)
+        LoginViewModelFactory(
+            app.tokenRepository,
+            app.authRepository,
+            app.memberRepository,
+            googleCredentialManager,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +54,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleAutoLogin() {
         lifecycleScope.launch {
-            val isTokenValid: Boolean = viewModel.isTokenValid()
-            if (isTokenValid) {
+            if (!viewModel.isTokenValid()) {
+                isAppInitialized = true
+                return@launch
+            }
+
+            if (viewModel.isNewUser()) {
+                navigateToFavoriteTeam()
+            } else {
                 navigateToMain()
             }
             isAppInitialized = true
@@ -74,31 +83,21 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel.loginResult.observe(this) { value: LoginResult ->
             when (value) {
-                LoginResult.Success -> {
-                    // TODO: 회원가입일 때 팀 선택 화면으로 이동
-                    val app = application as YaguBoguApplication
-                    lifecycleScope.launch { app.memberRepository.updateFavoriteTeam(Team.OB) }
-                    navigateToMain()
-                }
-
-                is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
+                LoginResult.SignUp -> navigateToFavoriteTeam()
+                LoginResult.SignIn -> navigateToMain()
+                is LoginResult.Failure -> binding.root.showSnackbar(R.string.login_failed_message)
                 LoginResult.Cancel -> Unit
             }
         }
     }
 
-    private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+    private fun navigateToFavoriteTeam() {
+        startActivity(Intent(this, FavoriteTeamActivity::class.java))
         finish()
     }
 
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            show()
-        }
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }

@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.attendance.AttendanceHistoryViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        tools:context=".presentation.stats.attendance.AttendanceHistoryFragment">
-
-        <TextView
-            android:id="@+id/tv_attendance_history_title"
-            style="@style/TextView.Pretendard.Bold.20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/stats_attendance_history_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:paddingHorizontal="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp"
+        tools:context=".presentation.attendance.AttendanceHistoryFragment">
 
         <Spinner
             android:id="@+id/spinner_attendance_history_filter"
@@ -26,18 +26,41 @@
             android:overlapAnchor="false"
             android:paddingEnd="20dp"
             android:spinnerMode="dropdown"
-            app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_attendance_history_title" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/iv_spinner_arrow"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_arrow_down"
             app:layout_constraintBottom_toBottomOf="@id/spinner_attendance_history_filter"
+            app:layout_constraintEnd_toEndOf="@id/spinner_attendance_history_filter"
+            app:layout_constraintTop_toTopOf="@id/spinner_attendance_history_filter"
+            app:tint="@color/gray500" />
+
+        <TextView
+            android:id="@+id/tv_attendance_history_sort"
+            style="@style/TextView.Pretendard.Regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{() -> viewModel.switchAttendanceHistorySort()}"
+            android:paddingEnd="20dp"
+            android:textColor="@color/gray500"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/spinner_attendance_history_filter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/spinner_attendance_history_filter"
+            tools:text="최신순" />
+
+        <ImageView
+            android:id="@+id/iv_attendance_history_switch"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_switch"
+            app:layout_constraintBottom_toBottomOf="@id/tv_attendance_history_sort"
+            app:layout_constraintEnd_toEndOf="@id/tv_attendance_history_sort"
+            app:layout_constraintTop_toTopOf="@id/tv_attendance_history_sort"
             app:tint="@color/gray500" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -47,21 +70,38 @@
             android:layout_marginTop="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_attendance_history_title" />
+            app:layout_constraintTop_toBottomOf="@id/spinner_attendance_history_filter" />
+
+        <ImageView
+            android:id="@+id/iv_empty_history"
+            android:layout_width="wrap_content"
+            android:layout_height="140dp"
+            android:contentDescription="@string/attendance_history_empty_scoreboard_illustration_description"
+            android:src="@drawable/img_baseball_scoreboard"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/tv_empty_history"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_empty_history"
             style="@style/TextView.Pretendard.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:lineSpacingExtra="8dp"
-            android:text="@string/stats_empty_attendance_history_description"
+            android:text="@string/attendance_history_empty_description"
             android:textColor="@color/gray400"
             android:textSize="18sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/iv_empty_history"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

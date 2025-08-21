@@ -28,7 +28,12 @@ class LivetalkFragment : Fragment() {
         LivetalkStadiumAdapter(
             object : LivetalkStadiumViewHolder.Handler {
                 override fun onItemClick(item: LivetalkStadiumItem) {
-                    val intent = LivetalkChatActivity.newIntent(requireContext(), item.gameId)
+                    val intent =
+                        LivetalkChatActivity.newIntent(
+                            requireContext(),
+                            item.gameId,
+                            item.isVerified,
+                        )
                     startActivity(intent)
                 }
             },
@@ -58,6 +63,13 @@ class LivetalkFragment : Fragment() {
         _binding = null
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchGames()
+        }
+    }
+
     private fun setupBindings() {
         val linearLayoutManager = LinearLayoutManager(requireContext())
         binding.rvLivetalkStadium.apply {
@@ -69,6 +81,10 @@ class LivetalkFragment : Fragment() {
     private fun setupObservers() {
         viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
             livetalkStadiumAdapter.submitList(value)
+
+            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
+            binding.ivEmptyGame.visibility = visibility
+            binding.tvEmptyGame.visibility = visibility
         }
     }
 }

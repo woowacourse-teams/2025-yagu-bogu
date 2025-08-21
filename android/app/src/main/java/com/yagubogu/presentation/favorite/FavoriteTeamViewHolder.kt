@@ -5,20 +5,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemFavoriteTeamBinding
 
-class FavoriteTeamViewHolder(
+class FavoriteTeamViewHolder private constructor(
     private val binding: ItemFavoriteTeamBinding,
-    private val handler: Handler,
+    handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.handler = handler
     }
 
-    fun bind(favoriteTeamUiModel: FavoriteTeamUiModel) {
-        binding.favoriteTeamUiModel = favoriteTeamUiModel
+    fun bind(favoriteTeamItem: FavoriteTeamItem) {
+        binding.favoriteTeamItem = favoriteTeamItem
     }
 
     interface Handler {
-        fun onItemClick(item: FavoriteTeamUiModel)
+        fun onItemClick(item: FavoriteTeamItem)
     }
 
     companion object {
