@@ -44,7 +44,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
 
-      - name: Docker Image Build & Push (multi-arch)
+      - name: Docker Image Build & Push (arm64-arch)
         run: |
           TAG_LATEST="dev-latest"
           # Dockerfile 경로: backend/Dockerfile
