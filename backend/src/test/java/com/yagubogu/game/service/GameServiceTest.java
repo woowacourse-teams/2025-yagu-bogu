@@ -1,16 +1,17 @@
 package com.yagubogu.game.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.GameResultResponse;
+import com.yagubogu.game.dto.GameResultResponse.ScoreBoardResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
@@ -34,7 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import(AuthTestConfig.class)
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 class GameServiceTest {
 
@@ -131,6 +135,27 @@ class GameServiceTest {
                 .hasMessage("Member is not found");
     }
 
+    @DisplayName("끝난 게임의 스코어보드를 조회한다")
+    @Test
+    void findGameScoreBoard() {
+        // given
+        LocalDate date = TestFixture.getToday();
+        Game game = makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
+        long gameId = game.getId();
+
+        GameResultResponse expected = new GameResultResponse(
+                ScoreBoardResponse.from(expectedHomeScoreBoard()),
+                ScoreBoardResponse.from(expectedAwayScoreBoard()),
+                "이포라", "김롯데"
+        );
+
+        // when
+        GameResultResponse scoreBoard = gameService.findScoreBoard(gameId);
+
+        // then
+        assertThat(scoreBoard).isEqualTo(expected);
+    }
+
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
@@ -141,6 +166,43 @@ class GameServiceTest {
                 .awayTeam(awayTeam)
                 .stadium(stadium)
                 .date(date)
+        );
+    }
+
+    private Game makeGameWithScoreBoard(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
+        Team homeTeam = getTeamByCode(homeCode);
+        Team awayTeam = getTeamByCode(awayCode);
+        Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
+        ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
+        ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-"));
+        String homePitcher = "이포라";
+        String awayPitcher = "김롯데";
+
+        return gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(date)
+                .homeScoreBoard(homeScoreBoard)
+                .awayScoreBoard(awayScoreBoard)
+                .homePitcher(homePitcher)
+                .awayPitcher(awayPitcher)
+        );
+    }
+
+    private ScoreBoard expectedHomeScoreBoard() {
+        return new ScoreBoard(
+                5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-")
+        );
+    }
+
+    private ScoreBoard expectedAwayScoreBoard() {
+        return new ScoreBoard(
+                3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-")
         );
     }
 

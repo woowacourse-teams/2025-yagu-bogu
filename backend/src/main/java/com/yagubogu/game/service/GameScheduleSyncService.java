@@ -73,6 +73,8 @@ public class GameScheduleSyncService {
                     null,
                     null,
                     null,
+                    null,
+                    null,
                     gameState
             );
             games.add(game);

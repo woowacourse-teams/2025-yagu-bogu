@@ -4,6 +4,7 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.service.MemberService;
@@ -34,6 +35,14 @@ public class MemberController implements MemberControllerInterface {
         memberService.removeMember(memberClaims.id());
 
         return ResponseEntity.noContent().build();
+    }
+
+    public ResponseEntity<MemberInfoResponse> findMember(
+            final MemberClaims memberClaims
+    ) {
+        MemberInfoResponse response = memberService.findMember(memberClaims.id());
+
+        return ResponseEntity.ok(response);
     }
 
     public ResponseEntity<MemberNicknameResponse> findNickname(

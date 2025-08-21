@@ -4,6 +4,7 @@ public record CheckInGameTeamResponse(
         String code,
         String name,
         Integer score,
-        boolean isMyTeam
+        boolean isMyTeam,
+        String pitcher
 ) {
 }

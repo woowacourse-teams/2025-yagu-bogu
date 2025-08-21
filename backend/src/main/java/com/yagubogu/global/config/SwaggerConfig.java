@@ -46,7 +46,7 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("YaguBogu API")
-                .description("야구보구 API 명세입니다.")
+                .description("야구보구⚾ API 명세입니다.")
                 .version("1.0.0");
     }
 }
