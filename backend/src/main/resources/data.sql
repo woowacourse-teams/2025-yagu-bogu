@@ -49,36 +49,33 @@ VALUES (5000, 2, '엘지1', '엘지1@example.com', 'GOOGLE', 'sub-엘지1', 'USE
        (5021, 2, '엘지7', '엘지7@example.com', 'GOOGLE', 'sub-엘지7', 'USER', 'https://image.com/엘지7.png');
 
 -- 4. 스코어보드 데이터
-INSERT INTO score_board (runs, hits, errors, bases_on_balls, inning_1_score, inning_2_score, inning_3_score,
-                         inning_4_score, inning_5_score, inning_6_score, inning_7_score, inning_8_score, inning_9_score,
-                         inning_10_score, inning_11_score)
+INSERT INTO score_board (runs, hits, errors, bases_on_balls, inning_scores)
 VALUES
     -- 경기 1 (HT vs OB), score_board_id: 1, 2
-    (5, 8, 0, 4, 0, 1, 0, 0, 3, 0, 1, 0, NULL, NULL, NULL),   -- 홈팀 HT (ID: 1)
-    (4, 7, 1, 3, 2, 0, 0, 1, 0, 1, 0, 0, 0, NULL, NULL),      -- 원정팀 OB (ID: 2)
+    (5, 8, 0, 4, '0,1,0,0,3,0,1,0,-,-,-'),   -- 홈팀 HT (ID: 1)
+    (4, 7, 1, 3, '2,0,0,1,0,1,0,0,0,-,-'),   -- 원정팀 OB (ID: 2)
     -- 경기 2 (HT vs OB), score_board_id: 3, 4
-    (5, 9, 0, 5, 1, 1, 1, 1, 1, 0, 0, 0, NULL, NULL, NULL),   -- 홈팀 HT (ID: 3)
-    (4, 6, 1, 2, 0, 0, 0, 0, 2, 0, 2, 0, 0, NULL, NULL),      -- 원정팀 OB (ID: 4)
+    (5, 9, 0, 5, '1,1,1,1,1,0,0,0,0,-,-'),   -- HT (ID: 3)
+    (4, 6, 1, 2, '0,0,0,0,2,0,2,0,0,-,-'),   -- 원정팀 OB (ID: 4)
     -- 경기 3 (LT vs LG), score_board_id: 5, 6
-    (3, 5, 2, 3, 0, 0, 0, 0, 0, 1, 2, 0, 0, NULL, NULL),      -- 홈팀 LT (ID: 5)
-    (5, 10, 0, 6, 1, 0, 0, 4, 0, 0, 0, 0, NULL, NULL, NULL),  -- 원정팀 LG (ID: 6)
+    (3, 5, 2, 3, '0,0,0,0,0,1,2,0,0,-,-'),   -- 홈팀 LT (ID: 5)
+    (5, 10, 0, 6, '1,0,0,4,0,0,0,0,0,-,-'),  -- LG (ID: 6)
     -- 경기 4 (LG vs HT), score_board_id: 7, 8
-    (10, 12, 0, 8, 5, 0, 0, 0, 5, 0, 0, 0, NULL, NULL, NULL), -- 홈팀 LG (ID: 7)
-    (0, 3, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),      -- 원정팀 HT (ID: 8)
+    (10, 12, 0, 8, '5,0,0,0,5,0,0,0,0,-,-'), -- LG (ID: 7)
+    (0, 3, 3, 2, '0,0,0,0,0,0,0,0,0,-,-'),   -- 원정팀 HT (ID: 8)
     -- 경기 5 (LG vs HT), score_board_id: 9, 10
-    (10, 15, 1, 7, 3, 0, 1, 0, 2, 0, 4, 0, NULL, NULL, NULL), -- 홈팀 LG (ID: 9)
-    (0, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
+    (10, 15, 1, 7, '3,0,1,0,2,0,4,0,0,-,-'), -- LG (ID: 9)
+    (0, 4, 2, 1, '0,0,0,0,0,0,0,0,0,-,-');
 -- 원정팀 HT (ID: 10)
 
 -- 5. 경기 데이터
 INSERT INTO games (stadium_id, home_team_id, away_team_id, date, start_at, game_code, home_score, away_score,
-                   game_state, home_score_board_id, away_score_board_id, winning_pitcher, losing_pitcher, save_pitcher,
-                   hold_pitcher)
-VALUES (4, 5, 4, '2025-07-25', '18:30', '20250725SSKT0', NULL, NULL, 'SCHEDULED', NULL, NULL, NULL, NULL, NULL, NULL),
-       (1, 2, 1, '2025-07-24', '18:30', '20250724LGHT0', 5, 4, 'COMPLETED', 1, 2, '양현종', '알칸타라', '정해영', NULL),
-       (1, 1, 10, '2025-07-25', '18:30', '20250725HTOB0', 5, 4, 'COMPLETED', 3, 4, '이의리', '곽빈', NULL, '최지민'),
-       (6, 6, 2, '2025-07-25', '18:30', '20250725LTLG0', 3, 5, 'COMPLETED', 5, 6, '켈리', '반즈', '고우석', NULL),
-       (2, 2, 1, '2025-07-25', '18:30', '20250725LGHT0', 10, 0, 'COMPLETED', 9, 10, '엔스', '오원석', NULL, '유영찬');
+                   game_state, home_score_board_id, away_score_board_id, home_pitcher, away_pitcher)
+VALUES (4, 10, 4, '2025-07-25', '18:30', '20250725SSKT0', NULL, NULL, 'SCHEDULED', NULL, NULL, NULL, NULL),
+       (1, 10, 1, '2025-07-24', '18:30', '20250724LGHT0', 5, 4, 'COMPLETED', 1, 2, '양현종', '알칸타라'),
+       (1, 1, 10, '2025-07-25', '18:30', '20250725HTOB0', 5, 4, 'COMPLETED', 3, 4, '이의리', '곽빈'),
+       (6, 6, 2, '2025-07-25', '18:30', '20250725LTLG0', 3, 5, 'COMPLETED', 5, 6, '켈리', '반즈'),
+       (2, 2, 1, '2025-07-25', '18:30', '20250725LGHT0', 10, 0, 'COMPLETED', 9, 10, '엔스', '오원석');
 
 
 -- 6. 체크인 정보
@@ -97,7 +94,7 @@ VALUES
     (5011, 1, 6),
 
     -- 경기 2
-    (5002, 2, 2),
+    (5002, 2, 10),
     (5003, 2, 10),
     (5004, 2, 10),
     (5005, 2, 10),

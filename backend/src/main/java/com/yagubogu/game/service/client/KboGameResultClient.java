@@ -54,10 +54,8 @@ public class KboGameResultClient {
             return new KboGameResultResponse(
                     scoreBoards.homeScoreBoard(),
                     scoreBoards.awayScoreBoard(),
-                    pitchers.winningPitcher(),
-                    pitchers.losingPitcher(),
-                    pitchers.savePitcher(),
-                    pitchers.holdPitcher()
+                    pitchers.homePitcher(),
+                    pitchers.awayPitcher()
             );
         } catch (Exception e) {
             throw new GameSyncException("Failed to fetch game data from Kbo api", e);
@@ -121,16 +119,16 @@ public class KboGameResultClient {
 
         String code = root.path("code").asText();
         String msg = root.path("msg").asText();
-        String winningPitcher = null;
-        String losingPitcher = null;
-        String savePitcher = null;
-        String holdPitcher = null;
+        String homePitcher = null;
+        String awayPitcher = null;
 
         if (SUCCESS_CODE.equals(code)) {
             JsonNode arrPitcher = root.path("arrPitcher");
             if (arrPitcher.isArray()) {
-                for (JsonNode teamPitcherNode : arrPitcher) {
+                for (int i = 0; i < arrPitcher.size(); i++) {
+                    JsonNode teamPitcherNode = arrPitcher.get(i);
                     String tableJsonString = teamPitcherNode.path("table").asText();
+
                     if (tableJsonString.isEmpty()) {
                         continue;
                     }
@@ -142,32 +140,30 @@ public class KboGameResultClient {
                             continue;
                         }
 
-                        // headers 기준: [0:선수명, 1:등판, 2:결과]
-                        String name = columns.path(0).path("Text").asText();
                         String result = columns.path(2).path("Text").asText();
 
-                        // '결과' 컬럼의 텍스트를 직접 비교
-                        switch (result) {
-                            case "승" -> winningPitcher = name;
-                            case "패" -> losingPitcher = name;
-                            case "세" -> savePitcher = name;
-                            case "무" -> holdPitcher = name;
+                        // 승/패/무 결과에 해당하면
+                        if ("승".equals(result) || "패".equals(result) || "무".equals(result)) {
+                            if (i == 0) {
+                                awayPitcher = result;
+                            } else if (i == 1) {
+                                homePitcher = result;
+                            }
+                            break;
                         }
                     }
                 }
             }
         }
 
-        return new PitcherDataWithStatus(code, msg, winningPitcher, losingPitcher, savePitcher, holdPitcher);
+        return new PitcherDataWithStatus(code, msg, homePitcher, awayPitcher);
     }
 
     private record PitcherDataWithStatus(
             String code,
             String msg,
-            String winningPitcher,
-            String losingPitcher,
-            String savePitcher,
-            String holdPitcher
+            String homePitcher,
+            String awayPitcher
     ) {
     }
 

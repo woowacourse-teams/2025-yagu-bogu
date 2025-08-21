@@ -43,7 +43,8 @@ public class GameService {
     }
 
     private static void validateScoreBoard(final Game game) {
-        if (game.getHomeScoreBoard() == null || game.getAwayScoreBoard() == null || game.getPitchers() == null) {
+        if (game.getHomeScoreBoard() == null || game.getAwayScoreBoard() == null || game.getHomePitcher() == null
+                || game.getAwayPitcher() == null) {
             throw new NotFoundException("ScoreBoard not found");
         }
     }
