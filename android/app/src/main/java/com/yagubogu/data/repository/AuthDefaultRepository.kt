@@ -1,7 +1,7 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.AuthDataSource
-import com.yagubogu.data.dto.response.LoginResponse
+import com.yagubogu.data.datasource.auth.AuthDataSource
+import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository

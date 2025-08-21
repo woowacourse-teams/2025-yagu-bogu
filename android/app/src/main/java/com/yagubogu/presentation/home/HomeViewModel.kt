@@ -9,7 +9,7 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
-import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val memberRepository: MemberRepository,
-    private val checkInsRepository: CheckInsRepository,
+    private val checkInRepository: CheckInRepository,
     private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
@@ -90,7 +90,7 @@ class HomeViewModel(
     fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
-                checkInsRepository.getStadiumFanRates(date)
+                checkInRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
                     stadiumFanRateItems.value = stadiumFanRates
@@ -106,7 +106,7 @@ class HomeViewModel(
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
-            val checkInStatusResult: Result<Boolean> = checkInsRepository.getCheckInStatus(date)
+            val checkInStatusResult: Result<Boolean> = checkInRepository.getCheckInStatus(date)
             checkInStatusResult
                 .onSuccess { checkInStatus: Boolean ->
                     _hasAlreadyCheckedIn.value = checkInStatus
@@ -121,7 +121,7 @@ class HomeViewModel(
             val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
             val attendanceCountDeferred: Deferred<Result<Int>> =
-                async { checkInsRepository.getCheckInCounts(year) }
+                async { checkInRepository.getCheckInCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
 
@@ -154,7 +154,7 @@ class HomeViewModel(
     private fun fetchVictoryFairyRanking() {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                checkInsRepository.getVictoryFairyRankings()
+                checkInRepository.getVictoryFairyRankings()
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
@@ -192,7 +192,7 @@ class HomeViewModel(
         }
 
         val today = LocalDate.now()
-        checkInsRepository
+        checkInRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
                 _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))

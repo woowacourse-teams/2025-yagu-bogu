@@ -1,6 +1,6 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.TokenDataSource
+import com.yagubogu.data.datasource.token.TokenDataSource
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.repository.TokenRepository
 
