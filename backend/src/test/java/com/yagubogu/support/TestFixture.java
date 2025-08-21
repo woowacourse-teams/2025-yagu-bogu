@@ -8,6 +8,7 @@ import com.yagubogu.team.domain.Team;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class TestFixture {
 
@@ -28,11 +29,13 @@ public class TestFixture {
     }
 
     public static ScoreBoard getHomeScoreBoard() {
-        return new ScoreBoard(10, 10, 10, 10);
+        return new ScoreBoard(10, 10, 10, 10,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
     }
 
     public static ScoreBoard getAwayScoreBoard() {
-        return new ScoreBoard(1, 1, 1, 1);
+        return new ScoreBoard(1, 1, 1, 1,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
     }
 
     public static Member getUser(Team team) {

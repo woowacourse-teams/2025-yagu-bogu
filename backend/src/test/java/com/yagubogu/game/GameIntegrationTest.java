@@ -1,7 +1,6 @@
 package com.yagubogu.game;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
@@ -42,8 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class GameIntegrationTest {
-
-    private static final String ID_TOKEN = "ID_TOKEN";
 
     @LocalServerPort
     private int port;
@@ -154,8 +151,8 @@ public class GameIntegrationTest {
         );
     }
 
-    private CheckIn makeCheckIn(final Game game, final Team team, final Member member) {
-        return checkInFactory.save(builder -> builder
+    private void makeCheckIn(final Game game, final Team team, final Member member) {
+        checkInFactory.save(builder -> builder
                 .game(game)
                 .member(member)
                 .team(team)

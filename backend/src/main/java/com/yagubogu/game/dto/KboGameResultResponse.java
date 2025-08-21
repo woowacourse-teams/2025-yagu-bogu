@@ -3,21 +3,9 @@ package com.yagubogu.game.dto;
 import com.yagubogu.game.domain.ScoreBoard;
 
 public record KboGameResultResponse(
-        String statusCode,
-        String msg,
-        KboScoreBoardResponse homeScoreBoard,
-        KboScoreBoardResponse awayScoreBoard
+        ScoreBoard homeScoreBoard,
+        ScoreBoard awayScoreBoard,
+        String homePitcher,
+        String awayPitcher
 ) {
-
-    public record KboScoreBoardResponse(
-            int runs,
-            int hits,
-            int errors,
-            int basesOnBalls
-    ) {
-
-        public ScoreBoard toScoreBoard() {
-            return new ScoreBoard(runs, hits, errors, basesOnBalls);
-        }
-    }
 }
