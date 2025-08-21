@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response
+package com.yagubogu.data.dto.response.token
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
