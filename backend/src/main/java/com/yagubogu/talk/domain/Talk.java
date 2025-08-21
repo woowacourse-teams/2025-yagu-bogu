@@ -1,6 +1,7 @@
 package com.yagubogu.talk.domain;
 
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,12 +16,16 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE talks SET deleted_at = now() WHERE talk_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @Table(name = "talks")
 @Entity
-public class Talk {
+public class Talk extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,6 @@
 package com.yagubogu.member.domain;
 
-import com.yagubogu.global.domain.SoftDeleteEntity;
+import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,12 +16,14 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@SQLDelete(sql = "UPDATE members SET deleted_at = now() WHERE member_id = ?")
 @Table(name = "members")
 @Entity
-public class Member extends SoftDeleteEntity {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
