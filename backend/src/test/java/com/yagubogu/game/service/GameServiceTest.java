@@ -11,7 +11,6 @@ import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameResultResponse;
 import com.yagubogu.game.dto.GameResultResponse.ScoreBoardResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
-import com.yagubogu.game.dto.Pitchers;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
 import com.yagubogu.game.repository.GameRepository;
@@ -146,7 +145,7 @@ class GameServiceTest {
         GameResultResponse expected = new GameResultResponse(
                 ScoreBoardResponse.from(expectedHomeScoreBoard()),
                 ScoreBoardResponse.from(expectedAwayScoreBoard()),
-                "1", "1", "1", "1"
+                "이포라", "김롯데"
         );
 
         // when
@@ -174,10 +173,11 @@ class GameServiceTest {
         Team awayTeam = getTeamByCode(awayCode);
         Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
         ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
-                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
         ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
-                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
-        Pitchers pitchers = new Pitchers("1", "1", "1", "1");
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-"));
+        String homePitcher = "이포라";
+        String awayPitcher = "김롯데";
 
         return gameFactory.save(builder -> builder
                 .homeTeam(homeTeam)
@@ -186,21 +186,22 @@ class GameServiceTest {
                 .date(date)
                 .homeScoreBoard(homeScoreBoard)
                 .awayScoreBoard(awayScoreBoard)
-                .pitchers(pitchers)
+                .homePitcher(homePitcher)
+                .awayPitcher(awayPitcher)
         );
     }
 
     private ScoreBoard expectedHomeScoreBoard() {
         return new ScoreBoard(
                 5, 8, 1, 3,
-                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-")
         );
     }
 
     private ScoreBoard expectedAwayScoreBoard() {
         return new ScoreBoard(
                 3, 6, 2, 4,
-                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-")
         );
     }
 

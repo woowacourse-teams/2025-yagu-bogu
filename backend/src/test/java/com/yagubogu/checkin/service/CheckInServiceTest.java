@@ -3,6 +3,7 @@ package com.yagubogu.checkin.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
@@ -11,7 +12,6 @@ import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
@@ -193,54 +193,26 @@ class CheckInServiceTest {
         CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.LATEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            final int index = i;
-            Game game = gameFactory.save(gameBuilder ->
-                    gameBuilder.date(startDate.plusDays(index))
-                            .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                            .gameState(GameState.COMPLETED)
-            );
-            savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game)));
-        }
 
-        List<CheckInGameResponse> expected = List.of(
-                new CheckInGameResponse(
-                        savedCheckIns.get(3).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(3)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(2).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(2)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(1).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(1)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(0).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate
-                )
-        );
+        makeGames(startDate, savedCheckIns, member);
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
 
         // then
-        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+        assertThat(actual.checkInHistory()).hasSize(4) // 먼저 승리한 경기 4개만 필터링되었는지 확인
+                .extracting(
+                        CheckInGameResponse::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.homeTeam().score(),
+                        r -> r.awayTeam().name(),
+                        r -> r.awayTeam().score()
+                ).containsExactly(
+                        tuple(startDate.plusDays(3), "롯데", 10, "KIA", 1),
+                        tuple(startDate.plusDays(2), "롯데", 10, "KIA", 10),
+                        tuple(startDate.plusDays(1), "롯데", 1, "KIA", 10),
+                        tuple(startDate, "롯데", 10, "KIA", 1)
+                );
     }
 
     @DisplayName("직관 인증 내역을 모두 오래된순으로 조회한다")
@@ -254,54 +226,26 @@ class CheckInServiceTest {
         CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.OLDEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            final int index = i;
-            Game game = gameFactory.save(gameBuilder ->
-                    gameBuilder.date(startDate.plusDays(index))
-                            .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                            .gameState(GameState.COMPLETED)
-            );
-            savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game)));
-        }
 
-        List<CheckInGameResponse> expected = List.of(
-                new CheckInGameResponse(
-                        savedCheckIns.get(0).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(1).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(1)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(2).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(2)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(3).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("LT", "롯데", 10, true),
-                        new CheckInGameTeamResponse("HT", "KIA", 1, false),
-                        startDate.plusDays(3)
-                )
-        );
+        makeGames(startDate, savedCheckIns, member);
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
 
         // then
-        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+        assertThat(actual.checkInHistory()).hasSize(4)
+                .extracting(
+                        CheckInGameResponse::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.homeTeam().score(),
+                        r -> r.awayTeam().name(),
+                        r -> r.awayTeam().score()
+                ).containsExactly(
+                        tuple(startDate, "롯데", 10, "KIA", 1),
+                        tuple(startDate.plusDays(1), "롯데", 1, "KIA", 10),
+                        tuple(startDate.plusDays(2), "롯데", 10, "KIA", 10),
+                        tuple(startDate.plusDays(3), "롯데", 10, "KIA", 1)
+                );
     }
 
     @DisplayName("직관 인증 내역 중 이긴 내역만 필터링되어 최신순으로 반환된다")
@@ -317,67 +261,29 @@ class CheckInServiceTest {
         CheckInOrderFilter orderFilter = CheckInOrderFilter.LATEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
         // 승리 경기 3개
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(1)
-                .date(startDate));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(1)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(2)));
+        makeWinningGames(startDate, savedCheckIns, por);
 
         // 패배 경기 3개
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kt).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(3)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(lg).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(4)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(samsung).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(5)));
-
-        gameRepository.findAll().forEach(game ->
-                savedCheckIns.add(checkInFactory.save(b -> b.member(por).team(por.getTeam()).game(game)))
-        );
-
-        List<CheckInGameResponse> expected = List.of(
-                new CheckInGameResponse(
-                        savedCheckIns.get(2).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
-                        startDate.plusDays(2)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(1).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("LG", "LG", 1, false),
-                        startDate.plusDays(1)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(0).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("KT", "KT", 1, false),
-                        startDate
-                )
-        );
+        makeLosingGames(startDate, savedCheckIns, por);
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
 
         // then
-        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+        assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
+                .extracting(
+                        CheckInGameResponse::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.homeTeam().score(),
+                        r -> r.awayTeam().name(),
+                        r -> r.awayTeam().score()
+                ).containsExactly(
+                        tuple(startDate.plusDays(2), "KIA", 4, "삼성", 0),
+                        tuple(startDate.plusDays(1), "KIA", 5, "LG", 4),
+                        tuple(startDate, "KIA", 10, "KT", 1)
+                );
     }
+
 
     @DisplayName("직관 인증 내역 중 이긴 내역만 필터링되어 오래된순으로 반환된다")
     @Test
@@ -391,67 +297,30 @@ class CheckInServiceTest {
         CheckInResultFilter resultFilter = CheckInResultFilter.WIN;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.OLDEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
+
         // 승리 경기 3개
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(1)
-                .date(startDate));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(1)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(2)));
+        makeWinningGames(startDate, savedCheckIns, por);
 
         // 패배 경기 3개
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kt).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(3)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(lg).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(4)));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(samsung).homeScore(10)
-                .awayTeam(kia).awayScore(1)
-                .date(startDate.plusDays(5)));
-
-        gameRepository.findAll().forEach(game ->
-                savedCheckIns.add(checkInFactory.save(b -> b.member(por).team(por.getTeam()).game(game)))
-        );
-
-        List<CheckInGameResponse> expected = List.of(
-                new CheckInGameResponse(
-                        savedCheckIns.get(0).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("KT", "KT", 1, false),
-                        startDate
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(1).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("LG", "LG", 1, false),
-                        startDate.plusDays(1)
-                ),
-                new CheckInGameResponse(
-                        savedCheckIns.get(2).getId(),
-                        "잠실야구장",
-                        new CheckInGameTeamResponse("HT", "KIA", 10, true),
-                        new CheckInGameTeamResponse("SS", "삼성", 1, false),
-                        startDate.plusDays(2)
-                )
-        );
+        makeLosingGames(startDate, savedCheckIns, por);
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
 
         // then
-        assertThat(actual.checkInHistory()).containsExactlyElementsOf(expected);
+        assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
+                .extracting(
+                        CheckInGameResponse::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.homeTeam().score(),
+                        r -> r.awayTeam().name(),
+                        r -> r.awayTeam().score()
+                ).containsExactly(
+                        tuple(startDate, "KIA", 10, "KT", 1),
+                        tuple(startDate.plusDays(1), "KIA", 5, "LG", 4),
+                        tuple(startDate.plusDays(2), "KIA", 4, "삼성", 0)
+                );
+
     }
 
     @DisplayName("승리 요정 랭킹 조회 - 승률, 직관 횟수, 닉네임 순 정렬되어 반환된다")
@@ -692,5 +561,117 @@ class CheckInServiceTest {
             Member member = memberFactory.save(b -> b.team(team));
             checkInFactory.save(b -> b.member(member).team(team).game(game));
         }
+    }
+
+    private void makeGames(final LocalDate startDate, final List<CheckIn> savedCheckIns, final Member member) {
+        Game game1 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(0))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homePitcher("일승리")
+                        .awayPitcher("일패배")
+                        .gameState(GameState.COMPLETED)
+        );
+        savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game1)));
+
+        Game game2 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(1))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(1).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homePitcher("이패배")
+                        .awayPitcher("이승리")
+                        .gameState(GameState.COMPLETED)
+        );
+        savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game2)));
+
+        Game game3 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(2))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homePitcher("삼무승부")
+                        .awayPitcher("삼무승부")
+                        .gameState(GameState.COMPLETED)
+        );
+        savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game3)));
+
+        Game game4 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(3))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homePitcher("사승리")
+                        .awayPitcher("사패배")
+                        .gameState(GameState.COMPLETED)
+        );
+        savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game4)));
+    }
+
+    private void makeWinningGames(final LocalDate startDate, final List<CheckIn> savedCheckIns, final Member member) {
+        Game game1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("김승리")
+                .awayPitcher("최패배")
+                .date(startDate));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game1)));
+
+        Game game2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(5)
+                .awayTeam(lg).awayScore(4)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("이승리")
+                .awayPitcher("송패배")
+                .date(startDate.plusDays(1)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game2)));
+
+        Game game3 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(4)
+                .awayTeam(samsung).awayScore(0)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("박승리")
+                .awayPitcher("공패배")
+                .date(startDate.plusDays(2)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
+    }
+
+    private void makeLosingGames(final LocalDate startDate, final List<CheckIn> savedCheckIns, final Member member) {
+        Game game1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kt).homeScore(11)
+                .awayTeam(kia).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("포라")
+                .awayPitcher("파이브라")
+                .date(startDate.plusDays(3)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game1)));
+
+        Game game2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(lg).homeScore(5)
+                .awayTeam(kia).awayScore(2)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("식스라")
+                .awayPitcher("세븐라")
+                .date(startDate.plusDays(4)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game2)));
+
+        Game game3 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(samsung).homeScore(25)
+                .awayTeam(kia).awayScore(2)
+                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homePitcher("에잇라")
+                .awayPitcher("나인라")
+                .date(startDate.plusDays(5)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }
 }

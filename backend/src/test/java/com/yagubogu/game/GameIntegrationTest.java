@@ -175,6 +175,8 @@ public class GameIntegrationTest {
         ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
                 List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
         Pitchers pitchers = new Pitchers("1", "1", "1", "1");
+        String homePitcher = "이포라";
+        String awayPitcher = "포라리";
 
         return gameFactory.save(builder -> builder
                 .homeTeam(homeTeam)
@@ -183,7 +185,8 @@ public class GameIntegrationTest {
                 .date(date)
                 .homeScoreBoard(homeScoreBoard)
                 .awayScoreBoard(awayScoreBoard)
-                .pitchers(pitchers)
+                .homePitcher(homePitcher)
+                .awayPitcher(awayPitcher)
         );
     }
 

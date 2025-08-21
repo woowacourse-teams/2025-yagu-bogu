@@ -3,7 +3,6 @@ package com.yagubogu.support.game;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.Pitchers;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
@@ -23,7 +22,8 @@ public class GameBuilder {
     private GameState gameState = GameState.SCHEDULED;
     private ScoreBoard homeScoreBoard;
     private ScoreBoard awayScoreBoard;
-    private Pitchers pitchers;
+    private String homePitcher;
+    private String awayPitcher;
 
     public GameBuilder stadium(final Stadium stadium) {
         this.stadium = stadium;
@@ -73,8 +73,14 @@ public class GameBuilder {
         return this;
     }
 
-    public GameBuilder pitchers(final Pitchers pitchers) {
-        this.pitchers = pitchers;
+    public GameBuilder homePitcher(final String homePitcher) {
+        this.homePitcher = homePitcher;
+
+        return this;
+    }
+
+    public GameBuilder awayPitcher(final String awayPitcher) {
+        this.awayPitcher = awayPitcher;
 
         return this;
     }
@@ -109,7 +115,8 @@ public class GameBuilder {
                 awayScore,
                 homeScoreBoard,
                 awayScoreBoard,
-                pitchers,
+                homePitcher,
+                awayPitcher,
                 gameState
         );
     }

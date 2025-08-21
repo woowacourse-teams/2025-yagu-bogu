@@ -159,18 +159,14 @@ class GameScheduleSyncServiceTest {
                 List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
         ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
                 List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
-        String winningPitcher = "이포라";
-        String losingPitcher = "송우가";
-        String savePitcher = "감밍트";
-        String holdPitcher = "차두리";
+        String homePitcher = "이포라";
+        String awayPitcher = "포라리";
 
         KboGameResultResponse mockGameResult = new KboGameResultResponse(
                 homeScoreBoard,
                 awayScoreBoard,
-                winningPitcher,
-                losingPitcher,
-                savePitcher,
-                holdPitcher
+                homePitcher,
+                awayPitcher
         );
         given(kboGameResultClient.fetchGameResult(any(Game.class)))
                 .willReturn(mockGameResult);
@@ -186,10 +182,8 @@ class GameScheduleSyncServiceTest {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
             softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
             softAssertions.assertThat(game.getAwayScoreBoard()).isEqualTo(awayScoreBoardExpected);
-            softAssertions.assertThat(game.getPitchers().getWinningPitcher()).isEqualTo(winningPitcher);
-            softAssertions.assertThat(game.getPitchers().getLosingPitcher()).isEqualTo(losingPitcher);
-            softAssertions.assertThat(game.getPitchers().getSavePitcher()).isEqualTo(savePitcher);
-            softAssertions.assertThat(game.getPitchers().getHoldPitcher()).isEqualTo(holdPitcher);
+            softAssertions.assertThat(game.getHomePitcher()).isEqualTo(homePitcher);
+            softAssertions.assertThat(game.getAwayPitcher()).isEqualTo(awayPitcher);
         }));
     }
 
