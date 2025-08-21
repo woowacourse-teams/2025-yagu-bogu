@@ -1,6 +1,6 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.MemberDataSource
+import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
 import com.yagubogu.domain.model.Team

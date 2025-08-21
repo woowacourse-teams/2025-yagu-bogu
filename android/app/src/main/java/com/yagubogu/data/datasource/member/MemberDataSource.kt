@@ -1,4 +1,4 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.member
 
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
