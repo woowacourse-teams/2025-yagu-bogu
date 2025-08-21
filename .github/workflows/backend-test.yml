@@ -126,7 +126,7 @@ jobs:
       IMAGE: yagubogu/yagubogu-backend
       NEXT_VERSION: ${{ needs.release.outputs.next_version }}   # 1.0.1
       NEXT_VERSION_WITH_V: ${{ needs.release.outputs.next_version_with_v }}   # v1.0.1
-      DIGEST: ${{ needs.release.outputs.digest }}    # sha256:
+      DIGEST: ${{ needs.release.outputs.digest }}    # sha256:...
       IMG_TAG: ${{ needs.release.outputs.img_tag }}   # v1.0.1-abcdef12
     steps:
       - name: Login to Docker Hub
