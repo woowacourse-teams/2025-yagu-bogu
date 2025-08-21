@@ -2,6 +2,7 @@ package com.yagubogu.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -14,7 +15,6 @@ import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -142,7 +142,7 @@ public class MemberServiceTest {
         memberService.updateFavorite(member.getId(), request);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.getTeam()).isNotNull();
             softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });
@@ -163,7 +163,7 @@ public class MemberServiceTest {
         memberService.updateFavorite(member.getId(), request);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.getTeam().getTeamCode()).isNotEqualTo(beforeTeamCode);
             softAssertions.assertThat(member.getTeam().getTeamCode()).isEqualTo(teamCode);
         });

@@ -29,7 +29,6 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -486,7 +485,7 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), year);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             // 전체 상대팀(내 팀 제외) 9개
             softAssertions.assertThat(actual.opponents()).hasSize(9);
 
@@ -539,7 +538,7 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
         // then: 내 팀 제외 9팀 모두 포함, LT만 100.0, 나머지는 0.0
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.opponents()).hasSize(9);
             softAssertions.assertThat(actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
@@ -589,7 +588,7 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
         // then: 9팀 모두 포함, LT는 100.0, 나머지 0.0
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.opponents()).hasSize(9);
             softAssertions.assertThat(actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))

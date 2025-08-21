@@ -1,6 +1,7 @@
 package com.yagubogu.stat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
@@ -25,7 +26,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -350,7 +350,7 @@ public class StatIntegrationTest {
                 .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.opponents()).hasSize(9);
             softAssertions.assertThat(actual.opponents().get(0))
                     .extracting(
