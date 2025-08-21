@@ -2,6 +2,7 @@ package com.yagubogu.game.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -26,7 +27,6 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,7 +166,7 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly((softAssertions -> {
+        assertSoftly((softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
             softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
             softAssertions.assertThat(game.getAwayScoreBoard()).isEqualTo(awayScoreBoardExpected);
@@ -191,7 +191,7 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.LIVE);
             softAssertions.assertThat(game.getHomeScore()).isNull();
             softAssertions.assertThat(game.getAwayScore()).isNull();
@@ -216,7 +216,7 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly(soft -> {
+        assertSoftly(soft -> {
             soft.assertThat(game.getGameState()).isEqualTo(GameState.CANCELED);
             soft.assertThat(game.getHomeScore()).isNull();
             soft.assertThat(game.getAwayScore()).isNull();

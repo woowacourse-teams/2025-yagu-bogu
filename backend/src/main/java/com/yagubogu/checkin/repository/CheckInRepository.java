@@ -8,11 +8,13 @@ import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stat.dto.AverageStatistic;
+import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -250,5 +252,43 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             Member member,
             LocalDate startDate,
             LocalDate endDate
+    );
+
+    @Query("""
+            select new com.yagubogu.stat.dto.OpponentWinRateRow(
+                away.id, away.name, away.shortName, away.teamCode,
+                sum(case when g.homeScore > g.awayScore then 1 else 0 end),
+                count(g)
+            )
+            from Game g
+            join Team away on away.id = g.awayTeam.id
+            where g.homeTeam.id = :myTeamId
+              and g.date between :start and :end
+              and g.gameState = 'COMPLETED'
+            group by away.id, away.name, away.shortName, away.teamCode
+            """)
+    List<OpponentWinRateRow> findOpponentWinRatesWhenHome(
+            @Param("myTeamId") Long myTeamId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
+
+    @Query("""
+            select new com.yagubogu.stat.dto.OpponentWinRateRow(
+                home.id, home.name, home.shortName, home.teamCode,
+                sum(case when g.awayScore > g.homeScore then 1 else 0 end),
+                count(g)
+            )
+            from Game g
+            join Team home on home.id = g.homeTeam.id
+            where g.awayTeam.id = :myTeamId
+              and g.date between :start and :end
+              and g.gameState = 'COMPLETED'
+            group by home.id, home.name, home.shortName, home.teamCode
+            """)
+    List<OpponentWinRateRow> findOpponentWinRatesWhenAway(
+            @Param("myTeamId") Long myTeamId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
     );
 }
