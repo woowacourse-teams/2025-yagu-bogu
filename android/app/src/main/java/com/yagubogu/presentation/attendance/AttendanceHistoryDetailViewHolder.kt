@@ -40,7 +40,7 @@ class AttendanceHistoryDetailViewHolder private constructor(
     ) {
         (row.getChildAt(0) as TextView).text = teamName
 
-        scoreBoard.inningScore.forEachIndexed { index: Int, score: String ->
+        scoreBoard.inningScores.forEachIndexed { index: Int, score: String ->
             (row.getChildAt(index + 2) as TextView).text = score
         }
         (row.getChildAt(row.childCount - 1) as TextView).text = scoreBoard.runs.toString()

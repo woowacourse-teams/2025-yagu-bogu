@@ -1,7 +1,6 @@
 package com.yagubogu.data.dto.response.checkin
 
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.attendance.model.GameScoreBoard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
@@ -18,6 +17,10 @@ data class CheckInGameDto(
     val awayTeam: CheckInGameTeamDto,
     @SerialName("attendanceDate")
     val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
+    @SerialName("homeScoreBoard")
+    val homeScoreBoard: ScoreBoardDto,
+    @SerialName("awayScoreBoard")
+    val awayScoreBoard: ScoreBoardDto,
 ) {
     fun toPresentation(): AttendanceHistoryItem.Detail {
         val summary =
@@ -28,12 +31,10 @@ data class CheckInGameDto(
                 awayTeam = awayTeam.toPresentation(),
                 homeTeam = homeTeam.toPresentation(),
             )
-        val awayTeamScoreBoard = GameScoreBoard.DUMMY_DATA
-        val homeTeamScoreBoard = GameScoreBoard.DUMMY_DATA
         return AttendanceHistoryItem.Detail(
             summary = summary,
-            awayTeamScoreBoard = awayTeamScoreBoard,
-            homeTeamScoreBoard = homeTeamScoreBoard,
+            awayTeamScoreBoard = awayScoreBoard.toPresentation(),
+            homeTeamScoreBoard = homeScoreBoard.toPresentation(),
         )
     }
 }

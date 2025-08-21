@@ -15,6 +15,8 @@ data class CheckInGameTeamDto(
     val score: Int, // 팀 점수
     @SerialName("isMyTeam")
     val isMyTeam: Boolean, // 내가 응원하는 팀 여부
+    @SerialName("pitcher")
+    val pitcher: String, // 투수 이름
 ) {
     fun toPresentation(): GameTeam =
         GameTeam(
@@ -22,6 +24,6 @@ data class CheckInGameTeamDto(
             name = name,
             score = score,
             isMyTeam = isMyTeam,
-            pitcher = "투수이름",
+            pitcher = pitcher,
         )
 }

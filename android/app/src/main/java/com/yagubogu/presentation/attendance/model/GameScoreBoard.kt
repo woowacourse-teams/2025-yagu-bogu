@@ -7,7 +7,7 @@ data class GameScoreBoard(
     val basesOnBalls: Int,
     private val scores: List<String>,
 ) {
-    val inningScore: List<String> =
+    val inningScores: List<String> =
         if (scores.size >= NUMBER_OF_INNINGS) {
             scores.take(NUMBER_OF_INNINGS)
         } else {
@@ -17,14 +17,5 @@ data class GameScoreBoard(
     companion object {
         private const val NUMBER_OF_INNINGS = 11
         private const val EMPTY_SCORE = "-"
-
-        val DUMMY_DATA =
-            GameScoreBoard(
-                runs = 9,
-                hits = 13,
-                errors = 1,
-                basesOnBalls = 5,
-                scores = listOf("1", "0", "0", "4", "0", "0", "2", "2", "0"),
-            )
     }
 }
