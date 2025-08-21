@@ -107,7 +107,7 @@ public class TalkService {
             throw new ForbiddenException("Invalid memberId for the talk");
         }
 
-        talkRepository.deleteById(talkId);
+        talkRepository.delete(talk);
     }
 
     public List<TalkResponse> hideReportedTalks(

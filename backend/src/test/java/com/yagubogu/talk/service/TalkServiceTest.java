@@ -510,6 +510,32 @@ class TalkServiceTest {
         assertThat(talkRepository.findById(talk.getId())).isNotPresent();
     }
 
+    @DisplayName("본인이 작성한 톡을 삭제한다 - 소프트 딜리트 검증")
+    @Test
+    void removeTalk_softDelete() {
+        // given
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(team));
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Talk talk = talkFactory.save(builder ->
+                builder.member(member)
+                        .game(game)
+        );
+
+        // when
+        talkService.removeTalk(game.getId(), talk.getId(), member.getId());
+
+        // then
+        assertThat(talkRepository.findById(talk.getId())).isEmpty();
+    }
+
     @DisplayName("예외: 다른 사람이 작성한 톡을 삭제하려고 하면 예외가 발생한다")
     @Test
     void removeTalk_ByOtherUser() {

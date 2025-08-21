@@ -38,7 +38,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             SELECT t
             FROM Talk t
             WHERE t.game.id = :gameId AND t.id > :cursorId
-            ORDER BY t.id DESC 
+            ORDER BY t.id DESC
             """)
     Slice<Talk> fetchTalksAfterCursor(
             @Param("gameId") long gameId,
