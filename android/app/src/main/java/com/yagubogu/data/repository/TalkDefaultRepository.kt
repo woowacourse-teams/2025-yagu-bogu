@@ -1,21 +1,21 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.TalksDataSource
-import com.yagubogu.data.dto.response.talks.TalkCursorResponse
-import com.yagubogu.data.dto.response.talks.TalkDto
-import com.yagubogu.domain.repository.TalksRepository
+import com.yagubogu.data.datasource.talk.TalkDataSource
+import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkResponse
+import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 
-class TalksDefaultRepository(
-    private val talksDataSource: TalksDataSource,
-) : TalksRepository {
+class TalkDefaultRepository(
+    private val talkDataSource: TalkDataSource,
+) : TalkRepository {
     override suspend fun getBeforeTalks(
         gameId: Long,
         before: Long?,
         limit: Int,
     ): Result<LivetalkResponseItem> =
-        talksDataSource
+        talkDataSource
             .getTalks(
                 gameId = gameId,
                 before = before,
@@ -29,7 +29,7 @@ class TalksDefaultRepository(
         after: Long?,
         limit: Int,
     ): Result<LivetalkResponseItem> =
-        talksDataSource
+        talkDataSource
             .getLatestTalks(
                 gameId = gameId,
                 after = after,
@@ -42,26 +42,26 @@ class TalksDefaultRepository(
         gameId: Long,
         content: String,
     ): Result<LivetalkChatItem> =
-        talksDataSource
+        talkDataSource
             .postTalks(
                 gameId = gameId,
                 content = content,
-            ).map { talkDto: TalkDto ->
-                talkDto.toPresentation()
+            ).map { talkResponse: TalkResponse ->
+                talkResponse.toPresentation()
             }
 
     override suspend fun deleteTalks(
         gameId: Long,
         talkId: Long,
     ): Result<Unit> =
-        talksDataSource
+        talkDataSource
             .deleteTalks(
                 gameId = gameId,
                 talkId = talkId,
             )
 
     override suspend fun reportTalks(talkId: Long): Result<Unit> =
-        talksDataSource
+        talkDataSource
             .reportTalks(
                 talkId = talkId,
             )

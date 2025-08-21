@@ -1,7 +1,7 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.stats.StatsDataSource
-import com.yagubogu.data.dto.response.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse

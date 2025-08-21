@@ -1,9 +1,9 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.talk
 
-import com.yagubogu.data.dto.response.talks.TalkCursorResponse
-import com.yagubogu.data.dto.response.talks.TalkDto
+import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkResponse
 
-interface TalksDataSource {
+interface TalkDataSource {
     suspend fun getTalks(
         gameId: Long,
         before: Long?,
@@ -19,7 +19,7 @@ interface TalksDataSource {
     suspend fun postTalks(
         gameId: Long,
         content: String,
-    ): Result<TalkDto>
+    ): Result<TalkResponse>
 
     suspend fun deleteTalks(
         gameId: Long,

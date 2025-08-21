@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.talks
+package com.yagubogu.data.dto.response.talk
 
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import kotlinx.serialization.SerialName
@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-data class TalkDto(
+data class TalkResponse(
     @SerialName("id")
     val id: Int, // 톡 메시지 ID
     @SerialName("memberId")

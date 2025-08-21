@@ -1,13 +1,13 @@
-package com.yagubogu.data.dto.response.talks
+package com.yagubogu.data.dto.response.talk
 
 import com.yagubogu.presentation.livetalk.chat.LivetalkCursorItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CursorResultDto(
+data class CursorResultTalkDto(
     @SerialName("content")
-    val contents: List<TalkDto>, // 페이징된 톡 메시지 리스트
+    val contents: List<TalkResponse>, // 페이징된 톡 메시지 리스트
     @SerialName("nextCursorId")
     val nextCursorId: Long?, // 다음 페이지 조회를 위한 커서 ID (없으면 null)
     @SerialName("hasNext")

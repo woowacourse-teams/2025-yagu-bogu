@@ -1,21 +1,21 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.talk
 
-import com.yagubogu.data.dto.request.TalksRequest
-import com.yagubogu.data.dto.response.talks.TalkCursorResponse
-import com.yagubogu.data.dto.response.talks.TalkDto
-import com.yagubogu.data.service.TalksApiService
+import com.yagubogu.data.dto.request.talk.TalkRequest
+import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkResponse
+import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.util.safeApiCall
 
-class TalksRemoteDataSource(
-    private val talksApiService: TalksApiService,
-) : TalksDataSource {
+class TalkRemoteDataSource(
+    private val talkApiService: TalkApiService,
+) : TalkDataSource {
     override suspend fun getTalks(
         gameId: Long,
         before: Long?,
         limit: Int,
     ): Result<TalkCursorResponse> =
         safeApiCall {
-            talksApiService.getTalks(gameId, before, limit)
+            talkApiService.getTalks(gameId, before, limit)
         }
 
     override suspend fun getLatestTalks(
@@ -25,17 +25,17 @@ class TalksRemoteDataSource(
     ): Result<TalkCursorResponse> =
         safeApiCall {
             when (after) {
-                null -> talksApiService.getTalks(gameId, null, limit)
-                else -> talksApiService.getLatestTalks(gameId, after, limit)
+                null -> talkApiService.getTalks(gameId, null, limit)
+                else -> talkApiService.getLatestTalks(gameId, after, limit)
             }
         }
 
     override suspend fun postTalks(
         gameId: Long,
         content: String,
-    ): Result<TalkDto> =
+    ): Result<TalkResponse> =
         safeApiCall {
-            talksApiService.postTalks(gameId, TalksRequest(content))
+            talkApiService.postTalks(gameId, TalkRequest(content))
         }
 
     override suspend fun deleteTalks(
@@ -43,11 +43,11 @@ class TalksRemoteDataSource(
         talkId: Long,
     ): Result<Unit> =
         safeApiCall {
-            talksApiService.deleteTalks(gameId, talkId)
+            talkApiService.deleteTalks(gameId, talkId)
         }
 
     override suspend fun reportTalks(talkId: Long): Result<Unit> =
         safeApiCall {
-            talksApiService.reportTalks(talkId)
+            talkApiService.reportTalks(talkId)
         }
 }

@@ -3,7 +3,7 @@ package com.yagubogu.domain.repository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 
-interface TalksRepository {
+interface TalkRepository {
     suspend fun getBeforeTalks(
         gameId: Long,
         before: Long?,

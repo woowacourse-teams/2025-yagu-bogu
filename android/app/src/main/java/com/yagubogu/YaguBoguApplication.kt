@@ -5,7 +5,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
-import com.yagubogu.data.datasource.TalksRemoteDataSource
 import com.yagubogu.data.datasource.TokenRemoteDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
@@ -14,6 +13,7 @@ import com.yagubogu.data.datasource.location.LocationLocalDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
 import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsRemoteDataSource
+import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
@@ -23,7 +23,7 @@ import com.yagubogu.data.repository.LocationDefaultRepository
 import com.yagubogu.data.repository.MemberDefaultRepository
 import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
-import com.yagubogu.data.repository.TalksDefaultRepository
+import com.yagubogu.data.repository.TalkDefaultRepository
 import com.yagubogu.data.repository.TokenDefaultRepository
 import timber.log.Timber
 
@@ -56,8 +56,8 @@ class YaguBoguApplication : Application() {
     private val gamesDataSource by lazy { GameRemoteDataSource(retrofit.gameApiService) }
     val gamesRepository by lazy { GameDefaultRepository(gamesDataSource) }
 
-    private val talksDataSource by lazy { TalksRemoteDataSource(retrofit.talksApiService) }
-    val talksRepository by lazy { TalksDefaultRepository(talksDataSource) }
+    private val talksDataSource by lazy { TalkRemoteDataSource(retrofit.talkApiService) }
+    val talksRepository by lazy { TalkDefaultRepository(talksDataSource) }
 
     override fun onCreate() {
         super.onCreate()

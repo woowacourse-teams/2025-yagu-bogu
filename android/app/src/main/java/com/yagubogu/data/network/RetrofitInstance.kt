@@ -7,7 +7,7 @@ import com.yagubogu.data.service.GameApiService
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
-import com.yagubogu.data.service.TalksApiService
+import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.TokenApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -95,8 +95,8 @@ class RetrofitInstance(
         baseRetrofit.create(GameApiService::class.java)
     }
 
-    val talksApiService: TalksApiService by lazy {
-        baseRetrofit.create(TalksApiService::class.java)
+    val talkApiService: TalkApiService by lazy {
+        baseRetrofit.create(TalkApiService::class.java)
     }
 
     companion object {

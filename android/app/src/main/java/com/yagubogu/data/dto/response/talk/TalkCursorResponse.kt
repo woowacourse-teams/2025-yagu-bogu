@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.talks
+package com.yagubogu.data.dto.response.talk
 
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 import kotlinx.serialization.SerialName
@@ -13,7 +13,7 @@ data class TalkCursorResponse(
     @SerialName("awayTeamName")
     val awayTeamName: String, // 현장톡 채팅 화면의 어웨이팀명
     @SerialName("cursorResult")
-    val cursorResult: CursorResultDto, // 페이징된 톡 메시지
+    val cursorResult: CursorResultTalkDto, // 페이징된 톡 메시지
 ) {
     fun toPresentation(): LivetalkResponseItem =
         LivetalkResponseItem(

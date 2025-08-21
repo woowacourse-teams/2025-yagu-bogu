@@ -1,8 +1,8 @@
 package com.yagubogu.data.service
 
-import com.yagubogu.data.dto.request.TalksRequest
-import com.yagubogu.data.dto.response.talks.TalkCursorResponse
-import com.yagubogu.data.dto.response.talks.TalkDto
+import com.yagubogu.data.dto.request.talk.TalkRequest
+import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -11,7 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface TalksApiService {
+interface TalkApiService {
     @GET("/api/talks/{gameId}")
     suspend fun getTalks(
         @Path("gameId") gameId: Long,
@@ -29,8 +29,8 @@ interface TalksApiService {
     @POST("/api/talks/{gameId}")
     suspend fun postTalks(
         @Path("gameId") gameId: Long,
-        @Body request: TalksRequest,
-    ): Response<TalkDto>
+        @Body request: TalkRequest,
+    ): Response<TalkResponse>
 
     @DELETE("/api/talks/{gameId}/{talkId}")
     suspend fun deleteTalks(
