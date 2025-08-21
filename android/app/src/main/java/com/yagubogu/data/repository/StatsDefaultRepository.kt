@@ -2,10 +2,10 @@ package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.stats.StatsDataSource
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
-import com.yagubogu.data.dto.response.stats.VsTeamStatsResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.stats.detail.VsTeamStatItem
@@ -49,8 +49,8 @@ class StatsDefaultRepository(
     override suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>> =
         statsDataSource
             .getVsTeamStats(year)
-            .map { vsTeamStatsResponse: VsTeamStatsResponse ->
-                vsTeamStatsResponse.opponents.mapIndexed { index, opponentDto ->
+            .map { opponentWinRateResponse: OpponentWinRateResponse ->
+                opponentWinRateResponse.opponents.mapIndexed { index, opponentDto ->
                     opponentDto.toPresentation(index)
                 }
             }

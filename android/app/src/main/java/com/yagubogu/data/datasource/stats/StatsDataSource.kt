@@ -1,10 +1,10 @@
 package com.yagubogu.data.datasource.stats
 
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
-import com.yagubogu.data.dto.response.stats.VsTeamStatsResponse
 
 interface StatsDataSource {
     suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse>
@@ -15,5 +15,5 @@ interface StatsDataSource {
 
     suspend fun getAverageStats(): Result<AverageStatisticResponse>
 
-    suspend fun getVsTeamStats(year: Int): Result<VsTeamStatsResponse>
+    suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse>
 }

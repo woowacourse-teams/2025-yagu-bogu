@@ -4,8 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-// TODO: swagger 확인 불가능에 따라 클래스명 임시 정의
-data class VsTeamStatsResponse(
+data class OpponentWinRateResponse(
     @SerialName("opponents")
-    val opponents: List<OpponentDto>,
+    val opponents: List<OpponentWinRateTeamDto>,
 )

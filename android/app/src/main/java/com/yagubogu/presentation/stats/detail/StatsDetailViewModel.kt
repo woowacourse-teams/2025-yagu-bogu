@@ -43,9 +43,9 @@ class StatsDetailViewModel(
 
     private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
-            val vsTeamStatsResponse: Result<List<VsTeamStatItem>> =
+            val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
                 statsRepository.getVsTeamStats(year)
-            vsTeamStatsResponse
+            vsTeamStatsResult
                 .onSuccess { vsTeamStats: List<VsTeamStatItem> ->
                     vsTeamStatItems = vsTeamStats
                 }.onFailure { exception: Throwable ->
