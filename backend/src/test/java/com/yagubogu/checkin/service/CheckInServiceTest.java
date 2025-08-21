@@ -25,6 +25,7 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -48,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import(AuthTestConfig.class)
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 class CheckInServiceTest {
 
@@ -94,7 +95,7 @@ class CheckInServiceTest {
 
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
         stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
-        stadiumIncheon = stadiumRepository.findById(7L).orElseThrow();
+        stadiumIncheon = stadiumRepository.findById(4L).orElseThrow();
     }
 
     @DisplayName("인증을 저장한다")

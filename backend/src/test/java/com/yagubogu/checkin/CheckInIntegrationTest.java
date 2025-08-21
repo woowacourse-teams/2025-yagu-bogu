@@ -10,6 +10,7 @@ import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -41,7 +42,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(AuthTestConfig.class)
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CheckInIntegrationTest {

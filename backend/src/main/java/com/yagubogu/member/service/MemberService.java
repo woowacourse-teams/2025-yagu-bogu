@@ -4,6 +4,7 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
@@ -62,6 +63,12 @@ public class MemberService {
         member.updateFavorite(team);
 
         return MemberFavoriteResponse.from(member.getTeam());
+    }
+
+    public MemberInfoResponse findMember(final Long memberId) {
+        Member member = getMember(memberId);
+
+        return MemberInfoResponse.from(member);
     }
 
     private Member getMember(final long memberId) {
