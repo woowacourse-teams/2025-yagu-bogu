@@ -27,7 +27,7 @@ public class GameScheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 15 2 * * *")
     public void fetchDailyGameResult() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         try {
