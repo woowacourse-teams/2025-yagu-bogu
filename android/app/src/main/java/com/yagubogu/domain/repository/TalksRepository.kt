@@ -20,4 +20,11 @@ interface TalksRepository {
         gameId: Long,
         content: String,
     ): Result<LivetalkChatItem>
+
+    suspend fun deleteTalks(
+        gameId: Long,
+        talkId: Long,
+    ): Result<Unit>
+
+    suspend fun reportTalks(talkId: Long): Result<Unit>
 }

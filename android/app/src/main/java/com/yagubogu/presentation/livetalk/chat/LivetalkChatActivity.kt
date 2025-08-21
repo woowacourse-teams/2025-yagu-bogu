@@ -8,8 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
+import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.showSnackbar
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -26,7 +32,59 @@ class LivetalkChatActivity : AppCompatActivity() {
         )
     }
 
-    private val livetalkChatAdapter = LivetalkChatAdapter()
+    private var talkDeleteDialog: DefaultDialogFragment? = null
+
+    private var pendingDeleteMessageId: Long? = null
+    private var pendingReportMessageId: Long? = null
+
+    private val livetalkChatAdapter by lazy {
+        LivetalkChatAdapter { event: LivetalkChatEvent ->
+            when (event) {
+                is LivetalkChatEvent.Delete -> {
+                    pendingDeleteMessageId = event.livetalkChatItem.chatId
+                    showTalkDeleteDialog()
+                }
+
+                is LivetalkChatEvent.Report -> {
+                    pendingReportMessageId = event.livetalkChatItem.chatId
+                    showTalkReportDialog(
+                        event.livetalkChatItem.nickname ?: getString(R.string.all_null_nick_name),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun showTalkDeleteDialog() {
+        if (talkDeleteDialog == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.livetalk_trash_btn),
+                    message = getString(R.string.livetalk_trash_dialog_message),
+                    positiveText = getString(R.string.livetalk_trash_btn),
+                )
+            talkDeleteDialog =
+                DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
+        }
+
+        talkDeleteDialog?.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
+    }
+
+    private fun showTalkReportDialog(reportTalkNickName: String) {
+        val dialogUiModel =
+            DefaultDialogUiModel(
+                title = getString(R.string.livetalk_user_report_btn),
+                message =
+                    getString(
+                        R.string.livetalk_user_report_dialog_message,
+                        reportTalkNickName,
+                    ),
+                positiveText = getString(R.string.livetalk_user_report_btn),
+            )
+        val talkReportDialog =
+            DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
+        talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
+    }
 
     private val chatLinearLayoutManager by lazy {
         binding.rvChatMessages.layoutManager as LinearLayoutManager
@@ -37,8 +95,8 @@ class LivetalkChatActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
         setupBinding()
-        setupRecyclerView()
         setupListener()
+        setupRecyclerView()
         setupObservers()
     }
 
@@ -68,6 +126,26 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             },
         )
+
+        supportFragmentManager.setFragmentResultListener(
+            KEY_TALK_DELETE_DIALOG,
+            this,
+        ) { _, bundle ->
+            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.deleteMessage(pendingDeleteMessageId ?: return@setFragmentResultListener)
+            }
+        }
+
+        supportFragmentManager.setFragmentResultListener(
+            KEY_TALK_REPORT_DIALOG,
+            this,
+        ) { _, bundle ->
+            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.reportMessage(pendingReportMessageId ?: return@setFragmentResultListener)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -106,21 +184,32 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             }
         }
-    }
+        viewModel.livetalkReportEvent.observe(this) { livetalkReportEvent: LivetalkReportEvent ->
+            when (livetalkReportEvent) {
+                LivetalkReportEvent.DuplicatedReport ->
+                    binding.root.showSnackbar(
+                        R.string.livetalk_already_reported,
+                        R.id.divider,
+                    )
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.startChatPolling()
-    }
+                LivetalkReportEvent.Success ->
+                    binding.root.showSnackbar(
+                        R.string.livetalk_report_succeed,
+                        R.id.divider,
+                    )
+            }
+        }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.stopChatPolling()
+        viewModel.livetalkDeleteEvent.observe(this) {
+            binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
+        }
     }
 
     companion object {
         private const val KEY_GAME_ID = "gameId"
         private const val KEY_IS_VERIFIED = "isVerified"
+        private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
+        private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
 
         fun newIntent(
             context: Context,

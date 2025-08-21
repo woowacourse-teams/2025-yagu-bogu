@@ -5,7 +5,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.TalksRepository
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
+import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,6 +33,12 @@ class LivetalkChatViewModel(
         MediatorLiveData<Boolean>().apply {
             addSource(messageFormText) { value = isVerified && !it.isNullOrBlank() }
         }
+
+    private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
+    val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
+
+    private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
+    val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
     private val fetchLock = Mutex()
     private val pollingControlLock = Mutex()
@@ -78,6 +88,69 @@ class LivetalkChatViewModel(
                     messageFormText.value = ""
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    fun deleteMessage(chatId: Long) {
+        viewModelScope.launch {
+            fetchLock.withLock {
+                talksRepository
+                    .deleteTalks(gameId, chatId)
+                    .onSuccess {
+                        val currentChats = _liveTalkChatBubbleItem.value ?: emptyList()
+                        val deletedChats =
+                            currentChats.filter { it.livetalkChatItem.chatId != chatId }
+                        newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
+                        oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
+                        _liveTalkChatBubbleItem.value = deletedChats
+                        _livetalkDeleteEvent.setValue(Unit)
+                        Timber.d("현장톡 정상 삭제")
+                    }.onFailure { exception: Throwable ->
+                        when (exception) {
+                            is ApiException.BadRequest -> Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
+                            is ApiException.Forbidden -> Timber.d("타인의 현장톡 삭제 시도")
+                            is ApiException.NotFound -> Timber.d("존재하지 않는 현장톡 삭제 시도")
+                            else -> Timber.d(exception)
+                        }
+                    }
+            }
+        }
+    }
+
+    fun reportMessage(chatId: Long) {
+        viewModelScope.launch {
+            talksRepository
+                .reportTalks(chatId)
+                .onSuccess {
+                    val currentChats: List<LivetalkChatBubbleItem> =
+                        _liveTalkChatBubbleItem.value ?: emptyList()
+                    val updatedChats: List<LivetalkChatBubbleItem> =
+                        currentChats.map { chatBubbleItem: LivetalkChatBubbleItem ->
+                            if (chatBubbleItem.livetalkChatItem.chatId == chatId) {
+                                val updatedChatItem =
+                                    chatBubbleItem.livetalkChatItem.copy(
+                                        reported = true,
+                                        message = "숨김처리되었습니다",
+                                    )
+                                LivetalkChatBubbleItem.OtherBubbleItem(updatedChatItem)
+                            } else {
+                                chatBubbleItem
+                            }
+                        }
+                    _liveTalkChatBubbleItem.value = updatedChats
+                    _livetalkReportEvent.setValue(LivetalkReportEvent.Success)
+                    Timber.d("현장톡 정상 신고")
+                }.onFailure { exception: Throwable ->
+                    when (exception) {
+                        is ApiException.BadRequest -> {
+                            _livetalkReportEvent.setValue(LivetalkReportEvent.DuplicatedReport)
+                            Timber.d("스스로 신고하거나 중복 신고인 경우")
+                        }
+
+                        is ApiException.Forbidden -> Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                        else -> Timber.d(exception)
+                    }
                 }
         }
     }
