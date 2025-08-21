@@ -5,8 +5,10 @@ import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.VsTeamStatsResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.presentation.stats.my.AverageStats
 
 class StatsDefaultRepository(
@@ -43,4 +45,13 @@ class StatsDefaultRepository(
                 concededHits = averageStatisticResponse.concededHits ?: 0.0,
             )
         }
+
+    override suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>> =
+        statsDataSource
+            .getVsTeamStats(year)
+            .map { vsTeamStatsResponse: VsTeamStatsResponse ->
+                vsTeamStatsResponse.opponents.mapIndexed { index, opponentDto ->
+                    opponentDto.toPresentation(index)
+                }
+            }
 }

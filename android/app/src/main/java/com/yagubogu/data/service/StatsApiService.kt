@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.VsTeamStatsResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -26,4 +27,9 @@ interface StatsApiService {
 
     @GET("/api/stats/me")
     suspend fun getAverageStats(): Response<AverageStatisticResponse>
+
+    @GET("/api/check-ins/win-rate/opponents")
+    suspend fun getVsTeamStats(
+        @Query("year") year: Int,
+    ): Response<VsTeamStatsResponse>
 }
