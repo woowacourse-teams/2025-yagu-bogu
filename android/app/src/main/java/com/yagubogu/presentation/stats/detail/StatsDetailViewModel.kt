@@ -23,10 +23,11 @@ class StatsDetailViewModel(
     private val _stadiumVisitCounts = MutableLiveData<List<StadiumVisitCount>>()
     val stadiumVisitCounts: LiveData<List<StadiumVisitCount>> get() = _stadiumVisitCounts
 
-    val vsTeamStats: LiveData<List<VsTeamStatItem>> =
+    private val _vsTeamStats: MutableLiveData<List<VsTeamStatItem>> =
         MediatorLiveData<List<VsTeamStatItem>>().apply {
             addSource(isVsTeamStatsExpanded) { value = updateVsTeamStats() }
         }
+    val vsTeamStats: LiveData<List<VsTeamStatItem>> get() = _vsTeamStats
 
     init {
         fetchAll()
@@ -46,8 +47,9 @@ class StatsDetailViewModel(
             val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
                 statsRepository.getVsTeamStats(year)
             vsTeamStatsResult
-                .onSuccess { vsTeamStats: List<VsTeamStatItem> ->
-                    vsTeamStatItems = vsTeamStats
+                .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
+                    vsTeamStatItems = updatedVsTeamStats
+                    _vsTeamStats.value = updateVsTeamStats()
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -60,7 +62,7 @@ class StatsDetailViewModel(
                 checkInRepository.getCheckInStadiumCounts(year)
             stadiumVisitCountsResult
                 .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
-                    _stadiumVisitCounts.value = stadiumVisitCounts
+                    _stadiumVisitCounts.value = stadiumVisitCounts.sortedByDescending { it.visitCounts }
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

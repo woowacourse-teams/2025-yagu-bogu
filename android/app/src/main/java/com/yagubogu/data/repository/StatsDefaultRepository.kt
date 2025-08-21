@@ -51,7 +51,7 @@ class StatsDefaultRepository(
             .getVsTeamStats(year)
             .map { opponentWinRateResponse: OpponentWinRateResponse ->
                 opponentWinRateResponse.opponents.mapIndexed { index, opponentDto ->
-                    opponentDto.toPresentation(index)
+                    opponentDto.toPresentation(index + 1)
                 }
             }
 }
