@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
+import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.service.CheckInsApiService
 import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate
@@ -49,5 +50,10 @@ class CheckInsRemoteDataSource(
     ): Result<CheckInHistoryResponse> =
         safeApiCall {
             checkInsApiService.getCheckInHistories(year, filter, order)
+        }
+
+    override suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse> =
+        safeApiCall {
+            checkInsApiService.getCheckInStatus(date.toString())
         }
 }

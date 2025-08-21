@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
+import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import java.time.LocalDate
 
 interface CheckInsDataSource {
@@ -23,4 +24,6 @@ interface CheckInsDataSource {
         filter: String,
         order: String,
     ): Result<CheckInHistoryResponse>
+
+    suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse>
 }

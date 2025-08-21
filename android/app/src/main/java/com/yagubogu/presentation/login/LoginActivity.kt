@@ -1,18 +1,15 @@
 package com.yagubogu.presentation.login
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
@@ -21,6 +18,7 @@ import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
+import com.yagubogu.presentation.util.showSnackbar
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -87,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
             when (value) {
                 LoginResult.SignUp -> navigateToFavoriteTeam()
                 LoginResult.SignIn -> navigateToMain()
-                is LoginResult.Failure -> showSnackbar(R.string.login_failed_message)
+                is LoginResult.Failure -> binding.root.showSnackbar(R.string.login_failed_message)
                 LoginResult.Cancel -> Unit
             }
         }
@@ -101,15 +99,5 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
-    }
-
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            show()
-        }
     }
 }

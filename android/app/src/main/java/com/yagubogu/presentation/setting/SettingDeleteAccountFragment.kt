@@ -62,7 +62,7 @@ class SettingDeleteAccountFragment : Fragment() {
                         .newInstance(KEY_DELETE_ACCOUNT_REQUEST_DIALOG, dialogUiModel)
             }
 
-            deleteAccountDialog?.show(parentFragmentManager, "deleteAccountDialog")
+            deleteAccountDialog?.show(parentFragmentManager, KEY_DELETE_ACCOUNT_REQUEST_DIALOG)
         }
     }
 
