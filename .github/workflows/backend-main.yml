@@ -173,7 +173,7 @@ jobs:
             -l app=yagubogu-backend \
             -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \
-            -l release.alias="${IMG_T AG}" \
+            -l release.alias="${IMG_TAG}" \
             "$IMAGE@${DIGEST}"
 
           # Health check (exit if failed)
