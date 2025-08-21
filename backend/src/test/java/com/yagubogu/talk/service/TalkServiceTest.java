@@ -228,6 +228,57 @@ class TalkServiceTest {
         });
     }
 
+//    @DisplayName("위로 슬라이드 하는 과정에서 이전 채팅 기록 가져오기 - 소프트 딜리트")
+//    @Test
+//    void findFirstPage_whenCursorExists_returnsLeftMember_softDelete() {
+//        // given
+//        int limit = 2;
+//        Long cursorId = null;
+//        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
+//
+//        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+//        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+//        Team expectedAwayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+//        Game game = gameFactory.save(builder -> builder.homeTeam(expectedHomeTeam)
+//                .awayTeam(expectedAwayTeam)
+//                .stadium(expectedStadium));
+//
+//        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
+//        Talk expectedFirstPageTalk = talkFactory.save(builder ->
+//                builder.member(expectedMessageWriter)
+//                        .game(game)
+//        );
+//        Member soonLeftMember = memberFactory.save(MemberBuilder::build);
+//        Talk remainedTalkByLeftMember = talkFactory.save(builder ->
+//                builder.member(soonLeftMember)
+//                        .game(game)
+//        );
+//        memberRepository.delete(soonLeftMember);
+//
+//        // when
+//        TalkCursorResult result = talkService.findTalksExcludingReported(
+//                game.getId(),
+//                cursorId,
+//                limit,
+//                firstEnterMember.getId()
+//        );
+//
+//        // then
+//        assertSoftly(softAssertions -> {
+//            softAssertions.assertThat(result.stadiumName()).isEqualTo(expectedStadium.getFullName());
+//            softAssertions.assertThat(result.homeTeamName()).isEqualTo(expectedHomeTeam.getShortName());
+//            softAssertions.assertThat(result.awayTeamName()).isEqualTo(expectedAwayTeam.getShortName());
+//            softAssertions.assertThat(result.cursorResult().content().getFirst().id())
+//                    .isEqualTo(remainedTalkByLeftMember.getId());
+//            softAssertions.assertThat(result.cursorResult().content().getFirst().memberId())
+//                    .isEqualTo(remainedTalkByLeftMember.getMember().getId());
+//            softAssertions.assertThat(result.cursorResult().content().getFirst().imageUrl())
+//                    .isEqualTo(remainedTalkByLeftMember.getMember().getImageUrl());
+//            softAssertions.assertThat(result.cursorResult().nextCursorId()).isNull();
+//            softAssertions.assertThat(result.cursorResult().hasNext()).isFalse();
+//        });
+//    }
+
     @DisplayName("가져온 톡 중 자신이 작성한 톡을 구분할 수 있다")
     @Test
     void findTalks_myTalk() {
