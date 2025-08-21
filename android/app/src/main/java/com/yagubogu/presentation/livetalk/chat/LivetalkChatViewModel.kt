@@ -25,7 +25,7 @@ class LivetalkChatViewModel(
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
     val messageFormText = MutableLiveData<String>()
-    val isCanMessageSend =
+    val canSendMessage =
         MediatorLiveData<Boolean>().apply {
             addSource(messageFormText) { value = isVerified && !it.isNullOrBlank() }
         }
