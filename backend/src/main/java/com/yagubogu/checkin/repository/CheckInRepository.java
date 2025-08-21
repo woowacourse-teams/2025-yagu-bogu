@@ -3,6 +3,7 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
@@ -234,6 +235,24 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 AND (g.homeTeam = ci.team OR g.awayTeam = ci.team)
             """)
     AverageStatistic findAverageStatistic(Member member);
+
+    @Query("""
+             SELECT new com.yagubogu.checkin.dto.StadiumCheckInCountResponse(
+                 s.id,
+                 s.location,
+                 COUNT(c.id)
+             )
+             FROM Stadium s
+             LEFT JOIN CheckIn c ON c.game.stadium.id = s.id
+                                AND c.member = :member
+                                AND c.game.date BETWEEN :startDate AND :endDate
+             GROUP BY s.id, s.location
+            """)
+    List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
+            Member member,
+            LocalDate startDate,
+            LocalDate endDate
+    );
 
     @Query("""
             select new com.yagubogu.stat.dto.OpponentWinRateRow(

@@ -3,7 +3,7 @@ name: YaguBogu Backend Release & Deploy (Auto SemVer)
 on:
   pull_request_target:
     types: [ closed ]
-    branches: [ "dev-be" ]
+    branches: [ "main" ]
 
 env:
   IMAGE: yagubogu/yagubogu-backend
@@ -15,8 +15,8 @@ jobs:
     permissions:
       contents: write
     outputs:
-      version: ${{ steps.semver.outputs.next_version }}     # 1.0.1
-      ver_tag: ${{ steps.ver.outputs.ver_tag }}             # v1.0.1
+      next_version: ${{ steps.semver.outputs.next_version }}     # 1.0.1
+      next_version_with_v: ${{ steps.ver.outputs.next_version_with_v }}             # v1.0.1
       digest: ${{ steps.capture.outputs.digest }}          # sha256:...
       img_tag: ${{ steps.alias.outputs.image_tag }}         # v1.0.1-abcdef12
     steps:
@@ -69,7 +69,21 @@ jobs:
           set -euo pipefail
           VER="v${{ steps.semver.outputs.next_version }}"
           echo "VER=$VER" >> "$GITHUB_ENV"
-          echo "ver_tag=$VER" >> "$GITHUB_OUTPUT"
+          echo "next_version_with_v=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag (v-prefixed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${{ steps.ver.outputs.next_version_with_v }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/$VER" >/dev/null; then
+            echo "Tag $VER already exists. Skip."
+          else
+            git tag -a "$VER" -m "Release $VER (auto)"
+            git push origin "$VER"
+          fi
 
       - id: capture
         name: Capture image digest of dev-latest
@@ -95,7 +109,7 @@ jobs:
           DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
           SHORT="${DIGEST#sha256:}"
           SHORT="${SHORT:0:8}"
-          READABLE="v${{ steps.semver.outputs.next_version }}-${SHORT}"
+          READABLE="${{ steps.ver.outputs.next_version_with_v }}-${SHORT}"
           docker buildx imagetools create \
             -t "$IMAGE:$READABLE" \
             "$IMAGE:dev-latest"
@@ -107,8 +121,8 @@ jobs:
     runs-on: [ self-hosted, production ]
     env:
       IMAGE: yagubogu/yagubogu-backend
-      VERSION: ${{ needs.release.outputs.version }}   # 1.0.1
-      VER: ${{ needs.release.outputs.ver_tag }}   # v1.0.1
+      NEXT_VERSION: ${{ needs.release.outputs.next_version }}   # 1.0.1
+      NEXT_VERSION_WITH_V: ${{ needs.release.outputs.next_version_with_v }}   # v1.0.1
       DIGEST: ${{ needs.release.outputs.digest }}    # sha256:
       IMG_TAG: ${{ needs.release.outputs.img_tag }}   # v1.0.1-abcdef12
     steps:
@@ -153,8 +167,11 @@ jobs:
             -e DB_URL="${{ secrets.DB_PROD_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
+            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
             -l app=yagubogu-backend \
-            -l release.version="${VER}" \
+            -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \
             -l release.alias="${IMG_TAG}" \
             "$IMAGE@${DIGEST}"
@@ -193,9 +210,9 @@ jobs:
 
           LOG_DIR="/var/log/yagubogu"
           sudo mkdir -p "$LOG_DIR"
-          echo "$(date -Is) release=${VER} version=${VERSION} digest=${DIGEST} alias=${IMG_TAG} color=${COLOR} port=${PORT}" \
+          echo "$(date -Is) release=${NEXT_VERSION_WITH_V} version=${NEXT_VERSION} digest=${DIGEST} alias=${IMG_TAG} color=${COLOR} port=${PORT}" \
             | sudo tee -a "$LOG_DIR/deployments.log"
-          echo "${VER} ${VERSION} ${DIGEST} ${IMG_TAG} ${COLOR} ${PORT}" | sudo tee "$LOG_DIR/current.release" >/dev/null
+          echo "${NEXT_VERSION_WITH_V} ${NEXT_VERSION} ${DIGEST} ${IMG_TAG} ${COLOR} ${PORT}" | sudo tee "$LOG_DIR/current.release" >/dev/null
 
       - name: Prune old images (local)
         shell: bash

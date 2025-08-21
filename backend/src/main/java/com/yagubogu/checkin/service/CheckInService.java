@@ -1,8 +1,10 @@
 package com.yagubogu.checkin.service;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
@@ -10,6 +12,8 @@ import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateGameEntry;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -23,6 +27,7 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -89,15 +94,22 @@ public class CheckInService {
     public CheckInHistoryResponse findCheckInHistory(
             final long memberId,
             final int year,
-            final CheckInResultFilter filter
+            final CheckInResultFilter resultFilter,
+            final CheckInOrderFilter orderFilter
     ) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        return switch (filter) {
-            case ALL -> new CheckInHistoryResponse(checkInRepository.findCheckInHistory(member, team, year));
-            case WIN -> new CheckInHistoryResponse(checkInRepository.findCheckInWinHistory(member, team, year));
+        List<CheckInGameResponse> checkIns = switch (resultFilter) {
+            case ALL -> checkInRepository.findCheckInHistory(member, team, year);
+            case WIN -> checkInRepository.findCheckInWinHistory(member, team, year);
         };
+
+        if (orderFilter.isOldest()) {
+            Collections.reverse(checkIns);
+        }
+
+        return new CheckInHistoryResponse(checkIns);
     }
 
     public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
@@ -110,6 +122,16 @@ public class CheckInService {
                 .toList();
 
         return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
+    }
+
+    public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
+        Member member = getMember(memberId);
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
+        List<StadiumCheckInCountResponse> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
+                start, end);
+
+        return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {

@@ -1,12 +1,13 @@
 package com.yagubogu.checkin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.member.domain.Member;
@@ -18,6 +19,7 @@ import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -36,6 +38,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -83,9 +87,9 @@ public class CheckInIntegrationTest {
         doosan = teamRepository.findByTeamCode("OB").orElseThrow();
         lotte = teamRepository.findByTeamCode("LT").orElseThrow();
 
-        stadiumJamsil = stadiumRepository.findById(1L).orElseThrow();
-        stadiumGocheok = stadiumRepository.findById(2L).orElseThrow();
-        stadiumIncheon = stadiumRepository.findById(3L).orElseThrow();
+        stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
+        stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
+        stadiumIncheon = stadiumRepository.findById(7L).orElseThrow();
     }
 
     @DisplayName("인증을 저장한다")
@@ -195,9 +199,9 @@ public class CheckInIntegrationTest {
                 .statusCode(404);
     }
 
-    @DisplayName("직관 내역을 조회한다")
+    @DisplayName("직관 내역을 최신순으로 조회한다")
     @Test
-    void findCheckInHistory() {
+    void findCheckInHistory_findAllOrderByLatest() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
@@ -229,6 +233,127 @@ public class CheckInIntegrationTest {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("모든 직관 내역을 오래된순으로 조회한다")
+    @Test
+    void findCheckInHistory_findAllOrderByOldest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.OLDEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("이긴 직관 내역을 최신순으로 조회한다")
+    @Test
+    void findCheckInWinHistory_findWinOrderByLatest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("이긴 직관 내역을 오래된순으로 조회한다")
+    @Test
+    void findCheckInWinHistory_findWinOrderByOldest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
@@ -320,45 +445,6 @@ public class CheckInIntegrationTest {
         assertThat(actual.isCheckIn()).isTrue();
     }
 
-    @DisplayName("이긴 직관 내역을 조회한다")
-    @Test
-    void findCheckInWinHistory() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        LocalDate date = LocalDate.of(2025, 7, 25);
-        Game game1 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-        Game game2 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date.plusDays(1))
-                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-        Game game3 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date.plusDays(2))
-                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-
-        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
-        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
-        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
-                .queryParam("result", CheckInResultFilter.WIN)
-                .when().get("/api/check-ins/members")
-                .then().log().all()
-                .statusCode(200);
-    }
-
     @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율을 조회한다")
     @Test
     void findFanRatesByStadiums() {
@@ -389,6 +475,86 @@ public class CheckInIntegrationTest {
                 .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("구장별 방문 횟수 조회 - 방문한 경기장이 없을 때")
+    @Test
+    void findStadiumCheckInCounts_noCheckIn() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
+                List.of(
+                        new StadiumCheckInCountResponse(1L, "광주", 0L),
+                        new StadiumCheckInCountResponse(2L, "잠실", 0L),
+                        new StadiumCheckInCountResponse(3L, "고척", 0L),
+                        new StadiumCheckInCountResponse(4L, "수원", 0L),
+                        new StadiumCheckInCountResponse(5L, "대구", 0L),
+                        new StadiumCheckInCountResponse(6L, "부산", 0L),
+                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                )
+        );
+
+        // when
+        StadiumCheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/stadiums/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StadiumCheckInCountsResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("구장별 방문 횟수 조회 - 방문한 경기장이 있을 때")
+    @Test
+    void findStadiumCheckInCounts_hasCheckIn() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        Game game1 = gameFactory.save(builder -> builder
+                .date(TestFixture.getYesterday())
+                .stadium(stadiumJamsil)
+                .homeTeam(samsung)
+                .awayTeam(doosan)
+        );
+        checkInFactory.save(builder -> builder.game(game1).member(member).team(samsung));
+
+        StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
+                List.of(
+                        new StadiumCheckInCountResponse(1L, "광주", 0L),
+                        new StadiumCheckInCountResponse(2L, "잠실", 1L),
+                        new StadiumCheckInCountResponse(3L, "고척", 0L),
+                        new StadiumCheckInCountResponse(4L, "수원", 0L),
+                        new StadiumCheckInCountResponse(5L, "대구", 0L),
+                        new StadiumCheckInCountResponse(6L, "부산", 0L),
+                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                )
+        );
+
+        // when
+        StadiumCheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/stadiums/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StadiumCheckInCountsResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
     }
 
     private void createCheckInsForGame(Team team, Game game, int count) {

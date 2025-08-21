@@ -2,12 +2,14 @@ package com.yagubogu.checkin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
@@ -43,12 +45,19 @@ public class CheckInController implements CheckInControllerInterface {
         return ResponseEntity.ok(response);
     }
 
+    @Override
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             final MemberClaims memberClaims,
             @RequestParam final int year,
-            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter filter
+            @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
+            @RequestParam(name = "order", defaultValue = "LATEST") final CheckInOrderFilter orderFilter
     ) {
-        CheckInHistoryResponse response = checkInService.findCheckInHistory(memberClaims.id(), year, filter);
+        CheckInHistoryResponse response = checkInService.findCheckInHistory(
+                memberClaims.id(),
+                year,
+                resultFilter,
+                orderFilter
+        );
 
         return ResponseEntity.ok(response);
     }
@@ -75,6 +84,15 @@ public class CheckInController implements CheckInControllerInterface {
             @RequestParam final LocalDate date
     ) {
         CheckInStatusResponse response = checkInService.findCheckInStatus(memberClaims.id(), date);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
+            final MemberClaims memberClaims,
+            @RequestParam final int year
+    ) {
+        StadiumCheckInCountsResponse response = checkInService.findStadiumCheckInCounts(memberClaims.id(), year);
 
         return ResponseEntity.ok(response);
     }
