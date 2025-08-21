@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.yagubogu.R
@@ -105,9 +106,12 @@ class AttendanceHistoryFragment : Fragment() {
                 }
             }
 
-            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
-            binding.ivEmptyHistory.visibility = visibility
-            binding.tvEmptyHistory.visibility = visibility
+            val isAttendanceHistoryEmpty: Boolean = value.isEmpty()
+            binding.ivEmptyHistory.isVisible = isAttendanceHistoryEmpty
+            binding.tvEmptyHistory.isVisible = isAttendanceHistoryEmpty
+
+            binding.constraintFilter.isVisible = !isAttendanceHistoryEmpty
+            binding.constraintOrder.isVisible = !isAttendanceHistoryEmpty
         }
 
         viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
