@@ -14,6 +14,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
     @Query("""
             SELECT t
             FROM Talk t
+            LEFT JOIN t.member m
             WHERE t.game.id = :gameId
             ORDER BY t.id DESC
             """)
@@ -25,6 +26,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
     @Query("""
             SELECT t
             FROM Talk t
+            LEFT JOIN t.member m
             WHERE t.game.id = :gameId AND t.id < :cursorId
             ORDER BY t.id DESC
             """)
@@ -37,8 +39,9 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
     @Query("""
             SELECT t
             FROM Talk t
+            LEFT JOIN t.member m
             WHERE t.game.id = :gameId AND t.id > :cursorId
-            ORDER BY t.id DESC 
+            ORDER BY t.id DESC
             """)
     Slice<Talk> fetchTalksAfterCursor(
             @Param("gameId") long gameId,

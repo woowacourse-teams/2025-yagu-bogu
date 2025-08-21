@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record TalkResponse(
         long id,
-        long memberId,
+        Long memberId,
         String nickname,
         String favorite,
         String imageUrl,
@@ -15,6 +15,19 @@ public record TalkResponse(
 ) {
 
     public static TalkResponse from(Talk talk, long memberId) {
+        if (talk.getMember() == null) {
+            return new TalkResponse(
+                    talk.getId(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    talk.getContent(),
+                    talk.getCreatedAt(),
+                    false
+            );
+        }
+
         return new TalkResponse(
                 talk.getId(),
                 talk.getMember().getId(),
