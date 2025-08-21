@@ -1,5 +1,9 @@
 package com.yagubogu.stat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -33,10 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -493,29 +493,39 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), year);
 
         // then
-        assertSoftly(softAssertions -> {
-            // 전체 상대팀(내 팀 제외) 9개
-            softAssertions.assertThat(actual.opponents()).hasSize(9);
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
 
-            softAssertions.assertThat(actual.opponents().get(0))
-                    .satisfies(it -> {
-                        assertThat(it.teamCode()).isEqualTo("SS");
-                        assertThat(it.winRate()).isEqualTo(100.0);
-                    });
-            softAssertions.assertThat(actual.opponents().get(1))
-                    .satisfies(it -> {
-                        assertThat(it.teamCode()).isEqualTo("LT");
-                        assertThat(it.winRate()).isEqualTo(50.0);
-                    });
+            // SS
+            s.assertThat(actual.opponents().get(0).teamCode()).isEqualTo("SS");
+            s.assertThat(actual.opponents().get(0).wins()).isEqualTo(2);
+            s.assertThat(actual.opponents().get(0).losses()).isEqualTo(0);
+            s.assertThat(actual.opponents().get(0).draws()).isEqualTo(0);
+            s.assertThat(actual.opponents().get(0).winRate()).isEqualTo(100.0);
 
-            // 미대결 팀들은 0.0 포함
+            // LT
+            s.assertThat(actual.opponents().get(1).teamCode()).isEqualTo("LT");
+            s.assertThat(actual.opponents().get(1).wins()).isEqualTo(1);
+            s.assertThat(actual.opponents().get(1).losses()).isEqualTo(1);
+            s.assertThat(actual.opponents().get(1).draws()).isEqualTo(0);
+            s.assertThat(actual.opponents().get(1).winRate()).isEqualTo(50.0);
+
+            // NC
+            OpponentWinRateTeamResponse nc = actual.opponents().stream()
+                    .filter(r -> r.teamCode().equals("NC"))
+                    .findFirst().orElseThrow();
+            s.assertThat(nc.wins()).isEqualTo(0);
+            s.assertThat(nc.losses()).isEqualTo(0);
+            s.assertThat(nc.draws()).isEqualTo(1);
+            s.assertThat(nc.winRate()).isEqualTo(0.0);
+
+            // 미대결 팀들
             var zeroTeamCodes = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
                     .map(OpponentWinRateTeamResponse::teamCode)
                     .toList();
-
-            softAssertions.assertThat(zeroTeamCodes)
-                    .containsExactly("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+            s.assertThat(zeroTeamCodes)
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
         });
     }
 
@@ -545,13 +555,18 @@ class StatServiceTest {
         // when
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
-        // then: 내 팀 제외 9팀 모두 포함, LT만 100.0, 나머지는 0.0
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.opponents()).hasSize(9);
-            softAssertions.assertThat(actual.opponents().stream()
+        // then
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
+            OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
-                    .findFirst().orElseThrow().winRate()).isEqualTo(100.0);
-            softAssertions.assertThat(actual.opponents().stream()
+                    .findFirst().orElseThrow();
+            s.assertThat(lt.winRate()).isEqualTo(100.0);
+            s.assertThat(lt.wins()).isEqualTo(1);
+            s.assertThat(lt.losses()).isEqualTo(0);
+            s.assertThat(lt.draws()).isEqualTo(0);
+
+            s.assertThat(actual.opponents().stream()
                     .filter(it -> !it.teamCode().equals("LT"))
                     .allMatch(it -> it.winRate() == 0.0)).isTrue();
         });
@@ -595,13 +610,18 @@ class StatServiceTest {
         // when
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
-        // then: 9팀 모두 포함, LT는 100.0, 나머지 0.0
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.opponents()).hasSize(9);
-            softAssertions.assertThat(actual.opponents().stream()
+        // then
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
+            OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
-                    .findFirst().orElseThrow().winRate()).isEqualTo(100.0);
-            softAssertions.assertThat(actual.opponents().stream()
+                    .findFirst().orElseThrow();
+            s.assertThat(lt.winRate()).isEqualTo(100.0);
+            s.assertThat(lt.wins()).isEqualTo(1);
+            s.assertThat(lt.losses()).isEqualTo(0);
+            s.assertThat(lt.draws()).isEqualTo(0);
+
+            s.assertThat(actual.opponents().stream()
                     .filter(it -> !it.teamCode().equals("LT"))
                     .allMatch(it -> it.winRate() == 0.0)).isTrue();
         });

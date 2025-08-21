@@ -6,6 +6,7 @@ public record OpponentWinRateRow(
         String shortName,
         String teamCode,
         long wins,
-        long games
+        long losses,
+        long draws
 ) {
 }
