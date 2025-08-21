@@ -94,6 +94,7 @@ public interface CheckInControllerInterface {
     @Operation(summary = "구장별 방문 횟수 조회", description = "사용자의 현재 연도 기준 구장별 체크인 횟수를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "구장별 체크인 횟수 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
     })
     @GetMapping("/stadiums/counts")
     ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
