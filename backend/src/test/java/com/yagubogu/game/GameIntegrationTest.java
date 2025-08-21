@@ -3,13 +3,9 @@ package com.yagubogu.game;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.GameResponse;
-import com.yagubogu.game.dto.GameResultResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
-import com.yagubogu.game.dto.Pitchers;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
 import com.yagubogu.member.domain.Member;
@@ -135,24 +131,6 @@ public class GameIntegrationTest {
                 .statusCode(422);
     }
 
-    @DisplayName("끝난 경기의 스코어보드를 조회한다")
-    @Test
-    void findGameScoreBoard() {
-        // given
-        LocalDate date = TestFixture.getToday();
-        Game game = makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .pathParam("gameId", game.getId())
-                .when().get("/api/games/{gameId}")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(GameResultResponse.class);
-    }
-
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
@@ -166,38 +144,14 @@ public class GameIntegrationTest {
         );
     }
 
-    private Game makeGameWithScoreBoard(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
-        Team homeTeam = getTeamByCode(homeCode);
-        Team awayTeam = getTeamByCode(awayCode);
-        Stadium stadium = stadiumRepository.findByShortName(stadiumShortName).orElseThrow();
-        ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
-                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
-        ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
-                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
-        Pitchers pitchers = new Pitchers("1", "1", "1", "1");
-        String homePitcher = "이포라";
-        String awayPitcher = "포라리";
-
-        return gameFactory.save(builder -> builder
-                .homeTeam(homeTeam)
-                .awayTeam(awayTeam)
-                .stadium(stadium)
-                .date(date)
-                .homeScoreBoard(homeScoreBoard)
-                .awayScoreBoard(awayScoreBoard)
-                .homePitcher(homePitcher)
-                .awayPitcher(awayPitcher)
-        );
-    }
-
     private void makeCheckIns(Game game, Team team, int count) {
         makeMembers(count, team).forEach(member ->
                 makeCheckIn(game, team, member)
         );
     }
 
-    private CheckIn makeCheckIn(final Game game, final Team team, final Member member) {
-        return checkInFactory.save(builder -> builder
+    private void makeCheckIn(final Game game, final Team team, final Member member) {
+        checkInFactory.save(builder -> builder
                 .game(game)
                 .member(member)
                 .team(team)
