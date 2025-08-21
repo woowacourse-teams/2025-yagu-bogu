@@ -1,7 +1,6 @@
 package com.yagubogu.presentation.setting
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,16 +21,9 @@ class SettingViewModel(
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
 
-    private val _nickname = MutableLiveData<String>()
-    val nickname: LiveData<String> get() = _nickname
-
     private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
     val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
 
-    val memberPeriod: LiveData<Int> =
-        MediatorLiveData<Int>().apply {
-            addSource(myMemberInfoItem) { value = it.memberPeriod }
-        }
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
 
@@ -45,7 +37,6 @@ class SettingViewModel(
     val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
 
     init {
-        fetchNickname()
         // fetchMemberInfo()
         setDummyMemberInfo() // TODO: 내 정보 API 구현시 더미 제거
     }
@@ -59,7 +50,7 @@ class SettingViewModel(
             memberRepository
                 .updateNickname(newNickname)
                 .onSuccess {
-                    _nickname.value = newNickname
+                    _myMemberInfoItem.value = _myMemberInfoItem.value?.copy(nickName = newNickname)
                     _nicknameEditedEvent.setValue(newNickname)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
@@ -95,18 +86,6 @@ class SettingViewModel(
         _deleteAccountCancelEvent.setValue(Unit)
     }
 
-    private fun fetchNickname() {
-        viewModelScope.launch {
-            memberRepository
-                .getNickname()
-                .onSuccess { nickname: String ->
-                    _nickname.value = nickname
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "닉네임 조회 API 호출 실패")
-                }
-        }
-    }
-
     private fun fetchMemberInfo() {
         viewModelScope.launch {
             memberRepository
@@ -122,7 +101,7 @@ class SettingViewModel(
     private fun setDummyMemberInfo() {
         _myMemberInfoItem.value =
             MemberInfoItem(
-                nickName = nickname.value.orEmpty(),
+                nickName = "Jake",
                 createdAt = LocalDate.of(2025, 8, 20),
                 favoriteTeam = Team.KT,
                 profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",

@@ -58,7 +58,7 @@ class SettingMainFragment : Fragment() {
 
     private fun setupListeners() {
         binding.layoutEditNickname.root.setOnClickListener {
-            val currentNickname: String = viewModel.nickname.value.toString()
+            val currentNickname: String = viewModel.myMemberInfoItem.value?.nickName ?: ""
             SettingNicknameEditFragment
                 .newInstance(currentNickname)
                 .show(parentFragmentManager, "SettingNicknameEditFragment")
