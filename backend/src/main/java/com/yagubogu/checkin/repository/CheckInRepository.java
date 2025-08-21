@@ -244,8 +244,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             from Game g
             join Team away on away.id = g.awayTeam.id
             where g.homeTeam.id = :myTeamId
-              and g.homeScore is not null and g.awayScore is not null
               and g.date between :start and :end
+              and g.gameState = 'COMPLETED'
             group by away.id, away.name, away.shortName, away.teamCode
             """)
     List<OpponentWinRateRow> findOpponentWinRatesWhenHome(
@@ -263,8 +263,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             from Game g
             join Team home on home.id = g.homeTeam.id
             where g.awayTeam.id = :myTeamId
-              and g.homeScore is not null and g.awayScore is not null
               and g.date between :start and :end
+              and g.gameState = 'COMPLETED'
             group by home.id, home.name, home.shortName, home.teamCode
             """)
     List<OpponentWinRateRow> findOpponentWinRatesWhenAway(
