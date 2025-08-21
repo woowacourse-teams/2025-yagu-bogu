@@ -17,6 +17,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 class RetrofitInstance(
+    baseUrl: String,
     tokenManager: TokenManager,
 ) {
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
@@ -40,7 +41,7 @@ class RetrofitInstance(
     private val tokenRetrofit: Retrofit by lazy {
         Retrofit
             .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(baseUrl)
             .client(tokenClient)
             .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
@@ -65,7 +66,7 @@ class RetrofitInstance(
     private val baseRetrofit: Retrofit by lazy {
         Retrofit
             .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(baseUrl)
             .client(baseClient)
             .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
