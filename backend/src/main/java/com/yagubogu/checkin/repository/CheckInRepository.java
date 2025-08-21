@@ -267,7 +267,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             select new com.yagubogu.stat.dto.OpponentWinRateRow(
                 away.id, away.name, away.shortName, away.teamCode,
                 sum(case when g.homeScore > g.awayScore then 1 else 0 end),
-                count(g)
+                sum(case when g.homeScore < g.awayScore then 1 else 0 end),
+                sum(case when g.homeScore = g.awayScore then 1 else 0 end)
             )
             from Game g
             join Team away on away.id = g.awayTeam.id
@@ -286,7 +287,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             select new com.yagubogu.stat.dto.OpponentWinRateRow(
                 home.id, home.name, home.shortName, home.teamCode,
                 sum(case when g.awayScore > g.homeScore then 1 else 0 end),
-                count(g)
+                sum(case when g.awayScore < g.homeScore then 1 else 0 end),
+                sum(case when g.awayScore = g.homeScore then 1 else 0 end)
             )
             from Game g
             join Team home on home.id = g.homeTeam.id

@@ -5,6 +5,9 @@ public record OpponentWinRateTeamResponse(
         String name,
         String shortName,
         String teamCode,
+        long wins,
+        long losses,
+        long draws,
         double winRate
 ) {
 }
