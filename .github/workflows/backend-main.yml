@@ -167,10 +167,13 @@ jobs:
             -e DB_URL="${{ secrets.DB_PROD_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
+            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
             -l app=yagubogu-backend \
             -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \
-            -l release.alias="${IMG_TAG}" \
+            -l release.alias="${IMG_T AG}" \
             "$IMAGE@${DIGEST}"
 
           # Health check (exit if failed)
