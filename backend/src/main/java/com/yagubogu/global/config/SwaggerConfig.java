@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(SwaggerUiServersProperties.class)
 @Configuration
 public class SwaggerConfig {
-
-
+    
     private final SwaggerUiServersProperties serversProps;
 
     public SwaggerConfig(SwaggerUiServersProperties serversProps) {
