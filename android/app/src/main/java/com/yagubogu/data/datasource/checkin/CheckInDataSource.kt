@@ -1,13 +1,13 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.checkin
 
-import com.yagubogu.data.dto.response.CheckInCountsResponse
-import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
+import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
+import com.yagubogu.data.dto.response.checkin.FanRateResponse
+import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import java.time.LocalDate
 
-interface CheckInsDataSource {
+interface CheckInDataSource {
     suspend fun addCheckIn(
         stadiumId: Long,
         date: LocalDate,

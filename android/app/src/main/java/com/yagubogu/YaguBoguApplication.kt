@@ -5,7 +5,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
-import com.yagubogu.data.datasource.CheckInsRemoteDataSource
 import com.yagubogu.data.datasource.GamesRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
@@ -14,10 +13,11 @@ import com.yagubogu.data.datasource.StatsRemoteDataSource
 import com.yagubogu.data.datasource.TalksRemoteDataSource
 import com.yagubogu.data.datasource.TokenRemoteDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
+import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
-import com.yagubogu.data.repository.CheckInsDefaultRepository
+import com.yagubogu.data.repository.CheckInDefaultRepository
 import com.yagubogu.data.repository.GamesDefaultRepository
 import com.yagubogu.data.repository.LocationDefaultRepository
 import com.yagubogu.data.repository.MemberDefaultRepository
@@ -47,8 +47,8 @@ class YaguBoguApplication : Application() {
     private val stadiumDataSource by lazy { StadiumRemoteDataSource(retrofit.stadiumApiService) }
     val stadiumRepository by lazy { StadiumDefaultRepository(stadiumDataSource) }
 
-    private val checkInsDataSource by lazy { CheckInsRemoteDataSource(retrofit.checkInsApiService) }
-    val checkInsRepository by lazy { CheckInsDefaultRepository(checkInsDataSource) }
+    private val checkInsDataSource by lazy { CheckInRemoteDataSource(retrofit.checkInApiService) }
+    val checkInsRepository by lazy { CheckInDefaultRepository(checkInsDataSource) }
 
     private val statsDataSource by lazy { StatsRemoteDataSource(retrofit.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }

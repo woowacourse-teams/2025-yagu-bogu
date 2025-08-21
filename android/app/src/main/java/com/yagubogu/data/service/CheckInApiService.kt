@@ -1,18 +1,18 @@
 package com.yagubogu.data.service
 
-import com.yagubogu.data.dto.request.CheckInRequest
-import com.yagubogu.data.dto.response.CheckInCountsResponse
-import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
+import com.yagubogu.data.dto.request.checkin.CheckInRequest
+import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
+import com.yagubogu.data.dto.response.checkin.FanRateResponse
+import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface CheckInsApiService {
+interface CheckInApiService {
     @POST("/api/check-ins")
     suspend fun postCheckIn(
         @Body body: CheckInRequest,

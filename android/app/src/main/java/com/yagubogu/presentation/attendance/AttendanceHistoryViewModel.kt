@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistorySort
@@ -15,7 +15,7 @@ import timber.log.Timber
 import java.time.LocalDate
 
 class AttendanceHistoryViewModel(
-    private val checkInsRepository: CheckInsRepository,
+    private val checkInRepository: CheckInRepository,
 ) : ViewModel(),
     AttendanceHistorySummaryViewHolder.Handler,
     AttendanceHistoryDetailViewHolder.Handler {
@@ -44,7 +44,7 @@ class AttendanceHistoryViewModel(
             val filter: AttendanceHistoryFilter =
                 attendanceHistoryFilter.value ?: AttendanceHistoryFilter.ALL
             val attendanceHistories: Result<List<AttendanceHistoryItem.Detail>> =
-                checkInsRepository.getCheckInHistories(year, filter.name)
+                checkInRepository.getCheckInHistories(year, filter.name)
             attendanceHistories
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem.Detail> ->
                     items.value = attendanceHistoryItems

@@ -1,19 +1,19 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.checkin
 
-import com.yagubogu.data.dto.request.CheckInRequest
-import com.yagubogu.data.dto.response.CheckInCountsResponse
-import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
+import com.yagubogu.data.dto.request.checkin.CheckInRequest
+import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
-import com.yagubogu.data.service.CheckInsApiService
+import com.yagubogu.data.dto.response.checkin.FanRateResponse
+import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
+import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate
 import kotlinx.datetime.LocalDate.Companion as KLocalDate
 
-class CheckInsRemoteDataSource(
-    private val checkInsApiService: CheckInsApiService,
-) : CheckInsDataSource {
+class CheckInRemoteDataSource(
+    private val checkInApiService: CheckInApiService,
+) : CheckInDataSource {
     override suspend fun addCheckIn(
         stadiumId: Long,
         date: LocalDate,
@@ -24,23 +24,23 @@ class CheckInsRemoteDataSource(
                 date = KLocalDate.parse(date.toString()),
             )
         return safeApiCall {
-            checkInsApiService.postCheckIn(checkInRequest)
+            checkInApiService.postCheckIn(checkInRequest)
         }
     }
 
     override suspend fun getCheckInCounts(year: Int): Result<CheckInCountsResponse> =
         safeApiCall {
-            checkInsApiService.getCheckInCounts(year)
+            checkInApiService.getCheckInCounts(year)
         }
 
     override suspend fun getStadiumFanRates(date: LocalDate): Result<FanRateResponse> =
         safeApiCall {
-            checkInsApiService.getStadiumFanRates(date.toString())
+            checkInApiService.getStadiumFanRates(date.toString())
         }
 
     override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRankingResponse> =
         safeApiCall {
-            checkInsApiService.getVictoryFairyRankings()
+            checkInApiService.getVictoryFairyRankings()
         }
 
     override suspend fun getCheckInHistories(
@@ -48,11 +48,11 @@ class CheckInsRemoteDataSource(
         filter: String,
     ): Result<CheckInHistoryResponse> =
         safeApiCall {
-            checkInsApiService.getCheckInHistories(year, filter)
+            checkInApiService.getCheckInHistories(year, filter)
         }
 
     override suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse> =
         safeApiCall {
-            checkInsApiService.getCheckInStatus(date.toString())
+            checkInApiService.getCheckInStatus(date.toString())
         }
 }

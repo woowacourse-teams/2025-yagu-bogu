@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.request
+package com.yagubogu.data.dto.request.checkin
 
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName

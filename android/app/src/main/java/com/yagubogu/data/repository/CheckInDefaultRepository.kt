@@ -1,35 +1,35 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.CheckInsDataSource
-import com.yagubogu.data.dto.response.CheckInCountsResponse
-import com.yagubogu.data.dto.response.FanRateByGameDto
-import com.yagubogu.data.dto.response.FanRateResponse
-import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
+import com.yagubogu.data.datasource.checkin.CheckInDataSource
+import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
-import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
+import com.yagubogu.data.dto.response.checkin.FanRateResponse
+import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
+import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
-class CheckInsDefaultRepository(
-    private val checkInsDataSource: CheckInsDataSource,
-) : CheckInsRepository {
+class CheckInDefaultRepository(
+    private val checkInDataSource: CheckInDataSource,
+) : CheckInRepository {
     override suspend fun addCheckIn(
         stadiumId: Long,
         date: LocalDate,
-    ): Result<Unit> = checkInsDataSource.addCheckIn(stadiumId, date)
+    ): Result<Unit> = checkInDataSource.addCheckIn(stadiumId, date)
 
     override suspend fun getCheckInCounts(year: Int): Result<Int> =
-        checkInsDataSource
+        checkInDataSource
             .getCheckInCounts(year)
             .map { checkInCountsResponse: CheckInCountsResponse ->
                 checkInCountsResponse.checkInCounts
             }
 
     override suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>> =
-        checkInsDataSource
+        checkInDataSource
             .getStadiumFanRates(date)
             .map { fanRateResponse: FanRateResponse ->
                 fanRateResponse.fanRateByGames.map { fanRateByGameDto: FanRateByGameDto ->
@@ -38,7 +38,7 @@ class CheckInsDefaultRepository(
             }
 
     override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking> =
-        checkInsDataSource
+        checkInDataSource
             .getVictoryFairyRankings()
             .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
                 victoryFairyRankingResponse.toPresentation()
@@ -48,14 +48,14 @@ class CheckInsDefaultRepository(
         year: Int,
         filter: String,
     ): Result<List<AttendanceHistoryItem.Detail>> =
-        checkInsDataSource
+        checkInDataSource
             .getCheckInHistories(year, filter)
             .map { checkInHistoryResponse: CheckInHistoryResponse ->
                 checkInHistoryResponse.checkInHistory.map { it.toPresentation() }
             }
 
     override suspend fun getCheckInStatus(date: LocalDate): Result<Boolean> =
-        checkInsDataSource
+        checkInDataSource
             .getCheckInStatus(date)
             .map { checkInStatusResponse: CheckInStatusResponse ->
                 checkInStatusResponse.isCheckIn

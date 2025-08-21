@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response
+package com.yagubogu.data.dto.response.checkin
 
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import kotlinx.serialization.SerialName

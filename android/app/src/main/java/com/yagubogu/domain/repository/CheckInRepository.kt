@@ -5,7 +5,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalDate
 
-interface CheckInsRepository {
+interface CheckInRepository {
     suspend fun addCheckIn(
         stadiumId: Long,
         date: LocalDate,
