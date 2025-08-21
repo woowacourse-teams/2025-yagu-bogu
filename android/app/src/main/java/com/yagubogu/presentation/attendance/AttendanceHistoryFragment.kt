@@ -105,6 +105,12 @@ class AttendanceHistoryFragment : Fragment() {
             binding.tvEmptyHistory.visibility = visibility
         }
 
+        viewModel.scrollToTopEvent.observe(viewLifecycleOwner) {
+            attendanceHistoryAdapter.submitList(viewModel.attendanceHistoryItems.value) {
+                binding.rvAttendanceHistory.scrollToPosition(0)
+            }
+        }
+
         viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
             binding.tvAttendanceHistoryOrder.text =
                 getString(

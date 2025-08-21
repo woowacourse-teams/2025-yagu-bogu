@@ -10,6 +10,8 @@ import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
+import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -23,21 +25,20 @@ class AttendanceHistoryViewModel(
     private val _attendanceHistoryOrder = MutableLiveData(AttendanceHistoryOrder.LATEST)
     val attendanceHistoryOrder: LiveData<AttendanceHistoryOrder> get() = _attendanceHistoryOrder
 
-    private val items: MutableLiveData<List<AttendanceHistoryItem.Detail>> =
-        MediatorLiveData<List<AttendanceHistoryItem.Detail>>().apply {
-            addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
-            addSource(_attendanceHistoryOrder) { fetchAttendanceHistoryItems() }
-        }
-    private val detailItemPosition = MutableLiveData<Int?>()
+    private val items = MutableLiveData<List<AttendanceHistoryItem.Detail>>()
+    private val detailItemPosition = MutableLiveData<Int?>(FIRST_INDEX)
 
     val attendanceHistoryItems: LiveData<List<AttendanceHistoryItem>> =
         MediatorLiveData<List<AttendanceHistoryItem>>().apply {
-            addSource(items) {
-                detailItemPosition.value = FIRST_INDEX
-                value = buildAttendanceHistoryItems()
-            }
+            addSource(items) { value = buildAttendanceHistoryItems() }
             addSource(detailItemPosition) { value = buildAttendanceHistoryItems() }
+
+            addSource(attendanceHistoryFilter) { fetchAttendanceHistoryItems() }
+            addSource(_attendanceHistoryOrder) { fetchAttendanceHistoryItems() }
         }
+
+    private val _scrollToTopEvent = MutableSingleLiveData<Unit>()
+    val scrollToTopEvent: SingleLiveData<Unit> = _scrollToTopEvent
 
     fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
@@ -46,11 +47,12 @@ class AttendanceHistoryViewModel(
             val order: AttendanceHistoryOrder =
                 attendanceHistoryOrder.value ?: AttendanceHistoryOrder.LATEST
 
-            val attendanceHistories: Result<List<AttendanceHistoryItem.Detail>> =
-                checkInsRepository.getCheckInHistories(year, filter.name, order.name)
-            attendanceHistories
+            checkInsRepository
+                .getCheckInHistories(year, filter.name, order.name)
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem.Detail> ->
                     items.value = attendanceHistoryItems
+                    detailItemPosition.value = FIRST_INDEX
+                    _scrollToTopEvent.setValue(Unit)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -58,15 +60,16 @@ class AttendanceHistoryViewModel(
     }
 
     fun updateAttendanceHistoryFilter(filter: AttendanceHistoryFilter) {
-        attendanceHistoryFilter.value = filter
+        if (attendanceHistoryFilter.value != filter) {
+            attendanceHistoryFilter.value = filter
+        }
     }
 
     fun switchAttendanceHistoryOrder() {
         _attendanceHistoryOrder.value =
-            if (attendanceHistoryOrder.value == AttendanceHistoryOrder.LATEST) {
-                AttendanceHistoryOrder.OLDEST
-            } else {
-                AttendanceHistoryOrder.LATEST
+            when (attendanceHistoryOrder.value) {
+                AttendanceHistoryOrder.LATEST -> AttendanceHistoryOrder.OLDEST
+                else -> AttendanceHistoryOrder.LATEST
             }
     }
 
