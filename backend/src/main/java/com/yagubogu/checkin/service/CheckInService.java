@@ -12,6 +12,8 @@ import com.yagubogu.checkin.dto.FanRateByGameResponse;
 import com.yagubogu.checkin.dto.FanRateGameEntry;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -120,6 +122,16 @@ public class CheckInService {
                 .toList();
 
         return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
+    }
+
+    public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
+        Member member = getMember(memberId);
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
+        List<StadiumCheckInCountResponse> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
+                start, end);
+
+        return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
