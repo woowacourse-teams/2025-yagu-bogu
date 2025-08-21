@@ -59,6 +59,7 @@ class SettingViewModel(
             authRepository
                 .logout()
                 .onSuccess {
+                    memberRepository.invalidateCache()
                     _logoutEvent.setValue(Unit)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "로그아웃 API 호출 실패")

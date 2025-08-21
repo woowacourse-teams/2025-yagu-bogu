@@ -9,8 +9,8 @@ import com.yagubogu.domain.repository.MemberRepository
 class MemberDefaultRepository(
     private val memberDataSource: MemberDataSource,
 ) : MemberRepository {
-    private var cachedFavoriteTeam: String? = null
     private var cachedNickname: String? = null
+    private var cachedFavoriteTeam: String? = null
 
     override suspend fun getNickname(): Result<String> {
         cachedNickname?.let { nickname: String ->
@@ -57,4 +57,9 @@ class MemberDefaultRepository(
             }
 
     override suspend fun deleteMember(): Result<Unit> = memberDataSource.deleteMember()
+
+    override fun invalidateCache() {
+        cachedNickname = null
+        cachedFavoriteTeam = null
+    }
 }
