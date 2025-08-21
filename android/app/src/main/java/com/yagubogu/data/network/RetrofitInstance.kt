@@ -3,7 +3,7 @@ package com.yagubogu.data.network
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInApiService
-import com.yagubogu.data.service.GamesApiService
+import com.yagubogu.data.service.GameApiService
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
@@ -91,8 +91,8 @@ class RetrofitInstance(
         baseRetrofit.create(StatsApiService::class.java)
     }
 
-    val gamesApiService: GamesApiService by lazy {
-        baseRetrofit.create(GamesApiService::class.java)
+    val gameApiService: GameApiService by lazy {
+        baseRetrofit.create(GameApiService::class.java)
     }
 
     val talksApiService: TalksApiService by lazy {

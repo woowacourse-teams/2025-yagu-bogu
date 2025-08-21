@@ -1,11 +1,11 @@
-package com.yagubogu.data.dto.response.games
+package com.yagubogu.data.dto.response.game
 
 import com.yagubogu.domain.model.Team
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TeamDto(
+data class TeamByGameDto(
     @SerialName("id")
     val id: Int, // 팀 식별자
     @SerialName("name")

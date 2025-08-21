@@ -1,11 +1,11 @@
-package com.yagubogu.data.dto.response.games
+package com.yagubogu.data.dto.response.game
 
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GameDto(
+data class GameWithCheckInDto(
     @SerialName("gameId")
     val gameId: Long, // 경기 (톡방) 아이디
     @SerialName("totalCheckIns")
@@ -13,16 +13,16 @@ data class GameDto(
     @SerialName("isMyCheckIn")
     val isMyCheckIn: Boolean, // 인증 여부
     @SerialName("stadium")
-    val stadiumDto: StadiumDto,
+    val stadium: StadiumByGameDto,
     @SerialName("homeTeam")
-    val homeTeam: TeamDto,
+    val homeTeam: TeamByGameDto,
     @SerialName("awayTeam")
-    val awayTeam: TeamDto,
+    val awayTeam: TeamByGameDto,
 ) {
     fun toPresentation(): LivetalkStadiumItem =
         LivetalkStadiumItem(
             gameId = gameId,
-            stadiumName = stadiumDto.name,
+            stadiumName = stadium.name,
             userCount = totalCheckIns,
             awayTeam = awayTeam.toDomain(),
             homeTeam = homeTeam.toDomain(),

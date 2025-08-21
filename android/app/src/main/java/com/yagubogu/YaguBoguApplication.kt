@@ -5,7 +5,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
-import com.yagubogu.data.datasource.GamesRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
 import com.yagubogu.data.datasource.MemberRemoteDataSource
 import com.yagubogu.data.datasource.StadiumRemoteDataSource
@@ -14,11 +13,12 @@ import com.yagubogu.data.datasource.TalksRemoteDataSource
 import com.yagubogu.data.datasource.TokenRemoteDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
+import com.yagubogu.data.datasource.game.GameRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
 import com.yagubogu.data.repository.CheckInDefaultRepository
-import com.yagubogu.data.repository.GamesDefaultRepository
+import com.yagubogu.data.repository.GameDefaultRepository
 import com.yagubogu.data.repository.LocationDefaultRepository
 import com.yagubogu.data.repository.MemberDefaultRepository
 import com.yagubogu.data.repository.StadiumDefaultRepository
@@ -53,8 +53,8 @@ class YaguBoguApplication : Application() {
     private val statsDataSource by lazy { StatsRemoteDataSource(retrofit.statsApiService) }
     val statsRepository by lazy { StatsDefaultRepository(statsDataSource) }
 
-    private val gamesDataSource by lazy { GamesRemoteDataSource(retrofit.gamesApiService) }
-    val gamesRepository by lazy { GamesDefaultRepository(gamesDataSource) }
+    private val gamesDataSource by lazy { GameRemoteDataSource(retrofit.gameApiService) }
+    val gamesRepository by lazy { GameDefaultRepository(gamesDataSource) }
 
     private val talksDataSource by lazy { TalksRemoteDataSource(retrofit.talksApiService) }
     val talksRepository by lazy { TalksDefaultRepository(talksDataSource) }

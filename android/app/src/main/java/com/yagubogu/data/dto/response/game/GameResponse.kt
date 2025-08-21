@@ -1,10 +1,10 @@
-package com.yagubogu.data.dto.response.games
+package com.yagubogu.data.dto.response.game
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GamesResponse(
+data class GameResponse(
     @SerialName("games")
-    val games: List<GameDto>,
+    val games: List<GameWithCheckInDto>,
 )
