@@ -64,7 +64,7 @@ public interface StatControllerInterface {
     @GetMapping("/me")
     ResponseEntity<AverageStatisticResponse> findAverageStatistic(@Parameter(hidden = true) MemberClaims memberClaims);
 
-    @Operation(summary = "상대 팀별 승률 조회", description = "상대 팀별 승률 정보를 조회합니다.")
+    @Operation(summary = "상대 팀별 승률 조회", description = "상대 팀별 승률 정보 및 전적 정보를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "평균 경기 통계 조회 성공"),
             @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
