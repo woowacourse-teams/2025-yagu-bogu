@@ -56,9 +56,9 @@ class StatsDetailViewModel(
 
     private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
-            val stadiumVisitCountsResponse: Result<List<StadiumVisitCount>> =
+            val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
                 checkInRepository.getCheckInStadiumCounts(year)
-            stadiumVisitCountsResponse
+            stadiumVisitCountsResult
                 .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
                     _stadiumVisitCounts.value = stadiumVisitCounts
                 }.onFailure { exception: Throwable ->

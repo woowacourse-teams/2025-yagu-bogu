@@ -5,7 +5,7 @@ import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
-import com.yagubogu.data.dto.response.checkin.StadiumCountsResponse
+import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.util.safeApiCall
@@ -57,7 +57,7 @@ class CheckInRemoteDataSource(
             checkInApiService.getCheckInStatus(date.toString())
         }
 
-    override suspend fun getCheckInStadiumCounts(year: Int): Result<StadiumCountsResponse> =
+    override suspend fun getCheckInStadiumCounts(year: Int): Result<StadiumCheckInCountsResponse> =
         safeApiCall {
             checkInApiService.getCheckInStadiumCounts(year)
         }

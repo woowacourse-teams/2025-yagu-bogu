@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StadiumDto(
+data class StadiumCheckInCountDto(
     @SerialName("id")
     val id: Int, // 구장 id
     @SerialName("location")
