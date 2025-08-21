@@ -116,8 +116,10 @@ public class CheckInService {
 
     public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
         List<StadiumCheckInCountResponse> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
-                year);
+                start, end);
 
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
 

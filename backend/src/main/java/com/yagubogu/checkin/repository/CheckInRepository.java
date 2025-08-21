@@ -235,19 +235,20 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     AverageStatistic findAverageStatistic(Member member);
 
     @Query("""
-                SELECT new com.yagubogu.checkin.dto.StadiumCheckInCountResponse(
-                    s.id,
-                    s.location,
-                    COUNT(c.id)
-                )
-                FROM Stadium s
-                LEFT JOIN CheckIn c ON c.game.stadium.id = s.id
-                                   AND c.member = :member
-                                   AND YEAR(c.game.date) = :year
-                GROUP BY s.id
+             SELECT new com.yagubogu.checkin.dto.StadiumCheckInCountResponse(
+                 s.id,
+                 s.location,
+                 COUNT(c.id)
+             )
+             FROM Stadium s
+             LEFT JOIN CheckIn c ON c.game.stadium.id = s.id
+                                AND c.member = :member
+                                AND c.game.date BETWEEN :startDate AND :endDate
+             GROUP BY s.id
             """)
     List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
             Member member,
-            int year
+            LocalDate startDate,
+            LocalDate endDate
     );
 }
