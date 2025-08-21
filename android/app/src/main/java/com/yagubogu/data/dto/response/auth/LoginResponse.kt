@@ -1,5 +1,6 @@
-package com.yagubogu.data.dto.response
+package com.yagubogu.data.dto.response.auth
 
+import com.yagubogu.data.dto.response.MemberDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

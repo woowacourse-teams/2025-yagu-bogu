@@ -5,7 +5,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
-import com.yagubogu.data.datasource.AuthRemoteDataSource
 import com.yagubogu.data.datasource.CheckInsRemoteDataSource
 import com.yagubogu.data.datasource.GamesRemoteDataSource
 import com.yagubogu.data.datasource.LocationLocalDataSource
@@ -14,6 +13,7 @@ import com.yagubogu.data.datasource.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.StatsRemoteDataSource
 import com.yagubogu.data.datasource.TalksRemoteDataSource
 import com.yagubogu.data.datasource.TokenRemoteDataSource
+import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository

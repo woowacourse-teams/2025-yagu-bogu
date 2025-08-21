@@ -1,8 +1,8 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.auth
 
-import com.yagubogu.data.dto.request.LoginRequest
-import com.yagubogu.data.dto.request.LogoutRequest
-import com.yagubogu.data.dto.response.LoginResponse
+import com.yagubogu.data.dto.request.auth.LoginRequest
+import com.yagubogu.data.dto.request.auth.LogoutRequest
+import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.util.safeApiCall
 
