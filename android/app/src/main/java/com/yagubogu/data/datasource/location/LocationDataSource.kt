@@ -1,4 +1,4 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.location
 
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance

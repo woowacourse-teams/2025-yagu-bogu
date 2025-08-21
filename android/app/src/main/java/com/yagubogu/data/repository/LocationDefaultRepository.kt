@@ -1,6 +1,6 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.LocationDataSource
+import com.yagubogu.data.datasource.location.LocationDataSource
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.repository.LocationRepository

@@ -1,4 +1,4 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.location
 
 import android.annotation.SuppressLint
 import android.location.Location
