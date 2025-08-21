@@ -1,9 +1,9 @@
 package com.yagubogu.member.domain;
 
+import com.yagubogu.global.domain.SoftDeleteEntity;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -13,23 +13,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE member_id = ?")
-@SQLRestriction("is_deleted = false")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "members")
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Member {
+public class Member extends SoftDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,15 +49,8 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @Column(name = "image_url", nullable = true)
+    @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private boolean isDeleted = false;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
     public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
                   final String oauthId, final Role role, final String imageUrl) {
@@ -82,7 +67,7 @@ public class Member {
         return role.equals(Role.ADMIN);
     }
 
-    public boolean isSameId(long memberId) {
+    public boolean isSameId(final long memberId) {
         return this.id.equals(memberId);
     }
 
