@@ -30,8 +30,8 @@ data class OpponentWinRateTeamDto(
             team = Team.getByCode(teamCode),
             teamName = shortName,
             winCounts = wins,
-            drawCounts = losses,
-            loseCounts = draws,
+            drawCounts = draws,
+            loseCounts = losses,
             winningPercentage = winRate,
         )
 }
