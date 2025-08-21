@@ -611,13 +611,13 @@ class CheckInServiceTest {
     void findStadiumCheckInCounts_hasCheckIn() {
         // given
         Member member = memberFactory.save(MemberBuilder::build);
-        Game game1 = gameFactory.save(builder -> builder
+        Game game = gameFactory.save(builder -> builder
                 .date(TestFixture.getYesterday())
                 .stadium(stadiumGocheok)
                 .homeTeam(samsung)
                 .awayTeam(doosan)
         );
-        checkInFactory.save(builder -> builder.game(game1).member(member).team(samsung));
+        checkInFactory.save(builder -> builder.game(game).member(member).team(samsung));
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(
