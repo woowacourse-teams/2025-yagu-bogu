@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StatService {
 
-    private static final Comparator<OpponentWinRateTeamResponse> BY_RATE_DESC_THEN_NAME = Comparator.comparingDouble(
+    private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
                     OpponentWinRateTeamResponse::winRate)
             .reversed()
             .thenComparing(OpponentWinRateTeamResponse::name);
@@ -95,15 +95,15 @@ public class StatService {
     }
 
     public OpponentWinRateResponse findOpponentWinRate(final Long memberId, final int year) {
-        Long myTeamId = getTeamByMemberId(memberId);
+        Long myTeamId = getTeamIdByMemberId(memberId);
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
         List<OpponentWinRateRow> home = checkInRepository.findOpponentWinRatesWhenHome(myTeamId, start, end);
         List<OpponentWinRateRow> away = checkInRepository.findOpponentWinRatesWhenAway(myTeamId, start, end);
-        Map<Long, OpponentWinRateRow> merged = mergeByTeamId(home, away);
+        Map<Long, OpponentWinRateRow> mergedWinRate = mergeByTeamId(home, away);
 
         List<Team> opponents = teamRepository.findOpponentsExcluding(myTeamId);
-        List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(merged, opponents);
+        List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(mergedWinRate, opponents);
 
         return new OpponentWinRateResponse(responses);
     }
@@ -128,7 +128,7 @@ public class StatService {
         }
     }
 
-    private Long getTeamByMemberId(final Long memberId) {
+    private Long getTeamIdByMemberId(final Long memberId) {
         return memberRepository.findTeamIdById(memberId)
                 .orElseThrow(() -> new NotFoundException("Team not exist"));
     }
@@ -137,20 +137,19 @@ public class StatService {
             final List<OpponentWinRateRow> home,
             final List<OpponentWinRateRow> away
     ) {
-        Map<Long, OpponentWinRateRow> merged = new HashMap<>();
+        Map<Long, OpponentWinRateRow> mergedWinRate = new HashMap<>();
         for (OpponentWinRateRow r : home) {
-            merged.put(r.teamId(), r);
+            mergedWinRate.put(r.teamId(), r);
         }
         for (OpponentWinRateRow r : away) {
-            merged.merge(r.teamId(), r, (a, b) ->
+            mergedWinRate.merge(r.teamId(), r, (a, b) ->
                     new OpponentWinRateRow(
-                            a.teamId(), a.name(), a.shortName(), a.teamCode(),
-                            a.wins() + b.wins(),
+                            a.teamId(), a.name(), a.shortName(), a.teamCode(), a.wins() + b.wins(),
                             a.games() + b.games()
                     )
             );
         }
-        return merged;
+        return mergedWinRate;
     }
 
     private List<OpponentWinRateTeamResponse> getOpponentWinRateTeamResponse(
@@ -162,19 +161,16 @@ public class StatService {
                     OpponentWinRateRow row = merged.get(op.getId());
                     if (row == null) {
                         return new OpponentWinRateTeamResponse(
-                                op.getId(),
-                                op.getName(),
-                                op.getShortName(),
-                                op.getTeamCode(),
-                                0.0
+                                op.getId(), op.getName(), op.getShortName(), op.getTeamCode(), 0.0
                         );
                     }
                     double winRate = calculateWinRate(row.wins(), row.games());
 
                     return new OpponentWinRateTeamResponse(
-                            row.teamId(), row.name(), row.shortName(), row.teamCode(), winRate);
+                            row.teamId(), row.name(), row.shortName(), row.teamCode(), winRate
+                    );
                 })
-                .sorted(BY_RATE_DESC_THEN_NAME)
+                .sorted(OPPONENT_WIN_RATE_TEAM_COMPARATOR)
                 .toList();
     }
 }
