@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(SwaggerUiServersProperties.class)
 @Configuration
 public class SwaggerConfig {
-    
+
     private final SwaggerUiServersProperties serversProps;
 
     public SwaggerConfig(SwaggerUiServersProperties serversProps) {
@@ -32,7 +32,6 @@ public class SwaggerConfig {
                 .addSecurityItem(new SecurityRequirement().addList("Access Token"))
                 .info(apiInfo());
 
-        // application.yml의 springdoc.swagger-ui.servers를 OpenAPI servers에 반영
         if (serversProps.getServers() != null && !serversProps.getServers().isEmpty()) {
             openAPI.setServers(
                     serversProps.getServers().stream()

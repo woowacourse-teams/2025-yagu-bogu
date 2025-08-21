@@ -18,8 +18,8 @@ public class SwaggerUiServersProperties {
     }
 
     public static class ServerEntry {
-        private String name; // yml의 name
-        private String url;  // yml의 url
+        private String name;
+        private String url;
 
         public String getName() {
             return name;
