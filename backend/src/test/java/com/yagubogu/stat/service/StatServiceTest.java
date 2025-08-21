@@ -203,7 +203,7 @@ class StatServiceTest {
         );
     }
 
-    @DisplayName("회원이 조회되지 않으면 NotFoundException이 발생한다")
+    @DisplayName("예외: 회원이 조회되지 않으면 NotFoundException이 발생한다")
     @Test
     void findStatCounts_notFoundMember() {
         // given
@@ -216,7 +216,7 @@ class StatServiceTest {
                 .hasMessage("Member is not found");
     }
 
-    @DisplayName("관리자인 경우 ForbiddenException 발생한다")
+    @DisplayName("예외: 관리자인 경우 ForbiddenException 발생한다")
     @Test
     void findStatCounts_isAdmin() {
         // given
@@ -549,11 +549,11 @@ class StatServiceTest {
         });
     }
 
-    @DisplayName("회원에 팀이 없으면 NotFoundException을 던진다")
+    @DisplayName("예외: 회원에 팀이 없으면 NotFoundException을 던진다")
     @Test
     void findOpponentWinRate_member_without_team() {
         // given
-        Member member = memberFactory.save(b -> b.build());
+        Member member = memberFactory.save(MemberBuilder::build);
 
         // when & then
         assertThatThrownBy(() -> statService.findOpponentWinRate(member.getId(), 2025))
