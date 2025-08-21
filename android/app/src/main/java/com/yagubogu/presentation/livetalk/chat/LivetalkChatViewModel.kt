@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.repository.TalksRepository
+import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -19,7 +19,7 @@ import timber.log.Timber
 
 class LivetalkChatViewModel(
     private val gameId: Long,
-    private val talksRepository: TalksRepository,
+    private val talkRepository: TalkRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
@@ -57,7 +57,7 @@ class LivetalkChatViewModel(
         viewModelScope.launch {
             fetchLock.withLock {
                 val result =
-                    talksRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                    talkRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { response ->
                         val pastChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
@@ -80,7 +80,7 @@ class LivetalkChatViewModel(
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
-                talksRepository.postTalks(gameId, message.trim())
+                talkRepository.postTalks(gameId, message.trim())
             talksResult
                 .onSuccess {
                     stopChatPolling()
@@ -95,7 +95,7 @@ class LivetalkChatViewModel(
     fun deleteMessage(chatId: Long) {
         viewModelScope.launch {
             fetchLock.withLock {
-                talksRepository
+                talkRepository
                     .deleteTalks(gameId, chatId)
                     .onSuccess {
                         val currentChats = _liveTalkChatBubbleItem.value ?: emptyList()
@@ -120,7 +120,7 @@ class LivetalkChatViewModel(
 
     fun reportMessage(chatId: Long) {
         viewModelScope.launch {
-            talksRepository
+            talkRepository
                 .reportTalks(chatId)
                 .onSuccess {
                     val currentChats: List<LivetalkChatBubbleItem> =
@@ -183,7 +183,7 @@ class LivetalkChatViewModel(
     private fun fetchInitialTalks() {
         viewModelScope.launch {
             fetchLock.withLock {
-                val result = talksRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
+                val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
                         _livetalkResponseItem.value = livetalkResponseItem
@@ -206,7 +206,7 @@ class LivetalkChatViewModel(
         viewModelScope.launch {
             fetchLock.withLock {
                 val result =
-                    talksRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                    talkRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { response ->
                         val newChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
