@@ -1,6 +1,6 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.stadium
 
-import com.yagubogu.data.dto.response.StadiumsResponse
+import com.yagubogu.data.dto.response.stadium.StadiumsResponse
 import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.util.safeApiCall
 

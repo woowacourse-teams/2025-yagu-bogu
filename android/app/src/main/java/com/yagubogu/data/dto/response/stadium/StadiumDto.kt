@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response
+package com.yagubogu.data.dto.response.stadium
 
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
