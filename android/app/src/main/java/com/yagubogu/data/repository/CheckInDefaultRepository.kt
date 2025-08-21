@@ -6,11 +6,13 @@ import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
+import com.yagubogu.data.dto.response.checkin.StadiumCountsResponse
 import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import java.time.LocalDate
 
 class CheckInDefaultRepository(
@@ -59,5 +61,12 @@ class CheckInDefaultRepository(
             .getCheckInStatus(date)
             .map { checkInStatusResponse: CheckInStatusResponse ->
                 checkInStatusResponse.isCheckIn
+            }
+
+    override suspend fun getCheckInStadiumCounts(year: Int): Result<List<StadiumVisitCount>> =
+        checkInDataSource
+            .getCheckInStadiumCounts(year)
+            .map { stadiumCountsResponse: StadiumCountsResponse ->
+                stadiumCountsResponse.stadiums.map { it.toPresentation() }
             }
 }

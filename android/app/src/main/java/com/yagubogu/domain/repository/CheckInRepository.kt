@@ -3,6 +3,7 @@ package com.yagubogu.domain.repository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import java.time.LocalDate
 
 interface CheckInRepository {
@@ -23,4 +24,6 @@ interface CheckInRepository {
     ): Result<List<AttendanceHistoryItem.Detail>>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>
+
+    suspend fun getCheckInStadiumCounts(year: Int): Result<List<StadiumVisitCount>>
 }

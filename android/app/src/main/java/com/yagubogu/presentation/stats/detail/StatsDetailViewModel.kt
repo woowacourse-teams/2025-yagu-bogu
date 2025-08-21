@@ -4,9 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.yagubogu.domain.model.Team
+import androidx.lifecycle.viewModelScope
+import com.yagubogu.domain.repository.CheckInRepository
+import com.yagubogu.domain.repository.StatsRepository
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.time.LocalDate
 
-class StatsDetailViewModel : ViewModel() {
+class StatsDetailViewModel(
+    private val statsRepository: StatsRepository,
+    private val checkInRepository: CheckInRepository,
+) : ViewModel() {
     private val _isVsTeamStatsExpanded = MutableLiveData(false)
     val isVsTeamStatsExpanded: LiveData<Boolean> get() = _isVsTeamStatsExpanded
 
@@ -33,14 +41,30 @@ class StatsDetailViewModel : ViewModel() {
         _isVsTeamStatsExpanded.value = isVsTeamStatsExpanded.value?.not() ?: true
     }
 
-    private fun fetchVsTeamStats() {
-        // TODO: API 연결 후 DUMMY 제거
-        vsTeamStatItems = DUMMY_VS_TEAM_STATS
+    private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val vsTeamStatsResponse: Result<List<VsTeamStatItem>> =
+                statsRepository.getVsTeamStats(year)
+            vsTeamStatsResponse
+                .onSuccess { vsTeamStats: List<VsTeamStatItem> ->
+                    vsTeamStatItems = vsTeamStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
-    private fun fetchStadiumVisitCounts() {
-        // TODO: API 연결 후 DUMMY 제거
-        _stadiumVisitCounts.value = DUMMY_STADIUM_VISIT_COUNTS
+    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val stadiumVisitCountsResponse: Result<List<StadiumVisitCount>> =
+                checkInRepository.getCheckInStadiumCounts(year)
+            stadiumVisitCountsResponse
+                .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
+                    _stadiumVisitCounts.value = stadiumVisitCounts
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
     private fun updateVsTeamStats(): List<VsTeamStatItem> {
@@ -50,103 +74,5 @@ class StatsDetailViewModel : ViewModel() {
 
     companion object {
         private const val DEFAULT_TEAM_STATS_COUNT = 5
-
-        private val DUMMY_VS_TEAM_STATS =
-            listOf(
-                VsTeamStatItem(
-                    rank = 1,
-                    teamName = "두산",
-                    team = Team.OB,
-                    winCounts = 4,
-                    drawCounts = 0,
-                    loseCounts = 0,
-                    winningPercentage = 100.0,
-                ),
-                VsTeamStatItem(
-                    rank = 2,
-                    teamName = "LG",
-                    team = Team.LG,
-                    winCounts = 3,
-                    drawCounts = 1,
-                    loseCounts = 0,
-                    winningPercentage = 75.0,
-                ),
-                VsTeamStatItem(
-                    rank = 3,
-                    teamName = "키움",
-                    team = Team.WO,
-                    winCounts = 2,
-                    drawCounts = 0,
-                    loseCounts = 1,
-                    winningPercentage = 66.6,
-                ),
-                VsTeamStatItem(
-                    rank = 4,
-                    teamName = "KT",
-                    team = Team.KT,
-                    winCounts = 2,
-                    drawCounts = 0,
-                    loseCounts = 2,
-                    winningPercentage = 50.0,
-                ),
-                VsTeamStatItem(
-                    rank = 5,
-                    teamName = "삼성",
-                    team = Team.SS,
-                    winCounts = 1,
-                    drawCounts = 0,
-                    loseCounts = 2,
-                    winningPercentage = 33.3,
-                ),
-                VsTeamStatItem(
-                    rank = 6,
-                    teamName = "NC",
-                    team = Team.NC,
-                    winCounts = 1,
-                    drawCounts = 1,
-                    loseCounts = 2,
-                    winningPercentage = 25.0,
-                ),
-                VsTeamStatItem(
-                    rank = 7,
-                    teamName = "롯데",
-                    team = Team.LT,
-                    winCounts = 1,
-                    drawCounts = 0,
-                    loseCounts = 4,
-                    winningPercentage = 20.0,
-                ),
-                VsTeamStatItem(
-                    rank = 8,
-                    teamName = "SSG",
-                    team = Team.SK,
-                    winCounts = 0,
-                    drawCounts = 0,
-                    loseCounts = 0,
-                    winningPercentage = 0.0,
-                ),
-                VsTeamStatItem(
-                    rank = 9,
-                    teamName = "한화",
-                    team = Team.HH,
-                    winCounts = 0,
-                    drawCounts = 0,
-                    loseCounts = 0,
-                    winningPercentage = 0.0,
-                ),
-            )
-
-        private val DUMMY_STADIUM_VISIT_COUNTS =
-            listOf(
-                StadiumVisitCount("잠실", 30),
-                StadiumVisitCount("인천", 4),
-                StadiumVisitCount("고척", 4),
-                StadiumVisitCount("수원", 3),
-                StadiumVisitCount("대구", 2),
-                StadiumVisitCount("부산", 2),
-                StadiumVisitCount("수원", 1),
-                StadiumVisitCount("대전", 0),
-                StadiumVisitCount("광주", 0),
-            )
     }
 }
