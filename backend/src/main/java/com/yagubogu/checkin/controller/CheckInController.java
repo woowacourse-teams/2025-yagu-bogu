@@ -88,5 +88,4 @@ public class CheckInController implements CheckInControllerInterface {
 
         return ResponseEntity.ok(response);
     }
-
 }
