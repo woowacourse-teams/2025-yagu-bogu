@@ -5,7 +5,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
@@ -73,13 +72,15 @@ class AttendanceHistoryViewModel(
             }
     }
 
-    override fun onSummaryItemClick(position: Int) {
-        if (position == RecyclerView.NO_POSITION) return
+    override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+        val position: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
+        if (position < FIRST_INDEX) return
         detailItemPosition.value = position
     }
 
-    override fun onDetailItemClick(position: Int) {
-        if (position == RecyclerView.NO_POSITION) return
+    override fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+        val position: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
+        if (position < FIRST_INDEX) return
         detailItemPosition.value = null
     }
 
