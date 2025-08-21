@@ -43,7 +43,7 @@ interface CheckInApiService {
         @Query("date") date: String,
     ): Response<CheckInStatusResponse>
 
-    @GET("/api/check-ins/stadiums/count")
+    @GET("/api/check-ins/stadiums/counts")
     suspend fun getCheckInStadiumCounts(
         @Query("year") year: Int,
     ): Response<StadiumCheckInCountsResponse>
