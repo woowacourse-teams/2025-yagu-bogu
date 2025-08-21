@@ -2,15 +2,15 @@ package com.yagubogu.presentation.livetalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.yagubogu.domain.repository.GamesRepository
+import com.yagubogu.domain.repository.GameRepository
 
 class LivetalkViewModelFactory(
-    private val gamesRepository: GamesRepository,
+    private val gameRepository: GameRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LivetalkViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LivetalkViewModel(gamesRepository) as T
+            return LivetalkViewModel(gameRepository) as T
         }
         throw IllegalArgumentException()
     }

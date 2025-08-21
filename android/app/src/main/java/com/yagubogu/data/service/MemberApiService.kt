@@ -1,7 +1,7 @@
 package com.yagubogu.data.service
 
-import com.yagubogu.data.dto.request.MemberFavoriteRequest
-import com.yagubogu.data.dto.request.MemberNicknameRequest
+import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
+import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse

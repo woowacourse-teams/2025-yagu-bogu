@@ -59,7 +59,7 @@ class SettingAccountFragment : Fragment() {
                     DefaultDialogFragment.newInstance(KEY_LOGOUT_REQUEST_DIALOG, dialogUiModel)
             }
 
-            logoutDialog?.show(parentFragmentManager, "logoutDialog")
+            logoutDialog?.show(parentFragmentManager, KEY_LOGOUT_REQUEST_DIALOG)
         }
 
         binding.layoutDeleteAccount.root.setOnClickListener {

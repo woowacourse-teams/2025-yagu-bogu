@@ -10,4 +10,5 @@ data class LivetalkChatItem(
     val nickname: String?,
     val teamName: String?,
     val timestamp: LocalDateTime,
+    val reported: Boolean,
 )
