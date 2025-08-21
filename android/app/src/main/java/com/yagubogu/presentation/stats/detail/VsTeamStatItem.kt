@@ -7,9 +7,9 @@ data class VsTeamStatItem(
     val rank: Int,
     val team: Team,
     val teamName: String,
-    val winCounts: Int,
-    val drawCounts: Int,
-    val loseCounts: Int,
+    val winCounts: Long,
+    val drawCounts: Long,
+    val loseCounts: Long,
     val winningPercentage: Double,
 ) {
     val teamEmoji: String = team.getEmoji()

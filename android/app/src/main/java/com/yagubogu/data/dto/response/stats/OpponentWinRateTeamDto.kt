@@ -15,6 +15,12 @@ data class OpponentWinRateTeamDto(
     val shortName: String, // 축약된 팀 이름
     @SerialName("teamCode")
     val teamCode: String, // 팀 코드
+    @SerialName("wins")
+    val wins: Long,
+    @SerialName("losses")
+    val losses: Long,
+    @SerialName("draws")
+    val draws: Long,
     @SerialName("winRate")
     val winRate: Double, // 승률(%)
 ) {
@@ -23,9 +29,9 @@ data class OpponentWinRateTeamDto(
             rank = rank,
             team = Team.getByCode(teamCode),
             teamName = shortName,
-            winCounts = 1,
-            drawCounts = 1,
-            loseCounts = 1,
+            winCounts = wins,
+            drawCounts = losses,
+            loseCounts = draws,
             winningPercentage = winRate,
         )
 }
