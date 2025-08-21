@@ -1,8 +1,7 @@
 package com.yagubogu.checkin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
@@ -39,6 +38,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -198,9 +199,9 @@ public class CheckInIntegrationTest {
                 .statusCode(404);
     }
 
-    @DisplayName("직관 내역을 조회한다")
+    @DisplayName("직관 내역을 최신순으로 조회한다")
     @Test
-    void findCheckInHistory() {
+    void findCheckInHistory_findAllOrderByLatest() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
@@ -232,6 +233,127 @@ public class CheckInIntegrationTest {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("모든 직관 내역을 오래된순으로 조회한다")
+    @Test
+    void findCheckInHistory_findAllOrderByOldest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.OLDEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("이긴 직관 내역을 최신순으로 조회한다")
+    @Test
+    void findCheckInWinHistory_findWinOrderByLatest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/check-ins/members")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("이긴 직관 내역을 오래된순으로 조회한다")
+    @Test
+    void findCheckInWinHistory_findWinOrderByOldest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .queryParam("result", CheckInResultFilter.WIN)
+                .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
@@ -321,45 +443,6 @@ public class CheckInIntegrationTest {
 
         // then
         assertThat(actual.isCheckIn()).isTrue();
-    }
-
-    @DisplayName("이긴 직관 내역을 조회한다")
-    @Test
-    void findCheckInWinHistory() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        LocalDate date = LocalDate.of(2025, 7, 25);
-        Game game1 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date)
-                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-        Game game2 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date.plusDays(1))
-                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-        Game game3 = gameFactory.save(builder ->
-                builder.stadium(stadiumJamsil)
-                        .date(date.plusDays(2))
-                        .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
-
-        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
-        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
-        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
-                .queryParam("result", CheckInResultFilter.WIN)
-                .when().get("/api/check-ins/members")
-                .then().log().all()
-                .statusCode(200);
     }
 
     @DisplayName("오늘 경기하는 모든 구장 별 팬 점유율을 조회한다")
