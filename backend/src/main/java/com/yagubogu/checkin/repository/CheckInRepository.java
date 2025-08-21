@@ -118,10 +118,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                   AND (g.homeTeam = :team OR g.awayTeam = :team)
                   AND YEAR(g.date) = :year
                   AND g.gameState = 'COMPLETED'
-                  AND g.homeScoreBoard IS NOT NULL
-                  AND g.awayScoreBoard IS NOT NULL
-                  AND g.homePitcher IS NOT NULL
-                  AND g.awayPitcher IS NOT NULL
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
@@ -205,10 +201,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 (g.awayTeam = :team AND g.awayScore > g.homeScore)
             )
                   AND YEAR(g.date) = :year
-                  AND g.homeScoreBoard IS NOT NULL
-                  AND g.awayScoreBoard IS NOT NULL
-                  AND g.homePitcher IS NOT NULL
-                  AND g.awayPitcher IS NOT NULL
             ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
