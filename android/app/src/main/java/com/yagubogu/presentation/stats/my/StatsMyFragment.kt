@@ -12,16 +12,16 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
-import com.yagubogu.databinding.FragmentMyStatsBinding
+import com.yagubogu.databinding.FragmentStatsMyBinding
 
 @Suppress("ktlint:standard:backing-property-naming")
-class MyStatsFragment : Fragment() {
-    private var _binding: FragmentMyStatsBinding? = null
-    private val binding: FragmentMyStatsBinding get() = _binding!!
+class StatsMyFragment : Fragment() {
+    private var _binding: FragmentStatsMyBinding? = null
+    private val binding: FragmentStatsMyBinding get() = _binding!!
 
-    private val viewModel: MyStatsViewModel by viewModels {
+    private val viewModel: StatsMyViewModel by viewModels {
         val app = requireActivity().application as YaguBoguApplication
-        MyStatsViewModelFactory(app.statsRepository, app.memberRepository)
+        StatsMyViewModelFactory(app.statsRepository, app.memberRepository)
     }
 
     override fun onCreateView(
@@ -29,7 +29,7 @@ class MyStatsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentMyStatsBinding.inflate(inflater, container, false)
+        _binding = FragmentStatsMyBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -55,8 +55,8 @@ class MyStatsFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.myStatsUiModel.observe(viewLifecycleOwner) { value: MyStatsUiModel ->
-            binding.myStatsUiModel = value
+        viewModel.statsMyUiModel.observe(viewLifecycleOwner) { value: StatsMyUiModel ->
+            binding.statsMyUiModel = value
             loadChartData(value)
         }
         viewModel.averageStats.observe(viewLifecycleOwner) { value: AverageStats ->
@@ -83,11 +83,11 @@ class MyStatsFragment : Fragment() {
         }
     }
 
-    private fun loadChartData(myStatsUiModel: MyStatsUiModel) {
+    private fun loadChartData(statsMyUiModel: StatsMyUiModel) {
         val pieEntries: List<PieEntry> =
             listOf(
-                PieEntry(myStatsUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN),
-                PieEntry(myStatsUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC),
+                PieEntry(statsMyUiModel.winningPercentage.toFloat(), PIE_ENTRY_LABEL_WIN),
+                PieEntry(statsMyUiModel.etcPercentage.toFloat(), PIE_ENTRY_LABEL_ETC),
             )
 
         val myStatsChartDataSet: PieDataSet =
