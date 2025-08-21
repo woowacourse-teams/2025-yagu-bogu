@@ -223,7 +223,7 @@ class HomeFragment : Fragment() {
                 DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
         }
 
-        checkInDialog?.show(parentFragmentManager, "checkInDialog")
+        checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
     }
 
     companion object {

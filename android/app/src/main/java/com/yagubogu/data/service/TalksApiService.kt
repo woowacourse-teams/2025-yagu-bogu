@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.response.talks.TalkCursorResponse
 import com.yagubogu.data.dto.response.talks.TalkDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -30,4 +31,15 @@ interface TalksApiService {
         @Path("gameId") gameId: Long,
         @Body request: TalksRequest,
     ): Response<TalkDto>
+
+    @DELETE("/api/talks/{gameId}/{talkId}")
+    suspend fun deleteTalks(
+        @Path("gameId") gameId: Long,
+        @Path("talkId") talkId: Long,
+    ): Response<Unit>
+
+    @POST("/api/talks/{talkId}/reports")
+    suspend fun reportTalks(
+        @Path("talkId") talkId: Long,
+    ): Response<Unit>
 }
