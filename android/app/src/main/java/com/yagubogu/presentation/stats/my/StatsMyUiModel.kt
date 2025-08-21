@@ -1,6 +1,6 @@
 package com.yagubogu.presentation.stats.my
 
-data class MyStatsUiModel(
+data class StatsMyUiModel(
     val winCount: Int,
     val drawCount: Int,
     val loseCount: Int,

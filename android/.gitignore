@@ -10,3 +10,5 @@
 local.properties
 app/release/
 **/google-services.json
+app/yagubogu-keystore
+keystore.properties
