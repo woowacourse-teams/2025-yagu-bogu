@@ -140,14 +140,15 @@ public class KboGameResultClient {
                             continue;
                         }
 
+                        String name = columns.path(0).path("Text").asText();
                         String result = columns.path(2).path("Text").asText();
 
                         // 승/패/무 결과에 해당하면
                         if ("승".equals(result) || "패".equals(result) || "무".equals(result)) {
                             if (i == 0) {
-                                awayPitcher = result;
+                                awayPitcher = name;
                             } else if (i == 1) {
-                                homePitcher = result;
+                                homePitcher = name;
                             }
                             break;
                         }
