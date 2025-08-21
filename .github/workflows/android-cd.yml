@@ -2,12 +2,13 @@ name: YaguBogu Android CD
 
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev-an" ]
     paths:
       - 'android/**'
       
 env:
-  BASE_URL: ${{ secrets.BASE_URL }}
+  BASE_URL_DEBUG: ${{ secrets.BASE_URL_DEBUG }}
+  BASE_URL_RELEASE: ${{ secrets.BASE_URL_RELEASE }}
   WEB_CLIENT_ID: ${{ secrets.WEB_CLIENT_ID }}
   GOOGLE_SERVICES_JSON_DEBUG: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
   GOOGLE_SERVICES_JSON_RELEASE: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
@@ -37,7 +38,8 @@ jobs:
 
       - name: Add Local Properties
         run: |
-          echo "BASE_URL=$BASE_URL" >> ./local.properties
+          echo "BASE_URL_DEBUG=$BASE_URL_DEBUG" >> ./local.properties
+          echo "BASE_URL_RELEASE=$BASE_URL_RELEASE" >> ./local.properties
           echo "WEB_CLIENT_ID=$WEB_CLIENT_ID" >> ./local.properties 
 
       - name: Create google-services.json for debug
