@@ -2,15 +2,12 @@ package com.yagubogu.presentation.livetalk.chat
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
@@ -18,6 +15,7 @@ import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.showSnackbar
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -184,24 +182,22 @@ class LivetalkChatActivity : AppCompatActivity() {
         }
         viewModel.livetalkReportEvent.observe(this) { livetalkReportEvent: LivetalkReportEvent ->
             when (livetalkReportEvent) {
-                LivetalkReportEvent.DuplicatedReport -> showSnackbar(R.string.livetalk_already_reported)
-                LivetalkReportEvent.Success -> showSnackbar(R.string.livetalk_report_succeed)
+                LivetalkReportEvent.DuplicatedReport ->
+                    binding.root.showSnackbar(
+                        R.string.livetalk_already_reported,
+                        R.id.divider,
+                    )
+
+                LivetalkReportEvent.Success ->
+                    binding.root.showSnackbar(
+                        R.string.livetalk_report_succeed,
+                        R.id.divider,
+                    )
             }
         }
 
         viewModel.livetalkDeleteEvent.observe(this) {
-            showSnackbar(R.string.livetalk_delete_succeed)
-        }
-    }
-
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            setAnchorView(binding.divider)
-            show()
+            binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
     }
 
