@@ -1,5 +1,6 @@
 package com.yagubogu.checkin.dto;
 
+import com.yagubogu.game.domain.ScoreBoard;
 import java.time.LocalDate;
 
 public record CheckInGameResponse(
@@ -7,7 +8,9 @@ public record CheckInGameResponse(
         String stadiumFullName,
         CheckInGameTeamResponse homeTeam,
         CheckInGameTeamResponse awayTeam,
-        LocalDate attendanceDate
+        LocalDate attendanceDate,
+        ScoreBoard homeScoreBoard,
+        ScoreBoard awayScoreBoard
 ) {
 }
 

@@ -41,9 +41,11 @@ public class GameResultSyncService {
         }
 
         KboGameResultResponse gameResult = kboGameResultClient.fetchGameResult(game);
-        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard().toScoreBoard();
-        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard().toScoreBoard();
+        ScoreBoard homeScoreBoard = gameResult.homeScoreBoard();
+        ScoreBoard awayScoreBoard = gameResult.awayScoreBoard();
+        String homePitcher = gameResult.homePitcher();
+        String awayPitcher = gameResult.awayPitcher();
 
-        game.updateScoreBoard(homeScoreBoard, awayScoreBoard);
+        game.updateScoreBoard(homeScoreBoard, awayScoreBoard, homePitcher, awayPitcher);
     }
 }

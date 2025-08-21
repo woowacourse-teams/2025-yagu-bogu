@@ -2,6 +2,7 @@ package com.yagubogu.game.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -11,7 +12,6 @@ import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGameResultResponse.KboScoreBoardResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
@@ -26,7 +26,6 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -148,28 +147,43 @@ class GameScheduleSyncServiceTest {
         String gameCode = "20250721OBLG0";
         Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
+        // 1. kboGameSyncClient Mocking (경기 목록 조회)
         KboGameResponse kboGameResponse = new KboGameResponse(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
 
-        KboScoreBoardResponse home = new KboScoreBoardResponse(5, 8, 1, 3);
-        KboScoreBoardResponse away = new KboScoreBoardResponse(3, 6, 2, 4);
-        given(kboGameResultClient.fetchGameResult(any(Game.class)))
-                .willReturn(new KboGameResultResponse("100", "success", home, away));
+        // 2. kboGameResultClient Mocking (상세 경기 결과 조회)
+        ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
+        ScoreBoard awayScoreBoard = new ScoreBoard(3, 6, 2, 4,
+                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
+        String homePitcher = "이포라";
+        String awayPitcher = "포라리";
 
-        ScoreBoard homeScoreBoardExpected = home.toScoreBoard();
-        ScoreBoard awayScoreBoardExpected = away.toScoreBoard();
+        KboGameResultResponse mockGameResult = new KboGameResultResponse(
+                homeScoreBoard,
+                awayScoreBoard,
+                homePitcher,
+                awayPitcher
+        );
+        given(kboGameResultClient.fetchGameResult(any(Game.class)))
+                .willReturn(mockGameResult);
+
+        ScoreBoard homeScoreBoardExpected = mockGameResult.homeScoreBoard();
+        ScoreBoard awayScoreBoardExpected = mockGameResult.awayScoreBoard();
 
         // when
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly((softAssertions -> {
+        assertSoftly((softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.COMPLETED);
             softAssertions.assertThat(game.getHomeScoreBoard()).isEqualTo(homeScoreBoardExpected);
             softAssertions.assertThat(game.getAwayScoreBoard()).isEqualTo(awayScoreBoardExpected);
+            softAssertions.assertThat(game.getHomePitcher()).isEqualTo(homePitcher);
+            softAssertions.assertThat(game.getAwayPitcher()).isEqualTo(awayPitcher);
         }));
     }
 
@@ -191,7 +205,7 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(game.getGameState()).isEqualTo(GameState.LIVE);
             softAssertions.assertThat(game.getHomeScore()).isNull();
             softAssertions.assertThat(game.getAwayScore()).isNull();
@@ -216,7 +230,7 @@ class GameScheduleSyncServiceTest {
         gameResultSyncService.syncGameResult(yesterday);
 
         // then
-        SoftAssertions.assertSoftly(soft -> {
+        assertSoftly(soft -> {
             soft.assertThat(game.getGameState()).isEqualTo(GameState.CANCELED);
             soft.assertThat(game.getHomeScore()).isNull();
             soft.assertThat(game.getAwayScore()).isNull();

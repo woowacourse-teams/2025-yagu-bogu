@@ -19,9 +19,11 @@ public class GameBuilder {
     private String gameCode = UUID.randomUUID().toString();
     private Integer homeScore;
     private Integer awayScore;
+    private GameState gameState = GameState.SCHEDULED;
     private ScoreBoard homeScoreBoard;
     private ScoreBoard awayScoreBoard;
-    private GameState gameState = GameState.SCHEDULED;
+    private String homePitcher;
+    private String awayPitcher;
 
     public GameBuilder stadium(final Stadium stadium) {
         this.stadium = stadium;
@@ -71,6 +73,18 @@ public class GameBuilder {
         return this;
     }
 
+    public GameBuilder homePitcher(final String homePitcher) {
+        this.homePitcher = homePitcher;
+
+        return this;
+    }
+
+    public GameBuilder awayPitcher(final String awayPitcher) {
+        this.awayPitcher = awayPitcher;
+
+        return this;
+    }
+
     public GameBuilder homeScoreBoard(final ScoreBoard homeScoreBoard) {
         this.homeScoreBoard = homeScoreBoard;
 
@@ -101,6 +115,8 @@ public class GameBuilder {
                 awayScore,
                 homeScoreBoard,
                 awayScoreBoard,
+                homePitcher,
+                awayPitcher,
                 gameState
         );
     }

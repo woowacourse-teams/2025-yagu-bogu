@@ -3,6 +3,7 @@ package com.yagubogu.stat.controller;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,4 +63,15 @@ public interface StatControllerInterface {
     })
     @GetMapping("/me")
     ResponseEntity<AverageStatisticResponse> findAverageStatistic(@Parameter(hidden = true) MemberClaims memberClaims);
+
+    @Operation(summary = "상대 팀별 승률 조회", description = "상대 팀별 승률 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "평균 경기 통계 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
+    })
+    @GetMapping("/win-rate/opponents")
+    ResponseEntity<OpponentWinRateResponse> findOpponentWinRate(
+            @Parameter(hidden = true) MemberClaims memberClaim,
+            @RequestParam final int year
+    );
 }
