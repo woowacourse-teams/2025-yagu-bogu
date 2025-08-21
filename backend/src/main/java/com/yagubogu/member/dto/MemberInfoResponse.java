@@ -1,6 +1,7 @@
 package com.yagubogu.member.dto;
 
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 
 public record MemberInfoResponse(
@@ -11,19 +12,20 @@ public record MemberInfoResponse(
 ) {
 
     public static MemberInfoResponse from(final Member member) {
+        Team team = member.getTeam();
+        if (team == null) {
+            return new MemberInfoResponse(
+                    member.getNickname(),
+                    member.getCreatedAt().toLocalDate(),
+                    null,
+                    member.getImageUrl()
+            );
+        }
+
         return new MemberInfoResponse(
                 member.getNickname(),
                 member.getCreatedAt().toLocalDate(),
                 member.getTeam().getShortName(),
-                member.getImageUrl()
-        );
-    }
-
-    public static MemberInfoResponse fromNullableTeam(final Member member) {
-        return new MemberInfoResponse(
-                member.getNickname(),
-                member.getCreatedAt().toLocalDate(),
-                null,
                 member.getImageUrl()
         );
     }

@@ -67,11 +67,6 @@ public class MemberService {
 
     public MemberInfoResponse findMember(final Long memberId) {
         Member member = getMember(memberId);
-        Team team = member.getTeam();
-
-        if (team == null) {
-            return MemberInfoResponse.fromNullableTeam(member);
-        }
 
         return MemberInfoResponse.from(member);
     }
