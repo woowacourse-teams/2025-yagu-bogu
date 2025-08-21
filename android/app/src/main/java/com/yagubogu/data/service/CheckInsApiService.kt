@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.response.CheckInCountsResponse
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
+import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -35,4 +36,9 @@ interface CheckInsApiService {
         @Query("year") year: Int,
         @Query("result") result: String,
     ): Response<CheckInHistoryResponse>
+
+    @GET("/api/check-ins/status")
+    suspend fun getCheckInStatus(
+        @Query("date") date: String,
+    ): Response<CheckInStatusResponse>
 }

@@ -59,11 +59,15 @@ class HomeViewModel(
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
 
+    private val _hasAlreadyCheckedIn = MutableLiveData<Boolean>()
+    val hasAlreadyCheckedIn: LiveData<Boolean> get() = _hasAlreadyCheckedIn
+
     init {
         fetchAll()
     }
 
     fun fetchAll() {
+        fetchCheckInStatus()
         fetchMemberStats()
         fetchStadiumStats()
         fetchVictoryFairyRanking()
@@ -98,6 +102,18 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+        viewModelScope.launch {
+            val checkInStatusResult: Result<Boolean> = checkInsRepository.getCheckInStatus(date)
+            checkInStatusResult
+                .onSuccess { checkInStatus: Boolean ->
+                    _hasAlreadyCheckedIn.value = checkInStatus
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {
@@ -179,11 +195,12 @@ class HomeViewModel(
         checkInsRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
+                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
+                _hasAlreadyCheckedIn.value = true
                 _memberStatsUiModel.value =
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
-                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
                 _isCheckInLoading.value = false
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
