@@ -2,7 +2,6 @@ package com.yagubogu.presentation.home
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -11,11 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -28,6 +25,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
+import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -109,14 +107,16 @@ class HomeFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
-            showSnackbar(
+            val message: String =
                 when (value) {
-                    is CheckInUiEvent.Success -> R.string.home_check_in_success_message
-                    CheckInUiEvent.OutOfRange -> R.string.home_check_in_out_of_range_message
-                    CheckInUiEvent.LocationFetchFailed -> R.string.home_check_in_location_fetch_failed_message
-                    CheckInUiEvent.NetworkFailed -> R.string.home_check_in_network_failed_message
-                },
-            )
+                    is CheckInUiEvent.Success ->
+                        getString(R.string.home_check_in_success_message, value.stadium.fullName)
+
+                    CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
+                    CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
+                    CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
+                }
+            binding.root.showSnackbar(message, R.id.bnv_navigation)
         }
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
@@ -161,7 +161,12 @@ class HomeFragment : Fragment() {
                 }
             when {
                 isPermissionGranted -> showCheckInConfirmDialog()
-                shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
+                shouldShowRationale ->
+                    binding.root.showSnackbar(
+                        R.string.home_location_permission_denied_message,
+                        R.id.bnv_navigation,
+                    )
+
                 else -> showPermissionDeniedDialog()
             }
         }
@@ -184,17 +189,6 @@ class HomeFragment : Fragment() {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
             ),
         )
-    }
-
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            setAnchorView(R.id.bnv_navigation)
-            show()
-        }
     }
 
     private fun showPermissionDeniedDialog() {

@@ -6,6 +6,7 @@ import com.yagubogu.data.dto.response.FanRateByGameDto
 import com.yagubogu.data.dto.response.FanRateResponse
 import com.yagubogu.data.dto.response.VictoryFairyRankingResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
+import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.domain.repository.CheckInsRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
@@ -51,5 +52,12 @@ class CheckInsDefaultRepository(
             .getCheckInHistories(year, filter)
             .map { checkInHistoryResponse: CheckInHistoryResponse ->
                 checkInHistoryResponse.checkInHistory.map { it.toPresentation() }
+            }
+
+    override suspend fun getCheckInStatus(date: LocalDate): Result<Boolean> =
+        checkInsDataSource
+            .getCheckInStatus(date)
+            .map { checkInStatusResponse: CheckInStatusResponse ->
+                checkInStatusResponse.isCheckIn
             }
 }
