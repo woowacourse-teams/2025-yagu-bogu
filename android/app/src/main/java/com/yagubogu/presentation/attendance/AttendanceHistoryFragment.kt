@@ -99,17 +99,15 @@ class AttendanceHistoryFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
-            attendanceHistoryAdapter.submitList(value)
+            attendanceHistoryAdapter.submitList(value) {
+                viewModel.detailItemPosition.value?.let {
+                    binding.rvAttendanceHistory.smoothScrollToPosition(it)
+                }
+            }
 
             val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
             binding.ivEmptyHistory.visibility = visibility
             binding.tvEmptyHistory.visibility = visibility
-        }
-
-        viewModel.scrollToTopEvent.observe(viewLifecycleOwner) {
-            attendanceHistoryAdapter.submitList(viewModel.attendanceHistoryItems.value) {
-                binding.rvAttendanceHistory.scrollToPosition(0)
-            }
         }
 
         viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
