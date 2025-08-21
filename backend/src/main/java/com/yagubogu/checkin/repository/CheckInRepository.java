@@ -244,7 +244,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
              LEFT JOIN CheckIn c ON c.game.stadium.id = s.id
                                 AND c.member = :member
                                 AND c.game.date BETWEEN :startDate AND :endDate
-             GROUP BY s.id
+             GROUP BY s.id, s.location
             """)
     List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
             Member member,
