@@ -28,12 +28,6 @@ public class MemberBuilder {
         return this;
     }
 
-    public MemberBuilder email(final String email) {
-        this.email = email;
-
-        return this;
-    }
-
     public MemberBuilder role(final Role role) {
         this.role = role;
 

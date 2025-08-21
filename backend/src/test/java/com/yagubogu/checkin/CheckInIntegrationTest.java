@@ -6,8 +6,11 @@ import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -17,6 +20,7 @@ import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -38,7 +42,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(AuthTestConfig.class)
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CheckInIntegrationTest {
@@ -84,9 +88,9 @@ public class CheckInIntegrationTest {
         doosan = teamRepository.findByTeamCode("OB").orElseThrow();
         lotte = teamRepository.findByTeamCode("LT").orElseThrow();
 
-        stadiumJamsil = stadiumRepository.findById(1L).orElseThrow();
-        stadiumGocheok = stadiumRepository.findById(2L).orElseThrow();
-        stadiumIncheon = stadiumRepository.findById(3L).orElseThrow();
+        stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
+        stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
+        stadiumIncheon = stadiumRepository.findById(7L).orElseThrow();
     }
 
     @DisplayName("인증을 저장한다")
@@ -472,6 +476,86 @@ public class CheckInIntegrationTest {
                 .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("구장별 방문 횟수 조회 - 방문한 경기장이 없을 때")
+    @Test
+    void findStadiumCheckInCounts_noCheckIn() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
+                List.of(
+                        new StadiumCheckInCountResponse(1L, "광주", 0L),
+                        new StadiumCheckInCountResponse(2L, "잠실", 0L),
+                        new StadiumCheckInCountResponse(3L, "고척", 0L),
+                        new StadiumCheckInCountResponse(4L, "수원", 0L),
+                        new StadiumCheckInCountResponse(5L, "대구", 0L),
+                        new StadiumCheckInCountResponse(6L, "부산", 0L),
+                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                )
+        );
+
+        // when
+        StadiumCheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/stadiums/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StadiumCheckInCountsResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("구장별 방문 횟수 조회 - 방문한 경기장이 있을 때")
+    @Test
+    void findStadiumCheckInCounts_hasCheckIn() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        Game game1 = gameFactory.save(builder -> builder
+                .date(TestFixture.getYesterday())
+                .stadium(stadiumJamsil)
+                .homeTeam(samsung)
+                .awayTeam(doosan)
+        );
+        checkInFactory.save(builder -> builder.game(game1).member(member).team(samsung));
+
+        StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
+                List.of(
+                        new StadiumCheckInCountResponse(1L, "광주", 0L),
+                        new StadiumCheckInCountResponse(2L, "잠실", 1L),
+                        new StadiumCheckInCountResponse(3L, "고척", 0L),
+                        new StadiumCheckInCountResponse(4L, "수원", 0L),
+                        new StadiumCheckInCountResponse(5L, "대구", 0L),
+                        new StadiumCheckInCountResponse(6L, "부산", 0L),
+                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                )
+        );
+
+        // when
+        StadiumCheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/stadiums/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StadiumCheckInCountsResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(expected);
     }
 
     private void createCheckInsForGame(Team team, Game game, int count) {

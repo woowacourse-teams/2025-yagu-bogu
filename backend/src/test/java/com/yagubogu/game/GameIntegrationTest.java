@@ -1,13 +1,12 @@
 package com.yagubogu.game;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.dto.StadiumByGame;
 import com.yagubogu.game.dto.TeamByGame;
+import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
@@ -36,7 +35,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@Import(AuthTestConfig.class)
+import static org.assertj.core.api.Assertions.assertThat;
+
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class GameIntegrationTest {
