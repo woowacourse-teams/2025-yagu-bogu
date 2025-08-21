@@ -29,8 +29,13 @@ android {
 
         buildConfigField(
             "String",
-            "BASE_URL",
-            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL")}\"",
+            "BASE_URL_DEBUG",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_DEBUG")}\"",
+        )
+        buildConfigField(
+            "String",
+            "BASE_URL_RELEASE",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_RELEASE")}\"",
         )
         buildConfigField(
             type = "String",
