@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.livetalk.chat
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +20,7 @@ import timber.log.Timber
 class LivetalkChatViewModel(
     private val gameId: Long,
     private val talksRepository: TalksRepository,
+    private val isVerified: Boolean,
 ) : ViewModel() {
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
     val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
@@ -27,6 +29,10 @@ class LivetalkChatViewModel(
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
     val messageFormText = MutableLiveData<String>()
+    val canSendMessage =
+        MediatorLiveData<Boolean>().apply {
+            addSource(messageFormText) { value = isVerified && !it.isNullOrBlank() }
+        }
 
     private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
     val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
