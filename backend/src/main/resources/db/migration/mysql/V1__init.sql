@@ -32,8 +32,11 @@ CREATE TABLE members
     oauth_id   VARCHAR(255)          NOT NULL,
     provider   ENUM ('GOOGLE')       NOT NULL,
     role       ENUM ('ADMIN','USER') NOT NULL,
-    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    is_deleted BOOLEAN                        DEFAULT FALSE NOT NULL,
     image_url  VARCHAR(512)          NULL,
+    created_at DATETIME(6)           NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6)           NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    deleted_at DATETIME(6)           NULL,
     PRIMARY KEY (member_id),
     CONSTRAINT fk_members_team FOREIGN KEY (team_id) REFERENCES teams (team_id)
 ) ENGINE = InnoDB;
@@ -84,6 +87,8 @@ CREATE TABLE talks
     member_id  BIGINT       NOT NULL,
     content    VARCHAR(255) NOT NULL,
     created_at DATETIME(6)  NOT NULL,
+    updated_at DATETIME(6)  NOT NULL,
+    deleted_at DATETIME(6)  NULL,
     PRIMARY KEY (talk_id),
     CONSTRAINT fk_talks_game FOREIGN KEY (game_id) REFERENCES games (game_id),
     CONSTRAINT fk_talks_member FOREIGN KEY (member_id) REFERENCES members (member_id)
