@@ -122,7 +122,6 @@ public class CheckInService {
                 start, end);
 
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
-
     }
 
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
