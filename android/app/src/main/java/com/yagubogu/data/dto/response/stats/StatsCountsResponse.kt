@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response
+package com.yagubogu.data.dto.response.stats
 
 import com.yagubogu.domain.model.StatsCounts
 import kotlinx.serialization.SerialName

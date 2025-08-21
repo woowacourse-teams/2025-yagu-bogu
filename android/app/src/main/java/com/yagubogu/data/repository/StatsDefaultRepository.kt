@@ -1,10 +1,10 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.StatsDataSource
+import com.yagubogu.data.datasource.stats.StatsDataSource
 import com.yagubogu.data.dto.response.AverageStatisticResponse
-import com.yagubogu.data.dto.response.StatsCountsResponse
-import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.StatsCountsResponse
+import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
+import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.stats.my.AverageStats
