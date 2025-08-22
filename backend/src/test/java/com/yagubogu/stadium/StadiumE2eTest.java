@@ -45,15 +45,15 @@ public class StadiumE2eTest extends E2eTestBase {
 
     private List<StadiumResponse> getStadiums() {
         return List.of(
-                new StadiumResponse(1L, "챔피언스필드", "챔피언스필드", "광주", 35.1683, 126.8889),
-                new StadiumResponse(2L, "잠실야구장", "잠실구장", "잠실", 37.5121, 127.0710),
-                new StadiumResponse(3L, "고척스카이돔", "고척돔", "고척", 37.4982, 126.8676),
-                new StadiumResponse(4L, "수원KT위즈파크", "위즈파크", "수원", 37.2996, 126.9707),
-                new StadiumResponse(5L, "대구삼성라이온즈파크", "라이온즈파크", "대구", 35.8419, 128.6815),
-                new StadiumResponse(6L, "사직야구장", "사직구장", "부산", 35.1943, 129.0615),
-                new StadiumResponse(7L, "문학야구장", "랜더스필드", "인천", 37.4361, 126.6892),
-                new StadiumResponse(8L, "마산야구장", "엔씨파크", "마산", 35.2281, 128.6819),
-                new StadiumResponse(9L, "이글스파크", "볼파크", "대전", 36.3173, 127.4280)
+                new StadiumResponse(1L, "광주 기아 챔피언스필드", "챔피언스필드", "광주", 35.168139, 126.889111),
+                new StadiumResponse(2L, "잠실 야구장", "잠실구장", "잠실", 37.512150, 127.071976),
+                new StadiumResponse(3L, "고척 스카이돔", "고척돔", "고척", 37.498222, 126.867250),
+                new StadiumResponse(4L, "수원 KT 위즈파크", "위즈파크", "수원", 37.299759, 127.009781),
+                new StadiumResponse(5L, "대구 삼성 라이온즈파크", "라이온즈파크", "대구", 35.841111, 128.681667),
+                new StadiumResponse(6L, "사직야구장", "사직구장", "부산", 35.194077, 129.061584),
+                new StadiumResponse(7L, "인천 SSG 랜더스필드", "랜더스필드", "인천", 37.436778, 126.693306),
+                new StadiumResponse(8L, "창원 NC 파크", "엔씨파크", "창원", 35.222754, 128.582251),
+                new StadiumResponse(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211)
         );
     }
 }

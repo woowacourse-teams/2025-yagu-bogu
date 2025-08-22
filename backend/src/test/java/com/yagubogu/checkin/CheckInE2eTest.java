@@ -1,5 +1,7 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
@@ -36,8 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class CheckInE2eTest extends E2eTestBase {
@@ -489,7 +489,7 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
                         new StadiumCheckInCountResponse(6L, "부산", 0L),
                         new StadiumCheckInCountResponse(7L, "인천", 0L),
-                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L)
                 )
         );
@@ -533,7 +533,7 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
                         new StadiumCheckInCountResponse(6L, "부산", 0L),
                         new StadiumCheckInCountResponse(7L, "인천", 0L),
-                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L)
                 )
         );

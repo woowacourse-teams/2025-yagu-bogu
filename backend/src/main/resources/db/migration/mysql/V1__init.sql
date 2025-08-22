@@ -41,31 +41,40 @@ CREATE TABLE members
     CONSTRAINT fk_members_team FOREIGN KEY (team_id) REFERENCES teams (team_id)
 ) ENGINE = InnoDB;
 
+CREATE TABLE score_boards
+(
+    score_board_id BIGINT       NOT NULL AUTO_INCREMENT,
+    runs           INT          NOT NULL DEFAULT 0,
+    hits           INT          NOT NULL DEFAULT 0,
+    errors         INT          NOT NULL DEFAULT 0,
+    bases_on_balls INT          NOT NULL DEFAULT 0,
+    inning_scores  VARCHAR(100) NOT NULL,
+    PRIMARY KEY (score_board_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE games
 (
     game_id             BIGINT       NOT NULL AUTO_INCREMENT,
     game_code           VARCHAR(255) NOT NULL,
     date                DATE         NOT NULL,
-    start_at            TIME(6)      NOT NULL,
+    start_at            TIME         NOT NULL,
     stadium_id          BIGINT       NOT NULL,
     home_team_id        BIGINT       NOT NULL,
     away_team_id        BIGINT       NOT NULL,
     home_score          INT,
     away_score          INT,
-    home_runs           INT,
-    away_runs           INT,
-    home_hits           INT,
-    away_hits           INT,
-    home_errors         INT,
-    away_errors         INT,
-    home_bases_on_balls INT,
-    away_bases_on_balls INT,
-    game_state          ENUM ('CANCELED','COMPLETED','LIVE','SCHEDULED'),
+    home_score_board_id BIGINT,
+    away_score_board_id BIGINT,
+    home_pitcher        VARCHAR(255),
+    away_pitcher        VARCHAR(255),
+    game_state          ENUM ('SCHEDULED','LIVE','COMPLETED','CANCELED'),
     PRIMARY KEY (game_id),
     UNIQUE (game_code),
     CONSTRAINT fk_games_stadium FOREIGN KEY (stadium_id) REFERENCES stadiums (stadium_id),
     CONSTRAINT fk_games_home FOREIGN KEY (home_team_id) REFERENCES teams (team_id),
-    CONSTRAINT fk_games_away FOREIGN KEY (away_team_id) REFERENCES teams (team_id)
+    CONSTRAINT fk_games_away FOREIGN KEY (away_team_id) REFERENCES teams (team_id),
+    CONSTRAINT fk_games_home_score_board FOREIGN KEY (home_score_board_id) REFERENCES score_boards (score_board_id),
+    CONSTRAINT fk_games_away_score_board FOREIGN KEY (away_score_board_id) REFERENCES score_boards (score_board_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE check_ins
