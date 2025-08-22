@@ -97,14 +97,14 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                         g.homeTeam.teamCode,
                         g.homeTeam.shortName,
-                        g.homeScore,
+                        g.homeScoreBoard.runs,
                         CASE WHEN g.homeTeam = :team THEN true ELSE false END,
                         g.homePitcher
                     ),
                     new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                         g.awayTeam.teamCode,
                         g.awayTeam.shortName,
-                        g.awayScore,
+                        g.awayScoreBoard.runs,
                         CASE WHEN g.awayTeam = :team THEN true ELSE false END,
                         g.awayPitcher
                     ),
@@ -178,14 +178,14 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                     g.homeTeam.teamCode,
                     g.homeTeam.shortName,
-                    g.homeScore,
+                    g.homeScoreBoard.runs,
                     CASE WHEN g.homeTeam = :team THEN true ELSE false END,
                     g.homePitcher
                 ),
                 new com.yagubogu.checkin.dto.CheckInGameTeamResponse(
                     g.awayTeam.teamCode,
                     g.awayTeam.shortName,
-                    g.awayScore,
+                    g.awayScoreBoard.runs,
                     CASE WHEN g.awayTeam = :team THEN true ELSE false END,
                     g.awayPitcher
                 ),
