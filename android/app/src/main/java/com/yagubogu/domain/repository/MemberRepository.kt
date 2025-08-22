@@ -1,10 +1,10 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.setting.MemberInfoItem
 
 interface MemberRepository {
-    suspend fun getMemberInfo(): Result<MemberInfoResponse>
+    suspend fun getMemberInfo(): Result<MemberInfoItem>
 
     suspend fun getNickname(): Result<String>
 

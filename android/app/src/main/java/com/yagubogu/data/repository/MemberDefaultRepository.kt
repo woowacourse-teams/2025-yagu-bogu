@@ -6,6 +6,7 @@ import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.presentation.setting.MemberInfoItem
 
 class MemberDefaultRepository(
     private val memberDataSource: MemberDataSource,
@@ -13,13 +14,13 @@ class MemberDefaultRepository(
     private var cachedNickname: String? = null
     private var cachedFavoriteTeam: String? = null
 
-    override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
+    override suspend fun getMemberInfo(): Result<MemberInfoItem> =
         memberDataSource
             .getMemberInfo()
             .map { memberInfoResponse: MemberInfoResponse ->
                 cachedNickname = memberInfoResponse.nickname
                 cachedFavoriteTeam = memberInfoResponse.favoriteTeam
-                memberInfoResponse
+                memberInfoResponse.toPresentation()
             }
 
     override suspend fun getNickname(): Result<String> {

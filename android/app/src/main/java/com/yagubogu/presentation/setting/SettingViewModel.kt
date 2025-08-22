@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -88,8 +87,8 @@ class SettingViewModel(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
-                .onSuccess { memberInfoResponse: MemberInfoResponse ->
-                    _myMemberInfoItem.value = memberInfoResponse.toPresentation()
+                .onSuccess { memberInfoResponse: MemberInfoItem ->
+                    _myMemberInfoItem.value = memberInfoResponse
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "회원 정보 조회 API 호출 실패")
                 }
