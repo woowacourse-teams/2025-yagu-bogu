@@ -105,13 +105,7 @@ class AttendanceHistoryFragment : Fragment() {
                     binding.rvAttendanceHistory.smoothScrollToPosition(it)
                 }
             }
-
-            val isAttendanceHistoryEmpty: Boolean = value.isEmpty()
-            binding.ivEmptyHistory.isVisible = isAttendanceHistoryEmpty
-            binding.tvEmptyHistory.isVisible = isAttendanceHistoryEmpty
-
-            binding.constraintFilter.isVisible = !isAttendanceHistoryEmpty
-            binding.constraintOrder.isVisible = !isAttendanceHistoryEmpty
+            updateEmptyHistoryState(value.isEmpty())
         }
 
         viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
@@ -123,5 +117,13 @@ class AttendanceHistoryFragment : Fragment() {
                     },
                 )
         }
+    }
+
+    private fun updateEmptyHistoryState(isEmpty: Boolean) {
+        binding.ivEmptyHistory.isVisible = isEmpty
+        binding.tvEmptyHistory.isVisible = isEmpty
+
+        binding.constraintFilter.isVisible = !isEmpty
+        binding.constraintOrder.isVisible = !isEmpty
     }
 }
