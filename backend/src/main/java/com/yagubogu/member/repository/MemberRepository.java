@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findByOauthId(String oauthId);
+    Optional<Member> findByOauthIdAndDeletedAtIsNull(String oauthId);
 
-    @Query("select m.team.id from Member m where m.id = :memberId")
+    @Query("select m.team.id from Member m where m.id = :memberId and m.deletedAt is null")
     Optional<Long> findTeamIdById(Long memberId);
 }

@@ -32,7 +32,9 @@ public class MemberService {
 
     @Transactional
     public void removeMember(final Long memberId) {
-        memberRepository.deleteById(memberId);
+        Member member = getMember(memberId);
+
+        memberRepository.delete(member);
     }
 
     public MemberNicknameResponse findNickname(final long memberId) {
