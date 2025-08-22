@@ -18,7 +18,7 @@ class AttendanceHistoryViewModel(
 ) : ViewModel(),
     AttendanceHistorySummaryViewHolder.Handler,
     AttendanceHistoryDetailViewHolder.Handler {
-    private val items = MutableLiveData<List<AttendanceHistoryItem.Detail>>()
+    private var items: List<AttendanceHistoryItem.Detail> = emptyList()
 
     private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
     private val _attendanceHistoryOrder = MutableLiveData(AttendanceHistoryOrder.LATEST)
@@ -44,7 +44,7 @@ class AttendanceHistoryViewModel(
             checkInRepository
                 .getCheckInHistories(year, filter.name, order.name)
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem.Detail> ->
-                    items.value = attendanceHistoryItems
+                    items = attendanceHistoryItems
                     _detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -78,12 +78,10 @@ class AttendanceHistoryViewModel(
         _detailItemPosition.value = null
     }
 
-    private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> {
-        val currentItems: List<AttendanceHistoryItem.Detail> = items.value.orEmpty()
-        return currentItems.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
+    private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> =
+        items.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
             if (index == detailItemPosition.value) item else item.summary
         }
-    }
 
     companion object {
         private const val FIRST_INDEX = 0
