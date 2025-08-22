@@ -1,6 +1,9 @@
 package com.yagubogu.game;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckIn;
@@ -11,6 +14,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
@@ -27,20 +31,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class GameIntegrationTest {
+public class GameE2eTest extends E2eTestBase {
 
     @LocalServerPort
     private int port;
@@ -151,8 +147,8 @@ public class GameIntegrationTest {
         );
     }
 
-    private void makeCheckIn(final Game game, final Team team, final Member member) {
-        checkInFactory.save(builder -> builder
+    private CheckIn makeCheckIn(final Game game, final Team team, final Member member) {
+        return checkInFactory.save(builder -> builder
                 .game(game)
                 .member(member)
                 .team(team)
