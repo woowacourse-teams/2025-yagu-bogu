@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.yagubogu.presentation.setting.SettingViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_delete_account"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="40dp"
+        tools:context=".presentation.setting.SettingDeleteAccountFragment">
+
+        <TextView
+            android:id="@+id/tv_delete_account_question_title"
+            style="@style/TextView.Pretendard.Bold.24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_delete_account_question_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_delete_account_question_message"
+            style="@style/TextView.Pretendard.Regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/setting_delete_account_question_message"
+            android:textColor="@color/gray400"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/tv_delete_account_question_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_title" />
+
+        <ImageView
+            android:id="@+id/iv_delete_account_illustration"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:contentDescription="@string/Setting_delete_account_illustration_description"
+            android:src="@drawable/img_baseball_leave_stadium"
+            app:layout_constraintBottom_toTopOf="@id/tv_remember_message"
+            app:layout_constraintTop_toBottomOf="@id/tv_delete_account_question_message"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tv_remember_message"
+            style="@style/TextView.Pretendard.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:lineSpacingExtra="4dp"
+            android:text="@{@string/setting_remember_message(viewModel.myMemberInfoItem.nickName, viewModel.myMemberInfoItem.memberPeriod)}"
+            android:textAlignment="center"
+            android:textColor="@color/gray500"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_delete_account_illustration"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@string/setting_remember_message" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.App.Button.Positive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:onClick="@{() -> viewModel.cancelDeleteAccount()}"
+            android:paddingVertical="16dp"
+            android:text="@string/setting_delete_account_cancel"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_confirm" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            style="@style/Widget.App.Button.Negative"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/gray100"
+            android:paddingVertical="12dp"
+            android:text="@string/setting_delete_account"
+            android:textColor="@color/gray400"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

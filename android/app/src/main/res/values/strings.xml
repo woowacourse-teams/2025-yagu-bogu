@@ -3,44 +3,143 @@
 
     <string name="all_settings">설정</string>
     <string name="all_cancel">취소</string>
-    <string name="all_winning_percentage">%d%%</string>
+    <string name="all_confirm">확인</string>
+    <string name="all_rounded_win_rate">%d%%</string>
+    <string name="all_win_rate">%.1f%%</string>
+    <string name="all_fan">%s 팬</string>
+    <string name="all_count">%d회</string>
+    <string name="all_null_nick_name">(알 수 없음)</string>
 
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
-    <string name="bottom_navigation_record">기록</string>
-    <string name="bottom_navigation_challenge">챌린지</string>
+    <string name="bottom_navigation_attendance_history">직관 내역</string>
+    <string name="bottom_navigation_livetalk">현장톡</string>
 
     <string name="permission_dialog_open_settings">"설정으로 이동"</string>
     <string name="permission_dialog_location_title">위치 권한 필요</string>
     <string name="permission_dialog_location_description">인증하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
 
+    <string name="login_app_description">야구보구 인증하구 통계보구</string>
+    <string name="login_google_icon_description">구글 G 아이콘</string>
+    <string name="login_button_google_account">Google 계정으로 계속하기</string>
+
     <string name="home_check_in">직관 인증하기</string>
+    <string name="home_already_checked_in">오늘 인증했어요!</string>
+    <string name="home_check_in_stadium_emoji">🏟️</string>
+    <string name="home_check_in_confirm">직관 인증 할까요?</string>
+    <string name="home_check_in_caution">직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.</string>
     <string name="home_my_team">우리 팀</string>
     <string name="home_attendance_count">인증 횟수</string>
-    <string name="home_winning_percentage">승률</string>
-    <string name="home_recent_attendance_record">최근 직관 기록</string>
-    <string name="home_empty_attendance_record_description">직관 기록이 없습니다.\n직관의 추억을 기록해 주세요!</string>
+    <string name="home_winning_percentage">직관 승률</string>
     <string name="home_location_permission_denied_message">위치 권한이 거부되었습니다.</string>
-    <string name="home_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
-    <string name="home_check_in_success_message">직관 인증이 완료되었습니다!</string>
-    <string name="home_check_in_failure_message">구장 근처에서만 인증할 수 있어요.</string>
+    <string name="home_check_in_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
+    <string name="home_check_in_success_message">%s 인증이 완료되었습니다!</string>
+    <string name="home_check_in_out_of_range_message">구장 근처에서만 인증할 수 있어요.</string>
+    <string name="home_check_in_network_failed_message">네트워크 오류로 인증에 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
+
+    <string name="home_stadium_stats_title">오늘 팬 현황</string>
+    <string name="home_stadium_stats_refresh_time">%02d:%02d 기준</string>
+    <string name="home_show_more">더보기</string>
+    <string name="home_show_less">접기</string>
+    <string name="home_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="home_victory_fairy_my_nickname">나 (%s)</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
-    <string name="stats_tab_stadium_stats">오늘의 구장 통계</string>
-    <string name="stats_percentage">%d%%</string>
-    <string name="stats_legend_percentage">%.1f%%</string>
+    <string name="stats_tab_stats_detail">상세 통계</string>
 
     <string name="stats_my_pie_chart_title">직관 승률</string>
     <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
     <string name="stats_my_pie_chart_win">승리</string>
     <string name="stats_my_pie_chart_draw">무승부</string>
     <string name="stats_my_pie_chart_lose">패배</string>
-    <string name="stats_my_team">최다 응원팀</string>
-    <string name="stats_my_lucky_stadium">행운의 구장</string>
     <string name="stats_my_team_emoji">🏆</string>
     <string name="stats_my_lucky_stadium_emoji">🍀</string>
+    <string name="stats_my_team">응원팀</string>
+    <string name="stats_my_lucky_stadium">행운의 구장</string>
     <string name="stats_my_no_lucky_stadium">없어요..</string>
+    <string name="stats_attendance_stats_title">직관 평균 통계</string>
+    <string name="stats_gain_score_emoji">😊</string>
+    <string name="stats_loss_score_emoji">😡</string>
+    <string name="stats_gain_score">득점</string>
+    <string name="stats_loss_score">실점</string>
+    <string name="stats_hit">안타</string>
+    <string name="stats_hit_allowed">피안타</string>
+    <string name="stats_error">실책</string>
+    <string name="stats_average_score">%.1f점</string>
+    <string name="stats_average_count">%.1f개</string>
+    <string name="stats_vs_team_stats">%d승 %d무 %d패</string>
+    <string name="stats_vs_team_winning_percentage">VS 팀 승률</string>
+    <string name="stats_winning_percentage">직관 승률</string>
+    <string name="stats_stadium_visit_count">구장 방문 횟수</string>
 
-    <string name="stats_stadium_pie_chart_title">%s 현황</string>
-    <string name="stats_stadium_refresh_time">%02d:%02d 기준</string>
+    <string name="attendance_history_empty_description">직관 내역이 없어요</string>
+    <string name="attendance_history_empty_scoreboard_illustration_description">비어있는 스코어보드 일러스트</string>
+    <string-array name="attendance_history_filter">
+        <item name="all">전체 경기</item>
+        <item name="win">승리한 경기</item>
+    </string-array>
+    <string name="attendance_history_latest">최신순</string>
+    <string name="attendance_history_oldest">오래된순</string>
+    <string name="attendance_history_winning_pitcher">승 - %s</string>
+    <string name="attendance_history_draw_pitcher">무 - %s</string>
+    <string name="attendance_history_losing_pitcher">패 - %s</string>
+    <string name="attendance_history_team_name">팀명</string>
+    <string name="attendance_history_team_record">팀 기록</string>
+    <string name="attendance_history_hits">안타</string>
+    <string name="attendance_history_errors">실책</string>
+    <string name="attendance_history_balls">사사구</string>
+
+    <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
+    <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
+    <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
+
+    <string name="login_failed_message">로그인에 실패했습니다.</string>
+
+    <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
+    <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
+
+    <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
+    <string name="livetalk_away_home_name">%s vs %s</string>
+    <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
+    <string name="livetalk_chat_input_hint_unverified">직관 인증을 먼저 해주세요</string>
+    <string name="livetalk_return_stadiums_description">현장톡 구장목록으로 돌아가기 아이콘</string>
+
+    <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
+    <string name="livetalk_trash_btn">삭제</string>
+    <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
+    <string name="livetalk_delete_succeed">메시지가 삭제되었습니다.</string>
+    <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
+    <string name="livetalk_user_report_btn">신고</string>
+    <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
+    <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
+    <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
+
+    <string name="setting_main_title">설정</string>
+    <string name="setting_main_sign_up_date">가입한 날 : %s</string>
+    <string name="setting_icon_description">설정 아이콘</string>
+    <string name="setting_edit_nickname">닉네임 수정</string>
+    <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
+    <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
+
+    <string name="setting_manage_account">계정 관리</string>
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
+    <string name="setting_logout_alert">로그아웃 되었습니다.</string>
+    <string name="setting_delete_account">탈퇴하기</string>
+    <string name="Setting_delete_account_illustration_description">구단을 떠나는 선수 일러스트</string>
+    <string name="setting_delete_account_question_title">정말 떠나실 건가요?</string>
+    <string name="setting_delete_account_question_message">계정을 삭제하면 더 이상 직관 기록을 볼 수 없어요.</string>
+    <string name="setting_remember_message">%s님,\n야구보구와 함께한 %d일을 소중히 기억할게요.</string>
+    <string name="setting_delete_account_dialog_title">정말 탈퇴 하시겠습니까?</string>
+    <string name="setting_delete_account_dialog_message">이 작업은 되돌릴 수 없습니다.</string>
+    <string name="setting_delete_account_confirm_select_alert">지금까지 야구보구를\n이용해주셔서 감사합니다.</string>
+    <string name="setting_delete_account_cancel">잔류하기</string>
+    <string name="setting_delete_account_cancel_select_alert">앞으로도 잘 부탁드립니다!</string>
+
+    <string name="setting_notice">공지사항</string>
+    <string name="setting_contact_us">문의하기</string>
+    <string name="setting_open_source_license">오픈소스 라이선스</string>
+    <string name="setting_app_version">앱 버전: %s</string>
+
 </resources>

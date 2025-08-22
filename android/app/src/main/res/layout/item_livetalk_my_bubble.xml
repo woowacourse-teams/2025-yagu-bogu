@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="livetalkChatItem"
+            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:layout_marginStart="30dp"
+        android:background="@drawable/bg_primary050_radius_16dp"
+        android:paddingStart="12dp"
+        android:paddingTop="12dp">
+
+
+        <TextView
+            android:id="@+id/tv_chat_body"
+            style="@style/TextView.Pretendard.Regular.16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:text="@{livetalkChatItem.message}"
+            android:textColor="@color/primary900"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="경기장 분위기 정말 뜨거웠어! 응원 열기가 장난 아니었지. 다음에도 꼭 직관 가야겠어." />
+
+        <TextView
+            android:id="@+id/tv_chat_write_time"
+            style="@style/TextView.Pretendard.Regular.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/primary700"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_chat_body"
+            app:timeStamp="@{livetalkChatItem.timestamp}"
+            tools:text="오후 01:25" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_delete_talk_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_primary050_radius_12dp_ripple"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_chat_write_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_chat_write_time">
+
+            <ImageView
+                android:id="@+id/iv_trash_icon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/livetalk_trash_icon_description"
+                android:src="@drawable/ic_trash"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_trash"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/primary700" />
+
+            <TextView
+                android:id="@+id/tv_trash"
+                style="@style/TextView.Pretendard.Regular.12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/livetalk_trash_btn"
+                android:textColor="@color/primary700"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
