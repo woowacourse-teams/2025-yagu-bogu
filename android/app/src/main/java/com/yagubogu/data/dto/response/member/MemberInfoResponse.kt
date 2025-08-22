@@ -1,6 +1,5 @@
 package com.yagubogu.data.dto.response.member
 
-import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.setting.MemberInfoItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,7 +20,7 @@ data class MemberInfoResponse(
         MemberInfoItem(
             nickName = nickname,
             createdAt = LocalDate.parse(createdAt),
-            favoriteTeam = Team.getByCode(favoriteTeam),
+            favoriteTeam = favoriteTeam,
             profileImageUrl = profileImageUrl,
         )
 }
