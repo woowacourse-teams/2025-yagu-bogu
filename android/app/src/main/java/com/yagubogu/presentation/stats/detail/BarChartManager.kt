@@ -97,7 +97,7 @@ class BarChartManager(
             // X축 라벨에 구장 이름 매핑
             xAxis.valueFormatter =
                 IndexAxisValueFormatter(
-                    itemsTopToBottom.map { it.stadiumName },
+                    itemsTopToBottom.map { it.location },
                 )
             xAxis.labelCount = itemsTopToBottom.size
 

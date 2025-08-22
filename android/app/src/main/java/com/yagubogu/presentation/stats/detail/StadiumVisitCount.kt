@@ -1,6 +1,6 @@
 package com.yagubogu.presentation.stats.detail
 
 data class StadiumVisitCount(
-    val stadiumName: String,
+    val location: String,
     val visitCounts: Int,
 )

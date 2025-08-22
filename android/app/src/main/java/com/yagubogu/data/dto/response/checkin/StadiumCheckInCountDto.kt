@@ -15,7 +15,7 @@ data class StadiumCheckInCountDto(
 ) {
     fun toPresentation(): StadiumVisitCount =
         StadiumVisitCount(
-            stadiumName = location,
+            location = location,
             visitCounts = checkInCounts,
         )
 }
