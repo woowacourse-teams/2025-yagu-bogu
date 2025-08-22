@@ -1,12 +1,14 @@
 package com.yagubogu.auth.support;
 
+import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.exception.InvalidTokenException;
-import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
 
@@ -32,6 +34,13 @@ public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
         }
 
         if (!googleAuthProperties.clientId().equals(response.aud())) {
+            String expectedClientId = googleAuthProperties.clientId();
+            String actualAud = response.aud();
+
+            // ✅ 로그 추가: clientId와 audience 값 확인
+            log.info("Validating Google token audience. expectedClientId={}, actualAud={}",
+                    expectedClientId, actualAud);
+
             throw new InvalidTokenException("Invalid audience");
         }
 
