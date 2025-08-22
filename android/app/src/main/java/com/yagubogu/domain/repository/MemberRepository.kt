@@ -1,8 +1,11 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.setting.MemberInfoItem
 
 interface MemberRepository {
+    suspend fun getMemberInfo(): Result<MemberInfoItem>
+
     suspend fun getNickname(): Result<String>
 
     suspend fun updateNickname(nickname: String): Result<Unit>

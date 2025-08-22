@@ -18,8 +18,8 @@ class SettingViewModel(
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
 
-    private val _nickname = MutableLiveData<String>()
-    val nickname: LiveData<String> get() = _nickname
+    private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
+    val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
 
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
@@ -34,7 +34,7 @@ class SettingViewModel(
     val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
 
     init {
-        fetchNickname()
+        fetchMemberInfo()
     }
 
     fun setSettingTitle(title: String) {
@@ -46,7 +46,7 @@ class SettingViewModel(
             memberRepository
                 .updateNickname(newNickname)
                 .onSuccess {
-                    _nickname.value = newNickname
+                    _myMemberInfoItem.value = myMemberInfoItem.value?.copy(nickName = newNickname)
                     _nicknameEditedEvent.setValue(newNickname)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
@@ -83,14 +83,14 @@ class SettingViewModel(
         _deleteAccountCancelEvent.setValue(Unit)
     }
 
-    private fun fetchNickname() {
+    private fun fetchMemberInfo() {
         viewModelScope.launch {
             memberRepository
-                .getNickname()
-                .onSuccess { nickname: String ->
-                    _nickname.value = nickname
+                .getMemberInfo()
+                .onSuccess { memberInfoItem: MemberInfoItem ->
+                    _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "닉네임 조회 API 호출 실패")
+                    Timber.w(exception, "회원 정보 조회 API 호출 실패")
                 }
         }
     }
