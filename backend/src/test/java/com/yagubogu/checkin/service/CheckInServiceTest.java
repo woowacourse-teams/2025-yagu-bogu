@@ -6,11 +6,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -110,8 +105,8 @@ class CheckInServiceTest {
         Member member = memberFactory.save(builder -> builder.team(lotte));
         Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1)));
         CreateCheckInRequest request = new CreateCheckInRequest(stadiumJamsil.getId(), game.getDate());
 
         // when & then
@@ -177,8 +172,8 @@ class CheckInServiceTest {
             Game game = gameFactory.save(gameBuilder ->
                     gameBuilder.date(startDate.plusDays(index))
                             .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                            .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                            .awayTeam(kia).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                             .gameState(GameState.COMPLETED)
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
@@ -213,9 +208,9 @@ class CheckInServiceTest {
                 .extracting(
                         CheckInGameResponse::attendanceDate,
                         r -> r.homeTeam().name(),
-                        r -> r.homeTeam().score(),
+                        r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
-                        r -> r.awayTeam().score()
+                        r -> r.awayScoreBoard().getRuns()
                 ).containsExactly(
                         tuple(startDate.plusDays(3), "롯데", 10, "KIA", 1),
                         tuple(startDate.plusDays(2), "롯데", 10, "KIA", 10),
@@ -246,9 +241,9 @@ class CheckInServiceTest {
                 .extracting(
                         CheckInGameResponse::attendanceDate,
                         r -> r.homeTeam().name(),
-                        r -> r.homeTeam().score(),
+                        r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
-                        r -> r.awayTeam().score()
+                        r -> r.awayScoreBoard().getRuns()
                 ).containsExactly(
                         tuple(startDate, "롯데", 10, "KIA", 1),
                         tuple(startDate.plusDays(1), "롯데", 1, "KIA", 10),
@@ -283,9 +278,9 @@ class CheckInServiceTest {
                 .extracting(
                         CheckInGameResponse::attendanceDate,
                         r -> r.homeTeam().name(),
-                        r -> r.homeTeam().score(),
+                        r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
-                        r -> r.awayTeam().score()
+                        r -> r.awayScoreBoard().getRuns()
                 ).containsExactly(
                         tuple(startDate.plusDays(2), "KIA", 4, "삼성", 0),
                         tuple(startDate.plusDays(1), "KIA", 5, "LG", 4),
@@ -319,9 +314,9 @@ class CheckInServiceTest {
                 .extracting(
                         CheckInGameResponse::attendanceDate,
                         r -> r.homeTeam().name(),
-                        r -> r.homeTeam().score(),
+                        r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
-                        r -> r.awayTeam().score()
+                        r -> r.awayScoreBoard().getRuns()
                 ).containsExactly(
                         tuple(startDate, "KIA", 10, "KT", 1),
                         tuple(startDate.plusDays(1), "KIA", 5, "LG", 4),
@@ -344,26 +339,38 @@ class CheckInServiceTest {
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(kt).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(lg).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate.plusDays(1)));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate.plusDays(2)));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(lg).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate.plusDays(3)));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate.plusDays(4)));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(lg).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate.plusDays(5)));
 
         List<Member> members = memberRepository.findAll();
@@ -416,8 +423,10 @@ class CheckInServiceTest {
 
         LocalDate startDate = LocalDate.of(2025, 7, 21);
         Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(1)
+                .homeTeam(kia)
+                .awayTeam(kt)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .date(startDate));
         checkInFactory.save(builder -> builder
                 .team(samsung)
@@ -451,10 +460,8 @@ class CheckInServiceTest {
         Game game = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
                 .homeTeam(kia)
                 .awayTeam(kt)
-                .homeScore(10)
-                .awayScore(1)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(1))
                 .date(date));
 
         checkInFactory.save(checkInBuilder -> checkInBuilder
@@ -637,10 +644,8 @@ class CheckInServiceTest {
         Game game1 = gameFactory.save(gameBuilder ->
                 gameBuilder.date(startDate.plusDays(0))
                         .stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                         .homePitcher("일승리")
                         .awayPitcher("일패배")
                         .gameState(GameState.COMPLETED)
@@ -650,10 +655,8 @@ class CheckInServiceTest {
         Game game2 = gameFactory.save(gameBuilder ->
                 gameBuilder.date(startDate.plusDays(1))
                         .stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(1).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeTeam(lotte).homeScore(1).homeScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(10))
                         .homePitcher("이패배")
                         .awayPitcher("이승리")
                         .gameState(GameState.COMPLETED)
@@ -663,10 +666,8 @@ class CheckInServiceTest {
         Game game3 = gameFactory.save(gameBuilder ->
                 gameBuilder.date(startDate.plusDays(2))
                         .stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getAwayScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(10).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(10))
                         .homePitcher("삼무승부")
                         .awayPitcher("삼무승부")
                         .gameState(GameState.COMPLETED)
@@ -676,10 +677,8 @@ class CheckInServiceTest {
         Game game4 = gameFactory.save(gameBuilder ->
                 gameBuilder.date(startDate.plusDays(3))
                         .stadium(stadiumJamsil)
-                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                        .homeScoreBoard(TestFixture.getHomeScoreBoard())
-                        .awayScoreBoard(TestFixture.getAwayScoreBoard())
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getAwayScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                         .homePitcher("사승리")
                         .awayPitcher("사패배")
                         .gameState(GameState.COMPLETED)
@@ -691,27 +690,33 @@ class CheckInServiceTest {
         Game game1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(kt).awayScore(1)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .homePitcher("김승리")
                 .awayPitcher("최패배")
+                .gameState(GameState.COMPLETED)
                 .date(startDate));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game1)));
 
         Game game2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(5)
                 .awayTeam(lg).awayScore(4)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(5))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(4))
                 .homePitcher("이승리")
                 .awayPitcher("송패배")
+                .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(1)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game2)));
 
         Game game3 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(4)
                 .awayTeam(samsung).awayScore(0)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(4))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(0))
                 .homePitcher("박승리")
                 .awayPitcher("공패배")
+                .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(2)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }
@@ -720,27 +725,33 @@ class CheckInServiceTest {
         Game game1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(11)
                 .awayTeam(kia).awayScore(1)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(11))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
                 .homePitcher("포라")
                 .awayPitcher("파이브라")
+                .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(3)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game1)));
 
         Game game2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(lg).homeScore(5)
                 .awayTeam(kia).awayScore(2)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(5))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
                 .homePitcher("식스라")
                 .awayPitcher("세븐라")
+                .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(4)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game2)));
 
         Game game3 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(samsung).homeScore(25)
                 .awayTeam(kia).awayScore(2)
-                .homeScoreBoard(TestFixture.getHomeScoreBoard()).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(25))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
                 .homePitcher("에잇라")
                 .awayPitcher("나인라")
+                .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(5)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }

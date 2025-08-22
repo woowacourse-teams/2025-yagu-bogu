@@ -33,8 +33,18 @@ public class TestFixture {
                 List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
     }
 
+    public static ScoreBoard getHomeScoreBoardAbout(Integer runs) {
+        return new ScoreBoard(runs, 10, 10, 10,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
+    }
+
     public static ScoreBoard getAwayScoreBoard() {
         return new ScoreBoard(1, 1, 1, 1,
+                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
+    }
+
+    public static ScoreBoard getAwayScoreBoardAbout(Integer runs) {
+        return new ScoreBoard(runs, 10, 10, 10,
                 List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
     }
 
