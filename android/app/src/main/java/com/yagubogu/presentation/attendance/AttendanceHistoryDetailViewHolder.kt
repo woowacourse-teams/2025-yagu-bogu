@@ -38,10 +38,10 @@ class AttendanceHistoryDetailViewHolder private constructor(
         teamName: String,
         scoreBoard: GameScoreBoard,
     ) {
-        (row.getChildAt(0) as TextView).text = teamName
+        (row.getChildAt(TEAM_NAME_INDEX) as TextView).text = teamName
 
         scoreBoard.inningScores.forEachIndexed { index: Int, score: String ->
-            (row.getChildAt(index + 2) as TextView).text = score
+            (row.getChildAt(index + INNING_SCORE_START_INDEX) as TextView).text = score
         }
         (row.getChildAt(row.childCount - 1) as TextView).text = scoreBoard.runs.toString()
     }
@@ -51,6 +51,9 @@ class AttendanceHistoryDetailViewHolder private constructor(
     }
 
     companion object {
+        private const val TEAM_NAME_INDEX = 0
+        private const val INNING_SCORE_START_INDEX = 2
+
         fun from(
             parent: ViewGroup,
             handler: Handler,
