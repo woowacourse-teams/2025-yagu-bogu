@@ -74,11 +74,11 @@ fun TextView.setDateFormat(date: LocalDate?) {
     text = date.format(DateFormatter.yyyyMMdd)
 }
 
-@BindingAdapter("joinDateFormat")
-fun TextView.setJoinDateFormat(date: LocalDate?) {
+@BindingAdapter("signUpDateFormat")
+fun TextView.setSignUpDateFormat(date: LocalDate?) {
     date ?: return
     val dateText = date.format(DateFormatter.yyyyMMdd)
-    text = context.getString(R.string.setting_main_join_date, dateText)
+    text = context.getString(R.string.setting_main_sign_up_date, dateText)
 }
 
 @BindingAdapter("timeStamp")
