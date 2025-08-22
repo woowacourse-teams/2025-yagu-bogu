@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StadiumCheckInCountDto(
     @SerialName("id")
-    val id: Int, // 구장 id
+    val id: Long, // 구장 id
     @SerialName("location")
     val location: String, // 구장 지역
     @SerialName("checkInCounts")
