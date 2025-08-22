@@ -46,7 +46,7 @@ class YaguBoguApplication : Application() {
     val authRepository by lazy { AuthDefaultRepository(authDataSource, tokenManager) }
 
     private val memberDataSource by lazy { MemberRemoteDataSource(retrofit.memberApiService) }
-    val memberRepository by lazy { MemberDefaultRepository(memberDataSource) }
+    val memberRepository by lazy { MemberDefaultRepository(memberDataSource, tokenManager) }
 
     private val stadiumDataSource by lazy { StadiumRemoteDataSource(retrofit.stadiumApiService) }
     val stadiumRepository by lazy { StadiumDefaultRepository(stadiumDataSource) }
