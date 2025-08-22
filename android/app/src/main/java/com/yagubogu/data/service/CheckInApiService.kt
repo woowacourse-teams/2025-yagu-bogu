@@ -44,7 +44,7 @@ interface CheckInApiService {
     ): Response<CheckInStatusResponse>
 
     @GET("/api/check-ins/stadiums/counts")
-    suspend fun getCheckInStadiumCounts(
+    suspend fun getStadiumCheckInCounts(
         @Query("year") year: Int,
     ): Response<StadiumCheckInCountsResponse>
 }

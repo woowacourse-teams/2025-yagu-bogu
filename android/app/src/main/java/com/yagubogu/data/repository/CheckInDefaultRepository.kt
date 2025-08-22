@@ -63,7 +63,7 @@ class CheckInDefaultRepository(
                 checkInStatusResponse.isCheckIn
             }
 
-    override suspend fun getCheckInStadiumCounts(year: Int): Result<List<StadiumVisitCount>> =
+    override suspend fun getStadiumCheckInCounts(year: Int): Result<List<StadiumVisitCount>> =
         checkInDataSource
             .getStadiumCheckInCounts(year)
             .map { stadiumCheckInCountsResponse: StadiumCheckInCountsResponse ->

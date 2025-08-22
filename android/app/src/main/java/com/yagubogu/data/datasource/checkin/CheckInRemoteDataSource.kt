@@ -59,6 +59,6 @@ class CheckInRemoteDataSource(
 
     override suspend fun getStadiumCheckInCounts(year: Int): Result<StadiumCheckInCountsResponse> =
         safeApiCall {
-            checkInApiService.getCheckInStadiumCounts(year)
+            checkInApiService.getStadiumCheckInCounts(year)
         }
 }

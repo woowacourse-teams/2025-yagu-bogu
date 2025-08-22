@@ -25,5 +25,5 @@ interface CheckInRepository {
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>
 
-    suspend fun getCheckInStadiumCounts(year: Int): Result<List<StadiumVisitCount>>
+    suspend fun getStadiumCheckInCounts(year: Int): Result<List<StadiumVisitCount>>
 }

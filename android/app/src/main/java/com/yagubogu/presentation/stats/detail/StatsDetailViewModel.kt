@@ -59,7 +59,7 @@ class StatsDetailViewModel(
     private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
-                checkInRepository.getCheckInStadiumCounts(year)
+                checkInRepository.getStadiumCheckInCounts(year)
             stadiumVisitCountsResult
                 .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
                     _stadiumVisitCounts.value = stadiumVisitCounts.sortedByDescending { it.visitCounts }
