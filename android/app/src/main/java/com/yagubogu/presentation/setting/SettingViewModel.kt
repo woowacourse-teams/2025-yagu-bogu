@@ -46,7 +46,7 @@ class SettingViewModel(
             memberRepository
                 .updateNickname(newNickname)
                 .onSuccess {
-                    _myMemberInfoItem.value = _myMemberInfoItem.value?.copy(nickName = newNickname)
+                    _myMemberInfoItem.value = myMemberInfoItem.value?.copy(nickName = newNickname)
                     _nicknameEditedEvent.setValue(newNickname)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
@@ -87,8 +87,8 @@ class SettingViewModel(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
-                .onSuccess { memberInfoResponse: MemberInfoItem ->
-                    _myMemberInfoItem.value = memberInfoResponse
+                .onSuccess { memberInfoItem: MemberInfoItem ->
+                    _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "회원 정보 조회 API 호출 실패")
                 }
