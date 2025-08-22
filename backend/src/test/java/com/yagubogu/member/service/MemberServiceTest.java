@@ -132,6 +132,20 @@ public class MemberServiceTest {
         assertThat(memberRepository.findById(memberId)).isEmpty();
     }
 
+    @DisplayName("회원을 탈퇴한다 - 소프트 딜리트")
+    @Test
+    void removeMember_softDelete() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        Long memberId = member.getId();
+
+        // when
+        memberService.removeMember(memberId);
+
+        // then
+        assertThat(memberRepository.findById(memberId)).isEmpty();
+    }
+
     @DisplayName("팀을 등록한다")
     @Test
     void patchTeam() {

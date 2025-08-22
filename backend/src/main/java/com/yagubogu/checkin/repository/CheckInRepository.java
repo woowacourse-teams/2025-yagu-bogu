@@ -118,10 +118,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                   AND (g.homeTeam = :team OR g.awayTeam = :team)
                   AND YEAR(g.date) = :year
                   AND g.gameState = 'COMPLETED'
-                  AND g.homeScoreBoard IS NOT NULL
-                  AND g.awayScoreBoard IS NOT NULL
-                  AND g.homePitcher IS NOT NULL
-                  AND g.awayPitcher IS NOT NULL
                 ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
@@ -205,10 +201,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 (g.awayTeam = :team AND g.awayScore > g.homeScore)
             )
                   AND YEAR(g.date) = :year
-                  AND g.homeScoreBoard IS NOT NULL
-                  AND g.awayScoreBoard IS NOT NULL
-                  AND g.homePitcher IS NOT NULL
-                  AND g.awayPitcher IS NOT NULL
             ORDER BY g.date DESC
             """)
     List<CheckInGameResponse> findCheckInWinHistory(Member member, Team team, int year);
@@ -275,7 +267,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             select new com.yagubogu.stat.dto.OpponentWinRateRow(
                 away.id, away.name, away.shortName, away.teamCode,
                 sum(case when g.homeScore > g.awayScore then 1 else 0 end),
-                count(g)
+                sum(case when g.homeScore < g.awayScore then 1 else 0 end),
+                sum(case when g.homeScore = g.awayScore then 1 else 0 end)
             )
             from Game g
             join Team away on away.id = g.awayTeam.id
@@ -294,7 +287,8 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             select new com.yagubogu.stat.dto.OpponentWinRateRow(
                 home.id, home.name, home.shortName, home.teamCode,
                 sum(case when g.awayScore > g.homeScore then 1 else 0 end),
-                count(g)
+                sum(case when g.awayScore < g.homeScore then 1 else 0 end),
+                sum(case when g.awayScore = g.homeScore then 1 else 0 end)
             )
             from Game g
             join Team home on home.id = g.homeTeam.id

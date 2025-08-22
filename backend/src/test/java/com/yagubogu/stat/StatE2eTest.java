@@ -14,7 +14,6 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.support.E2eTestBase;
@@ -27,6 +26,7 @@ import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -298,7 +298,7 @@ public class StatE2eTest extends E2eTestBase {
         assertThat(actual).isEqualTo(new AverageStatisticResponse(7.7, 5.3, 0.3, 12.0, 9.0));
     }
 
-    @DisplayName("상대팀별 승률을 계산해 반환하며, 승률 내림차순 → name(String) 오름차순으로 정렬하고 미대결 팀은 0.0으로 포함한다")
+    @DisplayName("상대팀별 승률을 계산해 반환하며, 승률 내림차순 → name(String) 오름차순으로 정렬하고 미대결 팀은 0.0으로 포함한다 (무=0 규칙)")
     @Test
     void findOpponentWinRate_opponents_sorted_and_includes_unplayed() {
         // given
@@ -329,7 +329,7 @@ public class StatE2eTest extends E2eTestBase {
                 .homeScore(7).awayScore(1)
                 .gameState(GameState.COMPLETED));
 
-        // NC와는 1전 0승 1무 → 0.0 (무는 분모 포함)
+        // NC와는 1전 0승 1무 → 0.0 (무는 분모만 포함)
         Team nc = teamRepository.findByTeamCode("NC").orElseThrow();
         Game n1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(ht).awayTeam(nc)
@@ -356,26 +356,48 @@ public class StatE2eTest extends E2eTestBase {
                 .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
 
         // then
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.opponents()).hasSize(9);
-            softAssertions.assertThat(actual.opponents().get(0))
-                    .extracting(
-                            OpponentWinRateTeamResponse::teamCode,
-                            OpponentWinRateTeamResponse::winRate
-                    )
-                    .containsExactly("SS", 100.0);
-            softAssertions.assertThat(actual.opponents().get(1))
-                    .extracting(
-                            OpponentWinRateTeamResponse::teamCode,
-                            OpponentWinRateTeamResponse::winRate
-                    )
-                    .containsExactly("LT", 50.0);
-            List<String> zeros = actual.opponents().stream()
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
+
+            // 1위: SS(2-0-0, 100.0)
+            var first = actual.opponents().get(0);
+            s.assertThat(first.teamCode()).isEqualTo("SS");
+            s.assertThat(first.wins()).isEqualTo(2);
+            s.assertThat(first.losses()).isEqualTo(0);
+            s.assertThat(first.draws()).isEqualTo(0);
+            s.assertThat(first.winRate()).isEqualTo(100.0);
+
+            // 2위: LT(1-1-0, 50.0)
+            var second = actual.opponents().get(1);
+            s.assertThat(second.teamCode()).isEqualTo("LT");
+            s.assertThat(second.wins()).isEqualTo(1);
+            s.assertThat(second.losses()).isEqualTo(1);
+            s.assertThat(second.draws()).isEqualTo(0);
+            s.assertThat(second.winRate()).isEqualTo(50.0);
+
+            // NC(0-0-1, 0.0) 포함 검증
+            var ncRes = actual.opponents().stream()
+                    .filter(r -> r.teamCode().equals("NC"))
+                    .findFirst().orElseThrow();
+            s.assertThat(ncRes.wins()).isZero();
+            s.assertThat(ncRes.losses()).isZero();
+            s.assertThat(ncRes.draws()).isEqualTo(1);
+            s.assertThat(ncRes.winRate()).isEqualTo(0.0);
+
+            // 미대결 0.0 팀코드 (정렬/로케일 영향 최소화를 위해 any-order)
+            var zeros = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
                     .map(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::teamCode)
                     .toList();
-            softAssertions.assertThat(zeros)
-                    .containsExactly("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+            s.assertThat(zeros)
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+
+            // 전체 정렬 검증: winRate desc → name asc
+            var sorted = actual.opponents().stream()
+                    .sorted(Comparator.comparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::winRate).reversed()
+                            .thenComparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::name))
+                    .toList();
+            s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
     }
 

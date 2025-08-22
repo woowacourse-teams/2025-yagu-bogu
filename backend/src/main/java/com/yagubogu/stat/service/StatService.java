@@ -145,7 +145,8 @@ public class StatService {
             mergedWinRate.merge(r.teamId(), r, (a, b) ->
                     new OpponentWinRateRow(
                             a.teamId(), a.name(), a.shortName(), a.teamCode(), a.wins() + b.wins(),
-                            a.games() + b.games()
+                            a.losses() + b.losses(),
+                            a.draws() + b.draws()
                     )
             );
         }
@@ -161,13 +162,17 @@ public class StatService {
                     OpponentWinRateRow row = merged.get(op.getId());
                     if (row == null) {
                         return new OpponentWinRateTeamResponse(
-                                op.getId(), op.getName(), op.getShortName(), op.getTeamCode(), 0.0
+                                op.getId(), op.getName(), op.getShortName(), op.getTeamCode(), 0, 0,
+                                0, 0.0
                         );
                     }
-                    double winRate = calculateWinRate(row.wins(), row.games());
+                    long totalGames = row.wins() + row.draws() + row.losses();
+                    double winRate = calculateWinRate(row.wins(), totalGames);
 
                     return new OpponentWinRateTeamResponse(
-                            row.teamId(), row.name(), row.shortName(), row.teamCode(), winRate
+                            row.teamId(), row.name(), row.shortName(), row.teamCode(),
+                            row.wins(), row.losses(), row.draws(),
+                            winRate
                     );
                 })
                 .sorted(OPPONENT_WIN_RATE_TEAM_COMPARATOR)
