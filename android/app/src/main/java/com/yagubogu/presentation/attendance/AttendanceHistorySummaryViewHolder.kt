@@ -16,11 +16,10 @@ class AttendanceHistorySummaryViewHolder(
 
     fun bind(item: AttendanceHistoryItem.Summary) {
         binding.attendanceHistoryItem = item
-        binding.bindingPosition = bindingAdapterPosition
     }
 
     interface Handler {
-        fun onSummaryItemClick(position: Int)
+        fun onSummaryItemClick(item: AttendanceHistoryItem.Summary)
     }
 
     companion object {

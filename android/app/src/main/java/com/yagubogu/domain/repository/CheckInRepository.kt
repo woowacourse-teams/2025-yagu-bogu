@@ -21,6 +21,7 @@ interface CheckInRepository {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
+        order: String,
     ): Result<List<AttendanceHistoryItem.Detail>>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>

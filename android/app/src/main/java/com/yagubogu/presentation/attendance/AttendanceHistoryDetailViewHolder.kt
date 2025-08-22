@@ -2,32 +2,58 @@ package com.yagubogu.presentation.attendance
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TableRow
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemAttendanceHistoryDetailBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.GameScoreBoard
 
 class AttendanceHistoryDetailViewHolder private constructor(
     private val binding: ItemAttendanceHistoryDetailBinding,
     handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private val tableRows: List<TableRow> =
+        (0 until binding.tableScoreboard.childCount)
+            .mapNotNull { binding.tableScoreboard.getChildAt(it) as? TableRow }
+
     init {
         binding.handler = handler
     }
 
     fun bind(item: AttendanceHistoryItem.Detail) {
         binding.attendanceHistoryItem = item
-        binding.bindingPosition = bindingAdapterPosition
+
         binding.tvAwayTeamPitcher.text =
-            itemView.context.getString(item.awayTeamPitcherRes, item.awayTeamPitcherName)
+            itemView.context.getString(item.awayTeamPitcherStringRes, item.awayTeam.pitcher)
         binding.tvHomeTeamPitcher.text =
-            itemView.context.getString(item.homeTeamPitcherRes, item.homeTeamPitcherName)
+            itemView.context.getString(item.homeTeamPitcherStringRes, item.homeTeam.pitcher)
+
+        updateScoreRow(tableRows[1], item.awayTeam.name, item.awayTeamScoreBoard)
+        updateScoreRow(tableRows[2], item.homeTeam.name, item.homeTeamScoreBoard)
+    }
+
+    private fun updateScoreRow(
+        row: TableRow,
+        teamName: String,
+        scoreBoard: GameScoreBoard,
+    ) {
+        (row.getChildAt(TEAM_NAME_INDEX) as TextView).text = teamName
+
+        scoreBoard.inningScores.forEachIndexed { index: Int, score: String ->
+            (row.getChildAt(index + INNING_SCORE_START_INDEX) as TextView).text = score
+        }
+        (row.getChildAt(row.childCount - 1) as TextView).text = scoreBoard.runs.toString()
     }
 
     interface Handler {
-        fun onDetailItemClick(position: Int)
+        fun onDetailItemClick(item: AttendanceHistoryItem.Detail)
     }
 
     companion object {
+        private const val TEAM_NAME_INDEX = 0
+        private const val INNING_SCORE_START_INDEX = 2
+
         fun from(
             parent: ViewGroup,
             handler: Handler,

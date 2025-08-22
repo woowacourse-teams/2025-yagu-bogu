@@ -13,8 +13,8 @@ sealed class AttendanceHistoryItem(
         val id: Long,
         val attendanceDate: LocalDate,
         val stadiumName: String,
-        val awayTeam: AttendanceHistoryTeamItem,
-        val homeTeam: AttendanceHistoryTeamItem,
+        val awayTeam: GameTeam,
+        val homeTeam: GameTeam,
     ) : AttendanceHistoryItem(ViewType.SUMMARY) {
         @ColorRes
         val awayTeamColorRes: Int = determineTeamColorRes(awayTeam, homeTeam)
@@ -24,8 +24,8 @@ sealed class AttendanceHistoryItem(
 
         @ColorRes
         private fun determineTeamColorRes(
-            thisTeam: AttendanceHistoryTeamItem,
-            otherTeam: AttendanceHistoryTeamItem,
+            thisTeam: GameTeam,
+            otherTeam: GameTeam,
         ): Int {
             val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
             return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {
@@ -38,19 +38,22 @@ sealed class AttendanceHistoryItem(
 
     data class Detail(
         val summary: Summary,
+        val awayTeamScoreBoard: GameScoreBoard,
+        val homeTeamScoreBoard: GameScoreBoard,
     ) : AttendanceHistoryItem(ViewType.DETAIL) {
-        @StringRes
-        val awayTeamPitcherRes: Int = determineTeamPitcher(summary.awayTeam, summary.homeTeam)
-        val awayTeamPitcherName: String = summary.awayTeam.pitcher
+        val awayTeam: GameTeam get() = summary.awayTeam
+        val homeTeam: GameTeam get() = summary.homeTeam
 
         @StringRes
-        val homeTeamPitcherRes: Int = determineTeamPitcher(summary.homeTeam, summary.awayTeam)
-        val homeTeamPitcherName: String = summary.homeTeam.pitcher
+        val awayTeamPitcherStringRes: Int = determineTeamPitcher(awayTeam, homeTeam)
+
+        @StringRes
+        val homeTeamPitcherStringRes: Int = determineTeamPitcher(homeTeam, awayTeam)
 
         @StringRes
         private fun determineTeamPitcher(
-            thisTeam: AttendanceHistoryTeamItem,
-            otherTeam: AttendanceHistoryTeamItem,
+            thisTeam: GameTeam,
+            otherTeam: GameTeam,
         ): Int {
             val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
             return when (gameResult) {

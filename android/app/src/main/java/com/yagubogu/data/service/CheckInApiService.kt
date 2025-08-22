@@ -36,6 +36,7 @@ interface CheckInApiService {
     suspend fun getCheckInHistories(
         @Query("year") year: Int,
         @Query("result") result: String,
+        @Query("order") order: String,
     ): Response<CheckInHistoryResponse>
 
     @GET("/api/check-ins/status")

@@ -1,6 +1,6 @@
 package com.yagubogu.presentation.attendance.model
 
-enum class AttendanceHistorySort {
-    NEWEST,
+enum class AttendanceHistoryOrder {
+    LATEST,
     OLDEST,
 }
