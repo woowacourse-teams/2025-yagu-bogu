@@ -1,6 +1,7 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
@@ -26,4 +27,9 @@ interface StatsApiService {
 
     @GET("/api/stats/me")
     suspend fun getAverageStats(): Response<AverageStatisticResponse>
+
+    @GET("/api/stats/win-rate/opponents")
+    suspend fun getVsTeamStats(
+        @Query("year") year: Int,
+    ): Response<OpponentWinRateResponse>
 }
