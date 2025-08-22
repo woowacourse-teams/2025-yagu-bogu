@@ -1,5 +1,7 @@
 package com.yagubogu.auth;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
@@ -9,6 +11,7 @@ import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
 import com.yagubogu.support.member.MemberBuilder;
@@ -34,7 +37,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class AuthIntegrationTest {
+public class AuthE2eTest extends E2eTestBase {
 
     private static final String BEARER = "Bearer ";
     private static final String ID_TOKEN = "ID_TOKEN";
