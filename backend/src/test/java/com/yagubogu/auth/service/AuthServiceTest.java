@@ -154,4 +154,71 @@ class AuthServiceTest {
                 .isExactlyInstanceOf(UnAuthorizedException.class)
                 .hasMessage("Refresh token is invalid or expired");
     }
+
+    @DisplayName("회원의 모든 Refresh Token을 revoke 한다")
+    @Test
+    void removeAllRefreshTokens_revokesAllTokensOfMember() {
+        // given
+        Member owner = memberFactory.save(MemberBuilder::build);
+        Member other = memberFactory.save(MemberBuilder::build);
+
+        // owner의 토큰(유효 2개 + 이미 revoke 1개)
+        RefreshToken t1 = refreshTokenFactory.save(b -> b.member(owner));
+        RefreshToken t2 = refreshTokenFactory.save(b -> b.member(owner));
+        RefreshToken t3Revoked = refreshTokenFactory.save(b -> b.member(owner).isRevoked(true));
+
+        // 다른 회원 토큰
+        RefreshToken otherToken = refreshTokenFactory.save(b -> b.member(other));
+
+        // when
+        authService.removeAllRefreshTokens(owner.getId());
+
+        // then
+        List<RefreshToken> owners = refreshTokenRepository.findAllByMemberId(owner.getId());
+        List<RefreshToken> others = refreshTokenRepository.findAllByMemberId(other.getId());
+
+        assertSoftly(softly -> {
+            softly.assertThat(owners).hasSize(3);
+            softly.assertThat(owners).allMatch(RefreshToken::isRevoked);
+            softly.assertThat(others).hasSize(1);
+            softly.assertThat(others.getFirst().isRevoked())
+                    .as("다른 회원 토큰은 revoke 되면 안 된다")
+                    .isFalse();
+        });
+    }
+
+    @DisplayName("토큰이 하나도 없어도 예외 없이 동작한다(멱등)")
+    @Test
+    void removeAllRefreshTokens_whenEmpty_isIdempotent() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+
+        // when
+        authService.removeAllRefreshTokens(member.getId());
+        authService.removeAllRefreshTokens(member.getId()); // 재호출(멱등성)
+
+        // then
+        List<RefreshToken> tokens = refreshTokenRepository.findAllByMemberId(member.getId());
+        org.assertj.core.api.Assertions.assertThat(tokens).isEmpty();
+    }
+
+    @DisplayName("멱등성: 토큰이 있어도 두 번 호출해 항상 revoke 상태를 유지한다")
+    @Test
+    void removeAllRefreshTokens_withTokens_isIdempotent() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        refreshTokenFactory.save(b -> b.member(member));
+        refreshTokenFactory.save(b -> b.member(member));
+
+        // when
+        authService.removeAllRefreshTokens(member.getId());
+        authService.removeAllRefreshTokens(member.getId()); // 재호출
+
+        // then
+        List<RefreshToken> tokens = refreshTokenRepository.findAllByMemberId(member.getId());
+        org.assertj.core.api.Assertions.assertThat(tokens)
+                .isNotEmpty()
+                .allMatch(RefreshToken::isRevoked);
+    }
+
 }

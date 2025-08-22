@@ -92,6 +92,14 @@ public class AuthService {
         return refreshToken.getId();
     }
 
+    @Transactional
+    public void removeAllRefreshTokens(final Long memberId) {
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findAllByMemberId(memberId);
+        for (RefreshToken refreshToken : refreshTokens) {
+            refreshToken.revoke();
+        }
+    }
+
     private Member findOrCreateMember(
             final boolean isNew,
             final AuthResponse response,
@@ -150,4 +158,5 @@ public class AuthService {
             throw new UnAuthorizedException("Refresh token is invalid or expired");
         }
     }
+
 }
