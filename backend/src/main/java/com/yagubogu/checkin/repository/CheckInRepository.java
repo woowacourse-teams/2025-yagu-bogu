@@ -21,15 +21,16 @@ import org.springframework.stereotype.Repository;
 public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
 
     @Query("""
-                SELECT COUNT(ci) 
+                SELECT COUNT(ci)
                 FROM CheckIn ci
                 JOIN ci.member m
                 JOIN ci.game g
                 WHERE m = :member
                   AND YEAR(g.date) = :year
                   AND (
-                        (g.homeTeam = m.team AND g.homeScore > g.awayScore)
-                     OR (g.awayTeam = m.team AND g.awayScore > g.homeScore)
+                    (ci.team = g.awayTeam AND g.awayScore > g.homeScore)
+                                OR
+                    (ci.team = g.homeTeam AND g.homeScore > g.awayScore)
                   )
             """)
     int findWinCounts(Member member, final int year);
@@ -41,8 +42,9 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 WHERE m = :member
                   AND YEAR(g.date) = :year
                   AND (
-                        (g.homeTeam = m.team AND g.homeScore < g.awayScore)
-                     OR (g.awayTeam = m.team AND g.awayScore < g.homeScore)
+                    (ci.team = g.homeTeam AND g.homeScore < g.awayScore)
+                        OR
+                    (ci.team = g.awayTeam AND g.awayScore < g.homeScore)
                   )
             """)
     int findLoseCounts(Member member, final int year);
@@ -53,7 +55,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 JOIN ci.game g
                 WHERE m = :member
                   AND YEAR(g.date) = :year
-                  AND  ((g.homeTeam = m.team OR g.awayTeam = m.team) AND g.homeScore = g.awayScore)
+                  AND (ci.team = g.homeTeam OR ci.team = g.awayTeam) AND g.homeScore = g.awayScore
             """)
     int findDrawCounts(Member member, final int year);
 
