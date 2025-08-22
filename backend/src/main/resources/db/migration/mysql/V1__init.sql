@@ -16,8 +16,8 @@ CREATE TABLE stadiums
     full_name  VARCHAR(255)  NOT NULL,
     short_name VARCHAR(255)  NOT NULL,
     location   VARCHAR(255)  NOT NULL,
-    latitude   DECIMAL(9, 6) NOT NULL,
-    longitude  DECIMAL(9, 6) NOT NULL,
+    latitude   DOUBLE NOT NULL,
+    longitude  DOUBLE NOT NULL,
     PRIMARY KEY (stadium_id),
     UNIQUE (full_name),
     UNIQUE (short_name)
