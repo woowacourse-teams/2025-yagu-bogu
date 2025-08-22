@@ -1,0 +1,60 @@
+spring:
+  profiles:
+    active: local
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/mysql
+    validate-on-migrate: true
+
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: ${GOOGLE_CLIENT_ID}
+    connect-timeout: 180s # 3분
+    read-timeout: 180s
+
+security:
+  token:
+    access-token:
+      secret-key: ${ACCESS_TOKEN_SECRET_KEY}
+      expires-in: 900      # 15분 (초)
+    refresh-token:
+      secret-key: ${REFRESH_TOKEN_SECRET_KEY}
+      expires-in: 1209600  # 14일 (초)
+
+api:
+  kbo:
+    base-url: https://www.koreabaseball.com/ws
+    connect-timeout: 5s
+    read-timeout: 30s
+    content-type: application/x-www-form-urlencoded; charset=UTF-8
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
