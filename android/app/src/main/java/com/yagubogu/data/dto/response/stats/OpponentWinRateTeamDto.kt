@@ -16,11 +16,11 @@ data class OpponentWinRateTeamDto(
     @SerialName("teamCode")
     val teamCode: String, // 팀 코드
     @SerialName("wins")
-    val wins: Int, // 우승 횟수
+    val wins: Int, // 승리 횟수
     @SerialName("losses")
-    val losses: Int, // 실패 횟수
+    val losses: Int, // 패배 횟수
     @SerialName("draws")
-    val draws: Int, // 비김 횟수
+    val draws: Int, // 무승부 횟수
     @SerialName("winRate")
     val winRate: Double, // 승률(%)
 ) {
