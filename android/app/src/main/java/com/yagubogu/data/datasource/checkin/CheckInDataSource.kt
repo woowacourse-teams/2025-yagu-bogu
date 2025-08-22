@@ -27,5 +27,5 @@ interface CheckInDataSource {
 
     suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse>
 
-    suspend fun getCheckInStadiumCounts(year: Int): Result<StadiumCheckInCountsResponse>
+    suspend fun getStadiumCheckInCounts(year: Int): Result<StadiumCheckInCountsResponse>
 }
