@@ -2,6 +2,7 @@ package com.yagubogu.member.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.auth.service.AuthService;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController implements MemberControllerInterface {
 
     private final MemberService memberService;
+    private final AuthService authService;
 
     public ResponseEntity<MemberNicknameResponse> patchNickname(
             @RequestBody final MemberNicknameRequest request,
@@ -32,7 +34,9 @@ public class MemberController implements MemberControllerInterface {
     public ResponseEntity<Void> removeMember(
             final MemberClaims memberClaims
     ) {
-        memberService.removeMember(memberClaims.id());
+        Long memberId = memberClaims.id();
+        memberService.removeMember(memberId);
+        authService.removeAllRefreshTokens(memberId);
 
         return ResponseEntity.noContent().build();
     }
