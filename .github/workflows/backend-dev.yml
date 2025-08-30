@@ -2,7 +2,7 @@ name: YaguBogu Backend Dev
 
 on:
   push:
-    branches: [ "fix/469" ]
+    branches: [ "dev" ]
     paths:
       - "backend/**"
       - ".github/workflows/**"
