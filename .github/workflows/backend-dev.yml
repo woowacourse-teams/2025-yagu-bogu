@@ -2,9 +2,10 @@ name: YaguBogu Backend Dev
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "fix/469" ]
     paths:
       - "backend/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 env:
