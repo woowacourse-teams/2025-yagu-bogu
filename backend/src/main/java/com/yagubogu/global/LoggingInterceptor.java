@@ -90,11 +90,4 @@ public class LoggingInterceptor implements HandlerInterceptor {
             MDC.clear();
         }
     }
-
-    private String shortenUserAgent(final String userAgent) {
-        if (userAgent == null) {
-            return "UNKNOWN";
-        }
-        return userAgent.length() > 50 ? userAgent.substring(0, 50) + "…" : userAgent;
-    }
 }
