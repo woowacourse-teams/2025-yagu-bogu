@@ -47,7 +47,6 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
-    private var checkInDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -212,18 +211,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun showCheckInConfirmDialog() {
-        if (checkInDialog == null) {
+        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_REQUEST_DIALOG) == null) {
             val dialogUiModel =
                 DefaultDialogUiModel(
                     title = getString(R.string.home_check_in_confirm),
                     emoji = getString(R.string.home_check_in_stadium_emoji),
                     message = getString(R.string.home_check_in_caution),
                 )
-            checkInDialog =
+            val dialog =
                 DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
-        }
 
-        checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+            dialog.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+        }
     }
 
     companion object {
