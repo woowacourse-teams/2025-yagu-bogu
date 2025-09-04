@@ -456,36 +456,43 @@ class StatServiceTest {
         Stadium sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
         Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
 
-        // 2025-07: HT vs SS → 2전 2승 (100.0)
-        gameFactory.save(b -> b.stadium(kia)
+        // 2025-07: HT vs SS → 2승
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(SS)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(5).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(sam)
+        checkInFactory.save(b -> b.member(member).team(HT).game(g1));
+
+        Game g2 = gameFactory.save(b -> b.stadium(sam)
                 .homeTeam(SS).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(2).awayScore(4)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(g2));
 
-        // 2025-07: HT vs LT → 2전 1승 1패 (50.0)
-        gameFactory.save(b -> b.stadium(kia)
+        // 2025-07: HT vs LT → 1승 1패
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(6).awayScore(2)
                 .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(lot)
+        checkInFactory.save(b -> b.member(member).team(HT).game(g3));
+
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(7).awayScore(1)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(g4));
 
-        // 2025-07: HT vs NC → 1전 0승 1무 (0.0, 무는 분모 포함)
-        gameFactory.save(b -> b.stadium(kia)
+        // 2025-07: HT vs NC → 1무
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(NC)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(4).awayScore(4)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(g5));
 
         int year = 2025;
 
@@ -539,18 +546,20 @@ class StatServiceTest {
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
         // 2024(제외)
-        gameFactory.save(b -> b.stadium(kia)
+        Game game2024 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2024, 9, 1))
                 .homeScore(10).awayScore(1)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(game2024));
 
         // 2025(포함, 승)
-        gameFactory.save(b -> b.stadium(kia)
+        Game game2025 =gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 9, 1))
                 .homeScore(3).awayScore(2)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(game2025));
 
         // when
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
@@ -593,19 +602,21 @@ class StatServiceTest {
         Member member = memberFactory.save(b -> b.team(HT));
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
-        // 미기록(제외)
-        gameFactory.save(b -> b.stadium(kia)
+        // 미기록(제외: SCHEDULED)
+        var gScheduled = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 30))
                 .homeScore(null).awayScore(null)
                 .gameState(GameState.SCHEDULED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(gScheduled));
 
         // 기록(포함, 승)
-        gameFactory.save(b -> b.stadium(kia)
+        var gCompleted = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 8, 2))
                 .homeScore(2).awayScore(1)
                 .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(gCompleted));
 
         // when
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
@@ -623,6 +634,63 @@ class StatServiceTest {
 
             s.assertThat(actual.opponents().stream()
                     .filter(it -> !it.teamCode().equals("LT"))
+                    .allMatch(it -> it.winRate() == 0.0)).isTrue();
+        });
+    }
+
+    @DisplayName("game만 존재하고 해당 회원의 checkIn이 없으면 그 경기는 승률 집계에서 제외된다")
+    @Test
+    void findOpponentWinRate_excludes_games_without_member_checkin() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
+
+        // 집계 대상 회원(응원팀 HT)
+        Member member = memberFactory.save(b -> b.team(HT));
+
+        // 다른 회원(같은 팀 HT) — 이 회원의 체크인은 대상 회원 집계에 포함되면 안 됨
+        Member other = memberFactory.save(b -> b.team(HT));
+
+        // 2025-08-01: HT(home) vs LT — COMPLETED
+        var gHome = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 8, 1))
+                .homeScore(3).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        // 대상 회원의 CheckIn 없음
+        checkInFactory.save(b -> b.member(other).team(HT).game(gHome));
+
+        // 2025-08-02: LT(home) vs HT — COMPLETED
+        var gAway = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 8, 2))
+                .homeScore(1).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        // 대상 회원의 CheckIn 없음
+        checkInFactory.save(b -> b.member(other).team(HT).game(gAway));
+
+        // when
+        OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
+
+        // then
+        assertSoftly(s -> {
+            // 전체 10개 팀 중 내 팀(HT) 제외 → 9개
+            s.assertThat(actual.opponents()).hasSize(9);
+
+            // LT는 두 경기가 있었지만, 대상 회원의 CheckIn이 없어 집계 제외되어 0.0이어야 한다.
+            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+                    .filter(it -> it.teamCode().equals("LT"))
+                    .findFirst().orElseThrow();
+
+            s.assertThat(lt.wins()).isEqualTo(0);
+            s.assertThat(lt.losses()).isEqualTo(0);
+            s.assertThat(lt.draws()).isEqualTo(0);
+            s.assertThat(lt.winRate()).isEqualTo(0.0);
+
+            // 나머지 미대결팀들도 0.0인지 확인 (LT 포함)
+            s.assertThat(actual.opponents().stream()
                     .allMatch(it -> it.winRate() == 0.0)).isTrue();
         });
     }
