@@ -13,6 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.Priority
+import com.google.android.gms.location.SettingsClient
+import com.google.android.gms.tasks.Task
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -86,7 +94,8 @@ class HomeFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                showCheckInConfirmDialog()
+                val task: Task<LocationSettingsResponse?> = requestLocationServices()
+                checkLocationSettingsThenShowDialog(task)
             } else {
                 requestLocationPermissions()
             }
@@ -224,6 +233,34 @@ class HomeFragment : Fragment() {
         }
 
         checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+    }
+
+    private fun requestLocationServices(): Task<LocationSettingsResponse?> {
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
+
+        val locationSettingsRequestBuilder =
+            LocationSettingsRequest
+                .Builder()
+                .addLocationRequest(locationRequest)
+
+        val settingsClient: SettingsClient = LocationServices.getSettingsClient(requireActivity())
+        val task: Task<LocationSettingsResponse?> =
+            settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
+
+        return task
+    }
+
+    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse?>) {
+        task
+            .addOnSuccessListener {
+                // 위치 설정이 활성화된 경우 직관 인증 확인 다이얼로그 표시
+                showCheckInConfirmDialog()
+            }.addOnFailureListener { exception ->
+                // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
+                if (exception is ResolvableApiException) {
+                    exception.startResolutionForResult(requireActivity(), 1001)
+                }
+            }
     }
 
     companion object {
