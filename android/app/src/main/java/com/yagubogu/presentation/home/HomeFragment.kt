@@ -234,22 +234,20 @@ class HomeFragment : Fragment() {
         checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
     }
 
-    private fun requestLocationServices(): Task<LocationSettingsResponse?> {
+    private fun requestLocationServices(): Task<LocationSettingsResponse> {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
 
         val locationSettingsRequestBuilder =
             LocationSettingsRequest
                 .Builder()
                 .addLocationRequest(locationRequest)
+                .setAlwaysShow(true)
 
         val settingsClient: SettingsClient = LocationServices.getSettingsClient(requireActivity())
-        val task: Task<LocationSettingsResponse?> =
-            settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
-
-        return task
+        return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
     }
 
-    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse?>) {
+    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse>) {
         task
             .addOnSuccessListener {
                 // 위치 설정이 활성화된 경우 직관 인증 확인 다이얼로그 표시
