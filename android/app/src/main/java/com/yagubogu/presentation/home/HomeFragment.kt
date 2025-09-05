@@ -94,8 +94,7 @@ class HomeFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                val task: Task<LocationSettingsResponse?> = requestLocationServices()
-                checkLocationSettingsThenShowDialog(task)
+                checkLocationSettingsThenShowDialog(requestLocationServices())
             } else {
                 requestLocationPermissions()
             }
@@ -169,7 +168,7 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> showCheckInConfirmDialog()
+                isPermissionGranted -> checkLocationSettingsThenShowDialog(requestLocationServices())
                 shouldShowRationale ->
                     binding.root.showSnackbar(
                         R.string.home_location_permission_denied_message,
