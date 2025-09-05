@@ -28,3 +28,4 @@ springdoc:
 
 server:
   shutdown: graceful
+  forward-headers-strategy: native
