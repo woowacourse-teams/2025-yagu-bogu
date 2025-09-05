@@ -255,7 +255,7 @@ class HomeFragment : Fragment() {
             }.addOnFailureListener { exception ->
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
-                    exception.startResolutionForResult(requireActivity(), 1001)
+                    exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
                 } else {
                     binding.root.showSnackbar(
                         R.string.home_location_settings_disabled,
@@ -270,5 +270,6 @@ class HomeFragment : Fragment() {
         private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
+        private const val RC_LOCATION_SETTINGS = 1001
     }
 }
