@@ -98,8 +98,8 @@ public class StatService {
         Long myTeamId = getTeamIdByMemberId(memberId);
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
-        List<OpponentWinRateRow> home = checkInRepository.findOpponentWinRatesWhenHome(myTeamId, start, end);
-        List<OpponentWinRateRow> away = checkInRepository.findOpponentWinRatesWhenAway(myTeamId, start, end);
+        List<OpponentWinRateRow> home = checkInRepository.findOpponentWinRatesWhenHome(memberId, myTeamId, start, end);
+        List<OpponentWinRateRow> away = checkInRepository.findOpponentWinRatesWhenAway(memberId, myTeamId, start, end);
         Map<Long, OpponentWinRateRow> mergedWinRate = mergeByTeamId(home, away);
 
         List<Team> opponents = teamRepository.findOpponentsExcluding(myTeamId);
