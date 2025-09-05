@@ -256,6 +256,11 @@ class HomeFragment : Fragment() {
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
                     exception.startResolutionForResult(requireActivity(), 1001)
+                } else {
+                    binding.root.showSnackbar(
+                        R.string.home_location_settings_disabled,
+                        R.id.bnv_navigation,
+                    )
                 }
             }
     }
