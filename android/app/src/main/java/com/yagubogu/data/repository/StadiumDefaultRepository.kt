@@ -1,8 +1,8 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.StadiumDataSource
-import com.yagubogu.data.dto.response.StadiumDto
-import com.yagubogu.data.dto.response.StadiumsResponse
+import com.yagubogu.data.datasource.stadium.StadiumDataSource
+import com.yagubogu.data.dto.response.stadium.StadiumDto
+import com.yagubogu.data.dto.response.stadium.StadiumsResponse
 import com.yagubogu.domain.model.Stadiums
 import com.yagubogu.domain.repository.StadiumRepository
 

@@ -272,14 +272,18 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 sum(case when g.homeScore < g.awayScore then 1 else 0 end),
                 sum(case when g.homeScore = g.awayScore then 1 else 0 end)
             )
-            from Game g
+            from CheckIn ci
+            join ci.game g
             join Team away on away.id = g.awayTeam.id
-            where g.homeTeam.id = :myTeamId
+            where ci.member.id = :memberId
+              and ci.team.id = :myTeamId
+              and g.homeTeam.id = :myTeamId
               and g.date between :start and :end
               and g.gameState = 'COMPLETED'
             group by away.id, away.name, away.shortName, away.teamCode
             """)
     List<OpponentWinRateRow> findOpponentWinRatesWhenHome(
+            @Param("memberId") Long memberId,
             @Param("myTeamId") Long myTeamId,
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
@@ -292,14 +296,18 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
                 sum(case when g.awayScore < g.homeScore then 1 else 0 end),
                 sum(case when g.awayScore = g.homeScore then 1 else 0 end)
             )
-            from Game g
+            from CheckIn ci
+            join ci.game g
             join Team home on home.id = g.homeTeam.id
-            where g.awayTeam.id = :myTeamId
+            where ci.member.id = :memberId
+              and ci.team.id = :myTeamId
+              and g.awayTeam.id = :myTeamId
               and g.date between :start and :end
               and g.gameState = 'COMPLETED'
             group by home.id, home.name, home.shortName, home.teamCode
             """)
     List<OpponentWinRateRow> findOpponentWinRatesWhenAway(
+            @Param("memberId") Long memberId,
             @Param("myTeamId") Long myTeamId,
             @Param("start") LocalDate start,
             @Param("end") LocalDate end

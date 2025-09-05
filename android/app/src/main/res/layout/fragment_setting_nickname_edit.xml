@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="30dp">
+
+        <TextView
+            android:id="@+id/tv_edit_nickname_title"
+            style="@style/TextView.Esamanru.Medium.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_edit_nickname"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_edit_nickname_field"
+            style="@style/TextView.Pretendard.SemiBold.16"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/setting_edit_nickname_dialog_hint"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:maxLength="12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_edit_nickname_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_negative_btn"
+            style="@style/Widget.App.Button.Negative"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/all_cancel"
+            app:layout_constraintEnd_toStartOf="@id/tv_positive_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_edit_nickname_field"
+            tools:text="취소" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tv_positive_btn"
+            style="@style/Widget.App.Button.Positive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/all_confirm"
+            app:layout_constraintBottom_toBottomOf="@id/tv_negative_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_negative_btn"
+            app:layout_constraintTop_toTopOf="@id/tv_negative_btn"
+            tools:text="확인" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

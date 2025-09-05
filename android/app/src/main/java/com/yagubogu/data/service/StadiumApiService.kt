@@ -1,6 +1,6 @@
 package com.yagubogu.data.service
 
-import com.yagubogu.data.dto.response.StadiumsResponse
+import com.yagubogu.data.dto.response.stadium.StadiumsResponse
 import retrofit2.Response
 import retrofit2.http.GET
 

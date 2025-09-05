@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="stadiumFanRate"
+            type="com.yagubogu.presentation.home.stadium.StadiumFanRateItem" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="85dp"
+            android:elevation="8dp">
+
+            <View
+                android:id="@+id/view_left_bar_chart"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:setConstraintWidthPercent="@{stadiumFanRate.awayTeamChartRange}"
+                app:setCustomChartBackground="@{stadiumFanRate.awayTeamFanRate.teamColor}"
+                tools:background="@color/team_kia"
+                tools:layout_constraintWidth_percent="0.3" />
+
+            <View
+                android:id="@+id/view_right_bar_chart"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:setConstraintWidthPercent="@{stadiumFanRate.homeTeamChartRange}"
+                app:setCustomChartBackground="@{stadiumFanRate.homeTeamFanRate.teamColor}"
+                tools:background="@color/team_kiwoom"
+                tools:layout_constraintWidth_percent="0.7" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_separate_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:setConstraintGuidePercent="@{stadiumFanRate.awayTeamChartRange}"
+                tools:layout_constraintGuide_percent="0.3" />
+
+            <View
+                android:id="@+id/view_left_divider_background"
+                android:layout_width="29dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:translationX="-4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/iv_trapezoid_right_divider"
+                app:layout_constraintStart_toStartOf="@id/iv_trapezoid_left_divider"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/right_divider_background"
+                android:layout_width="29dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:translationX="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/iv_trapezoid_right_divider"
+                app:layout_constraintStart_toStartOf="@id/iv_trapezoid_left_divider"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_trapezoid_left_divider"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/img_chart_divider_trapezoid_left"
+                android:translationX="-5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
+                app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
+                app:layout_constraintTop_toTopOf="parent"
+                app:setCustomChartDividerTint="@{stadiumFanRate.awayTeamFanRate.teamColor}"
+                tools:tint="@color/team_kia" />
+
+            <ImageView
+                android:id="@+id/iv_trapezoid_right_divider"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/img_chart_divider_trapezoid_right"
+                android:translationX="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
+                app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
+                app:layout_constraintTop_toTopOf="parent"
+                app:setCustomChartDividerTint="@{stadiumFanRate.homeTeamFanRate.teamColor}"
+                tools:tint="@color/team_kiwoom" />
+
+
+            <TextView
+                android:id="@+id/tv_vs_design"
+                style="@style/TextView.Pretendard.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_white_radius_100dp"
+                android:elevation="8dp"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="VS"
+                android:textColor="@color/gray700"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
+                app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/tv_first_team_name"
+                style="@style/TextView.Esamanru.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="4dp"
+                android:includeFontPadding="false"
+                android:text="@{stadiumFanRate.awayTeamFanRate.teamName}"
+                android:textColor="@color/white"
+                android:textSize="22dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_first_team_percent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="KIA" />
+
+            <TextView
+                android:id="@+id/tv_first_team_percent"
+                style="@style/TextView.Pretendard.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{@string/all_win_rate(stadiumFanRate.awayTeamPercentage)}"
+                android:textColor="@color/white"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_first_team_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_first_team_name"
+                tools:text="10.0%" />
+
+
+            <TextView
+                android:id="@+id/tv_second_team_name"
+                style="@style/TextView.Esamanru.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="4dp"
+                android:includeFontPadding="false"
+                android:text="@{stadiumFanRate.homeTeamFanRate.teamName}"
+                android:textColor="@color/white"
+                android:textSize="22dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_second_team_percent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="키움" />
+
+            <TextView
+                android:id="@+id/tv_second_team_percent"
+                style="@style/TextView.Pretendard.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@{@string/all_win_rate(stadiumFanRate.homeTeamPercentage)}"
+                android:textColor="@color/white"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/tv_second_team_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_second_team_name"
+                tools:text="90.0%" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

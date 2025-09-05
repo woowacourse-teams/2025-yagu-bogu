@@ -2,32 +2,30 @@ package com.yagubogu.presentation.home
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import com.google.android.material.snackbar.Snackbar
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
+import com.yagubogu.presentation.MainActivity
+import com.yagubogu.presentation.dialog.DefaultDialogFragment
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeUiModel
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
+import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
+import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment : Fragment() {
@@ -47,6 +45,10 @@ class HomeFragment : Fragment() {
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
+    private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
+    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
+    private var checkInDialog: DefaultDialogFragment? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,9 +63,16 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupMenu()
         setupBindings()
         setupObservers()
+        setupFragmentResultListener()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchAll()
+        }
     }
 
     override fun onDestroyView() {
@@ -71,51 +80,75 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupMenu() {
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(
-            object : MenuProvider {
-                override fun onCreateMenu(
-                    menu: Menu,
-                    menuInflater: MenuInflater,
-                ) {
-                    menuInflater.inflate(R.menu.menu_home, menu)
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                    when (menuItem.itemId) {
-                        R.id.item_settings -> true
-                        else -> false
-                    }
-            },
-            viewLifecycleOwner,
-            Lifecycle.State.STARTED,
-        )
-    }
-
     private fun setupBindings() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                viewModel.checkIn()
+                showCheckInConfirmDialog()
             } else {
                 requestLocationPermissions()
             }
         }
+
+        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
+        binding.rvVictoryFairy.adapter = victoryFairyAdapter
+
+        binding.ivRefresh.setOnClickListener { view: View ->
+            viewModel.fetchStadiumStats()
+            view
+                .animate()
+                .rotationBy(REFRESH_ANIMATION_ROTATION)
+                .setDuration(REFRESH_ANIMATION_DURATION)
+                .start()
+        }
     }
 
     private fun setupObservers() {
-        viewModel.homeUiModel.observe(viewLifecycleOwner) { value: HomeUiModel ->
-            binding.homeUiModel = value
+        viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
+            val message: String =
+                when (value) {
+                    is CheckInUiEvent.Success ->
+                        getString(R.string.home_check_in_success_message, value.stadium.fullName)
+
+                    CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
+                    CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
+                    CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
+                }
+            binding.root.showSnackbar(message, R.id.bnv_navigation)
         }
 
-        viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
-            showSnackbar(
-                when (value) {
-                    is CheckInUiEvent.CheckInSuccess -> R.string.home_check_in_success_message
-                    CheckInUiEvent.CheckInFailure -> R.string.home_check_in_failure_message
-                    CheckInUiEvent.LocationFetchFailed -> R.string.home_location_fetch_failed_message
-                },
-            )
+        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
+            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
+        }
+
+        viewModel.victoryFairyRanking.observe(viewLifecycleOwner) { value: VictoryFairyRanking ->
+            victoryFairyAdapter.submitList(value.topRankings)
+            binding.layoutMyVictoryFairy.victoryFairyItem =
+                value.myRanking.copy(
+                    nickname =
+                        getString(
+                            R.string.home_victory_fairy_my_nickname,
+                            value.myRanking.nickname,
+                        ),
+                )
+        }
+
+        viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
+            (requireActivity() as MainActivity).setLoadingScreen(value)
+        }
+    }
+
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            KEY_CHECK_IN_REQUEST_DIALOG,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.checkIn()
+            }
         }
     }
 
@@ -127,8 +160,13 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> viewModel.checkIn()
-                shouldShowRationale -> showSnackbar(R.string.home_location_permission_denied_message)
+                isPermissionGranted -> showCheckInConfirmDialog()
+                shouldShowRationale ->
+                    binding.root.showSnackbar(
+                        R.string.home_location_permission_denied_message,
+                        R.id.bnv_navigation,
+                    )
+
                 else -> showPermissionDeniedDialog()
             }
         }
@@ -153,17 +191,6 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            setAnchorView(R.id.bnv_navigation)
-            show()
-        }
-    }
-
     private fun showPermissionDeniedDialog() {
         AlertDialog
             .Builder(requireContext())
@@ -184,7 +211,25 @@ class HomeFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun showCheckInConfirmDialog() {
+        if (checkInDialog == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.home_check_in_confirm),
+                    emoji = getString(R.string.home_check_in_stadium_emoji),
+                    message = getString(R.string.home_check_in_caution),
+                )
+            checkInDialog =
+                DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
+        }
+
+        checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+    }
+
     companion object {
         private const val PACKAGE_SCHEME = "package"
+        private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
+        private const val REFRESH_ANIMATION_ROTATION = 360f
+        private const val REFRESH_ANIMATION_DURATION = 1000L
     }
 }
