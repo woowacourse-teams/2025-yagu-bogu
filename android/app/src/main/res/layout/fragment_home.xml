@@ -219,6 +219,16 @@
                     app:layout_constraintBottom_toTopOf="@id/constraint_show_more"
                     app:layout_constraintTop_toBottomOf="@id/tv_stadium_stats_title" />
 
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@android:color/transparent"
+                    android:onClick="@{() -> viewModel.toggleStadiumStats()}"
+                    app:layout_constraintBottom_toBottomOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintEnd_toEndOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintStart_toStartOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintTop_toTopOf="@id/rv_stadium_fan_rate" />
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraint_show_more"
                     android:layout_width="match_parent"
