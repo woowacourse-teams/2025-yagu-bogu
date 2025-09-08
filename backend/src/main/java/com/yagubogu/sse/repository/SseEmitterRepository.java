@@ -1,5 +1,6 @@
 package com.yagubogu.sse.repository;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -17,9 +18,25 @@ public class SseEmitterRepository {
         sseEmitterMap.put(id, sseEmitter);
 
         Runnable cleanup = () -> sseEmitterMap.remove(id);
-        sseEmitter.onTimeout(cleanup);
+
+        sseEmitter.onTimeout(() -> {
+            try {
+                sseEmitter.send(SseEmitter.event()
+                        .name("timeout")
+                        .data("server-timeout")
+                        .reconnectTime(3000));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                cleanup.run();
+            }
+        });
+
         sseEmitter.onCompletion(cleanup);
-        sseEmitter.onError(t -> cleanup.run());
+        sseEmitter.onError(t -> {
+            System.err.println("SSE error: " + t.getMessage());
+            cleanup.run();
+        });
 
         return sseEmitter;
     }

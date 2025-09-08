@@ -15,8 +15,7 @@ public class SseEmitterService {
 
     public SseEmitter add() {
         SseEmitter emitter = new SseEmitter(ONE_HOUR_TIMEOUT);
-        sseEmitterRepository.add(emitter);
 
-
+        return sseEmitterRepository.add(emitter);
     }
 }

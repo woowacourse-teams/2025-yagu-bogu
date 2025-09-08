@@ -22,9 +22,11 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.sse.repository.SseEmitterRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +36,7 @@ import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -48,6 +51,7 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
+    private final SseEmitterRepository sseEmitterRepository;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -59,7 +63,26 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        checkInRepository.save(new CheckIn(game, member, team));
+        CheckIn checkIn = new CheckIn(game, member, team);
+        CheckIn savedCheckIn = checkInRepository.save(checkIn);
+
+        String eventData = buildCheckInEventData(savedCheckIn);
+        sseEmitterRepository.all().forEach(emitter -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("check-in-created")
+                        .data(eventData));
+            } catch (IOException e) {
+                System.err.println("SSE 전송 실패: " + e.getMessage());
+            }
+        });
+    }
+
+    private String buildCheckInEventData(final CheckIn checkIn) {
+        return String.format("{\"memberId\":%d,\"stadiumId\":%d,\"date\":\"%s\"}",
+                checkIn.getMember().getId(),
+                checkIn.getGame().getStadium().getId(),
+                checkIn.getGame().getDate().toString());
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
