@@ -63,7 +63,6 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="@android:color/transparent"
                     android:onClick="@{() -> viewModel.toggleVsTeamStats()}"
                     app:layout_constraintBottom_toBottomOf="@id/rv_vs_team_winning_percentage"
                     app:layout_constraintEnd_toEndOf="@id/rv_vs_team_winning_percentage"
