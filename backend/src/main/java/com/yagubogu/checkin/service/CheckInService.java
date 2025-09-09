@@ -22,7 +22,6 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.sse.repository.SseEmitterRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -50,7 +49,6 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
-    private final SseEmitterRepository sseEmitterRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
