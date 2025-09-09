@@ -22,12 +22,10 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.sse.repository.SseEmitterRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,9 +33,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -53,6 +51,7 @@ public class CheckInService {
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
     private final SseEmitterRepository sseEmitterRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -67,34 +66,7 @@ public class CheckInService {
         CheckIn checkIn = new CheckIn(game, member, team);
         checkInRepository.save(checkIn);
 
-        List<GameWithFanRateResponse> eventData = buildCheckInEventData(date);
-        sseEmitterRepository.all().forEach(emitter -> {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("check-in-created")
-                        .data(eventData));
-            } catch (IOException e) {
-                System.err.println("SSE 전송 실패: " + e.getMessage());
-            }
-        });
-    }
-
-    private List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
-        List<GameWithFanRateResponse> result = new ArrayList<>();
-
-        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
-        for (GameWithFanCountsResponse response : responses) {
-            Game game = response.game();
-            long homeTeamCounts = response.homeTeamCheckInCounts();
-            long awayTeamCounts = response.awayTeamCheckInCounts();
-            long totalCounts = response.totalCheckInCounts();
-
-            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
-            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
-            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
-        }
-
-        return result;
+        applicationEventPublisher.publishEvent(date);
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
