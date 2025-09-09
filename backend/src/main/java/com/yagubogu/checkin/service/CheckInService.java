@@ -22,6 +22,7 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.sse.repository.SseEmitterRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -64,9 +65,9 @@ public class CheckInService {
         Team team = member.getTeam();
 
         CheckIn checkIn = new CheckIn(game, member, team);
-        CheckIn savedCheckIn = checkInRepository.save(checkIn);
+        checkInRepository.save(checkIn);
 
-        String eventData = buildCheckInEventData(savedCheckIn);
+        List<GameWithFanRateResponse> eventData = buildCheckInEventData(date);
         sseEmitterRepository.all().forEach(emitter -> {
             try {
                 emitter.send(SseEmitter.event()
@@ -78,11 +79,22 @@ public class CheckInService {
         });
     }
 
-    private String buildCheckInEventData(final CheckIn checkIn) {
-        return String.format("{\"memberId\":%d,\"stadiumId\":%d,\"date\":\"%s\"}",
-                checkIn.getMember().getId(),
-                checkIn.getGame().getStadium().getId(),
-                checkIn.getGame().getDate().toString());
+    private List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
+        List<GameWithFanRateResponse> result = new ArrayList<>();
+
+        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
+        for (GameWithFanCountsResponse response : responses) {
+            Game game = response.game();
+            long homeTeamCounts = response.homeTeamCheckInCounts();
+            long awayTeamCounts = response.awayTeamCheckInCounts();
+            long totalCounts = response.totalCheckInCounts();
+
+            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
+            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
+            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
+        }
+
+        return result;
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
