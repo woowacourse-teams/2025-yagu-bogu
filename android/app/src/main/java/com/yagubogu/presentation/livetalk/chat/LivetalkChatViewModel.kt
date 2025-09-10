@@ -22,8 +22,9 @@ class LivetalkChatViewModel(
     private val talkRepository: TalkRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
-    private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
-    val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
+    private val _livetalkResponseUiState =
+        MutableLiveData<LivetalkResponseUiState>(LivetalkResponseUiState.Loading)
+    val livetalkResponseUiState: LiveData<LivetalkResponseUiState> get() = _livetalkResponseUiState
 
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
@@ -186,7 +187,9 @@ class LivetalkChatViewModel(
                 val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
-                        _livetalkResponseItem.value = livetalkResponseItem
+                        _livetalkResponseUiState.value =
+                            LivetalkResponseUiState.LivetalkResponse(livetalkResponseItem)
+
                         val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
                             livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
                         _liveTalkChatBubbleItem.value = livetalkChatBubbleItem
@@ -197,6 +200,7 @@ class LivetalkChatViewModel(
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
+                        _livetalkResponseUiState.value = LivetalkResponseUiState.Error
                     }
             }
         }
