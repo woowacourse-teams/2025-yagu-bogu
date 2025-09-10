@@ -165,81 +165,87 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.livetalkResponseUiState.observe(this) { livetalkResponseUiState: LivetalkResponseUiState ->
-            val shimmerLayouts: List<ShimmerFrameLayout> =
-                listOf(binding.shimmerStadiumName, binding.shimmerAwayVsHomeName)
-            val views: List<View> = listOf(binding.tvAwayVsHomeName, binding.rvChatMessages)
-
-            when (livetalkResponseUiState) {
-                is LivetalkResponseUiState.LivetalkResponse -> {
-                    binding.livetalkResponseItem = livetalkResponseUiState.livetalkResponseItem
-                    views.forEach {
-                        it.visibility = View.VISIBLE
-                    }
-                    shimmerLayouts.forEach {
-                        it.visibility = View.INVISIBLE
-                        it.stopShimmer()
-                    }
-                }
-
-                LivetalkResponseUiState.Loading -> {
-                    binding.editMessage.hint = ""
-                    views.forEach {
-                        it.visibility = View.INVISIBLE
-                    }
-                    shimmerLayouts.forEach {
-                        it.startShimmer()
-                    }
-                }
-
-                LivetalkResponseUiState.Error -> {
-                    views.forEach {
-                        it.visibility = View.INVISIBLE
-                    }
-                    shimmerLayouts.forEach {
-                        it.startShimmer()
-                    }
-                    Toast.makeText(this, getString(R.string.livetalk_loading_error), Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
-
-            val oldFirstItemId =
-                livetalkChatAdapter.currentList
-                    .firstOrNull()
-                    ?.livetalkChatItem
-                    ?.chatId
-
-            val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
-
-            livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
-                val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
-                val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
-
-                if (isNewMessageArrived && firstVisibleItemPosition == 0) {
-                    chatLinearLayoutManager.scrollToPosition(0)
-                }
-            }
-        }
-        viewModel.livetalkReportEvent.observe(this) { livetalkReportEvent: LivetalkReportEvent ->
-            when (livetalkReportEvent) {
-                LivetalkReportEvent.DuplicatedReport ->
-                    binding.root.showSnackbar(
-                        R.string.livetalk_already_reported,
-                        R.id.divider,
-                    )
-
-                LivetalkReportEvent.Success ->
-                    binding.root.showSnackbar(
-                        R.string.livetalk_report_succeed,
-                        R.id.divider,
-                    )
-            }
-        }
-
+        viewModel.livetalkResponseUiState.observe(this, ::handleLivetalkResponseUiState)
+        viewModel.liveTalkChatBubbleItem.observe(this, ::handleLiveTalkChatBubbleItem)
+        viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
+        }
+    }
+
+    private fun handleLivetalkResponseUiState(uiState: LivetalkResponseUiState) {
+        val shimmerLayouts: List<ShimmerFrameLayout> =
+            listOf(binding.shimmerStadiumName, binding.shimmerAwayVsHomeName)
+        val views: List<View> = listOf(binding.tvAwayVsHomeName, binding.rvChatMessages)
+
+        when (uiState) {
+            is LivetalkResponseUiState.LivetalkResponse -> {
+                binding.livetalkResponseItem = uiState.livetalkResponseItem
+                views.forEach {
+                    it.visibility = View.VISIBLE
+                }
+                shimmerLayouts.forEach {
+                    it.visibility = View.INVISIBLE
+                    it.stopShimmer()
+                }
+            }
+
+            LivetalkResponseUiState.Loading -> {
+                binding.editMessage.hint = ""
+                views.forEach {
+                    it.visibility = View.INVISIBLE
+                }
+                shimmerLayouts.forEach {
+                    it.startShimmer()
+                }
+            }
+
+            LivetalkResponseUiState.Error -> {
+                views.forEach {
+                    it.visibility = View.INVISIBLE
+                }
+                shimmerLayouts.forEach {
+                    it.startShimmer()
+                }
+                Toast
+                    .makeText(this, getString(R.string.livetalk_loading_error), Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun handleLiveTalkChatBubbleItem(livetalkChatBubbleItems: List<LivetalkChatBubbleItem>) {
+        val oldFirstItemId =
+            livetalkChatAdapter.currentList
+                .firstOrNull()
+                ?.livetalkChatItem
+                ?.chatId
+
+        val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
+
+        livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
+            val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
+            val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
+
+            if (isNewMessageArrived && firstVisibleItemPosition == 0) {
+                chatLinearLayoutManager.scrollToPosition(0)
+            }
+        }
+    }
+
+    private fun handleLivetalkReportEvent(livetalkReportEvent: LivetalkReportEvent) {
+        when (livetalkReportEvent) {
+            LivetalkReportEvent.DuplicatedReport ->
+                binding.root.showSnackbar(
+                    R.string.livetalk_already_reported,
+                    R.id.divider,
+                )
+
+            LivetalkReportEvent.Success ->
+                binding.root.showSnackbar(
+                    R.string.livetalk_report_succeed,
+                    R.id.divider,
+                )
         }
     }
 
