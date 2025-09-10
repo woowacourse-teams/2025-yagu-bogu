@@ -15,6 +15,13 @@ public class SseEmitterService {
 
     public SseEmitter add() {
         SseEmitter emitter = new SseEmitter(ONE_HOUR_TIMEOUT);
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("connected"));
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
 
         return sseEmitterRepository.add(emitter);
     }
