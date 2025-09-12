@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var lastBackPressedTime: Long = 0L
-    private val backPressInterval: Long = 1500L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,7 +140,7 @@ class MainActivity : AppCompatActivity() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val currentTime: Long = System.currentTimeMillis()
-                    if (currentTime - lastBackPressedTime > backPressInterval) {
+                    if (currentTime - lastBackPressedTime > BACK_PRESS_INTERVAL) {
                         lastBackPressedTime = currentTime
                         binding.root.showSnackbar(
                             R.string.main_back_press_to_exit,
@@ -153,5 +152,9 @@ class MainActivity : AppCompatActivity() {
                 }
             },
         )
+    }
+
+    companion object {
+        private const val BACK_PRESS_INTERVAL = 1500L
     }
 }
