@@ -33,8 +33,7 @@ class LivetalkViewModel(
     }
 
     private fun sortStadiumsByVerification(livetalkStadiumItems: List<LivetalkStadiumItem>): List<LivetalkStadiumItem> {
-        val verifiedStadiumItems = livetalkStadiumItems.filter { it.isVerified }
-        val unverifiedStadiumItems = livetalkStadiumItems.filter { !it.isVerified }
-        return verifiedStadiumItems + unverifiedStadiumItems
+        val (verifiedItems, unverifiedItems) = livetalkStadiumItems.partition { it.isVerified }
+        return verifiedItems + unverifiedItems
     }
 }
