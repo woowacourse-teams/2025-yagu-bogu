@@ -26,6 +26,14 @@ class LivetalkChatViewModel(
         MutableLiveData<LivetalkResponseUiState>(LivetalkResponseUiState.Loading)
     val livetalkResponseUiState: LiveData<LivetalkResponseUiState> get() = _livetalkResponseUiState
 
+    val isStadiumLoading =
+        MediatorLiveData<Boolean>().apply {
+            addSource(livetalkResponseUiState) { value = it !is LivetalkResponseUiState.Success }
+        }
+
+    private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
+    val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
+
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
@@ -187,8 +195,8 @@ class LivetalkChatViewModel(
                 val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
-                        _livetalkResponseUiState.value =
-                            LivetalkResponseUiState.LivetalkResponse(livetalkResponseItem)
+                        _livetalkResponseUiState.value = LivetalkResponseUiState.Success
+                        _livetalkResponseItem.value = livetalkResponseItem
 
                         val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
                             livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }

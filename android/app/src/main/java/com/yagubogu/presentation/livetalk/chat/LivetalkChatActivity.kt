@@ -3,14 +3,12 @@ package com.yagubogu.presentation.livetalk.chat
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.shimmer.ShimmerFrameLayout
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
@@ -19,6 +17,7 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.presentation.util.showToast
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -174,43 +173,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun handleLivetalkResponseUiState(uiState: LivetalkResponseUiState) {
-        val shimmerLayouts: List<ShimmerFrameLayout> =
-            listOf(binding.shimmerStadiumName, binding.shimmerAwayVsHomeName)
-        val views: List<View> = listOf(binding.tvAwayVsHomeName, binding.rvChatMessages)
-
-        when (uiState) {
-            is LivetalkResponseUiState.LivetalkResponse -> {
-                binding.livetalkResponseItem = uiState.livetalkResponseItem
-                views.forEach {
-                    it.visibility = View.VISIBLE
-                }
-                shimmerLayouts.forEach {
-                    it.visibility = View.INVISIBLE
-                    it.stopShimmer()
-                }
-            }
-
-            LivetalkResponseUiState.Loading -> {
-                binding.editMessage.hint = ""
-                views.forEach {
-                    it.visibility = View.INVISIBLE
-                }
-                shimmerLayouts.forEach {
-                    it.startShimmer()
-                }
-            }
-
-            LivetalkResponseUiState.Error -> {
-                views.forEach {
-                    it.visibility = View.INVISIBLE
-                }
-                shimmerLayouts.forEach {
-                    it.startShimmer()
-                }
-                Toast
-                    .makeText(this, getString(R.string.livetalk_loading_error), Toast.LENGTH_SHORT)
-                    .show()
-            }
+        if (uiState is LivetalkResponseUiState.Error) {
+            this.showToast(R.string.livetalk_loading_error)
         }
     }
 
