@@ -185,6 +185,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <ImageView
+                    android:id="@+id/ic_stadium_stats_info"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_info"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintStart_toEndOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title"
+                    app:tint="@color/gray400" />
+
                 <TextView
                     android:id="@+id/tv_refresh_time"
                     style="@style/TextView.Pretendard.Regular"
@@ -288,16 +299,38 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    style="@style/TextView.Pretendard.Medium"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraints_victory_fairy_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_winning_percentage"
-                    android:textColor="@color/gray400"
-                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking" />
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking">
+
+                    <TextView
+                        android:id="@+id/tv_victory_fairy_win_rate"
+                        style="@style/TextView.Pretendard.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_winning_percentage"
+                        android:textColor="@color/gray400"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/ic_victory_fairy_win_rate_info"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_info"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_win_rate"
+                        app:layout_constraintStart_toEndOf="@id/tv_victory_fairy_win_rate"
+                        app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_win_rate"
+                        app:tint="@color/gray400" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <include
                     android:id="@+id/layout_my_victory_fairy"
