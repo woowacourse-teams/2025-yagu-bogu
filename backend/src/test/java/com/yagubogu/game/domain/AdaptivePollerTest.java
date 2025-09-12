@@ -206,7 +206,7 @@ class AdaptivePollerTest {
         verify(gameResultSyncService, times(1)).updateGameDetails(eq("G2"), any(KboGameResponse.class));
     }
 
-    @DisplayName("SCHEDULED 보호 주기: 킥오프 전/지연 상황에서도 최소 10~15분 주기가 유지된다(행동 검증)")
+    @DisplayName("SCHEDULED 보호 주기: 킥오프 전/지연 상황에서도 최소 10~15분 주기가 유지된다")
     @Test
     void scheduled_hasProtectionWindow_behaviorally() {
         LocalDate today = LocalDate.of(2025, 7, 21);
