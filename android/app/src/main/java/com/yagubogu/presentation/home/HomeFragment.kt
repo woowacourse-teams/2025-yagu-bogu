@@ -33,6 +33,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
+import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -73,6 +74,7 @@ class HomeFragment : Fragment() {
         setupBindings()
         setupObservers()
         setupFragmentResultListener()
+        setupBalloons()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -262,6 +264,26 @@ class HomeFragment : Fragment() {
                     )
                 }
             }
+    }
+
+    private fun setupBalloons() {
+        val stadiumStatsInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_stadium_stats_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.constraintStadiumStatsTitle.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.constraintStadiumStatsTitle)
+        }
+
+        val victoryFairyInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_victory_fairy_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.constraintVictoryFairyRankingTitle.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.constraintVictoryFairyRankingTitle)
+        }
     }
 
     companion object {

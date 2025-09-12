@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsMyBinding
+import com.yagubogu.presentation.util.buildBalloon
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StatsMyFragment : Fragment() {
@@ -40,6 +41,7 @@ class StatsMyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupChart()
         setupObservers()
+        setupBalloons()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -103,6 +105,26 @@ class StatsMyFragment : Fragment() {
         pieData.setDrawValues(false)
         binding.pieChart.data = pieData
         binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
+    }
+
+    private fun setupBalloons() {
+        val myChartInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.stats_my_pie_chart_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.constraintMyChart.setOnClickListener {
+            myChartInfoBalloon.showAlignBottom(binding.constraintMyChart)
+        }
+
+        val luckyStadiumInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.stats_my_lucky_stadium_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.constraintLuckyStadium.setOnClickListener {
+            luckyStadiumInfoBalloon.showAlignBottom(binding.constraintLuckyStadium)
+        }
     }
 
     companion object {

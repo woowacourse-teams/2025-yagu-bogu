@@ -39,16 +39,19 @@
     <string name="home_check_in_network_failed_message">네트워크 오류로 인증에 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
 
     <string name="home_stadium_stats_title">오늘 팬 현황</string>
+    <string name="home_stadium_stats_tooltip">오늘 야구보구에서 직관 인증한 팬들의 비율이에요.</string>
     <string name="home_stadium_stats_refresh_time">%02d:%02d 기준</string>
     <string name="home_show_more">더보기</string>
     <string name="home_show_less">접기</string>
     <string name="home_victory_fairy_ranking">승리요정 랭킹</string>
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
+    <string name="home_victory_fairy_tooltip">직관 승률이 높은 순위예요. 일정 경기 이상 직관해야 등록돼요.</string>
 
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_stats_detail">상세 통계</string>
 
     <string name="stats_my_pie_chart_title">직관 승률</string>
+    <string name="stats_my_pie_chart_tooltip">내 응원팀 직관 경기들의 승률이에요.</string>
     <string name="stats_my_pie_chart_attendance_count">%d 경기</string>
     <string name="stats_my_pie_chart_win">승리</string>
     <string name="stats_my_pie_chart_draw">무승부</string>
@@ -57,6 +60,7 @@
     <string name="stats_my_lucky_stadium_emoji">🍀</string>
     <string name="stats_my_team">응원팀</string>
     <string name="stats_my_lucky_stadium">행운의 구장</string>
+    <string name="stats_my_lucky_stadium_tooltip">직관 승률이 제일 높은 구장이에요.</string>
     <string name="stats_my_no_lucky_stadium">없어요..</string>
     <string name="stats_attendance_stats_title">직관 평균 통계</string>
     <string name="stats_gain_score_emoji">😊</string>
