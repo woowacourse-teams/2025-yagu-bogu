@@ -1,6 +1,7 @@
 package com.yagubogu.game.repository;
 
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
@@ -17,11 +18,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     Optional<Game> findByStadiumAndDate(Stadium stadium, LocalDate date);
 
     Optional<Game> findByGameCode(String gameCode);
-
-    List<Game> findByDate(LocalDate date);
-
-    List<Game> findGameByDate(LocalDate date);
-
 
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
@@ -50,4 +46,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             GROUP BY g.id
             """)
     List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
+
+    List<Game> findAllByDate(LocalDate today);
+
+    boolean existsByDateAndGameStateIn(LocalDate today, List<GameState> scheduled);
+
+    boolean existsByDate(LocalDate date);
 }

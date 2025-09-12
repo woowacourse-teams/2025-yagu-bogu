@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -42,8 +44,16 @@ public class GameScheduleSyncService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
+    /**
+     * KBO API에서 일정을 가져와 DB에 저장한다.
+     */
     @Transactional
-    public void syncGameSchedule(final LocalDate date) {
+    public void fetchGameSchedule(final LocalDate date) {
+        if (gameRepository.existsByDate(date)) {
+            log.info("[ScheduleSync] already exists for {}, skip fetching.", date);
+            return;
+        }
+
         KboGamesResponse kboGamesResponse = kboGameSyncClient.fetchGames(date);
         List<Game> games = convertToGames(kboGamesResponse);
 

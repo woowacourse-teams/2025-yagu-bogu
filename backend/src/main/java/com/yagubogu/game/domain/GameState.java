@@ -2,6 +2,7 @@ package com.yagubogu.game.domain;
 
 import com.yagubogu.game.exception.GameSyncException;
 import java.util.Arrays;
+import java.util.EnumSet;
 
 public enum GameState {
 
@@ -10,6 +11,8 @@ public enum GameState {
     COMPLETED(3),
     CANCELED(4),
     ;
+
+    public static final EnumSet<GameState> FINALIZED_GAME_STATES = EnumSet.of(GameState.COMPLETED, GameState.CANCELED);
 
     private final Integer stateNumber;
 
@@ -26,9 +29,5 @@ public enum GameState {
 
     public boolean isCompleted() {
         return this == COMPLETED;
-    }
-
-    public boolean isNotCompleted() {
-        return !isCompleted();
     }
 }
