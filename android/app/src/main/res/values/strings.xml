@@ -115,7 +115,7 @@
     <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
-    <string name="livetalk_loading_error">해당 경기 현장톡을 불러오는 데 실패했습니다.</string>
+    <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
 
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>

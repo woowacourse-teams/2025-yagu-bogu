@@ -5,13 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel" />
-
-        <variable
-            name="livetalkResponseItem"
-            type="com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem" />
 
         <variable
             name="isVerified"
@@ -32,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            app:isShimmering="@{viewModel.isStadiumLoading}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -49,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@{livetalkResponseItem.stadiumName}"
+            android:text="@{viewModel.livetalkResponseItem.stadiumName}"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -61,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            app:isShimmering="@{viewModel.isStadiumLoading}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_stadium_name">
@@ -78,7 +78,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="@{@string/livetalk_away_home_name(livetalkResponseItem.awayTeamName, livetalkResponseItem.homeTeamName)}"
+            android:text="@{@string/livetalk_away_home_name(viewModel.livetalkResponseItem.awayTeamName, viewModel.livetalkResponseItem.homeTeamName)}"
+            android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
@@ -144,7 +145,7 @@
                 android:background="@null"
                 android:enabled="@{isVerified}"
                 android:gravity="center_vertical"
-                android:hint="@{isVerified? @string/livetalk_chat_input_hint(livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
+                android:hint="@{isVerified? @string/livetalk_chat_input_hint(viewModel.livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxLength="200"
@@ -155,6 +156,7 @@
                 android:textColor="@color/gray900"
                 android:textColorHint="@color/gray500"
                 android:textSize="16sp"
+                android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
