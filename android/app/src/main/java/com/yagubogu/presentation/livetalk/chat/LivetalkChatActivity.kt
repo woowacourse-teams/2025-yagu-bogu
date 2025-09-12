@@ -3,7 +3,6 @@ package com.yagubogu.presentation.livetalk.chat
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -175,6 +174,7 @@ class LivetalkChatActivity : AppCompatActivity() {
     private fun handleLivetalkResponseUiState(uiState: LivetalkResponseUiState) {
         if (uiState is LivetalkResponseUiState.Error) {
             this.showToast(R.string.livetalk_loading_error)
+            finish()
         }
     }
 
