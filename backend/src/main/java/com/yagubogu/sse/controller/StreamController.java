@@ -1,7 +1,9 @@
 package com.yagubogu.sse.controller;
 
 import com.yagubogu.sse.service.SseEmitterService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,8 +16,15 @@ public class StreamController {
 
     private final SseEmitterService sseEmitterService;
 
-    @GetMapping
-    public SseEmitter getEventStream() {
+    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter getEventStream(HttpServletResponse response) {
+        // 캐싱 방지
+        response.setHeader("Cache-Control", "no-cache");
+        // 연결 유지
+        response.setHeader("Connection", "keep-alive");
+        // nginx에서 버퍼링 방지
+        response.setHeader("X-Accel-Buffering", "no");
+
         return sseEmitterService.add();
     }
 }
