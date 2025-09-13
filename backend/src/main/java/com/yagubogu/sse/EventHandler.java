@@ -11,11 +11,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class EventHandler {
@@ -35,6 +37,7 @@ public class EventHandler {
                         .data(eventData));
             } catch (IOException e) {
                 System.err.println("SSE 전송 실패: " + e.getMessage());
+                log.warn("SSE 전송 실패: {}", e.getMessage(), e);
             }
         });
     }
