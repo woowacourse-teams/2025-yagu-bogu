@@ -31,9 +31,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@DataJpaTest
-@ActiveProfiles("integration")
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
+@ActiveProfiles("integration")
+@DataJpaTest
 class AuthServiceTest {
 
     private AuthService authService;
