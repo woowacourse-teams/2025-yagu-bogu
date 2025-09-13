@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = true)
     private Team team;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname", unique = true, nullable = false)
     private String nickname;
 
     @Column(name = "email", nullable = false)

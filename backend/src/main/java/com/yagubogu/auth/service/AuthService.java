@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +46,28 @@ public class AuthService {
 
         Optional<Member> memberOptional = memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId());
         boolean isNew = memberOptional.isEmpty();
-        Member member = findOrCreateMember(isNew, response, memberOptional);
-        MemberClaims memberClaims = MemberClaims.from(member);
+        Member member = memberOptional.orElseGet(() -> createNewMember(response));
 
+        MemberClaims memberClaims = MemberClaims.from(member);
         String accessToken = authTokenProvider.createAccessToken(memberClaims);
         String refreshToken = generateRefreshToken(member);
 
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
+    }
+
+    private Member createNewMember(final AuthResponse response) {
+        String randomNickname = UUID.randomUUID().toString();
+        Member newMember = new Member(
+                null,
+                randomNickname,
+                response.email(),
+                OAuthProvider.GOOGLE,
+                response.oauthId(),
+                Role.USER,
+                response.picture()
+        );
+
+        return memberRepository.save(newMember);
     }
 
     public MemberClaims makeMemberClaims(final String token) {
@@ -98,18 +114,6 @@ public class AuthService {
         for (RefreshToken refreshToken : refreshTokens) {
             refreshToken.revoke();
         }
-    }
-
-    private Member findOrCreateMember(
-            final boolean isNew,
-            final AuthResponse response,
-            final Optional<Member> memberOptional
-    ) {
-        if (isNew) {
-            return memberRepository.save(response.toMember());
-        }
-
-        return memberOptional.get();
     }
 
     private void validateToken(
