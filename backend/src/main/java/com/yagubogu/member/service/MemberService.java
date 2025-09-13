@@ -1,5 +1,6 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -24,6 +25,9 @@ public class MemberService {
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
+        String nickname = request.nickname();
+        validateDuplicateNickname(nickname);
+        
         Member member = getMember(memberId);
         member.updateNickname(request.nickname());
 
@@ -81,5 +85,11 @@ public class MemberService {
     private Team getTeamByCode(final String teamCode) {
         return teamRepository.findByTeamCode(teamCode)
                 .orElseThrow(() -> new NotFoundException("Team is not found"));
+    }
+
+    private void validateDuplicateNickname(final String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new ConflictException("Nickname already exists: " + nickname);
+        }
     }
 }

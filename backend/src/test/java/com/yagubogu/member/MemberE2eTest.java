@@ -117,6 +117,25 @@ public class MemberE2eTest extends E2eTestBase {
         assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
+    @DisplayName("예외: 닉네임 수정 시 중복된 닉네임이면 409 상태를 반환한다")
+    @Test
+    void patchNickname_duplicateNicknameReturn409Status() {
+        // given
+        String existNickname = "존재하는닉네임";
+        Member member1 = memberFactory.save(builder -> builder.nickname(existNickname));
+        Member member2 = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member2.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new MemberNicknameRequest(existNickname))
+                .when().patch("/api/members/me/nickname")
+                .then().log().all()
+                .statusCode(409);
+    }
+
     @DisplayName("회원 탈퇴한다")
     @Test
     void removeMember() {

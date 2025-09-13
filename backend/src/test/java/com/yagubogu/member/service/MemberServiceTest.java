@@ -1,11 +1,8 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -24,6 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -104,6 +105,21 @@ public class MemberServiceTest {
 
         // then
         assertThat(actual.nickname()).isEqualTo(newNickname);
+    }
+
+    @DisplayName("예외: 닉네임 수정시 존재하는 닉네임이면 예외가 발생한다")
+    @Test
+    void patchNickname_duplicateNickname() {
+        // given
+        String existNickname = "존재하는닉네임";
+        memberFactory.save(builder -> builder.nickname(existNickname));
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        MemberNicknameRequest request = new MemberNicknameRequest(existNickname);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
+                .isExactlyInstanceOf(ConflictException.class)
+                .hasMessage("Nickname already exists: " + existNickname);
     }
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다")
