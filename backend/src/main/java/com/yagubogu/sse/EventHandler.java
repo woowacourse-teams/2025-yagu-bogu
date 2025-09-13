@@ -37,7 +37,6 @@ public class EventHandler {
                         .data(eventData));
             } catch (IOException e) {
                 System.err.println("SSE 전송 실패: " + e.getMessage());
-                log.warn("SSE 전송 실패: {}", e.getMessage(), e);
             }
         });
     }
