@@ -152,6 +152,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             )
             from CheckIn ci
             join ci.game g
+            where ci.member.deletedAt IS NULL
             group by
               ci.member.id
             """)
