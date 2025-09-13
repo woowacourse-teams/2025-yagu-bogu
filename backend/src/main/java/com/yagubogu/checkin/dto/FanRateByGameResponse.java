@@ -12,8 +12,8 @@ public record FanRateByGameResponse(
 
     public static FanRateByGameResponse from(Game game, long totalCounts, double homeTeamRate, double awayTeamRate) {
         return new FanRateByGameResponse(
-                game.getId(),
                 totalCounts,
+                game.getId(),
                 TeamFanRateResponse.from(game.getHomeTeam(), homeTeamRate),
                 TeamFanRateResponse.from(game.getAwayTeam(), awayTeamRate)
         );
