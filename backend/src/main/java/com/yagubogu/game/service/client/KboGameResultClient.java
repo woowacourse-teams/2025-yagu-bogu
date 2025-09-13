@@ -10,13 +10,12 @@ import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-@RequiredArgsConstructor
 @Component
 public class KboGameResultClient {
 
@@ -27,6 +26,16 @@ public class KboGameResultClient {
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
     private final KboClientExceptionHandler kboClientExceptionHandler;
+
+    public KboGameResultClient(
+            @Qualifier("kboRestClient") final RestClient kboRestClient,
+            final ObjectMapper objectMapper,
+            final KboClientExceptionHandler kboClientExceptionHandler
+    ) {
+        this.kboRestClient = kboRestClient;
+        this.objectMapper = objectMapper;
+        this.kboClientExceptionHandler = kboClientExceptionHandler;
+    }
 
     public KboGameResultResponse fetchGameResult(final Game game) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

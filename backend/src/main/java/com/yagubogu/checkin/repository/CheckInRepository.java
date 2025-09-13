@@ -171,7 +171,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             WHERE g.date = :date
             GROUP BY g
             """)
-    List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date);
+    List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(@Param("date") LocalDate date);
 
     @Query("""
             SELECT new com.yagubogu.checkin.dto.CheckInGameResponse(

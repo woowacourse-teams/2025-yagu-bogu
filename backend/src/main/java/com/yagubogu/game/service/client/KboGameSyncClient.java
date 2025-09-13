@@ -6,13 +6,12 @@ import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-@RequiredArgsConstructor
 @Component
 public class KboGameSyncClient {
 
@@ -22,6 +21,16 @@ public class KboGameSyncClient {
     private final RestClient kboRestClient;
     private final ObjectMapper objectMapper;
     private final KboClientExceptionHandler kboClientExceptionHandler;
+
+    public KboGameSyncClient(
+            @Qualifier("kboRestClient") final RestClient kboRestClient,
+            final ObjectMapper objectMapper,
+            final KboClientExceptionHandler kboClientExceptionHandler
+    ) {
+        this.kboRestClient = kboRestClient;
+        this.objectMapper = objectMapper;
+        this.kboClientExceptionHandler = kboClientExceptionHandler;
+    }
 
     public KboGamesResponse fetchGames(final LocalDate date) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
