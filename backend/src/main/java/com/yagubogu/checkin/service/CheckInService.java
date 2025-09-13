@@ -112,7 +112,7 @@ public class CheckInService {
         return new CheckInHistoryResponse(checkIns);
     }
 
-    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId) {
+    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId, final String teamCode) {
         List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
         int myRanking = findMyRankingIndex(sortedList, memberId);
         VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);

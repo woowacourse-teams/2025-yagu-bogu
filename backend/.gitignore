@@ -85,3 +85,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+/src/main/generated

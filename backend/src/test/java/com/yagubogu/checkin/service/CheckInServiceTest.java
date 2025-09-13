@@ -382,7 +382,7 @@ class CheckInServiceTest {
         }
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId());
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), "");
 
         // then
         assertSoftly(softAssertions -> {
@@ -404,7 +404,7 @@ class CheckInServiceTest {
         long memberId = fora.getId();
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId);
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId, "");
 
         // then
         assertSoftly(softAssertions -> {
@@ -435,7 +435,7 @@ class CheckInServiceTest {
         );
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId());
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), "");
 
         // then
         assertSoftly(softAssertions -> {

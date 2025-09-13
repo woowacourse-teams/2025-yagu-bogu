@@ -6,6 +6,7 @@ import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.QMember;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
@@ -18,7 +19,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
+public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomCheckInRepository {
 
     @Query("""
                 SELECT COUNT(ci)
