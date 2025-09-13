@@ -22,6 +22,7 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.sse.dto.CheckInCreatedEvent;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -64,7 +65,7 @@ public class CheckInService {
         CheckIn checkIn = new CheckIn(game, member, team);
         checkInRepository.save(checkIn);
 
-        applicationEventPublisher.publishEvent(date);
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {

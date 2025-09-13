@@ -3,6 +3,7 @@ package com.yagubogu.sse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.sse.dto.CheckInCreatedEvent;
 import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.sse.repository.SseEmitterRepository;
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class EventHandler {
 
     @Async
     @TransactionalEventListener
-    public void onCheckInCreated(final LocalDate date) {
-        List<GameWithFanRateResponse> eventData = buildCheckInEventData(date);
+    public void onCheckInCreated(final CheckInCreatedEvent event) {
+        List<GameWithFanRateResponse> eventData = buildCheckInEventData(event.date());
 
         sseEmitterRepository.all().forEach(emitter -> {
             try {
