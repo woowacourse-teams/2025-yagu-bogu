@@ -15,3 +15,11 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/mysql
+    validate-on-migrate: true
+    clean-disabled: true
