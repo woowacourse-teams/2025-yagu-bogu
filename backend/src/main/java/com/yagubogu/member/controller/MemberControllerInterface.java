@@ -1,6 +1,7 @@
 package com.yagubogu.member.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
@@ -74,4 +75,12 @@ public interface MemberControllerInterface {
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody MemberFavoriteRequest request
     );
+
+    @Operation(summary = "뱃지 조회", description = "모든 뱃지와 현재 로그인된 회원이 보유한 뱃지를 보여준다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "뱃지 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
+    })
+    @GetMapping("/me/badges")
+    ResponseEntity<BadgeListResponse> findBadges(@Parameter(hidden = true) MemberClaims memberClaims);
 }

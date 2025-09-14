@@ -5,10 +5,12 @@ import com.yagubogu.auth.gateway.FakeAuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -73,5 +75,10 @@ public class AuthTestConfig {
     @Bean
     public RefreshTokenFactory refreshTokenFactory(final RefreshTokenRepository refreshTokenRepository) {
         return new RefreshTokenFactory(refreshTokenRepository);
+    }
+
+    @Bean
+    public MemberBadgeFactory memberBadgeFactory(final MemberBadgeRepository memberBadgeRepository) {
+        return new MemberBadgeFactory(memberBadgeRepository);
     }
 }

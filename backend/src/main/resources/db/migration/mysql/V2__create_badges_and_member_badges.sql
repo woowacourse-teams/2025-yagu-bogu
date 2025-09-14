@@ -13,11 +13,14 @@ CREATE TABLE badges
 -- 2. member_badges 테이블 생성
 CREATE TABLE member_badges
 (
-    member_badge_id BIGINT NOT NULL AUTO_INCREMENT,
-    badge_id        BIGINT NOT NULL,
-    member_id       BIGINT NOT NULL,
-    progress        DOUBLE NOT NULL,
+    member_badge_id BIGINT      NOT NULL AUTO_INCREMENT,
+    badge_id        BIGINT      NOT NULL,
+    member_id       BIGINT      NOT NULL,
+    progress        DOUBLE      NOT NULL,
     representative  BOOLEAN,
+    created_at      DATETIME(6) NOT NULL,
+    updated_at      DATETIME(6) NOT NULL,
+    deleted_at      DATETIME(6) NULL,
     PRIMARY KEY (member_badge_id),
     FOREIGN KEY (badge_id) REFERENCES badges (badge_id),
     FOREIGN KEY (member_id) REFERENCES members (member_id)

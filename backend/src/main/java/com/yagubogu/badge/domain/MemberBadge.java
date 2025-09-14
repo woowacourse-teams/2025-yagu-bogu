@@ -1,5 +1,6 @@
 package com.yagubogu.badge.domain;
 
+import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "member_badges")
 @Entity
-public class MemberBadge {
+public class MemberBadge extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

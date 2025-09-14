@@ -3,6 +3,7 @@ package com.yagubogu.member.controller;
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.service.AuthService;
+import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
@@ -70,6 +71,13 @@ public class MemberController implements MemberControllerInterface {
             @RequestBody final MemberFavoriteRequest memberFavoriteRequest
     ) {
         MemberFavoriteResponse response = memberService.updateFavorite(memberClaims.id(), memberFavoriteRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<BadgeListResponse> findBadges(final MemberClaims memberClaims) {
+        BadgeListResponse response = memberService.findBadges(memberClaims.id());
 
         return ResponseEntity.ok(response);
     }

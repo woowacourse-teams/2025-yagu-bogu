@@ -1,6 +1,11 @@
 package com.yagubogu.member;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.domain.Policy;
+import com.yagubogu.badge.dto.BadgeListResponse;
+import com.yagubogu.badge.dto.BadgeResponse;
+import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -11,12 +16,15 @@ import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +50,12 @@ public class MemberE2eTest extends E2eTestBase {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private BadgeRepository badgeRepository;
+
+    @Autowired
+    private MemberBadgeFactory memberBadgeFactory;
 
     @BeforeEach
     void setUp() {
@@ -190,5 +204,35 @@ public class MemberE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
         });
+    }
+
+    @DisplayName("뱃지를 조회한다")
+    @Test
+    void findBadges() {
+        // given
+        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
+        List<BadgeResponse> expected = List.of(
+                new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
+                        Policy.SIGN_UP, 100.0, 100.0,
+                        true, LocalDateTime.now(), null)
+        );
+
+        // when
+        BadgeListResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/members/me/badges")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(BadgeListResponse.class);
+
+        // then
+        assertThat(actual.badges())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
+                .containsExactlyInAnyOrderElementsOf(expected);
     }
 }

@@ -37,7 +37,8 @@ ON DUPLICATE KEY UPDATE full_name  = new_data.full_name,
 INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_value, badge_achieved_rate)
     VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1, 100.0)
         AS new_data
-ON DUPLICATE KEY UPDATE badge_description     = new_data.badge_description,
+ON DUPLICATE KEY UPDATE badge_name            = new_data.badge_name,
+                        badge_description     = new_data.badge_description,
                         badge_condition_type  = new_data.badge_condition_type,
                         badge_condition_value = new_data.badge_condition_value,
                         badge_achieved_rate   = new_data.badge_achieved_rate;

@@ -1,5 +1,8 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.badge.dto.BadgeListResponse;
+import com.yagubogu.badge.dto.BadgeResponse;
+import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -10,6 +13,7 @@ import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
+    private final BadgeRepository badgeRepository;
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
@@ -67,10 +72,23 @@ public class MemberService {
         return MemberFavoriteResponse.from(member.getTeam());
     }
 
+    public BadgeListResponse findBadges(final Long memberId) {
+        validateMemberExists(memberId);
+        List<BadgeResponse> badgeResponse = badgeRepository.findAllBadgesWithAcquiredBadgeStatus(memberId);
+
+        return BadgeListResponse.from(badgeResponse);
+    }
+
     public MemberInfoResponse findMember(final Long memberId) {
         Member member = getMember(memberId);
 
         return MemberInfoResponse.from(member);
+    }
+
+    public void validateMemberExists(final Long memberId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundException("Member is not Found");
+        }
     }
 
     private Member getMember(final long memberId) {
