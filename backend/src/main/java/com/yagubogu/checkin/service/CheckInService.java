@@ -115,16 +115,20 @@ public class CheckInService {
         return new CheckInHistoryResponse(checkIns);
     }
 
-    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId, final TeamFilter teamCode) {
+    public VictoryFairyRankingResponses findVictoryFairyRankings(
+            final long memberId,
+            final TeamFilter teamCode,
+            final int year
+    ) {
         Member member = getMember(memberId);
 
         // m : 전체 유저 평균 승롤 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
-        double m = checkInRepository.calculateTotalAverageWinRate(2025);
+        double m = checkInRepository.calculateTotalAverageWinRate(year);
         // c
-        double c = checkInRepository.calculateAverageCheckInCount(2025);
+        double c = checkInRepository.calculateAverageCheckInCount(year);
 
-        System.out.println(m + " " + c);
         if (teamCode == TeamFilter.ALL) {
+            checkInRepository.findTopRankingAndMyRanking(m, c, year);
            // 모든 팀 팬들을 고려한 승요 랭킹
         }
         // 응원팀 승요 랭킹

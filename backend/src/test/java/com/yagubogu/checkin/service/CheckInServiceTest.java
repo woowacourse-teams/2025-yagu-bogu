@@ -342,37 +342,50 @@ class CheckInServiceTest {
                 .awayTeam(kt).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate));
+                .date(startDate)
+                .gameState(GameState.COMPLETED)
+        );
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(lg).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate.plusDays(1)));
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED)
+
+        );
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate.plusDays(2)));
+                .date(startDate.plusDays(2))
+                .gameState(GameState.COMPLETED)
+        );
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(lg).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate.plusDays(3)));
+                .date(startDate.plusDays(3))
+                .gameState(GameState.COMPLETED)
+        );
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate.plusDays(4)));
+                .date(startDate.plusDays(4))
+                .gameState(GameState.COMPLETED)
+        );
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(lg).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate.plusDays(5)));
+                .date(startDate.plusDays(5))
+                .gameState(GameState.COMPLETED)
+        );
 
         List<Member> members = memberRepository.findAll();
         List<Game> games = gameRepository.findAll();

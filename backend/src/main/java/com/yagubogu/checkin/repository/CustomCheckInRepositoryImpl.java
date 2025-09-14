@@ -1,11 +1,15 @@
 package com.yagubogu.checkin.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yagubogu.checkin.domain.QCheckIn;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.member.domain.QMember;
@@ -25,20 +29,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QMember member = QMember.member;
 
         BooleanExpression finished = isFinished(game);
-
-        NumberExpression<Long> isWin =
-                new CaseBuilder()
-                        .when(
-                                checkIn.team.eq(game.homeTeam)
-                                        .and(game.homeScore.gt(game.awayScore))
-                        )
-                        .then(1L)
-                        .when(
-                                checkIn.team.eq(game.awayTeam)
-                                        .and(game.awayScore.gt(game.homeScore))
-                        )
-                        .then(1L)
-                        .otherwise(0L);
+        NumberExpression<Long> isWin = calculateWinCounts(checkIn, game);
 
         Tuple tuple = jpaQueryFactory.select(isWin.sum(), checkIn.count())
                 .from(checkIn)
@@ -69,6 +60,34 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return (perCheckInCount == 0) ? 0.0 : (double) totalCheckInCount / perCheckInCount;
     }
 
+    @Override
+    public VictoryFairyRankingResponses findTopRankingAndMyRanking(final double m, final double c, final int year) {
+        QCheckIn checkIn = QCheckIn.checkIn;
+        QGame game = QGame.game;
+        QMember member = QMember.member;
+
+        // w: 개인의 승리 횟수
+        NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
+        NumberExpression<Long> total = checkIn.count();
+
+        NumberExpression<Double> calculateWinRankingScoreExpression = wins.doubleValue()
+                .add(Expressions.constant(c * m))
+                .divide(total.doubleValue().add(Expressions.constant(c)));
+
+        //       int ranking,
+        //            String nickname,
+        //            String profileImageUrl,
+        //            String teamShortName,
+        //            double winPercent
+        int ranking = 1;
+        jpaQueryFactory.select(Projections.constructor(
+                VictoryFairyRankingResponse.class,
+                ranking
+
+        ))
+
+    }
+
     private BooleanExpression isFinished(final QGame game) {
         return game.gameState.eq(GameState.COMPLETED);
     }
@@ -95,6 +114,21 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         isFavoriteTeam(checkIn, member)
                 )
                 .fetchOne();
+    }
+
+    private NumberExpression<Long> calculateWinCounts(final QCheckIn checkIn, final QGame game) {
+        return new CaseBuilder()
+                .when(
+                        checkIn.team.eq(game.homeTeam)
+                                .and(game.homeScore.gt(game.awayScore))
+                )
+                .then(1L)
+                .when(
+                        checkIn.team.eq(game.awayTeam)
+                                .and(game.awayScore.gt(game.homeScore))
+                )
+                .then(1L)
+                .otherwise(0L);
     }
 
     private Long calculatePerCheckInCount(final int year) {
