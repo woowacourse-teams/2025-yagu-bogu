@@ -1,8 +1,12 @@
 package com.yagubogu.talk.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
+import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -25,10 +29,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-@Import({AuthTestConfig.class, JpaAuditingConfig.class})
+@Import({AuthTestConfig.class, JpaAuditingConfig.class, QueryDslConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @DataJpaTest
 class TalkReportServiceTest {
