@@ -1,8 +1,5 @@
 package com.yagubogu.auth.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
@@ -28,8 +25,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DataJpaTest
 @ActiveProfiles("integration")
@@ -62,10 +63,13 @@ class AuthServiceTest {
     @Autowired
     private RefreshTokenFactory refreshTokenFactory;
 
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     @BeforeEach
     void setUp() {
         authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider,
-                List.of(googleAuthValidator), refreshTokenRepository, authTokenProperties);
+                List.of(googleAuthValidator), refreshTokenRepository, authTokenProperties, publisher);
     }
 
     @DisplayName("로그인을 수행한다")

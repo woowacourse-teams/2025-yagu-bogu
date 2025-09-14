@@ -22,3 +22,7 @@ VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.88
        (7, '문학야구장', '랜더스필드', '인천', 37.4361, 126.6892),
        (8, '마산야구장', '엔씨파크', '마산', 35.2281, 128.6819),
        (9, '이글스파크', '볼파크', '대전', 36.3173, 127.4280);
+
+-- 3. 회원가입 뱃지 데이터
+INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_value, badge_achieved_rate)
+VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1, 100.0);

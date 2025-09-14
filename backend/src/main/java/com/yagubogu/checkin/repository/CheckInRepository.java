@@ -312,4 +312,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
     );
+
+    Integer countCheckInsByMember(Member member);
 }

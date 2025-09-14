@@ -13,6 +13,8 @@ import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
+import com.yagubogu.badge.BadgeEvent;
+import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -23,6 +25,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,7 @@ public class AuthService {
     private final List<AuthValidator<? extends AuthResponse>> authValidators;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthTokenProperties authTokenProperties;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public LoginResponse login(final LoginRequest request) {
@@ -51,6 +55,9 @@ public class AuthService {
         String accessToken = authTokenProvider.createAccessToken(memberClaims);
         String refreshToken = generateRefreshToken(member);
 
+        if (isNew) {
+            publisher.publishEvent(new BadgeEvent(member, Policy.SIGN_UP));
+        }
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
