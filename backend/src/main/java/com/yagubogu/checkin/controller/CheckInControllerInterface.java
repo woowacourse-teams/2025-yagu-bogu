@@ -46,7 +46,7 @@ public interface CheckInControllerInterface {
     @GetMapping("/counts")
     ResponseEntity<CheckInCountsResponse> findCheckInCounts(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam long year
+            @RequestParam int year
     );
 
     @Operation(summary = "인증 내역 조회", description = "연도별 인증 내역을 조회합니다.")

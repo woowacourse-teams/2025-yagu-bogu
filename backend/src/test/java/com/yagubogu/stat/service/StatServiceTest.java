@@ -353,7 +353,8 @@ class StatServiceTest {
     @Test
     void findLuckyStadium_noCheckInCounts() {
         // given
-        Member member = memberFactory.save(MemberBuilder::build);
+        Team ss = teamRepository.findByTeamCode("SS").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(ss));
         int year = 2025;
 
         // when
@@ -554,7 +555,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(game2024));
 
         // 2025(포함, 승)
-        Game game2025 =gameFactory.save(b -> b.stadium(kia)
+        Game game2025 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 9, 1))
                 .homeScore(3).awayScore(2)

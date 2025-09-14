@@ -401,7 +401,7 @@ public class StatE2eTest extends E2eTestBase {
         });
     }
 
-    @DisplayName("예외: 상대팀별 승률 조회시 응원팀이 없으면 404를 반환한다")
+    @DisplayName("예외: 상대팀별 승률 조회시 응원팀이 없으면 422를 반환한다")
     @Test
     void findOpponentWinRate_memberWithoutTeam_notFound() {
         // given
@@ -415,6 +415,6 @@ public class StatE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .when().get("/api/stats/win-rate/opponents")
                 .then().log().all()
-                .statusCode(404);
+                .statusCode(422);
     }
 }
