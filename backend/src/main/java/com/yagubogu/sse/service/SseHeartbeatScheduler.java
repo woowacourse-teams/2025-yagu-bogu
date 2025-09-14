@@ -16,9 +16,7 @@ public class SseHeartbeatScheduler {
     public void sendHeartbeat() {
         for (SseEmitter emitter : repository.all()) {
             try {
-                emitter.send(SseEmitter.event()
-                        .name("ping")
-                        .data(":"));
+                emitter.send(SseEmitter.event().comment("keepalive"));
             } catch (Exception e) {
                 emitter.completeWithError(e);
             }
