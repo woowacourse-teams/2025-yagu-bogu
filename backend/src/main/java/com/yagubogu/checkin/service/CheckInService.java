@@ -14,6 +14,7 @@ import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -25,6 +26,7 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +50,7 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -112,7 +115,24 @@ public class CheckInService {
         return new CheckInHistoryResponse(checkIns);
     }
 
-    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId, final String teamCode) {
+    public VictoryFairyRankingResponses findVictoryFairyRankings(final long memberId, final TeamFilter teamCode) {
+        Member member = getMember(memberId);
+
+        // m : 전체 유저 평균 승롤 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
+        double m = checkInRepository.calculateTotalAverageWinRate(2025);
+        // c
+        double c = checkInRepository.calculateAverageCheckInCount(2025);
+
+        System.out.println(m + " " + c);
+        if (teamCode == TeamFilter.ALL) {
+           // 모든 팀 팬들을 고려한 승요 랭킹
+        }
+        // 응원팀 승요 랭킹
+        teamRepository.findByTeamCode(teamCode.name());
+
+               // 승요 점수 별 멤버 정렬해서 반환
+
+
         List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
         int myRanking = findMyRankingIndex(sortedList, memberId);
         VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);

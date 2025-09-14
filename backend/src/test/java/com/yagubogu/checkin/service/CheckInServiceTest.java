@@ -20,6 +20,7 @@ import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.TeamFanRateResponse;
+import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -84,7 +85,7 @@ class CheckInServiceTest {
 
     @BeforeEach
     void setUp() {
-        checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository);
+        checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository, teamRepository);
 
         kia = teamRepository.findByTeamCode("HT").orElseThrow();
         kt = teamRepository.findByTeamCode("KT").orElseThrow();
@@ -382,7 +383,7 @@ class CheckInServiceTest {
         }
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), "");
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL);
 
         // then
         assertSoftly(softAssertions -> {
@@ -404,7 +405,7 @@ class CheckInServiceTest {
         long memberId = fora.getId();
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId, "");
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(memberId, TeamFilter.ALL);
 
         // then
         assertSoftly(softAssertions -> {
@@ -435,7 +436,7 @@ class CheckInServiceTest {
         );
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), "");
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL);
 
         // then
         assertSoftly(softAssertions -> {
@@ -753,6 +754,7 @@ class CheckInServiceTest {
                 .awayPitcher("나인라")
                 .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(5)));
-        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
+                savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }
+
 }
