@@ -1,6 +1,7 @@
 package com.yagubogu.stat.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.game.dto.RecentTenGamesWinRateResponse;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
@@ -40,6 +41,18 @@ public interface StatControllerInterface {
     })
     @GetMapping("/win-rate")
     ResponseEntity<WinRateResponse> findWinRate(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam int year
+    );
+
+    @Operation(summary = "내 팀 최근 10경기 인증 승률 조회", description = "내 팀의 최근 10경기 인증 승률을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "승률 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "관리자는 사용할 수 없음"),
+            @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
+    })
+    @GetMapping("/win-rate/recent")
+    ResponseEntity<RecentTenGamesWinRateResponse> findRecentTenGamesWinRate(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year
     );
