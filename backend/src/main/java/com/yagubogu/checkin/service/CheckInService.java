@@ -15,8 +15,9 @@ import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -26,13 +27,10 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,15 +40,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CheckInService {
 
-    private static final int TOP_RANKINGS = 5;
     private static final int NOT_FOUND = -1;
     private static final int FOUND = 1;
+    private static final int VICTORY_RANKING_LIMIT = 5;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
-    private final TeamRepository teamRepository;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -117,35 +114,19 @@ public class CheckInService {
 
     public VictoryFairyRankingResponses findVictoryFairyRankings(
             final long memberId,
-            final TeamFilter teamCode,
+            final TeamFilter teamFilter,
             final int year
     ) {
         Member member = getMember(memberId);
-
-        // m : 전체 유저 평균 승롤 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
+        // m : 전체 유저 평균 승률 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
         double m = checkInRepository.calculateTotalAverageWinRate(year);
-        // c
+        // c : 평균 전체 유저 직관 횟수
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
-        if (teamCode == TeamFilter.ALL) {
-            checkInRepository.findTopRankingAndMyRanking(m, c, year);
-           // 모든 팀 팬들을 고려한 승요 랭킹
-        }
-        // 응원팀 승요 랭킹
-        teamRepository.findByTeamCode(teamCode.name());
+        List<VictoryFairyRankingResponse> topRankingResponses = findTopVictoryRanking(teamFilter, year, m, c);
+        VictoryFairyRankingResponse myRankingResponse = findMyVictoryRanking(teamFilter, year, m, c, member);
 
-               // 승요 점수 별 멤버 정렬해서 반환
-
-
-        List<VictoryFairyRankingEntryResponse> sortedList = getSortedRankingList();
-        int myRanking = findMyRankingIndex(sortedList, memberId);
-        VictoryFairyRankingEntryResponse myRankingData = findMyRanking(sortedList, memberId);
-
-        List<VictoryFairyRankingEntryResponse> topRankings = sortedList.stream()
-                .limit(TOP_RANKINGS)
-                .toList();
-
-        return VictoryFairyRankingResponses.from(topRankings, myRankingData, myRanking);
+        return new VictoryFairyRankingResponses(topRankingResponses, myRankingResponse);
     }
 
     public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
@@ -158,46 +139,49 @@ public class CheckInService {
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
-    private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
-        List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
-
-        return memberCheckIns.stream()
-                .sorted(Comparator
-                        // 1. 승률 먼저 정렬
-                        .comparingDouble(VictoryFairyRankingEntryResponse::winPercent).reversed()
-                        // 2. 직관 횟수 정렬
-                        .thenComparing(Comparator.comparing(VictoryFairyRankingEntryResponse::totalCheckIns).reversed())
-                        // 3. 닉네임순 정렬
-                        .thenComparing(VictoryFairyRankingEntryResponse::nickname)
-                )
-                .toList();
-    }
-
-    private int findMyRankingIndex(
-            final List<VictoryFairyRankingEntryResponse> sortedResponses,
-            final long memberId
-    ) {
-        return IntStream.range(0, sortedResponses.size())
-                .filter(i -> sortedResponses.get(i).memberId().equals(memberId))
-                .findFirst()
-                .orElse(NOT_FOUND) + FOUND;
-    }
-
-    private VictoryFairyRankingEntryResponse findMyRanking(
-            final List<VictoryFairyRankingEntryResponse> sortedResponses,
-            final long memberId
-    ) {
-        return sortedResponses.stream()
-                .filter(d -> d.memberId().equals(memberId))
-                .findFirst()
-                .orElse(VictoryFairyRankingEntryResponse.generateEmptyRankingFor(getMember(memberId)));
-    }
-
     public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
         boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
 
         return new CheckInStatusResponse(isCheckIn);
+    }
+
+    private List<VictoryFairyRankingResponse> findTopVictoryRanking(final TeamFilter teamFilter,
+                                                                    final int year, final double m,
+                                                                    final double c) {
+        List<VictoryFairyRank> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
+                VICTORY_RANKING_LIMIT);
+        double prev = -1.0;
+        int ranking = 0;
+        int count = 1;
+        List<VictoryFairyRankingResponse> topRankingResponses = new ArrayList<>();
+        for (VictoryFairyRank rank : topRanking) {
+            double cur = rank.score();
+            if (prev != cur) {
+                ranking += count;
+                count = 1;
+            } else {
+                count++;
+            }
+            topRankingResponses.add(new VictoryFairyRankingResponse(ranking, rank.nickname(),
+                    rank.profileImageUrl(), rank.teamShortName(), rank.winPercent()));
+            prev = cur;
+        }
+        return topRankingResponses;
+    }
+
+    private VictoryFairyRankingResponse findMyVictoryRanking(final TeamFilter teamFilter, final int year,
+                                                             final double m, final double c,
+                                                             final Member member) {
+        VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
+        int myRankingOrder = checkInRepository.calculateMyRankingOrder(myRanking.score(), m, c, year, teamFilter);
+
+        return new VictoryFairyRankingResponse(
+                myRankingOrder,
+                myRanking.nickname(),
+                myRanking.profileImageUrl(),
+                myRanking.teamShortName(),
+                myRanking.winPercent());
     }
 
     private Stadium getStadiumById(final long stadiumId) {
