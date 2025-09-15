@@ -1,5 +1,6 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -7,6 +8,7 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.UpsertResult;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -71,6 +73,13 @@ public class MemberService {
         Member member = getMember(memberId);
 
         return MemberInfoResponse.from(member);
+    }
+
+    @Transactional
+    public UpsertResult upsertMember(final AuthResponse response) {
+        return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
+                .map(m -> new UpsertResult(m, false))
+                .orElseGet(() -> new UpsertResult(memberRepository.save(response.toMember()), true));
     }
 
     private Member getMember(final long memberId) {
