@@ -1,7 +1,6 @@
 package com.yagubogu.stadium.service;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -14,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import({AuthTestConfig.class, JpaAuditingConfig.class})
+@Import(AuthTestConfig.class)
 @DataJpaTest
 class StadiumServiceTest {
 
