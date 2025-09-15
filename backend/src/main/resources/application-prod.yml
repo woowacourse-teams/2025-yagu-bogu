@@ -8,6 +8,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+  sql:
+    init:
+      mode: never
+
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
