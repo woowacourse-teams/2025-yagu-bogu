@@ -17,7 +17,6 @@ import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
-import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
@@ -35,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import({AuthTestConfig.class, QueryDslConfig.class})
+@Import({AuthTestConfig.class})
 @DataJpaTest
 class GameScheduleSyncServiceTest {
 

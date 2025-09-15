@@ -14,7 +14,6 @@ import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.global.config.JpaAuditingConfig;
-import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -34,7 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @ActiveProfiles("integration")
-@Import({AuthTestConfig.class, JpaAuditingConfig.class, QueryDslConfig.class})
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 class AuthServiceTest {
 
     private AuthService authService;

@@ -26,7 +26,6 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
-import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -50,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import({AuthTestConfig.class, JpaAuditingConfig.class, QueryDslConfig.class})
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 class CheckInServiceTest {
 
