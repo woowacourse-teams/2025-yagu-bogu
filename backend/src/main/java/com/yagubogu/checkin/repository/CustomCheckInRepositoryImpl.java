@@ -251,23 +251,25 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         BooleanExpression myHome = game.homeTeam.eq(team);
         BooleanExpression myAway = game.awayTeam.eq(team);
 
+        BooleanExpression hasCheckIn = checkIn.id.isNotNull();
+
         NumberExpression<Integer> winExpr =
                 new CaseBuilder()
-                        .when(myHome.and(game.homeScore.gt(game.awayScore))).then(1)
-                        .when(myAway.and(game.awayScore.gt(game.homeScore))).then(1)
+                        .when(hasCheckIn.and(myHome).and(game.homeScore.gt(game.awayScore))).then(1)
+                        .when(hasCheckIn.and(myAway).and(game.awayScore.gt(game.homeScore))).then(1)
                         .otherwise(0);
 
         NumberExpression<Integer> loseExpr =
                 new CaseBuilder()
-                        .when(myHome.and(game.homeScore.lt(game.awayScore))).then(1)
-                        .when(myAway.and(game.awayScore.lt(game.homeScore))).then(1)
+                        .when(hasCheckIn.and(myHome).and(game.homeScore.lt(game.awayScore))).then(1)
+                        .when(hasCheckIn.and(myAway).and(game.awayScore.lt(game.homeScore))).then(1)
                         .otherwise(0);
 
         NumberExpression<Integer> drawExpr =
                 new CaseBuilder()
-                        .when(game.homeScore.eq(game.awayScore)
-                                .and(game.gameState.eq(GameState.COMPLETED)))
-                        .then(1)
+                        .when(hasCheckIn
+                                .and(game.homeScore.eq(game.awayScore))
+                        ).then(1)
                         .otherwise(0);
 
         BooleanExpression gameOnOpponent =
@@ -294,9 +296,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         drawExpr.sum().coalesce(0)
                 ))
                 .from(opponentTeam)
-                .leftJoin(game).on(gameOnOpponent)
                 .leftJoin(checkIn).on(checkIn.game.eq(game).and(checkInFilter))
-                .where(opponentTeam.ne(team))
+                .leftJoin(game).on(gameOnOpponent
+                        .and(checkIn.game.eq(game))
+                ).where(opponentTeam.ne(team))
                 .groupBy(opponentTeam.id, opponentTeam.name, opponentTeam.shortName, opponentTeam.teamCode)
                 .fetch();
     }
