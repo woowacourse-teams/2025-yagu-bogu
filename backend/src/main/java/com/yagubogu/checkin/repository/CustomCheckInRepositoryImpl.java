@@ -90,8 +90,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(checkIn.game, game)
                 .where(
                         checkIn.member.eq(member),
-                        isBetweenYear(game, year),
-                        isMyCurrentFavorite(member, checkIn)
+                        isBetweenYear(game, year)
                 ).fetchOne()
                 .intValue();
     }
