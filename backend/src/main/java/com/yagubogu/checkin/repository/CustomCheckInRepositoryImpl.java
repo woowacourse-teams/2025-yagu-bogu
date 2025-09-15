@@ -34,12 +34,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         NumberExpression<Long> isWin = calculateWinCounts(checkIn, game);
 
-        Tuple tuple = jpaQueryFactory.select(isWin.sum(), checkIn.count())
-                .from(member)
-                .leftJoin(checkIn).on(checkIn.member.eq(member))
-                .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(isFavoriteTeam(checkIn, member)
-                ).fetchOne();
+        Tuple tuple = jpaQueryFactory.select(isWin.sum(), checkIn.count()).from(member).leftJoin(checkIn)
+                .on(checkIn.member.eq(member)).leftJoin(game)
+                .on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .where(isFavoriteTeam(checkIn, member)).fetchOne();
 
         long winCounts =
                 (tuple == null || tuple.get(0, Long.class) == null) ? 0L : tuple.get(0, Long.class).longValue();
@@ -72,27 +70,17 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Long> total = checkIn.count();
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
-        NumberExpression<Double> calculatePercent = wins.multiply(100.0).divide(total).doubleValue();
+        NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
         NumberExpression<Double> safeWinPercent = getSafeWinPercent(total, calculatePercent);
 
-        return jpaQueryFactory.select(Projections.constructor(
-                        VictoryFairyRank.class,
-                        score,
-                        member.nickname,
-                        member.imageUrl,
-                        member.team.shortName,
-                        safeWinPercent
-                )).from(member)
-                .leftJoin(checkIn).on(
-                        checkIn.member.eq(member)
-                )
-                .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+        return jpaQueryFactory.select(
+                        Projections.constructor(VictoryFairyRank.class, score, member.nickname, member.imageUrl,
+                                member.team.shortName, safeWinPercent)).from(member).leftJoin(checkIn)
+                .on(checkIn.member.eq(member)).leftJoin(game)
+                .on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
                 .where(filterByTeam(member.team, teamFilter))
-                .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
-                .having(total.gt(0))
-                .orderBy(score.desc())
-                .limit(limit)
-                .fetch();
+                .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName).having(total.gt(0))
+                .orderBy(score.desc()).limit(limit).fetch();
     }
 
     public VictoryFairyRank findMyRanking(final double m, final double c, final Member targetMember, final int year,
@@ -107,37 +95,22 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Long> total = checkIn.count().coalesce(0L);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
-        NumberExpression<Double> calculatePercent = wins
-                .multiply(100.0)
-                .divide(total)
-                .doubleValue();
+        NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
 
         NumberExpression<Double> safeWinPercent = getSafeWinPercent(total, calculatePercent);
 
-        return jpaQueryFactory.select(Projections.constructor(
-                        VictoryFairyRank.class,
-                        score,
-                        member.nickname,
-                        member.imageUrl,
-                        member.team.shortName,
-                        safeWinPercent
-                ))
-                .from(member)
-                .leftJoin(checkIn).on(checkIn.member.eq(member))
-                .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(
-                        member.eq(targetMember),
-                        filterByTeam(team, teamFilter)
-                ).groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
-                .fetchOne();
+        return jpaQueryFactory.select(
+                        Projections.constructor(VictoryFairyRank.class, score, member.nickname, member.imageUrl,
+                                member.team.shortName, safeWinPercent)).from(member).leftJoin(checkIn)
+                .on(checkIn.member.eq(member)).leftJoin(game)
+                .on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .where(member.eq(targetMember), filterByTeam(member.team, teamFilter))
+                .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName).fetchOne();
     }
 
     private NumberExpression<Double> getSafeWinPercent(final NumberExpression<Long> total,
                                                        final NumberExpression<Double> calculatePercent) {
-        return new CaseBuilder()
-                .when(total.gt(0))
-                .then(calculatePercent)
-                .otherwise(0.0);
+        return new CaseBuilder().when(total.gt(0)).then(calculatePercent).otherwise(0.0);
     }
 
     public int calculateMyRankingOrder(final double targetScore, final double m, final double c, final int year,
@@ -153,25 +126,19 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
         Expression<Double> myScore = Expressions.constant(targetScore);
-        return jpaQueryFactory.selectOne()
-                .from(member)
-                .leftJoin(checkIn).on(checkIn.member.eq(member))
-                .leftJoin(game).on(checkIn.game.eq(game))
-                .where(
-                        isFinished(game),
-                        isBetweenYear(game, year),
-                        filterByTeam(team, teamFilter)
-                ).groupBy(member)
-                .having(score.gt(myScore))
-                .fetch().size();
+        return jpaQueryFactory.selectOne().from(member).leftJoin(checkIn).on(checkIn.member.eq(member)).leftJoin(game)
+                .on(checkIn.game.eq(game))
+                .where(isFinished(game), isBetweenYear(game, year), filterByTeam(team, teamFilter)).groupBy(member)
+                .having(score.gt(myScore)).fetch().size();
     }
 
     private NumberExpression<Double> calculateWinRankingScore(final double m, final double c,
                                                               final NumberExpression<Long> wins,
                                                               final NumberExpression<Long> total) {
-        return wins.doubleValue()
-                .add(Expressions.constant(c * m))
-                .divide(total.doubleValue().add(Expressions.constant(c)));
+        NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
+
+        return new CaseBuilder().when(denominator.ne(0.0))
+                .then(wins.sum().doubleValue().add(Expressions.constant(c * m)).divide(denominator)).otherwise(0.0);
     }
 
     private BooleanExpression isFinished(final QGame game) {
@@ -198,46 +165,23 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QGame game = QGame.game;
         QMember member = QMember.member;
 
-        return jpaQueryFactory.select(checkIn.count())
-                .from(checkIn)
-                .join(game).on(checkIn.game.eq(game))
-                .join(member).on(checkIn.member.eq(member))
-                .where(
-                        isFinished(game),
-                        isBetweenYear(game, year),
-                        isFavoriteTeam(checkIn, member)
-                )
-                .fetchOne();
+        return jpaQueryFactory.select(checkIn.count()).from(checkIn).join(game).on(checkIn.game.eq(game)).join(member)
+                .on(checkIn.member.eq(member))
+                .where(isFinished(game), isBetweenYear(game, year), isFavoriteTeam(checkIn, member)).fetchOne();
     }
 
     private NumberExpression<Long> calculateWinCounts(final QCheckIn checkIn, final QGame game) {
-        return new CaseBuilder()
-                .when(
-                        checkIn.team.eq(game.homeTeam)
-                                .and(game.homeScore.gt(game.awayScore))
-                )
-                .then(1L)
-                .when(
-                        checkIn.team.eq(game.awayTeam)
-                                .and(game.awayScore.gt(game.homeScore))
-                )
-                .then(1L)
-                .otherwise(0L);
+        return new CaseBuilder().when(checkIn.team.eq(game.homeTeam).and(game.homeScore.gt(game.awayScore))).then(1L)
+                .when(checkIn.team.eq(game.awayTeam).and(game.awayScore.gt(game.homeScore))).then(1L).otherwise(0L);
     }
 
     private Long calculatePerCheckInCount(final int year) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
-        return jpaQueryFactory.select(member.countDistinct())
-                .from(checkIn)
-                .join(game).on(checkIn.game.eq(game))
+        return jpaQueryFactory.select(member.countDistinct()).from(checkIn).join(game).on(checkIn.game.eq(game))
                 .join(member).on(checkIn.member.eq(member))
-                .where(
-                        isFinished(game),
-                        isBetweenYear(game, year),
-                        isFavoriteTeam(checkIn, member)
-                ).fetchOne();
+                .where(isFinished(game), isBetweenYear(game, year), isFavoriteTeam(checkIn, member)).fetchOne();
     }
 
     private BooleanExpression isFavoriteTeam(final QCheckIn checkIn, final QMember member) {
