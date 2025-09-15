@@ -7,6 +7,7 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -83,4 +85,14 @@ public interface MemberControllerInterface {
     })
     @GetMapping("/me/badges")
     ResponseEntity<BadgeListResponse> findBadges(@Parameter(hidden = true) MemberClaims memberClaims);
+
+    @Operation(summary = "대표 뱃지 수정", description = "현재 로그인된 회원의 대표 뱃지를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "대표 뱃지 수정 성공")
+    })
+    @PatchMapping("/me/badges/{badgeId}/representative")
+    ResponseEntity<MemberRepresentativeBadgeResponse> patchRepresentativeBadge(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @PathVariable final long badgeId
+    );
 }

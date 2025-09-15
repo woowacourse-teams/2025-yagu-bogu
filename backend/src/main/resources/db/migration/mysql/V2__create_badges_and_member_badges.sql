@@ -17,7 +17,6 @@ CREATE TABLE member_badges
     badge_id        BIGINT      NOT NULL,
     member_id       BIGINT      NOT NULL,
     progress        DOUBLE      NOT NULL,
-    representative  BOOLEAN,
     created_at      DATETIME(6) NOT NULL,
     updated_at      DATETIME(6) NOT NULL,
     deleted_at      DATETIME(6) NULL,
@@ -25,3 +24,8 @@ CREATE TABLE member_badges
     FOREIGN KEY (badge_id) REFERENCES badges (badge_id),
     FOREIGN KEY (member_id) REFERENCES members (member_id)
 ) ENGINE = InnoDB;
+
+ALTER TABLE members
+    ADD COLUMN representative_badge_id BIGINT NULL,
+    ADD CONSTRAINT fk_member_representative_badge
+        FOREIGN KEY (representative_badge_id) REFERENCES badges (badge_id);

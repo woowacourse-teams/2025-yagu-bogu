@@ -214,11 +214,16 @@ public class MemberE2eTest extends E2eTestBase {
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
         memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
-        List<BadgeResponse> expected = List.of(
+        List<BadgeResponse> badgeResponses = List.of(
                 new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
                         Policy.SIGN_UP, 100.0, 100.0,
-                        true, LocalDateTime.now(), null)
+                        true, LocalDateTime.now()),
+                new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
+                        Policy.FIRST_CHAT, 0.0, null,
+                        false, LocalDateTime.now())
         );
+
+        BadgeListResponse expected = BadgeListResponse.from(member.getRepresentativeBadge(), badgeResponses);
 
         // when
         BadgeListResponse actual = RestAssured.given().log().all()
@@ -231,8 +236,12 @@ public class MemberE2eTest extends E2eTestBase {
                 .as(BadgeListResponse.class);
 
         // then
-        assertThat(actual.badges())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
-                .containsExactlyInAnyOrderElementsOf(expected);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.representativeBadge())
+                    .isEqualTo(expected.representativeBadge());
+            softAssertions.assertThat(actual.badges())
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
+                    .containsExactlyInAnyOrderElementsOf(expected.badges());
+        });
     }
 }

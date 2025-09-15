@@ -7,11 +7,10 @@ public record BadgeResponse(
         Long id,
         String name,
         String description,
-        Policy conditionType,
+        Policy type,
         double achievedRate,
-        double progress,
+        Double progress,
         boolean owned,
-        LocalDateTime achievedAt,
-        Boolean representative
+        LocalDateTime achievedAt
 ) {
 }

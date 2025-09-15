@@ -15,8 +15,7 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
             SELECT new com.yagubogu.badge.dto.BadgeResponse(
                  b.id, b.name, b.description, b.type, b.achievedRate, mb.progress,
                  CASE WHEN mb.id IS NOT NULL THEN true ELSE false END,
-                 mb.createdAt,
-                 mb.representative
+                 mb.createdAt
             )
             FROM Badge b
             LEFT JOIN MemberBadge mb

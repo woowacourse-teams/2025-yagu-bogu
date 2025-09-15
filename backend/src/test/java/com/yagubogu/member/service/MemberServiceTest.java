@@ -6,6 +6,7 @@ import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponse;
 import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -49,6 +50,9 @@ public class MemberServiceTest {
     private BadgeRepository badgeRepository;
 
     @Autowired
+    private MemberBadgeRepository memberBadgeRepository;
+
+    @Autowired
     private MemberFactory memberFactory;
 
     @Autowired
@@ -56,7 +60,7 @@ public class MemberServiceTest {
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberService(memberRepository, teamRepository, badgeRepository);
+        memberService = new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository);
     }
 
     @DisplayName("멤버가 응원하는 팀을 조회한다")
@@ -273,18 +277,27 @@ public class MemberServiceTest {
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         long memberId = member.getId();
         memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
-        List<BadgeResponse> expected = List.of(
+        List<BadgeResponse> badgeResponses = List.of(
                 new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
                         Policy.SIGN_UP, 100.0, 100.0,
-                        true, LocalDateTime.now(), null)
+                        true, LocalDateTime.now()),
+                new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
+                        Policy.FIRST_CHAT, 0.0, null,
+                        false, LocalDateTime.now())
         );
+
+        BadgeListResponse expected = BadgeListResponse.from(member.getRepresentativeBadge(), badgeResponses);
 
         // when
         BadgeListResponse actual = memberService.findBadges(memberId);
 
         // then
-        assertThat(actual.badges())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
-                .containsExactlyInAnyOrderElementsOf(expected);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.representativeBadge())
+                    .isEqualTo(expected.representativeBadge());
+            softAssertions.assertThat(actual.badges())
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
+                    .containsExactlyInAnyOrderElementsOf(expected.badges());
+        });
     }
 }

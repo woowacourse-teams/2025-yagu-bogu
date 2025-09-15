@@ -35,7 +35,7 @@ public class MemberJoinBadgePolicy implements BadgePolicy {
         Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
         boolean exists = memberBadgeRepository.existsByMemberAndBadge(member, badge);
         if (!exists) {
-            MemberBadge memberBadge = new MemberBadge(badge, member, 100.0, null);
+            MemberBadge memberBadge = new MemberBadge(badge, member, 100.0);
             memberBadgeRepository.save(memberBadge);
         }
     }

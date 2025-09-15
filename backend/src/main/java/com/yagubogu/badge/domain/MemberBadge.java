@@ -37,13 +37,9 @@ public class MemberBadge extends BaseEntity {
     @Column(name = "progress", nullable = false)
     private Double progress;
 
-    @Column(name = "representative", nullable = true)
-    private Boolean representative;
-
-    public MemberBadge(final Badge badge, final Member member, final Double progress, final Boolean representative) {
+    public MemberBadge(final Badge badge, final Member member, final Double progress) {
         this.badge = badge;
         this.member = member;
         this.progress = progress;
-        this.representative = representative;
     }
 }

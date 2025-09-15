@@ -1,8 +1,10 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponse;
 import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
@@ -10,6 +12,7 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -26,6 +29,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final BadgeRepository badgeRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
@@ -72,11 +76,23 @@ public class MemberService {
         return MemberFavoriteResponse.from(member.getTeam());
     }
 
+    @Transactional
+    public MemberRepresentativeBadgeResponse patchRepresentativeBadge(final Long memberId, final long badgeId) {
+        Member member = getMember(memberId);
+        Badge badge = getBadge(badgeId);
+        validateMemberHasBadge(member, badge);
+
+        member.updateBadge(badge);
+
+        return MemberRepresentativeBadgeResponse.from(badge);
+    }
+
     public BadgeListResponse findBadges(final Long memberId) {
-        validateMemberExists(memberId);
+        Member member = getMember(memberId);
+        Badge representativeBadge = member.getRepresentativeBadge();
         List<BadgeResponse> badgeResponse = badgeRepository.findAllBadgesWithAcquiredBadgeStatus(memberId);
 
-        return BadgeListResponse.from(badgeResponse);
+        return BadgeListResponse.from(representativeBadge, badgeResponse);
     }
 
     public MemberInfoResponse findMember(final Long memberId) {
@@ -85,10 +101,16 @@ public class MemberService {
         return MemberInfoResponse.from(member);
     }
 
-    public void validateMemberExists(final Long memberId) {
-        if (!memberRepository.existsById(memberId)) {
-            throw new NotFoundException("Member is not Found");
+    private void validateMemberHasBadge(Member member, Badge badge) {
+        boolean hasBadge = memberBadgeRepository.existsByMemberAndBadge(member, badge);
+        if (!hasBadge) {
+            throw new NotFoundException("Member doew not own this badge");
         }
+    }
+
+    private Badge getBadge(final long badgeId) {
+        return badgeRepository.findById(badgeId)
+                .orElseThrow(() -> new NotFoundException("Badge is not found"));
     }
 
     private Member getMember(final long memberId) {
