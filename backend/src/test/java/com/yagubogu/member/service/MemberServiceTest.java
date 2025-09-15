@@ -300,4 +300,22 @@ public class MemberServiceTest {
                     .containsExactlyInAnyOrderElementsOf(expected.badges());
         });
     }
+
+    @DisplayName("대표 뱃지 수정한다")
+    @Test
+    void patchRepresentativeBadge() {
+        // given
+        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        memberBadgeFactory.save(builder ->
+                builder.member(member)
+                        .badge(badge)
+        );
+
+        // when
+        memberService.patchRepresentativeBadge(member.getId(), badge.getId());
+
+        // then
+        assertThat(member.getRepresentativeBadge()).isEqualTo(badge);
+    }
 }

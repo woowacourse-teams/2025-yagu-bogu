@@ -244,4 +244,23 @@ public class MemberE2eTest extends E2eTestBase {
                     .containsExactlyInAnyOrderElementsOf(expected.badges());
         });
     }
+
+    @DisplayName("대표 뱃지를 수정한다")
+    @Test
+    void patchRepresentativeBadge() {
+        // given
+        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(200);
+    }
 }
