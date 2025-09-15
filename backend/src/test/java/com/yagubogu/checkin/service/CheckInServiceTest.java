@@ -21,7 +21,9 @@ import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.dto.TeamFilter;
+import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -326,7 +328,7 @@ class CheckInServiceTest {
 
     }
 
-    @DisplayName("승리 요정 랭킹 조회 - 승률, 직관 횟수, 닉네임 순 정렬되어 반환된다")
+    @DisplayName("승리 요정 랭킹 조회 - 베이즈 정리로 정렬되어 반환된다")
     @Test
     void findVictoryFairyRankings() {
         // given
@@ -390,7 +392,7 @@ class CheckInServiceTest {
         // 체크인: "응원팀이 출전한 경기"에만 체크인시켜 승률/표본이 의도대로 형성되게 함
         // KIA 팬: 밍트(3경기 전부), 포르(2경기) → 둘 다 100%지만 표본 수로 밍트가 상위
         checkInFavorite(mint, g1, g2, g3);
-        checkInFavorite(por,  g1, g2);
+        checkInFavorite(por, g1, g2);
 
         // KT 팬: 포라(2경기 중 2승 → 100%)
         checkInFavorite(fora, g4, g5);
@@ -402,7 +404,8 @@ class CheckInServiceTest {
         checkInFavorite(uga, g3, g5, g6);
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL, 2025);
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
+                2025);
 
         // then
         assertSoftly(softAssertions -> {
@@ -416,6 +419,41 @@ class CheckInServiceTest {
         );
     }
 
+    @DisplayName("승리 요정 랭킹 조회 - 취소된 경기가 존재하는 경우 승률에 집계되지 않는다")
+    @Test
+    void findVictoryFairyRankings_winRate() {
+        // given
+        Member mint = memberFactory.save(b -> b.team(kia).nickname("밍트"));
+        LocalDate startDate = LocalDate.of(2025, 7, 21);
+
+        Game g1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .date(startDate)
+                .gameState(GameState.COMPLETED)
+        );
+        Game g2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(1)
+                .awayTeam(lg).awayScore(10)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .date(startDate.plusDays(1))
+                .gameState(GameState.CANCELED)
+        );
+
+        checkInFavorite(mint, g1, g2);
+
+        // when
+        VictoryFairyRankingResponse myRanking = checkInService.findVictoryFairyRankings(mint.getId(),
+                TeamFilter.ALL,
+                startDate.getYear()).myRanking();
+
+        // then
+        assertThat(myRanking.winPercent()).isEqualTo(100.0);
+    }
+
     private void checkInFavorite(Member member, Game... games) {
         for (Game g : games) {
             boolean participates =
@@ -427,7 +465,6 @@ class CheckInServiceTest {
         }
     }
 
-    // TODO: 취소된 경기일 경우 랭킹
     @DisplayName("승리 요정 랭킹 조회 중 회원이 인증한 정보가 없는 경우에 null이 아닌 회원 정보가 반환된다")
     @Test
     void findVictoryFairyRankings_notCheckInForMember() {
@@ -467,7 +504,8 @@ class CheckInServiceTest {
         );
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL, 2025);
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
+                2025);
 
         // then
         assertSoftly(softAssertions -> {
@@ -785,7 +823,7 @@ class CheckInServiceTest {
                 .awayPitcher("나인라")
                 .gameState(GameState.COMPLETED)
                 .date(startDate.plusDays(5)));
-                savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
+        savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }
 
 }
