@@ -12,6 +12,7 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -590,8 +591,8 @@ class StatServiceTest {
 
         // when & then
         assertThatThrownBy(() -> statService.findOpponentWinRate(member.getId(), 2025))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessage("Team not exist");
+                .isExactlyInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("Team should not be null");
     }
 
     @DisplayName("점수 미기록 경기는 제외되며 그 외 미대결 팀은 0.0으로 포함된다")

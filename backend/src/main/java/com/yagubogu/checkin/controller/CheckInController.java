@@ -72,10 +72,9 @@ public class CheckInController implements CheckInControllerInterface {
     }
 
     public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            final MemberClaims memberClaims,
-            final String teamCode
+            final MemberClaims memberClaims
     ) {
-        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id(), teamCode);
+        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id());
 
         return ResponseEntity.ok(response);
     }
