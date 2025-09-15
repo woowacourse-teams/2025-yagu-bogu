@@ -36,10 +36,33 @@ ON DUPLICATE KEY UPDATE full_name  = new_data.full_name,
 -- badges
 INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_value, badge_achieved_rate)
     VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1, 100.0),
-           ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1, 0)
+           ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1, 0.0)
         AS new_data
 ON DUPLICATE KEY UPDATE badge_name            = new_data.badge_name,
                         badge_description     = new_data.badge_description,
                         badge_condition_type  = new_data.badge_condition_type,
                         badge_condition_value = new_data.badge_condition_value,
                         badge_achieved_rate   = new_data.badge_achieved_rate;
+
+INSERT INTO games (game_code, date, start_at, stadium_id, home_team_id, away_team_id,
+                   home_score, away_score, home_score_board_id, away_score_board_id,
+                   home_pitcher, away_pitcher, game_state)
+    VALUES ('G001', '2025-09-15', '18:30:00', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'SCHEDULED')
+        AS new_data
+ON DUPLICATE KEY UPDATE date                = new_data.date,
+                        start_at            = new_data.start_at,
+                        stadium_id          = new_data.stadium_id,
+                        home_team_id        = new_data.home_team_id,
+                        away_team_id        = new_data.away_team_id,
+                        home_score          = new_data.home_score,
+                        away_score          = new_data.away_score,
+                        home_score_board_id = new_data.home_score_board_id,
+                        away_score_board_id = new_data.away_score_board_id,
+                        home_pitcher        = new_data.home_pitcher,
+                        away_pitcher        = new_data.away_pitcher,
+                        game_state          = new_data.game_state;
+
+-- 4. badge_update_queue 초기 row 삽입
+INSERT INTO badge_update_queue (badge_update_queue_id, pending_count)
+VALUES (1, 0)
+ON DUPLICATE KEY UPDATE pending_count = badge_update_queue.pending_count;

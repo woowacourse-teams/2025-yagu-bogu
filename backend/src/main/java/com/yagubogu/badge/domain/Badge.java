@@ -47,4 +47,8 @@ public class Badge {
         this.value = value;
         this.achievedRate = achievedRate;
     }
+
+    public void updateAchievedRate(final double achievedRate) {
+        this.achievedRate = achievedRate;
+    }
 }

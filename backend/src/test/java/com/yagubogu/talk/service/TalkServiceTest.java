@@ -28,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -73,9 +74,13 @@ class TalkServiceTest {
     @Autowired
     private TalkReportRepository talkReportRepository;
 
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     @BeforeEach
     void setUp() {
-        talkService = new TalkService(talkRepository, gameRepository, memberRepository, talkReportRepository);
+        talkService = new TalkService(talkRepository, gameRepository, memberRepository, talkReportRepository,
+                publisher);
     }
 
     @DisplayName("최신 커서가 없는 경우 첫 페이지를 조회한다 - 다음 페이지가 없는 경우")
@@ -270,7 +275,7 @@ class TalkServiceTest {
 //            softAssertions.assertThat(result.awayTeamName()).isEqualTo(expectedAwayTeam.getShortName());
 //            softAssertions.assertThat(result.cursorResult().content().getFirst().id())
 //                    .isEqualTo(remainedTalkByLeftMember.getId());
-//            softAssertions.assertThat(result.cursorResult().content().getFirst().memberId())
+//            softAssertions.assertThat(result.cursorResult().content().getFirst().member())
 //                    .isEqualTo(remainedTalkByLeftMember.getMember().getId());
 //            softAssertions.assertThat(result.cursorResult().content().getFirst().imageUrl())
 //                    .isEqualTo(remainedTalkByLeftMember.getMember().getImageUrl());
@@ -609,6 +614,27 @@ class TalkServiceTest {
         // when & then
         assertThatThrownBy(() -> talkService.removeTalk(game.getId(), myTalk.getId(), other.getId()))
                 .isExactlyInstanceOf(ForbiddenException.class)
-                .hasMessage("Invalid memberId for the talk");
+                .hasMessage("Invalid member for the talk");
+    }
+
+    @DisplayName("처음으로 톡을 입력하면 뱃지를 발행한다")
+    @Test
+    void createTalk_publishEvent() {
+        // given
+        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.team(team));
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        String content = "오늘 야구 재밌겠당";
+        TalkRequest request = new TalkRequest(content);
+
+        // when
+        TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());
     }
 }

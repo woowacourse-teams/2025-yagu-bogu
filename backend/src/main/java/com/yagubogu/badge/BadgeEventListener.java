@@ -1,9 +1,12 @@
 package com.yagubogu.badge;
 
+import com.yagubogu.badge.dto.BadgeAwardCandidate;
 import com.yagubogu.badge.policy.BadgePolicy;
-import com.yagubogu.member.domain.Member;
 import java.util.List;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -17,11 +20,13 @@ public class BadgeEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     public void handleBadgeEvent(final BadgeEvent event) {
-        Member member = event.memberId();
         for (BadgePolicy policy : badgePolicies) {
-            if (policy.canAward(event)) {
-                policy.award(member);
+            BadgeAwardCandidate candidate = policy.canAward(event);
+            if (candidate != null) {
+                policy.award(candidate);
             }
         }
     }

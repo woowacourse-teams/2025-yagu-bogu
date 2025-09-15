@@ -25,6 +25,13 @@ CREATE TABLE member_badges
     FOREIGN KEY (member_id) REFERENCES members (member_id)
 ) ENGINE = InnoDB;
 
+CREATE TABLE badge_update_queue
+(
+    badge_update_queue_id BIGINT NOT NULL,
+    pending_count         BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (badge_update_queue_id)
+) ENGINE = InnoDB;
+
 ALTER TABLE members
     ADD COLUMN representative_badge_id BIGINT NULL,
     ADD CONSTRAINT fk_member_representative_badge

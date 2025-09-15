@@ -4,7 +4,7 @@ import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.member.domain.Member;
 
 public record BadgeEvent(
-        Member memberId,
+        Member member,
         Policy policy
 ) {
 }

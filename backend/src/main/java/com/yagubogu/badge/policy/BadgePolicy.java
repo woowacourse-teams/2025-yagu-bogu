@@ -1,10 +1,10 @@
 package com.yagubogu.badge.policy;
 
 import com.yagubogu.badge.BadgeEvent;
-import com.yagubogu.member.domain.Member;
+import com.yagubogu.badge.dto.BadgeAwardCandidate;
 
 public interface BadgePolicy {
-    boolean canAward(BadgeEvent event);
+    BadgeAwardCandidate canAward(BadgeEvent event);
 
-    void award(Member member);
+    void award(BadgeAwardCandidate member);
 }
