@@ -163,7 +163,7 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.livetalkResponseUiState.observe(this, ::handleLivetalkResponseUiState)
+        viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
         viewModel.liveTalkChatBubbleItem.observe(this, ::handleLiveTalkChatBubbleItem)
         viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
         viewModel.livetalkDeleteEvent.observe(this) {
@@ -171,8 +171,8 @@ class LivetalkChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLivetalkResponseUiState(uiState: LivetalkResponseUiState) {
-        if (uiState is LivetalkResponseUiState.Error) {
+    private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {
+        if (uiState is LivetalkUiState.Error) {
             this.showToast(R.string.livetalk_loading_error)
             finish()
         }

@@ -22,13 +22,13 @@ class LivetalkChatViewModel(
     private val talkRepository: TalkRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
-    private val _livetalkResponseUiState =
-        MutableLiveData<LivetalkResponseUiState>(LivetalkResponseUiState.Loading)
-    val livetalkResponseUiState: LiveData<LivetalkResponseUiState> get() = _livetalkResponseUiState
+    private val _livetalkUiState =
+        MutableLiveData<LivetalkUiState>(LivetalkUiState.Loading)
+    val livetalkUiState: LiveData<LivetalkUiState> get() = _livetalkUiState
 
     val isStadiumLoading =
         MediatorLiveData<Boolean>().apply {
-            addSource(livetalkResponseUiState) { value = it !is LivetalkResponseUiState.Success }
+            addSource(livetalkUiState) { value = it !is LivetalkUiState.Success }
         }
 
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
@@ -195,7 +195,7 @@ class LivetalkChatViewModel(
                 val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
-                        _livetalkResponseUiState.value = LivetalkResponseUiState.Success
+                        _livetalkUiState.value = LivetalkUiState.Success
                         _livetalkResponseItem.value = livetalkResponseItem
 
                         val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
@@ -208,7 +208,7 @@ class LivetalkChatViewModel(
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
-                        _livetalkResponseUiState.value = LivetalkResponseUiState.Error
+                        _livetalkUiState.value = LivetalkUiState.Error
                     }
             }
         }
