@@ -13,9 +13,12 @@ import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsMyBinding
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class StatsMyFragment : Fragment() {
+class StatsMyFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentStatsMyBinding? = null
     private val binding: FragmentStatsMyBinding get() = _binding!!
 
@@ -52,6 +55,10 @@ class StatsMyFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun scrollToTop() {
+        binding.svRoot.smoothScrollTo(0, 0)
     }
 
     private fun setupObservers() {
