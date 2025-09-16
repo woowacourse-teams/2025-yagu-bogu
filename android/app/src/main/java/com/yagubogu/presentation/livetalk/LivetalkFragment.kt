@@ -13,9 +13,12 @@ import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class LivetalkFragment : Fragment() {
+class LivetalkFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentLivetalkBinding? = null
     private val binding get() = _binding!!
 
@@ -68,6 +71,10 @@ class LivetalkFragment : Fragment() {
         if (!hidden) {
             viewModel.fetchGames()
         }
+    }
+
+    override fun scrollToTop() {
+        binding.rvLivetalkStadium.smoothScrollToPosition(0)
     }
 
     private fun setupBindings() {
