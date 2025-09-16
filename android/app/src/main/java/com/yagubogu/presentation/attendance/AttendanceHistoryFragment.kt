@@ -15,9 +15,12 @@ import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class AttendanceHistoryFragment : Fragment() {
+class AttendanceHistoryFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
 
@@ -62,6 +65,10 @@ class AttendanceHistoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun scrollToTop() {
+        binding.rvAttendanceHistory.smoothScrollToPosition(0)
     }
 
     private fun setupBindings() {
