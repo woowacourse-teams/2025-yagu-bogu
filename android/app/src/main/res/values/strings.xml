@@ -10,6 +10,8 @@
     <string name="all_count">%d회</string>
     <string name="all_null_nick_name">(알 수 없음)</string>
 
+    <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
+
     <string name="bottom_navigation_home">홈</string>
     <string name="bottom_navigation_stats">통계</string>
     <string name="bottom_navigation_attendance_history">직관 내역</string>

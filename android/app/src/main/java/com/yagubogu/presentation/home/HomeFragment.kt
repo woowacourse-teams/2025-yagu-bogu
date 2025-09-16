@@ -21,6 +21,9 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -55,6 +58,8 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -109,6 +114,7 @@ class HomeFragment : Fragment() {
                 .rotationBy(REFRESH_ANIMATION_ROTATION)
                 .setDuration(REFRESH_ANIMATION_DURATION)
                 .start()
+            firebaseAnalytics.logEvent("fan_rate_refresh", null)
         }
     }
 
@@ -155,6 +161,7 @@ class HomeFragment : Fragment() {
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
             if (isConfirmed) {
                 viewModel.checkIn()
+                firebaseAnalytics.logEvent("check_in", null)
             }
         }
     }
