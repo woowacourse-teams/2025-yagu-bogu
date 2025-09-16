@@ -44,7 +44,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:onClick="@{() -> viewModel.switchAttendanceHistoryOrder()}"
             android:paddingEnd="20dp"
             android:textColor="@color/gray500"
             android:textSize="14sp"
