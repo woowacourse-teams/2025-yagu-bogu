@@ -281,6 +281,7 @@ class HomeFragment : Fragment() {
             )
         binding.frameStadiumStatsTooltip.setOnClickListener {
             stadiumStatsInfoBalloon.showAlignBottom(binding.frameStadiumStatsTooltip)
+            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
         }
 
         val victoryFairyInfoBalloon =
@@ -290,6 +291,7 @@ class HomeFragment : Fragment() {
             )
         binding.frameVictoryFairyRankingTooltip.setOnClickListener {
             victoryFairyInfoBalloon.showAlignBottom(binding.frameVictoryFairyRankingTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
         }
     }
 

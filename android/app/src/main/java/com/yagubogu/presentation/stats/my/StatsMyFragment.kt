@@ -10,6 +10,9 @@ import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsMyBinding
@@ -24,6 +27,8 @@ class StatsMyFragment : Fragment() {
         val app = requireActivity().application as YaguBoguApplication
         StatsMyViewModelFactory(app.statsRepository, app.memberRepository)
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,6 +120,7 @@ class StatsMyFragment : Fragment() {
             )
         binding.frameMyChartTooltip.setOnClickListener {
             myChartInfoBalloon.showAlignBottom(binding.frameMyChartTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_my_chart", null)
         }
 
         val luckyStadiumInfoBalloon =
@@ -124,6 +130,7 @@ class StatsMyFragment : Fragment() {
             )
         binding.constraintLuckyStadium.setOnClickListener {
             luckyStadiumInfoBalloon.showAlignBottom(binding.constraintLuckyStadium)
+            firebaseAnalytics.logEvent("tooltip_lucky_stadium", null)
         }
     }
 
