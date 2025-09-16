@@ -2,6 +2,7 @@ package com.yagubogu
 
 import android.app.Application
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
@@ -68,6 +69,7 @@ class YaguBoguApplication : Application() {
         if (BuildConfig.DEBUG) {
             // 개발 환경
             FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = false
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false)
             Timber.plant(YaguBoguDebugTree())
         } else {
             // 운영 환경

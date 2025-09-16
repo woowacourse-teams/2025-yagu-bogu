@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
@@ -53,39 +56,11 @@ class LivetalkChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun showTalkDeleteDialog() {
-        if (supportFragmentManager.findFragmentByTag(KEY_TALK_DELETE_DIALOG) == null) {
-            val dialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.livetalk_trash_btn),
-                    message = getString(R.string.livetalk_trash_dialog_message),
-                    positiveText = getString(R.string.livetalk_trash_btn),
-                )
-            val dialog =
-                DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
-            dialog.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
-        }
-    }
-
-    private fun showTalkReportDialog(reportTalkNickName: String) {
-        val dialogUiModel =
-            DefaultDialogUiModel(
-                title = getString(R.string.livetalk_user_report_btn),
-                message =
-                    getString(
-                        R.string.livetalk_user_report_dialog_message,
-                        reportTalkNickName,
-                    ),
-                positiveText = getString(R.string.livetalk_user_report_btn),
-            )
-        val talkReportDialog =
-            DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
-        talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
-    }
-
     private val chatLinearLayoutManager by lazy {
         binding.rvChatMessages.layoutManager as LinearLayoutManager
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,6 +116,13 @@ class LivetalkChatActivity : AppCompatActivity() {
             val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
             if (isConfirmed) {
                 viewModel.reportMessage(pendingReportMessageId ?: return@setFragmentResultListener)
+            }
+        }
+
+        binding.constraintBtnSend.setOnClickListener {
+            viewModel.sendMessage()
+            if (binding.editMessage.text.isNotBlank()) {
+                firebaseAnalytics.logEvent("livetalk_send_message", null)
             }
         }
     }
@@ -200,6 +182,36 @@ class LivetalkChatActivity : AppCompatActivity() {
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
+    }
+
+    private fun showTalkDeleteDialog() {
+        if (supportFragmentManager.findFragmentByTag(KEY_TALK_DELETE_DIALOG) == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.livetalk_trash_btn),
+                    message = getString(R.string.livetalk_trash_dialog_message),
+                    positiveText = getString(R.string.livetalk_trash_btn),
+                )
+            val dialog =
+                DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
+            dialog.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
+        }
+    }
+
+    private fun showTalkReportDialog(reportTalkNickName: String) {
+        val dialogUiModel =
+            DefaultDialogUiModel(
+                title = getString(R.string.livetalk_user_report_btn),
+                message =
+                    getString(
+                        R.string.livetalk_user_report_dialog_message,
+                        reportTalkNickName,
+                    ),
+                positiveText = getString(R.string.livetalk_user_report_btn),
+            )
+        val talkReportDialog =
+            DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
+        talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
     }
 
     companion object {

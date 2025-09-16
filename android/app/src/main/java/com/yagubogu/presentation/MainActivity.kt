@@ -12,6 +12,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
@@ -28,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var lastBackPressedTime: Long = 0L
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +106,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.bnvNavigation.setOnItemReselectedListener { item: MenuItem ->
+        binding.bnvNavigation.setOnItemReselectedListener {
             val currentFragment: Fragment? =
                 supportFragmentManager.fragments.firstOrNull { it.isVisible }
 
@@ -129,6 +135,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setToolbarTitle(selectedItemId)
+
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, tag)
+        }
     }
 
     private fun setToolbarTitle(

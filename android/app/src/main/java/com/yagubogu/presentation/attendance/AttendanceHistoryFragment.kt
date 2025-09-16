@@ -9,6 +9,9 @@ import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
@@ -20,6 +23,8 @@ import com.yagubogu.presentation.util.ScrollToTop
 @Suppress("ktlint:standard:backing-property-naming")
 class AttendanceHistoryFragment :
     Fragment(),
+    AttendanceHistorySummaryViewHolder.Handler,
+    AttendanceHistoryDetailViewHolder.Handler,
     ScrollToTop {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
@@ -31,10 +36,12 @@ class AttendanceHistoryFragment :
 
     private val attendanceHistoryAdapter by lazy {
         AttendanceHistoryAdapter(
-            attendanceHistorySummaryHandler = viewModel,
-            attendanceHistoryDetailHandler = viewModel,
+            attendanceHistorySummaryHandler = this,
+            attendanceHistoryDetailHandler = this,
         )
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +60,7 @@ class AttendanceHistoryFragment :
         setupBindings()
         setupSpinner()
         setupObservers()
+        setupListeners()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -65,6 +73,16 @@ class AttendanceHistoryFragment :
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+        viewModel.onSummaryItemClick(item)
+        firebaseAnalytics.logEvent("attendance_history_item_click", null)
+    }
+
+    override fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+        viewModel.onDetailItemClick(item)
+        firebaseAnalytics.logEvent("attendance_history_item_click", null)
     }
 
     override fun scrollToTop() {
@@ -98,6 +116,7 @@ class AttendanceHistoryFragment :
                     ) {
                         val filter = AttendanceHistoryFilter.entries[position]
                         viewModel.updateAttendanceHistoryFilter(filter)
+                        firebaseAnalytics.logEvent("attendance_history_change_filter", null)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -126,6 +145,13 @@ class AttendanceHistoryFragment :
                         AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
                     },
                 )
+        }
+    }
+
+    private fun setupListeners() {
+        binding.tvAttendanceHistoryOrder.setOnClickListener {
+            viewModel.switchAttendanceHistoryOrder()
+            firebaseAnalytics.logEvent("attendance_history_change_order", null)
         }
     }
 }
