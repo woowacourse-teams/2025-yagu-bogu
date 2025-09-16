@@ -20,12 +20,15 @@ public interface MemberBadgeRepository extends JpaRepository<MemberBadge, Long> 
             FROM Member m
             LEFT JOIN MemberBadge mb
             ON mb.member.id = m.id AND mb.badge = :badge
+            WHERE m.deletedAt IS NULL
             """)
     double calculateAchievedRate(@Param("badge") Badge badge);
 
     @Query("""
                 SELECT new com.yagubogu.badge.dto.BadgeCountResponse(mb.badge.id, COUNT(mb))
                 FROM MemberBadge mb
+                JOIN mb.member m
+                WHERE m.deletedAt IS NULL
                 GROUP BY mb.badge.id
             """)
     List<BadgeCountResponse> countByBadge();

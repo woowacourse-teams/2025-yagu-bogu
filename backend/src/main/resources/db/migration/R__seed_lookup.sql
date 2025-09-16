@@ -61,8 +61,3 @@ ON DUPLICATE KEY UPDATE date                = new_data.date,
                         home_pitcher        = new_data.home_pitcher,
                         away_pitcher        = new_data.away_pitcher,
                         game_state          = new_data.game_state;
-
--- 4. badge_update_queue 초기 row 삽입
-INSERT INTO badge_update_queue (badge_update_queue_id, pending_count)
-VALUES (1, 0)
-ON DUPLICATE KEY UPDATE pending_count = badge_update_queue.pending_count;

@@ -19,9 +19,9 @@ public class BadgeEventListener {
         this.badgePolicies = badgePolicies;
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBadgeEvent(final BadgeEvent event) {
         for (BadgePolicy policy : badgePolicies) {
             BadgeAwardCandidate candidate = policy.canAward(event);
