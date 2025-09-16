@@ -58,6 +58,7 @@ class AttendanceHistoryFragment :
         setupBindings()
         setupSpinner()
         setupObservers()
+        setupListeners()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -109,6 +110,7 @@ class AttendanceHistoryFragment :
                     ) {
                         val filter = AttendanceHistoryFilter.entries[position]
                         viewModel.updateAttendanceHistoryFilter(filter)
+                        firebaseAnalytics.logEvent("attendance_history_change_filter", null)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -137,6 +139,13 @@ class AttendanceHistoryFragment :
                         AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
                     },
                 )
+        }
+    }
+
+    private fun setupListeners() {
+        binding.tvAttendanceHistoryOrder.setOnClickListener {
+            viewModel.switchAttendanceHistoryOrder()
+            firebaseAnalytics.logEvent("attendance_history_change_order", null)
         }
     }
 }
