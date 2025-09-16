@@ -279,8 +279,8 @@ class HomeFragment : Fragment() {
                 getString(R.string.home_stadium_stats_tooltip),
                 viewLifecycleOwner,
             )
-        binding.constraintStadiumStatsTitle.setOnClickListener {
-            stadiumStatsInfoBalloon.showAlignBottom(binding.constraintStadiumStatsTitle)
+        binding.frameStadiumStatsTooltip.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.frameStadiumStatsTooltip)
         }
 
         val victoryFairyInfoBalloon =
@@ -288,8 +288,8 @@ class HomeFragment : Fragment() {
                 getString(R.string.home_victory_fairy_tooltip),
                 viewLifecycleOwner,
             )
-        binding.constraintVictoryFairyRankingTitle.setOnClickListener {
-            victoryFairyInfoBalloon.showAlignBottom(binding.constraintVictoryFairyRankingTitle)
+        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.frameVictoryFairyRankingTooltip)
         }
     }
 

@@ -113,8 +113,8 @@ class StatsMyFragment : Fragment() {
                 getString(R.string.stats_my_pie_chart_tooltip),
                 viewLifecycleOwner,
             )
-        binding.constraintMyChart.setOnClickListener {
-            myChartInfoBalloon.showAlignBottom(binding.constraintMyChart)
+        binding.frameMyChartTooltip.setOnClickListener {
+            myChartInfoBalloon.showAlignBottom(binding.frameMyChartTooltip)
         }
 
         val luckyStadiumInfoBalloon =

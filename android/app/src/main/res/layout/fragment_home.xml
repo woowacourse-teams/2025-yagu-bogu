@@ -175,34 +175,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/constraint_my_team">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraint_stadium_stats_title"
+                <TextView
+                    android:id="@+id/tv_stadium_stats_title"
+                    style="@style/TextView.Pretendard.Bold.20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/home_stadium_stats_title"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/tv_stadium_stats_title"
-                        style="@style/TextView.Pretendard.Bold.20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:text="@string/home_stadium_stats_title" />
+                <FrameLayout
+                    android:id="@+id/frame_stadium_stats_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintStart_toEndOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title">
 
                     <ImageView
-                        android:id="@+id/ic_stadium_stats_info"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:src="@drawable/ic_info"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
-                        app:layout_constraintStart_toEndOf="@id/tv_stadium_stats_title"
-                        app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title"
-                        app:tint="@color/gray400" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:tint="@color/gray300" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tv_refresh_time"
@@ -213,9 +210,9 @@
                     android:text="@{@string/home_stadium_stats_refresh_time(viewModel.stadiumStatsUiModel.refreshTime.hour, viewModel.stadiumStatsUiModel.refreshTime.minute)}"
                     android:textColor="@color/gray400"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/constraint_stadium_stats_title"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
                     app:layout_constraintEnd_toStartOf="@id/iv_refresh"
-                    app:layout_constraintTop_toTopOf="@id/constraint_stadium_stats_title"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title"
                     tools:text="14:30 기준" />
 
                 <ImageView
@@ -236,7 +233,7 @@
                     android:layout_marginTop="20dp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toTopOf="@id/constraint_show_more"
-                    app:layout_constraintTop_toBottomOf="@id/constraint_stadium_stats_title" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_stadium_stats_title" />
 
                 <View
                     android:layout_width="0dp"
@@ -298,33 +295,30 @@
                 android:padding="20dp"
                 app:layout_constraintTop_toBottomOf="@id/constraint_stadium_stats">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraint_victory_fairy_ranking_title"
+                <TextView
+                    android:id="@+id/tv_victory_fairy_ranking"
+                    style="@style/TextView.Pretendard.Bold.20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/home_victory_fairy_ranking"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/tv_victory_fairy_ranking"
-                        style="@style/TextView.Pretendard.Bold.20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_victory_fairy_ranking"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <FrameLayout
+                    android:id="@+id/frame_victory_fairy_ranking_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintStart_toEndOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking">
 
                     <ImageView
-                        android:id="@+id/ic_victory_fairy_win_rate_info"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:src="@drawable/ic_info"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
-                        app:layout_constraintStart_toEndOf="@id/tv_victory_fairy_ranking"
-                        app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking"
-                        app:tint="@color/gray400" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:tint="@color/gray300" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tv_victory_fairy_win_rate"
@@ -334,9 +328,9 @@
                     android:text="@string/home_winning_percentage"
                     android:textColor="@color/gray400"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/constraint_victory_fairy_ranking_title"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/constraint_victory_fairy_ranking_title" />
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking" />
 
                 <include
                     android:id="@+id/layout_my_victory_fairy"
@@ -344,7 +338,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:layout_constraintTop_toBottomOf="@id/constraint_victory_fairy_ranking_title" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_victory_fairy_ranking" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider"
