@@ -33,22 +33,13 @@ public class Badge {
     @Enumerated(EnumType.STRING)
     private Policy type;
 
-    @Column(name = "badge_condition_value", nullable = false)
-    private Long value;
+    @Column(name = "badge_condition_threshold", nullable = false)
+    private Long threshold;
 
-    @Column(name = "badge_achieved_rate", nullable = false)
-    private Double achievedRate;
-
-    public Badge(final String name, final String description, final Policy type, final Long value,
-                 final Double achievedRate) {
+    public Badge(final String name, final String description, final Policy type, final Long threshold) {
         this.name = name;
         this.description = description;
         this.type = type;
-        this.value = value;
-        this.achievedRate = achievedRate;
-    }
-
-    public void updateAchievedRate(final double achievedRate) {
-        this.achievedRate = achievedRate;
+        this.threshold = threshold;
     }
 }

@@ -34,15 +34,14 @@ ON DUPLICATE KEY UPDATE full_name  = new_data.full_name,
                         longitude  = new_data.longitude;
 
 -- badges
-INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_value, badge_achieved_rate)
-    VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1, 100.0),
-           ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1, 0.0)
+INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_threshold)
+    VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1),
+           ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1)
         AS new_data
-ON DUPLICATE KEY UPDATE badge_name            = new_data.badge_name,
-                        badge_description     = new_data.badge_description,
-                        badge_condition_type  = new_data.badge_condition_type,
-                        badge_condition_value = new_data.badge_condition_value,
-                        badge_achieved_rate   = new_data.badge_achieved_rate;
+ON DUPLICATE KEY UPDATE badge_name                = new_data.badge_name,
+                        badge_description         = new_data.badge_description,
+                        badge_condition_type      = new_data.badge_condition_type,
+                        badge_condition_threshold = new_data.badge_condition_threshold;
 
 INSERT INTO games (game_code, date, start_at, stadium_id, home_team_id, away_team_id,
                    home_score, away_score, home_score_board_id, away_score_board_id,

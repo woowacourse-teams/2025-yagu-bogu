@@ -24,6 +24,6 @@ VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.88
        (9, '이글스파크', '볼파크', '대전', 36.3173, 127.4280);
 
 -- 3. 회원가입 뱃지 데이터
-INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_value, badge_achieved_rate)
-VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1, 100.0),
-       ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1, 0);
+INSERT INTO badges (badge_name, badge_description, badge_condition_type, badge_condition_threshold)
+VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1),
+       ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1);

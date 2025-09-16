@@ -8,7 +8,6 @@ public record BadgeResponse(
         String name,
         String description,
         Policy type,
-        double achievedRate,
         Double progress,
         boolean owned,
         LocalDateTime achievedAt

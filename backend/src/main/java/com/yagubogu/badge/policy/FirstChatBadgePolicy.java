@@ -36,11 +36,5 @@ public class FirstChatBadgePolicy implements BadgePolicy {
     public void award(final BadgeAwardCandidate candidate) {
         MemberBadge memberBadge = new MemberBadge(candidate.badge(), candidate.member(), 100.0);
         memberBadgeRepository.save(memberBadge);
-        updateAchievedRate(candidate.badge());
-    }
-
-    private void updateAchievedRate(final Badge badge) {
-        double achievedRate = memberBadgeRepository.calculateAchievedRate(badge);
-        badge.updateAchievedRate(achievedRate);
     }
 }

@@ -6,17 +6,20 @@ import java.util.List;
 
 public record BadgeListResponse(
         RepresentativeBadgeResponse representativeBadge,
-        List<BadgeResponse> badges
+        List<BadgeResponseWithAchievedRate> badges
 ) {
-    public static BadgeListResponse from(final Badge representativeBadge, final List<BadgeResponse> badges) {
+    public static BadgeListResponse from(
+            final Badge representativeBadge,
+            final List<BadgeResponseWithAchievedRate> badgeResponseWithAchievedRates
+    ) {
         RepresentativeBadgeResponse representativeBadgeResponse = null;
         if (representativeBadge == null) {
-            return new BadgeListResponse(representativeBadgeResponse, badges);
+            return new BadgeListResponse(representativeBadgeResponse, badgeResponseWithAchievedRates);
         }
         representativeBadgeResponse = new RepresentativeBadgeResponse(
                 representativeBadge.getId(), representativeBadge.getName(), representativeBadge.getType());
 
-        return new BadgeListResponse(representativeBadgeResponse, badges);
+        return new BadgeListResponse(representativeBadgeResponse, badgeResponseWithAchievedRates);
     }
 
     private record RepresentativeBadgeResponse(

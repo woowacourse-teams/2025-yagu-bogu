@@ -5,6 +5,7 @@ import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponse;
+import com.yagubogu.badge.dto.BadgeResponseWithAchievedRate;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -277,13 +278,17 @@ public class MemberServiceTest {
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         long memberId = member.getId();
         memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
-        List<BadgeResponse> badgeResponses = List.of(
-                new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
-                        Policy.SIGN_UP, 100.0, 100.0,
-                        true, LocalDateTime.now()),
-                new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
-                        Policy.FIRST_CHAT, 0.0, null,
-                        false, LocalDateTime.now())
+        List<BadgeResponseWithAchievedRate> badgeResponses = List.of(
+                new BadgeResponseWithAchievedRate(
+                        new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
+                                Policy.SIGN_UP, 100.0, true, LocalDateTime.now()),
+                        100.0
+                ),
+                new BadgeResponseWithAchievedRate(
+                        new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
+                                Policy.FIRST_CHAT, null, false, null),
+                        0.0
+                )
         );
 
         BadgeListResponse expected = BadgeListResponse.from(member.getRepresentativeBadge(), badgeResponses);
@@ -296,7 +301,7 @@ public class MemberServiceTest {
             softAssertions.assertThat(actual.representativeBadge())
                     .isEqualTo(expected.representativeBadge());
             softAssertions.assertThat(actual.badges())
-                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("badgeInfo.achievedAt")
                     .containsExactlyInAnyOrderElementsOf(expected.badges());
         });
     }

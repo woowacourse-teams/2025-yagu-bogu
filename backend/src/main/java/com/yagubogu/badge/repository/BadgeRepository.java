@@ -15,7 +15,8 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
 
     @Query("""
             SELECT new com.yagubogu.badge.dto.BadgeResponse(
-                 b.id, b.name, b.description, b.type, b.achievedRate, mb.progress,
+                 b.id, b.name, b.description, b.type,
+                 mb.progress,
                  CASE WHEN mb.id IS NOT NULL THEN true ELSE false END,
                  mb.createdAt
             )
