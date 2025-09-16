@@ -117,6 +117,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.glide)
     implementation(libs.play.services.oss.licenses)
+    implementation(libs.ucrop)
 
     // firebase
     implementation(platform(libs.firebase.bom))
