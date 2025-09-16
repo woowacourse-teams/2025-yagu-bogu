@@ -1,11 +1,9 @@
 package com.yagubogu.presentation.login
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen
@@ -13,7 +11,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -25,6 +22,7 @@ import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
+import com.yagubogu.presentation.util.showSnackbar
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -37,7 +35,12 @@ class LoginActivity : AppCompatActivity() {
         val googleCredentialManager =
             GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
         val app = application as YaguBoguApplication
-        LoginViewModelFactory(app.authRepository, app.memberRepository, googleCredentialManager)
+        LoginViewModelFactory(
+            app.tokenRepository,
+            app.authRepository,
+            app.memberRepository,
+            googleCredentialManager,
+        )
     }
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
@@ -97,7 +100,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 is LoginResult.Failure -> {
-                    showSnackbar(R.string.login_failed_message)
+                    binding.root.showSnackbar(R.string.login_failed_message)
                     val bundle = bundleOf("reason" to "${value.exception}")
                     firebaseAnalytics.logEvent("login_failure", bundle)
                 }
@@ -115,15 +118,5 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
-    }
-
-    private fun showSnackbar(
-        @StringRes message: Int,
-    ) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).apply {
-            setBackgroundTint(Color.DKGRAY)
-            setTextColor(context.getColor(R.color.white))
-            show()
-        }
     }
 }

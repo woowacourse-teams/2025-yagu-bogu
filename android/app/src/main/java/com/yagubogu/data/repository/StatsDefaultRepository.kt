@@ -1,12 +1,15 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.StatsDataSource
-import com.yagubogu.data.dto.response.AverageStatisticResponse
-import com.yagubogu.data.dto.response.StatsCountsResponse
-import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsWinRateResponse
+import com.yagubogu.data.datasource.stats.StatsDataSource
+import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
+import com.yagubogu.data.dto.response.stats.StatsCountsResponse
+import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
+import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.presentation.stats.my.AverageStats
 
 class StatsDefaultRepository(
@@ -34,13 +37,24 @@ class StatsDefaultRepository(
             }
 
     override suspend fun getAverageStats(): Result<AverageStats> =
-        statsDataSource.getAverageStats().map { averageStatisticResponse: AverageStatisticResponse ->
-            AverageStats(
-                averageRuns = averageStatisticResponse.averageRun ?: 0.0,
-                concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
-                averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
-                averageHits = averageStatisticResponse.averageHits ?: 0.0,
-                concededHits = averageStatisticResponse.concededHits ?: 0.0,
-            )
-        }
+        statsDataSource
+            .getAverageStats()
+            .map { averageStatisticResponse: AverageStatisticResponse ->
+                AverageStats(
+                    averageRuns = averageStatisticResponse.averageRun ?: 0.0,
+                    concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
+                    averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
+                    averageHits = averageStatisticResponse.averageHits ?: 0.0,
+                    concededHits = averageStatisticResponse.concededHits ?: 0.0,
+                )
+            }
+
+    override suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>> =
+        statsDataSource
+            .getVsTeamStats(year)
+            .map { opponentWinRateResponse: OpponentWinRateResponse ->
+                opponentWinRateResponse.opponents.mapIndexed { index: Int, opponentDto: OpponentWinRateTeamDto ->
+                    opponentDto.toPresentation(index + 1)
+                }
+            }
 }

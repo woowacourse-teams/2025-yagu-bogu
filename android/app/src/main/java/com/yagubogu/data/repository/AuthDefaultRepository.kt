@@ -1,7 +1,7 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.AuthDataSource
-import com.yagubogu.data.dto.response.LoginResponse
+import com.yagubogu.data.datasource.auth.AuthDataSource
+import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
@@ -20,12 +20,13 @@ class AuthDefaultRepository(
             }
         }
 
-    override suspend fun refreshTokens(): Result<Unit> {
+    override suspend fun logout(): Result<Unit> {
         val refreshToken: String =
             tokenManager.getRefreshToken()
                 ?: return Result.failure(Exception(ERROR_NO_REFRESH_TOKEN))
-        return authDataSource.refreshTokens(refreshToken).map { (accessToken, refreshToken) ->
-            tokenManager.saveTokens(accessToken, refreshToken)
+
+        return authDataSource.logout(refreshToken).map {
+            tokenManager.clearTokens()
         }
     }
 

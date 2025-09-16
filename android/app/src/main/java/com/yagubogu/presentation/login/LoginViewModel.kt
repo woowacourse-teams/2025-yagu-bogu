@@ -9,10 +9,12 @@ import com.yagubogu.data.auth.GoogleCredentialResult
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.domain.repository.TokenRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LoginViewModel(
+    private val tokenRepository: TokenRepository,
     private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
     private val googleCredentialManager: GoogleCredentialManager,
@@ -20,7 +22,7 @@ class LoginViewModel(
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> get() = _loginResult
 
-    suspend fun isTokenValid(): Boolean = authRepository.refreshTokens().isSuccess
+    suspend fun isTokenValid(): Boolean = tokenRepository.refreshTokens().isSuccess
 
     suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
 

@@ -1,4 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.android.build.gradle.internal.dsl.SigningConfig
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -8,6 +11,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.google.oss.licenses.plugin)
 }
 
 android {
@@ -18,15 +22,20 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 5
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
             "String",
-            "BASE_URL",
-            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL")}\"",
+            "BASE_URL_DEBUG",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_DEBUG")}\"",
+        )
+        buildConfigField(
+            "String",
+            "BASE_URL_RELEASE",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_RELEASE")}\"",
         )
         buildConfigField(
             type = "String",
@@ -34,6 +43,24 @@ android {
             "\"${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}\"",
         )
     }
+
+    val signingFile = rootProject.file("keystore.properties")
+    val releaseSigningConfig: SigningConfig? =
+        if (signingFile.exists()) {
+            val keystoreProperties =
+                Properties().apply {
+                    load(FileInputStream(signingFile))
+                }
+
+            signingConfigs.create("release") {
+                storeFile = file("yagubogu-keystore")
+                keyAlias = "${keystoreProperties["KEY_ALIAS"]}"
+                keyPassword = "${keystoreProperties["KEY_PASSWORD"]}"
+                storePassword = "${keystoreProperties["KEYSTORE_PASSWORD"]}"
+            }
+        } else {
+            null
+        }
 
     buildTypes {
         debug {
@@ -52,6 +79,9 @@ android {
                 "proguard-rules.pro",
             )
             manifestPlaceholders["appName"] = "@string/app_name"
+            if (releaseSigningConfig != null) {
+                signingConfig = releaseSigningConfig
+            }
         }
     }
     compileOptions {
@@ -86,6 +116,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.glide)
+    implementation(libs.play.services.oss.licenses)
 
     // firebase
     implementation(platform(libs.firebase.bom))

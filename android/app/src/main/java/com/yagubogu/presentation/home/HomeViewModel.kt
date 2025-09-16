@@ -9,7 +9,7 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadiums
-import com.yagubogu.domain.repository.CheckInsRepository
+import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val memberRepository: MemberRepository,
-    private val checkInsRepository: CheckInsRepository,
+    private val checkInRepository: CheckInRepository,
     private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
@@ -59,11 +59,15 @@ class HomeViewModel(
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
 
+    private val _hasAlreadyCheckedIn = MutableLiveData<Boolean>()
+    val hasAlreadyCheckedIn: LiveData<Boolean> get() = _hasAlreadyCheckedIn
+
     init {
         fetchAll()
     }
 
     fun fetchAll() {
+        fetchCheckInStatus()
         fetchMemberStats()
         fetchStadiumStats()
         fetchVictoryFairyRanking()
@@ -86,7 +90,7 @@ class HomeViewModel(
     fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
-                checkInsRepository.getStadiumFanRates(date)
+                checkInRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
                     stadiumFanRateItems.value = stadiumFanRates
@@ -100,12 +104,24 @@ class HomeViewModel(
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
+    private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+        viewModelScope.launch {
+            val checkInStatusResult: Result<Boolean> = checkInRepository.getCheckInStatus(date)
+            checkInStatusResult
+                .onSuccess { checkInStatus: Boolean ->
+                    _hasAlreadyCheckedIn.value = checkInStatus
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
             val attendanceCountDeferred: Deferred<Result<Int>> =
-                async { checkInsRepository.getCheckInCounts(year) }
+                async { checkInRepository.getCheckInCounts(year) }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
 
@@ -138,7 +154,7 @@ class HomeViewModel(
     private fun fetchVictoryFairyRanking() {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                checkInsRepository.getVictoryFairyRankings()
+                checkInRepository.getVictoryFairyRankings()
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
@@ -176,14 +192,15 @@ class HomeViewModel(
         }
 
         val today = LocalDate.now()
-        checkInsRepository
+        checkInRepository
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
+                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
+                _hasAlreadyCheckedIn.value = true
                 _memberStatsUiModel.value =
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     }
-                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
                 _isCheckInLoading.value = false
             }.onFailure { exception: Throwable ->
                 Timber.w(exception, "API 호출 실패")
