@@ -134,7 +134,6 @@
             android:layout_marginEnd="20dp"
             android:background="@{viewModel.canSendMessage ? @drawable/bg_primary500_radius_12dp_ripple : @drawable/bg_gray400_radius_12dp}"
             android:enabled="@{isVerified}"
-            android:onClick="@{() -> viewModel.sendMessage()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/constraint_input_message">
