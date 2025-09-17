@@ -1,0 +1,95 @@
+name: Discord PR Notification
+
+on:
+  pull_request:
+    types: [ review_requested, opened, reopened, ready_for_review ]
+
+jobs:
+  notify:
+    # Draft PR 제외
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Decide webhook by base branch
+        id: route
+        shell: bash
+        run: |
+          BASE="${{ github.event.pull_request.base.ref }}"
+
+          # 브랜치 → 웹훅 매핑
+          case "$BASE" in
+            dev-be) WEBHOOK="${{ secrets.DISCORD_WEBHOOK_BE }}";;
+            dev-an) WEBHOOK="${{ secrets.DISCORD_WEBHOOK_AN }}";;
+            *) WEBHOOK="";;
+          esac
+
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          [ -n "$WEBHOOK" ] && echo "webhook=$WEBHOOK" >> "$GITHUB_OUTPUT"
+
+          # 이벤트/리뷰어(개인/팀) 추출: review_requested 이벤트에서만 존재
+          ACTION="${{ github.event.action }}"
+          REQ_USER="${{ github.event.requested_reviewer.login }}"
+          REQ_TEAM="${{ github.event.requested_team.slug }}"
+
+          if [ -n "$REQ_USER" ]; then
+            REQUESTED="$REQ_USER"
+          elif [ -n "$REQ_TEAM" ]; then
+            REQUESTED="team/${REQ_TEAM}"
+          else
+            REQUESTED=""
+          fi
+
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+          echo "requested=$REQUESTED" >> "$GITHUB_OUTPUT"
+
+          # 공통 메시지 필드 (PR 제목은 멀티라인 안전 처리)
+          {
+            echo "pr_number=${{ github.event.pull_request.number }}"
+            echo "pr_title<<EOF"
+            echo "${{ github.event.pull_request.title }}"
+            echo "EOF"
+            echo "pr_url=${{ github.event.pull_request.html_url }}"
+            echo "sender=${{ github.actor }}"
+            echo "head=${{ github.event.pull_request.head.ref }}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Skip if base branch is not mapped
+        if: ${{ steps.route.outputs.webhook == '' }}
+        run: echo "No target webhook for base=${{ steps.route.outputs.base }}. Skipping."
+
+      - name: Build Discord payload
+        if: ${{ steps.route.outputs.webhook != '' }}
+        shell: bash
+        run: |
+          # 이벤트별 타이틀/추가 설명
+          case "${{ steps.route.outputs.action }}" in
+            review_requested)
+              TITLE="🔔 Review Requested"
+              if [ -n "${{ steps.route.outputs.requested }}" ]; then
+                EXTRA=$'\n''👀 Requested reviewer: `'"${{ steps.route.outputs.requested }}"'`'
+              else
+                EXTRA=""
+              fi
+              ;;
+            opened)           TITLE="📌 PR Opened";      EXTRA="";;
+            reopened)         TITLE="📌 PR Reopened";    EXTRA="";;
+            ready_for_review) TITLE="✅ Ready for Review"; EXTRA="";;
+            *)                TITLE="PR Event";          EXTRA="";;
+          esac
+
+          # 본문(Discord embed description)
+          DESC="**#${{ steps.route.outputs.pr_number }}** ${{ steps.route.outputs.pr_title }}
+          by \`${{ steps.route.outputs.sender }}\`
+          base: \`${{ steps.route.outputs.base }}\` ← head: \`${{ steps.route.outputs.head }}\`
+          🔗 ${{ steps.route.outputs.pr_url }}${EXTRA}"
+
+          # JSON 생성 (jq 필요)
+          jq -n --arg t "$TITLE" --arg d "$DESC" \
+            '{embeds:[{title:$t, description:$d}]}' > payload.json
+
+      - name: Send to Discord
+        if: ${{ steps.route.outputs.webhook != '' }}
+        run: |
+          curl -sS -X POST -H "Content-Type: application/json" \
+            -d @payload.json "${{ steps.route.outputs.webhook }}"

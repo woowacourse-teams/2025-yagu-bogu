@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: integration
+  flyway:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e
+
+---
+spring:
+  config:
+    activate:
+      on-profile: integration

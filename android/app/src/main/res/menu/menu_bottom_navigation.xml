@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/bottom_navigation_home" />
+    <item
+        android:id="@+id/item_stats"
+        android:icon="@drawable/ic_stats"
+        android:title="@string/bottom_navigation_stats" />
+    <item
+        android:id="@+id/item_attendance_history"
+        android:icon="@drawable/ic_attendance_history"
+        android:title="@string/bottom_navigation_attendance_history" />
+    <item
+        android:id="@+id/item_livetalk"
+        android:icon="@drawable/ic_livetalk"
+        android:title="@string/bottom_navigation_livetalk" />
+
+</menu>
