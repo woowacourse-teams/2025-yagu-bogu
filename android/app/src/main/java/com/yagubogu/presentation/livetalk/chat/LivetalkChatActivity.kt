@@ -19,6 +19,7 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.presentation.util.showToast
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -144,39 +145,53 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.liveTalkChatBubbleItem.observe(this) { livetalkChatBubbleItems: List<LivetalkChatBubbleItem> ->
+        viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
+        viewModel.liveTalkChatBubbleItem.observe(this, ::handleLiveTalkChatBubbleItem)
+        viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
+        viewModel.livetalkDeleteEvent.observe(this) {
+            binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
+        }
+    }
 
-            val oldFirstItemId =
-                livetalkChatAdapter.currentList
-                    .firstOrNull()
-                    ?.livetalkChatItem
-                    ?.chatId
+    private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {
+        if (uiState is LivetalkUiState.Error) {
+            showToast(R.string.livetalk_loading_error)
+            finish()
+        }
+    }
 
-            val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
+    private fun handleLiveTalkChatBubbleItem(livetalkChatBubbleItems: List<LivetalkChatBubbleItem>) {
+        val oldFirstItemId =
+            livetalkChatAdapter.currentList
+                .firstOrNull()
+                ?.livetalkChatItem
+                ?.chatId
 
-            livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
-                val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
-                val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
+        val firstVisibleItemPosition = chatLinearLayoutManager.findFirstVisibleItemPosition()
 
-                if (isNewMessageArrived && firstVisibleItemPosition == 0) {
-                    chatLinearLayoutManager.scrollToPosition(0)
-                }
+        livetalkChatAdapter.submitList(livetalkChatBubbleItems) {
+            val newFirstItemId = livetalkChatBubbleItems.firstOrNull()?.livetalkChatItem?.chatId
+            val isNewMessageArrived = oldFirstItemId != null && oldFirstItemId != newFirstItemId
+
+            if (isNewMessageArrived && firstVisibleItemPosition == 0) {
+                chatLinearLayoutManager.scrollToPosition(0)
             }
         }
-        viewModel.livetalkReportEvent.observe(this) { livetalkReportEvent: LivetalkReportEvent ->
-            when (livetalkReportEvent) {
-                LivetalkReportEvent.DuplicatedReport ->
-                    binding.root.showSnackbar(
-                        R.string.livetalk_already_reported,
-                        R.id.divider,
-                    )
+    }
 
-                LivetalkReportEvent.Success ->
-                    binding.root.showSnackbar(
-                        R.string.livetalk_report_succeed,
-                        R.id.divider,
-                    )
-            }
+    private fun handleLivetalkReportEvent(livetalkReportEvent: LivetalkReportEvent) {
+        when (livetalkReportEvent) {
+            LivetalkReportEvent.DuplicatedReport ->
+                binding.root.showSnackbar(
+                    R.string.livetalk_already_reported,
+                    R.id.divider,
+                )
+
+            LivetalkReportEvent.Success ->
+                binding.root.showSnackbar(
+                    R.string.livetalk_report_succeed,
+                    R.id.divider,
+                )
         }
 
         viewModel.livetalkDeleteEvent.observe(this) {

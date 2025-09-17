@@ -92,15 +92,15 @@
     <string name="attendance_history_errors">실책</string>
     <string name="attendance_history_balls">사사구</string>
 
-    <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
-    <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
-    <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
-    <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
-
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 
     <string name="favorite_team_selection">응원하는 팀을\n선택해 주세요!</string>
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
+
+    <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
+    <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
+    <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
 
     <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
     <string name="livetalk_away_home_name">%s vs %s</string>
@@ -117,6 +117,7 @@
     <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
+    <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
 
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>

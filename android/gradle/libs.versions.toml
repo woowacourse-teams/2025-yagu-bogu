@@ -20,6 +20,7 @@ constraintlayout = "2.2.1"
 ktlint = "13.0.0"
 playServicesOssLicenses = "17.2.2"
 retrofit = "3.0.0"
+shimmer = "0.5.0"
 timber = "5.0.1"
 viewpager2 = "1.1.0"
 playServicesLocation = "21.3.0"
@@ -56,6 +57,7 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 google-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleidVersion" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
