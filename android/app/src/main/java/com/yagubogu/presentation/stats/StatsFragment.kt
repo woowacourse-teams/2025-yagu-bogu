@@ -55,7 +55,7 @@ class StatsFragment :
 
     override fun scrollToTop() {
         val position: Int = binding.vpStatsFragment.currentItem
-        val currentFragment: Fragment? = statsStateAdapter.createFragment(position)
+        val currentFragment: Fragment = statsStateAdapter.createFragment(position)
         if (currentFragment is ScrollToTop) {
             currentFragment.scrollToTop()
         }
