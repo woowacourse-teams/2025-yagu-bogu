@@ -79,7 +79,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(filterByTeam(member.team, teamFilter))
+                .where(
+                        filterByTeam(member.team, teamFilter),
+                        isMemberNotDeleted(member)
+                )
                 .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
                 .orderBy(score.desc()).limit(limit).fetch();
     }
@@ -105,7 +108,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(member.eq(targetMember), filterByTeam(member.team, teamFilter))
+                .where(
+                        member.eq(targetMember),
+                        filterByTeam(member.team, teamFilter),
+                        isMemberNotDeleted(member)
+                )
                 .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
                 .fetchOne();
     }
@@ -138,13 +145,18 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetch().size();
     }
 
+    private BooleanExpression isMemberNotDeleted(final QMember member) {
+        return member.deletedAt.isNull();
+    }
+
     private NumberExpression<Double> calculateWinRankingScore(final double m, final double c,
                                                               final NumberExpression<Long> wins,
                                                               final NumberExpression<Long> total) {
         NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
 
         return new CaseBuilder().when(denominator.ne(0.0))
-                .then(wins.sum().doubleValue().add(Expressions.constant(c * m)).divide(denominator)).otherwise(0.0);
+                .then(wins.sum().doubleValue().add(Expressions.constant(c * m)).divide(denominator))
+                .otherwise(0.0);
     }
 
     private BooleanExpression isFinished(final QGame game) {

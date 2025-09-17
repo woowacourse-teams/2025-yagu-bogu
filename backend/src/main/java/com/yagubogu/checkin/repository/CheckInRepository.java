@@ -6,7 +6,6 @@ import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.domain.QMember;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
@@ -126,37 +125,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 
     boolean existsByMemberAndGameDate(Member member, LocalDate date);
-
-    @Query("""
-            select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
-              ci.member.id,
-              ci.member.nickname,
-              ci.member.imageUrl,
-              ci.member.team.shortName,
-              COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END),
-              CASE
-                WHEN COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END) = 0
-                  THEN 0.0
-                ELSE ROUND(
-                  (1.0 * SUM(
-                    CASE
-                      WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
-                        OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
-                      THEN 1 ELSE 0
-                    END
-                  ) / COUNT(
-                    CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END
-                  )) * 100,
-                  1
-                )
-              END
-            )
-            from CheckIn ci
-            join ci.game g
-            group by
-              ci.member.id
-            """)
-    List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
 
     @Query("""
             SELECT new com.yagubogu.checkin.dto.GameWithFanCountsResponse(
