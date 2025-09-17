@@ -80,7 +80,9 @@ class LivetalkFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
-            livetalkStadiumAdapter.submitList(value)
+            livetalkStadiumAdapter.submitList(value) {
+                binding.rvLivetalkStadium.scrollToPosition(0)
+            }
 
             val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
             binding.ivEmptyGame.visibility = visibility
