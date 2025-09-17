@@ -17,7 +17,6 @@ import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.repository.TeamRepository;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class StatService {
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
-    private final TeamRepository teamRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -56,9 +54,8 @@ public class StatService {
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
-        int drawCounts = checkInRepository.findDrawCounts(member, year);
         int loseCounts = checkInRepository.findLoseCounts(member, year);
-        int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
+        int favoriteCheckInCounts = winCounts + loseCounts;
 
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
     }
@@ -130,7 +127,7 @@ public class StatService {
     ) {
         return winRates.stream()
                 .map(row -> {
-                    long totalGames = row.wins() + row.draws() + row.losses();
+                    long totalGames = row.wins() + row.losses();
                     double winRate = calculateWinRate(row.wins(), totalGames);
 
                     return new OpponentWinRateTeamResponse(

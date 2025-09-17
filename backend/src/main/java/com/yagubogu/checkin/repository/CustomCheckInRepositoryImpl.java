@@ -44,6 +44,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return conditionCount(member, year, drawCondition(QCheckIn.checkIn, QGame.game));
     }
 
+    // 구장 방문 총 횟수
+    // 행운의 구장 계산시 사용
+    // 구장별 승률 => 해당 구장에서 승리한 횟수 / (해당 구장에서 승리한 횟수 + 해당 구장에서 패배한 횟수)
+    // 경기 완료 여부 o, 무승부 x, 내 응원팀 여부 o
     public int countTotalFavoriteTeamGamesByStadiumAndMember(Stadium stadium, Member member, int year) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
@@ -55,7 +59,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         checkIn.member.eq(member),
                         isBetweenYear(game, year),
                         game.stadium.eq(stadium),
-                        isMyCurrentFavorite(member, checkIn)
+                        isMyCurrentFavorite(member, checkIn),
+                        drawCondition(checkIn, game).isFalse(),
+                        game.gameState.eq(GameState.COMPLETED)
                 )
                 .fetchOne()
                 .intValue();
