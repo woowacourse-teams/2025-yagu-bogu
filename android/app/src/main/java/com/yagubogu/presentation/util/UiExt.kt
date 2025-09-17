@@ -8,7 +8,6 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
-import com.skydoves.balloon.ArrowPositionRules
 import com.skydoves.balloon.Balloon
 import com.yagubogu.R
 
@@ -54,8 +53,10 @@ fun Context.buildBalloon(
     .setText(text)
     .setWidthRatio(0.5f)
     .setCornerRadius(8f)
-    .setPadding(6)
-    .setBackgroundColorResource(R.color.gray400)
-    .setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
+    .setPaddingHorizontal(10)
+    .setPaddingVertical(8)
+    .setTextColorResource(R.color.gray800)
+    .setBackgroundColorResource(R.color.gray200)
+    .setArrowTopPadding(4)
     .setLifecycleOwner(lifecycleOwner) // lifecycle에 맞춰 자동 dismiss
     .build()
