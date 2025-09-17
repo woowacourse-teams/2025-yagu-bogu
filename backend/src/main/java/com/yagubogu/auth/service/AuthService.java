@@ -47,7 +47,7 @@ public class AuthService {
 
         Optional<Member> memberOptional = memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId());
         boolean isNew = memberOptional.isEmpty();
-        Member member = memberOptional.orElseGet(() -> createNewMember(response));
+        Member member = memberOptional.orElseGet(() -> saveMember(response));
 
         MemberClaims memberClaims = MemberClaims.from(member);
         String accessToken = authTokenProvider.createAccessToken(memberClaims);
@@ -56,7 +56,7 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
-    private Member createNewMember(final AuthResponse response) {
+    private Member saveMember(final AuthResponse response) {
         String randomNickname = UUID.randomUUID().toString().substring(0, 15);
         Member newMember = new Member(
                 null,
