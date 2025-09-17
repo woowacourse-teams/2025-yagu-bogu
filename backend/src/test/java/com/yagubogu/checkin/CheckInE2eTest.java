@@ -432,6 +432,49 @@ public class CheckInE2eTest extends E2eTestBase {
         );
     }
 
+    @DisplayName("무승부는 직관 승률에 포함하지 않는다")
+    @Test
+    void findVictoryFairyRankings_withoutDraws() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(10)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED));
+
+        List<Game> games = gameRepository.findAll();
+        for (Game g : games) {
+            checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(g));
+        }
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/check-ins/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        SoftAssertions.assertSoftly(
+                softAssertions ->
+                {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.getFirst().winPercent()).isEqualTo(100.0);
+                }
+        );
+    }
+
     @DisplayName("탈퇴된 회원은 랭킹에 조회되지 않는다")
     @Test
     void findVictoryFairyRankings_quit() {

@@ -66,7 +66,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QMember member = QMember.member;
 
         NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
-        NumberExpression<Long> total = game.id.count();
+        NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
         NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
@@ -95,7 +95,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         // w: 개인의 승리 횟수
         NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
-        NumberExpression<Long> total = game.id.count().coalesce(0L);
+        NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
         NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
@@ -117,11 +117,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetchOne();
     }
 
-    private NumberExpression<Double> getSafeWinPercent(final NumberExpression<Long> total,
-                                                       final NumberExpression<Double> calculatePercent) {
-        return new CaseBuilder().when(total.gt(0)).then(calculatePercent).otherwise(0.0);
-    }
-
     public int calculateMyRankingOrder(final double targetScore, final double m, final double c, final int year,
                                        final TeamFilter teamFilter) {
         QCheckIn checkIn = QCheckIn.checkIn;
@@ -131,7 +126,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         // w: 개인의 승리 횟수
         NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
-        NumberExpression<Long> total = checkIn.count();
+        NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
 
         Expression<Double> myScore = Expressions.constant(targetScore);
@@ -143,6 +138,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .groupBy(member)
                 .having(score.gt(myScore))
                 .fetch().size();
+    }
+
+    private NumberExpression<Double> getSafeWinPercent(final NumberExpression<Long> total,
+                                                       final NumberExpression<Double> calculatePercent) {
+        return new CaseBuilder().when(total.gt(0)).then(calculatePercent).otherwise(0.0);
     }
 
     private BooleanExpression isMemberNotDeleted(final QMember member) {
@@ -195,6 +195,14 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .when(checkIn.team.eq(game.awayTeam).and(game.awayScore.gt(game.homeScore)))
                 .then(1L)
                 .otherwise(0L);
+    }
+
+    private NumberExpression<Long> calculateTotalCountsWithoutDraws(final QGame game) {
+        return new CaseBuilder()
+                .when(game.gameState.eq(GameState.COMPLETED).and(game.homeScore.ne(game.awayScore)))
+                .then(1L)
+                .otherwise(0L)
+                .sum();
     }
 
     private Long calculatePerCheckInCount(final int year) {
