@@ -341,13 +341,32 @@ class CheckInServiceTest {
         Game canceledGame = gameFactory.save(
                 builder -> builder.gameState(GameState.CANCELED).awayTeam(kia).homeTeam(samsung)
                         .stadium(stadiumJamsil).date(startDate));
-        checkInFactory.save(builder -> builder.team(kia).member(por).game(canceledGame));
+        CheckIn savedCheckIn = checkInFactory.save(builder -> builder.team(kia).member(por).game(canceledGame));
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
 
         // then
-        assertThat(actual.checkInHistory().getFirst().awayTeam().code()).isEqualTo(kia.getTeamCode());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.checkInHistory()).hasSize(1);
+            CheckInGameResponse actualGameResponse = actual.checkInHistory().getFirst();
+
+            softAssertions.assertThat(actualGameResponse.checkInId()).isEqualTo(savedCheckIn.getId());
+            softAssertions.assertThat(actualGameResponse.stadiumFullName())
+                    .isEqualTo(canceledGame.getStadium().getFullName());
+            softAssertions.assertThat(actualGameResponse.attendanceDate()).isEqualTo(canceledGame.getDate());
+
+            softAssertions.assertThat(actualGameResponse.homeTeam().code())
+                    .isEqualTo(canceledGame.getHomeTeam().getTeamCode());
+            softAssertions.assertThat(actualGameResponse.homeTeam().score()).isNull();
+
+            softAssertions.assertThat(actualGameResponse.awayTeam().code())
+                    .isEqualTo(canceledGame.getAwayTeam().getTeamCode());
+            softAssertions.assertThat(actualGameResponse.awayTeam().score()).isNull();
+
+            softAssertions.assertThat(actualGameResponse.homeScoreBoard()).isNull();
+            softAssertions.assertThat(actualGameResponse.awayScoreBoard()).isNull();
+        });
     }
 
 
