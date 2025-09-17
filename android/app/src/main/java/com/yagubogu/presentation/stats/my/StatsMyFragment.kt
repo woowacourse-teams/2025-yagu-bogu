@@ -120,7 +120,7 @@ class StatsMyFragment : Fragment() {
             )
         binding.frameMyChartTooltip.setOnClickListener {
             myChartInfoBalloon.showAlignBottom(binding.ivWinRateTooltip)
-            firebaseAnalytics.logEvent("tooltip_victory_my_chart", null)
+            firebaseAnalytics.logEvent("tooltip_my_chart", null)
         }
 
         val luckyStadiumInfoBalloon =
