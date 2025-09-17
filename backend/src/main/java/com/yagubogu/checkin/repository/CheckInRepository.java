@@ -273,5 +273,4 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
     );
-
 }

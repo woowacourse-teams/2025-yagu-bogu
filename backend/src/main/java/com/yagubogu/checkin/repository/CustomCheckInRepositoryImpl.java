@@ -6,7 +6,6 @@ import com.yagubogu.checkin.domain.QCheckIn;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.domain.QMember;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,28 +48,25 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     private int conditionCount(final Member member, final int year, final BooleanExpression condition) {
-        QMember qMember = QMember.member;
         QCheckIn qCheckIn = QCheckIn.checkIn;
         QGame qGame = QGame.game;
 
-        BooleanExpression memberEq = qCheckIn.member.eq(member);
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
         Long result = jpaQueryFactory
-                .select(qCheckIn.count())
+                .select(qCheckIn.id.count())
                 .from(qCheckIn)
-                .join(qCheckIn.member, qMember)
                 .join(qCheckIn.game, qGame)
                 .where(
-                        memberEq,
+                        qCheckIn.member.eq(member),
                         qGame.date.between(start, end),
                         qGame.gameState.eq(GameState.COMPLETED),
                         condition
                 )
                 .fetchOne();
 
-        return result == null ? 0 : result.intValue();
+        return result.intValue();
     }
 
     private int conditionCountOnRecentGames(
@@ -82,7 +78,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QGame qGame = QGame.game;
 
         List<Long> recentGameIds = findRecentGameIds(member, year, RECENT_LIMIT);
-        System.out.println("recentGameIds: " + recentGameIds);
         if (recentGameIds.isEmpty()) {
             return 0;
         }
