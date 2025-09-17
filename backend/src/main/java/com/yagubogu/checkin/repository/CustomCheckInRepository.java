@@ -10,9 +10,9 @@ public interface CustomCheckInRepository {
 
     int findDrawCounts(Member member, final int year);
 
-    int findRecentTenGamesWinCounts(Member member, final int year);
+    int findRecentGamesWinCounts(Member member, final int year, final int limit);
 
-    int findRecentTenGamesLoseCounts(Member member, final int year);
+    int findRecentGamesLoseCounts(Member member, final int year, final int limit);
 
-    int findRecentTenGamesDrawCounts(Member member, final int year);
+    int findRecentGamesDrawCounts(Member member, final int year, final int limit);
 }

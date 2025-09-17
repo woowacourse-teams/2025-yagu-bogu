@@ -42,6 +42,8 @@ import org.springframework.context.annotation.Import;
 @DataJpaTest
 class StatServiceTest {
 
+    private final int RECENT_LIMIT = 10;
+
     private StatService statService;
 
     @Autowired
@@ -345,9 +347,9 @@ class StatServiceTest {
         }
 
         // when
-        int wins = checkInRepository.findRecentTenGamesWinCounts(member, 2025);
-        int loses = checkInRepository.findRecentTenGamesLoseCounts(member, 2025);
-        int draws = checkInRepository.findRecentTenGamesDrawCounts(member, 2025);
+        int wins = checkInRepository.findRecentGamesWinCounts(member, 2025, RECENT_LIMIT);
+        int loses = checkInRepository.findRecentGamesLoseCounts(member, 2025, RECENT_LIMIT);
+        int draws = checkInRepository.findRecentGamesDrawCounts(member, 2025, RECENT_LIMIT);
 
         // then
         assertSoftly(s -> {

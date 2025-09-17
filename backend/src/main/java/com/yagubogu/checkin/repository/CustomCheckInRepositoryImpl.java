@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
-    private static final int RECENT_LIMIT = 10;
-
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
@@ -33,18 +31,18 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
-    public int findRecentTenGamesWinCounts(final Member member, final int year) {
-        return conditionCountOnRecentGames(member, year, winCondition(QCheckIn.checkIn, QGame.game));
+    public int findRecentGamesWinCounts(final Member member, final int year, final int limit) {
+        return conditionCountOnRecentGames(member, year, winCondition(QCheckIn.checkIn, QGame.game), limit);
     }
 
     @Override
-    public int findRecentTenGamesLoseCounts(final Member member, final int year) {
-        return conditionCountOnRecentGames(member, year, loseCondition(QCheckIn.checkIn, QGame.game));
+    public int findRecentGamesLoseCounts(final Member member, final int year, final int limit) {
+        return conditionCountOnRecentGames(member, year, loseCondition(QCheckIn.checkIn, QGame.game), limit);
     }
 
     @Override
-    public int findRecentTenGamesDrawCounts(final Member member, final int year) {
-        return conditionCountOnRecentGames(member, year, drawCondition(QCheckIn.checkIn, QGame.game));
+    public int findRecentGamesDrawCounts(final Member member, final int year, final int limit) {
+        return conditionCountOnRecentGames(member, year, drawCondition(QCheckIn.checkIn, QGame.game), limit);
     }
 
     private int conditionCount(final Member member, final int year, final BooleanExpression condition) {
@@ -72,12 +70,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private int conditionCountOnRecentGames(
             final Member member,
             final int year,
-            final BooleanExpression condition
+            final BooleanExpression condition,
+            final int limit
     ) {
         QCheckIn qCheckIn = QCheckIn.checkIn;
         QGame qGame = QGame.game;
 
-        List<Long> recentGameIds = findRecentGameIds(member, year, RECENT_LIMIT);
+        List<Long> recentGameIds = findRecentGameIds(member, year, limit);
         if (recentGameIds.isEmpty()) {
             return 0;
         }

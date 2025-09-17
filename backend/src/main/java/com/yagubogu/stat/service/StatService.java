@@ -32,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StatService {
 
+    private static final int RECENT_LIMIT = 10;
+
     private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
                     OpponentWinRateTeamResponse::winRate)
             .reversed()
@@ -70,12 +72,12 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        int recentTenWinCounts = checkInRepository.findRecentTenGamesWinCounts(member, year);
-        int recentTenDrawCounts = checkInRepository.findRecentTenGamesDrawCounts(member, year);
-        int recentTenLoseCounts = checkInRepository.findRecentTenGamesLoseCounts(member, year);
-        int recentTenCounts = recentTenWinCounts + recentTenDrawCounts + recentTenLoseCounts;
+        int recentWinCounts = checkInRepository.findRecentGamesWinCounts(member, year, RECENT_LIMIT);
+        int recentDrawCounts = checkInRepository.findRecentGamesDrawCounts(member, year, RECENT_LIMIT);
+        int recentLoseCounts = checkInRepository.findRecentGamesLoseCounts(member, year, RECENT_LIMIT);
+        int recentCounts = recentWinCounts + recentDrawCounts + recentLoseCounts;
 
-        return new RecentGamesWinRateResponse(calculateWinRate(recentTenWinCounts, recentTenCounts));
+        return new RecentGamesWinRateResponse(calculateWinRate(recentWinCounts, recentCounts));
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
