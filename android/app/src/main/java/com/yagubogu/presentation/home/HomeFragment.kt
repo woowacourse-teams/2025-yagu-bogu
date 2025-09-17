@@ -280,7 +280,7 @@ class HomeFragment : Fragment() {
                 viewLifecycleOwner,
             )
         binding.frameStadiumStatsTooltip.setOnClickListener {
-            stadiumStatsInfoBalloon.showAlignBottom(binding.frameStadiumStatsTooltip)
+            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
             firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
         }
 
@@ -290,7 +290,7 @@ class HomeFragment : Fragment() {
                 viewLifecycleOwner,
             )
         binding.frameVictoryFairyRankingTooltip.setOnClickListener {
-            victoryFairyInfoBalloon.showAlignBottom(binding.frameVictoryFairyRankingTooltip)
+            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
             firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
         }
     }

@@ -195,6 +195,7 @@
                     app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title">
 
                     <ImageView
+                        android:id="@+id/iv_stadium_stats_tooltip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_info"
@@ -314,6 +315,7 @@
                     app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking">
 
                     <ImageView
+                        android:id="@+id/iv_victory_fairy_ranking_tooltip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_info"

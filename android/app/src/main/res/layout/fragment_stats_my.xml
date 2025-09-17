@@ -54,6 +54,7 @@
                     app:layout_constraintTop_toTopOf="@id/tv_my_chart_title">
 
                     <ImageView
+                        android:id="@+id/iv_win_rate_tooltip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_info"

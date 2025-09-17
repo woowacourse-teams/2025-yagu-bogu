@@ -119,7 +119,7 @@ class StatsMyFragment : Fragment() {
                 viewLifecycleOwner,
             )
         binding.frameMyChartTooltip.setOnClickListener {
-            myChartInfoBalloon.showAlignBottom(binding.frameMyChartTooltip)
+            myChartInfoBalloon.showAlignBottom(binding.ivWinRateTooltip)
             firebaseAnalytics.logEvent("tooltip_victory_my_chart", null)
         }
 
