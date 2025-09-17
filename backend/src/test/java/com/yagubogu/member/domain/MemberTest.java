@@ -16,7 +16,7 @@ class MemberTest {
         //given
         Team team = new Team("기아 타이거즈", "기아", "HT");
         Member member = new Member(team, "김도영", "email", OAuthProvider.GOOGLE, "sub",
-                role, "picture");
+                role, "picture", null);
 
         //when & then
         assertThat(member.isAdmin()).isEqualTo(expected);

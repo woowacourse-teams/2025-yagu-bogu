@@ -1,5 +1,7 @@
 package com.yagubogu.talk.service;
 
+import com.yagubogu.badge.BadgeEvent;
+import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.BadRequestException;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -36,6 +39,7 @@ public class TalkService {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
+    private final ApplicationEventPublisher publisher;
 
     public TalkCursorResult findTalksExcludingReported(
             final long gameId,
@@ -87,6 +91,7 @@ public class TalkService {
         validateBlockedFromGame(gameId, memberId);
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
+        publisher.publishEvent(new BadgeEvent(member, Policy.FIRST_CHAT));
 
         return TalkResponse.from(talk, memberId);
     }
@@ -104,7 +109,7 @@ public class TalkService {
         }
 
         if (isValidMemberId(memberId, talk)) {
-            throw new ForbiddenException("Invalid memberId for the talk");
+            throw new ForbiddenException("Invalid member for the talk");
         }
 
         talkRepository.delete(talk);

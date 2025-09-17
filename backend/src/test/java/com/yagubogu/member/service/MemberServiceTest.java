@@ -1,10 +1,13 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.domain.Policy;
+import com.yagubogu.badge.dto.BadgeListResponse;
+import com.yagubogu.badge.dto.BadgeResponse;
+import com.yagubogu.badge.dto.BadgeResponseWithAchievedRate;
+import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -14,16 +17,23 @@ import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -38,11 +48,20 @@ public class MemberServiceTest {
     private TeamRepository teamRepository;
 
     @Autowired
+    private BadgeRepository badgeRepository;
+
+    @Autowired
+    private MemberBadgeRepository memberBadgeRepository;
+
+    @Autowired
     private MemberFactory memberFactory;
+
+    @Autowired
+    private MemberBadgeFactory memberBadgeFactory;
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberService(memberRepository, teamRepository);
+        memberService = new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository);
     }
 
     @DisplayName("멤버가 응원하는 팀을 조회한다")
@@ -249,5 +268,59 @@ public class MemberServiceTest {
         assertThatThrownBy(() -> memberService.findMember(invalidMemberId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
+    }
+
+    @DisplayName("뱃지를 조회한다")
+    @Test
+    void findBadges() {
+        // given
+        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        long memberId = member.getId();
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
+        List<BadgeResponseWithAchievedRate> badgeResponses = List.of(
+                new BadgeResponseWithAchievedRate(
+                        new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
+                                Policy.SIGN_UP, 100.0, true, LocalDateTime.now()),
+                        100.0
+                ),
+                new BadgeResponseWithAchievedRate(
+                        new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
+                                Policy.FIRST_CHAT, null, false, null),
+                        0.0
+                )
+        );
+
+        BadgeListResponse expected = BadgeListResponse.from(member.getRepresentativeBadge(), badgeResponses);
+
+        // when
+        BadgeListResponse actual = memberService.findBadges(memberId);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.representativeBadge())
+                    .isEqualTo(expected.representativeBadge());
+            softAssertions.assertThat(actual.badges())
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("badgeInfo.achievedAt")
+                    .containsExactlyInAnyOrderElementsOf(expected.badges());
+        });
+    }
+
+    @DisplayName("대표 뱃지 수정한다")
+    @Test
+    void patchRepresentativeBadge() {
+        // given
+        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        memberBadgeFactory.save(builder ->
+                builder.member(member)
+                        .badge(badge)
+        );
+
+        // when
+        memberService.patchRepresentativeBadge(member.getId(), badge.getId());
+
+        // then
+        assertThat(member.getRepresentativeBadge()).isEqualTo(badge);
     }
 }

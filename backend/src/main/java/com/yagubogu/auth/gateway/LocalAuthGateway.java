@@ -4,6 +4,7 @@ import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class LocalAuthGateway implements AuthGateway {
     public AuthResponse validateToken(final LoginRequest loginRequest) {
         return new GoogleAuthResponse(
                 "accounts.google.com",
-                "local-sub-id",
+                UUID.randomUUID().toString(),
                 "azp",
                 googleAuthProperties.clientId(),
                 111L,

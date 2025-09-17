@@ -57,6 +57,6 @@ public record GoogleAuthResponse(
 
     @Override
     public Member toMember() {
-        return new Member(null, name, email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture);
+        return new Member(null, name, email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture, null);
     }
 }

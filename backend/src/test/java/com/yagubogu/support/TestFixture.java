@@ -1,9 +1,6 @@
 package com.yagubogu.support;
 
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.domain.OAuthProvider;
-import com.yagubogu.member.domain.Role;
 import com.yagubogu.team.domain.Team;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -46,11 +43,6 @@ public class TestFixture {
     public static ScoreBoard getAwayScoreBoardAbout(Integer runs) {
         return new ScoreBoard(runs, 10, 10, 10,
                 List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-"));
-    }
-
-    public static Member getUser(Team team) {
-        return new Member(team, "김도영", "email", OAuthProvider.GOOGLE, "sub", Role.USER,
-                "picture");
     }
 
     public static Team getTeam() {
