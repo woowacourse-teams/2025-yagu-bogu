@@ -60,6 +60,15 @@
                     tools:itemCount="5"
                     tools:listitem="@layout/item_vs_team_stat" />
 
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:onClick="@{() -> viewModel.toggleVsTeamStats()}"
+                    app:layout_constraintBottom_toBottomOf="@id/rv_vs_team_winning_percentage"
+                    app:layout_constraintEnd_toEndOf="@id/rv_vs_team_winning_percentage"
+                    app:layout_constraintStart_toStartOf="@id/rv_vs_team_winning_percentage"
+                    app:layout_constraintTop_toTopOf="@id/rv_vs_team_winning_percentage" />
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraint_show_more"
                     android:layout_width="match_parent"

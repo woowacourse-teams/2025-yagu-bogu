@@ -13,6 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.Priority
+import com.google.android.gms.location.SettingsClient
+import com.google.android.gms.tasks.Task
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -47,7 +55,6 @@ class HomeFragment : Fragment() {
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
-    private var checkInDialog: DefaultDialogFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +93,7 @@ class HomeFragment : Fragment() {
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                showCheckInConfirmDialog()
+                checkLocationSettingsThenShowDialog(requestLocationServices())
             } else {
                 requestLocationPermissions()
             }
@@ -160,7 +167,7 @@ class HomeFragment : Fragment() {
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> showCheckInConfirmDialog()
+                isPermissionGranted -> checkLocationSettingsThenShowDialog(requestLocationServices())
                 shouldShowRationale ->
                     binding.root.showSnackbar(
                         R.string.home_location_permission_denied_message,
@@ -212,18 +219,49 @@ class HomeFragment : Fragment() {
     }
 
     private fun showCheckInConfirmDialog() {
-        if (checkInDialog == null) {
+        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_REQUEST_DIALOG) == null) {
             val dialogUiModel =
                 DefaultDialogUiModel(
                     title = getString(R.string.home_check_in_confirm),
                     emoji = getString(R.string.home_check_in_stadium_emoji),
                     message = getString(R.string.home_check_in_caution),
                 )
-            checkInDialog =
+            val dialog =
                 DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
-        }
 
-        checkInDialog?.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+            dialog.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+        }
+    }
+
+    private fun requestLocationServices(): Task<LocationSettingsResponse> {
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
+
+        val locationSettingsRequestBuilder =
+            LocationSettingsRequest
+                .Builder()
+                .addLocationRequest(locationRequest)
+                .setAlwaysShow(true)
+
+        val settingsClient: SettingsClient = LocationServices.getSettingsClient(requireActivity())
+        return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
+    }
+
+    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse>) {
+        task
+            .addOnSuccessListener {
+                // 위치 설정이 활성화된 경우 직관 인증 확인 다이얼로그 표시
+                showCheckInConfirmDialog()
+            }.addOnFailureListener { exception ->
+                // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
+                if (exception is ResolvableApiException) {
+                    exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
+                } else {
+                    binding.root.showSnackbar(
+                        R.string.home_location_settings_disabled,
+                        R.id.bnv_navigation,
+                    )
+                }
+            }
     }
 
     companion object {
@@ -231,5 +269,6 @@ class HomeFragment : Fragment() {
         private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
+        private const val RC_LOCATION_SETTINGS = 1001
     }
 }
