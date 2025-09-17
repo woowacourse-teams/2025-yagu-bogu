@@ -40,9 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CheckInService {
 
-    private static final int NOT_FOUND = -1;
-    private static final int FOUND = 1;
     private static final int VICTORY_RANKING_LIMIT = 5;
+    private static final double ROUND_FACTOR = 10.0;
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -151,21 +150,22 @@ public class CheckInService {
                                                                     final double c) {
         List<VictoryFairyRank> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
                 VICTORY_RANKING_LIMIT);
-        double prev = -1.0;
+        double previousScore = -1.0;
         int ranking = 0;
         int count = 1;
         List<VictoryFairyRankingResponse> topRankingResponses = new ArrayList<>();
         for (VictoryFairyRank rank : topRanking) {
-            double cur = rank.score();
-            if (prev != cur) {
+            double currentScore = Math.round(rank.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR;
+            if (previousScore != currentScore) {
                 ranking += count;
                 count = 1;
             } else {
                 count++;
             }
+            double winPercent = Math.round(rank.winPercent() * ROUND_FACTOR) / ROUND_FACTOR;
             topRankingResponses.add(new VictoryFairyRankingResponse(ranking, rank.nickname(),
-                    rank.profileImageUrl(), rank.teamShortName(), rank.winPercent()));
-            prev = cur;
+                    rank.profileImageUrl(), rank.teamShortName(), winPercent, currentScore));
+            previousScore = currentScore;
         }
         return topRankingResponses;
     }
@@ -174,14 +174,18 @@ public class CheckInService {
                                                              final double m, final double c,
                                                              final Member member) {
         VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
-        int myRankingOrder = checkInRepository.calculateMyRankingOrder(myRanking.score(), m, c, year, teamFilter);
+        double score = Math.round(myRanking.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR;
+        int myRankingOrder = checkInRepository.calculateMyRankingOrder(score, m, c, year, teamFilter);
+        double winPercent = Math.round(myRanking.winPercent() * ROUND_FACTOR) / ROUND_FACTOR;
 
         return new VictoryFairyRankingResponse(
                 myRankingOrder,
                 myRanking.nickname(),
                 myRanking.profileImageUrl(),
                 myRanking.teamShortName(),
-                myRanking.winPercent());
+                winPercent,
+                score
+        );
     }
 
     private Stadium getStadiumById(final long stadiumId) {
@@ -212,6 +216,6 @@ public class CheckInService {
             return 0.0;
         }
 
-        return Math.round(((double) checkInCounts / total) * 1000) / 10.0;
+        return Math.round(((double) checkInCounts / total) * 1000) / ROUND_FACTOR;
     }
 }
