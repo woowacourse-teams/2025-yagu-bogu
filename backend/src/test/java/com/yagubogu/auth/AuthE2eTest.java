@@ -72,7 +72,6 @@ public class AuthE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.accessToken()).isNotNull();
             softAssertions.assertThat(actual.refreshToken()).isNotNull();
             softAssertions.assertThat(actual.isNew()).isTrue();
-            softAssertions.assertThat(actual.member().nickname()).matches("^[0-9a-fA-F\\-]{36}$");
         });
     }
 

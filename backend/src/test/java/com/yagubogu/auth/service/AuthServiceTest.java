@@ -82,7 +82,6 @@ class AuthServiceTest {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
-            softAssertions.assertThat(response.member().nickname()).matches("^[0-9a-fA-F\\-]{36}$");
         });
     }
 

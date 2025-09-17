@@ -204,7 +204,7 @@ public class MemberE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());

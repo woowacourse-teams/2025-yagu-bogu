@@ -15,6 +15,7 @@ import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -56,10 +57,10 @@ public class AuthService {
     }
 
     private Member createNewMember(final AuthResponse response) {
-        String randomNickname = UUID.randomUUID().toString();
+        String randomNickname = UUID.randomUUID().toString().substring(0, 15);
         Member newMember = new Member(
                 null,
-                randomNickname,
+                new Nickname(randomNickname),
                 response.email(),
                 OAuthProvider.GOOGLE,
                 response.oauthId(),

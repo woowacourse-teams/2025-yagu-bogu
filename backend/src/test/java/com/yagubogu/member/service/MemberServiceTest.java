@@ -230,7 +230,7 @@ public class MemberServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
@@ -248,7 +248,7 @@ public class MemberServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.favoriteTeam()).isNull();
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());

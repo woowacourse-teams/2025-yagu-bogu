@@ -15,7 +15,7 @@ public record MemberInfoResponse(
         Team team = member.getTeam();
         if (team == null) {
             return new MemberInfoResponse(
-                    member.getNickname(),
+                    member.getNickname().getValue(),
                     member.getCreatedAt().toLocalDate(),
                     null,
                     member.getImageUrl()
@@ -23,7 +23,7 @@ public record MemberInfoResponse(
         }
 
         return new MemberInfoResponse(
-                member.getNickname(),
+                member.getNickname().getValue(),
                 member.getCreatedAt().toLocalDate(),
                 member.getTeam().getShortName(),
                 member.getImageUrl()
