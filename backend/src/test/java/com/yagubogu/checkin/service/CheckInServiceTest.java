@@ -325,6 +325,32 @@ class CheckInServiceTest {
 
     }
 
+    @DisplayName("직관 인증 내역 중 취소된 내역도 반환한다")
+    @Test
+    void findCheckInWinHistory_returnsCanceledGames() {
+        // given
+        Member por = memberFactory.save(b -> b.team(kia).nickname("포르"));
+        long memberId = por.getId();
+        int year = 2025;
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+
+        CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
+        CheckInOrderFilter orderFilter = CheckInOrderFilter.OLDEST;
+
+        // 취소 경기 한개
+        Game canceledGame = gameFactory.save(
+                builder -> builder.gameState(GameState.CANCELED).awayTeam(kia).homeTeam(samsung)
+                        .stadium(stadiumJamsil).date(startDate));
+        checkInFactory.save(builder -> builder.team(kia).member(por).game(canceledGame));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
+
+        // then
+        assertThat(actual.checkInHistory().getFirst().awayTeam().code()).isEqualTo(kia.getTeamCode());
+    }
+
+
     @DisplayName("승리 요정 랭킹 조회 - 승률, 직관 횟수, 닉네임 순 정렬되어 반환된다")
     @Test
     void findVictoryFairyRankings() {

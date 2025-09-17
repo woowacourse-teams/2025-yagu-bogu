@@ -16,6 +16,7 @@ import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
+import com.yagubogu.game.domain.QScoreBoard;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.QStadium;
 import com.yagubogu.stadium.domain.Stadium;
@@ -65,7 +66,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 )
                 .fetchOne()
                 .intValue();
-
     }
 
     public int countWinsFavoriteTeamByStadiumAndMember(Stadium stadium, Member member, int year) {
@@ -101,7 +101,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .intValue();
     }
 
-    // 내 응원 팀 여부 관계 x(내가 인증한 경기는 모두 보여줌), 게임 완료 여부 관계 x(취소된 경기도 보여줌)
+    // 내 응원 팀 여부 관계 o, 게임 완료 여부 관계 x(취소된 경기도 보여줌)
     public List<CheckInGameResponse> findCheckInHistory(
             Member member,
             Team team,
@@ -114,8 +114,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QStadium stadium = QStadium.stadium;
         QTeam home = new QTeam("home");
         QTeam away = new QTeam("away");
+        QScoreBoard homeScoreBoard = new QScoreBoard("homeScoreBoard");
+        QScoreBoard awayScoreBoard = new QScoreBoard("awayScoreBoard");
 
-        BooleanExpression myTeamWin = getMyTeamWin(resultFilter, member, checkIn);
+        BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, member, checkIn);
         OrderSpecifier<LocalDate> order = getOrderByFilter(orderFilter, game);
         return jpaQueryFactory.select(Projections.constructor(
                         CheckInGameResponse.class,
@@ -131,10 +133,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(game.stadium, stadium)
                 .join(game.homeTeam, home)
                 .join(game.awayTeam, away)
+                .leftJoin(game.homeScoreBoard, homeScoreBoard)
+                .leftJoin(game.awayScoreBoard, awayScoreBoard)
                 .where(
                         checkIn.member.eq(member),
                         isBetweenYear(game, year),
-                        myTeamWin
+                        isMyCurrentFavorite(member, checkIn),
+                        myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
     }
@@ -219,7 +224,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 ).fetchOne();
     }
 
-    // 구장별 인증 횟수?
+    // 구장별 인증 횟수
     // 내가 응원하는 팀 o, 완료된 경기만 x
     public List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
             Member member,
@@ -316,12 +321,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return game.date.desc();
     }
 
-    private BooleanExpression getMyTeamWin(CheckInResultFilter resultFilter, Member member, QCheckIn checkIn) {
+    private BooleanExpression getMyTeamWinFilter(CheckInResultFilter resultFilter, Member member, QCheckIn checkIn) {
         if (resultFilter == CheckInResultFilter.ALL) {
             return null;
         }
-        return isMyCurrentFavorite(member, checkIn)
-                .and(winCondition(checkIn, checkIn.game));
+        return winCondition(checkIn, checkIn.game);
     }
 
 
@@ -330,7 +334,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 CheckInGameTeamResponse.class,
                 home.teamCode,
                 home.shortName,
-                g.homeScoreBoard.runs,
+                g.homeScore,
                 new CaseBuilder().when(home.eq(team)).then(true).otherwise(false),
                 g.homePitcher
         );
@@ -341,7 +345,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 CheckInGameTeamResponse.class,
                 away.teamCode,
                 away.shortName,
-                g.awayScoreBoard.runs,
+                g.awayScore,
                 new CaseBuilder().when(away.eq(team)).then(true).otherwise(false),
                 g.awayPitcher
         );

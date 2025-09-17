@@ -68,7 +68,7 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, stadiumRepository, teamRepository);
+        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
