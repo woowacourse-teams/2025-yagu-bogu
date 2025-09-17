@@ -51,9 +51,4 @@ public record GoogleAuthResponse(
                 locale
         );
     }
-//
-//    @Override
-//    public Member toMember() {
-//        return new Member(null, name, email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture);
-//    }
 }
