@@ -32,8 +32,6 @@ class LivetalkChatActivity : AppCompatActivity() {
         )
     }
 
-    private var talkDeleteDialog: DefaultDialogFragment? = null
-
     private var pendingDeleteMessageId: Long? = null
     private var pendingReportMessageId: Long? = null
 
@@ -56,18 +54,17 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun showTalkDeleteDialog() {
-        if (talkDeleteDialog == null) {
+        if (supportFragmentManager.findFragmentByTag(KEY_TALK_DELETE_DIALOG) == null) {
             val dialogUiModel =
                 DefaultDialogUiModel(
                     title = getString(R.string.livetalk_trash_btn),
                     message = getString(R.string.livetalk_trash_dialog_message),
                     positiveText = getString(R.string.livetalk_trash_btn),
                 )
-            talkDeleteDialog =
+            val dialog =
                 DefaultDialogFragment.newInstance(KEY_TALK_DELETE_DIALOG, dialogUiModel)
+            dialog.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
         }
-
-        talkDeleteDialog?.show(supportFragmentManager, KEY_TALK_DELETE_DIALOG)
     }
 
     private fun showTalkReportDialog(reportTalkNickName: String) {
