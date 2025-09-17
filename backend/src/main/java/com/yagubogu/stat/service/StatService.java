@@ -1,7 +1,6 @@
 package com.yagubogu.stat.service;
 
 import com.yagubogu.checkin.repository.CheckInRepository;
-import com.yagubogu.game.dto.RecentTenGamesWinRateResponse;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -14,6 +13,7 @@ import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
+import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
@@ -66,7 +66,7 @@ public class StatService {
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
     }
 
-    public RecentTenGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final int year) {
+    public RecentGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final int year) {
         Member member = getMember(memberId);
         validateUser(member);
 
@@ -75,7 +75,7 @@ public class StatService {
         int recentTenLoseCounts = checkInRepository.findRecentTenGamesLoseCounts(member, year);
         int recentTenCounts = recentTenWinCounts + recentTenDrawCounts + recentTenLoseCounts;
 
-        return new RecentTenGamesWinRateResponse(calculateWinRate(recentTenWinCounts, recentTenCounts));
+        return new RecentGamesWinRateResponse(calculateWinRate(recentTenWinCounts, recentTenCounts));
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {

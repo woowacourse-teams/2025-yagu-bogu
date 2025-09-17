@@ -1,10 +1,10 @@
 package com.yagubogu.stat.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.game.dto.RecentTenGamesWinRateResponse;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +52,7 @@ public interface StatControllerInterface {
             @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
     })
     @GetMapping("/win-rate/recent")
-    ResponseEntity<RecentTenGamesWinRateResponse> findRecentTenGamesWinRate(
+    ResponseEntity<RecentGamesWinRateResponse> findRecentTenGamesWinRate(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam int year
     );
