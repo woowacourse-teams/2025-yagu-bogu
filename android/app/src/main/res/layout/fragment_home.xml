@@ -13,6 +13,7 @@
     </data>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
