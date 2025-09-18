@@ -40,7 +40,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @return 전체 유저 평균 승률 (0.0 ~ 1.0). 인증이 없으면 0.5 기본값 반환
      */
     @Override
-    public double calculateTotalAverageWinRate(int year) {
+    public double calculateTotalAverageWinRate(final int year) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
@@ -73,7 +73,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @return 전체 유저 평균 직관 횟수 (0.0 이상)
      */
     @Override
-    public double calculateAverageCheckInCount(int year) {
+    public double calculateAverageCheckInCount(final int year) {
         // 전체 유저 직관 횟수
         Long totalCheckInCount = calculateTotalCheckInCount(year);
         // 직관을 간 유저 숫자
@@ -226,14 +226,14 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return game.gameState.eq(GameState.COMPLETED);
     }
 
-    private BooleanExpression isBetweenYear(QGame game, final int year) {
+    private BooleanExpression isBetweenYear(final QGame game, final int year) {
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
         return game.date.between(start, end);
     }
 
-    private BooleanExpression filterByTeam(final QTeam team, TeamFilter teamFilter) {
+    private BooleanExpression filterByTeam(final QTeam team, final TeamFilter teamFilter) {
         if (teamFilter == TeamFilter.ALL) {
             return Expressions.TRUE.isTrue();
         }
@@ -241,7 +241,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return team.teamCode.eq(teamFilter.name());
     }
 
-    private Long calculateTotalCheckInCount(int year) {
+    private Long calculateTotalCheckInCount(final int year) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;

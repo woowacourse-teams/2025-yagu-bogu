@@ -11,11 +11,9 @@ public interface CustomCheckInRepository {
 
     double calculateAverageCheckInCount(int year);
 
-    List<VictoryFairyRank> findTopVictoryRanking(double m, double c, int year, final TeamFilter teamFilter, int limit);
+    List<VictoryFairyRank> findTopVictoryRanking(double m, double c, int year, TeamFilter teamFilter, int limit);
 
-    VictoryFairyRank findMyRanking(final double m, final double c, final Member targetMember, final int year,
-                                   final TeamFilter teamFilter);
+    VictoryFairyRank findMyRanking(double m, double c, Member targetMember, final int year, TeamFilter teamFilter);
 
-    int calculateMyRankingOrder(final double targetScore, final double m, final double c, final int year,
-                                final TeamFilter teamFilter);
+    int calculateMyRankingOrder(double targetScore, double m, double c, int year, TeamFilter teamFilter);
 }
