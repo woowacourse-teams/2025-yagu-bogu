@@ -25,30 +25,57 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    /**
+     * m : 전체 유저 평균 승률
+     *
+     * 정의: 특정 연도의 모든 "완료된 경기" 기준으로,
+     *       각 유저의 인증(CheckIn) 중에서 승리한 횟수 / 전체 인증 횟수
+     *
+     * 계산식:
+     *   - 분자: 승리한 인증 수 (유저가 응원한 팀이 이긴 경우)
+     *   - 분모: 전체 인증 수
+     *   - 전체 유저를 합산하여 평균 승률을 반환
+     *
+     * @param year 기준 연도
+     * @return 전체 유저 평균 승률 (0.0 ~ 1.0). 인증이 없으면 0.5 기본값 반환
+     */
     @Override
-    // m : 전체 유저 평균 승롤 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
     public double calculateTotalAverageWinRate(int year) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
 
-        NumberExpression<Long> isWin = calculateWinCounts(checkIn, game);
+        NumberExpression<Long> w = calculateWinCounts(checkIn, game);
 
-        Tuple tuple = jpaQueryFactory.select(isWin.sum(), checkIn.count())
+        Tuple tuple = jpaQueryFactory.select(w, checkIn.count())
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(isFavoriteTeam(checkIn, member)).fetchOne();
+                .where(
+                        isFavoriteTeam(checkIn, member),
+                        isMemberNotDeleted(member)
+                ).fetchOne();
 
         long winCounts =
                 (tuple == null || tuple.get(0, Long.class) == null) ? 0L : tuple.get(0, Long.class).longValue();
         long totalCounts = (tuple == null || tuple.get(1, Long.class) == null) ? 0L : tuple.get(1, Long.class);
 
-        return (totalCounts == 0) ? 0.5 : (double) winCounts / totalCounts;
+        return (totalCounts == 0) ? 0.0 : (double) winCounts / totalCounts;
     }
 
+    /**
+     * c : 전체 유저 평균 직관 횟수
+     *
+     * 정의: 특정 연도의 총 직관(체크인) 횟수 / 직관에 참여한 유저 수
+     *
+     * 계산식:
+     *   - 분자: 해당 연도의 모든 인증 기록 수 (ΣN)
+     *   - 분모: 해당 연도에 한 번이라도 직관한 유저 수
+     *
+     * @param year 기준 연도
+     * @return 전체 유저 평균 직관 횟수 (0.0 이상)
+     */
     @Override
-    // c : 전체 유저 직관 횟수 평균
     public double calculateAverageCheckInCount(int year) {
         // 전체 유저 직관 횟수
         Long totalCheckInCount = calculateTotalCheckInCount(year);
@@ -58,6 +85,23 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return (perCheckInCount == 0) ? 0.0 : (double) totalCheckInCount / perCheckInCount;
     }
 
+    /**
+     * 전체 유저 중 "승리 요정 랭킹" 상위 N명을 조회
+     *
+     * - 베이즈 평균 공식을 기반으로 점수(score)를 계산
+     *   score = (W + C * m) / (N + C)
+     *     W: 개인 승리 횟수
+     *     N: 개인 직관 수
+     *     m: 전체 평균 승률
+     *     C: 전체 평균 직관 횟수
+     *
+     * @param m 전체 유저 평균 승률
+     * @param c 전체 유저 평균 직관 횟수
+     * @param year 기준 연도
+     * @param teamFilter 팀 필터(ALL 또는 특정 팀만 조회)
+     * @param limit 상위 N명 제한
+     * @return VictoryFairyRank DTO 리스트 (상위 랭킹)
+     */
     @Override
     public List<VictoryFairyRank> findTopVictoryRanking(final double m, final double c, final int year,
                                                         final TeamFilter teamFilter, final int limit) {
@@ -65,11 +109,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QGame game = QGame.game;
         QMember member = QMember.member;
 
-        NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
+        NumberExpression<Long> w = calculateWinCounts(checkIn, game);
         NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
+        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, total);
 
-        NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
+        NumberExpression<Double> calculatePercent = w.multiply(100.0).divide(total).doubleValue();
         NumberExpression<Double> safeWinPercent = getSafeWinPercent(total, calculatePercent);
 
         return jpaQueryFactory.select(
@@ -87,20 +131,29 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .orderBy(score.desc()).limit(limit).fetch();
     }
 
+    /**
+     * 특정 유저의 승리 요정 랭킹 점수 및 정보 조회
+     *
+     * @param m 전체 유저 평균 승률
+     * @param c 전체 유저 평균 직관 횟수
+     * @param targetMember 조회 대상 유저
+     * @param year 기준 연도
+     * @param teamFilter 팀 필터
+     * @return VictoryFairyRank DTO (단일 유저의 랭킹 정보)
+     */
     public VictoryFairyRank findMyRanking(final double m, final double c, final Member targetMember, final int year,
                                           final TeamFilter teamFilter) {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
 
-        // w: 개인의 승리 횟수
-        NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
-        NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
+        NumberExpression<Long> w = calculateWinCounts(checkIn, game);
+        NumberExpression<Long> n = calculateTotalCountsWithoutDraws(game);
+        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
 
-        NumberExpression<Double> calculatePercent = wins.sum().multiply(100.0).divide(total).doubleValue();
+        NumberExpression<Double> calculatePercent = w.multiply(100.0).divide(n).doubleValue();
 
-        NumberExpression<Double> safeWinPercent = getSafeWinPercent(total, calculatePercent);
+        NumberExpression<Double> safeWinPercent = getSafeWinPercent(n, calculatePercent);
 
         return jpaQueryFactory.select(
                         Projections.constructor(VictoryFairyRank.class, score, member.nickname, member.imageUrl,
@@ -117,6 +170,19 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetchOne();
     }
 
+    /**
+     * 특정 유저의 점수를 기준으로 "내 위에 몇 명이 있는지" 순위를 계산
+     *
+     * - targetScore보다 점수가 높은 유저 수를 계산하여,
+     *   "내 순위 = (해당 수 + 1)"로 환산 가능
+     *
+     * @param targetScore 조회 대상 유저의 베이즈 평균 점수
+     * @param m 전체 유저 평균 승률
+     * @param c 전체 유저 평균 직관 횟수
+     * @param year 기준 연도
+     * @param teamFilter 팀 필터
+     * @return 나보다 점수가 높은 유저 수 (즉, 내 순위 - 1)
+     */
     public int calculateMyRankingOrder(final double targetScore, final double m, final double c, final int year,
                                        final TeamFilter teamFilter) {
         QCheckIn checkIn = QCheckIn.checkIn;
@@ -124,10 +190,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QMember member = QMember.member;
         QTeam team = QTeam.team;
 
-        // w: 개인의 승리 횟수
-        NumberExpression<Long> wins = calculateWinCounts(checkIn, game);
-        NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, wins, total);
+        NumberExpression<Long> w = calculateWinCounts(checkIn, game);
+        NumberExpression<Long> n = calculateTotalCountsWithoutDraws(game);
+        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
 
         Expression<Double> myScore = Expressions.constant(targetScore);
         return jpaQueryFactory.selectOne()
@@ -155,7 +220,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
 
         return new CaseBuilder().when(denominator.ne(0.0))
-                .then(wins.sum().doubleValue().add(Expressions.constant(c * m)).divide(denominator))
+                .then(wins.doubleValue().add(Expressions.constant(c * m)).divide(denominator))
                 .otherwise(0.0);
     }
 
@@ -185,7 +250,12 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(checkIn.count()).from(checkIn).join(game).on(checkIn.game.eq(game)).join(member)
                 .on(checkIn.member.eq(member))
-                .where(isFinished(game), isBetweenYear(game, year), isFavoriteTeam(checkIn, member)).fetchOne();
+                .where(
+                        isFinished(game),
+                        isBetweenYear(game, year),
+                        isFavoriteTeam(checkIn, member),
+                        isMemberNotDeleted(member)
+                ).fetchOne();
     }
 
     private NumberExpression<Long> calculateWinCounts(final QCheckIn checkIn, final QGame game) {
@@ -194,7 +264,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .then(1L)
                 .when(checkIn.team.eq(game.awayTeam).and(game.awayScore.gt(game.homeScore)))
                 .then(1L)
-                .otherwise(0L);
+                .otherwise(0L)
+                .sum();
     }
 
     private NumberExpression<Long> calculateTotalCountsWithoutDraws(final QGame game) {
@@ -213,7 +284,12 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(checkIn)
                 .join(game).on(checkIn.game.eq(game))
                 .join(member).on(checkIn.member.eq(member))
-                .where(isFinished(game), isBetweenYear(game, year), isFavoriteTeam(checkIn, member))
+                .where(
+                        isFinished(game),
+                        isBetweenYear(game, year),
+                        isFavoriteTeam(checkIn, member),
+                        isMemberNotDeleted(member)
+                )
                 .fetchOne();
     }
 
