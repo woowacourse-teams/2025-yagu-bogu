@@ -129,6 +129,10 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.googleid)
 
+    // play in-app update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
