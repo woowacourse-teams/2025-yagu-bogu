@@ -64,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
     private val appUpdateResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
             if (shouldImmediateUpdate && result.resultCode != RESULT_OK) {
-                showToast("앱을 계속 사용하려면\n최신 버전으로 업데이트 해주세요", true)
+                showToast(getString(R.string.login_should_immediate_update_message), true)
                 finish()
             }
         }
@@ -156,7 +156,7 @@ class LoginActivity : AppCompatActivity() {
                 // 이미 업데이트가 다운로드 완료된 상태라면 설치를 완료하도록 요청
                 if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
                     appUpdateManager.completeUpdate()
-                    showToast("업데이트 중이에요! ⚾", true)
+                    showToast(getString(R.string.login_complete_update_message), true)
                 }
 
                 // 스토어에서 제공되는 최신 앱 버전 코드
