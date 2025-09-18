@@ -277,9 +277,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         NumberExpression<Integer> drawExpr =
                 new CaseBuilder()
-                        .when(hasCheckIn
-                                .and(game.homeScore.eq(game.awayScore))
-                        ).then(1)
+                        .when(hasCheckIn.and(game.homeScore.eq(game.awayScore)))
+                        .then(1)
                         .otherwise(0);
 
         BooleanExpression gameOnOpponent =
