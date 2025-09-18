@@ -61,9 +61,8 @@ public class StatService {
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
-        int drawCounts = checkInRepository.findDrawCounts(member, year);
         int loseCounts = checkInRepository.findLoseCounts(member, year);
-        int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
+        int favoriteCheckInCounts = winCounts + loseCounts;
 
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
     }

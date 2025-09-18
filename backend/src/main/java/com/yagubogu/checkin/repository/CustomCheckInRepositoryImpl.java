@@ -76,7 +76,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QCheckIn qCheckIn = QCheckIn.checkIn;
         QGame qGame = QGame.game;
 
-        List<Long> recentGameIds = findRecentGameIds(member, year, limit);
+        List<Long> recentGameIds = findRecentGameIdsByYear(member, year, limit);
         if (recentGameIds.isEmpty()) {
             return 0;
         }
@@ -95,7 +95,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return result == null ? 0 : result.intValue();
     }
 
-    private List<Long> findRecentGameIds(final Member member, final int year, final int limit) {
+    private List<Long> findRecentGameIdsByYear(final Member member, final int year, final int limit) {
         QCheckIn qCheckIn = QCheckIn.checkIn;
         QGame qGame = QGame.game;
 
