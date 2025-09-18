@@ -3,6 +3,7 @@ package com.yagubogu.stadium.service;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.dto.StadiumsResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,8 @@ public class StadiumService {
 
     private final StadiumRepository stadiumRepository;
 
-    public StadiumsResponse findAll() {
-        List<Stadium> stadiums = stadiumRepository.findAll();
+    public StadiumsResponse findStadiumsWithGame() {
+        List<Stadium> stadiums = stadiumRepository.findStadiumsByGameDate(LocalDate.now());
 
         return StadiumsResponse.from(stadiums);
     }

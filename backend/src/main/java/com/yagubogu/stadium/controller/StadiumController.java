@@ -13,7 +13,7 @@ public class StadiumController implements StadiumControllerInterface {
     private final StadiumService stadiumService;
 
     public ResponseEntity<StadiumsResponse> findStadiums() {
-        StadiumsResponse response = stadiumService.findAll();
+        StadiumsResponse response = stadiumService.findStadiumsWithGame();
         return ResponseEntity.ok(response);
     }
 }
