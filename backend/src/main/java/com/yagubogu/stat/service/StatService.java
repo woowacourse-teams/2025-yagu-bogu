@@ -72,9 +72,8 @@ public class StatService {
         validateUser(member);
 
         int recentWinCounts = checkInRepository.findRecentGamesWinCounts(member, year, RECENT_LIMIT);
-        int recentDrawCounts = checkInRepository.findRecentGamesDrawCounts(member, year, RECENT_LIMIT);
         int recentLoseCounts = checkInRepository.findRecentGamesLoseCounts(member, year, RECENT_LIMIT);
-        int recentCounts = recentWinCounts + recentDrawCounts + recentLoseCounts;
+        int recentCounts = recentWinCounts + recentLoseCounts;
 
         return new RecentGamesWinRateResponse(calculateWinRate(recentWinCounts, recentCounts));
     }
