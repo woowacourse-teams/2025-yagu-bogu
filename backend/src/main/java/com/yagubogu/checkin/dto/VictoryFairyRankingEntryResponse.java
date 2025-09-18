@@ -14,7 +14,7 @@ public record VictoryFairyRankingEntryResponse(
     public static VictoryFairyRankingEntryResponse generateEmptyRankingFor(final Member member) {
         return new VictoryFairyRankingEntryResponse(
                 member.getId(),
-                member.getNickname(),
+                member.getNickname().getValue(),
                 member.getImageUrl(),
                 member.getTeam().getShortName(),
                 0L,

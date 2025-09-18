@@ -1,11 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -48,6 +42,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -409,7 +409,7 @@ class CheckInServiceTest {
         // then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(0);
-            softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(fora.getNickname());
+            softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(fora.getNickname().getValue());
             softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(fora.getTeam().getShortName());
             softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
         });
