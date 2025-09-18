@@ -16,6 +16,31 @@ spring:
       - classpath:db/migration/mysql
     validate-on-migrate: true
 
+  datasource:
+    hikari:
+      maximumPoolSize: 16
+      minimumIdle: 16
+      connectionTimeout: 5000
+      idleTimeout: 0
+      maxLifetime: 1500000
+      validationTimeout: 1000
+      poolName: main-hikari-pool
+
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 4
+        queue-capacity: 200
+      thread-name-prefix: app-async-
+
+server:
+  tomcat:
+    threads:
+      max: 80
+      min-spare: 16
+    accept-count: 200
+
 oauth:
   google:
     base-uri: 'https://oauth2.googleapis.com'
