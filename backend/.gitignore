@@ -1,9 +1,12 @@
-.idea/
+.idea
 ### Java ###
 # Compiled class file
 *.class
 
-backend/.env
+.env
+build
+bin
+.gradle
 
 # Log file
 *.log
