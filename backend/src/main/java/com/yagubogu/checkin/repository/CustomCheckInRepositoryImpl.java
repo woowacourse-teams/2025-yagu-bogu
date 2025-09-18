@@ -289,9 +289,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 ).or(myAway.and(game.homeTeam.id.eq(opponentTeam.id)))
                         );
 
-        BooleanExpression checkInFilter =
-                checkIn.member.eq(member)
-                        .and(checkIn.team.eq(team));
+        BooleanExpression checkInFilter = checkIn.member.eq(member).and(checkIn.team.eq(team));
 
         return jpaQueryFactory
                 .select(Projections.constructor(
