@@ -305,10 +305,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         drawExpr.sum().coalesce(0)
                 ))
                 .from(opponentTeam)
+                .leftJoin(game).on(gameOnOpponent)
                 .leftJoin(checkIn).on(checkIn.game.eq(game).and(checkInFilter))
-                .leftJoin(game).on(gameOnOpponent
-                        .and(checkIn.game.eq(game))
-                ).where(opponentTeam.ne(team))
+                .where(opponentTeam.ne(team))
                 .groupBy(opponentTeam.id, opponentTeam.name, opponentTeam.shortName, opponentTeam.teamCode)
                 .fetch();
     }
