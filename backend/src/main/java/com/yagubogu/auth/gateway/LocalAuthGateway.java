@@ -20,7 +20,7 @@ public class LocalAuthGateway implements AuthGateway {
     public AuthResponse validateToken(final LoginRequest loginRequest) {
         return new GoogleAuthResponse(
                 "accounts.google.com",
-                UUID.randomUUID().toString(),
+                "local-sub-id",
                 "azp",
                 googleAuthProperties.clientId(),
                 111L,
