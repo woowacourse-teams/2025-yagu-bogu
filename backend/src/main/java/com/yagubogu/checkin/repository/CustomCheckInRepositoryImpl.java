@@ -285,8 +285,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 game.gameState.eq(GameState.COMPLETED)
                         .and(isBetweenYear(game, year))
                         .and(
-                                myHome.and(game.awayTeam.id.eq(opponentTeam.id))
-                                        .or(myAway.and(game.homeTeam.id.eq(opponentTeam.id)))
+                                myHome.and(game.awayTeam.id.eq(opponentTeam.id)
+                                ).or(myAway.and(game.homeTeam.id.eq(opponentTeam.id)))
                         );
 
         BooleanExpression checkInFilter =
