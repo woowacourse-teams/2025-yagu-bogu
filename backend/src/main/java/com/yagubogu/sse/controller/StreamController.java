@@ -1,5 +1,6 @@
 package com.yagubogu.sse.controller;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.sse.service.SseEmitterService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class StreamController {
 
     private final SseEmitterService sseEmitterService;
 
+    @RequireRole
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter getEventStream(HttpServletResponse response) {
         // 캐싱 방지
