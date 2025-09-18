@@ -198,6 +198,7 @@ class LoginActivity : AppCompatActivity() {
                     InAppUpdateType.NONE -> shouldImmediateUpdate = false
                 }
             }.addOnFailureListener {
+                shouldImmediateUpdate = false
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
             }
     }
