@@ -21,6 +21,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -41,6 +42,7 @@ class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
+    private var shouldImmediateUpdate: Boolean = true
     private var isAppInitialized: Boolean = false
 
     private val viewModel: LoginViewModel by viewModels {
@@ -56,21 +58,21 @@ class LoginActivity : AppCompatActivity() {
     }
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
+    // 인앱 업데이트 요청 후 결과를 처리하기 위한 ActivityResultLauncher
+    // - StartIntentSenderForResult() : 인앱 업데이트 플로우 실행 후 결과를 콜백으로 받음
+    // - shouldImmediateUpdate = true 인 경우, 업데이트를 완료하지 않으면 앱을 종료하도록 처리
     private val appUpdateResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-            // handle callback
-            if (result.resultCode != RESULT_OK) {
-                showToast("결과 받음 ${result.resultCode}")
-                Timber.d("Update flow failed! Result code: " + result.resultCode)
-                // If the update is canceled or fails,
-                // you can request to start the update again.
+            if (shouldImmediateUpdate && result.resultCode != RESULT_OK) {
+                showToast("앱을 계속 사용하려면\n최신 버전으로 업데이트 해주세요", true)
+                finish()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         super.onCreate(savedInstanceState)
-        checkInAppUpdate()
+        handleInAppUpdate()
         handleAutoLogin()
         setupView()
         setupBindings()
@@ -78,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupSplash() {
         val splashScreen: SplashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isAppInitialized }
+        splashScreen.setKeepOnScreenCondition { shouldImmediateUpdate || !isAppInitialized }
     }
 
     private fun handleAutoLogin() {
@@ -144,28 +146,33 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun checkInAppUpdate() {
+    private fun handleInAppUpdate() {
         val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
 
-        // Returns an intent object that you use to check for an update.
         val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
 
-        // Checks whether the platform allows the specified type of update,
-        // and current version staleness.
         appUpdateInfoTask
             .addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
+                // 이미 업데이트가 다운로드 완료된 상태라면 설치를 완료하도록 요청
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    appUpdateManager.completeUpdate()
+                    showToast("업데이트 중이에요! ⚾", true)
+                }
+
+                // 스토어에서 제공되는 최신 앱 버전 코드
                 val availableVersionCode: Int = appUpdateInfo.availableVersionCode()
                 val availableVersionInfo = VersionInfo.of(availableVersionCode)
-                showToast("$availableVersionCode, $availableVersionInfo")
-                Timber.d("성공, 스토어 버전 : $availableVersionCode")
 
+                // 현재 앱의 버전 코드
                 val currentVersionCode: Int = BuildConfig.VERSION_CODE
                 val currentVersionInfo = VersionInfo.of(currentVersionCode)
-                Timber.d("현재 버전 : $currentVersionCode")
 
-                val inAppUpdateType = InAppUpdateType.determine(currentVersionInfo, availableVersionInfo)
+                // 현재 버전과 최신 버전을 비교해 업데이트 타입 결정
+                val inAppUpdateType =
+                    InAppUpdateType.determine(currentVersionInfo, availableVersionInfo)
 
                 when (inAppUpdateType) {
+                    // 강제 업데이트가 필요한 경우
                     InAppUpdateType.IMMEDIATE -> {
                         appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
@@ -176,7 +183,9 @@ class LoginActivity : AppCompatActivity() {
                         )
                     }
 
+                    // 권장 업데이트 (사용자가 원할 때 업데이트 가능)
                     InAppUpdateType.FLEXIBLE -> {
+                        shouldImmediateUpdate = false
                         appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
                             appUpdateResultLauncher,
@@ -186,7 +195,7 @@ class LoginActivity : AppCompatActivity() {
                         )
                     }
 
-                    InAppUpdateType.NONE -> Unit
+                    InAppUpdateType.NONE -> shouldImmediateUpdate = false
                 }
             }.addOnFailureListener {
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
