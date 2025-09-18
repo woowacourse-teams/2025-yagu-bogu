@@ -98,8 +98,13 @@ public class CheckInService {
     ) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
-        List<CheckInGameResponse> checkIns = checkInRepository.findCheckInHistory(member, team, year,
-                resultFilter, orderFilter);
+        List<CheckInGameResponse> checkIns = checkInRepository.findCheckInHistory(
+                member,
+                team,
+                year,
+                resultFilter,
+                orderFilter
+        );
 
         return new CheckInHistoryResponse(checkIns);
     }
