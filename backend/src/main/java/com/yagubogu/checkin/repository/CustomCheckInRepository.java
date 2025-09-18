@@ -15,11 +15,11 @@ import java.util.List;
 
 public interface CustomCheckInRepository {
 
-    int findWinCounts(Member member, final int year);
+    int findWinCounts(Member member, int year);
 
-    int findLoseCounts(Member member, final int year);
+    int findLoseCounts(Member member, int year);
 
-    int findDrawCounts(Member member, final int year);
+    int findDrawCounts(Member member, int year);
 
     int countTotalFavoriteTeamGamesByStadiumAndMember(Stadium stadium, Member member, int year);
 
@@ -27,9 +27,13 @@ public interface CustomCheckInRepository {
 
     int countByMemberAndYear(Member member, int year);
 
-    List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year,
-                                                 final CheckInResultFilter resultFilter,
-                                                 final CheckInOrderFilter orderFilter);
+    List<CheckInGameResponse> findCheckInHistory(
+            Member member,
+            Team team,
+            int year,
+            CheckInResultFilter resultFilter,
+            CheckInOrderFilter orderFilter
+    );
 
     List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date);
 
