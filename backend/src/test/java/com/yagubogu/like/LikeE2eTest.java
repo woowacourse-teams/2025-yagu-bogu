@@ -6,21 +6,26 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.like.dto.LikeBatchRequest;
+import com.yagubogu.like.dto.LikeBatchRequest.LikeDelta;
+import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.game.GameFactory;
+import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class LikeE2eTest extends E2eTestBase {
@@ -36,6 +41,14 @@ public class LikeE2eTest extends E2eTestBase {
 
     @Autowired
     private GameFactory gameFactory;
+
+    @Autowired
+    private MemberFactory memberFactory;
+
+    @Autowired
+    private AuthFactory authFactory;
+
+    private String accessToken;
 
     @BeforeEach
     void setUp() {
@@ -53,10 +66,13 @@ public class LikeE2eTest extends E2eTestBase {
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)
                 .stadium(stadium));
+        Member member = memberFactory.save(b -> b.team(homeTeam));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("gameId", game.getId())
                 .when()
                 .get("/api/games/{gameId}/likes/counts")
@@ -77,18 +93,18 @@ public class LikeE2eTest extends E2eTestBase {
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)
                 .stadium(stadium));
+        Member member = memberFactory.save(b -> b.team(homeTeam));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         LikeBatchRequest request = new LikeBatchRequest(
                 "test-client-1",
                 1L,
-                List.of(
-                        new LikeBatchRequest.Entry(homeTeam.getId(), 3),
-                        new LikeBatchRequest.Entry(awayTeam.getId(), 2)
-                )
+                new LikeDelta(homeTeam.getId(), 3)
         );
 
         // when & then
         RestAssured.given().log().all()
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(ContentType.JSON)
                 .pathParam("gameId", game.getId())
                 .body(request)
@@ -97,8 +113,7 @@ public class LikeE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .body("gameId", is(game.getId().intValue()))
-                .body("counts.%s".formatted(homeTeam.getId()), is(3))
-                .body("counts.%s".formatted(awayTeam.getId()), is(2));
+                .body("counts.find {it.teamId == %s }.totalCount".formatted(homeTeam.getId()), is(3));
     }
 }
 

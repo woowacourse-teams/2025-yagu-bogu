@@ -1,9 +1,9 @@
 package com.yagubogu.like.dto;
 
-import java.util.Map;
+import java.util.List;
 
 public record LikeCountsResponse(
         long gameId,
-        Map<Long, Long> counts
+        List<TeamLikeCountResponse> counts
 ) {
 }

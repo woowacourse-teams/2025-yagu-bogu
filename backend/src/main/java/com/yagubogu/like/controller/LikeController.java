@@ -1,5 +1,6 @@
 package com.yagubogu.like.controller;
 
+import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.like.dto.LikeBatchRequest;
 import com.yagubogu.like.dto.LikeCountsResponse;
 import com.yagubogu.like.service.LikeService;
@@ -21,8 +22,8 @@ public class LikeController {
 
     @PostMapping("/{gameId}/likes/batch")
     public ResponseEntity<LikeCountsResponse> applyLikeBatch(
-            @PathVariable long gameId,
-            @RequestBody LikeBatchRequest body
+            @PathVariable final long gameId,
+            @RequestBody final LikeBatchRequest body
     ) {
         LikeCountsResponse response = likeService.applyBatch(gameId, body);
 
@@ -30,8 +31,11 @@ public class LikeController {
     }
 
     @GetMapping("/{gameId}/likes/counts")
-    public ResponseEntity<LikeCountsResponse> findLikeCounts(@PathVariable long gameId) {
-        LikeCountsResponse response = likeService.findCounts(gameId);
+    public ResponseEntity<LikeCountsResponse> findLikeCounts(
+            final MemberClaims memberClaims,
+            @PathVariable final long gameId
+    ) {
+        LikeCountsResponse response = likeService.findCounts(gameId, memberClaims.id());
 
         return ResponseEntity.ok(response);
     }

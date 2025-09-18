@@ -1,6 +1,7 @@
 package com.yagubogu.like.repository;
 
 import com.yagubogu.like.domain.Like;
+import com.yagubogu.like.dto.TeamLikeCountResponse;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,4 +18,14 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     int upsertDelta(long gameId, long teamId, long delta);
 
     List<Like> findAllByGameId(long gameId);
+
+    @Query("""
+                select new com.yagubogu.like.dto.TeamLikeCountResponse(
+                    l.team.id,
+                    l.totalCount
+                )
+                from Like l
+                where l.game.id = :gameId
+            """)
+    List<TeamLikeCountResponse> findTeamCountsByGameId(Long gameId);
 }
