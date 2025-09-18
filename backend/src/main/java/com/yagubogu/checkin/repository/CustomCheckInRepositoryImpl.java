@@ -218,9 +218,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                                               final NumberExpression<Long> wins,
                                                               final NumberExpression<Long> total) {
         NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
+        NumberExpression<Double> numerator = wins.doubleValue().add(Expressions.constant(c * m));
 
         return new CaseBuilder().when(denominator.ne(0.0))
-                .then(wins.doubleValue().add(Expressions.constant(c * m)).divide(denominator))
+                .then(numerator.divide(denominator))
                 .otherwise(0.0);
     }
 
