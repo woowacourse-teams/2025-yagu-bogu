@@ -99,7 +99,7 @@ public class LikeE2eTest extends E2eTestBase {
         LikeBatchRequest request = new LikeBatchRequest(
                 "test-client-1",
                 1L,
-                new LikeDelta(homeTeam.getId(), 3)
+                new LikeDelta(homeTeam.getId(), 3L)
         );
 
         // when & then
@@ -111,9 +111,7 @@ public class LikeE2eTest extends E2eTestBase {
                 .when()
                 .post("/api/games/{gameId}/likes/batch")
                 .then().log().all()
-                .statusCode(200)
-                .body("gameId", is(game.getId().intValue()))
-                .body("counts.find {it.teamId == %s }.totalCount".formatted(homeTeam.getId()), is(3));
+                .statusCode(204);
     }
 }
 

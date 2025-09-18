@@ -36,7 +36,7 @@ public class Like {
     @Column(name = "total_count", nullable = false)
     private long totalCount = 0L;
 
-    public Like(Game game, Team team) {
+    public Like(final Game game, final Team team) {
         this.game = game;
         this.team = team;
     }

@@ -3,7 +3,6 @@ package com.yagubogu.like.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
-import com.yagubogu.like.domain.Like;
 import com.yagubogu.like.dto.LikeBatchRequest;
 import com.yagubogu.like.dto.LikeBatchRequest.LikeDelta;
 import com.yagubogu.like.dto.LikeCountsResponse;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class LikeService {
 
@@ -27,7 +27,7 @@ public class LikeService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public LikeCountsResponse applyBatch(
+    public void applyBatch(
             final long gameId,
             final LikeBatchRequest request
     ) {
@@ -40,34 +40,18 @@ public class LikeService {
                 request.windowStartEpochSec()
         );
         if (!inserted) {
-            return buildCountsResponse(gameId);
+            return;
         }
 
         LikeDelta likeDelta = request.likeDelta();
-        likeRepository.upsertDelta(gameId, likeDelta.teamId(), likeDelta.delta().longValue());
-
-        return buildCountsResponse(gameId);
+        likeRepository.upsertDelta(gameId, likeDelta.teamId(), likeDelta.delta());
     }
 
-    @Transactional(readOnly = true)
     public LikeCountsResponse findCounts(final long gameId, final long memberId) {
         Game game = getGame(gameId);
         Member member = getMember(memberId);
 
         List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
-
-        return new LikeCountsResponse(gameId, teamLikeCounts);
-    }
-
-    private LikeCountsResponse buildCountsResponse(final long gameId) {
-        List<Like> rows = likeRepository.findAllByGameId(gameId);
-
-        List<TeamLikeCountResponse> teamLikeCounts = rows.stream()
-                .map(like -> new TeamLikeCountResponse(
-                        like.getTeam().getId(),
-                        like.getTotalCount()
-                ))
-                .toList();
 
         return new LikeCountsResponse(gameId, teamLikeCounts);
     }
