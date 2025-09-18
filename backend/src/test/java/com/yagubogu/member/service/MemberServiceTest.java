@@ -1,9 +1,14 @@
 package com.yagubogu.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
@@ -21,10 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -120,6 +121,21 @@ public class MemberServiceTest {
         assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
                 .isExactlyInstanceOf(ConflictException.class)
                 .hasMessage("Nickname already exists: " + existNickname);
+    }
+
+    @DisplayName("예외: 닉네임 수정 시 최대 길이를 초과하면 예외가 발생한다")
+    @Test
+    void patchNickname_nickNameTooLong() {
+        // given
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+
+        String longNickName = "1234567890123";
+        MemberNicknameRequest request = new MemberNicknameRequest(longNickName);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
+                .isExactlyInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("Nickname must be " + 12 + " characters or fewer.");
     }
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다")

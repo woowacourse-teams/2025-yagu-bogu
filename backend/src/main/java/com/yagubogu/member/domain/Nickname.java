@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Nickname {
 
-    private static final int MAX_LENGTH = 15;
+    private static final int MAX_LENGTH = 12;
 
     @Column(name = "nickname", unique = true, nullable = false, length = MAX_LENGTH)
     private String value;
@@ -26,6 +26,7 @@ public class Nickname {
         if (value == null || value.isBlank()) {
             throw new UnprocessableEntityException("Nickname must not be empty.");
         }
+        System.out.println(value);
         if (value.length() > MAX_LENGTH) {
             throw new UnprocessableEntityException("Nickname must be " + MAX_LENGTH + " characters or fewer.");
         }

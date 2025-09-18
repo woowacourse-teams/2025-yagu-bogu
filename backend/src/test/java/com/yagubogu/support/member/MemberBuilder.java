@@ -10,7 +10,7 @@ import java.util.UUID;
 public class MemberBuilder {
 
     private Team team;
-    private Nickname nickname = new Nickname(UUID.randomUUID().toString().substring(0, 15));
+    private Nickname nickname = new Nickname(UUID.randomUUID().toString().substring(0, 10));
     private String email = UUID.randomUUID() + "email@gmail.com";
     private OAuthProvider provider = OAuthProvider.GOOGLE;
     private String oauthId = UUID.randomUUID().toString();

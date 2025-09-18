@@ -1,5 +1,8 @@
 package com.yagubogu.member;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -24,9 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class MemberE2eTest extends E2eTestBase {
@@ -134,6 +134,25 @@ public class MemberE2eTest extends E2eTestBase {
                 .when().patch("/api/members/me/nickname")
                 .then().log().all()
                 .statusCode(409);
+    }
+
+    @DisplayName("예외: 닉네임 수정 시 길이 제한을 초과하면 422 상태를 반환한다")
+    @Test
+    void patchNickname_nickNameTooLongReturn422Status() {
+        // given
+        Member member2 = memberFactory.save(builder -> builder.nickname("우가"));
+        String longNickName = "1234567890123";
+
+        String accessToken = authFactory.getAccessTokenByMemberId(member2.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new MemberNicknameRequest(longNickName))
+                .when().patch("/api/members/me/nickname")
+                .then().log().all()
+                .statusCode(422);
     }
 
     @DisplayName("회원 탈퇴한다")

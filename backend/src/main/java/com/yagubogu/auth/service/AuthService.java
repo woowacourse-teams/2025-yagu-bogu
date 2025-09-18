@@ -57,7 +57,7 @@ public class AuthService {
     }
 
     private Member saveMember(final AuthResponse response) {
-        String randomNickname = UUID.randomUUID().toString().substring(0, 15);
+        String randomNickname = UUID.randomUUID().toString().substring(0, 12);
         Member newMember = new Member(
                 null,
                 new Nickname(randomNickname),
