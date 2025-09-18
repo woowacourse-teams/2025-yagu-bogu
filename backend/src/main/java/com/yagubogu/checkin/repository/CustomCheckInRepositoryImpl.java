@@ -49,12 +49,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         Tuple tuple = jpaQueryFactory.select(w, checkIn.count())
                 .from(member)
-                .leftJoin(checkIn).on(checkIn.member.eq(member))
+                .leftJoin(checkIn).on(checkIn.member.eq(member), isFavoriteTeam(checkIn, member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(
-                        isFavoriteTeam(checkIn, member),
-                        isMemberNotDeleted(member)
-                ).fetchOne();
+                .where(isMemberNotDeleted(member)).fetchOne();
 
         long winCounts =
                 (tuple == null || tuple.get(0, Long.class) == null) ? 0L : tuple.get(0, Long.class).longValue();
@@ -108,6 +105,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
+        QTeam team = QTeam.team;
 
         NumberExpression<Long> w = calculateWinCounts(checkIn, game);
         NumberExpression<Long> total = calculateTotalCountsWithoutDraws(game);
@@ -123,10 +121,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
-                .where(
-                        filterByTeam(member.team, teamFilter),
-                        isMemberNotDeleted(member)
-                )
+                .leftJoin(team).on(member.team.eq(team), filterByTeam(team, teamFilter))
+                .where(isMemberNotDeleted(member))
                 .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
                 .orderBy(score.desc()).limit(limit).fetch();
     }
@@ -146,6 +142,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QCheckIn checkIn = QCheckIn.checkIn;
         QGame game = QGame.game;
         QMember member = QMember.member;
+        QTeam team = QTeam.team;
 
         NumberExpression<Long> w = calculateWinCounts(checkIn, game);
         NumberExpression<Long> n = calculateTotalCountsWithoutDraws(game);
@@ -161,9 +158,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
                 .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .leftJoin(team).on(member.team.eq(team), filterByTeam(team, teamFilter))
                 .where(
                         member.eq(targetMember),
-                        filterByTeam(member.team, teamFilter),
                         isMemberNotDeleted(member)
                 )
                 .groupBy(member.id, member.nickname, member.imageUrl, member.team.shortName)
@@ -198,8 +195,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.selectOne()
                 .from(member)
                 .leftJoin(checkIn).on(checkIn.member.eq(member))
-                .leftJoin(game).on(checkIn.game.eq(game))
-                .where(isFinished(game), isBetweenYear(game, year), filterByTeam(team, teamFilter))
+                .leftJoin(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .leftJoin(team).on(checkIn.team.eq(team), filterByTeam(team, teamFilter))
                 .groupBy(member)
                 .having(score.gt(myScore))
                 .fetch().size();
@@ -249,14 +246,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QGame game = QGame.game;
         QMember member = QMember.member;
 
-        return jpaQueryFactory.select(checkIn.count()).from(checkIn).join(game).on(checkIn.game.eq(game)).join(member)
-                .on(checkIn.member.eq(member))
-                .where(
-                        isFinished(game),
-                        isBetweenYear(game, year),
-                        isFavoriteTeam(checkIn, member),
-                        isMemberNotDeleted(member)
-                ).fetchOne();
+        return jpaQueryFactory.select(checkIn.count())
+                .from(checkIn)
+                .join(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .join(member).on(checkIn.member.eq(member), isFavoriteTeam(checkIn, member), isMemberNotDeleted(member))
+                .fetchOne();
     }
 
     private NumberExpression<Long> calculateWinCounts(final QCheckIn checkIn, final QGame game) {
@@ -283,14 +277,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QMember member = QMember.member;
         return jpaQueryFactory.select(member.countDistinct())
                 .from(checkIn)
-                .join(game).on(checkIn.game.eq(game))
-                .join(member).on(checkIn.member.eq(member))
-                .where(
-                        isFinished(game),
-                        isBetweenYear(game, year),
-                        isFavoriteTeam(checkIn, member),
-                        isMemberNotDeleted(member)
-                )
+                .join(game).on(checkIn.game.eq(game), isFinished(game), isBetweenYear(game, year))
+                .join(member).on(checkIn.member.eq(member), isFavoriteTeam(checkIn, member),
+                        isMemberNotDeleted(member))
                 .fetchOne();
     }
 
