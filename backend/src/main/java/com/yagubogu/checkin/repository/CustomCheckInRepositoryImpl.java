@@ -61,7 +61,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         isBetweenYear(game, year),
                         game.stadium.eq(stadium),
                         isMyCurrentFavorite(member, checkIn),
-                        drawCondition(checkIn, game).isFalse(),
+                        drawCondition(checkIn, game).not(),
                         game.gameState.eq(GameState.COMPLETED)
                 )
                 .fetchOne()
