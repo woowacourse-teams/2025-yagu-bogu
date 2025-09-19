@@ -369,7 +369,6 @@ class CheckInServiceTest {
         });
     }
 
-
     @DisplayName("승리 요정 랭킹 조회 - 승률, 직관 횟수, 닉네임 순 정렬되어 반환된다")
     @Test
     void findVictoryFairyRankings() {
