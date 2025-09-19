@@ -243,11 +243,6 @@ class TalkServiceTest {
 //                .awayTeam(expectedAwayTeam)
 //                .stadium(expectedStadium));
 //
-//        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
-//        Talk expectedFirstPageTalk = talkFactory.save(builder ->
-//                builder.member(expectedMessageWriter)
-//                        .game(game)
-//        );
 //        Member soonLeftMember = memberFactory.save(MemberBuilder::build);
 //        Talk remainedTalkByLeftMember = talkFactory.save(builder ->
 //                builder.member(soonLeftMember)

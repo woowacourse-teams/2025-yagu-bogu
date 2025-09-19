@@ -1,6 +1,7 @@
 package com.yagubogu.checkin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -34,7 +35,6 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -427,7 +427,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .extract()
                 .as(VictoryFairyRankingResponses.class);
 
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
                     softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(40.0);
@@ -473,7 +473,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .extract()
                 .as(VictoryFairyRankingResponses.class);
 
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions ->
                 {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
@@ -519,7 +519,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .extract()
                 .as(VictoryFairyRankingResponses.class);
 
-        SoftAssertions.assertSoftly(
+        assertSoftly(
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
                     softAssertions.assertThat(actual.size()).isOne();
