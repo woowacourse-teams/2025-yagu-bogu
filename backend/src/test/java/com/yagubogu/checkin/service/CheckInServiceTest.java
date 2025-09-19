@@ -41,6 +41,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,12 +80,21 @@ class CheckInServiceTest {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     private Team kia, kt, lg, samsung, doosan, lotte;
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
     @BeforeEach
     void setUp() {
-        checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository);
+        checkInService = new CheckInService(
+                checkInRepository,
+                memberRepository,
+                stadiumRepository,
+                gameRepository,
+                applicationEventPublisher
+        );
 
         kia = teamRepository.findByTeamCode("HT").orElseThrow();
         kt = teamRepository.findByTeamCode("KT").orElseThrow();
@@ -503,14 +513,17 @@ class CheckInServiceTest {
         FanRateResponse expected = new FanRateResponse(List.of(
                 new FanRateByGameResponse(
                         30L,
+                        gameAandB.getId(),
                         new TeamFanRateResponse("KIA", "HT", 66.7),
                         new TeamFanRateResponse("KT", "KT", 33.3)),
                 new FanRateByGameResponse(
                         14L,
+                        gameCandD.getId(),
                         new TeamFanRateResponse("LG", "LG", 71.4),
                         new TeamFanRateResponse("삼성", "SS", 28.6)),
                 new FanRateByGameResponse(
                         7L,
+                        gameEandF.getId(),
                         new TeamFanRateResponse("두산", "OB", 85.7),
                         new TeamFanRateResponse("롯데", "LT", 14.3))
         ));
@@ -547,18 +560,20 @@ class CheckInServiceTest {
         long memberId = wooga.getId();
 
         LocalDate gameDate = LocalDate.of(2025, 7, 25);
-        gameFactory.save(
+        Game game1 = gameFactory.save(
                 b -> b.stadium(stadiumJamsil).homeTeam(kia).awayTeam(kt).date(gameDate));
-        gameFactory.save(
+        Game game2 = gameFactory.save(
                 b -> b.stadium(stadiumIncheon).homeTeam(doosan).awayTeam(lotte).date(gameDate));
 
         List<FanRateByGameResponse> expected = List.of(
                 new FanRateByGameResponse(
                         0L,
+                        game2.getId(),
                         new TeamFanRateResponse("두산", "OB", 0),
                         new TeamFanRateResponse("롯데", "LT", 0)),
                 new FanRateByGameResponse(
                         0L,
+                        game1.getId(),
                         new TeamFanRateResponse("KIA", "HT", 0),
                         new TeamFanRateResponse("KT", "KT", 0))
         );
