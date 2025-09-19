@@ -4,6 +4,7 @@ import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import java.time.Instant;
+import java.util.UUID;
 
 public class FakeAuthGateway implements AuthGateway {
 
@@ -17,7 +18,7 @@ public class FakeAuthGateway implements AuthGateway {
                 111L, Instant.now().plusSeconds(3000).getEpochSecond(),
                 "email",
                 true,
-                "test-user",
+                UUID.randomUUID().toString().substring(0,10),
                 "picture",
                 "givenName",
                 "familyName",

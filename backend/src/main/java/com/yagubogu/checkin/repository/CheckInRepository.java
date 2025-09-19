@@ -18,46 +18,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
-
-    @Query("""
-                SELECT COUNT(ci)
-                FROM CheckIn ci
-                JOIN ci.member m
-                JOIN ci.game g
-                WHERE m = :member
-                  AND YEAR(g.date) = :year
-                  AND (
-                    (ci.team = g.awayTeam AND g.awayScore > g.homeScore)
-                                OR
-                    (ci.team = g.homeTeam AND g.homeScore > g.awayScore)
-                  )
-            """)
-    int findWinCounts(Member member, final int year);
-
-    @Query("""
-                SELECT COUNT(ci) FROM CheckIn ci
-                JOIN ci.member m
-                JOIN ci.game g
-                WHERE m = :member
-                  AND YEAR(g.date) = :year
-                  AND (
-                    (ci.team = g.homeTeam AND g.homeScore < g.awayScore)
-                        OR
-                    (ci.team = g.awayTeam AND g.awayScore < g.homeScore)
-                  )
-            """)
-    int findLoseCounts(Member member, final int year);
-
-    @Query("""
-                SELECT COUNT(ci) FROM CheckIn ci
-                JOIN ci.member m
-                JOIN ci.game g
-                WHERE m = :member
-                  AND YEAR(g.date) = :year
-                  AND (ci.team = g.homeTeam OR ci.team = g.awayTeam) AND g.homeScore = g.awayScore
-            """)
-    int findDrawCounts(Member member, final int year);
+public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomCheckInRepository {
 
     @Query("""
                 SELECT COUNT(c)
@@ -129,7 +90,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
     @Query("""
             select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
               ci.member.id,
-              ci.member.nickname,
+              ci.member.nickname.value,
               ci.member.imageUrl,
               ci.member.team.shortName,
               COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END),
@@ -152,6 +113,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
             )
             from CheckIn ci
             join ci.game g
+            where ci.member.deletedAt IS NULL
             group by
               ci.member.id
             """)

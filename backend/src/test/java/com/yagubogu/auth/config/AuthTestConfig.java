@@ -8,6 +8,7 @@ import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.auth.AuthFactory;
@@ -23,9 +24,11 @@ import com.yagubogu.team.repository.TeamRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @EnableConfigurationProperties({AuthTokenProperties.class, GoogleAuthProperties.class})
+@Import(QueryDslConfig.class)
 public class AuthTestConfig {
 
     @Bean

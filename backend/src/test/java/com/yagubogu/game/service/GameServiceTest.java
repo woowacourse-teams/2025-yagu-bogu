@@ -1,5 +1,8 @@
 package com.yagubogu.game.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
@@ -34,9 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest

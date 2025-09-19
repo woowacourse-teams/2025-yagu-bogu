@@ -37,6 +37,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 //    implementation 'org.flywaydb:flyway-core:10.20.1'
     implementation 'org.flywaydb:flyway-mysql:10.20.1'
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
     compileOnly 'org.projectlombok:lombok'
 

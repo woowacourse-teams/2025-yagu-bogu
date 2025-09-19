@@ -71,6 +71,11 @@ management:
       exposure:
         include: health, metrics
 
+sse:
+  heartbeat:
+    enabled: true
+    interval-ms: 25000
+
 ---
 spring:
   config:

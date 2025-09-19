@@ -1,6 +1,7 @@
 package com.yagubogu.support.member;
 
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.team.domain.Team;
@@ -9,7 +10,7 @@ import java.util.UUID;
 public class MemberBuilder {
 
     private Team team;
-    private String nickname = "user-" + UUID.randomUUID();
+    private Nickname nickname = new Nickname(UUID.randomUUID().toString().substring(0, 10));
     private String email = UUID.randomUUID() + "email@gmail.com";
     private OAuthProvider provider = OAuthProvider.GOOGLE;
     private String oauthId = UUID.randomUUID().toString();
@@ -22,8 +23,8 @@ public class MemberBuilder {
         return this;
     }
 
-    public MemberBuilder nickname(final String nickname) {
-        this.nickname = nickname;
+    public MemberBuilder nickname(final String name) {
+        this.nickname = new Nickname(name);
 
         return this;
     }

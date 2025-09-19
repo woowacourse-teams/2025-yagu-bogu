@@ -28,6 +28,10 @@ api:
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8
 
+sse:
+  heartbeat:
+    enabled: true
+    interval-ms: 25000
 ---
 spring:
   config:

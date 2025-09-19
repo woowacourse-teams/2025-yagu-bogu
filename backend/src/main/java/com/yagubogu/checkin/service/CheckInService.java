@@ -22,6 +22,8 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.sse.dto.CheckInCreatedEvent;
+import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -32,6 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,7 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -59,7 +63,10 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        checkInRepository.save(new CheckIn(game, member, team));
+        CheckIn checkIn = new CheckIn(game, member, team);
+        checkInRepository.save(checkIn);
+
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
@@ -134,6 +141,31 @@ public class CheckInService {
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
+    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+        Member member = getMember(memberId);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+
+        return new CheckInStatusResponse(isCheckIn);
+    }
+
+    public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
+        List<GameWithFanRateResponse> result = new ArrayList<>();
+
+        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
+        for (GameWithFanCountsResponse response : responses) {
+            Game game = response.game();
+            long homeTeamCounts = response.homeTeamCheckInCounts();
+            long awayTeamCounts = response.awayTeamCheckInCounts();
+            long totalCounts = response.totalCheckInCounts();
+
+            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
+            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
+            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
+        }
+
+        return result;
+    }
+
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
         List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
 
@@ -169,13 +201,6 @@ public class CheckInService {
                 .orElse(VictoryFairyRankingEntryResponse.generateEmptyRankingFor(getMember(memberId)));
     }
 
-    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
-        Member member = getMember(memberId);
-        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
-
-        return new CheckInStatusResponse(isCheckIn);
-    }
-
     private Stadium getStadiumById(final long stadiumId) {
         return stadiumRepository.findById(stadiumId)
                 .orElseThrow(() -> new NotFoundException("Stadium is not found"));
@@ -200,7 +225,7 @@ public class CheckInService {
     }
 
     private double calculateRoundRate(final Long checkInCounts, final Long total) {
-        if (total == 0 || checkInCounts == 0) {
+        if (total == 0) {
             return 0.0;
         }
 
