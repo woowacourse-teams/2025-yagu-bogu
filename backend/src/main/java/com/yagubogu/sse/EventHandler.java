@@ -60,7 +60,7 @@ public class EventHandler {
     }
 
     private double calculateRoundRate(final Long checkInCounts, final Long total) {
-        if (total == 0 || checkInCounts == 0) {
+        if (total == 0) {
             return 0.0;
         }
 

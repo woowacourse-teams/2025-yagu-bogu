@@ -1,6 +1,6 @@
 package com.yagubogu.sse;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -31,6 +31,7 @@ class EventHandlerTest {
     }
 
     static class RecordingEmitter extends SseEmitter {
+
         int sendCount = 0;
 
         RecordingEmitter() {
@@ -67,8 +68,10 @@ class EventHandlerTest {
         // then
         ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
         verify(checkInRepository).findGamesWithFanCountsByDate(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(date);
-        assertThat(e1.sendCount).isEqualTo(1);
-        assertThat(e2.sendCount).isEqualTo(1);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(captor.getValue()).isEqualTo(date);
+            softAssertions.assertThat(e1.sendCount).isEqualTo(1);
+            softAssertions.assertThat(e2.sendCount).isEqualTo(1);
+        });
     }
 }
