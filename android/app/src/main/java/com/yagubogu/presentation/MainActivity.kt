@@ -110,9 +110,7 @@ class MainActivity : AppCompatActivity() {
             val currentFragment: Fragment? =
                 supportFragmentManager.fragments.firstOrNull { it.isVisible }
 
-            if (currentFragment is ScrollToTop) {
-                currentFragment.scrollToTop()
-            }
+            (currentFragment as? ScrollToTop)?.scrollToTop()
         }
     }
 
