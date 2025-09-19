@@ -35,8 +35,12 @@ fun View.showSnackbar(
     }
 }
 
-fun Context.showToast(message: String) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+fun Context.showToast(
+    message: String,
+    isLong: Boolean = false,
+) {
+    val duration = if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+    Toast.makeText(this, message, duration).show()
 }
 
 fun Context.showToast(
