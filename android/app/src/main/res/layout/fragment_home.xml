@@ -170,7 +170,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_white_radius_12dp"
-                android:paddingVertical="20dp"
+                android:paddingTop="20dp"
                 android:visibility="@{viewModel.stadiumStatsUiModel.stadiumFanRates.isEmpty() ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -251,9 +251,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="20dp"
                     android:background="@drawable/bg_stroke_gray300_radius_12dp"
                     android:onClick="@{() -> viewModel.toggleStadiumStats()}"
                     android:paddingVertical="8dp"
+                    android:visibility="@{viewModel.stadiumFanRateItems.size == 1 ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/rv_stadium_fan_rate">
 
