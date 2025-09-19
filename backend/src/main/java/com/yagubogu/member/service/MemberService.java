@@ -1,7 +1,9 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
@@ -24,10 +26,13 @@ public class MemberService {
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
-        Member member = getMember(memberId);
-        member.updateNickname(request.nickname());
+        Nickname nickname = new Nickname(request.nickname());
+        validateDuplicateNickname(nickname);
 
-        return new MemberNicknameResponse(member.getNickname());
+        Member member = getMember(memberId);
+        member.updateNickname(nickname);
+
+        return MemberNicknameResponse.from(member.getNickname());
     }
 
     @Transactional
@@ -39,8 +44,9 @@ public class MemberService {
 
     public MemberNicknameResponse findNickname(final long memberId) {
         Member member = getMember(memberId);
+        Nickname nickname = member.getNickname();
 
-        return new MemberNicknameResponse(member.getNickname());
+        return MemberNicknameResponse.from(nickname);
     }
 
     public MemberFavoriteResponse findFavorite(final long memberId) {
@@ -81,5 +87,11 @@ public class MemberService {
     private Team getTeamByCode(final String teamCode) {
         return teamRepository.findByTeamCode(teamCode)
                 .orElseThrow(() -> new NotFoundException("Team is not found"));
+    }
+
+    private void validateDuplicateNickname(final Nickname nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new ConflictException("Nickname already exists: " + nickname);
+        }
     }
 }

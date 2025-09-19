@@ -15,7 +15,7 @@ class MemberTest {
     public void validateAdmin(Role role, boolean expected) {
         //given
         Team team = new Team("기아 타이거즈", "기아", "HT");
-        Member member = new Member(team, "김도영", "email", OAuthProvider.GOOGLE, "sub",
+        Member member = new Member(team, new Nickname("김도영"), "email", OAuthProvider.GOOGLE, "sub",
                 role, "picture");
 
         //when & then

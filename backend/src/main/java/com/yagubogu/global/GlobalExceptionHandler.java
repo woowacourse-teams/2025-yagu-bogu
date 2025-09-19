@@ -2,6 +2,7 @@ package com.yagubogu.global;
 
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnAuthorizedException;
@@ -58,6 +59,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionResponse handleNotFoundException(final NotFoundException e) {
         log.info("[NotFoundException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 409 Conflict
+     */
+    @ExceptionHandler(value = ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleConflictException(final ConflictException e) {
+        log.info("[ConflictException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
