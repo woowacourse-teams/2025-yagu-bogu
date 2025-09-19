@@ -31,7 +31,6 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -90,7 +89,7 @@ public class CheckInService {
         return FanRateResponse.from(myFanRateByGame, fanRatesByGames);
     }
 
-    public CheckInCountsResponse findCheckInCounts(final long memberId, final long year) {
+    public CheckInCountsResponse findCheckInCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
         int checkInCounts = checkInRepository.countByMemberAndYear(member, year);
 
@@ -105,15 +104,13 @@ public class CheckInService {
     ) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
-
-        List<CheckInGameResponse> checkIns = switch (resultFilter) {
-            case ALL -> checkInRepository.findCheckInHistory(member, team, year);
-            case WIN -> checkInRepository.findCheckInWinHistory(member, team, year);
-        };
-
-        if (orderFilter.isOldest()) {
-            Collections.reverse(checkIns);
-        }
+        List<CheckInGameResponse> checkIns = checkInRepository.findCheckInHistory(
+                member,
+                team,
+                year,
+                resultFilter,
+                orderFilter
+        );
 
         return new CheckInHistoryResponse(checkIns);
     }
@@ -135,10 +132,8 @@ public class CheckInService {
 
     public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
-        LocalDate start = LocalDate.of(year, 1, 1);
-        LocalDate end = LocalDate.of(year, 12, 31);
         List<StadiumCheckInCountResponse> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
-                start, end);
+                year);
 
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }

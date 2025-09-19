@@ -39,7 +39,7 @@ public class CheckInController implements CheckInControllerInterface {
 
     public ResponseEntity<CheckInCountsResponse> findCheckInCounts(
             final MemberClaims memberClaims,
-            @RequestParam final long year
+            @RequestParam final int year
     ) {
         CheckInCountsResponse response = checkInService.findCheckInCounts(memberClaims.id(), year);
 

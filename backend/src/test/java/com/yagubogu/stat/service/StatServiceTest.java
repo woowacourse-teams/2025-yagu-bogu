@@ -12,6 +12,7 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -69,7 +70,7 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, stadiumRepository, teamRepository);
+        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -412,7 +413,8 @@ class StatServiceTest {
     @Test
     void findLuckyStadium_noCheckInCounts() {
         // given
-        Member member = memberFactory.save(MemberBuilder::build);
+        Team ss = teamRepository.findByTeamCode("SS").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(ss));
         int year = 2025;
 
         // when
@@ -648,8 +650,8 @@ class StatServiceTest {
 
         // when & then
         assertThatThrownBy(() -> statService.findOpponentWinRate(member.getId(), 2025))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessage("Team not exist");
+                .isExactlyInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("Team should not be null");
     }
 
     @DisplayName("점수 미기록 경기는 제외되며 그 외 미대결 팀은 0.0으로 포함된다")

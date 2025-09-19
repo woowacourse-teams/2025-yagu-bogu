@@ -902,5 +902,4 @@ class CheckInServiceTest {
                 .date(startDate.plusDays(5)));
         savedCheckIns.add(checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(game3)));
     }
-
 }
