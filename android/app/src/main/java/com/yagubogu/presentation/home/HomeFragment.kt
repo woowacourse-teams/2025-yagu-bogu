@@ -21,6 +21,9 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
@@ -33,10 +36,14 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
+import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
-class HomeFragment : Fragment() {
+class HomeFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -56,6 +63,8 @@ class HomeFragment : Fragment() {
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
     private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
 
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,6 +82,7 @@ class HomeFragment : Fragment() {
         setupBindings()
         setupObservers()
         setupFragmentResultListener()
+        setupBalloons()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -85,6 +95,10 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun scrollToTop() {
+        binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
     private fun setupBindings() {
@@ -109,6 +123,7 @@ class HomeFragment : Fragment() {
                 .rotationBy(REFRESH_ANIMATION_ROTATION)
                 .setDuration(REFRESH_ANIMATION_DURATION)
                 .start()
+            firebaseAnalytics.logEvent("fan_rate_refresh", null)
         }
     }
 
@@ -155,6 +170,7 @@ class HomeFragment : Fragment() {
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
             if (isConfirmed) {
                 viewModel.checkIn()
+                firebaseAnalytics.logEvent("check_in", null)
             }
         }
     }
@@ -262,6 +278,28 @@ class HomeFragment : Fragment() {
                     )
                 }
             }
+    }
+
+    private fun setupBalloons() {
+        val stadiumStatsInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_stadium_stats_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameStadiumStatsTooltip.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
+            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
+        }
+
+        val victoryFairyInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_victory_fairy_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
+        }
     }
 
     companion object {

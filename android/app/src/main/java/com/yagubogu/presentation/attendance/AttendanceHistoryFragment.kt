@@ -9,15 +9,23 @@ import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class AttendanceHistoryFragment : Fragment() {
+class AttendanceHistoryFragment :
+    Fragment(),
+    AttendanceHistorySummaryViewHolder.Handler,
+    AttendanceHistoryDetailViewHolder.Handler,
+    ScrollToTop {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
 
@@ -28,10 +36,12 @@ class AttendanceHistoryFragment : Fragment() {
 
     private val attendanceHistoryAdapter by lazy {
         AttendanceHistoryAdapter(
-            attendanceHistorySummaryHandler = viewModel,
-            attendanceHistoryDetailHandler = viewModel,
+            attendanceHistorySummaryHandler = this,
+            attendanceHistoryDetailHandler = this,
         )
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +60,7 @@ class AttendanceHistoryFragment : Fragment() {
         setupBindings()
         setupSpinner()
         setupObservers()
+        setupListeners()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -62,6 +73,20 @@ class AttendanceHistoryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+        viewModel.onSummaryItemClick(item)
+        firebaseAnalytics.logEvent("attendance_history_item_click", null)
+    }
+
+    override fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+        viewModel.onDetailItemClick(item)
+        firebaseAnalytics.logEvent("attendance_history_item_click", null)
+    }
+
+    override fun scrollToTop() {
+        binding.rvAttendanceHistory.smoothScrollToPosition(0)
     }
 
     private fun setupBindings() {
@@ -91,6 +116,7 @@ class AttendanceHistoryFragment : Fragment() {
                     ) {
                         val filter = AttendanceHistoryFilter.entries[position]
                         viewModel.updateAttendanceHistoryFilter(filter)
+                        firebaseAnalytics.logEvent("attendance_history_change_filter", null)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -105,7 +131,10 @@ class AttendanceHistoryFragment : Fragment() {
                     binding.rvAttendanceHistory.smoothScrollToPosition(it)
                 }
             }
-            updateEmptyHistoryState(value.isEmpty())
+
+            val isEmpty: Boolean = value.isEmpty()
+            binding.ivEmptyHistory.isVisible = isEmpty
+            binding.tvEmptyHistory.isVisible = isEmpty
         }
 
         viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
@@ -119,11 +148,10 @@ class AttendanceHistoryFragment : Fragment() {
         }
     }
 
-    private fun updateEmptyHistoryState(isEmpty: Boolean) {
-        binding.ivEmptyHistory.isVisible = isEmpty
-        binding.tvEmptyHistory.isVisible = isEmpty
-
-        binding.constraintFilter.isVisible = !isEmpty
-        binding.constraintOrder.isVisible = !isEmpty
+    private fun setupListeners() {
+        binding.tvAttendanceHistoryOrder.setOnClickListener {
+            viewModel.switchAttendanceHistoryOrder()
+            firebaseAnalytics.logEvent("attendance_history_change_order", null)
+        }
     }
 }

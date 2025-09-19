@@ -20,20 +20,23 @@ class LivetalkViewModel(
         fetchGames()
     }
 
-    fun fetchGames() {
+    fun fetchGames(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
-            val gamesResult: Result<List<LivetalkStadiumItem>> =
-                gameRepository.getGames(DATE)
+            val gamesResult: Result<List<LivetalkStadiumItem>> = gameRepository.getGames(date)
             gamesResult
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
-                    _livetalkStadiumItems.value = livetalkStadiumItems
+                    _livetalkStadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
     }
 
-    companion object {
-        private val DATE = LocalDate.now()
+    private fun sortStadiumsByVerification(livetalkStadiumItems: List<LivetalkStadiumItem>): List<LivetalkStadiumItem> {
+        val (verifiedItems, unverifiedItems) =
+            livetalkStadiumItems.partition { liveTalkStadiumItem: LivetalkStadiumItem ->
+                liveTalkStadiumItem.isVerified
+            }
+        return verifiedItems + unverifiedItems
     }
 }
