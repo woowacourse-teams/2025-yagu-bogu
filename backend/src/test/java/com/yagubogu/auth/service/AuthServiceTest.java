@@ -1,8 +1,5 @@
 package com.yagubogu.auth.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
@@ -31,9 +28,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import({AuthTestConfig.class, JpaAuditingConfig.class})
-@ActiveProfiles("integration")
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 @DataJpaTest
+@ActiveProfiles("integration")
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 class AuthServiceTest {
 
     private AuthService authService;
@@ -68,12 +68,11 @@ class AuthServiceTest {
                 List.of(googleAuthValidator), refreshTokenRepository, authTokenProperties);
     }
 
-    @DisplayName("로그인을 수행한다")
+    @DisplayName("회원가입을 수행한다")
     @Test
-    void login() {
+    void login_register() {
         // given
         LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
-        String expectedNickname = "test-user";
 
         // when
         LoginResponse response = authService.login(loginRequest);
@@ -83,7 +82,26 @@ class AuthServiceTest {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
-            softAssertions.assertThat(response.member().nickname()).isEqualTo(expectedNickname);
+        });
+    }
+
+    @DisplayName("로그인을 수행한다")
+    @Test
+    void login() {
+        // given
+        LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
+        LoginResponse registerResponse = authService.login(loginRequest);
+        String expectedNickname = registerResponse.member().nickname();
+
+        // when
+        LoginResponse actual = authService.login(loginRequest);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.accessToken()).isNotNull();
+            softAssertions.assertThat(actual.refreshToken()).isNotNull();
+            softAssertions.assertThat(actual.isNew()).isFalse();
+            softAssertions.assertThat(actual.member().nickname()).isEqualTo(expectedNickname);
         });
     }
 

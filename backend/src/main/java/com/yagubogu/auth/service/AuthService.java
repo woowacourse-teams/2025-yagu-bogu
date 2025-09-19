@@ -15,6 +15,7 @@ import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
@@ -22,6 +23,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +47,28 @@ public class AuthService {
 
         Optional<Member> memberOptional = memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId());
         boolean isNew = memberOptional.isEmpty();
-        Member member = findOrCreateMember(isNew, response, memberOptional);
-        MemberClaims memberClaims = MemberClaims.from(member);
+        Member member = memberOptional.orElseGet(() -> saveMember(response));
 
+        MemberClaims memberClaims = MemberClaims.from(member);
         String accessToken = authTokenProvider.createAccessToken(memberClaims);
         String refreshToken = generateRefreshToken(member);
 
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
+    }
+
+    private Member saveMember(final AuthResponse response) {
+        String randomNickname = UUID.randomUUID().toString().substring(0, 12);
+        Member newMember = new Member(
+                null,
+                new Nickname(randomNickname),
+                response.email(),
+                OAuthProvider.GOOGLE,
+                response.oauthId(),
+                Role.USER,
+                response.picture()
+        );
+
+        return memberRepository.save(newMember);
     }
 
     public MemberClaims makeMemberClaims(final String token) {
@@ -98,18 +115,6 @@ public class AuthService {
         for (RefreshToken refreshToken : refreshTokens) {
             refreshToken.revoke();
         }
-    }
-
-    private Member findOrCreateMember(
-            final boolean isNew,
-            final AuthResponse response,
-            final Optional<Member> memberOptional
-    ) {
-        if (isNew) {
-            return memberRepository.save(response.toMember());
-        }
-
-        return memberOptional.get();
     }
 
     private void validateToken(

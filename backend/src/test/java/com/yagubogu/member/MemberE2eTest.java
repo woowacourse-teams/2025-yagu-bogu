@@ -1,5 +1,8 @@
 package com.yagubogu.member;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -24,9 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class MemberE2eTest extends E2eTestBase {
@@ -117,6 +117,44 @@ public class MemberE2eTest extends E2eTestBase {
         assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
+    @DisplayName("예외: 닉네임 수정 시 중복된 닉네임이면 409 상태를 반환한다")
+    @Test
+    void patchNickname_duplicateNicknameReturn409Status() {
+        // given
+        String existNickname = "존재하는닉네임";
+        Member member1 = memberFactory.save(builder -> builder.nickname(existNickname));
+        Member member2 = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member2.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new MemberNicknameRequest(existNickname))
+                .when().patch("/api/members/me/nickname")
+                .then().log().all()
+                .statusCode(409);
+    }
+
+    @DisplayName("예외: 닉네임 수정 시 길이 제한을 초과하면 422 상태를 반환한다")
+    @Test
+    void patchNickname_nickNameTooLongReturn422Status() {
+        // given
+        Member member2 = memberFactory.save(builder -> builder.nickname("우가"));
+        String longNickName = "1234567890123";
+
+        String accessToken = authFactory.getAccessTokenByMemberId(member2.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new MemberNicknameRequest(longNickName))
+                .when().patch("/api/members/me/nickname")
+                .then().log().all()
+                .statusCode(422);
+    }
+
     @DisplayName("회원 탈퇴한다")
     @Test
     void removeMember() {
@@ -185,7 +223,7 @@ public class MemberE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());

@@ -17,7 +17,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     @Query("""
             select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
               ci.member.id,
-              ci.member.nickname,
+              ci.member.nickname.value,
               ci.member.imageUrl,
               ci.member.team.shortName,
               COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END),
@@ -40,6 +40,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
             )
             from CheckIn ci
             join ci.game g
+            where ci.member.deletedAt IS NULL
             group by
               ci.member.id
             """)
