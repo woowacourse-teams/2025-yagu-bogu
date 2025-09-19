@@ -7,19 +7,19 @@ import java.util.List;
 
 public interface CustomCheckInRepository {
 
-    int findWinCounts(Member member, final int year);
+    int findWinCounts(Member member, int year);
 
-    int findLoseCounts(Member member, final int year);
+    int findLoseCounts(Member member, int year);
 
-    int findDrawCounts(Member member, final int year);
+    int findDrawCounts(Member member, int year);
 
-    int findRecentGamesWinCounts(Member member, final int year, final int limit);
+    int findRecentGamesWinCounts(Member member, int year, int limit);
 
-    int findRecentGamesLoseCounts(Member member, final int year, final int limit);
+    int findRecentGamesLoseCounts(Member member, int year, int limit);
 
-    int findRecentGamesDrawCounts(Member member, final int year, final int limit);
+    int findRecentGamesDrawCounts(Member member, int year, int limit);
 
-    VictoryFairyRank findMyRanking(double m, double c, Member targetMember, final int year, TeamFilter teamFilter);
+    VictoryFairyRank findMyRanking(double m, double c, Member targetMember, int year, TeamFilter teamFilter);
 
     List<VictoryFairyRank> findTopVictoryRanking(double m, double c, int year, TeamFilter teamFilter, int limit);
 
