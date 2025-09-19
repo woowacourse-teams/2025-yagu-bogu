@@ -402,6 +402,11 @@ public class CheckInE2eTest extends E2eTestBase {
                 .awayTeam(samsung).awayScore(1)
                 .date(startDate.plusDays(5))
                 .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(LocalDate.of(2024, 5, 3))
+                .gameState(GameState.COMPLETED));
 
         List<Member> members = memberRepository.findAll();
         List<Game> games = gameRepository.findAll();
@@ -415,6 +420,7 @@ public class CheckInE2eTest extends E2eTestBase {
         VictoryFairyRankingResponses responses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
                 .when().get("/api/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)
@@ -460,6 +466,7 @@ public class CheckInE2eTest extends E2eTestBase {
         VictoryFairyRankingResponses responses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
                 .when().get("/api/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)
@@ -505,6 +512,7 @@ public class CheckInE2eTest extends E2eTestBase {
         VictoryFairyRankingResponses responses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, duriAccessToken)
+                .queryParam("year", 2025)
                 .when().get("/api/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)

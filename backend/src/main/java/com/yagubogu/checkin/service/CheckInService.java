@@ -117,9 +117,7 @@ public class CheckInService {
             final int year
     ) {
         Member member = getMember(memberId);
-        // m : 전체 유저 평균 승률 (전체 완료된 경기의 인증 중 승수 / 전체 완료된 경기의 인증수)
         double m = checkInRepository.calculateTotalAverageWinRate(year);
-        // c : 평균 전체 유저 직관 횟수
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
         List<VictoryFairyRankingResponse> topRankingResponses = findTopVictoryRanking(teamFilter, year, m, c);
