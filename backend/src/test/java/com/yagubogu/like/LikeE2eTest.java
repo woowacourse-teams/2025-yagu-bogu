@@ -109,7 +109,7 @@ public class LikeE2eTest extends E2eTestBase {
                 .pathParam("gameId", game.getId())
                 .body(request)
                 .when()
-                .post("/api/games/{gameId}/likes/batch")
+                .post("/api/games/{gameId}/like-batches")
                 .then().log().all()
                 .statusCode(204);
     }
