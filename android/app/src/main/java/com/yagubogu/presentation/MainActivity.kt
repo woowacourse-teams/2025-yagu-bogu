@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            supportFragmentManager.fragments.forEach { if (it.isVisible) hide(it) }
+            supportFragmentManager.fragments.forEach { if (it != targetFragment) hide(it) }
 
             if (targetFragment == null) {
                 add(binding.fcvFragment.id, fragmentClass, null, tag)
