@@ -32,7 +32,7 @@ public class SseEventHandler {
                         .name("check-in-created")
                         .data(eventData));
             } catch (IOException e) {
-                System.err.println("SSE 전송 실패: " + e.getMessage());
+                sseEmitterRegistry.removeWithError(emitter, e);
             }
         });
     }
