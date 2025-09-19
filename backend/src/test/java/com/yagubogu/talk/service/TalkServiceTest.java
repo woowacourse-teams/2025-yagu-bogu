@@ -234,7 +234,8 @@ class TalkServiceTest {
 //        // given
 //        int limit = 2;
 //        Long cursorId = null;
-//        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
+//        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+//        Member firstEnterMember = memberFactory.save(builder -> builder.team(team).build());
 //
 //        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
 //        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
@@ -243,7 +244,7 @@ class TalkServiceTest {
 //                .awayTeam(expectedAwayTeam)
 //                .stadium(expectedStadium));
 //
-//        Member soonLeftMember = memberFactory.save(MemberBuilder::build);
+//        Member soonLeftMember = memberFactory.save(builder -> builder.team(team).build());
 //        Talk remainedTalkByLeftMember = talkFactory.save(builder ->
 //                builder.member(soonLeftMember)
 //                        .game(game)

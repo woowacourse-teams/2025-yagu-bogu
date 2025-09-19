@@ -15,6 +15,7 @@ import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
+import com.yagubogu.member.domain.QNickname;
 import com.yagubogu.team.domain.QTeam;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private static final QGame GAME = QGame.game;
     private static final QMember MEMBER = QMember.member;
     private static final QTeam TEAM = QTeam.team;
+    private static final QNickname NICKNAME = QNickname.nickname;
 
     /**
      * m : 전체 유저 평균 승률
@@ -119,7 +121,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                VictoryFairyRank.class, score, MEMBER.nickname, MEMBER.imageUrl,
+                                VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
@@ -156,7 +158,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Double> safeWinPercent = getSafeWinPercent(n, calculatePercent);
 
         return jpaQueryFactory.select(
-                        Projections.constructor(VictoryFairyRank.class, score, MEMBER.nickname, MEMBER.imageUrl,
+                        Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))

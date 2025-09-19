@@ -1,5 +1,7 @@
 package com.yagubogu.auth;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;

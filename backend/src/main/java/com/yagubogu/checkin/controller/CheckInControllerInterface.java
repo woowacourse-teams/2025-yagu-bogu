@@ -81,8 +81,8 @@ public interface CheckInControllerInterface {
     @GetMapping("/victory-fairy/rankings")
     ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam(name = "team", defaultValue = "ALL") final TeamFilter teamFilter,
-            final int year
+            @RequestParam(name = "team", defaultValue = "ALL") TeamFilter teamFilter,
+            int year
     );
 
     @Operation(summary = "당일 인증 여부 조회", description = "해당 날짜에 사용자가 인증했는지 여부를 반환합니다.")
