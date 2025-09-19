@@ -34,6 +34,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     public static final QCheckIn CHECK_IN = QCheckIn.checkIn;
     public static final QGame GAME = QGame.game;
     public static final QStadium STADIUM = QStadium.stadium;
+
     private final JPAQueryFactory jpaQueryFactory;
 
     public int findWinCounts(Member member, final int year) {
