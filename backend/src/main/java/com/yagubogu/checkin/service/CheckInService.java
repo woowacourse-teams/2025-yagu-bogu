@@ -141,6 +141,31 @@ public class CheckInService {
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
+    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+        Member member = getMember(memberId);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+
+        return new CheckInStatusResponse(isCheckIn);
+    }
+
+    public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
+        List<GameWithFanRateResponse> result = new ArrayList<>();
+
+        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
+        for (GameWithFanCountsResponse response : responses) {
+            Game game = response.game();
+            long homeTeamCounts = response.homeTeamCheckInCounts();
+            long awayTeamCounts = response.awayTeamCheckInCounts();
+            long totalCounts = response.totalCheckInCounts();
+
+            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
+            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
+            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
+        }
+
+        return result;
+    }
+
     private List<VictoryFairyRankingEntryResponse> getSortedRankingList() {
         List<VictoryFairyRankingEntryResponse> memberCheckIns = checkInRepository.findVictoryFairyRankingCandidates();
 
@@ -176,13 +201,6 @@ public class CheckInService {
                 .orElse(VictoryFairyRankingEntryResponse.generateEmptyRankingFor(getMember(memberId)));
     }
 
-    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
-        Member member = getMember(memberId);
-        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
-
-        return new CheckInStatusResponse(isCheckIn);
-    }
-
     private Stadium getStadiumById(final long stadiumId) {
         return stadiumRepository.findById(stadiumId)
                 .orElseThrow(() -> new NotFoundException("Stadium is not found"));
@@ -204,24 +222,6 @@ public class CheckInService {
         double awayRate = calculateRoundRate(gameWithFanCounts.awayTeamCheckInCounts(), total);
 
         return FanRateByGameResponse.from(gameWithFanCounts.game(), total, homeRate, awayRate);
-    }
-
-    public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
-        List<GameWithFanRateResponse> result = new ArrayList<>();
-
-        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
-        for (GameWithFanCountsResponse response : responses) {
-            Game game = response.game();
-            long homeTeamCounts = response.homeTeamCheckInCounts();
-            long awayTeamCounts = response.awayTeamCheckInCounts();
-            long totalCounts = response.totalCheckInCounts();
-
-            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
-            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
-            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
-        }
-
-        return result;
     }
 
     private double calculateRoundRate(final Long checkInCounts, final Long total) {
