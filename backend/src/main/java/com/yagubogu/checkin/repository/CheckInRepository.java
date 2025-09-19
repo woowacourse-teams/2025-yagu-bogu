@@ -21,6 +21,45 @@ import org.springframework.stereotype.Repository;
 public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomCheckInRepository {
 
     @Query("""
+                SELECT COUNT(ci)
+                FROM CheckIn ci
+                JOIN ci.member m
+                JOIN ci.game g
+                WHERE m = :member
+                  AND YEAR(g.date) = :year
+                  AND (
+                    (ci.team = g.awayTeam AND g.awayScore > g.homeScore)
+                                OR
+                    (ci.team = g.homeTeam AND g.homeScore > g.awayScore)
+                  )
+            """)
+    int findWinCounts(Member member, final int year);
+
+    @Query("""
+                SELECT COUNT(ci) FROM CheckIn ci
+                JOIN ci.member m
+                JOIN ci.game g
+                WHERE m = :member
+                  AND YEAR(g.date) = :year
+                  AND (
+                    (ci.team = g.homeTeam AND g.homeScore < g.awayScore)
+                        OR
+                    (ci.team = g.awayTeam AND g.awayScore < g.homeScore)
+                  )
+            """)
+    int findLoseCounts(Member member, final int year);
+
+    @Query("""
+                SELECT COUNT(ci) FROM CheckIn ci
+                JOIN ci.member m
+                JOIN ci.game g
+                WHERE m = :member
+                  AND YEAR(g.date) = :year
+                  AND (ci.team = g.homeTeam OR ci.team = g.awayTeam) AND g.homeScore = g.awayScore
+            """)
+    int findDrawCounts(Member member, final int year);
+
+    @Query("""
                 SELECT COUNT(c)
                 FROM CheckIn c
                 WHERE c.member = :member
@@ -86,38 +125,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     List<CheckInGameResponse> findCheckInHistory(Member member, Team team, int year);
 
     boolean existsByMemberAndGameDate(Member member, LocalDate date);
-
-    @Query("""
-            select new com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse(
-              ci.member.id,
-              ci.member.nickname.value,
-              ci.member.imageUrl,
-              ci.member.team.shortName,
-              COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END),
-              CASE
-                WHEN COUNT(CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END) = 0
-                  THEN 0.0
-                ELSE ROUND(
-                  (1.0 * SUM(
-                    CASE
-                      WHEN (g.homeTeam.id = ci.team.id AND g.homeScore > g.awayScore)
-                        OR (g.awayTeam.id = ci.team.id AND g.awayScore > g.homeScore)
-                      THEN 1 ELSE 0
-                    END
-                  ) / COUNT(
-                    CASE WHEN g.homeTeam.id = ci.team.id OR g.awayTeam.id = ci.team.id THEN 1 END
-                  )) * 100,
-                  1
-                )
-              END
-            )
-            from CheckIn ci
-            join ci.game g
-            where ci.member.deletedAt IS NULL
-            group by
-              ci.member.id
-            """)
-    List<VictoryFairyRankingEntryResponse> findVictoryFairyRankingCandidates();
 
     @Query("""
             SELECT new com.yagubogu.checkin.dto.GameWithFanCountsResponse(
