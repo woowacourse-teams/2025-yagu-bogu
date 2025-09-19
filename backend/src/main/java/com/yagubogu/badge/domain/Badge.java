@@ -29,17 +29,17 @@ public class Badge {
     @Column(name = "badge_description", nullable = false)
     private String description;
 
-    @Column(name = "badge_condition_type", nullable = false)
+    @Column(name = "badge_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Policy type;
+    private Policy policy;
 
-    @Column(name = "badge_condition_threshold", nullable = false)
-    private Long threshold;
+    @Column(name = "badge_threshold", nullable = false)
+    private int threshold;
 
-    public Badge(final String name, final String description, final Policy type, final Long threshold) {
+    public Badge(final String name, final String description, final Policy policy, final int threshold) {
         this.name = name;
         this.description = description;
-        this.type = type;
+        this.policy = policy;
         this.threshold = threshold;
     }
 }
