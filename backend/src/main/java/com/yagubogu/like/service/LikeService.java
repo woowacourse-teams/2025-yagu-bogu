@@ -55,10 +55,14 @@ public class LikeService {
     }
 
     private void existsGame(final long gameId) {
-        gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException("Game not Found"));
+        if (!gameRepository.existsById(gameId)) {
+            throw new NotFoundException("Game not found");
+        }
     }
 
     private void existsMember(final long memberId) {
-        memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member not Found"));
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundException("Member not found");
+        }
     }
 }

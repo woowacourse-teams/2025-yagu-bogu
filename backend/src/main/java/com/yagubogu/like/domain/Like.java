@@ -41,11 +41,11 @@ public class Like {
         this.team = team;
     }
 
-    public static Like of(Game game, Team team) {
+    public static Like of(final Game game, final Team team) {
         return new Like(game, team);
     }
 
-    public void add(long delta) {
+    public void add(final long delta) {
         if (delta == 0) {
             return;
         }
