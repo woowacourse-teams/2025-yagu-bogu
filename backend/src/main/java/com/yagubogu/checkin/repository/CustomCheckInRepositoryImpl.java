@@ -103,8 +103,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @return VictoryFairyRank DTO 리스트 (상위 랭킹)
      */
     @Override
-    public List<VictoryFairyRank> findTopVictoryRanking(final double m, final double c, final int year,
-                                                        final TeamFilter teamFilter, final int limit) {
+    public List<VictoryFairyRank> findTopVictoryRanking(
+            final double m,
+            final double c,
+            final int year,
+            final TeamFilter teamFilter,
+            final int limit
+    ) {
         NumberExpression<Long> w = calculateWinCounts(year);
         NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
@@ -135,8 +140,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @param teamFilter 팀 필터
      * @return VictoryFairyRank DTO (단일 유저의 랭킹 정보)
      */
-    public VictoryFairyRank findMyRanking(final double m, final double c, final Member targetMember, final int year,
-                                          final TeamFilter teamFilter) {
+    public VictoryFairyRank findMyRanking(
+            final double m,
+            final double c,
+            final Member targetMember,
+            final int year,
+            final TeamFilter teamFilter
+    ) {
         NumberExpression<Long> w = calculateWinCounts(year);
         NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
@@ -174,9 +184,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @param teamFilter 팀 필터
      * @return 나보다 점수가 높은 유저 수 (즉, 내 순위 - 1)
      */
-    public int calculateMyRankingOrder(final double targetScore, final double m, final double c, final int year,
-                                       final TeamFilter teamFilter) {
-
+    public int calculateMyRankingOrder(
+            final double targetScore,
+            final double m,
+            final double c,
+            final int year,
+            final TeamFilter teamFilter
+    ) {
         NumberExpression<Long> w = calculateWinCounts(year);
         NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
         NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
@@ -193,8 +207,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetch().size();
     }
 
-    private NumberExpression<Double> getSafeWinPercent(final NumberExpression<Long> total,
-                                                       final NumberExpression<Double> calculatePercent) {
+    private NumberExpression<Double> getSafeWinPercent(
+            final NumberExpression<Long> total,
+            final NumberExpression<Double> calculatePercent
+    ) {
         return new CaseBuilder().when(total.gt(0)).then(calculatePercent).otherwise(0.0);
     }
 
@@ -202,9 +218,12 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return MEMBER.deletedAt.isNull();
     }
 
-    private NumberExpression<Double> calculateWinRankingScore(final double m, final double c,
-                                                              final NumberExpression<Long> wins,
-                                                              final NumberExpression<Long> total) {
+    private NumberExpression<Double> calculateWinRankingScore(
+            final double m,
+            final double c,
+            final NumberExpression<Long> wins,
+            final NumberExpression<Long> total
+    ) {
         NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
         NumberExpression<Double> numerator = wins.doubleValue().add(Expressions.constant(c * m));
 
