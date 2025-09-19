@@ -22,6 +22,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -159,6 +160,26 @@ class LoginActivity : AppCompatActivity() {
                     showToast(getString(R.string.login_complete_update_message), true)
                 }
 
+                when (appUpdateInfo.updateAvailability()) {
+                    // 강제 업데이트 중 실패했을 때 재개
+                    UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            appUpdateResultLauncher,
+                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                        )
+                        return@addOnSuccessListener
+                    }
+
+                    // 업데이트 할 수 없거나, 네트워크 등 오류 발생했을 때 splash 종료
+                    UpdateAvailability.UNKNOWN, UpdateAvailability.UPDATE_NOT_AVAILABLE -> {
+                        shouldImmediateUpdate = false
+                        return@addOnSuccessListener
+                    }
+
+                    UpdateAvailability.UPDATE_AVAILABLE -> Unit
+                }
+
                 // 스토어에서 제공되는 최신 앱 버전 코드
                 val availableVersionCode: Int = appUpdateInfo.availableVersionCode()
                 val availableVersionInfo = VersionInfo.of(availableVersionCode)
@@ -174,25 +195,31 @@ class LoginActivity : AppCompatActivity() {
                 when (inAppUpdateType) {
                     // 강제 업데이트가 필요한 경우
                     InAppUpdateType.IMMEDIATE -> {
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            appUpdateResultLauncher,
-                            AppUpdateOptions
-                                .newBuilder(AppUpdateType.IMMEDIATE)
-                                .build(),
-                        )
+                        if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                            appUpdateManager.startUpdateFlowForResult(
+                                appUpdateInfo,
+                                appUpdateResultLauncher,
+                                AppUpdateOptions
+                                    .newBuilder(AppUpdateType.IMMEDIATE)
+                                    .build(),
+                            )
+                        } else {
+                            shouldImmediateUpdate = false
+                        }
                     }
 
                     // 권장 업데이트 (사용자가 원할 때 업데이트 가능)
                     InAppUpdateType.FLEXIBLE -> {
                         shouldImmediateUpdate = false
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            appUpdateResultLauncher,
-                            AppUpdateOptions
-                                .newBuilder(AppUpdateType.FLEXIBLE)
-                                .build(),
-                        )
+                        if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                            appUpdateManager.startUpdateFlowForResult(
+                                appUpdateInfo,
+                                appUpdateResultLauncher,
+                                AppUpdateOptions
+                                    .newBuilder(AppUpdateType.FLEXIBLE)
+                                    .build(),
+                            )
+                        }
                     }
 
                     InAppUpdateType.NONE -> shouldImmediateUpdate = false
