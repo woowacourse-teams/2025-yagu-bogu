@@ -10,10 +10,14 @@ import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsMyBinding
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.presentation.util.buildBalloon
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StatsMyFragment :
@@ -26,6 +30,8 @@ class StatsMyFragment :
         val app = requireActivity().application as YaguBoguApplication
         StatsMyViewModelFactory(app.statsRepository, app.memberRepository)
     }
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +49,7 @@ class StatsMyFragment :
         super.onViewCreated(view, savedInstanceState)
         setupChart()
         setupObservers()
+        setupBalloons()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -110,6 +117,28 @@ class StatsMyFragment :
         pieData.setDrawValues(false)
         binding.pieChart.data = pieData
         binding.pieChart.animateY(PIE_CHART_ANIMATION_MILLISECOND)
+    }
+
+    private fun setupBalloons() {
+        val myChartInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.stats_my_pie_chart_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameMyChartTooltip.setOnClickListener {
+            myChartInfoBalloon.showAlignBottom(binding.ivWinRateTooltip)
+            firebaseAnalytics.logEvent("tooltip_my_chart", null)
+        }
+
+        val luckyStadiumInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.stats_my_lucky_stadium_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.constraintLuckyStadium.setOnClickListener {
+            luckyStadiumInfoBalloon.showAlignBottom(binding.constraintLuckyStadium)
+            firebaseAnalytics.logEvent("tooltip_lucky_stadium", null)
+        }
     }
 
     companion object {

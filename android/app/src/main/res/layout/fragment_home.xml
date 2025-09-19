@@ -186,6 +186,23 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <FrameLayout
+                    android:id="@+id/frame_stadium_stats_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintStart_toEndOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title">
+
+                    <ImageView
+                        android:id="@+id/iv_stadium_stats_tooltip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/gray300" />
+                </FrameLayout>
+
                 <TextView
                     android:id="@+id/tv_refresh_time"
                     style="@style/TextView.Pretendard.Regular"
@@ -289,7 +306,25 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <FrameLayout
+                    android:id="@+id/frame_victory_fairy_ranking_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintStart_toEndOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking">
+
+                    <ImageView
+                        android:id="@+id/iv_victory_fairy_ranking_tooltip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/gray300" />
+                </FrameLayout>
+
                 <TextView
+                    android:id="@+id/tv_victory_fairy_win_rate"
                     style="@style/TextView.Pretendard.Medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
