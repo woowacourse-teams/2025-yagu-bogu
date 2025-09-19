@@ -8,9 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsDetailBinding
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class StatsDetailFragment : Fragment() {
+class StatsDetailFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentStatsDetailBinding? = null
     private val binding get() = _binding!!
 
@@ -56,6 +59,10 @@ class StatsDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun scrollToTop() {
+        binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
     private fun setupBindings() {

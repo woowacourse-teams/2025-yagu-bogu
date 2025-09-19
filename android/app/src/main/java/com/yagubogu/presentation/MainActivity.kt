@@ -23,6 +23,7 @@ import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.stats.StatsFragment
+import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
 
 class MainActivity : AppCompatActivity() {
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
+            switchFragment(HomeFragment::class.java, R.id.item_home)
         }
     }
 
@@ -101,6 +103,15 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 else -> false
+            }
+        }
+
+        binding.bnvNavigation.setOnItemReselectedListener {
+            val currentFragment: Fragment? =
+                supportFragmentManager.fragments.firstOrNull { it.isVisible }
+
+            if (currentFragment is ScrollToTop) {
+                currentFragment.scrollToTop()
             }
         }
     }

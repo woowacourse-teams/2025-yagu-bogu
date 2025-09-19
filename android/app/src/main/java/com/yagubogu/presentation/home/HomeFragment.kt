@@ -36,11 +36,14 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
+import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
-class HomeFragment : Fragment() {
+class HomeFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -92,6 +95,10 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun scrollToTop() {
+        binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
     private fun setupBindings() {
