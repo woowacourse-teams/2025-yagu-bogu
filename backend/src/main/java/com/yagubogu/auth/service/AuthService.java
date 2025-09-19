@@ -16,7 +16,7 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.member.dto.UpsertResult;
+import com.yagubogu.member.dto.MemberFindResult;
 import com.yagubogu.member.service.MemberService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +41,13 @@ public class AuthService {
         AuthResponse response = authGateway.validateToken(request);
         validateToken(response, OAuthProvider.GOOGLE);
 
-        UpsertResult upsertResult = memberService.upsertMember(response);
-        Member member = upsertResult.member();
+        MemberFindResult memberFindResult = memberService.findMember(response);
+        Member member = memberFindResult.member();
 
         String accessToken = authTokenProvider.issueAccessToken(MemberClaims.from(member));
         String refreshToken = refreshTokenService.issue(member);
 
-        return new LoginResponse(accessToken, refreshToken, upsertResult.isNew(), MemberResponse.from(member));
+        return new LoginResponse(accessToken, refreshToken, memberFindResult.isNew(), MemberResponse.from(member));
     }
 
     public MemberClaims makeMemberClaims(final String token) {
