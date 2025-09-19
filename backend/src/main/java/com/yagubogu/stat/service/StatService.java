@@ -13,6 +13,7 @@ import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
+import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
@@ -30,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 public class StatService {
+
+    private static final int RECENT_LIMIT = 10;
 
     private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
                     OpponentWinRateTeamResponse::winRate)
@@ -58,11 +61,21 @@ public class StatService {
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
-        int drawCounts = checkInRepository.findDrawCounts(member, year);
         int loseCounts = checkInRepository.findLoseCounts(member, year);
-        int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
+        int favoriteCheckInCounts = winCounts + loseCounts;
 
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
+    }
+
+    public RecentGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final int year) {
+        Member member = getMember(memberId);
+        validateUser(member);
+
+        int recentWinCounts = checkInRepository.findRecentGamesWinCounts(member, year, RECENT_LIMIT);
+        int recentLoseCounts = checkInRepository.findRecentGamesLoseCounts(member, year, RECENT_LIMIT);
+        int recentCounts = recentWinCounts + recentLoseCounts;
+
+        return new RecentGamesWinRateResponse(calculateWinRate(recentWinCounts, recentCounts));
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {

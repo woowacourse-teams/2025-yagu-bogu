@@ -17,3 +17,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create-drop
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    clean-disabled: false

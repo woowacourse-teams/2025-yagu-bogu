@@ -5,6 +5,7 @@ import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.stat.service.StatService;
@@ -34,6 +35,15 @@ public class StatController implements StatControllerInterface {
             @RequestParam final int year
     ) {
         WinRateResponse response = statService.findWinRate(memberClaims.id(), year);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<RecentGamesWinRateResponse> findRecentTenGamesWinRate(
+            final MemberClaims memberClaims,
+            @RequestParam final int year
+    ) {
+        RecentGamesWinRateResponse response = statService.findRecentTenGamesWinRate(memberClaims.id(), year);
 
         return ResponseEntity.ok(response);
     }

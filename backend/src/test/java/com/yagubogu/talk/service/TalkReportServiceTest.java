@@ -1,5 +1,8 @@
 package com.yagubogu.talk.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -24,9 +27,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
