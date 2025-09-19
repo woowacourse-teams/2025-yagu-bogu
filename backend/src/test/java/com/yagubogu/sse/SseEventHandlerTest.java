@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yagubogu.checkin.repository.CheckInRepository;
+import com.yagubogu.checkin.service.CheckInService;
 import com.yagubogu.sse.dto.CheckInCreatedEvent;
 import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.time.LocalDate;
@@ -20,14 +20,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 class SseEventHandlerTest {
 
     private SseEmitterRegistry repository;
-    private CheckInRepository checkInRepository;
+    private CheckInService checkInService;
     private SseEventHandler handler;
 
     @BeforeEach
     void setUp() {
         repository = new SseEmitterRegistry();
-        checkInRepository = mock(CheckInRepository.class);
-        handler = new SseEventHandler(repository, checkInRepository);
+        checkInService = mock(CheckInService.class);
+        handler = new SseEventHandler(repository, checkInService);
     }
 
     static class RecordingEmitter extends SseEmitter {
@@ -54,7 +54,7 @@ class SseEventHandlerTest {
     void onCheckInCreated_shouldSendEventToAllEmitters() {
         // given
         LocalDate date = LocalDate.of(2025, 7, 25);
-        when(checkInRepository.findGamesWithFanCountsByDate(any()))
+        when(checkInService.buildCheckInEventData(any()))
                 .thenReturn(List.of());
 
         RecordingEmitter e1 = new RecordingEmitter();
@@ -67,7 +67,7 @@ class SseEventHandlerTest {
 
         // then
         ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
-        verify(checkInRepository).findGamesWithFanCountsByDate(captor.capture());
+        verify(checkInService).buildCheckInEventData(captor.capture());
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(captor.getValue()).isEqualTo(date);
             softAssertions.assertThat(e1.sendCount).isEqualTo(1);

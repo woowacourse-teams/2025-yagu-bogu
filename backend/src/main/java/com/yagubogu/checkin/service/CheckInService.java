@@ -23,6 +23,7 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.sse.dto.CheckInCreatedEvent;
+import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -205,8 +206,26 @@ public class CheckInService {
         return FanRateByGameResponse.from(gameWithFanCounts.game(), total, homeRate, awayRate);
     }
 
+    public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
+        List<GameWithFanRateResponse> result = new ArrayList<>();
+
+        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
+        for (GameWithFanCountsResponse response : responses) {
+            Game game = response.game();
+            long homeTeamCounts = response.homeTeamCheckInCounts();
+            long awayTeamCounts = response.awayTeamCheckInCounts();
+            long totalCounts = response.totalCheckInCounts();
+
+            double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
+            double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
+            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
+        }
+
+        return result;
+    }
+
     private double calculateRoundRate(final Long checkInCounts, final Long total) {
-        if (total == 0 || checkInCounts == 0) {
+        if (total == 0) {
             return 0.0;
         }
 
