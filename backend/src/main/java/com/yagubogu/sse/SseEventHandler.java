@@ -20,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class EventHandler {
+public class SseEventHandler {
 
     private final SseEmitterRegistry sseEmitterRegistry;
     private final CheckInRepository checkInRepository;
