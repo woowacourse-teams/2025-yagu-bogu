@@ -170,7 +170,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_white_radius_12dp"
-                android:paddingVertical="20dp"
+                android:paddingTop="20dp"
                 android:visibility="@{viewModel.stadiumStatsUiModel.stadiumFanRates.isEmpty() ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -185,6 +185,23 @@
                     android:text="@string/home_stadium_stats_title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <FrameLayout
+                    android:id="@+id/frame_stadium_stats_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintStart_toEndOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title">
+
+                    <ImageView
+                        android:id="@+id/iv_stadium_stats_tooltip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/gray300" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tv_refresh_time"
@@ -234,9 +251,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="20dp"
                     android:background="@drawable/bg_stroke_gray300_radius_12dp"
                     android:onClick="@{() -> viewModel.toggleStadiumStats()}"
                     android:paddingVertical="8dp"
+                    android:visibility="@{viewModel.stadiumFanRateItems.size == 1 ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/rv_stadium_fan_rate">
 
@@ -289,7 +308,25 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <FrameLayout
+                    android:id="@+id/frame_victory_fairy_ranking_tooltip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintStart_toEndOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking">
+
+                    <ImageView
+                        android:id="@+id/iv_victory_fairy_ranking_tooltip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/gray300" />
+                </FrameLayout>
+
                 <TextView
+                    android:id="@+id/tv_victory_fairy_win_rate"
                     style="@style/TextView.Pretendard.Medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

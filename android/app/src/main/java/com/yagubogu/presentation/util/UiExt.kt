@@ -6,7 +6,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
+import com.skydoves.balloon.Balloon
 import com.yagubogu.R
 
 fun View.showSnackbar(
@@ -46,3 +48,19 @@ fun Context.showToast(
 ) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
+
+fun Context.buildBalloon(
+    text: String,
+    lifecycleOwner: LifecycleOwner,
+) = Balloon
+    .Builder(this)
+    .setText(text)
+    .setWidthRatio(0.5f)
+    .setCornerRadius(8f)
+    .setPaddingHorizontal(10)
+    .setPaddingVertical(8)
+    .setTextColorResource(R.color.gray800)
+    .setBackgroundColorResource(R.color.gray200)
+    .setArrowTopPadding(4)
+    .setLifecycleOwner(lifecycleOwner) // lifecycle에 맞춰 자동 dismiss
+    .build()

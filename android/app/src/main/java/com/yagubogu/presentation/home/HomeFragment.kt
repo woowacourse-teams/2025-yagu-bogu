@@ -37,6 +37,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -81,6 +82,7 @@ class HomeFragment :
         setupBindings()
         setupObservers()
         setupFragmentResultListener()
+        setupBalloons()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -276,6 +278,28 @@ class HomeFragment :
                     )
                 }
             }
+    }
+
+    private fun setupBalloons() {
+        val stadiumStatsInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_stadium_stats_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameStadiumStatsTooltip.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
+            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
+        }
+
+        val victoryFairyInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_victory_fairy_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
+        }
     }
 
     companion object {

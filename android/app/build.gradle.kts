@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
+    implementation(libs.balloon)
 
     // firebase
     implementation(platform(libs.firebase.bom))
