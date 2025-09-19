@@ -18,7 +18,7 @@ public class FakeAuthGateway implements AuthGateway {
                 111L, Instant.now().plusSeconds(3000).getEpochSecond(),
                 "email",
                 true,
-                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString().substring(0,10),
                 "picture",
                 "givenName",
                 "familyName",

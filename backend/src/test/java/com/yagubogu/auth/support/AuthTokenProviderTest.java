@@ -35,12 +35,12 @@ class AuthTokenProviderTest {
 
     @DisplayName("액세스 토큰을 생성한다")
     @Test
-    void createAccessToken() {
+    void issueAccessToken() {
         // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
 
         // when
-        String accessToken = authTokenProvider.createAccessToken(memberClaims);
+        String accessToken = authTokenProvider.issueAccessToken(memberClaims);
 
         // then
         assertThat(accessToken).isNotBlank();
@@ -80,7 +80,7 @@ class AuthTokenProviderTest {
         AuthTokenProvider expiredTokenProvider = new AuthTokenProvider(authTokenProperties);
 
         // when
-        String expiredToken = expiredTokenProvider.createAccessToken(memberClaims);
+        String expiredToken = expiredTokenProvider.issueAccessToken(memberClaims);
         try {
             Thread.sleep(1100);
         } catch (InterruptedException ignored) {
@@ -109,7 +109,7 @@ class AuthTokenProviderTest {
     void getMemberIdByAccessToken() {
         // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
-        String accessToken = authTokenProvider.createAccessToken(memberClaims);
+        String accessToken = authTokenProvider.issueAccessToken(memberClaims);
 
         // when
         Long memberId = authTokenProvider.getMemberIdByAccessToken(accessToken);
@@ -123,7 +123,7 @@ class AuthTokenProviderTest {
     void getRoleByAccessToken() {
         // given
         MemberClaims memberClaims = new MemberClaims(1L, Role.USER);
-        String accessToken = authTokenProvider.createAccessToken(memberClaims);
+        String accessToken = authTokenProvider.issueAccessToken(memberClaims);
 
         // when
         Role role = authTokenProvider.getRoleByAccessToken(accessToken);

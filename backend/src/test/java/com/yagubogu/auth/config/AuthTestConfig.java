@@ -3,12 +3,14 @@ package com.yagubogu.auth.config;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.gateway.FakeAuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
+import com.yagubogu.auth.service.RefreshTokenService;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
@@ -18,6 +20,7 @@ import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
+import com.yagubogu.team.repository.TeamRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -76,5 +79,15 @@ public class AuthTestConfig {
     @Bean
     public RefreshTokenFactory refreshTokenFactory(final RefreshTokenRepository refreshTokenRepository) {
         return new RefreshTokenFactory(refreshTokenRepository);
+    }
+
+    @Bean
+    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository, final AuthTokenProperties authTokenProperties) {
+        return new RefreshTokenService(refreshTokenRepository, authTokenProperties);
+    }
+
+    @Bean
+    public MemberService memberService(final MemberRepository memberRepository, final TeamRepository teamRepository) {
+        return new MemberService(memberRepository, teamRepository);
     }
 }

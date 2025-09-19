@@ -1,11 +1,13 @@
 package com.yagubogu.member.service;
 
 import com.yagubogu.global.exception.ConflictException;
+import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberFindResult;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
@@ -77,6 +79,16 @@ public class MemberService {
         Member member = getMember(memberId);
 
         return MemberInfoResponse.from(member);
+    }
+
+    @Transactional
+    public MemberFindResult findMember(final AuthResponse response) {
+        return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
+                .map(m -> new MemberFindResult(m, false))
+                .orElseGet(() -> {
+                    Member savedMember = memberRepository.save(response.toMember());
+                    return new MemberFindResult(savedMember, true);
+                });
     }
 
     private Member getMember(final long memberId) {

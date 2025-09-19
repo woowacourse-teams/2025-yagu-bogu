@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_favorite_team_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray050"
+        tools:context=".presentation.favorite.FavoriteTeamActivity">
+
+        <TextView
+            android:id="@+id/tv_favorite_team_selection"
+            style="@style/TextView.Esamanru.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="14dp"
+            android:text="@string/favorite_team_selection"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toTopOf="@id/rv_favorite_team_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_favorite_team_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingHorizontal="14dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_favorite_team_selection"
+            app:spanCount="2"
+            tools:listitem="@layout/item_favorite_team" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

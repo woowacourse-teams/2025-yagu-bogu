@@ -18,7 +18,7 @@ public class AuthFactory {
 
     public String getAccessTokenByMemberId(long memberId, Role role) {
         MemberClaims claims = new MemberClaims(memberId, role);
-        String jwt = authTokenProvider.createAccessToken(claims);
+        String jwt = authTokenProvider.issueAccessToken(claims);
 
         return BEARER + jwt;
     }

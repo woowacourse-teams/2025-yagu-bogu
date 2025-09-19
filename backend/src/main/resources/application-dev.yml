@@ -5,21 +5,13 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
   sql:
     init:
       mode: never
 
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: validate
-
   flyway:
     enabled: true
-    locations:
-      - classpath:db/migration
-      - classpath:db/migration/mysql
-    validate-on-migrate: true
-    clean-disabled: true
