@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Component
-public class SseEmitterRepository {
+public class SseEmitterRegistry {
 
     private final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
@@ -43,5 +43,10 @@ public class SseEmitterRepository {
 
     public Collection<SseEmitter> all() {
         return sseEmitterMap.values();
+    }
+    
+    public void removeWithError(SseEmitter emitter, Throwable throwable) {
+        emitter.completeWithError(throwable);
+        sseEmitterMap.values().removeIf(e -> e.equals(emitter));
     }
 }

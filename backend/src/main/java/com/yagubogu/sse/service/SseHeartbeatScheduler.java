@@ -1,6 +1,6 @@
 package com.yagubogu.sse.service;
 
-import com.yagubogu.sse.repository.SseEmitterRepository;
+import com.yagubogu.sse.repository.SseEmitterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -10,15 +10,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Component
 public class SseHeartbeatScheduler {
 
-    private final SseEmitterRepository repository;
+    private final SseEmitterRegistry registry;
 
     @Scheduled(fixedRateString = "${sse.heartbeat.interval-ms}")
     public void sendHeartbeat() {
-        for (SseEmitter emitter : repository.all()) {
+        for (SseEmitter emitter : registry.all()) {
+
             try {
                 emitter.send(SseEmitter.event().comment("keepalive"));
             } catch (Exception e) {
-                emitter.completeWithError(e);
+                registry.removeWithError(emitter, e);
             }
         }
     }

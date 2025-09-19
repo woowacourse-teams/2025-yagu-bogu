@@ -5,7 +5,7 @@ import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.sse.dto.CheckInCreatedEvent;
 import com.yagubogu.sse.dto.GameWithFanRateResponse;
-import com.yagubogu.sse.repository.SseEmitterRepository;
+import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Component
 public class EventHandler {
 
-    private final SseEmitterRepository sseEmitterRepository;
+    private final SseEmitterRegistry sseEmitterRegistry;
     private final CheckInRepository checkInRepository;
 
     @Async
@@ -30,7 +30,7 @@ public class EventHandler {
     public void onCheckInCreated(final CheckInCreatedEvent event) {
         List<GameWithFanRateResponse> eventData = buildCheckInEventData(event.date());
 
-        sseEmitterRepository.all().forEach(emitter -> {
+        sseEmitterRegistry.all().forEach(emitter -> {
             try {
                 emitter.send(SseEmitter.event()
                         .name("check-in-created")

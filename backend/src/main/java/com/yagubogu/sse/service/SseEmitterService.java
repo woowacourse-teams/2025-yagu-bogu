@@ -1,6 +1,6 @@
 package com.yagubogu.sse.service;
 
-import com.yagubogu.sse.repository.SseEmitterRepository;
+import com.yagubogu.sse.repository.SseEmitterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -11,7 +11,7 @@ public class SseEmitterService {
 
     private static final long ONE_HOUR_TIMEOUT = 60L * 60 * 1000;
 
-    private final SseEmitterRepository sseEmitterRepository;
+    private final SseEmitterRegistry registry;
 
     public SseEmitter add() {
         SseEmitter emitter = new SseEmitter(ONE_HOUR_TIMEOUT);
@@ -20,9 +20,9 @@ public class SseEmitterService {
                     .name("connect")
                     .data("connected"));
         } catch (Exception e) {
-            emitter.completeWithError(e);
+            registry.removeWithError(emitter, e);
         }
 
-        return sseEmitterRepository.add(emitter);
+        return registry.add(emitter);
     }
 }

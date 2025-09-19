@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.sse.dto.CheckInCreatedEvent;
-import com.yagubogu.sse.repository.SseEmitterRepository;
+import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +19,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 class EventHandlerTest {
 
-    private SseEmitterRepository repository;
+    private SseEmitterRegistry repository;
     private CheckInRepository checkInRepository;
     private EventHandler handler;
 
     @BeforeEach
     void setUp() {
-        repository = new SseEmitterRepository();
+        repository = new SseEmitterRegistry();
         checkInRepository = mock(CheckInRepository.class);
         handler = new EventHandler(repository, checkInRepository);
     }
