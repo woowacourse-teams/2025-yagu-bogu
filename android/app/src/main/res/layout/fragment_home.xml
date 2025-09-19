@@ -5,179 +5,326 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
-            name="homeUiModel"
-            type="com.yagubogu.presentation.home.model.HomeUiModel" />
+            name="viewModel"
+            type="com.yagubogu.presentation.home.HomeViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/gray050"
-        tools:context=".presentation.home.HomeFragment">
+        android:layout_height="match_parent">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_check_in"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/primary500"
-            app:cardCornerRadius="100dp"
-            app:cardElevation="8dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:background="@color/gray050"
+            android:paddingBottom="20dp"
+            tools:context=".presentation.home.HomeFragment">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_check_in"
-                style="@style/TextView.Pretendard.Bold.20"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_check_in"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/primary500"
-                android:paddingVertical="12dp"
-                android:text="@string/home_check_in"
-                android:textColor="@color/white"
-                app:icon="@drawable/ic_marker_pin"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:iconSize="24dp"
-                app:iconTint="@color/white"
-                app:rippleColor="@android:color/transparent" />
-        </androidx.cardview.widget.CardView>
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@{viewModel.hasAlreadyCheckedIn ? @color/primary050 : @color/primary500}"
+                app:cardCornerRadius="100dp"
+                app:cardElevation="8dp"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_my_team"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
-            app:layout_constraintEnd_toStartOf="@id/constraint_total_attendance"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cv_check_in">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_check_in"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/color_button_bg_selector"
+                    android:enabled="@{viewModel.hasAlreadyCheckedIn ? false : true}"
+                    android:paddingVertical="12dp"
+                    android:text="@{viewModel.hasAlreadyCheckedIn ? @string/home_already_checked_in : @string/home_check_in}"
+                    android:textColor="@{viewModel.hasAlreadyCheckedIn ? @color/primary700 : @color/white}"
+                    app:icon="@drawable/ic_marker_pin"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconSize="24dp"
+                    app:iconTint="@{viewModel.hasAlreadyCheckedIn ? @color/primary700 : @color/white}"
+                    app:rippleColor="@android:color/transparent"
+                    tools:text="@string/home_check_in"
+                    tools:textColor="@color/white" />
+            </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/tv_team"
-                style="@style/TextView.Pretendard.Bold"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_my_team"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{homeUiModel.myTeam}"
-                android:textColor="@color/primary700"
-                android:textSize="22sp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
+                android:paddingVertical="14dp"
+                app:layout_constraintEnd_toStartOf="@id/constraint_total_attendance"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cv_check_in">
+
+                <TextView
+                    android:id="@+id/tv_team"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.memberStatsUiModel.myTeam}"
+                    android:textColor="@color/primary700"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="KIA" />
+
+                <TextView
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/home_my_team"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_team" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_total_attendance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
+                android:paddingVertical="14dp"
+                app:layout_constraintEnd_toStartOf="@id/constraint_winning_percentage"
+                app:layout_constraintStart_toEndOf="@id/constraint_my_team"
+                app:layout_constraintTop_toTopOf="@id/constraint_my_team">
+
+                <TextView
+                    android:id="@+id/tv_total_attendance"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{String.valueOf(viewModel.memberStatsUiModel.attendanceCount)}"
+                    android:textColor="@color/primary700"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="24" />
+
+                <TextView
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/home_attendance_count"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_total_attendance" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_winning_percentage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
+                android:paddingVertical="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/constraint_total_attendance"
+                app:layout_constraintTop_toTopOf="@id/constraint_my_team">
+
+                <TextView
+                    android:id="@+id/tv_winning_percentage"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/all_rounded_win_rate(viewModel.memberStatsUiModel.winRate)}"
+                    android:textColor="@color/primary700"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="75%" />
+
+                <TextView
+                    style="@style/TextView.Pretendard.Regular.12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/home_winning_percentage"
+                    android:textColor="@color/gray500"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_winning_percentage" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_stadium_stats"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:paddingVertical="20dp"
+                android:visibility="@{viewModel.stadiumStatsUiModel.stadiumFanRates.isEmpty() ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="KIA" />
+                app:layout_constraintTop_toBottomOf="@id/constraint_my_team">
 
-            <TextView
-                style="@style/TextView.Pretendard.Regular.12"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/tv_stadium_stats_title"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/home_stadium_stats_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_refresh_time"
+                    style="@style/TextView.Pretendard.Regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:text="@{@string/home_stadium_stats_refresh_time(viewModel.stadiumStatsUiModel.refreshTime.hour, viewModel.stadiumStatsUiModel.refreshTime.minute)}"
+                    android:textColor="@color/gray400"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_stadium_stats_title"
+                    app:layout_constraintEnd_toStartOf="@id/iv_refresh"
+                    app:layout_constraintTop_toTopOf="@id/tv_stadium_stats_title"
+                    tools:text="14:30 기준" />
+
+                <ImageView
+                    android:id="@+id/iv_refresh"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:src="@drawable/ic_refresh"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_refresh_time"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_refresh_time"
+                    app:tint="@color/gray400" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_stadium_fan_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@id/constraint_show_more"
+                    app:layout_constraintTop_toBottomOf="@id/tv_stadium_stats_title" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:onClick="@{() -> viewModel.toggleStadiumStats()}"
+                    app:layout_constraintBottom_toBottomOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintEnd_toEndOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintStart_toStartOf="@id/rv_stadium_fan_rate"
+                    app:layout_constraintTop_toTopOf="@id/rv_stadium_fan_rate" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraint_show_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:background="@drawable/bg_stroke_gray300_radius_12dp"
+                    android:onClick="@{() -> viewModel.toggleStadiumStats()}"
+                    android:paddingVertical="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rv_stadium_fan_rate">
+
+                    <TextView
+                        android:id="@+id/tv_show_more"
+                        style="@style/TextView.Pretendard.Regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:text="@{viewModel.isStadiumStatsExpanded ? @string/home_show_less : @string/home_show_more}"
+                        android:textColor="@color/gray400"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/iv_arrow"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="더보기" />
+
+                    <ImageView
+                        android:id="@+id/iv_arrow"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@{viewModel.isStadiumStatsExpanded ? @drawable/ic_arrow_up : @drawable/ic_arrow_down}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_show_more"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/gray400"
+                        tools:src="@drawable/ic_arrow_down" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_victory_fairy_ranking"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/home_my_team"
-                android:textColor="@color/gray500"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_team" />
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_white_radius_12dp"
+                android:padding="20dp"
+                app:layout_constraintTop_toBottomOf="@id/constraint_stadium_stats">
+
+                <TextView
+                    android:id="@+id/tv_victory_fairy_ranking"
+                    style="@style/TextView.Pretendard.Bold.20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_victory_fairy_ranking"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    style="@style/TextView.Pretendard.Medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_winning_percentage"
+                    android:textColor="@color/gray400"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_victory_fairy_ranking" />
+
+                <include
+                    android:id="@+id/layout_my_victory_fairy"
+                    layout="@layout/item_victory_fairy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/tv_victory_fairy_ranking" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.4dp"
+                    android:layout_marginTop="4dp"
+                    app:dividerColor="@color/gray300"
+                    app:layout_constraintTop_toBottomOf="@id/layout_my_victory_fairy" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_victory_fairy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintTop_toBottomOf="@id/divider" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_total_attendance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
-            app:layout_constraintEnd_toStartOf="@id/constraint_winning_percentage"
-            app:layout_constraintStart_toEndOf="@id/constraint_my_team"
-            app:layout_constraintTop_toTopOf="@id/constraint_my_team">
-
-            <TextView
-                android:id="@+id/tv_total_attendance"
-                style="@style/TextView.Pretendard.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{String.valueOf(homeUiModel.attendanceCount)}"
-                android:textColor="@color/primary700"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="24" />
-
-            <TextView
-                style="@style/TextView.Pretendard.Regular.12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/home_attendance_count"
-                android:textColor="@color/gray500"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_total_attendance" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_winning_percentage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/bg_white_stroke_primary100_radius_12dp"
-            android:paddingVertical="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/constraint_total_attendance"
-            app:layout_constraintTop_toTopOf="@id/constraint_my_team">
-
-            <TextView
-                android:id="@+id/tv_winning_percentage"
-                style="@style/TextView.Pretendard.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{@string/all_winning_percentage(homeUiModel.winRate)}"
-                android:textColor="@color/primary700"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="75%" />
-
-            <TextView
-                style="@style/TextView.Pretendard.Regular.12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/home_winning_percentage"
-                android:textColor="@color/gray500"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_winning_percentage" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            style="@style/TextView.Pretendard.Bold.20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="28dp"
-            android:text="@string/home_recent_attendance_record"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/constraint_my_team" />
-
-        <TextView
-            style="@style/TextView.Pretendard.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lineSpacingExtra="8dp"
-            android:text="@string/home_empty_attendance_record_description"
-            android:textColor="@color/gray400"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/constraint_my_team" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

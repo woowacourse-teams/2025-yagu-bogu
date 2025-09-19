@@ -19,7 +19,7 @@
             android:paddingVertical="6dp"
             app:layout_constraintTop_toTopOf="parent"
             app:tabBackground="@color/primary050"
-            app:tabIndicator="@drawable/bg_primary500_radius_12dp"
+            app:tabIndicator="@drawable/bg_primary500_radius_12dp_padding_6dp"
             app:tabIndicatorColor="@color/primary500"
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"

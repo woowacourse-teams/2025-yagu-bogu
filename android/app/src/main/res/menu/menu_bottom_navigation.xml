@@ -5,16 +5,16 @@
         android:icon="@drawable/ic_home"
         android:title="@string/bottom_navigation_home" />
     <item
+        android:id="@+id/item_livetalk"
+        android:icon="@drawable/ic_livetalk"
+        android:title="@string/bottom_navigation_livetalk" />
+    <item
         android:id="@+id/item_stats"
         android:icon="@drawable/ic_stats"
         android:title="@string/bottom_navigation_stats" />
     <item
-        android:id="@+id/item_record"
-        android:icon="@drawable/ic_record"
-        android:title="@string/bottom_navigation_record" />
-    <item
-        android:id="@+id/item_challenge"
-        android:icon="@drawable/ic_challenge"
-        android:title="@string/bottom_navigation_challenge" />
+        android:id="@+id/item_attendance_history"
+        android:icon="@drawable/ic_attendance_history"
+        android:title="@string/bottom_navigation_attendance_history" />
 
 </menu>
