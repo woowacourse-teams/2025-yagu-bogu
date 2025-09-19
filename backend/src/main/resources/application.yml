@@ -4,12 +4,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+
   flyway:
-    enabled: true
-    locations:
-      - classpath:db/migration
-      - classpath:db/migration/mysql
-    validate-on-migrate: true
+    enabled: false
 
 oauth:
   google:
@@ -40,6 +37,11 @@ management:
     web:
       exposure:
         include: health
+
+sse:
+  heartbeat:
+    enabled: true
+    interval-ms: 25000
 
 ---
 spring:

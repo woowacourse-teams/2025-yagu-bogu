@@ -1,5 +1,9 @@
 package com.yagubogu.talk.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -31,10 +35,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -234,7 +234,8 @@ class TalkServiceTest {
 //        // given
 //        int limit = 2;
 //        Long cursorId = null;
-//        Member firstEnterMember = memberFactory.save(MemberBuilder::build);
+//        Team team = teamRepository.findByTeamCode("HH").orElseThrow();
+//        Member firstEnterMember = memberFactory.save(builder -> builder.team(team).build());
 //
 //        Stadium expectedStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
 //        Team expectedHomeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
@@ -243,12 +244,7 @@ class TalkServiceTest {
 //                .awayTeam(expectedAwayTeam)
 //                .stadium(expectedStadium));
 //
-//        Member expectedMessageWriter = memberFactory.save(builder -> builder.team(expectedAwayTeam));
-//        Talk expectedFirstPageTalk = talkFactory.save(builder ->
-//                builder.member(expectedMessageWriter)
-//                        .game(game)
-//        );
-//        Member soonLeftMember = memberFactory.save(MemberBuilder::build);
+//        Member soonLeftMember = memberFactory.save(builder -> builder.team(team).build());
 //        Talk remainedTalkByLeftMember = talkFactory.save(builder ->
 //                builder.member(soonLeftMember)
 //                        .game(game)

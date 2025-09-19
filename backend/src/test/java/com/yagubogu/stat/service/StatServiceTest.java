@@ -43,6 +43,8 @@ import org.springframework.context.annotation.Import;
 @DataJpaTest
 class StatServiceTest {
 
+    private final int RECENT_LIMIT = 10;
+
     private StatService statService;
 
     @Autowired
@@ -299,6 +301,63 @@ class StatServiceTest {
 
         // then
         assertThat(actual.winRate()).isEqualTo(83.3);
+    }
+
+    @DisplayName("최근 10경기에 대한 결과만 계산한다: 12경기 중 과거 2경기는 제외되고 최신 10경기의 승/패/무만 카운트된다")
+    @Test
+    void findRecentTenGamesWinRate_onlyLast10Games() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        Member member = memberFactory.save(b -> b.team(HT));
+
+        for (int d = 1; d <= 20; d++) {
+            int day = d;
+            int homeScore = 0;
+            int awayScore = 0;
+
+            if (day == 8 || day == 10 || day == 11 || day == 13 || day == 15 || day == 17) {
+                homeScore = 5;
+                awayScore = 2; // 승
+            } else if (day == 9 || day == 12 || day == 16) {
+                homeScore = 2;
+                awayScore = 6; // 패
+            } else if (day == 14) {
+                homeScore = 4;
+                awayScore = 4; // 무
+            } else {
+                homeScore = 1;
+                awayScore = 0; // 그냥 값 (집계대상 아님)
+            }
+
+            int hs = homeScore;
+            int as = awayScore;
+
+            Game g = gameFactory.save(b -> b.stadium(kia)
+                    .homeTeam(HT).awayTeam(LT)
+                    .date(LocalDate.of(2025, 8, day))
+                    .homeScore(hs).awayScore(as)
+                    .gameState(GameState.COMPLETED));
+
+            // 8/05~8/17에만 내가 체크인
+            if (day >= 5 && day <= 17) {
+                checkInFactory.save(b -> b.game(g).member(member).team(HT));
+            }
+        }
+
+        // when
+        int wins = checkInRepository.findRecentGamesWinCounts(member, 2025, RECENT_LIMIT);
+        int loses = checkInRepository.findRecentGamesLoseCounts(member, 2025, RECENT_LIMIT);
+        int draws = checkInRepository.findRecentGamesDrawCounts(member, 2025, RECENT_LIMIT);
+
+        // then
+        assertSoftly(s -> {
+            s.assertThat(wins).isEqualTo(6);
+            s.assertThat(loses).isEqualTo(3);
+            s.assertThat(draws).isEqualTo(1);
+        });
     }
 
     @DisplayName("0%가 아닌 승률이 있을 때 행운의 구장을 조회한다")
