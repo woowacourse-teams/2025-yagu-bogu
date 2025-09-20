@@ -193,7 +193,7 @@ public class CheckInService {
                                                              final Member member) {
         VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
         double score = Math.round(myRanking.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR;
-        int myRankingOrder = checkInRepository.calculateMyRankingOrder(score, m, c, year, teamFilter);
+        int myRankingOrder = checkInRepository.calculateMyRankingOrder(myRanking.score(), m, c, year, teamFilter) + 1;
         double winPercent = Math.round(myRanking.winPercent() * ROUND_FACTOR) / ROUND_FACTOR;
 
         return new VictoryFairyRankingResponse(
