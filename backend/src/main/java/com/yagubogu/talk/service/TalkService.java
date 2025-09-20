@@ -1,6 +1,6 @@
 package com.yagubogu.talk.service;
 
-import com.yagubogu.badge.BadgeEvent;
+import com.yagubogu.badge.EventPublished;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -91,7 +91,7 @@ public class TalkService {
         validateBlockedFromGame(gameId, memberId);
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
-        publisher.publishEvent(new BadgeEvent(member, Policy.FIRST_CHAT));
+        publisher.publishEvent(new EventPublished(member, Policy.CHAT));
 
         return TalkResponse.from(talk, memberId);
     }

@@ -222,7 +222,7 @@ public class MemberE2eTest extends E2eTestBase {
     @Test
     void patchRepresentativeBadge() {
         // given
-        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
         memberBadgeFactory.save(builder -> builder.badge(badge).member(member));

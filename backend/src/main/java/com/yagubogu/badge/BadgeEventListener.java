@@ -22,7 +22,7 @@ public class BadgeEventListener {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleBadgeEvent(final BadgeEvent event) {
+    public void handleBadgeEvent(final EventPublished event) {
         for (BadgePolicy policy : badgePolicies) {
             BadgeAwardCandidate candidate = policy.determineAwardCandidate(event);
             if (candidate != null) {

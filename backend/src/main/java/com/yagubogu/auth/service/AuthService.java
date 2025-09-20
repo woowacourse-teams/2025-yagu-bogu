@@ -13,7 +13,7 @@ import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
-import com.yagubogu.badge.BadgeEvent;
+import com.yagubogu.badge.EventPublished;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
@@ -56,7 +56,7 @@ public class AuthService {
         String refreshToken = generateRefreshToken(member);
 
         if (isNew) {
-            publisher.publishEvent(new BadgeEvent(member, Policy.SIGN_UP));
+            publisher.publishEvent(new EventPublished(member, Policy.SIGN_UP));
         }
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }

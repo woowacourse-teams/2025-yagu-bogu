@@ -274,7 +274,7 @@ public class MemberServiceTest {
     @Test
     void findBadges() {
         // given
-        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         long memberId = member.getId();
         MemberBadge memberBadge = memberBadgeFactory.save(builder ->
@@ -285,13 +285,18 @@ public class MemberServiceTest {
 
         List<BadgeResponseWithRates> badgeResponses = List.of(
                 new BadgeResponseWithRates(
-                        1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
+                        1L, "리드오프", "회원가입한 회원",
                         Policy.SIGN_UP, 1, true, LocalDateTime.now(),
                         100.0, 100.0
                 ),
                 new BadgeResponseWithRates(
-                        2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
-                        Policy.FIRST_CHAT, 0, false, null,
+                        2L, "말문이 트이다", "첫 현장톡 작성",
+                        Policy.CHAT, 0, false, null,
+                        0.0, 0.0
+                ),
+                new BadgeResponseWithRates(
+                        3L, "공포의 주둥아리", "현장톡 누적 100회",
+                        Policy.CHAT, 0, false, null,
                         0.0, 0.0
                 )
         );
@@ -315,7 +320,7 @@ public class MemberServiceTest {
     @Test
     void patchRepresentativeBadge() {
         // given
-        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         memberBadgeFactory.save(builder ->
                 builder.member(member)

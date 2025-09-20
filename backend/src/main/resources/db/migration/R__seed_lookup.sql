@@ -35,8 +35,9 @@ ON DUPLICATE KEY UPDATE full_name  = new_data.full_name,
 
 -- badges
 INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold)
-    VALUES ('첫 가입 기념', '첫 회원가입 시 지급되는 뱃지', 'SIGN_UP', 1),
-           ('말문이 트이다', '처음 현장톡 사용시 지급되는 뱃지', 'FIRST_CHAT', 1)
+    VALUES ('리드오프', '회원가입한 회원', 'SIGN_UP', 1),
+           ('말문이 트이다', '첫 현장톡 작성', 'CHAT', 1),
+           ('공포의 주둥아리', '현장톡 누적 100회', 'CHAT', 5)
         AS new_data
 ON DUPLICATE KEY UPDATE badge_name        = new_data.badge_name,
                         badge_description = new_data.badge_description,
