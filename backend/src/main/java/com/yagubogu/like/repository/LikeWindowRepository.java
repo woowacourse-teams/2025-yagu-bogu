@@ -15,7 +15,7 @@ public class LikeWindowRepository {
     public boolean tryInsertWindow(long gameId, Long memberId, long windowStart) {
         int updated = em.createNativeQuery("""
                         insert ignore into like_windows (game_id, member_id, window_start_epoch_sec)
-                        values (:gameId, :clientId, :windowStart)
+                        values (:gameId, :memberId, :windowStart)
                         """)
                 .setParameter("gameId", gameId)
                 .setParameter("memberId", memberId)
