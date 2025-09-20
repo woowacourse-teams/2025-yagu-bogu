@@ -3,11 +3,13 @@ package com.yagubogu.presentation.setting
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.LifecycleOwner
+import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingNicknameEditBinding
 
 class SettingNicknameEditFragment : DialogFragment() {
@@ -28,10 +30,23 @@ class SettingNicknameEditFragment : DialogFragment() {
         }
         binding.tvNegativeBtn.setOnClickListener { dismiss() }
 
-        return AlertDialog
-            .Builder(requireActivity())
-            .setView(binding.root)
-            .create()
+        val dialog =
+            AlertDialog
+                .Builder(requireActivity())
+                .setView(binding.root)
+                .create()
+
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_white_radius_12dp)
+
+        return dialog
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+        )
     }
 
     companion object {

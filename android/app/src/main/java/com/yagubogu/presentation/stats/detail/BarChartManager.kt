@@ -26,6 +26,7 @@ class BarChartManager(
      */
     fun setupChart() {
         chart.apply {
+            setNoDataText("")
             description.isEnabled = false
             legend.isEnabled = false
             setTouchEnabled(false)
