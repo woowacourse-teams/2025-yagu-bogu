@@ -1,6 +1,7 @@
 package com.yagubogu.checkin.domain;
 
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "check_ins")
 @Entity
-public class CheckIn {
+public class CheckIn extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
