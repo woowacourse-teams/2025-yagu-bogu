@@ -97,7 +97,7 @@ public class LikeE2eTest extends E2eTestBase {
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         LikeBatchRequest request = new LikeBatchRequest(
-                "test-client-1",
+                1L,
                 1L,
                 new LikeDelta(homeTeam.getId(), 3L)
         );
