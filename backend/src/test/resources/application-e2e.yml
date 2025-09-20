@@ -2,6 +2,7 @@ spring:
   sql:
     init:
       mode: never
+
   jpa:
     show-sql: true
     properties:
@@ -10,33 +11,10 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
+
   flyway:
     enabled: true
     locations:
       - classpath:db/migration
       - classpath:db/migration/mysql
     clean-disabled: false
-
-oauth:
-  google:
-    base-uri: 'https://oauth2.googleapis.com'
-    token-info-uri: '/tokeninfo'
-    client-id: 'this-is-client-id'
-    connect-timeout: 180s # 3분
-    read-timeout: 180s
-
-security:
-  token:
-    access-token:
-      secret-key: this-is-secret-key
-      expires-in: 900      # 15분 (초)
-    refresh-token:
-      secret-key: this-is-secret-key
-      expires-in: 1209600  # 14일 (초)
-
-api:
-  kbo:
-    base-url: https://www.koreabaseball.com/ws
-    connect-timeout: 5s
-    read-timeout: 30s
-    content-type: application/x-www-form-urlencoded; charset=UTF-8

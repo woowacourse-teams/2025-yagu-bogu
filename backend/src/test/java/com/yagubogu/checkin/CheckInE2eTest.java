@@ -1,6 +1,7 @@
 package com.yagubogu.checkin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -10,7 +11,10 @@ import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -371,27 +375,38 @@ public class CheckInE2eTest extends E2eTestBase {
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(kt).awayScore(1)
-                .date(startDate));
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(1)));
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(2)));
+                .date(startDate.plusDays(2))
+                .gameState(GameState.COMPLETED));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(3)));
+                .date(startDate.plusDays(3))
+                .gameState(GameState.COMPLETED));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kt).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(4)));
+                .date(startDate.plusDays(4))
+                .gameState(GameState.COMPLETED));
         gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(lg).homeScore(10)
                 .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(5)));
+                .date(startDate.plusDays(5))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(LocalDate.of(2024, 5, 3))
+                .gameState(GameState.COMPLETED));
 
         List<Member> members = memberRepository.findAll();
         List<Game> games = gameRepository.findAll();
@@ -402,12 +417,115 @@ public class CheckInE2eTest extends E2eTestBase {
         }
 
         // when & then
-        RestAssured.given().log().all()
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
                 .when().get("/api/check-ins/victory-fairy/rankings")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions -> {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(40.0);
+                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(40.0);
+                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(31.7);
+                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(23.3);
+                }
+        );
+    }
+
+    @DisplayName("무승부는 직관 승률에 포함하지 않는다")
+    @Test
+    void findVictoryFairyRankings_withoutDraws() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(10)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED));
+
+        List<Game> games = gameRepository.findAll();
+        for (Game g : games) {
+            checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(g));
+        }
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions ->
+                {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.getFirst().winPercent()).isEqualTo(100.0);
+                }
+        );
+    }
+
+    @DisplayName("탈퇴된 회원은 랭킹에 조회되지 않는다")
+    @Test
+    void findVictoryFairyRankings_quit() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String foraAccessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        Member duri = memberFactory.save(b -> b.team(samsung).nickname("두리"));
+        String duriAccessToken = authFactory.getAccessTokenByMemberId(duri.getId(), Role.USER);
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, foraAccessToken)
+                .when().delete("/api/members/me")
+                .then().log().all()
+                .statusCode(204);
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, duriAccessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/check-ins/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions -> {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.size()).isOne();
+                    softAssertions.assertThat(actual.getFirst().nickname()).isEqualTo("두리");
+                }
+        );
     }
 
     @DisplayName("인증 여부를 조회한다")

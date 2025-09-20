@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    disableAnsi="false"
+                    noConsoleNoAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] - %msg%n"/>
+        </Console>
+
+        <!-- Test 전용 파일 로깅: 프로젝트 내부 log 디렉토리 사용 (/var/log 미사용) -->
+        <RollingFile name="TestFile" fileName="log/test.log"
+                     filePattern="log/test-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green}] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="3"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="TestFile"/>
+        </Root>
+
+        <Logger name="org.springframework" level="warn"/>
+        <Logger name="com.yagubogu" level="debug"/>
+    </Loggers>
+</Configuration>
+

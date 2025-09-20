@@ -10,6 +10,7 @@ import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ public class CheckInController implements CheckInControllerInterface {
 
     public ResponseEntity<CheckInCountsResponse> findCheckInCounts(
             final MemberClaims memberClaims,
-            @RequestParam final long year
+            @RequestParam final int year
     ) {
         CheckInCountsResponse response = checkInService.findCheckInCounts(memberClaims.id(), year);
 
@@ -72,9 +73,11 @@ public class CheckInController implements CheckInControllerInterface {
     }
 
     public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            final MemberClaims memberClaims
+            final MemberClaims memberClaims,
+            @RequestParam(name = "team", defaultValue = "ALL") final TeamFilter teamFilter,
+            final int year
     ) {
-        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id());
+        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id(), teamFilter, year);
 
         return ResponseEntity.ok(response);
     }
