@@ -1,5 +1,11 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -15,7 +21,6 @@ import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.TeamFanRateResponse;
 import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -46,12 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -422,7 +421,7 @@ class CheckInServiceTest {
         checkInFavorite(uga, g3, g5, g6, g7);
 
         // when
-        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
+        VictoryFairyRankingResponses actual = checkInService.findVictoryFairyRankings(duri.getId(), TeamFilter.ALL,
                 2025);
 
         // then
@@ -430,9 +429,10 @@ class CheckInServiceTest {
                     softAssertions.assertThat(actual.topRankings())
                             .extracting("nickname")
                             .containsExactly("밍트", "포르", "포라", "두리", "우가");
-                    softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
-                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("KIA");
-                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(100.0);
+                    softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(duri.getNickname().getValue());
+                    softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(duri.getTeam().getShortName());
+                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
+                    softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(4);
                 }
         );
     }
@@ -549,7 +549,7 @@ class CheckInServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(0);
+            softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(1);
             softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(fora.getNickname().getValue());
             softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(fora.getTeam().getShortName());
             softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);

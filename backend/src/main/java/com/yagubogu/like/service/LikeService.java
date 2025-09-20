@@ -34,7 +34,7 @@ public class LikeService {
         // 멱등성 키 insert (INSERT IGNORE -> 이미 처리된 배치면 재적용 금지)
         boolean inserted = likeWindowRepository.tryInsertWindow(
                 gameId,
-                request.clientInstanceId(),
+                request.memberId(),
                 request.windowStartEpochSec()
         );
         if (!inserted) {

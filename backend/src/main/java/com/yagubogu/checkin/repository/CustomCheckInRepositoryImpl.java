@@ -232,7 +232,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
                 .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
                 .leftJoin(TEAM).on(CHECK_IN.team.eq(TEAM))
-                .where(filterByTeam(teamFilter))
+                .where(filterByTeam(teamFilter), isMemberNotDeleted())
                 .groupBy(MEMBER)
                 .having(score.gt(myScore))
                 .fetch().size();
@@ -291,6 +291,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return conditionCountOnRecentGames(member, year, drawCondition(QCheckIn.checkIn, QGame.game), limit);
     }
 
+    // 내 직관 내역 조회
     // 내 응원 팀 여부 관계 o, 게임 완료 여부 관계 x(취소된 경기도 보여줌)
     public List<CheckInGameResponse> findCheckInHistory(
             Member member,
