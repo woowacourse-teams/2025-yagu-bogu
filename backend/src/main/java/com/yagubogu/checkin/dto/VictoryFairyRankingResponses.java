@@ -1,5 +1,6 @@
 package com.yagubogu.checkin.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public record VictoryFairyRankingResponses(
             String profileImageUrl,
             String teamShortName,
             double winPercent,
+            @JsonIgnore
             double victoryFairyScore
     ) {
     }
