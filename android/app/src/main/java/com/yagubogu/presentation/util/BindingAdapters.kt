@@ -7,6 +7,7 @@ import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.yagubogu.R
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -109,5 +110,16 @@ fun ImageView.loadImage(url: String?) {
             .placeholder(R.drawable.ic_user)
             .circleCrop()
             .into(this)
+    }
+}
+
+@BindingAdapter("isShimmering")
+fun ShimmerFrameLayout.bindShimmering(isLoading: Boolean) {
+    if (isLoading) {
+        this.visibility = View.VISIBLE
+        this.startShimmer()
+    } else {
+        this.visibility = View.GONE
+        this.stopShimmer()
     }
 }

@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingDeleteAccountBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
@@ -17,6 +20,8 @@ class SettingDeleteAccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SettingViewModel by activityViewModels()
+
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,6 +66,12 @@ class SettingDeleteAccountFragment : Fragment() {
                         .newInstance(KEY_DELETE_ACCOUNT_REQUEST_DIALOG, dialogUiModel)
                 dialog.show(parentFragmentManager, KEY_DELETE_ACCOUNT_REQUEST_DIALOG)
             }
+            firebaseAnalytics.logEvent("delete_account_confirm", null)
+        }
+
+        binding.btnCancel.setOnClickListener {
+            viewModel.cancelDeleteAccount()
+            firebaseAnalytics.logEvent("delete_account_cancel", null)
         }
     }
 

@@ -22,8 +22,8 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.1"
+        versionCode = 1_01_00
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -117,6 +117,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.glide)
     implementation(libs.play.services.oss.licenses)
+    implementation(libs.shimmer)
+    implementation(libs.balloon)
 
     // firebase
     implementation(platform(libs.firebase.bom))
@@ -127,6 +129,10 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.googleid)
+
+    // play in-app update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

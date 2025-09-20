@@ -15,9 +15,7 @@ import java.time.LocalDate
 
 class AttendanceHistoryViewModel(
     private val checkInRepository: CheckInRepository,
-) : ViewModel(),
-    AttendanceHistorySummaryViewHolder.Handler,
-    AttendanceHistoryDetailViewHolder.Handler {
+) : ViewModel() {
     private var items: List<AttendanceHistoryItem.Detail> = emptyList()
 
     private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
@@ -66,13 +64,13 @@ class AttendanceHistoryViewModel(
             }
     }
 
-    override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+    fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
         val position: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
         if (position < FIRST_INDEX) return
         _detailItemPosition.value = position
     }
 
-    override fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+    fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
         val position: Int = attendanceHistoryItems.value.orEmpty().indexOf(item)
         if (position < FIRST_INDEX) return
         _detailItemPosition.value = null

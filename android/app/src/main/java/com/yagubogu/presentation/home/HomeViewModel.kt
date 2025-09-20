@@ -42,7 +42,8 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+    private val _stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+    val stadiumFanRateItems: LiveData<List<StadiumFanRateItem>> get() = _stadiumFanRateItems
 
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
@@ -93,7 +94,7 @@ class HomeViewModel(
                 checkInRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
-                    stadiumFanRateItems.value = stadiumFanRates
+                    _stadiumFanRateItems.value = stadiumFanRates
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
