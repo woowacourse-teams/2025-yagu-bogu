@@ -12,13 +12,13 @@ public class LikeWindowRepository {
     private EntityManager em;
 
     @Transactional
-    public boolean tryInsertWindow(long gameId, String clientId, long windowStart) {
+    public boolean tryInsertWindow(long gameId, String memberId, long windowStart) {
         int updated = em.createNativeQuery("""
-                        insert ignore into like_windows (game_id, client_instance_id, window_start_epoch_sec)
+                        insert ignore into like_windows (game_id, member_id, window_start_epoch_sec)
                         values (:gameId, :clientId, :windowStart)
                         """)
                 .setParameter("gameId", gameId)
-                .setParameter("clientId", clientId)
+                .setParameter("memberId", memberId)
                 .setParameter("windowStart", windowStart)
                 .executeUpdate();
         return updated > 0;
