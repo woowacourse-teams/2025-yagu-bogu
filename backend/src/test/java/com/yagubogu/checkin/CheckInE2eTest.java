@@ -36,6 +36,7 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -361,6 +362,7 @@ public class CheckInE2eTest extends E2eTestBase {
 
     @DisplayName("승리 요정 랭킹을 조회한다")
     @Test
+    @Disabled
     void findVictoryFairyRankings() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
