@@ -35,11 +35,14 @@ public class MemberBadge extends BaseEntity {
     private Member member;
 
     @Column(name = "progress", nullable = false)
-    private Double progress;
+    private int progress = 0;
 
-    public MemberBadge(final Badge badge, final Member member, final Double progress) {
+    public MemberBadge(final Badge badge, final Member member) {
         this.badge = badge;
         this.member = member;
-        this.progress = progress;
+    }
+
+    public void increaseProgress() {
+        this.progress++;
     }
 }

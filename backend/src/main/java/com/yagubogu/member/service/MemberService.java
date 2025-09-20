@@ -1,10 +1,8 @@
 package com.yagubogu.member.service;
 
 import com.yagubogu.badge.domain.Badge;
-import com.yagubogu.badge.dto.BadgeCountResponse;
 import com.yagubogu.badge.dto.BadgeListResponse;
-import com.yagubogu.badge.dto.BadgeResponse;
-import com.yagubogu.badge.dto.BadgeResponseWithAchievedRate;
+import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.exception.NotFoundException;
@@ -19,8 +17,6 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,33 +90,14 @@ public class MemberService {
     public BadgeListResponse findBadges(final Long memberId) {
         Member member = getMember(memberId);
         Badge representativeBadge = member.getRepresentativeBadge();
-        List<BadgeResponse> badgeResponses = badgeRepository.findAllBadgesWithAcquiredBadgeStatus(memberId);
 
         long totalMembers = memberRepository.countByDeletedAtIsNull();
-        Map<Long, Long> badgeCounts = memberBadgeRepository.countByBadge()
+        List<BadgeResponseWithRates> badgeResponses = badgeRepository.findAllBadgesWithAchievedCount(memberId)
                 .stream()
-                .collect(Collectors.toMap(BadgeCountResponse::badgeId, BadgeCountResponse::owners));
-
-        List<BadgeResponseWithAchievedRate> badgeResponseWithAchievedRates = badgeResponses.stream()
-                .map(badgeResponse -> new BadgeResponseWithAchievedRate(
-                        badgeResponse,
-                        getNewAchievedRate(badgeResponse, badgeCounts, totalMembers)
-                ))
+                .map(raw -> BadgeResponseWithRates.from(raw, totalMembers))
                 .toList();
 
-        return BadgeListResponse.from(representativeBadge, badgeResponseWithAchievedRates);
-    }
-
-    private double getNewAchievedRate(
-            final BadgeResponse badgeResponse,
-            final Map<Long, Long> badgeCounts,
-            final long totalMembers
-    ) {
-        if (!badgeCounts.containsKey(badgeResponse.id())) {
-            return 0.0;
-        }
-
-        return Math.round((100.0 * badgeCounts.get(badgeResponse.id()) / totalMembers) * 10) / 10.0;
+        return BadgeListResponse.from(representativeBadge, badgeResponses);
     }
 
     public MemberInfoResponse findMember(final Long memberId) {

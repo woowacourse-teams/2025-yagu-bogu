@@ -1,11 +1,11 @@
 -- 1. badges 테이블 생성
 CREATE TABLE badges
 (
-    badge_id                  BIGINT       NOT NULL AUTO_INCREMENT,
-    badge_name                VARCHAR(255) NOT NULL UNIQUE,
-    badge_description         VARCHAR(255),
-    badge_condition_type      VARCHAR(50)  NOT NULL,
-    badge_condition_threshold INT          NOT NULL,
+    badge_id          BIGINT       NOT NULL AUTO_INCREMENT,
+    badge_name        VARCHAR(255) NOT NULL UNIQUE,
+    badge_description VARCHAR(255),
+    badge_type        VARCHAR(50)  NOT NULL,
+    badge_threshold   INT          NOT NULL,
     PRIMARY KEY (badge_id)
 ) ENGINE = InnoDB;
 
@@ -15,7 +15,7 @@ CREATE TABLE member_badges
     member_badge_id BIGINT      NOT NULL AUTO_INCREMENT,
     badge_id        BIGINT      NOT NULL,
     member_id       BIGINT      NOT NULL,
-    progress        DOUBLE      NOT NULL,
+    progress        INT         NOT NULL,
     created_at      DATETIME(6) NOT NULL,
     updated_at      DATETIME(6) NOT NULL,
     deleted_at      DATETIME(6) NULL,

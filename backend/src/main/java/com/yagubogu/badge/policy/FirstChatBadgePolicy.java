@@ -18,12 +18,12 @@ public class FirstChatBadgePolicy implements BadgePolicy {
     private final MemberBadgeRepository memberBadgeRepository;
 
     @Override
-    public BadgeAwardCandidate canAward(final BadgeEvent event) {
+    public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
         if (event.policy() != Policy.FIRST_CHAT) {
             return null;
         }
 
-        Badge badge = badgeRepository.findByType(Policy.FIRST_CHAT);
+        Badge badge = badgeRepository.findByPolicy(Policy.FIRST_CHAT);
         boolean exists = memberBadgeRepository.existsByMemberAndBadge(event.member(), badge);
         if (exists) {
             return null;
@@ -34,7 +34,8 @@ public class FirstChatBadgePolicy implements BadgePolicy {
 
     @Override
     public void award(final BadgeAwardCandidate candidate) {
-        MemberBadge memberBadge = new MemberBadge(candidate.badge(), candidate.member(), 100.0);
+        MemberBadge memberBadge = new MemberBadge(candidate.badge(), candidate.member());
+        memberBadge.increaseProgress();
         memberBadgeRepository.save(memberBadge);
     }
 }

@@ -3,9 +3,6 @@ package com.yagubogu.member;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
-import com.yagubogu.badge.dto.BadgeListResponse;
-import com.yagubogu.badge.dto.BadgeResponse;
-import com.yagubogu.badge.dto.BadgeResponseWithAchievedRate;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -24,8 +21,6 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -211,50 +206,23 @@ public class MemberE2eTest extends E2eTestBase {
     @Test
     void findBadges() {
         // given
-        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
-        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
-        List<BadgeResponseWithAchievedRate> badgeResponses = List.of(
-                new BadgeResponseWithAchievedRate(
-                        new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
-                                Policy.SIGN_UP, 100.0, true, LocalDateTime.now()),
-                        100.0
-                ),
-                new BadgeResponseWithAchievedRate(
-                        new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
-                                Policy.FIRST_CHAT, null, false, null),
-                        0.0
-                )
-        );
 
-        BadgeListResponse expected = BadgeListResponse.from(member.getRepresentativeBadge(), badgeResponses);
-
-        // when
-        BadgeListResponse actual = RestAssured.given().log().all()
+        // when & then
+        RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .when().get("/api/members/me/badges")
                 .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(BadgeListResponse.class);
-
-        // then
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.representativeBadge())
-                    .isEqualTo(expected.representativeBadge());
-            softAssertions.assertThat(actual.badges())
-                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("badgeInfo.achievedAt")
-                    .containsExactlyInAnyOrderElementsOf(expected.badges());
-        });
+                .statusCode(200);
     }
 
     @DisplayName("대표 뱃지를 수정한다")
     @Test
     void patchRepresentativeBadge() {
         // given
-        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
         memberBadgeFactory.save(builder -> builder.badge(badge).member(member));

@@ -3,13 +3,15 @@ package com.yagubogu.badge.dto;
 import com.yagubogu.badge.domain.Policy;
 import java.time.LocalDateTime;
 
-public record BadgeResponse(
+public record BadgeRawResponse(
         Long id,
         String name,
         String description,
-        Policy type,
+        Policy policy,
         int progress,
-        boolean owned,
-        LocalDateTime achievedAt
+        boolean acquired,
+        LocalDateTime createdAt,
+        long achievedCount,
+        int threshold
 ) {
 }

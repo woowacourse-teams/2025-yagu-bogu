@@ -24,7 +24,7 @@ public class BadgeEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBadgeEvent(final BadgeEvent event) {
         for (BadgePolicy policy : badgePolicies) {
-            BadgeAwardCandidate candidate = policy.canAward(event);
+            BadgeAwardCandidate candidate = policy.determineAwardCandidate(event);
             if (candidate != null) {
                 policy.award(candidate);
             }

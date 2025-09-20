@@ -2,10 +2,10 @@ package com.yagubogu.member.service;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.domain.MemberBadge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeListResponse;
-import com.yagubogu.badge.dto.BadgeResponse;
-import com.yagubogu.badge.dto.BadgeResponseWithAchievedRate;
+import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -274,20 +274,25 @@ public class MemberServiceTest {
     @Test
     void findBadges() {
         // given
-        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         long memberId = member.getId();
-        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
-        List<BadgeResponseWithAchievedRate> badgeResponses = List.of(
-                new BadgeResponseWithAchievedRate(
-                        new BadgeResponse(1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
-                                Policy.SIGN_UP, 100.0, true, LocalDateTime.now()),
-                        100.0
+        MemberBadge memberBadge = memberBadgeFactory.save(builder ->
+                builder.badge(badge)
+                        .member(member)
+        );
+        memberBadge.increaseProgress();
+
+        List<BadgeResponseWithRates> badgeResponses = List.of(
+                new BadgeResponseWithRates(
+                        1L, "첫 가입 기념", "첫 회원가입 시 지급되는 뱃지",
+                        Policy.SIGN_UP, 1, true, LocalDateTime.now(),
+                        100.0, 100.0
                 ),
-                new BadgeResponseWithAchievedRate(
-                        new BadgeResponse(2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
-                                Policy.FIRST_CHAT, null, false, null),
-                        0.0
+                new BadgeResponseWithRates(
+                        2L, "말문이 트이다", "처음 현장톡 사용시 지급되는 뱃지",
+                        Policy.FIRST_CHAT, 0, false, null,
+                        0.0, 0.0
                 )
         );
 
@@ -301,7 +306,7 @@ public class MemberServiceTest {
             softAssertions.assertThat(actual.representativeBadge())
                     .isEqualTo(expected.representativeBadge());
             softAssertions.assertThat(actual.badges())
-                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("badgeInfo.achievedAt")
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
                     .containsExactlyInAnyOrderElementsOf(expected.badges());
         });
     }
@@ -310,7 +315,7 @@ public class MemberServiceTest {
     @Test
     void patchRepresentativeBadge() {
         // given
-        Badge badge = badgeRepository.findByType(Policy.SIGN_UP);
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP);
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         memberBadgeFactory.save(builder ->
                 builder.member(member)

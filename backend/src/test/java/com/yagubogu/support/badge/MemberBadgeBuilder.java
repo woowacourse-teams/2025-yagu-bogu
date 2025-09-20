@@ -8,7 +8,6 @@ public class MemberBadgeBuilder {
 
     private Badge badge;
     private Member member;
-    private double progress = 100.0;
 
     public MemberBadgeBuilder badge(final Badge badge) {
         this.badge = badge;
@@ -22,13 +21,7 @@ public class MemberBadgeBuilder {
         return this;
     }
 
-    public MemberBadgeBuilder progress(final double progress) {
-        this.progress = progress;
-
-        return this;
-    }
-
     public MemberBadge build() {
-        return new MemberBadge(badge, member, progress);
+        return new MemberBadge(badge, member);
     }
 }
