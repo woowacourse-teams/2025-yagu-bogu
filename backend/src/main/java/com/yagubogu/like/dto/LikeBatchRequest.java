@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 public record LikeBatchRequest(
-        @NotBlank String clientInstanceId,
+        @NotBlank Long memberId,
         @Min(0) Long windowStartEpochSec,
         LikeDelta likeDelta
 ) {
