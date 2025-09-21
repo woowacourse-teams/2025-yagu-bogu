@@ -9,12 +9,11 @@ import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
-import com.yagubogu.badge.EventPublished;
-import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -56,7 +55,7 @@ public class AuthService {
         String refreshToken = generateRefreshToken(member);
 
         if (isNew) {
-            publisher.publishEvent(new EventPublished(member, Policy.SIGN_UP));
+            publisher.publishEvent(new SignUpEvent(member));
         }
         return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }

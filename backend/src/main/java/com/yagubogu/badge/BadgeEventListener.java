@@ -19,12 +19,12 @@ public class BadgeEventListener {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleBadgeEvent(final EventPublished event) {
+    public void handleBadgeEvent(final BadgeEvent event) {
         BadgePolicy policy = badgePolicyRegistry.getPolicy(event.policy());
         executePolicy(policy, event);
     }
 
-    private void executePolicy(final BadgePolicy policy, final EventPublished event) {
+    private void executePolicy(final BadgePolicy policy, final BadgeEvent event) {
         BadgeAwardCandidate candidate = policy.determineAwardCandidate(event);
         if (candidate != null) {
             policy.award(candidate);

@@ -1,7 +1,5 @@
 package com.yagubogu.talk.service;
 
-import com.yagubogu.badge.EventPublished;
-import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.BadRequestException;
@@ -14,6 +12,7 @@ import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.event.TalkEvent;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
@@ -91,7 +90,7 @@ public class TalkService {
         validateBlockedFromGame(gameId, memberId);
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
-        publisher.publishEvent(new EventPublished(member, Policy.CHAT));
+        publisher.publishEvent(new TalkEvent(member));
 
         return TalkResponse.from(talk, memberId);
     }

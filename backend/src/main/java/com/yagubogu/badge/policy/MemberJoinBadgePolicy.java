@@ -1,7 +1,7 @@
 package com.yagubogu.badge.policy;
 
+import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
-import com.yagubogu.badge.EventPublished;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.MemberBadge;
 import com.yagubogu.badge.domain.Policy;
@@ -27,7 +27,7 @@ public class MemberJoinBadgePolicy implements BadgePolicy {
     }
 
     @Override
-    public BadgeAwardCandidate determineAwardCandidate(final EventPublished event) {
+    public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
         Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         boolean exists = memberBadgeRepository.existsByMemberAndBadge(event.member(), badge);
         if (exists) {

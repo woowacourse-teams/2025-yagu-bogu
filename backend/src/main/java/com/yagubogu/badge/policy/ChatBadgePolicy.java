@@ -1,7 +1,7 @@
 package com.yagubogu.badge.policy;
 
+import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
-import com.yagubogu.badge.EventPublished;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.MemberBadge;
 import com.yagubogu.badge.domain.Policy;
@@ -30,7 +30,7 @@ public class ChatBadgePolicy implements BadgePolicy {
     }
 
     @Override
-    public BadgeAwardCandidate determineAwardCandidate(final EventPublished event) {
+    public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
         Member member = event.member();
         List<Badge> badges = badgeRepository.findByPolicy(Policy.CHAT); //해당 뱃지들 찾고
         Set<Badge> acquiredSet = memberBadgeRepository.findAcquiredBadges(member, badges)
