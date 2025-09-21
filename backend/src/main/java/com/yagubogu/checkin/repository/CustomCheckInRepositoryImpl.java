@@ -1,8 +1,5 @@
 package com.yagubogu.checkin.repository;
 
-import static com.yagubogu.game.domain.QGame.game;
-import static com.yagubogu.member.domain.QMember.member;
-
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
@@ -720,7 +717,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     private BooleanExpression isMyTeamInGame() {
-        return member.team.eq(game.homeTeam)
-                .or(member.team.eq(game.awayTeam));
+        return MEMBER.team.eq(GAME.homeTeam)
+                .or(MEMBER.team.eq(GAME.awayTeam));
     }
 }
