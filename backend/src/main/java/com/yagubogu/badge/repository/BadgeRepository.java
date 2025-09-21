@@ -21,7 +21,10 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     b.description,
                     b.policy,
                     COALESCE(mb.progress, 0),
-                    CASE WHEN mb.id IS NOT NULL THEN true ELSE false END,
+                    CASE
+                        WHEN mb.id IS NOT NULL AND mb.progress >= b.threshold THEN true
+                        ELSE false
+                    END,
                     mb.createdAt,
                     COUNT(CASE WHEN mb2.progress >= b.threshold THEN 1 ELSE NULL END),
                     b.threshold
