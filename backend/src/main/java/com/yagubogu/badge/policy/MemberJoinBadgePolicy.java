@@ -28,7 +28,7 @@ public class MemberJoinBadgePolicy implements BadgePolicy {
 
     @Override
     public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
-        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Badge badge = badgeRepository.findByPolicy(event.policy()).getFirst();
         boolean exists = memberBadgeRepository.existsByMemberAndBadge(event.member(), badge);
         if (exists) {
             return null;
@@ -39,8 +39,10 @@ public class MemberJoinBadgePolicy implements BadgePolicy {
 
     @Override
     public void award(final BadgeAwardCandidate candidate) {
-        MemberBadge memberBadge = new MemberBadge(candidate.badges().getFirst(), candidate.member());
-        memberBadge.increaseProgress();
+        Badge badge = candidate.badges().getFirst();
+        MemberBadge memberBadge = new MemberBadge(badge, candidate.member());
+        memberBadge.increaseProgress(badge.getThreshold());
+
         memberBadgeRepository.save(memberBadge);
     }
 }

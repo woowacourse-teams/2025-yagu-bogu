@@ -3,6 +3,7 @@ package com.yagubogu.badge.repository;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeRawResponse;
+import com.yagubogu.member.domain.Member;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,12 +22,9 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     b.description,
                     b.policy,
                     COALESCE(mb.progress, 0),
-                    CASE
-                        WHEN mb.id IS NOT NULL AND mb.progress >= b.threshold THEN true
-                        ELSE false
-                    END,
-                    mb.createdAt,
-                    COUNT(CASE WHEN mb2.progress >= b.threshold THEN 1 ELSE NULL END),
+                    COALESCE(mb.isAchieved, false),
+                    mb.achievedAt,
+                    COUNT(CASE WHEN mb2.isAchieved = true THEN 1 ELSE NULL END),
                     b.threshold
                 )
                 FROM Badge b
@@ -34,8 +32,18 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     ON b.id = mb.badge.id AND mb.member.id = :memberId
                 LEFT JOIN MemberBadge mb2
                     ON b.id = mb2.badge.id
-                GROUP BY b.id, b.name, b.description, b.policy, mb.progress, mb.id, mb.createdAt, b.threshold
+                GROUP BY b.id, b.name, b.description, b.policy, mb.progress, mb.isAchieved, mb.achievedAt, b.threshold
             """)
     List<BadgeRawResponse> findAllBadgesWithAchievedCount(@Param("memberId") Long memberId);
 
+    @Query("""
+                SELECT b
+                FROM Badge b
+                LEFT JOIN MemberBadge mb
+                  ON mb.badge = b
+                 AND mb.member = :member
+                WHERE b.policy = :policy
+                  AND (mb.id IS NULL OR mb.isAchieved = false)
+            """)
+    List<Badge> findNotAchievedBadges(Member member, Policy policy);
 }

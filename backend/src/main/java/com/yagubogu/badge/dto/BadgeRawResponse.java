@@ -10,7 +10,7 @@ public record BadgeRawResponse(
         Policy policy,
         int progress,
         boolean acquired,
-        LocalDateTime createdAt,
+        LocalDateTime achievedAt,
         long achievedCount,
         int threshold
 ) {

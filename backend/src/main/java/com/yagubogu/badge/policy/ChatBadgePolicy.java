@@ -11,8 +11,6 @@ import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.member.domain.Member;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,16 +29,8 @@ public class ChatBadgePolicy implements BadgePolicy {
 
     @Override
     public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
-        Member member = event.member();
-        List<Badge> badges = badgeRepository.findByPolicy(Policy.CHAT); //해당 뱃지들 찾고
-        Set<Badge> acquiredSet = memberBadgeRepository.findAcquiredBadges(member, badges)
-                .stream()
-                .map(MemberBadge::getBadge)
-                .collect(Collectors.toSet()); //멤버가 획득한 뱃지들 찾고
-        List<Badge> notAcquired = badges.stream()
-                .filter(badge -> !acquiredSet.contains(badge))
-                .toList(); //획득하지 못한 뱃지들 찾기
-        if (notAcquired.isEmpty()) { //획득하지 못한 뱃지가 비어있다는 것은 모든 뱃지를 획득했다는 소리임.
+        List<Badge> notAcquired = badgeRepository.findNotAchievedBadges(event.member(), event.policy());
+        if (notAcquired.isEmpty()) {
             return null;
         }
 
@@ -58,7 +48,7 @@ public class ChatBadgePolicy implements BadgePolicy {
                         memberBadgeRepository.save(newBadge);
                         return newBadge;
                     });
-            memberBadge.increaseProgress();
+            memberBadge.increaseProgress(badge.getThreshold());
         }
     }
 }

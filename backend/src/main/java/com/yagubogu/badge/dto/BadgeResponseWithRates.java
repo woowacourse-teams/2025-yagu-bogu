@@ -26,7 +26,7 @@ public record BadgeResponseWithRates(
                 raw.policy(),
                 raw.progress(),
                 raw.acquired(),
-                raw.createdAt(),
+                raw.achievedAt(),
                 progressRate,
                 achievedRate
         );

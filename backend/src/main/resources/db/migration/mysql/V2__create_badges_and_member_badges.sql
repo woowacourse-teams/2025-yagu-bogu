@@ -16,6 +16,8 @@ CREATE TABLE member_badges
     badge_id        BIGINT      NOT NULL,
     member_id       BIGINT      NOT NULL,
     progress        INT         NOT NULL,
+    is_achieved     BOOLEAN     NOT NULL,
+    achieved_at     DATETIME(6) NULL,
     created_at      DATETIME(6) NOT NULL,
     updated_at      DATETIME(6) NOT NULL,
     deleted_at      DATETIME(6) NULL,

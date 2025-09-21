@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,12 +38,29 @@ public class MemberBadge extends BaseEntity {
     @Column(name = "progress", nullable = false)
     private int progress = 0;
 
+    @Column(name = "is_achieved", nullable = false)
+    private boolean isAchieved = false;
+
+    @Column(name = "achieved_at", nullable = true)
+    private LocalDateTime achievedAt;
+
     public MemberBadge(final Badge badge, final Member member) {
         this.badge = badge;
         this.member = member;
     }
 
-    public void increaseProgress() {
-        this.progress++;
+    public void increaseProgress(final int threshold) {
+        if (isAchieved) {
+            return;
+        }
+        progress++;
+        checkUpdateAchieved(threshold);
+    }
+
+    private void checkUpdateAchieved(final int threshold) {
+        if (progress >= threshold) {
+            isAchieved = true;
+            achievedAt = LocalDateTime.now();
+        }
     }
 }

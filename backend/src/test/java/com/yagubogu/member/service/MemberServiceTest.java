@@ -281,7 +281,7 @@ public class MemberServiceTest {
                 builder.badge(badge)
                         .member(member)
         );
-        memberBadge.increaseProgress();
+        memberBadge.increaseProgress(badge.getThreshold());
 
         List<BadgeResponseWithRates> badgeResponses = List.of(
                 new BadgeResponseWithRates(
