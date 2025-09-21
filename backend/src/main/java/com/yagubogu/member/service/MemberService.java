@@ -106,8 +106,8 @@ public class MemberService {
         return MemberInfoResponse.from(member);
     }
 
-    private void validateMemberHasBadge(Member member, Badge badge) {
-        boolean hasBadge = memberBadgeRepository.existsByMemberAndBadge(member, badge);
+    private void validateMemberHasBadge(final Member member, final Badge badge) {
+        boolean hasBadge = memberBadgeRepository.existsByMemberAndBadgeAndAchievedTrue(member, badge);
         if (!hasBadge) {
             throw new NotFoundException("Member does not own this badge");
         }

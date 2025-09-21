@@ -22,9 +22,9 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     b.description,
                     b.policy,
                     COALESCE(mb.progress, 0),
-                    COALESCE(mb.isAchieved, false),
+                    COALESCE(mb.achieved, false),
                     mb.achievedAt,
-                    COUNT(CASE WHEN mb2.isAchieved = true THEN 1 ELSE NULL END),
+                    COUNT(CASE WHEN mb2.achieved = true THEN 1 ELSE NULL END),
                     b.threshold
                 )
                 FROM Badge b
@@ -32,7 +32,7 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     ON b.id = mb.badge.id AND mb.member.id = :memberId
                 LEFT JOIN MemberBadge mb2
                     ON b.id = mb2.badge.id
-                GROUP BY b.id, b.name, b.description, b.policy, mb.progress, mb.isAchieved, mb.achievedAt, b.threshold
+                GROUP BY b.id, b.name, b.description, b.policy, mb.progress, mb.achieved, mb.achievedAt, b.threshold
             """)
     List<BadgeRawResponse> findAllBadgesWithAchievedCount(@Param("memberId") Long memberId);
 
@@ -43,7 +43,7 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                   ON mb.badge = b
                  AND mb.member = :member
                 WHERE b.policy = :policy
-                  AND (mb.id IS NULL OR mb.isAchieved = false)
+                  AND (mb.id IS NULL OR mb.achieved = false)
             """)
     List<Badge> findNotAchievedBadges(Member member, Policy policy);
 }

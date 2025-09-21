@@ -39,7 +39,7 @@ public class MemberBadge extends BaseEntity {
     private int progress = 0;
 
     @Column(name = "is_achieved", nullable = false)
-    private boolean isAchieved = false;
+    private boolean achieved = false;
 
     @Column(name = "achieved_at", nullable = true)
     private LocalDateTime achievedAt;
@@ -50,7 +50,7 @@ public class MemberBadge extends BaseEntity {
     }
 
     public void increaseProgress(final int threshold) {
-        if (isAchieved) {
+        if (achieved) {
             return;
         }
         progress++;
@@ -59,7 +59,7 @@ public class MemberBadge extends BaseEntity {
 
     private void checkUpdateAchieved(final int threshold) {
         if (progress >= threshold) {
-            isAchieved = true;
+            achieved = true;
             achievedAt = LocalDateTime.now();
         }
     }

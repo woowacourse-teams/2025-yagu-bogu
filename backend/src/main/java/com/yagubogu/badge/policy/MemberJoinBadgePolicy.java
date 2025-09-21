@@ -29,7 +29,7 @@ public class MemberJoinBadgePolicy implements BadgePolicy {
     @Override
     public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
         Badge badge = badgeRepository.findByPolicy(event.policy()).getFirst();
-        boolean exists = memberBadgeRepository.existsByMemberAndBadge(event.member(), badge);
+        boolean exists = memberBadgeRepository.existsByMemberAndBadgeAndAchievedTrue(event.member(), badge);
         if (exists) {
             return null;
         }
