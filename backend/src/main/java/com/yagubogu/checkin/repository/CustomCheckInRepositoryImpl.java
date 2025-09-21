@@ -1,5 +1,8 @@
 package com.yagubogu.checkin.repository;
 
+import static com.yagubogu.game.domain.QGame.game;
+import static com.yagubogu.member.domain.QMember.member;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
@@ -154,8 +157,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(isMemberNotDeleted(), filterByTeam(teamFilter))
                 .groupBy(MEMBER.id, MEMBER.nickname, MEMBER.imageUrl, MEMBER.team.shortName)
@@ -191,8 +194,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(
                         MEMBER.eq(targetMember),
@@ -326,6 +329,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
+                        isFinished(),
                         isMyCurrentFavorite(member, CHECK_IN),
                         myTeamWinFilter
                 ).orderBy(order)
@@ -714,5 +718,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return game.date.between(start, end);
     }
-}
 
+    private BooleanExpression isMyTeamInGame() {
+        return member.team.eq(game.homeTeam)
+                .or(member.team.eq(game.awayTeam));
+    }
+}
