@@ -46,7 +46,12 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
-            switchFragment(HomeFragment::class.java, R.id.item_home)
+            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
+            switchFragment(
+                HomeFragment::class.java,
+                homeMenuItem.title.toString(),
+                homeMenuItem.itemId,
+            )
         }
     }
 
@@ -81,28 +86,20 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
-            when (val itemId: Int = item.itemId) {
-                R.id.item_home -> {
-                    switchFragment(HomeFragment::class.java, itemId)
-                    true
+            val fragmentClass =
+                when (item.itemId) {
+                    R.id.item_home -> HomeFragment::class.java
+                    R.id.item_stats -> StatsFragment::class.java
+                    R.id.item_livetalk -> LivetalkFragment::class.java
+                    R.id.item_attendance_history -> AttendanceHistoryFragment::class.java
+                    else -> null
                 }
 
-                R.id.item_stats -> {
-                    switchFragment(StatsFragment::class.java, itemId)
-                    true
-                }
-
-                R.id.item_livetalk -> {
-                    switchFragment(LivetalkFragment::class.java, itemId)
-                    true
-                }
-
-                R.id.item_attendance_history -> {
-                    switchFragment(AttendanceHistoryFragment::class.java, itemId)
-                    true
-                }
-
-                else -> false
+            if (fragmentClass != null) {
+                switchFragment(fragmentClass, item.title.toString(), item.itemId)
+                true
+            } else {
+                false
             }
         }
 
@@ -118,7 +115,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchFragment(
         fragmentClass: Class<out Fragment>,
-        selectedItemId: Int,
+        screenName: String,
+        @IdRes selectedItemId: Int,
     ) {
         val tag: String = fragmentClass.name
         val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
@@ -137,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         setToolbarTitle(selectedItemId)
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            param(FirebaseAnalytics.Param.SCREEN_NAME, tag)
+            param(FirebaseAnalytics.Param.SCREEN_NAME, "$screenName Fragment")
         }
     }
 
