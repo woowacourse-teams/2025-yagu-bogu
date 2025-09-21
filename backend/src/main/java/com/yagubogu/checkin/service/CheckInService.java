@@ -118,8 +118,11 @@ public class CheckInService {
     public VictoryFairyRankingResponses findVictoryFairyRankings(
             final long memberId,
             final TeamFilter teamFilter,
-            final int year
+            Integer year
     ) {
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
         Member member = getMember(memberId);
         double m = checkInRepository.calculateTotalAverageWinRate(year);
         double c = checkInRepository.calculateAverageCheckInCount(year);
