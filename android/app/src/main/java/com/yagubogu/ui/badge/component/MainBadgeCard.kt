@@ -28,7 +28,6 @@ fun MainBadgeCard(
     Column(
         modifier =
             modifier
-                .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp))
                 .padding(20.dp),
     ) {

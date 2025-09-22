@@ -16,6 +16,8 @@ class BadgeActivity : ComponentActivity() {
         setContent {
             YaguBoguTheme {
                 BadgeScreen(
+                    mainBadge = null,
+                    badgeList = listOf(),
                     onBackClick = { finish() },
                     modifier = Modifier.fillMaxSize(),
                 )
