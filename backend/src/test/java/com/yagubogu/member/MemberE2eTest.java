@@ -141,7 +141,7 @@ public class MemberE2eTest extends E2eTestBase {
     void patchNickname_nickNameTooLongReturn422Status() {
         // given
         Member member2 = memberFactory.save(builder -> builder.nickname("우가"));
-        String longNickName = "1234567890123";
+        String longNickName = "12345678901234567890123456";
 
         String accessToken = authFactory.getAccessTokenByMemberId(member2.getId(), Role.USER);
 
