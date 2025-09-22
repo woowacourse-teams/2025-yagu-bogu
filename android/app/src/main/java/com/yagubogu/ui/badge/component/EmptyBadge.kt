@@ -15,8 +15,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yagubogu.R
-import com.yagubogu.ui.theme.PretendardMedium16
+import com.yagubogu.ui.theme.PretendardMedium
 
 @Composable
 fun EmptyBadge(modifier: Modifier = Modifier) {
@@ -30,10 +31,11 @@ fun EmptyBadge(modifier: Modifier = Modifier) {
             colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }),
             modifier = Modifier.size(120.dp),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = stringResource(R.string.badge_empty_badge_message),
-            style = PretendardMedium16,
+            style = PretendardMedium,
+            fontSize = 14.sp,
         )
     }
 }

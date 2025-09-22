@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.theme.YaguBoguTheme
 
 class BadgeActivity : ComponentActivity() {
@@ -12,6 +15,10 @@ class BadgeActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             YaguBoguTheme {
+                BadgeScreen(
+                    onBackClick = { finish() },
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }

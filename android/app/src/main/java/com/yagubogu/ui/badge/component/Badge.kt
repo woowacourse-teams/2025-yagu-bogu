@@ -34,7 +34,7 @@ fun Badge(
             contentDescription = stringResource(R.string.badge_image_description),
             modifier = Modifier.size(120.dp),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = badge.name,
             style = PretendardSemiBold,
