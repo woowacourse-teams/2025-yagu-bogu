@@ -32,6 +32,7 @@ fun Badge(
         AsyncImage(
             model = badge.imageUrl,
             contentDescription = stringResource(R.string.badge_image_description),
+            placeholder = painterResource(R.drawable.img_badge_lock),
             modifier = Modifier.size(120.dp),
         )
         Spacer(modifier = Modifier.height(10.dp))

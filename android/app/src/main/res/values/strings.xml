@@ -130,6 +130,7 @@
     <string name="badge_image_description">배지 이미지</string>
     <string name="badge_main_badge_title">대표 배지</string>
     <string name="badge_empty_badge_message">대표 배지를 선택해 주세요</string>
+    <string name="badge_list_title">배지 목록</string>
 
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>
