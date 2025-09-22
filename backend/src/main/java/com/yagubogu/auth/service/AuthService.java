@@ -47,7 +47,7 @@ public class AuthService {
         validateToken(response, OAuthProvider.GOOGLE);
 
         Optional<Member> memberOptional = memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId());
-        boolean isNew = true;
+        boolean isNew = memberOptional.isPresent();
         Member member = findOrCreateMember(isNew, response, memberOptional);
         MemberClaims memberClaims = MemberClaims.from(member);
 
