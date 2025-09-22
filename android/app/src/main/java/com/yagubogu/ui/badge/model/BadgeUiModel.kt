@@ -9,4 +9,5 @@ data class BadgeUiModel(
     val isAcquired: Boolean,
     val achievedRate: Int,
     val achievedAt: LocalDate,
+    val progressRate: Double,
 )

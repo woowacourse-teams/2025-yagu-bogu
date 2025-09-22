@@ -1,12 +1,9 @@
 package com.yagubogu.ui.badge.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,10 +13,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
-import com.yagubogu.ui.badge.model.BADGE_FIXTURE
+import com.yagubogu.ui.badge.model.BADGE_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.PretendardBold20
-import com.yagubogu.ui.theme.White
 
 @Composable
 fun MainBadgeCard(
@@ -59,6 +55,6 @@ private class MainBadgeCardPreviewParameterProvider : PreviewParameterProvider<B
     override val values: Sequence<BadgeUiModel?> =
         sequenceOf(
             null,
-            BADGE_FIXTURE,
+            BADGE_ACQUIRED_FIXTURE,
         )
 }

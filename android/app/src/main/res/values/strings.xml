@@ -134,6 +134,7 @@
     <string name="badge_register_main_badge">대표 배지로 사용하기</string>
     <string name="badge_achieved_rate_message">%의 사용자가 획득했어요</string>
     <string name="badge_achieved_date">획득한 날: %s</string>
+    <string name="badge_progress_rate">달성률: %.1f%%</string>
 
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>
