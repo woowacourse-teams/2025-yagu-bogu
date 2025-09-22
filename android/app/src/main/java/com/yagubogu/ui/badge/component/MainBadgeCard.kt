@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
+import com.yagubogu.ui.badge.model.BADGE_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.White
@@ -26,10 +27,7 @@ fun MainBadgeCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier =
-            modifier
-                .background(color = White, shape = RoundedCornerShape(12.dp))
-                .padding(20.dp),
+        modifier = modifier,
     ) {
         Text(
             text = stringResource(R.string.badge_main_badge_title),
@@ -58,15 +56,9 @@ private fun PaymentCardPreview(
 }
 
 private class MainBadgeCardPreviewParameterProvider : PreviewParameterProvider<BadgeUiModel?> {
-    private val badge: BadgeUiModel =
-        BadgeUiModel(
-            imageUrl = "",
-            name = "공포의 주둥아리",
-        )
-
     override val values: Sequence<BadgeUiModel?> =
         sequenceOf(
             null,
-            badge,
+            BADGE_FIXTURE,
         )
 }

@@ -33,7 +33,7 @@ fun Badge(
             model = badge.imageUrl,
             contentDescription = stringResource(R.string.badge_image_description),
             placeholder = painterResource(R.drawable.img_badge_lock),
-            modifier = Modifier.size(120.dp),
+            modifier = Modifier.size(140.dp),
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
