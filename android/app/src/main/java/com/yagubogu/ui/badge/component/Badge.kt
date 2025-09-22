@@ -14,8 +14,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.yagubogu.R
 import com.yagubogu.ui.theme.PretendardSemiBold
+
+@Composable
+fun Badge(
+    imageUrl: String,
+    name: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            modifier = Modifier.size(120.dp),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = name,
+            style = PretendardSemiBold,
+            fontSize = 14.sp,
+        )
+    }
+}
 
 @Composable
 fun Badge(
