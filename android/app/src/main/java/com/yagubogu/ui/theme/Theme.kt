@@ -89,7 +89,6 @@ fun YaguBoguTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
         content = content,
     )
 }
