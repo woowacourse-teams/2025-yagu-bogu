@@ -3,6 +3,7 @@ package com.yagubogu.stat.service;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
@@ -13,15 +14,12 @@ import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
+import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.repository.TeamRepository;
-import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StatService {
 
+    private static final int RECENT_LIMIT = 10;
+
     private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
                     OpponentWinRateTeamResponse::winRate)
             .reversed()
@@ -39,7 +39,6 @@ public class StatService {
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
-    private final TeamRepository teamRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -58,11 +57,21 @@ public class StatService {
         validateUser(member);
 
         int winCounts = checkInRepository.findWinCounts(member, year);
-        int drawCounts = checkInRepository.findDrawCounts(member, year);
         int loseCounts = checkInRepository.findLoseCounts(member, year);
-        int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
+        int favoriteCheckInCounts = winCounts + loseCounts;
 
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
+    }
+
+    public RecentGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final int year) {
+        Member member = getMember(memberId);
+        validateUser(member);
+
+        int recentWinCounts = checkInRepository.findRecentGamesWinCounts(member, year, RECENT_LIMIT);
+        int recentLoseCounts = checkInRepository.findRecentGamesLoseCounts(member, year, RECENT_LIMIT);
+        int recentCounts = recentWinCounts + recentLoseCounts;
+
+        return new RecentGamesWinRateResponse(calculateWinRate(recentWinCounts, recentCounts));
     }
 
     public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
@@ -95,15 +104,11 @@ public class StatService {
     }
 
     public OpponentWinRateResponse findOpponentWinRate(final Long memberId, final int year) {
-        Long myTeamId = getTeamIdByMemberId(memberId);
-        LocalDate start = LocalDate.of(year, 1, 1);
-        LocalDate end = LocalDate.of(year, 12, 31);
-        List<OpponentWinRateRow> home = checkInRepository.findOpponentWinRatesWhenHome(memberId, myTeamId, start, end);
-        List<OpponentWinRateRow> away = checkInRepository.findOpponentWinRatesWhenAway(memberId, myTeamId, start, end);
-        Map<Long, OpponentWinRateRow> mergedWinRate = mergeByTeamId(home, away);
-
-        List<Team> opponents = teamRepository.findOpponentsExcluding(myTeamId);
-        List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(mergedWinRate, opponents);
+        Member member = getMember(memberId);
+        validateUser(member);
+        Team team = member.getTeam();
+        List<OpponentWinRateRow> winRates = checkInRepository.findOpponentWinRates(member, team, year);
+        List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(winRates);
 
         return new OpponentWinRateResponse(responses);
     }
@@ -126,52 +131,27 @@ public class StatService {
         if (member.isAdmin()) {
             throw new ForbiddenException("Member should not be admin");
         }
-    }
-
-    private Long getTeamIdByMemberId(final Long memberId) {
-        return memberRepository.findTeamIdById(memberId)
-                .orElseThrow(() -> new NotFoundException("Team not exist"));
-    }
-
-    private Map<Long, OpponentWinRateRow> mergeByTeamId(
-            final List<OpponentWinRateRow> home,
-            final List<OpponentWinRateRow> away
-    ) {
-        Map<Long, OpponentWinRateRow> mergedWinRate = new HashMap<>();
-        for (OpponentWinRateRow r : home) {
-            mergedWinRate.put(r.teamId(), r);
+        if (member.getTeam() == null) {
+            throw new UnprocessableEntityException("Team should not be null");
         }
-        for (OpponentWinRateRow r : away) {
-            mergedWinRate.merge(r.teamId(), r, (a, b) ->
-                    new OpponentWinRateRow(
-                            a.teamId(), a.name(), a.shortName(), a.teamCode(), a.wins() + b.wins(),
-                            a.losses() + b.losses(),
-                            a.draws() + b.draws()
-                    )
-            );
-        }
-        return mergedWinRate;
     }
 
     private List<OpponentWinRateTeamResponse> getOpponentWinRateTeamResponse(
-            final Map<Long, OpponentWinRateRow> merged,
-            final List<Team> opponents
+            List<OpponentWinRateRow> winRates
     ) {
-        return opponents.stream()
-                .map(op -> {
-                    OpponentWinRateRow row = merged.get(op.getId());
-                    if (row == null) {
-                        return new OpponentWinRateTeamResponse(
-                                op.getId(), op.getName(), op.getShortName(), op.getTeamCode(), 0, 0,
-                                0, 0.0
-                        );
-                    }
-                    long totalGames = row.wins() + row.draws() + row.losses();
+        return winRates.stream()
+                .map(row -> {
+                    long totalGames = row.wins() + row.losses();
                     double winRate = calculateWinRate(row.wins(), totalGames);
 
                     return new OpponentWinRateTeamResponse(
-                            row.teamId(), row.name(), row.shortName(), row.teamCode(),
-                            row.wins(), row.losses(), row.draws(),
+                            row.teamId(),
+                            row.name(),
+                            row.shortName(),
+                            row.teamCode(),
+                            row.wins(),
+                            row.losses(),
+                            row.draws(),
                             winRate
                     );
                 })

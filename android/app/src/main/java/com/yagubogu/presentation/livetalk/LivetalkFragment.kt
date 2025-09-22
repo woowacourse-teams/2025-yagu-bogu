@@ -13,9 +13,12 @@ import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class LivetalkFragment : Fragment() {
+class LivetalkFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentLivetalkBinding? = null
     private val binding get() = _binding!!
 
@@ -70,6 +73,10 @@ class LivetalkFragment : Fragment() {
         }
     }
 
+    override fun scrollToTop() {
+        binding.rvLivetalkStadium.smoothScrollToPosition(0)
+    }
+
     private fun setupBindings() {
         val linearLayoutManager = LinearLayoutManager(requireContext())
         binding.rvLivetalkStadium.apply {
@@ -80,7 +87,9 @@ class LivetalkFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
-            livetalkStadiumAdapter.submitList(value)
+            livetalkStadiumAdapter.submitList(value) {
+                binding.rvLivetalkStadium.scrollToPosition(0)
+            }
 
             val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
             binding.ivEmptyGame.visibility = visibility

@@ -37,7 +37,6 @@ public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
             String expectedClientId = googleAuthProperties.clientId();
             String actualAud = response.aud();
 
-            // ✅ 로그 추가: clientId와 audience 값 확인
             log.info("Validating Google token audience. expectedClientId={}, actualAud={}",
                     expectedClientId, actualAud);
 

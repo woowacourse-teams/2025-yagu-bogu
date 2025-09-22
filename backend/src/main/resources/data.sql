@@ -49,7 +49,7 @@ VALUES (5000, 2, '엘지1', '엘지1@example.com', 'GOOGLE', 'sub-엘지1', 'USE
        (5021, 2, '엘지7', '엘지7@example.com', 'GOOGLE', 'sub-엘지7', 'USER', 'https://image.com/엘지7.png');
 
 -- 4. 스코어보드 데이터
-INSERT INTO score_board (runs, hits, errors, bases_on_balls, inning_scores)
+INSERT INTO score_boards (runs, hits, errors, bases_on_balls, inning_scores)
 VALUES
     -- 경기 1 (HT vs OB), score_board_id: 1, 2
     (5, 8, 0, 4, '0,1,0,0,3,0,1,0,-,-,-'),   -- 홈팀 HT (ID: 1)

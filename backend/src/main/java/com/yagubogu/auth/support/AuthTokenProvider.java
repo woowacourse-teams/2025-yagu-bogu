@@ -30,7 +30,7 @@ public class AuthTokenProvider {
         this.authTokenProperties = authTokenProperties;
     }
 
-    public String createAccessToken(final MemberClaims memberClaims) {
+    public String issueAccessToken(final MemberClaims memberClaims) {
         TokenProperties accessTokenProperties = authTokenProperties.getAccessToken();
 
         return createToken(memberClaims, accessTokenProperties);

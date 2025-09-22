@@ -32,8 +32,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -56,9 +54,9 @@ public class AuthE2eTest extends E2eTestBase {
         RestAssured.port = port;
     }
 
-    @DisplayName("로그인한다")
+    @DisplayName("회원가입을 수행한다")
     @Test
-    void login() {
+    void login_register() {
         // given & when
         LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -74,7 +72,39 @@ public class AuthE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.accessToken()).isNotNull();
             softAssertions.assertThat(actual.refreshToken()).isNotNull();
             softAssertions.assertThat(actual.isNew()).isTrue();
-            softAssertions.assertThat(actual.member().nickname()).isEqualTo("test-user");
+        });
+    }
+
+    @DisplayName("로그인을 수행한다")
+    @Test
+    void login() {
+        // given
+        LoginResponse registerResponse = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LoginRequest(ID_TOKEN))
+                .when().post("/api/auth/login")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LoginResponse.class);
+        String expectedStringName = registerResponse.member().nickname();
+
+        // when
+        LoginResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LoginRequest(ID_TOKEN))
+                .when().post("/api/auth/login")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LoginResponse.class);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.accessToken()).isNotNull();
+            softAssertions.assertThat(actual.refreshToken()).isNotNull();
+            softAssertions.assertThat(actual.isNew()).isFalse();
+            softAssertions.assertThat(actual.member().nickname()).isEqualTo(expectedStringName);
         });
     }
 
