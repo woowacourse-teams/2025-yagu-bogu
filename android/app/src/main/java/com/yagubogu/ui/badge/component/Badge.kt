@@ -17,12 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.yagubogu.R
+import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.PretendardSemiBold
 
 @Composable
 fun Badge(
-    imageUrl: String,
-    name: String,
+    badge: BadgeUiModel,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -30,13 +30,13 @@ fun Badge(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AsyncImage(
-            model = imageUrl,
+            model = badge.imageUrl,
             contentDescription = stringResource(R.string.badge_image_description),
             modifier = Modifier.size(120.dp),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = name,
+            text = badge.name,
             style = PretendardSemiBold,
             fontSize = 14.sp,
         )
@@ -44,7 +44,7 @@ fun Badge(
 }
 
 @Composable
-fun Badge(
+private fun Badge(
     @DrawableRes image: Int,
     name: String,
     modifier: Modifier = Modifier,
