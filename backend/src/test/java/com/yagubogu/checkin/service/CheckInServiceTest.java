@@ -1,11 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -47,7 +41,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -79,12 +80,16 @@ class CheckInServiceTest {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     private Team kia, kt, lg, samsung, doosan, lotte;
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
     @BeforeEach
     void setUp() {
-        checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository);
+        checkInService = new CheckInService(checkInRepository, memberRepository, stadiumRepository, gameRepository,
+                publisher);
 
         kia = teamRepository.findByTeamCode("HT").orElseThrow();
         kt = teamRepository.findByTeamCode("KT").orElseThrow();

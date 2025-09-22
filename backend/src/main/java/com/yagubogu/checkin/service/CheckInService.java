@@ -16,6 +16,7 @@ import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingEntryResponse;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.event.CheckInEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -32,6 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,7 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -60,6 +63,7 @@ public class CheckInService {
         Team team = member.getTeam();
 
         checkInRepository.save(new CheckIn(game, member, team));
+        publisher.publishEvent(new CheckInEvent(member));
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {

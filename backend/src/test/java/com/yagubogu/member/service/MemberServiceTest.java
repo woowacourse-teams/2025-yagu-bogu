@@ -297,6 +297,11 @@ public class MemberServiceTest {
                         3L, "공포의 주둥아리", "현장톡 누적 100회",
                         Policy.CHAT, 0, false, null,
                         0.0, 0.0
+                ),
+                new BadgeResponseWithRates(
+                        4L, "플레이볼", "첫 직관 인증",
+                        Policy.CHECK_IN, 0, false, null,
+                        0.0, 0.0
                 )
         );
 
