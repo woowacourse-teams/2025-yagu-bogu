@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.theme
+package com.yagubogu.ui.theme
 
 import android.os.Build
 import androidx.compose.material3.MaterialTheme
