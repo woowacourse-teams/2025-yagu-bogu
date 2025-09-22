@@ -126,6 +126,7 @@
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
     <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
 
+    <string name="badge_icon_description">배지 아이콘</string>
     <string name="badge_title">배지</string>
     <string name="badge_image_description">배지 이미지</string>
     <string name="badge_main_badge_title">대표 배지</string>

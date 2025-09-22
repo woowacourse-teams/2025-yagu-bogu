@@ -64,14 +64,18 @@ fun BadgeScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp)
                     .background(color = White, shape = RoundedCornerShape(12.dp))
-                    .padding(20.dp),
+                    .padding(horizontal = 20.dp),
         ) {
             item(span = { GridItemSpan(COLUMN_SIZE) }) {
                 MainBadgeCard(
                     badge = mainBadge,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp),
                 )
             }
             item(span = { GridItemSpan(COLUMN_SIZE) }) {
