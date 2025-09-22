@@ -176,7 +176,7 @@ public class CheckInService {
         int count = 1;
         List<VictoryFairyRankingResponse> topRankingResponses = new ArrayList<>();
         for (VictoryFairyRank rank : topRanking) {
-            double currentScore = Math.round(rank.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR;
+            double currentScore = rank.score();
             if (previousScore != currentScore) {
                 ranking += count;
                 count = 1;
@@ -184,8 +184,13 @@ public class CheckInService {
                 count++;
             }
             double winPercent = Math.round(rank.winPercent() * ROUND_FACTOR) / ROUND_FACTOR;
-            topRankingResponses.add(new VictoryFairyRankingResponse(ranking, rank.nickname(),
-                    rank.profileImageUrl(), rank.teamShortName(), winPercent, currentScore));
+            topRankingResponses.add(new VictoryFairyRankingResponse(
+                    ranking, rank.nickname(),
+                    rank.profileImageUrl(),
+                    rank.teamShortName(),
+                    winPercent,
+                    Math.round(rank.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR)
+            );
             previousScore = currentScore;
         }
         return topRankingResponses;

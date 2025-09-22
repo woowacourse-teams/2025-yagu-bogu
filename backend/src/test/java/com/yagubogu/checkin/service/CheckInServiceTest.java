@@ -563,16 +563,35 @@ class CheckInServiceTest {
         Member por = memberFactory.save(b -> b.team(samsung).nickname("포르"));
 
         LocalDate startDate = LocalDate.of(2025, 7, 21);
-        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
+        Game game1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(kia)
                 .awayTeam(kt)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .date(startDate));
+                .homeScore(10)
+                .awayScore(1)
+                .date(startDate)
+                .gameState(GameState.COMPLETED)
+        );
+        Game game2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(samsung)
+                .awayTeam(kt)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .homeScore(10)
+                .awayScore(1)
+                .date(startDate)
+                .gameState(GameState.COMPLETED)
+        );
+
         checkInFactory.save(builder -> builder
                 .team(samsung)
                 .member(por)
-                .game(game)
+                .game(game1)
+        );
+        checkInFactory.save(builder -> builder.team(samsung)
+                .member(por)
+                .game(game2)
         );
 
         // when
@@ -586,7 +605,7 @@ class CheckInServiceTest {
                             .containsExactly("포르");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("삼성");
-                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
+                    softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(100.0);
                 }
         );
     }

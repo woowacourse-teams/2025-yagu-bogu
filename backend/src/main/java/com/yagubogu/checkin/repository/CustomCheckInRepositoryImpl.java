@@ -154,8 +154,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(isMemberNotDeleted(), filterByTeam(teamFilter))
                 .groupBy(MEMBER.id, MEMBER.nickname, MEMBER.imageUrl, MEMBER.team.shortName)
@@ -191,8 +191,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(
                         MEMBER.eq(targetMember),
@@ -305,7 +305,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QScoreBoard homeScoreBoard = new QScoreBoard("homeScoreBoard");
         QScoreBoard awayScoreBoard = new QScoreBoard("awayScoreBoard");
 
-        BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, member, CHECK_IN);
+        BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, CHECK_IN);
         OrderSpecifier<LocalDate> order = getOrderByFilter(orderFilter, GAME);
         return jpaQueryFactory.select(Projections.constructor(
                         CheckInGameResponse.class,
@@ -326,7 +326,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
-                        isMyCurrentFavorite(member, CHECK_IN),
+                        isFinished(), // 버저닝 후 삭제 예정(취소된 경기도 보여주도록)
                         myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
@@ -674,7 +674,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return game.date.desc();
     }
 
-    private BooleanExpression getMyTeamWinFilter(CheckInResultFilter resultFilter, Member member, QCheckIn checkIn) {
+    private BooleanExpression getMyTeamWinFilter(CheckInResultFilter resultFilter, QCheckIn checkIn) {
         if (resultFilter == CheckInResultFilter.ALL) {
             return null;
         }
@@ -714,5 +714,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return game.date.between(start, end);
     }
-}
 
+    private BooleanExpression isMyTeamInGame() {
+        return MEMBER.team.eq(GAME.homeTeam)
+                .or(MEMBER.team.eq(GAME.awayTeam));
+    }
+}
