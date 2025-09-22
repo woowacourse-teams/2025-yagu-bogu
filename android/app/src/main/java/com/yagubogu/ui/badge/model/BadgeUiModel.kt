@@ -6,6 +6,7 @@ data class BadgeUiModel(
     val imageUrl: String,
     val name: String,
     val description: String,
+    val isAcquired: Boolean,
     val achievedRate: Int,
     val achievedAt: LocalDate,
 )

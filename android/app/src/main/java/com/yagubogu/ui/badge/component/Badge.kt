@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +34,7 @@ fun Badge(
         AsyncImage(
             model = badge.imageUrl,
             contentDescription = stringResource(R.string.badge_image_description),
+            colorFilter = if (!badge.isAcquired) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.2f) }) else null,
             placeholder = painterResource(R.drawable.img_badge_lock),
             modifier = Modifier.size(140.dp),
         )
