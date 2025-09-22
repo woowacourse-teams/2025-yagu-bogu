@@ -2,6 +2,8 @@
 agp = "8.9.3"
 balloon = "1.6.13"
 appUpdate = "2.1.0"
+coilCompose = "3.3.0"
+coilNetworkOkhttp = "3.3.0"
 coreSplashscreen = "1.0.1"
 credentials = "1.5.0"
 datastorePreferences = "1.1.7"
@@ -50,6 +52,8 @@ androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref =
 balloon = { module = "com.github.skydoves:balloon", version.ref = "balloon" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

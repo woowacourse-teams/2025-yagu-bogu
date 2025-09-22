@@ -147,6 +147,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.ui.tooling.preview)
 
+    // coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
