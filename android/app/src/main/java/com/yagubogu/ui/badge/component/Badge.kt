@@ -70,5 +70,5 @@ private fun Badge(
 @Preview(showBackground = true)
 @Composable
 private fun BadgePreview() {
-    Badge(image = R.drawable.img_badge_princess, name = "공포의 주둥아리")
+    Badge(image = R.drawable.img_badge_lock, name = "공포의 주둥아리")
 }
