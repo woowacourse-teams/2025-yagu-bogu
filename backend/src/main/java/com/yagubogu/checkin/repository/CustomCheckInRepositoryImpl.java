@@ -305,7 +305,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         QScoreBoard homeScoreBoard = new QScoreBoard("homeScoreBoard");
         QScoreBoard awayScoreBoard = new QScoreBoard("awayScoreBoard");
 
-        BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, member, CHECK_IN);
+        BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, CHECK_IN);
         OrderSpecifier<LocalDate> order = getOrderByFilter(orderFilter, GAME);
         return jpaQueryFactory.select(Projections.constructor(
                         CheckInGameResponse.class,
@@ -326,8 +326,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
-                        isFinished(),
-                        isMyCurrentFavorite(member, CHECK_IN),
+                        isFinished(), // 버저닝 후 삭제 예정(취소된 경기도 보여주도록)
                         myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
@@ -675,7 +674,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return game.date.desc();
     }
 
-    private BooleanExpression getMyTeamWinFilter(CheckInResultFilter resultFilter, Member member, QCheckIn checkIn) {
+    private BooleanExpression getMyTeamWinFilter(CheckInResultFilter resultFilter, QCheckIn checkIn) {
         if (resultFilter == CheckInResultFilter.ALL) {
             return null;
         }
