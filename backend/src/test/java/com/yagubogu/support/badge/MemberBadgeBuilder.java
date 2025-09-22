@@ -8,6 +8,8 @@ public class MemberBadgeBuilder {
 
     private Badge badge;
     private Member member;
+    private int progress = 0;
+    private boolean isAchieved = false;
 
     public MemberBadgeBuilder badge(final Badge badge) {
         this.badge = badge;
@@ -21,7 +23,17 @@ public class MemberBadgeBuilder {
         return this;
     }
 
+    public MemberBadgeBuilder isAchieved(final boolean isAchieved) {
+        this.isAchieved = isAchieved;
+
+        return this;
+    }
+
     public MemberBadge build() {
-        return new MemberBadge(badge, member);
+        MemberBadge mb = new MemberBadge(badge, member);
+        if (isAchieved) {
+            mb.increaseProgress(badge.getThreshold());
+        }
+        return mb;
     }
 }

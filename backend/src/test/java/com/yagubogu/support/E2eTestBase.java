@@ -33,6 +33,11 @@ public abstract class E2eTestBase {
         mysql.start();
     }
 
+    @Autowired
+    private EntityManager em;
+    @Autowired
+    private TransactionTemplate txTemplate;
+
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysql::getJdbcUrl);
@@ -44,12 +49,6 @@ public abstract class E2eTestBase {
     static void migrateOnce(@Autowired Flyway flyway) {
         flyway.migrate(); // DDL 한 번만 실행
     }
-
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private TransactionTemplate txTemplate;
 
     @AfterEach
     void cleanData() {

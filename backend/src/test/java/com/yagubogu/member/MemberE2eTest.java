@@ -225,7 +225,11 @@ public class MemberE2eTest extends E2eTestBase {
         Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
-        memberBadgeFactory.save(builder -> builder.badge(badge).member(member));
+        memberBadgeFactory.save(builder ->
+                builder.badge(badge)
+                        .member(member)
+                        .isAchieved(true)
+        );
 
         // when & then
         RestAssured.given().log().all()
@@ -235,5 +239,23 @@ public class MemberE2eTest extends E2eTestBase {
                 .when().patch("/api/members/me/badges/{badgeId}/representative")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("예외: 대표 뱃지가 수정이 될 때 소유하지 않은 뱃지면 예외가 발생한다")
+    @Test
+    void patchRepresentativeBadge_noOwnBadgeThrowNotFoundException() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(404);
     }
 }

@@ -2,7 +2,6 @@ package com.yagubogu.member.service;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
-import com.yagubogu.badge.domain.MemberBadge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponseWithRates;
@@ -277,11 +276,11 @@ public class MemberServiceTest {
         Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
         long memberId = member.getId();
-        MemberBadge memberBadge = memberBadgeFactory.save(builder ->
+        memberBadgeFactory.save(builder ->
                 builder.badge(badge)
                         .member(member)
+                        .isAchieved(true)
         );
-        memberBadge.increaseProgress(badge.getThreshold());
 
         List<BadgeResponseWithRates> badgeResponses = List.of(
                 new BadgeResponseWithRates(
@@ -325,6 +324,7 @@ public class MemberServiceTest {
         memberBadgeFactory.save(builder ->
                 builder.member(member)
                         .badge(badge)
+                        .isAchieved(true)
         );
 
         // when
@@ -332,5 +332,18 @@ public class MemberServiceTest {
 
         // then
         assertThat(member.getRepresentativeBadge()).isEqualTo(badge);
+    }
+
+    @DisplayName("예외: 대표 뱃지가 수정이 될 때 소유하지 않은 뱃지면 예외가 발생한다")
+    @Test
+    void patchRepresentativeBadge_noOwnBadgeThrowNotFoundException() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+
+        // when & then
+        assertThatThrownBy(() -> memberService.patchRepresentativeBadge(member.getId(), badge.getId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Member does not own this badge");
     }
 }
