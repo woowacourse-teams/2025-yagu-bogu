@@ -36,8 +36,22 @@ fun BadgeScreen(
     mainBadge: BadgeUiModel?,
     badgeList: List<BadgeUiModel>,
     onBackClick: () -> Unit,
+    onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val selectedBadge = rememberSaveable { mutableStateOf<BadgeUiModel?>(null) }
+
+    selectedBadge.value?.let { badge: BadgeUiModel ->
+        BadgeBottomSheet(
+            badge = badge,
+            onRegisterClick = {
+                onRegisterClick()
+                selectedBadge.value = null
+            },
+            onDismiss = { selectedBadge.value = null },
+        )
+    }
+
     Scaffold(
         topBar = { BadgeToolbar(onBackClick = onBackClick) },
         containerColor = Gray050,
@@ -74,7 +88,11 @@ fun BadgeScreen(
                 )
             }
             items(badgeList.size) { index: Int ->
-                Badge(badge = badgeList[index], modifier = Modifier.padding(bottom = 10.dp))
+                Badge(
+                    badge = badgeList[index],
+                    onClick = { selectedBadge.value = badgeList[index] },
+                    modifier = Modifier.padding(bottom = 10.dp),
+                )
             }
         }
     }
@@ -94,5 +112,6 @@ private fun BadgeScreenPreview() {
                 BADGE_ACQUIRED_FIXTURE,
             ),
         onBackClick = {},
+        onRegisterClick = {},
     )
 }

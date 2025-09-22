@@ -19,6 +19,7 @@ class BadgeActivity : ComponentActivity() {
                     mainBadge = null,
                     badgeList = listOf(),
                     onBackClick = { finish() },
+                    onRegisterClick = {},
                     modifier = Modifier.fillMaxSize(),
                 )
             }

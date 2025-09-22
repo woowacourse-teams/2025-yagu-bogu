@@ -21,20 +21,33 @@ import coil3.compose.AsyncImage
 import com.yagubogu.R
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.PretendardSemiBold
+import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun Badge(
     badge: BadgeUiModel,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.noRippleClickable(onClick),
     ) {
         AsyncImage(
             model = badge.imageUrl,
             contentDescription = stringResource(R.string.badge_image_description),
-            colorFilter = if (!badge.isAcquired) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.2f) }) else null,
+            colorFilter =
+                if (!badge.isAcquired) {
+                    ColorFilter.colorMatrix(
+                        ColorMatrix().apply {
+                            setToSaturation(
+                                0.2f,
+                            )
+                        },
+                    )
+                } else {
+                    null
+                },
             placeholder = painterResource(R.drawable.img_badge_lock),
             modifier = Modifier.size(140.dp),
         )
