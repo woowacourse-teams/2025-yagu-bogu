@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Nickname {
 
-    private static final int MAX_LENGTH = 12;
+    private static final int MAX_LENGTH = 25;
 
     @Column(name = "nickname", unique = true, nullable = false, length = MAX_LENGTH)
     private String value;
