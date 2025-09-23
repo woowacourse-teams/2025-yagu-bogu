@@ -610,7 +610,12 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(6L, "부산", 0L),
                         new StadiumCheckInCountResponse(7L, "인천", 0L),
                         new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                        new StadiumCheckInCountResponse(9L, "대전", 0L),
+                        new StadiumCheckInCountResponse(10L, "울산", 0L),
+                        new StadiumCheckInCountResponse(11L, "군산", 0L),
+                        new StadiumCheckInCountResponse(12L, "청주", 0L),
+                        new StadiumCheckInCountResponse(13L, "포항", 0L)
+
                 )
         );
 
@@ -654,7 +659,11 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(6L, "부산", 0L),
                         new StadiumCheckInCountResponse(7L, "인천", 0L),
                         new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L)
+                        new StadiumCheckInCountResponse(9L, "대전", 0L),
+                        new StadiumCheckInCountResponse(10L, "울산", 0L),
+                        new StadiumCheckInCountResponse(11L, "군산", 0L),
+                        new StadiumCheckInCountResponse(12L, "청주", 0L),
+                        new StadiumCheckInCountResponse(13L, "포항", 0L)
                 )
         );
 
