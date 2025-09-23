@@ -28,8 +28,10 @@ public class AdminController {
     }
 
     @PatchMapping("/game-results")
-    public ResponseEntity<Void> fetchForceDailyGameResult() {
-        gameResultSyncService.syncGameResult(LocalDate.now());
+    public ResponseEntity<Void> fetchForceDailyGameResult(
+            @RequestParam("date") LocalDate date
+    ) {
+        gameResultSyncService.syncGameResult(date);
 
         return ResponseEntity.ok().build();
     }
