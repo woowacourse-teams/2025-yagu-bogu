@@ -34,7 +34,8 @@ public class GameScheduleSyncService {
             "창원", "엔씨파크",
             "수원", "위즈파크",
             "고척", "고척돔",
-            "대구", "라이온즈파크"
+            "대구", "라이온즈파크",
+            "울산", "문수구장"
     );
 
     private final KboGameSyncClient kboGameSyncClient;
