@@ -53,7 +53,11 @@ public class StadiumE2eTest extends E2eTestBase {
                 new StadiumResponse(6L, "사직야구장", "사직구장", "부산", 35.194077, 129.061584),
                 new StadiumResponse(7L, "인천 SSG 랜더스필드", "랜더스필드", "인천", 37.436778, 126.693306),
                 new StadiumResponse(8L, "창원 NC 파크", "엔씨파크", "창원", 35.222754, 128.582251),
-                new StadiumResponse(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211)
+                new StadiumResponse(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211),
+                new StadiumResponse(10L, "울산 문수 야구장", "문수구장", "울산", 35.532334, 129.265575),
+                new StadiumResponse(11L, "월명종합경기장 야구장", "군산구장", "군산", 35.966360, 126.748161),
+                new StadiumResponse(12L, "청주 야구장", "청주구장", "청주", 36.638840, 127.470149),
+                new StadiumResponse(13L, "포항 야구장", "포항구장", "포항", 36.008273, 129.359410)
         );
     }
 }
