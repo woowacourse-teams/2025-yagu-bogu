@@ -27,7 +27,7 @@ public class LocalAuthGateway implements AuthGateway {
                 9999999999L,
                 "local@example.com",
                 true,
-                UUID.randomUUID().toString(),
+                "초코송이쿠키사탕별에서춤추고노래하는행복개발자밍트",
                 "https://example.com/profile.png",
                 "이름",
                 "성",

@@ -129,13 +129,13 @@ public class MemberServiceTest {
         // given
         Member member = memberFactory.save(builder -> builder.nickname("우가"));
 
-        String longNickName = "1234567890123";
+        String longNickName = "12345678901234567890123456";
         MemberNicknameRequest request = new MemberNicknameRequest(longNickName);
 
         // when & then
         assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
                 .isExactlyInstanceOf(UnprocessableEntityException.class)
-                .hasMessage("Nickname must be " + 12 + " characters or fewer.");
+                .hasMessage("Nickname must be " + 25 + " characters or fewer.");
     }
 
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다")
