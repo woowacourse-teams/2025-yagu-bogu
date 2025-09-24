@@ -1,6 +1,8 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.member.MemberDataSource
+import com.yagubogu.data.dto.response.member.BadgeDto
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -8,6 +10,8 @@ import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.ui.badge.BadgeUiState
+import com.yagubogu.ui.badge.model.BadgeUiModel
 
 class MemberDefaultRepository(
     private val memberDataSource: MemberDataSource,
@@ -72,6 +76,15 @@ class MemberDefaultRepository(
     override suspend fun deleteMember(): Result<Unit> =
         memberDataSource.deleteMember().map {
             tokenManager.clearTokens()
+        }
+
+    override suspend fun getBadges(): Result<BadgeUiState> =
+        memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
+            val representativeBadge: BadgeUiModel =
+                badgeResponse.representativeBadge.toPresentation()
+            val badges: List<BadgeUiModel> =
+                badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
+            BadgeUiState.Success(representativeBadge, badges)
         }
 
     override fun invalidateCache() {

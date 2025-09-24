@@ -2,6 +2,7 @@ package com.yagubogu.data.datasource.member
 
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -42,5 +43,10 @@ class MemberRemoteDataSource(
     override suspend fun deleteMember(): Result<Unit> =
         safeApiCall {
             memberApiService.deleteMember()
+        }
+
+    override suspend fun getBadges(): Result<BadgeResponse> =
+        safeApiCall {
+            memberApiService.getBadges()
         }
 }

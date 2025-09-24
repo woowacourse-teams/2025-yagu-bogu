@@ -2,6 +2,7 @@ package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -33,4 +34,7 @@ interface MemberApiService {
 
     @DELETE("/api/members/me")
     suspend fun deleteMember(): Response<Unit>
+
+    @GET("/api/members/me/badges")
+    suspend fun getBadges(): Response<BadgeResponse>
 }
