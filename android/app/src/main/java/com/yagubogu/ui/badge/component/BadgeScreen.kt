@@ -1,11 +1,13 @@
 package com.yagubogu.ui.badge.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,31 +19,71 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
+import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BADGE_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardBold20
-import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.shimmerLoading
+
+private const val COLUMN_SIZE = 2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeScreen(
-    mainBadge: BadgeUiModel?,
-    badgeList: List<BadgeUiModel>,
+    badgeUiState: BadgeUiState,
     onBackClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = { BadgeToolbar(onBackClick = onBackClick) },
+        containerColor = Gray050,
+        modifier = modifier,
+    ) { innerPadding: PaddingValues ->
+        when (badgeUiState) {
+            is BadgeUiState.Loading -> {
+                BadgeLoadingContent(
+                    modifier =
+                        Modifier
+                            .padding(innerPadding)
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                )
+            }
+
+            is BadgeUiState.Success -> {
+                BadgeSuccessContent(
+                    badgeUiState = badgeUiState,
+                    onRegisterClick = onRegisterClick,
+                    modifier =
+                        Modifier
+                            .padding(innerPadding)
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BadgeSuccessContent(
+    badgeUiState: BadgeUiState.Success,
     onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val selectedBadge = rememberSaveable { mutableStateOf<BadgeUiModel?>(null) }
 
-    selectedBadge.value?.let { badge: BadgeUiModel ->
+    selectedBadge.value?.let { badge ->
         BadgeBottomSheet(
             badge = badge,
             onRegisterClick = {
@@ -52,68 +94,117 @@ fun BadgeScreen(
         )
     }
 
-    Scaffold(
-        topBar = { BadgeToolbar(onBackClick = onBackClick) },
-        containerColor = Gray050,
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(COLUMN_SIZE),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier,
-    ) { innerPadding: PaddingValues ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(COLUMN_SIZE),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp)
-                    .background(color = White, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 20.dp),
-        ) {
-            item(span = { GridItemSpan(COLUMN_SIZE) }) {
-                MainBadgeCard(
-                    badge = mainBadge,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp),
-                )
-            }
-            item(span = { GridItemSpan(COLUMN_SIZE) }) {
-                HorizontalDivider(
-                    thickness = 0.4.dp,
-                    color = Gray300,
-                    modifier = Modifier.padding(vertical = 10.dp),
-                )
-            }
-            item(span = { GridItemSpan(COLUMN_SIZE) }) {
-                Text(
-                    text = stringResource(R.string.badge_list_title),
-                    style = PretendardBold20,
-                )
-            }
-            items(badgeList.size) { index: Int ->
-                Badge(
-                    badge = badgeList[index],
-                    onClick = { selectedBadge.value = badgeList[index] },
-                    modifier = Modifier.padding(bottom = 10.dp),
-                )
-            }
+    ) {
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            MainBadgeCard(
+                badge = badgeUiState.representativeBadge,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+            )
+        }
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            HorizontalDivider(
+                thickness = 0.4.dp,
+                color = Gray300,
+                modifier = Modifier.padding(vertical = 10.dp),
+            )
+        }
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            Text(
+                text = stringResource(R.string.badge_list_title),
+                style = PretendardBold20,
+            )
+        }
+        items(badgeUiState.badges.size) { index ->
+            Badge(
+                badge = badgeUiState.badges[index],
+                onClick = { selectedBadge.value = badgeUiState.badges[index] },
+                modifier = Modifier.padding(bottom = 10.dp),
+            )
         }
     }
 }
 
-private const val COLUMN_SIZE = 2
+@Composable
+private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(COLUMN_SIZE),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = modifier,
+    ) {
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.badge_main_badge_title),
+                    style = PretendardBold20,
+                )
+                Box(
+                    modifier =
+                        shimmeringBadgeModifier
+                            .sizeIn(maxWidth = 120.dp)
+                            .align(Alignment.CenterHorizontally),
+                )
+            }
+        }
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            HorizontalDivider(
+                thickness = 0.4.dp,
+                color = Gray300,
+                modifier = Modifier.padding(vertical = 10.dp),
+            )
+        }
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            Text(
+                text = stringResource(R.string.badge_list_title),
+                style = PretendardBold20,
+            )
+        }
+        items(6) {
+            Box(modifier = shimmeringBadgeModifier)
+        }
+    }
+}
+
+private val shimmeringBadgeModifier =
+    Modifier
+        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+        .size(160.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .shimmerLoading()
+
+@Preview
+@Composable
+private fun BadgeLoadingScreenPreview() {
+    BadgeScreen(
+        badgeUiState = BadgeUiState.Loading,
+        onBackClick = {},
+        onRegisterClick = {},
+    )
+}
 
 @Preview
 @Composable
 private fun BadgeScreenPreview() {
     BadgeScreen(
-        mainBadge = null,
-        badgeList =
-            listOf(
-                BADGE_ACQUIRED_FIXTURE,
+        badgeUiState =
+            BadgeUiState.Success(
                 BADGE_NOT_ACQUIRED_FIXTURE,
-                BADGE_ACQUIRED_FIXTURE,
+                listOf(
+                    BADGE_ACQUIRED_FIXTURE,
+                    BADGE_NOT_ACQUIRED_FIXTURE,
+                    BADGE_ACQUIRED_FIXTURE,
+                ),
             ),
         onBackClick = {},
         onRegisterClick = {},
