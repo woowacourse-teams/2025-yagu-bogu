@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.theme
+package com.yagubogu.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -121,10 +121,6 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.runtime.livedata)
 
     // firebase
     implementation(platform(libs.firebase.bom))
@@ -140,7 +136,26 @@ dependencies {
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
 
+    // compose
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+
+    // coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
