@@ -55,6 +55,7 @@ class HomeFragment :
             app.statsRepository,
             app.locationRepository,
             app.stadiumRepository,
+            app.streamRepository,
         )
     }
 

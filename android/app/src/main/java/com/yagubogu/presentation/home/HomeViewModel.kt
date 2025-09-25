@@ -14,10 +14,12 @@ import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
+import com.yagubogu.presentation.home.stadium.SseEvent
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -35,6 +37,7 @@ class HomeViewModel(
     private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
+    private val streamRepository: StreamRepository,
 ) : ViewModel() {
     private val _memberStatsUiModel = MutableLiveData<MemberStatsUiModel>()
     val memberStatsUiModel: LiveData<MemberStatsUiModel> get() = _memberStatsUiModel
@@ -65,6 +68,26 @@ class HomeViewModel(
 
     init {
         fetchAll()
+
+        viewModelScope.launch {
+            streamRepository.connect().collect { event: SseEvent ->
+                when (event) {
+                    is SseEvent.CheckInCreated -> {
+                        _stadiumFanRateItems.value = event.items
+                    }
+
+                    SseEvent.Connect,
+                    SseEvent.Timeout,
+                    SseEvent.Unknown,
+                    -> Unit
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        streamRepository.disconnect()
     }
 
     fun fetchAll() {
