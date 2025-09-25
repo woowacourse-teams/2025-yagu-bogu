@@ -19,6 +19,12 @@ spring:
   flyway:
     enabled: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+
 springdoc:
   api-docs:
     path: /api-docs
