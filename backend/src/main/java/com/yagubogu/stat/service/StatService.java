@@ -1,5 +1,6 @@
 package com.yagubogu.stat.service;
 
+import com.yagubogu.checkin.dto.StatCounts;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
@@ -45,12 +46,15 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        int winCounts = checkInRepository.findWinCounts(member, year);
-        int drawCounts = checkInRepository.findDrawCounts(member, year);
-        int loseCounts = checkInRepository.findLoseCounts(member, year);
-        int favoriteCheckInCounts = winCounts + drawCounts + loseCounts;
+        StatCounts statCounts = checkInRepository.findStatCounts(member, year);
+        int favoriteCheckInCounts = statCounts.winCounts() + statCounts.drawCounts() + statCounts.loseCounts();
 
-        return new StatCountsResponse(winCounts, drawCounts, loseCounts, favoriteCheckInCounts);
+        return new StatCountsResponse(
+                statCounts.winCounts(),
+                statCounts.drawCounts(),
+                statCounts.loseCounts(),
+                favoriteCheckInCounts
+        );
     }
 
     public WinRateResponse findWinRate(final long memberId, final int year) {
