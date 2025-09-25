@@ -6,11 +6,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.util.ApiException
+import com.yagubogu.domain.model.Team
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.presentation.util.getTeam
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -20,6 +26,7 @@ import timber.log.Timber
 class LivetalkChatViewModel(
     private val gameId: Long,
     private val talkRepository: TalkRepository,
+    private val memberRepository: MemberRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
     private val _livetalkUiState =
@@ -55,6 +62,20 @@ class LivetalkChatViewModel(
     private var newestMessageCursor: Long? = null
     private var hasNext: Boolean = true
     private var pollingJob: Job? = null
+
+    private val _myTeam = MutableLiveData<Team>()
+    val myTeam: LiveData<Team> get() = _myTeam
+    val myTeamEmoji =
+        MediatorLiveData<String>().apply {
+            addSource(myTeam) { value = myTeam.value?.getEmoji() }
+        }
+
+    private val _otherTeam = MutableLiveData<Team>()
+    val otherTeam: LiveData<Team> get() = _otherTeam
+    val otherTeamEmoji =
+        MediatorLiveData<String>().apply {
+            addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
+        }
 
     init {
         fetchInitialTalks()
@@ -205,10 +226,30 @@ class LivetalkChatViewModel(
                         oldestMessageCursor = livetalkResponseItem.cursor.nextCursorId
                         newestMessageCursor =
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
+
+                        getTeamEmojis()
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
                         _livetalkUiState.value = LivetalkUiState.Error
                     }
+            }
+        }
+    }
+
+    private fun getTeamEmojis() {
+        viewModelScope.launch {
+            val result = memberRepository.getFavoriteTeam()
+            result.onSuccess { favoriteTeam ->
+                favoriteTeam?.let { favoriteTeam ->
+                    if (livetalkResponseItem.value?.homeTeamName == favoriteTeam) {
+                        _myTeam.value = favoriteTeam.getTeam()
+                        _otherTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
+                    }
+                    if (livetalkResponseItem.value?.awayTeamName == favoriteTeam) {
+                        _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
+                        _otherTeam.value = favoriteTeam.getTeam()
+                    }
+                }
             }
         }
     }

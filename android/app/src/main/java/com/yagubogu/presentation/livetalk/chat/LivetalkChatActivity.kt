@@ -3,6 +3,7 @@ package com.yagubogu.presentation.livetalk.chat
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -32,6 +33,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         LivetalkChatViewModelFactory(
             gameId,
             app.talksRepository,
+            app.memberRepository,
             intent.getBooleanExtra(KEY_IS_VERIFIED, false),
         )
     }
@@ -156,23 +158,27 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupCheerButton() {
         val cheerButton = binding.tvCheerButton
-        val heartsView = binding.floatingHeartsView
 
         cheerButton.setOnClickListener {
-            // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 cheerBtnPosition 배열에 저장됨)
-            val cheerBtnPosition = IntArray(2)
-            cheerButton.getLocationOnScreen(cheerBtnPosition)
-
-            // 2. 애니메이션 컨테이너(heartsView)의 화면상 절대 좌표를 가져옵니다.
-            val containerPosition = IntArray(2)
-            heartsView.getLocationOnScreen(containerPosition)
-
-            // containerPosition을 빼서 상대 좌표를 정확히 계산합니다.
-            val startX = (cheerBtnPosition[0] - containerPosition[0]) + (cheerButton.width / 2f)
-            val startY = (cheerBtnPosition[1] - containerPosition[1]) + (cheerButton.height / 2f)
-
-            heartsView.addHeart(startX, startY)
+            extracted(cheerButton)
         }
+    }
+
+    private fun extracted(cheerButton: TextView) {
+        val heartsView = binding.floatingHeartsView
+        // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 cheerBtnPosition 배열에 저장됨)
+        val cheerBtnPosition = IntArray(2)
+        cheerButton.getLocationOnScreen(cheerBtnPosition)
+
+        // 2. 애니메이션 컨테이너(heartsView)의 화면상 절대 좌표를 가져옵니다.
+        val containerPosition = IntArray(2)
+        heartsView.getLocationOnScreen(containerPosition)
+
+        // containerPosition을 빼서 상대 좌표를 정확히 계산합니다.
+        val startX = (cheerBtnPosition[0] - containerPosition[0]) + (cheerButton.width / 2f)
+        val startY = (cheerBtnPosition[1] - containerPosition[1]) + (cheerButton.height / 2f)
+
+        heartsView.addHeart(startX, startY)
     }
 
     private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {
