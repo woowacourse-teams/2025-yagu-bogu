@@ -63,7 +63,8 @@ INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, 
 ON DUPLICATE KEY UPDATE badge_name        = new_data.badge_name,
                         badge_description = new_data.badge_description,
                         badge_type        = new_data.badge_type,
-                        badge_threshold   = new_data.badge_threshold;
+                        badge_threshold   = new_data.badge_threshold,
+                        badge_image_url   = new_data.badge_image_url;
 
 INSERT INTO games (game_code, date, start_at, stadium_id, home_team_id, away_team_id,
                    home_score, away_score, home_score_board_id, away_score_board_id,
