@@ -1,55 +1,60 @@
 package com.yagubogu.data.repository
 
-import com.yagubogu.data.datasource.StatsDataSource
-import com.yagubogu.data.dto.response.StatsCountsResponse
-import com.yagubogu.data.dto.response.StatsLuckyStadiumsResponse
-import com.yagubogu.data.dto.response.StatsWinRateResponse
-import com.yagubogu.data.dto.response.TeamOccupancyRatesResponse
+import com.yagubogu.data.datasource.stats.StatsDataSource
+import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
+import com.yagubogu.data.dto.response.stats.StatsCountsResponse
+import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
+import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.stats.stadium.model.TeamOccupancyRates
-import java.time.LocalDate
+import com.yagubogu.presentation.stats.detail.VsTeamStatItem
+import com.yagubogu.presentation.stats.my.AverageStats
 
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
 ) : StatsRepository {
-    override suspend fun getStatsWinRate(
-        memberId: Long,
-        year: Int,
-    ): Result<Double> =
+    override suspend fun getStatsWinRate(year: Int): Result<Double> =
         statsDataSource
-            .getStatsWinRate(memberId, year)
+            .getStatsWinRate(year)
             .map { statsWinRateResponse: StatsWinRateResponse ->
                 statsWinRateResponse.winPercent
             }
 
-    override suspend fun getStatsCounts(
-        memberId: Long,
-        year: Int,
-    ): Result<StatsCounts> =
+    override suspend fun getStatsCounts(year: Int): Result<StatsCounts> =
         statsDataSource
-            .getStatsCounts(memberId, year)
+            .getStatsCounts(year)
             .map { statsCountsResponse: StatsCountsResponse ->
                 statsCountsResponse.toDomain()
             }
 
-    override suspend fun getLuckyStadiums(
-        memberId: Long,
-        year: Int,
-    ): Result<String?> =
+    override suspend fun getLuckyStadiums(year: Int): Result<String?> =
         statsDataSource
-            .getLuckyStadiums(memberId, year)
+            .getLuckyStadiums(year)
             .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getTeamOccupancyRates(
-        memberId: Long,
-        date: LocalDate,
-    ): Result<TeamOccupancyRates> =
+    override suspend fun getAverageStats(): Result<AverageStats> =
         statsDataSource
-            .getTeamOccupancyRates(memberId, date)
-            .map { teamOccupancyRatesResponse: TeamOccupancyRatesResponse ->
-                teamOccupancyRatesResponse.toPresentation()
+            .getAverageStats()
+            .map { averageStatisticResponse: AverageStatisticResponse ->
+                AverageStats(
+                    averageRuns = averageStatisticResponse.averageRun ?: 0.0,
+                    concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
+                    averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
+                    averageHits = averageStatisticResponse.averageHits ?: 0.0,
+                    concededHits = averageStatisticResponse.concededHits ?: 0.0,
+                )
+            }
+
+    override suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>> =
+        statsDataSource
+            .getVsTeamStats(year)
+            .map { opponentWinRateResponse: OpponentWinRateResponse ->
+                opponentWinRateResponse.opponents.mapIndexed { index: Int, opponentDto: OpponentWinRateTeamDto ->
+                    opponentDto.toPresentation(index + 1)
+                }
             }
 }

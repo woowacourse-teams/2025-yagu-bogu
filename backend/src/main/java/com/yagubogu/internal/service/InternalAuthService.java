@@ -3,7 +3,7 @@ package com.yagubogu.internal.service;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.dto.TokenResponse;
-import com.yagubogu.auth.service.AuthService;
+import com.yagubogu.auth.service.RefreshTokenService;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -19,14 +19,14 @@ public class InternalAuthService {
 
     private final MemberRepository memberRepository;
     private final AuthTokenProvider jwtProvider;
-    private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
 
     public TokenResponse issueAccessToken(final long memberId) {
         Member member = getMember(memberId);
 
         MemberClaims claims = MemberClaims.from(member);
-        String accessToken = jwtProvider.createAccessToken(claims);
-        String refreshToken = authService.generateRefreshToken(member);
+        String accessToken = jwtProvider.issueAccessToken(claims);
+        String refreshToken = refreshTokenService.issue(member);
 
         return new TokenResponse(accessToken, refreshToken);
     }

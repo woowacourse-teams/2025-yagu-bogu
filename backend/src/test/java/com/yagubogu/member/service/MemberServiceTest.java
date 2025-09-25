@@ -8,7 +8,9 @@ import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
@@ -124,6 +126,36 @@ public class MemberServiceTest {
         assertThat(actual.nickname()).isEqualTo(newNickname);
     }
 
+    @DisplayName("예외: 닉네임 수정시 존재하는 닉네임이면 예외가 발생한다")
+    @Test
+    void patchNickname_duplicateNickname() {
+        // given
+        String existNickname = "존재하는닉네임";
+        memberFactory.save(builder -> builder.nickname(existNickname));
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        MemberNicknameRequest request = new MemberNicknameRequest(existNickname);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
+                .isExactlyInstanceOf(ConflictException.class)
+                .hasMessage("Nickname already exists: " + existNickname);
+    }
+
+    @DisplayName("예외: 닉네임 수정 시 최대 길이를 초과하면 예외가 발생한다")
+    @Test
+    void patchNickname_nickNameTooLong() {
+        // given
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+
+        String longNickName = "12345678901234567890123456";
+        MemberNicknameRequest request = new MemberNicknameRequest(longNickName);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.patchNickname(member.getId(), request))
+                .isExactlyInstanceOf(UnprocessableEntityException.class)
+                .hasMessage("Nickname must be " + 25 + " characters or fewer.");
+    }
+
     @DisplayName("예외: 멤버를 찾지 못하면 예외가 발생한다")
     @Test
     void findFavorite_notFoundMember() {
@@ -232,7 +264,7 @@ public class MemberServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());
@@ -250,7 +282,7 @@ public class MemberServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname());
+            softAssertions.assertThat(actual.nickname()).isEqualTo(member.getNickname().getValue());
             softAssertions.assertThat(actual.favoriteTeam()).isNull();
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(member.getImageUrl());

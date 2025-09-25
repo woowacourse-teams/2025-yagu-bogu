@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="livetalkStadiumItem"
+            type="com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder.Handler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_livetalk_stadium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:onClick="@{() -> handler.onItemClick(livetalkStadiumItem)}"
+        android:background="@{livetalkStadiumItem.isVerified ? @drawable/bg_white_stroke_primary500_radius_12dp : @drawable/bg_white_stroke_gray100_radius_12dp}"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="20dp"
+        tools:background="@drawable/bg_white_stroke_primary500_radius_12dp">
+
+        <TextView
+            android:id="@+id/tv_stadium_name"
+            style="@style/TextView.Pretendard.Bold.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@{livetalkStadiumItem.stadiumName}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="고척 스카이돔" />
+
+        <ImageView
+            android:id="@+id/iv_user_counter_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/livetalk_user_icon_description"
+            android:src="@drawable/ic_users"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+            app:layout_constraintStart_toEndOf="@id/tv_stadium_name"
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+            app:tint="@color/gray500" />
+
+        <TextView
+            android:id="@+id/tv_user_count"
+            style="@style/TextView.Pretendard.Medium.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@{String.valueOf(livetalkStadiumItem.userCount)}"
+            android:textColor="@color/gray500"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+            app:layout_constraintStart_toEndOf="@id/iv_user_counter_icon"
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+            tools:text="100" />
+
+
+        <ImageView
+            android:id="@+id/tv_arrow_right"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/livetalk_stadium_select_arrow_description"
+            android:src="@drawable/ic_arrow_right"
+            app:layout_constraintBottom_toBottomOf="@id/tv_stadium_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+            app:tint="@color/gray500" />
+
+        <TextView
+            android:id="@+id/tv_away_team_emoji"
+            style="@style/TextView.Pretendard.Medium.28"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@{livetalkStadiumItem.awayTeamEmoji}"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toStartOf="@id/tv_livetalk_vs_design"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
+            tools:text="\uD83D\uDC3B" />
+
+        <TextView
+            android:id="@+id/tv_away_team_nickname"
+            style="@style/TextView.Esamanru.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{livetalkStadiumItem.awayTeam.shortname}"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tv_away_team_emoji"
+            app:layout_constraintStart_toStartOf="@id/tv_away_team_emoji"
+            app:layout_constraintTop_toBottomOf="@id/tv_away_team_emoji"
+            app:textColorRes="@{livetalkStadiumItem.awayTeamColor}"
+            tools:text="베어스"
+            tools:textColor="@color/team_doosan" />
+
+        <TextView
+            android:id="@+id/tv_livetalk_vs_design"
+            style="@style/TextView.Pretendard.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="vs"
+            android:textColor="@color/gray500"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_away_team_nickname"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_away_team_emoji" />
+
+        <TextView
+            android:id="@+id/tv_home_team_emoji"
+            style="@style/TextView.Pretendard.Medium.28"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{livetalkStadiumItem.homeTeamEmoji}"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_livetalk_vs_design"
+            app:layout_constraintTop_toTopOf="@id/tv_away_team_emoji"
+            tools:text="\uD83E\uDDB8" />
+
+        <TextView
+            android:id="@+id/tv_home_team_nickname"
+            style="@style/TextView.Esamanru.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{livetalkStadiumItem.homeTeam.shortname}"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_away_team_nickname"
+            app:layout_constraintEnd_toEndOf="@id/tv_home_team_emoji"
+            app:layout_constraintStart_toStartOf="@id/tv_home_team_emoji"
+            app:layout_constraintTop_toBottomOf="@id/tv_away_team_emoji"
+            app:layout_constraintTop_toTopOf="@id/tv_away_team_nickname"
+            app:textColorRes="@{livetalkStadiumItem.homeTeamColor}"
+            tools:text="히어로즈"
+            tools:textColor="@color/team_kiwoom" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

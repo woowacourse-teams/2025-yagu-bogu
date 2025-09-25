@@ -1,7 +1,6 @@
 package com.yagubogu.auth.service;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.auth.config.AuthTokenProperties;
 import com.yagubogu.auth.domain.RefreshToken;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
@@ -13,7 +12,7 @@ import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
@@ -43,9 +42,6 @@ class AuthServiceTest {
     private AuthGateway fakeAuthGateway;
 
     @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
@@ -55,7 +51,7 @@ class AuthServiceTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private AuthTokenProperties authTokenProperties;
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
     private MemberFactory memberFactory;
@@ -64,20 +60,22 @@ class AuthServiceTest {
     private RefreshTokenFactory refreshTokenFactory;
 
     @Autowired
+    private MemberService memberService;
+
+    @Autowired
     private ApplicationEventPublisher publisher;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(memberRepository, fakeAuthGateway, authTokenProvider,
-                List.of(googleAuthValidator), refreshTokenRepository, authTokenProperties, publisher);
+        authService = new AuthService(fakeAuthGateway, authTokenProvider,
+                List.of(googleAuthValidator), refreshTokenRepository, publisher, memberService, refreshTokenService);
     }
 
-    @DisplayName("로그인을 수행한다")
+    @DisplayName("회원가입을 수행한다")
     @Test
-    void login() {
+    void login_register() {
         // given
         LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
-        String expectedNickname = "test-user";
 
         // when
         LoginResponse response = authService.login(loginRequest);
@@ -87,7 +85,26 @@ class AuthServiceTest {
             softAssertions.assertThat(response.accessToken()).isNotNull();
             softAssertions.assertThat(response.refreshToken()).isNotNull();
             softAssertions.assertThat(response.isNew()).isTrue();
-            softAssertions.assertThat(response.member().nickname()).isEqualTo(expectedNickname);
+        });
+    }
+
+    @DisplayName("로그인을 수행한다")
+    @Test
+    void login() {
+        // given
+        LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
+        LoginResponse registerResponse = authService.login(loginRequest);
+        String expectedNickname = registerResponse.member().nickname();
+
+        // when
+        LoginResponse actual = authService.login(loginRequest);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.accessToken()).isNotNull();
+            softAssertions.assertThat(actual.refreshToken()).isNotNull();
+            softAssertions.assertThat(actual.isNew()).isFalse();
+            softAssertions.assertThat(actual.member().nickname()).isEqualTo(expectedNickname);
         });
     }
 
@@ -224,5 +241,4 @@ class AuthServiceTest {
                 .isNotEmpty()
                 .allMatch(RefreshToken::isRevoked);
     }
-
 }

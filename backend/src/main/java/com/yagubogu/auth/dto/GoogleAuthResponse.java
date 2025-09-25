@@ -3,6 +3,7 @@ package com.yagubogu.auth.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
 
@@ -57,6 +58,6 @@ public record GoogleAuthResponse(
 
     @Override
     public Member toMember() {
-        return new Member(null, name, email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture, null);
+        return new Member(null, new Nickname(name), email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture, null);
     }
 }

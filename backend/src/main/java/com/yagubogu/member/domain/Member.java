@@ -4,6 +4,7 @@ import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,8 +36,8 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = true)
     private Team team;
 
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @Embedded
+    private Nickname nickname;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -59,7 +60,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "representative_badge_id", nullable = true)
     private Badge representativeBadge;
 
-    public Member(final Team team, final String nickname, final String email, final OAuthProvider provider,
+    public Member(final Team team, final Nickname nickname, final String email, final OAuthProvider provider,
                   final String oauthId, final Role role, final String imageUrl, final Badge representativeBadge) {
         this.team = team;
         this.nickname = nickname;
@@ -83,7 +84,7 @@ public class Member extends BaseEntity {
         this.team = team;
     }
 
-    public void updateNickname(final String nickname) {
+    public void updateNickname(final Nickname nickname) {
         this.nickname = nickname;
     }
 

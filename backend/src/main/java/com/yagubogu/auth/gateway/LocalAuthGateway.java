@@ -4,6 +4,7 @@ import com.yagubogu.auth.config.GoogleAuthProperties;
 import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.GoogleAuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class LocalAuthGateway implements AuthGateway {
                 9999999999L,
                 "local@example.com",
                 true,
-                "로컬유저",
+                "초코송이쿠키사탕별에서춤추고노래하는행복개발자밍트",
                 "https://example.com/profile.png",
                 "이름",
                 "성",

@@ -5,18 +5,19 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
   sql:
     init:
       mode: never
 
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: validate
   lifecycle:
     timeout-per-shutdown-phase: 30s
+
+  flyway:
+    enabled: true
 
 springdoc:
   api-docs:

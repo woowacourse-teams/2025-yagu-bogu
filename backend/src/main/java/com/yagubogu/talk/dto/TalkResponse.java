@@ -31,7 +31,7 @@ public record TalkResponse(
         return new TalkResponse(
                 talk.getId(),
                 talk.getMember().getId(),
-                talk.getMember().getNickname(),
+                talk.getMember().getNickname().getValue(),
                 talk.getMember().getTeam().getShortName(),
                 talk.getMember().getImageUrl(),
                 talk.getContent(),

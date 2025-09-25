@@ -11,13 +11,23 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStatsBinding
 import com.yagubogu.databinding.ViewTabStatsBinding
-import com.yagubogu.presentation.stats.my.MyStatsFragment
-import com.yagubogu.presentation.stats.stadium.StadiumStatsFragment
+import com.yagubogu.presentation.stats.detail.StatsDetailFragment
+import com.yagubogu.presentation.stats.my.StatsMyFragment
+import com.yagubogu.presentation.util.ScrollToTop
 
 @Suppress("ktlint:standard:backing-property-naming")
-class StatsFragment : Fragment() {
+class StatsFragment :
+    Fragment(),
+    ScrollToTop {
     private var _binding: FragmentStatsBinding? = null
     private val binding get() = _binding!!
+
+    private val statsStateAdapter: StatsFragmentStateAdapter by lazy {
+        StatsFragmentStateAdapter(
+            this,
+            listOf(StatsMyFragment(), StatsDetailFragment()),
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +43,7 @@ class StatsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupFragmentStateAdapter()
+        binding.vpStatsFragment.adapter = statsStateAdapter
         setupTabLayoutMediator()
         setupTabLayoutListener()
     }
@@ -43,12 +53,12 @@ class StatsFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupFragmentStateAdapter() {
-        binding.vpStatsFragment.adapter =
-            StatsFragmentStateAdapter(
-                this,
-                listOf(MyStatsFragment(), StadiumStatsFragment()),
-            )
+    override fun scrollToTop() {
+        val position: Int = binding.vpStatsFragment.currentItem
+        val currentFragment: Fragment = statsStateAdapter.createFragment(position)
+        if (currentFragment is ScrollToTop) {
+            currentFragment.scrollToTop()
+        }
     }
 
     private fun setupTabLayoutMediator() {

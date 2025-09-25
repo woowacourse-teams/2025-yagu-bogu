@@ -27,6 +27,10 @@
     <color name="gray800">#FF262626</color>
     <color name="gray900">#FF171717</color>
 
+    <!-- Dimming Colors -->
+    <color name="dimming025">#40000000</color>
+    <color name="dimming050">#80000000</color>
+
     <!-- Team Colors -->
     <color name="team_kia">#FFEA0029</color>
     <color name="team_samsung">#FF074CA1</color>
@@ -41,4 +45,7 @@
 
     <!-- Colors -->
     <color name="red">#FFFF2C2C</color>
+    <color name="gold">#FFC9B037</color>
+    <color name="silver">#FFB4B4B4</color>
+    <color name="bronze">#FFAD8A56</color>
 </resources>
