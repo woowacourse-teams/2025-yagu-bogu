@@ -8,7 +8,6 @@ import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
 import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.team.domain.Team;
@@ -22,10 +21,6 @@ public interface CustomCheckInRepository {
     int findLoseCounts(Member member, int year);
 
     int findDrawCounts(Member member, int year);
-
-    int countTotalFavoriteTeamGamesByStadiumAndMember(Stadium stadium, Member member, int year);
-
-    int countWinsFavoriteTeamByStadiumAndMember(Stadium stadium, Member member, int year);
 
     int countByMemberAndYear(Member member, int year);
 

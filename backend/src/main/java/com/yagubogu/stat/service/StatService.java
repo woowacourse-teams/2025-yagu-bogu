@@ -6,7 +6,6 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
@@ -15,9 +14,11 @@ import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
+import com.yagubogu.stat.dto.StadiumStatsDto;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -78,22 +79,25 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        List<Stadium> stadiums = stadiumRepository.findAll();
+        List<StadiumStatsDto> hello = checkInRepository.findWinAndNonDrawCountByStadium(
+                memberId,
+                LocalDate.of(year, 1, 1),
+                LocalDate.of(year, 12, 31)
+        );
         double lowestWinRate = 0;
-        Stadium luckyStadium = null;
-        for (Stadium stadium : stadiums) {
-            int winCounts = checkInRepository.countWinsFavoriteTeamByStadiumAndMember(stadium, member, year);
-            int totalCounts = checkInRepository.countTotalFavoriteTeamGamesByStadiumAndMember(stadium, member,
-                    year);
+        String luckyStadiumName = null;
+        for (StadiumStatsDto stadiumStatsDto : hello) {
+            long winCounts = stadiumStatsDto.winCounts();
+            long totalCountsWithoutDraw = stadiumStatsDto.totalCountsWithoutDraw();
 
-            double currentWinRate = calculateWinRate(winCounts, totalCounts);
+            double currentWinRate = calculateWinRate(winCounts, totalCountsWithoutDraw);
             if (currentWinRate > lowestWinRate) {
                 lowestWinRate = currentWinRate;
-                luckyStadium = stadium;
+                luckyStadiumName = stadiumStatsDto.stadiumName();
             }
         }
 
-        return LuckyStadiumResponse.from(luckyStadium);
+        return new LuckyStadiumResponse(luckyStadiumName);
     }
 
     public AverageStatisticResponse findAverageStatistic(final long memberId) {
