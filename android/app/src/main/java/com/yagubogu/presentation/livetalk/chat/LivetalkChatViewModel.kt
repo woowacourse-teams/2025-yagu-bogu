@@ -172,6 +172,7 @@ class LivetalkChatViewModel(
                     launch {
                         while (true) {
                             fetchAfterTalks()
+                            Timber.d("현장톡 폴링 시도")
                             delay(POLLING_INTERVAL_MILLS)
                         }
                     }
@@ -205,6 +206,7 @@ class LivetalkChatViewModel(
                         oldestMessageCursor = livetalkResponseItem.cursor.nextCursorId
                         newestMessageCursor =
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
+                        startChatPolling()
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
                         _livetalkUiState.value = LivetalkUiState.Error
