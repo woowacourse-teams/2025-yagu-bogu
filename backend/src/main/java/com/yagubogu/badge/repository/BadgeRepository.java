@@ -25,7 +25,8 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     COALESCE(mb.achieved, false),
                     mb.achievedAt,
                     COUNT(CASE WHEN mb2.achieved = true THEN 1 ELSE NULL END),
-                    b.threshold
+                    b.threshold,
+                    b.badgeImageUrl
                 )
                 FROM Badge b
                 LEFT JOIN MemberBadge mb

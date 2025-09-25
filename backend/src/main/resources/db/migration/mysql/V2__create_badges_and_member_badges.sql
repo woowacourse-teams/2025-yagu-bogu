@@ -6,6 +6,7 @@ CREATE TABLE badges
     badge_description VARCHAR(255),
     badge_type        VARCHAR(50)  NOT NULL,
     badge_threshold   INT          NOT NULL,
+    badge_image_url   VARCHAR(512) NOT NULL,
     PRIMARY KEY (badge_id)
 ) ENGINE = InnoDB;
 

@@ -17,7 +17,8 @@ public record BadgeListResponse(
             representativeBadgeResponse = new RepresentativeBadgeResponse(
                     representativeBadge.getId(),
                     representativeBadge.getName(),
-                    representativeBadge.getPolicy()
+                    representativeBadge.getPolicy(),
+                    representativeBadge.getBadgeImageUrl()
             );
         }
 
@@ -27,7 +28,8 @@ public record BadgeListResponse(
     public record RepresentativeBadgeResponse(
             Long id,
             String name,
-            Policy policy
+            Policy policy,
+            String badgeImageUrl
     ) {
     }
 }

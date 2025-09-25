@@ -36,10 +36,15 @@ public class Badge {
     @Column(name = "badge_threshold", nullable = false)
     private int threshold;
 
-    public Badge(final String name, final String description, final Policy policy, final int threshold) {
+    @Column(name = "badge_image_url", nullable = false)
+    private String badgeImageUrl;
+
+    public Badge(final String name, final String description, final Policy policy, final int threshold,
+                 final String badgeImageUrl) {
         this.name = name;
         this.description = description;
         this.policy = policy;
         this.threshold = threshold;
+        this.badgeImageUrl = badgeImageUrl;
     }
 }

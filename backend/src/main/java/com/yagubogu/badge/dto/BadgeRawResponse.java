@@ -12,6 +12,7 @@ public record BadgeRawResponse(
         boolean acquired,
         LocalDateTime achievedAt,
         long achievedCount,
-        int threshold
+        int threshold,
+        String badgeImageUrl
 ) {
 }

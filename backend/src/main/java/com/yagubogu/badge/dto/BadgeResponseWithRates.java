@@ -1,6 +1,5 @@
 package com.yagubogu.badge.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yagubogu.badge.domain.Policy;
 import java.time.LocalDateTime;
 
@@ -9,11 +8,11 @@ public record BadgeResponseWithRates(
         String name,
         String description,
         Policy policy,
-        @JsonIgnore int progress,
         boolean acquired,
         LocalDateTime achievedAt,
         double progressRate,
-        double achievedRate
+        double achievedRate,
+        String badgeImageUrl
 ) {
     public static BadgeResponseWithRates from(final BadgeRawResponse raw, final long totalMembers) {
         double progressRate = raw.progress() == 0 ? 0.0 : (raw.progress() * 100.0) / raw.threshold();
@@ -24,11 +23,11 @@ public record BadgeResponseWithRates(
                 raw.name(),
                 raw.description(),
                 raw.policy(),
-                raw.progress(),
                 raw.acquired(),
                 raw.achievedAt(),
                 progressRate,
-                achievedRate
+                achievedRate,
+                raw.badgeImageUrl()
         );
     }
 }

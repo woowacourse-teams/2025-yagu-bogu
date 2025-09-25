@@ -24,8 +24,14 @@ VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.88
        (9, '이글스파크', '볼파크', '대전', 36.3173, 127.4280);
 
 -- 3. 회원가입 뱃지 데이터
-INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold)
-VALUES ('리드오프', '회원가입한 회원', 'SIGN_UP', 1),
-       ('말문이 트이다', '첫 현장톡 작성', 'CHAT', 1),
-       ('공포의 주둥아리', '현장톡 누적 100회', 'CHAT', 100),
-       ('플레이볼', '첫 직관 인증', 'CHECK_IN', 1)
+INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, badge_image_url)
+VALUES ('리드오프', '회원가입한 회원', 'SIGN_UP', 1,
+        'https://github.com/user-attachments/assets/68f40c11-e0ac-4917-9cab-d482bd44bdea'),
+       ('말문이 트이다', '첫 현장톡 작성', 'CHAT', 1,
+        'https://github.com/user-attachments/assets/7f6cc5ae-e4af-41c7-96f1-e531c661f771'),
+       ('공포의 주둥아리', '현장톡 누적 100회', 'CHAT', 100,
+        'https://github.com/user-attachments/assets/b393d494-7168-4c4a-821d-113db6f6d7f0'),
+       ('플레이볼', '첫 직관 인증', 'CHECK_IN', 1,
+        'https://github.com/user-attachments/assets/36a27348-0870-4910-b106-c35319eb4ac6'),
+       ('그랜드슬램', '9개 전구장 방문', 'GRAND_SLAM', 9,
+        'https://github.com/user-attachments/assets/7ef1ead4-78cf-472e-a610-48f9d0439ded');
