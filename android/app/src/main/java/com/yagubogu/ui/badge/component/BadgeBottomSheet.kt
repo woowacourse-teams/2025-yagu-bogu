@@ -43,7 +43,7 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun BadgeBottomSheet(
     badge: BadgeUiModel,
-    onRegisterClick: () -> Unit,
+    onRegisterClick: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -84,7 +84,7 @@ fun BadgeBottomSheet(
             Spacer(modifier = Modifier.height(30.dp))
             if (badge.isAcquired) {
                 Button(
-                    onClick = onRegisterClick,
+                    onClick = { onRegisterClick(badge.id) },
                     colors =
                         ButtonColors(
                             containerColor = Primary500,

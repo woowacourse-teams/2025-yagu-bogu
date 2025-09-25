@@ -21,6 +21,27 @@ class BadgeViewModel(
         fetchBadges()
     }
 
+    fun patchRepresentativeBadge(badgeId: Long) {
+        viewModelScope.launch {
+            val patchRepresentativeBadgeResult: Result<Unit> =
+                memberRepository.patchRepresentativeBadge(badgeId)
+            patchRepresentativeBadgeResult
+                .onSuccess {
+                    val currentBadgeUiState: BadgeUiState = badgeUiState.value
+
+                    if (currentBadgeUiState is BadgeUiState.Success) {
+                        val selectedBadge = currentBadgeUiState.badges.find { it.id == badgeId }
+                        selectedBadge?.let { badge: BadgeUiModel ->
+                            badgeUiState.value =
+                                currentBadgeUiState.copy(representativeBadge = badge)
+                        }
+                    }
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
     // TODO API 배포 시 코드 수정
     private fun fetchBadges() {
 //        viewModelScope.launch {
@@ -44,27 +65,6 @@ class BadgeViewModel(
                         BADGE_ACQUIRED_FIXTURE,
                     ),
                 )
-        }
-    }
-
-    private fun patchRepresentativeBadge(badgeId: Long) {
-        viewModelScope.launch {
-            val patchRepresentativeBadgeResult: Result<Unit> =
-                memberRepository.patchRepresentativeBadge(badgeId)
-            patchRepresentativeBadgeResult
-                .onSuccess {
-                    val currentBadgeUiState: BadgeUiState = badgeUiState.value
-
-                    if (currentBadgeUiState is BadgeUiState.Success) {
-                        val selectedBadge = currentBadgeUiState.badges.find { it.id == badgeId }
-                        selectedBadge?.let { badge: BadgeUiModel ->
-                            badgeUiState.value =
-                                currentBadgeUiState.copy(representativeBadge = badge)
-                        }
-                    }
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
         }
     }
 }

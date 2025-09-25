@@ -24,7 +24,7 @@ class BadgeActivity : ComponentActivity() {
                 BadgeScreen(
                     badgeUiState = viewModel.badgeUiState.value,
                     onBackClick = { finish() },
-                    onRegisterClick = {},
+                    onRegisterClick = { badgeId: Long -> viewModel.patchRepresentativeBadge(badgeId) },
                     modifier = Modifier.fillMaxSize(),
                 )
             }

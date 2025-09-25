@@ -42,7 +42,7 @@ private const val COLUMN_SIZE = 2
 fun BadgeScreen(
     badgeUiState: BadgeUiState,
     onBackClick: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onRegisterClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -63,7 +63,7 @@ fun BadgeScreen(
             is BadgeUiState.Success -> {
                 BadgeSuccessContent(
                     badgeUiState = badgeUiState,
-                    onRegisterClick = onRegisterClick,
+                    onRegisterClick = { badgeId: Long -> onRegisterClick(badgeId) },
                     modifier =
                         Modifier
                             .padding(innerPadding)
@@ -78,7 +78,7 @@ fun BadgeScreen(
 @Composable
 private fun BadgeSuccessContent(
     badgeUiState: BadgeUiState.Success,
-    onRegisterClick: () -> Unit,
+    onRegisterClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val selectedBadge = rememberSaveable { mutableStateOf<BadgeUiModel?>(null) }
@@ -86,8 +86,8 @@ private fun BadgeSuccessContent(
     selectedBadge.value?.let { badge ->
         BadgeBottomSheet(
             badge = badge,
-            onRegisterClick = {
-                onRegisterClick()
+            onRegisterClick = { badgeId: Long ->
+                onRegisterClick(badgeId)
                 selectedBadge.value = null
             },
             onDismiss = { selectedBadge.value = null },
