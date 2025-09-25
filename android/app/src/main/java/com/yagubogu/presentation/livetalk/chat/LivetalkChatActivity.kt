@@ -160,11 +160,14 @@ class LivetalkChatActivity : AppCompatActivity() {
         val cheerButton = binding.tvCheerButton
 
         cheerButton.setOnClickListener {
-            extracted(cheerButton)
+            showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
         }
     }
 
-    private fun extracted(cheerButton: TextView) {
+    private fun showChearEmojiAnimation(
+        emoji: String,
+        cheerButton: TextView,
+    ) {
         val heartsView = binding.floatingHeartsView
         // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 cheerBtnPosition 배열에 저장됨)
         val cheerBtnPosition = IntArray(2)
@@ -178,7 +181,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         val startX = (cheerBtnPosition[0] - containerPosition[0]) + (cheerButton.width / 2f)
         val startY = (cheerBtnPosition[1] - containerPosition[1]) + (cheerButton.height / 2f)
 
-        heartsView.addHeart(startX, startY)
+        heartsView.addCheerEmoji(emoji, startX, startY)
     }
 
     private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {

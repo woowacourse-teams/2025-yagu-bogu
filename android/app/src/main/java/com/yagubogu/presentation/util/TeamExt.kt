@@ -35,4 +35,4 @@ fun Team.getEmoji(): String =
         Team.OB -> "\uD83D\uDC3B"
     }
 
-fun String.getTeam(): Team = Team.entries.find { it.name == this } ?: Team.NOT_SELECTED
+fun String.getTeam(): Team = Team.entries.find { it.shortname == this } ?: Team.NOT_SELECTED

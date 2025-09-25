@@ -33,48 +33,48 @@ class FloatingHeartsView
                 textSize = 60f
                 textAlign = Paint.Align.CENTER
             }
-        private val heartText = "❤️"
 
         init {
             // onDraw가 호출되도록 설정
             setWillNotDraw(false)
         }
 
-        /**
-         * 특정 뷰(anchor)의 위치에서 하트 애니메이션을 시작합니다.
-         * @param anchor 애니메이션이 시작될 기준 뷰
-         */
-        fun addHeartFrom(anchor: View) {
-            // 뷰의 크기가 아직 측정되지 않았다면, 측정이 끝난 후 재시도합니다.
-            if (width == 0 || height == 0 || anchor.width == 0 || anchor.height == 0) {
-                post { addHeartFrom(anchor) }
-                return
-            }
-
-            val selfOnScreen = IntArray(2)
-            getLocationOnScreen(selfOnScreen)
-
-            val anchorOnScreen = IntArray(2)
-            anchor.getLocationOnScreen(anchorOnScreen)
-
-            // anchor 뷰의 중심 좌표를 이 View 내부의 상대 좌표로 변환합니다.
-            val startX = (anchorOnScreen[0] - selfOnScreen[0]) + anchor.width / 2f
-            val startY = (anchorOnScreen[1] - selfOnScreen[1]) + anchor.height / 2f
-
-            addHeart(startX, startY)
-        }
+//        /**
+//         * 특정 뷰(anchor)의 위치에서 하트 애니메이션을 시작합니다.
+//         * @param anchor 애니메이션이 시작될 기준 뷰
+//         */
+//        fun addHeartFrom(anchor: View) {
+//            // 뷰의 크기가 아직 측정되지 않았다면, 측정이 끝난 후 재시도합니다.
+//            if (width == 0 || height == 0 || anchor.width == 0 || anchor.height == 0) {
+//                post { addHeartFrom(anchor) }
+//                return
+//            }
+//
+//            val selfOnScreen = IntArray(2)
+//            getLocationOnScreen(selfOnScreen)
+//
+//            val anchorOnScreen = IntArray(2)
+//            anchor.getLocationOnScreen(anchorOnScreen)
+//
+//            // anchor 뷰의 중심 좌표를 이 View 내부의 상대 좌표로 변환합니다.
+//            val startX = (anchorOnScreen[0] - selfOnScreen[0]) + anchor.width / 2f
+//            val startY = (anchorOnScreen[1] - selfOnScreen[1]) + anchor.height / 2f
+//
+//            addHeart(startX, startY)
+//        }
 
         /**
          * 지정된 상대 좌표에서 하트 애니메이션을 시작합니다.
          * @param startX 이 View 내에서의 X 시작 좌표
          * @param startY 이 View 내에서의 Y 시작 좌표
          */
-        fun addHeart(
+        fun addCheerEmoji(
+            emoji: String,
             startX: Float,
             startY: Float,
         ) {
             val bounds = Rect()
-            heartPaint.getTextBounds(heartText, 0, heartText.length, bounds)
+            heartPaint.getTextBounds(emoji, 0, emoji.length, bounds)
             val textH = bounds.height().toFloat()
 
             val heartView =
@@ -82,11 +82,11 @@ class FloatingHeartsView
                     override fun onDraw(canvas: Canvas) {
                         // 뷰의 중앙에 이모지를 그립니다.
                         val y = height / 2f + textH / 2f
-                        canvas.drawText(heartText, width / 2f, y, heartPaint)
+                        canvas.drawText(emoji, width / 2f, y, heartPaint)
                     }
                 }.apply {
                     // 이모지 크기에 맞춰 뷰의 크기를 설정합니다.
-                    val textW = heartPaint.measureText(heartText)
+                    val textW = heartPaint.measureText(emoji)
                     val padding = dpToPx(8f)
                     val viewW = (textW + padding * 2).toInt()
                     val viewH = (textH + padding * 2).toInt()

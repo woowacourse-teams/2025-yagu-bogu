@@ -124,8 +124,9 @@
                 android:layout_marginBottom="16dp"
                 android:elevation="6dp"
                 android:gravity="center"
-                android:text="❤"
+                android:text="@{viewModel.myTeamEmoji}"
                 android:textSize="24sp"
+                android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@id/rv_chat_messages"
                 app:layout_constraintEnd_toEndOf="@id/rv_chat_messages" />
 
