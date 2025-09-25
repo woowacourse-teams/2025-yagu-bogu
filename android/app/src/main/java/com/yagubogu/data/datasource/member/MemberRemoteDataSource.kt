@@ -49,4 +49,9 @@ class MemberRemoteDataSource(
         safeApiCall {
             memberApiService.getBadges()
         }
+
+    override suspend fun patchRepresentativeBadge(badgeId: Long): Result<Unit> =
+        safeApiCall {
+            memberApiService.patchRepresentativeBadge(badgeId)
+        }
 }

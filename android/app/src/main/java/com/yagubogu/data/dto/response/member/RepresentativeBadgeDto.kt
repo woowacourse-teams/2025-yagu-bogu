@@ -16,6 +16,7 @@ data class RepresentativeBadgeDto(
 ) {
     fun toPresentation(): BadgeUiModel =
         BadgeUiModel(
+            id = id,
             imageUrl = "TODO",
             name = name,
             description = "",

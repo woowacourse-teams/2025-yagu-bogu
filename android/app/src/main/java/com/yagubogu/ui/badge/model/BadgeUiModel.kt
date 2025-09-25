@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 @Parcelize
 data class BadgeUiModel(
+    val id: Long,
     val imageUrl: String,
     val name: String,
     val description: String,
