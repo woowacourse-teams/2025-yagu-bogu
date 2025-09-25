@@ -27,7 +27,7 @@ public record BadgeListResponse(
     public record RepresentativeBadgeResponse(
             Long id,
             String name,
-            Policy type
+            Policy policy
     ) {
     }
 }
