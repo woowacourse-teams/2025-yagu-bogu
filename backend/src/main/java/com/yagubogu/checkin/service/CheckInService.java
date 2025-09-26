@@ -18,6 +18,7 @@ import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.event.CheckInEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -65,6 +66,8 @@ public class CheckInService {
         checkInRepository.save(checkIn);
 
         applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));
+        checkInRepository.save(new CheckIn(game, member, team));
+        applicationEventPublisher.publishEvent(new CheckInEvent(member));
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {

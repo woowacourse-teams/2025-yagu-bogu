@@ -27,14 +27,15 @@ public class LikeService {
     @Transactional
     public void applyBatch(
             final long gameId,
-            final LikeBatchRequest request
+            final LikeBatchRequest request,
+            final long memberId
     ) {
         existsGame(gameId);
 
         // 멱등성 키 insert (INSERT IGNORE -> 이미 처리된 배치면 재적용 금지)
         boolean inserted = likeWindowRepository.tryInsertWindow(
                 gameId,
-                request.memberId(),
+                memberId,
                 request.windowStartEpochSec()
         );
         if (!inserted) {

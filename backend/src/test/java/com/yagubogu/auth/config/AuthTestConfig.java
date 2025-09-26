@@ -6,12 +6,15 @@ import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.service.RefreshTokenService;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
+import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -87,7 +90,13 @@ public class AuthTestConfig {
     }
 
     @Bean
-    public MemberService memberService(final MemberRepository memberRepository, final TeamRepository teamRepository) {
-        return new MemberService(memberRepository, teamRepository);
+    public MemberService memberService(final MemberRepository memberRepository, final TeamRepository teamRepository, final MemberBadgeRepository memberBadgeRepository, final
+                                       BadgeRepository badgeRepository) {
+        return new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository);
+    }
+
+    @Bean
+    public MemberBadgeFactory memberBadgeFactory(final MemberBadgeRepository memberBadgeRepository) {
+        return new MemberBadgeFactory(memberBadgeRepository);
     }
 }
