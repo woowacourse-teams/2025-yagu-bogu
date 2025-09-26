@@ -24,10 +24,11 @@ public class LikeController {
     @RequireRole
     @PostMapping("/{gameId}/like-batches")
     public ResponseEntity<Void> applyLikeBatch(
+            final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestBody final LikeBatchRequest body
     ) {
-        likeService.applyBatch(gameId, body);
+        likeService.applyBatch(gameId, body, memberClaims.id());
 
         return ResponseEntity.noContent().build();
     }

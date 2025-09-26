@@ -98,7 +98,6 @@ public class LikeE2eTest extends E2eTestBase {
 
         LikeBatchRequest request = new LikeBatchRequest(
                 1L,
-                1L,
                 new LikeDelta(homeTeam.getId(), 3L)
         );
 
