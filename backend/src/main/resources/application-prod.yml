@@ -25,6 +25,11 @@ management:
       exposure:
         include: health, prometheus
 
+  metrics:
+    tags:
+      app: yagubogu
+      env: prod
+
 springdoc:
   api-docs:
     path: /api-docs
