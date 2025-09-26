@@ -11,7 +11,6 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
-import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface MemberApiService {
@@ -40,7 +39,7 @@ interface MemberApiService {
     @GET("/api/members/me/badges")
     suspend fun getBadges(): Response<BadgeResponse>
 
-    @POST("/api/members/me/badges/{badgeId}/representative")
+    @PATCH("/api/members/me/badges/{badgeId}/representative")
     suspend fun patchRepresentativeBadge(
         @Path("badgeId") badgeId: Long,
     ): Response<Unit>

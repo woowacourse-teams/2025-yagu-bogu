@@ -19,7 +19,9 @@ data class BadgeDto(
     @SerialName("acquired")
     val acquired: Boolean,
     @SerialName("achievedAt")
-    val achievedAt: LocalDateTime,
+    val achievedAt: LocalDateTime?,
+    @SerialName("badgeImageUrl")
+    val badgeImageUrl: String,
     @SerialName("progressRate")
     val progressRate: Double,
     @SerialName("achievedRate")
@@ -28,12 +30,12 @@ data class BadgeDto(
     fun toPresentation(): BadgeUiModel =
         BadgeUiModel(
             id = id,
-            imageUrl = "TODO",
+            imageUrl = badgeImageUrl,
             name = name,
             description = description,
             isAcquired = acquired,
             achievedRate = achievedRate.toInt(),
-            achievedAt = achievedAt.date.toJavaLocalDate(),
+            achievedAt = achievedAt?.date?.toJavaLocalDate(),
             progressRate = progressRate,
         )
 }

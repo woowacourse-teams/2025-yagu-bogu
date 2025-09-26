@@ -105,7 +105,7 @@ fun BadgeBottomSheet(
                     text =
                         stringResource(
                             R.string.badge_achieved_date,
-                            badge.achievedAt.format(DateFormatter.yyyyMMdd),
+                            badge.achievedAt?.format(DateFormatter.yyyyMMdd) ?: "",
                         ),
                     style = PretendardRegular12,
                     color = Gray500,

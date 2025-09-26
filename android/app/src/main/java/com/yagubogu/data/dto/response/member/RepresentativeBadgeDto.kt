@@ -11,13 +11,15 @@ data class RepresentativeBadgeDto(
     val id: Long,
     @SerialName("name")
     val name: String,
-    @SerialName("type")
-    val type: String,
+    @SerialName("policy")
+    val policy: String,
+    @SerialName("badgeImageUrl")
+    val badgeImageUrl: String,
 ) {
     fun toPresentation(): BadgeUiModel =
         BadgeUiModel(
             id = id,
-            imageUrl = "TODO",
+            imageUrl = badgeImageUrl,
             name = name,
             description = "",
             isAcquired = true,

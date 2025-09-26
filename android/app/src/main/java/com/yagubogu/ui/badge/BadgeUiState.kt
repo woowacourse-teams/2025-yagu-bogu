@@ -6,7 +6,7 @@ sealed class BadgeUiState {
     object Loading : BadgeUiState()
 
     data class Success(
-        val representativeBadge: BadgeUiModel,
+        val representativeBadge: BadgeUiModel?,
         val badges: List<BadgeUiModel>,
     ) : BadgeUiState()
 }

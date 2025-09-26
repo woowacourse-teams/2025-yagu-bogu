@@ -80,8 +80,8 @@ class MemberDefaultRepository(
 
     override suspend fun getBadges(): Result<BadgeUiState> =
         memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
-            val representativeBadge: BadgeUiModel =
-                badgeResponse.representativeBadge.toPresentation()
+            val representativeBadge: BadgeUiModel? =
+                badgeResponse.representativeBadge?.toPresentation()
             val badges: List<BadgeUiModel> =
                 badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
             BadgeUiState.Success(representativeBadge, badges)

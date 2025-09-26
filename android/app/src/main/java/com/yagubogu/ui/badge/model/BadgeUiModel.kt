@@ -12,6 +12,6 @@ data class BadgeUiModel(
     val description: String,
     val isAcquired: Boolean,
     val achievedRate: Int,
-    val achievedAt: LocalDate,
+    val achievedAt: LocalDate?,
     val progressRate: Double,
 ) : Parcelable
