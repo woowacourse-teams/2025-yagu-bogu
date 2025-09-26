@@ -103,29 +103,26 @@ private fun BadgeSuccessContent(
     LazyVerticalGrid(
         columns = GridCells.Fixed(COLUMN_SIZE),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier,
+        modifier = modifier.padding(20.dp),
     ) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             MainBadgeCard(
                 badge = badgeUiState.representativeBadge,
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                        .fillMaxWidth(),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Text(
                 text = stringResource(R.string.badge_list_title),
                 style = PretendardBold20,
-                modifier = Modifier.padding(start = 20.dp),
             )
         }
         items(badgeUiState.badges.size) { index ->
@@ -143,7 +140,8 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(COLUMN_SIZE),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = modifier.padding(20.dp),
     ) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Column(
@@ -153,12 +151,11 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(R.string.badge_main_badge_title),
                     style = PretendardBold20,
-                    modifier = Modifier.padding(20.dp),
                 )
                 Box(
                     modifier =
                         shimmeringBadgeModifier
-                            .sizeIn(maxWidth = 120.dp)
+                            .sizeIn(maxWidth = 140.dp)
                             .align(Alignment.CenterHorizontally),
                 )
             }
@@ -167,14 +164,12 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Text(
                 text = stringResource(R.string.badge_list_title),
                 style = PretendardBold20,
-                modifier = Modifier.padding(start = 20.dp),
             )
         }
         items(6) {
@@ -185,8 +180,8 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
 
 private val shimmeringBadgeModifier =
     Modifier
-        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-        .size(160.dp)
+        .padding(bottom = 10.dp)
+        .size(140.dp)
         .clip(RoundedCornerShape(12.dp))
         .shimmerLoading()
 
