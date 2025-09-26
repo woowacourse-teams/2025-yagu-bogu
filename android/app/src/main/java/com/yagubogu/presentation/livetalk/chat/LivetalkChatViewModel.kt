@@ -299,13 +299,12 @@ class LivetalkChatViewModel(
             result.onSuccess { favoriteTeam ->
                 favoriteTeam?.let { favoriteTeam ->
                     if (livetalkResponseItem.value?.homeTeamName == favoriteTeam) {
-                        _myTeam.value = favoriteTeam.getTeam()
+                        _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
                         _otherTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
                         myTeamHomeOrAwayID.value = HOME_TEAM
-                    }
-                    if (livetalkResponseItem.value?.awayTeamName == favoriteTeam) {
-                        _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
-                        _otherTeam.value = favoriteTeam.getTeam()
+                    } else {
+                        _myTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
+                        _otherTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
                         myTeamHomeOrAwayID.value = AWAY_TEAM
                     }
                 }
