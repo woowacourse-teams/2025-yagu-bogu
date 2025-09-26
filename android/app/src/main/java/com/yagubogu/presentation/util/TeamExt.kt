@@ -7,7 +7,6 @@ import com.yagubogu.domain.model.Team
 @ColorRes
 fun Team.getTeamColor(): Int =
     when (this) {
-        Team.NOT_SELECTED -> R.color.black
         Team.HT -> R.color.team_kia
         Team.LG -> R.color.team_lg
         Team.WO -> R.color.team_kiwoom
@@ -22,7 +21,6 @@ fun Team.getTeamColor(): Int =
 
 fun Team.getEmoji(): String =
     when (this) {
-        Team.NOT_SELECTED -> "\uD83E\uDEE5"
         Team.HT -> "\uD83D\uDC2F"
         Team.LG -> "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1"
         Team.WO -> "\uD83E\uDDB8"
@@ -35,4 +33,4 @@ fun Team.getEmoji(): String =
         Team.OB -> "\uD83D\uDC3B"
     }
 
-fun String.getTeam(): Team = Team.entries.find { it.shortname == this } ?: Team.NOT_SELECTED
+fun String.getTeam(): Team? = Team.entries.find { it.shortname == this }

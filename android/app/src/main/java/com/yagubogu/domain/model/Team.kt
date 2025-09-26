@@ -3,7 +3,6 @@ package com.yagubogu.domain.model
 enum class Team(
     val shortname: String,
 ) {
-    NOT_SELECTED("없음"),
     HT("KIA"),
     LG("LG"),
     WO("키움"),

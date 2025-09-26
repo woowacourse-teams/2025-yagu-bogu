@@ -17,6 +17,7 @@ import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.presentation.util.getTeam
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,6 +83,10 @@ class LivetalkChatViewModel(
         MediatorLiveData<String>().apply {
             addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
         }
+
+    private val likeMutex = Mutex()
+    private var pendingLikeCount = 0
+    private var likeBatchingJob: Job? = null
 
     init {
         fetchInitialTalks()
@@ -215,25 +220,43 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun postLike() {
+    fun addLikeToBatch() {
         viewModelScope.launch {
-            if (myTeamHomeOrAwayID.value == null) {
-                return@launch
+            likeMutex.withLock {
+                pendingLikeCount++
+                if (likeBatchingJob?.isActive != true) {
+                    likeBatchingJob =
+                        launch {
+                            delay(LIKE_BATCH_INTERVAL_MILLS)
+                            sendLikeBatch()
+                        }
+                }
+            }
+        }
+    }
+
+    private suspend fun sendLikeBatch() {
+        val countToSend =
+            likeMutex.withLock {
+                val count = pendingLikeCount
+                pendingLikeCount = 0
+                count
             }
 
+        if (countToSend > 0 && myTeamHomeOrAwayID.value != null) {
             val result =
                 gameRepository.likeBatches(
                     gameId,
                     LikeUpdateRequest(
-                        getCurrentWindowStartEpochSec(),
-                        LikeDelta(2L, 0),
+                        windowStartEpochSec = getCurrentWindowStartEpochSec(),
+                        likeDelta = LikeDelta(myTeamHomeOrAwayID.value!!, countToSend),
                     ),
                 )
             result
                 .onSuccess {
-                    Timber.w("응원 성공")
+                    Timber.d("응원 배치 전송 성공: $countToSend 건")
                 }.onFailure { exception ->
-                    Timber.w(exception, "응원 실패")
+                    Timber.w(exception, "응원 배치 전송 실패")
                 }
         }
     }
@@ -315,11 +338,21 @@ class LivetalkChatViewModel(
     override fun onCleared() {
         super.onCleared()
         stopChatPolling()
+        likeBatchingJob?.cancel()
+
+        if (pendingLikeCount > 0) {
+            GlobalScope.launch {
+                sendLikeBatch()
+            }
+        }
     }
 
     companion object {
         private const val POLLING_INTERVAL_MILLS = 10_000L
+
         private const val CHAT_LOAD_LIMIT = 30
+
+        private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
 
         private const val HOME_TEAM = 1L
         private const val AWAY_TEAM = 2L

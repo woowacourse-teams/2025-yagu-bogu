@@ -161,7 +161,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         val cheerButton = binding.tvCheerButton
 
         cheerButton.setOnClickListener {
-            viewModel.postLike()
+            viewModel.addLikeToBatch()
             showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
         }
     }
