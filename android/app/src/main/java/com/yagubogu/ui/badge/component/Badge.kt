@@ -62,7 +62,7 @@ fun Badge(
                 contentDescription = stringResource(R.string.badge_image_description),
                 colorFilter =
                     if (!badge.isAcquired) {
-                        ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.2f) })
+                        ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.1f) })
                     } else {
                         null
                     },

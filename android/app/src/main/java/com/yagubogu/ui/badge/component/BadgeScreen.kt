@@ -1,5 +1,6 @@
 package com.yagubogu.ui.badge.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardBold20
+import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.shimmerLoading
 
 private const val COLUMN_SIZE = 2
@@ -48,7 +50,7 @@ fun BadgeScreen(
     Scaffold(
         topBar = { BadgeToolbar(onBackClick = onBackClick) },
         containerColor = Gray050,
-        modifier = modifier,
+        modifier = modifier.background(Gray300),
     ) { innerPadding: PaddingValues ->
         when (badgeUiState) {
             is BadgeUiState.Loading -> {
@@ -56,7 +58,9 @@ fun BadgeScreen(
                     modifier =
                         Modifier
                             .padding(innerPadding)
-                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(White),
                 )
             }
 
@@ -67,7 +71,9 @@ fun BadgeScreen(
                     modifier =
                         Modifier
                             .padding(innerPadding)
-                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(White),
                 )
             }
         }
@@ -105,20 +111,21 @@ private fun BadgeSuccessContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp),
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 10.dp),
+                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Text(
                 text = stringResource(R.string.badge_list_title),
                 style = PretendardBold20,
+                modifier = Modifier.padding(start = 20.dp),
             )
         }
         items(badgeUiState.badges.size) { index ->
@@ -141,13 +148,12 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Column(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
+                    Modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = stringResource(R.string.badge_main_badge_title),
                     style = PretendardBold20,
+                    modifier = Modifier.padding(20.dp),
                 )
                 Box(
                     modifier =
@@ -161,13 +167,14 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 10.dp),
+                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Text(
                 text = stringResource(R.string.badge_list_title),
                 style = PretendardBold20,
+                modifier = Modifier.padding(start = 20.dp),
             )
         }
         items(6) {
