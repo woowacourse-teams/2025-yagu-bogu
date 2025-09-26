@@ -118,7 +118,8 @@ class HomeFragment :
         binding.rvVictoryFairy.adapter = victoryFairyAdapter
 
         binding.ivRefresh.setOnClickListener { view: View ->
-            viewModel.fetchStadiumStats()
+//            viewModel.fetchStadiumStats()
+            viewModel.updateRefreshTime()
             view
                 .animate()
                 .rotationBy(REFRESH_ANIMATION_ROTATION)

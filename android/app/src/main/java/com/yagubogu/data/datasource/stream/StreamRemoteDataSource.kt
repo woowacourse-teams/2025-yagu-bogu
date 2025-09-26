@@ -27,6 +27,7 @@ class StreamRemoteDataSource(
             // SSE 연결 종료
             override fun onClosed() {
                 Timber.d("SSE onClosed")
+                sseClient.disconnect()
             }
 
             // SSE 이벤트 도착

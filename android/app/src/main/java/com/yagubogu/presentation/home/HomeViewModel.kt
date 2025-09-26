@@ -45,13 +45,14 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val _stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
-    val stadiumFanRateItems: LiveData<List<StadiumFanRateItem>> get() = _stadiumFanRateItems
+    val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+
+    private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
 
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
 
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
+    val stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
         MediatorLiveData<StadiumStatsUiModel>().apply {
             addSource(stadiumFanRateItems) { value = updateStadiumStats(isRefreshed = true) }
             addSource(isStadiumStatsExpanded) { value = updateStadiumStats() }
@@ -68,21 +69,7 @@ class HomeViewModel(
 
     init {
         fetchAll()
-
-        viewModelScope.launch {
-            streamRepository.connect().collect { event: SseEvent ->
-                when (event) {
-                    is SseEvent.CheckInCreated -> {
-                        _stadiumFanRateItems.value = event.items
-                    }
-
-                    SseEvent.Connect,
-                    SseEvent.Timeout,
-                    SseEvent.Unknown,
-                    -> Unit
-                }
-            }
-        }
+        observeStream()
     }
 
     override fun onCleared() {
@@ -117,7 +104,11 @@ class HomeViewModel(
                 checkInRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
-                    _stadiumFanRateItems.value = stadiumFanRates
+                    cachedStadiumFanRateItems.clear()
+                    stadiumFanRates.forEach { stadiumFanRateItem: StadiumFanRateItem ->
+                        cachedStadiumFanRateItems[stadiumFanRateItem.gameId] = stadiumFanRateItem
+                    }
+                    stadiumFanRateItems.value = stadiumFanRates
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -126,6 +117,35 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    fun updateRefreshTime() {
+        stadiumStatsUiModel.value = updateStadiumStats(isRefreshed = true)
+    }
+
+    private fun observeStream() {
+        viewModelScope.launch {
+            streamRepository.connect().collect { event: SseEvent ->
+                when (event) {
+                    is SseEvent.CheckInCreated -> {
+                        val newItems: List<StadiumFanRateItem> = event.items
+
+                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
+                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
+
+                        newItems.forEach { item: StadiumFanRateItem ->
+                            cachedStadiumFanRateItems[item.gameId] = item
+                        }
+                        stadiumFanRateItems.value = newItems
+                    }
+
+                    SseEvent.Connect,
+                    SseEvent.Timeout,
+                    SseEvent.Unknown,
+                    -> Unit
+                }
+            }
+        }
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
@@ -234,7 +254,7 @@ class HomeViewModel(
     }
 
     private fun updateStadiumStats(isRefreshed: Boolean = false): StadiumStatsUiModel {
-        val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
+        val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
         val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
         val currentStadiumStats: StadiumStatsUiModel =
             stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
