@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.home.stadium
 
 data class StadiumFanRateItem(
+    val gameId: Long,
     val awayTeamFanRate: TeamFanRate,
     val homeTeamFanRate: TeamFanRate,
 ) {
