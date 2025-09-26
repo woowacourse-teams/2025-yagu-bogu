@@ -1,6 +1,6 @@
 package com.yagubogu.data.repository
 
-import LikesRequest
+import LikeUpdateRequest
 import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.likes.GameLikesResponse
@@ -18,7 +18,7 @@ class GameDefaultRepository(
 
     override suspend fun likeBatches(
         gameId: Long,
-        likeRequest: LikesRequest,
+        likeRequest: LikeUpdateRequest,
     ): Result<Unit> = gameDataSource.likeBatches(gameId, likeRequest)
 
     override suspend fun likeCounts(gameId: Long): Result<GameLikesResponse> = gameDataSource.likeCounts(gameId)

@@ -1,5 +1,7 @@
 package com.yagubogu.presentation.livetalk.chat
 
+import LikeDelta
+import LikeUpdateRequest
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
+import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
@@ -14,19 +17,19 @@ import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.presentation.util.getTeam
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
+import java.time.Instant
 
 class LivetalkChatViewModel(
     private val gameId: Long,
     private val talkRepository: TalkRepository,
     private val memberRepository: MemberRepository,
+    private val gameRepository: GameRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
     private val _livetalkUiState =
@@ -65,6 +68,9 @@ class LivetalkChatViewModel(
 
     private val _myTeam = MutableLiveData<Team>()
     val myTeam: LiveData<Team> get() = _myTeam
+
+    val myTeamHomeOrAwayID = MutableLiveData<Long>()
+
     val myTeamEmoji =
         MediatorLiveData<String>().apply {
             addSource(myTeam) { value = myTeam.value?.getEmoji() }
@@ -209,6 +215,34 @@ class LivetalkChatViewModel(
         }
     }
 
+    fun postLike() {
+        viewModelScope.launch {
+            if (myTeamHomeOrAwayID.value == null) {
+                return@launch
+            }
+
+            val result =
+                gameRepository.likeBatches(
+                    gameId,
+                    LikeUpdateRequest(
+                        getCurrentWindowStartEpochSec(),
+                        LikeDelta(2L, 0),
+                    ),
+                )
+            result
+                .onSuccess {
+                    Timber.w("응원 성공")
+                }.onFailure { exception ->
+                    Timber.w(exception, "응원 실패")
+                }
+        }
+    }
+
+    fun getCurrentWindowStartEpochSec(): Long {
+        val nowInSeconds = Instant.now().epochSecond
+        return nowInSeconds - (nowInSeconds % 60)
+    }
+
     private fun fetchInitialTalks() {
         viewModelScope.launch {
             fetchLock.withLock {
@@ -244,10 +278,12 @@ class LivetalkChatViewModel(
                     if (livetalkResponseItem.value?.homeTeamName == favoriteTeam) {
                         _myTeam.value = favoriteTeam.getTeam()
                         _otherTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
+                        myTeamHomeOrAwayID.value = HOME_TEAM
                     }
                     if (livetalkResponseItem.value?.awayTeamName == favoriteTeam) {
                         _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
                         _otherTeam.value = favoriteTeam.getTeam()
+                        myTeamHomeOrAwayID.value = AWAY_TEAM
                     }
                 }
             }
@@ -261,7 +297,8 @@ class LivetalkChatViewModel(
                     talkRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { response ->
-                        val newChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+                        val newChats =
+                            response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
                         if (newChats.isNotEmpty()) {
                             val currentList = _liveTalkChatBubbleItem.value ?: emptyList()
                             _liveTalkChatBubbleItem.value = newChats + currentList
@@ -283,5 +320,8 @@ class LivetalkChatViewModel(
     companion object {
         private const val POLLING_INTERVAL_MILLS = 10_000L
         private const val CHAT_LOAD_LIMIT = 30
+
+        private const val HOME_TEAM = 1L
+        private const val AWAY_TEAM = 2L
     }
 }

@@ -1,7 +1,6 @@
 package com.yagubogu.data.service
 
-import LikesRequest
-import com.yagubogu.data.dto.request.auth.LogoutRequest
+import LikeUpdateRequest
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.likes.GameLikesResponse
 import retrofit2.Response
@@ -20,7 +19,7 @@ interface GameApiService {
     @POST("/api/games/{gameId}/like-batches")
     suspend fun postLikeBatches(
         @Path("gameId") gameId: Long,
-        @Body body: LikesRequest,
+        @Body body: LikeUpdateRequest,
     ): Response<Unit>
 
     @GET("/api/games/{gameId}/likes/counts")

@@ -34,6 +34,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             gameId,
             app.talksRepository,
             app.memberRepository,
+            app.gamesRepository,
             intent.getBooleanExtra(KEY_IS_VERIFIED, false),
         )
     }
@@ -160,6 +161,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         val cheerButton = binding.tvCheerButton
 
         cheerButton.setOnClickListener {
+            viewModel.postLike()
             showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
         }
     }

@@ -1,6 +1,6 @@
 package com.yagubogu.data.datasource.game
 
-import LikesRequest
+import LikeUpdateRequest
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.likes.GameLikesResponse
 import com.yagubogu.data.service.GameApiService
@@ -17,10 +17,10 @@ class GameRemoteDataSource(
 
     override suspend fun likeBatches(
         gameId: Long,
-        likeRequest: LikesRequest,
+        likeUpdateRequest: LikeUpdateRequest,
     ): Result<Unit> =
         safeApiCall {
-            gameApiService.postLikeBatches(gameId, likeRequest)
+            gameApiService.postLikeBatches(gameId, likeUpdateRequest)
         }
 
     override suspend fun likeCounts(gameId: Long): Result<GameLikesResponse> =
