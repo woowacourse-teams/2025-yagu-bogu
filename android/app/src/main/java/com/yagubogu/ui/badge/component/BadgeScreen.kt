@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -90,8 +92,11 @@ private fun BadgeSuccessContent(
     val selectedBadge = rememberSaveable { mutableStateOf<BadgeUiModel?>(null) }
 
     selectedBadge.value?.let { badge ->
+        val isEnabled = badge.id != (badgeUiState.representativeBadge?.id ?: -1)
+
         BadgeBottomSheet(
             badge = badge,
+            isEnabled = isEnabled,
             onRegisterClick = { badgeId: Long ->
                 onRegisterClick(badgeId)
                 selectedBadge.value = null
@@ -103,14 +108,15 @@ private fun BadgeSuccessContent(
     LazyVerticalGrid(
         columns = GridCells.Fixed(COLUMN_SIZE),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier.padding(20.dp),
+        modifier = modifier.padding(horizontal = 20.dp),
     ) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             MainBadgeCard(
                 badge = badgeUiState.representativeBadge,
                 modifier =
                     Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
@@ -132,6 +138,9 @@ private fun BadgeSuccessContent(
                 modifier = Modifier.padding(bottom = 10.dp),
             )
         }
+        item(span = { GridItemSpan(COLUMN_SIZE) }) {
+            Spacer(modifier = Modifier.height(20.dp))
+        }
     }
 }
 
@@ -141,12 +150,11 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
         columns = GridCells.Fixed(COLUMN_SIZE),
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier.padding(20.dp),
+        modifier = modifier.padding(horizontal = 20.dp),
     ) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Column(
-                modifier =
-                    Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
             ) {
                 Text(
                     text = stringResource(R.string.badge_main_badge_title),
@@ -174,6 +182,9 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
         }
         items(6) {
             Box(modifier = shimmeringBadgeModifier)
+        }
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

@@ -30,6 +30,7 @@ import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold12
 import com.yagubogu.ui.theme.PretendardBold16
@@ -43,6 +44,7 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun BadgeBottomSheet(
     badge: BadgeUiModel,
+    isEnabled: Boolean,
     onRegisterClick: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,11 +87,12 @@ fun BadgeBottomSheet(
             if (badge.isAcquired) {
                 Button(
                     onClick = { onRegisterClick(badge.id) },
+                    enabled = isEnabled,
                     colors =
                         ButtonColors(
                             containerColor = Primary500,
                             contentColor = White,
-                            disabledContainerColor = Primary500,
+                            disabledContainerColor = Gray400,
                             disabledContentColor = White,
                         ),
                     shape = RoundedCornerShape(12.dp),
@@ -97,7 +100,14 @@ fun BadgeBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = stringResource(R.string.badge_register_main_badge),
+                        text =
+                            stringResource(
+                                if (isEnabled) {
+                                    R.string.badge_register_main_badge
+                                } else {
+                                    R.string.badge_already_used_badge
+                                },
+                            ),
                         style = PretendardBold16,
                     )
                 }
@@ -146,6 +156,7 @@ fun BadgeBottomSheet(
 private fun BadgeBottomSheetPreview() {
     BadgeBottomSheet(
         badge = BADGE_NOT_ACQUIRED_FIXTURE,
+        isEnabled = true,
         onRegisterClick = {},
         onDismiss = {},
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
