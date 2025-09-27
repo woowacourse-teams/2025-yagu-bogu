@@ -11,6 +11,7 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.ui.badge.BadgeUiState
+import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 
 class MemberDefaultRepository(
@@ -82,7 +83,7 @@ class MemberDefaultRepository(
         memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
             val representativeBadge: BadgeUiModel? =
                 badgeResponse.representativeBadge?.toPresentation()
-            val badges: List<BadgeUiModel> =
+            val badges: List<BadgeInfoUiModel> =
                 badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
             BadgeUiState.Success(representativeBadge, badges)
         }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.ui.badge.model.BadgeUiModel
+import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -27,10 +27,10 @@ class BadgeViewModel(
                     val currentBadgeUiState: BadgeUiState = badgeUiState.value
 
                     if (currentBadgeUiState is BadgeUiState.Success) {
-                        val selectedBadge = currentBadgeUiState.badges.find { it.id == badgeId }
-                        selectedBadge?.let { badge: BadgeUiModel ->
+                        val selectedBadge: BadgeInfoUiModel? = currentBadgeUiState.badges.find { it.badge.id == badgeId }
+                        selectedBadge?.let { badgeInfo: BadgeInfoUiModel ->
                             badgeUiState.value =
-                                currentBadgeUiState.copy(representativeBadge = badge)
+                                currentBadgeUiState.copy(representativeBadge = badgeInfo.badge)
                         }
                     }
                 }.onFailure { exception: Throwable ->

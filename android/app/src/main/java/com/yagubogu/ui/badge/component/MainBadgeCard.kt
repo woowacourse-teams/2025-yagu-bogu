@@ -55,6 +55,6 @@ private class MainBadgeCardPreviewParameterProvider : PreviewParameterProvider<B
     override val values: Sequence<BadgeUiModel?> =
         sequenceOf(
             null,
-            BADGE_ACQUIRED_FIXTURE,
+            BADGE_ACQUIRED_FIXTURE.badge,
         )
 }

@@ -32,7 +32,7 @@ import com.yagubogu.R
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BADGE_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
-import com.yagubogu.ui.badge.model.BadgeUiModel
+import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardBold20
@@ -89,13 +89,13 @@ private fun BadgeSuccessContent(
     onRegisterClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedBadge = rememberSaveable { mutableStateOf<BadgeUiModel?>(null) }
+    val selectedBadge = rememberSaveable { mutableStateOf<BadgeInfoUiModel?>(null) }
 
-    selectedBadge.value?.let { badge ->
-        val isEnabled = badge.id != (badgeUiState.representativeBadge?.id ?: -1)
+    selectedBadge.value?.let { badgeInfo: BadgeInfoUiModel ->
+        val isEnabled = badgeInfo.badge.id != (badgeUiState.representativeBadge?.id ?: -1)
 
         BadgeBottomSheet(
-            badge = badge,
+            badgeInfo = badgeInfo,
             isEnabled = isEnabled,
             onRegisterClick = { badgeId: Long ->
                 onRegisterClick(badgeId)
@@ -133,7 +133,7 @@ private fun BadgeSuccessContent(
         }
         items(badgeUiState.badges.size) { index ->
             Badge(
-                badge = badgeUiState.badges[index],
+                badge = badgeUiState.badges[index].badge,
                 onClick = { selectedBadge.value = badgeUiState.badges[index] },
                 modifier = Modifier.padding(bottom = 10.dp),
             )
@@ -212,7 +212,7 @@ private fun BadgeScreenPreview() {
     BadgeScreen(
         badgeUiState =
             BadgeUiState.Success(
-                BADGE_NOT_ACQUIRED_FIXTURE,
+                BADGE_NOT_ACQUIRED_FIXTURE.badge,
                 listOf(
                     BADGE_ACQUIRED_FIXTURE,
                     BADGE_NOT_ACQUIRED_FIXTURE,
