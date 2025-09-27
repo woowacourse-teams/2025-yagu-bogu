@@ -28,8 +28,9 @@ import androidx.compose.ui.unit.sp
 import com.yagubogu.R
 import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
-import com.yagubogu.ui.badge.model.BadgeUiModel
+import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold12
 import com.yagubogu.ui.theme.PretendardBold16
@@ -38,12 +39,14 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.White
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeBottomSheet(
-    badge: BadgeUiModel,
-    onRegisterClick: () -> Unit,
+    badgeInfo: BadgeInfoUiModel,
+    isEnabled: Boolean,
+    onRegisterClick: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -60,10 +63,10 @@ fun BadgeBottomSheet(
                     .fillMaxWidth()
                     .padding(20.dp),
         ) {
-            Badge(badge = badge)
+            Badge(badge = badgeInfo.badge)
             Spacer(modifier = Modifier.height(10.dp))
             Row {
-                Text(text = "${badge.achievedRate}", style = PretendardBold12, color = Primary700)
+                Text(text = "${badgeInfo.achievedRate}", style = PretendardBold12, color = Primary700)
                 Text(
                     text = stringResource(R.string.badge_achieved_rate_message),
                     style = PretendardRegular12,
@@ -76,20 +79,21 @@ fun BadgeBottomSheet(
                 modifier = Modifier.padding(vertical = 20.dp),
             )
             Text(
-                text = badge.description,
+                text = badgeInfo.description,
                 style = PretendardMedium,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(30.dp))
-            if (badge.isAcquired) {
+            if (badgeInfo.badge.isAcquired) {
                 Button(
-                    onClick = onRegisterClick,
+                    onClick = { onRegisterClick(badgeInfo.badge.id) },
+                    enabled = isEnabled,
                     colors =
                         ButtonColors(
                             containerColor = Primary500,
                             contentColor = White,
-                            disabledContainerColor = Primary500,
+                            disabledContainerColor = Gray400,
                             disabledContentColor = White,
                         ),
                     shape = RoundedCornerShape(12.dp),
@@ -97,7 +101,14 @@ fun BadgeBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = stringResource(R.string.badge_register_main_badge),
+                        text =
+                            stringResource(
+                                if (isEnabled) {
+                                    R.string.badge_register_main_badge
+                                } else {
+                                    R.string.badge_already_used_badge
+                                },
+                            ),
                         style = PretendardBold16,
                     )
                 }
@@ -105,7 +116,7 @@ fun BadgeBottomSheet(
                     text =
                         stringResource(
                             R.string.badge_achieved_date,
-                            badge.achievedAt.format(DateFormatter.yyyyMMdd),
+                            badgeInfo.achievedAt?.format(DateFormatter.yyyyMMdd) ?: "",
                         ),
                     style = PretendardRegular12,
                     color = Gray500,
@@ -113,7 +124,7 @@ fun BadgeBottomSheet(
                 )
             } else {
                 LinearProgressIndicator(
-                    progress = { badge.progressRate.toFloat() / 100 },
+                    progress = { badgeInfo.progressRate.toFloat() / 100 },
                     color = Primary500,
                     trackColor = Gray300,
                     gapSize = (-12).dp,
@@ -127,7 +138,7 @@ fun BadgeBottomSheet(
                     text =
                         stringResource(
                             R.string.badge_progress_rate,
-                            badge.progressRate,
+                            badgeInfo.progressRate.roundToInt(),
                         ),
                     style = PretendardRegular12,
                     color = Gray500,
@@ -145,7 +156,8 @@ fun BadgeBottomSheet(
 @Composable
 private fun BadgeBottomSheetPreview() {
     BadgeBottomSheet(
-        badge = BADGE_NOT_ACQUIRED_FIXTURE,
+        badgeInfo = BADGE_NOT_ACQUIRED_FIXTURE,
+        isEnabled = true,
         onRegisterClick = {},
         onDismiss = {},
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
