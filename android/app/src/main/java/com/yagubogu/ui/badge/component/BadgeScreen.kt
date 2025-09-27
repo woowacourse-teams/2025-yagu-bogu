@@ -123,6 +123,7 @@ private fun BadgeSuccessContent(
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
+                modifier = Modifier.padding(vertical = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
@@ -135,7 +136,7 @@ private fun BadgeSuccessContent(
             Badge(
                 badge = badgeUiState.badges[index].badge,
                 onClick = { selectedBadge.value = badgeUiState.badges[index] },
-                modifier = Modifier.padding(bottom = 10.dp),
+                modifier = Modifier.padding(bottom = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
@@ -154,7 +155,10 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
     ) {
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
             ) {
                 Text(
                     text = stringResource(R.string.badge_main_badge_title),
@@ -172,6 +176,7 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
             HorizontalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
+                modifier = Modifier.padding(vertical = 20.dp),
             )
         }
         item(span = { GridItemSpan(COLUMN_SIZE) }) {
@@ -191,7 +196,7 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
 
 private val shimmeringBadgeModifier =
     Modifier
-        .padding(bottom = 10.dp)
+        .padding(bottom = 20.dp)
         .size(140.dp)
         .clip(RoundedCornerShape(12.dp))
         .shimmerLoading()
