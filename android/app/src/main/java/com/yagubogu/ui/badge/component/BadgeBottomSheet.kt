@@ -39,6 +39,7 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.White
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +138,7 @@ fun BadgeBottomSheet(
                     text =
                         stringResource(
                             R.string.badge_progress_rate,
-                            badgeInfo.progressRate,
+                            badgeInfo.progressRate.roundToInt(),
                         ),
                     style = PretendardRegular12,
                     color = Gray500,
