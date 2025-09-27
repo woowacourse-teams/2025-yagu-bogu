@@ -30,8 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
 import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.badge.model.BADGE_ACQUIRED_FIXTURE
-import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
+import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE_
+import com.yagubogu.ui.badge.model.BADGE_ID_0_NOT_ACQUIRED_FIXTURE
+import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
@@ -217,11 +218,11 @@ private fun BadgeScreenPreview() {
     BadgeScreen(
         badgeUiState =
             BadgeUiState.Success(
-                BADGE_NOT_ACQUIRED_FIXTURE.badge,
+                BADGE_ID_0_NOT_ACQUIRED_FIXTURE.badge,
                 listOf(
-                    BADGE_ACQUIRED_FIXTURE,
-                    BADGE_NOT_ACQUIRED_FIXTURE,
-                    BADGE_ACQUIRED_FIXTURE,
+                    BADGE_ID_0_ACQUIRED_FIXTURE_,
+                    BADGE_ID_1_ACQUIRED_FIXTURE,
+                    BADGE_ID_0_NOT_ACQUIRED_FIXTURE,
                 ),
             ),
         onBackClick = {},
