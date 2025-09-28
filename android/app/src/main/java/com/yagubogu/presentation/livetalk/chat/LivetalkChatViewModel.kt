@@ -83,8 +83,8 @@ class LivetalkChatViewModel(
     private val _myTeamLikeShowingCount = MutableLiveData<Int>()
     val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
 
-    private val _myTeamCheerAnimationEvent = MutableSingleLiveData<Int>()
-    val myTeamCheerAnimationEvent: SingleLiveData<Int> get() = _myTeamCheerAnimationEvent
+    private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
+    val myTeamLikeAnimationEvent: SingleLiveData<Int> get() = _myTeamLikeAnimationEvent
 
     // TODO: 상대팀 응원수 받는 API 추가할 경우 활용
     private val _otherTeam = MutableLiveData<Team>()
@@ -274,7 +274,7 @@ class LivetalkChatViewModel(
                         val diffCount = newTotalCount - currentMyTeamCount
 
                         _myTeamLikeRealCount.value = newTotalCount
-                        _myTeamCheerAnimationEvent.setValue(diffCount)
+                        _myTeamLikeAnimationEvent.setValue(diffCount)
                     } else if (_myTeamLikeRealCount.value == null) {
                         _myTeamLikeRealCount.value = newTotalCount
                     }

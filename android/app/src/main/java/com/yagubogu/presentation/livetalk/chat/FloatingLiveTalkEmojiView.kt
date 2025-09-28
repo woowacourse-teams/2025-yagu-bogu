@@ -43,7 +43,7 @@ class FloatingLiveTalkEmojiView
          * @param startX 이 View 내에서의 X 시작 좌표
          * @param startY 이 View 내에서의 Y 시작 좌표
          */
-        fun addCheerEmoji(
+        fun addLikeEmoji(
             emoji: String,
             startX: Float,
             startY: Float,

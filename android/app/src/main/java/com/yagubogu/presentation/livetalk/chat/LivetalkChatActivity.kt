@@ -132,7 +132,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 firebaseAnalytics.logEvent("livetalk_send_message", null)
             }
         }
-        setupCheerButton()
+        setupLikeButton()
     }
 
     private fun setupRecyclerView() {
@@ -162,8 +162,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     }
 
     private fun observePollingLikeAnimation() {
-        val cheerButton = binding.tvCheerButton
-        viewModel.myTeamCheerAnimationEvent.observe(this) { newLikesCount ->
+        val likeButton = binding.tvLikeButton
+        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount ->
             if (newLikesCount <= 0) return@observe
             val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
 
@@ -184,41 +184,41 @@ class LivetalkChatActivity : AppCompatActivity() {
                         delay(randomDelay)
 
                         viewModel.addMyTeamShowingCount(increment)
-                        showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
+                        showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
                     }
                 }
             }
         }
     }
 
-    private fun setupCheerButton() {
-        val cheerButton = binding.tvCheerButton
+    private fun setupLikeButton() {
+        val likeButton = binding.tvLikeButton
 
-        cheerButton.setOnClickListener {
+        likeButton.setOnClickListener {
             viewModel.addMyTeamShowingCount()
             viewModel.addLikeToBatch()
-            showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
+            showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
         }
     }
 
-    private fun showChearEmojiAnimation(
+    private fun showLikeEmojiAnimation(
         emoji: String,
-        cheerButton: TextView,
+        likeButtonView: TextView,
     ) {
-        val heartsView = binding.floatingHeartsView
-        // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 cheerBtnPosition 배열에 저장됨)
-        val cheerBtnPosition = IntArray(2)
-        cheerButton.getLocationOnScreen(cheerBtnPosition)
+        val emojiView = binding.floatingEmojisView
+        // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 likeBtnPosition 배열에 저장됨)
+        val likeBtnPosition = IntArray(2)
+        likeButtonView.getLocationOnScreen(likeBtnPosition)
 
-        // 2. 애니메이션 컨테이너(heartsView)의 화면상 절대 좌표를 가져옵니다.
+        // 2. 애니메이션 컨테이너(emojisView)의 화면상 절대 좌표를 가져옵니다.
         val containerPosition = IntArray(2)
-        heartsView.getLocationOnScreen(containerPosition)
+        emojiView.getLocationOnScreen(containerPosition)
 
         // containerPosition을 빼서 상대 좌표를 정확히 계산합니다.
-        val startX = (cheerBtnPosition[0] - containerPosition[0]) + (cheerButton.width / 2f)
-        val startY = (cheerBtnPosition[1] - containerPosition[1]) + (cheerButton.height / 2f)
+        val startX = (likeBtnPosition[0] - containerPosition[0]) + (likeButtonView.width / 2f)
+        val startY = (likeBtnPosition[1] - containerPosition[1]) + (likeButtonView.height / 2f)
 
-        heartsView.addCheerEmoji(emoji, startX, startY)
+        emojiView.addLikeEmoji(emoji, startX, startY)
     }
 
     private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {

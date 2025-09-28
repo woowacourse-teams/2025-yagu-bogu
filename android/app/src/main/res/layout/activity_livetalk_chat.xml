@@ -117,7 +117,7 @@
                 tools:listitem="@layout/item_livetalk_other_bubble" />
 
             <TextView
-                android:id="@+id/tv_cheer_button"
+                android:id="@+id/tv_like_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="20dp"
@@ -126,13 +126,13 @@
                 android:text="@{viewModel.myTeamEmoji}"
                 android:textSize="24sp"
                 android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@+id/floating_hearts_view"
+                app:layout_constraintBottom_toBottomOf="@+id/floating_emojis_view"
                 app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
                 app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
                 tools:text="🦍" />
 
             <TextView
-                android:id="@+id/tv_cheer_count"
+                android:id="@+id/tv_like_count"
                 style="@style/TextView.Pretendard.Medium.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -142,13 +142,13 @@
                 android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
 
                 app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"
-                app:layout_constraintEnd_toStartOf="@+id/tv_cheer_button"
+                app:layout_constraintEnd_toStartOf="@+id/tv_like_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
                 tools:text="실시간 한화 123,456회 응원중!" />
 
             <com.yagubogu.presentation.livetalk.chat.FloatingLiveTalkEmojiView
-                android:id="@+id/floating_hearts_view"
+                android:id="@+id/floating_emojis_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
