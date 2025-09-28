@@ -147,7 +147,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
                 tools:text="실시간 한화 123,456회 응원중!" />
 
-            <com.yagubogu.presentation.livetalk.chat.FloatingHeartsView
+            <com.yagubogu.presentation.livetalk.chat.FloatingLiveTalkEmojiView
                 android:id="@+id/floating_hearts_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
