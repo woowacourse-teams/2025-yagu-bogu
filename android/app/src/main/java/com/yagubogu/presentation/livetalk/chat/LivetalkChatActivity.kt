@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Firebase
@@ -21,6 +22,8 @@ import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -129,6 +132,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 firebaseAnalytics.logEvent("livetalk_send_message", null)
             }
         }
+        setupCheerButton()
     }
 
     private fun setupRecyclerView() {
@@ -154,13 +158,44 @@ class LivetalkChatActivity : AppCompatActivity() {
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
-        setupCheerButton()
+        observePollingLikeAnimation()
+    }
+
+    private fun observePollingLikeAnimation() {
+        val cheerButton = binding.tvCheerButton
+        viewModel.myTeamCheerAnimationEvent.observe(this) { newLikesCount ->
+            if (newLikesCount <= 0) return@observe
+            val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
+
+            // 각 애니메이션이 담당할 기본 카운트 (몫)
+            val baseIncrement = newLikesCount / animationCount
+
+            // 기본 카운트를 분배하고 남은 카운트 (나머지)
+            val remainder = newLikesCount % animationCount
+
+            lifecycleScope.launch {
+                repeat(animationCount) { index ->
+                    launch {
+                        // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
+                        // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
+                        val increment = if (index < remainder) baseIncrement + 1 else baseIncrement
+
+                        val randomDelay = (0L..10000L).random()
+                        delay(randomDelay)
+
+                        viewModel.addMyTeamShowingCount(increment)
+                        showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupCheerButton() {
         val cheerButton = binding.tvCheerButton
 
         cheerButton.setOnClickListener {
+            viewModel.addMyTeamShowingCount()
             viewModel.addLikeToBatch()
             showChearEmojiAnimation(cheerButton.text.toString(), cheerButton)
         }
@@ -267,6 +302,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         private const val KEY_IS_VERIFIED = "isVerified"
         private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
         private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
+        private const val MAX_ANIMATION_COUNT = 50
 
         fun newIntent(
             context: Context,

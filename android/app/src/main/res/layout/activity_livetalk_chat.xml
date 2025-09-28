@@ -138,7 +138,7 @@
                 android:layout_height="wrap_content"
                 android:elevation="6dp"
                 android:gravity="center"
-                android:text="@{@string/livetalk_like_count_message(viewModel.myTeam.shortname, viewModel.myTeamLikeCount)}"
+                android:text="@{@string/livetalk_like_count_message(viewModel.myTeam.shortname, viewModel.myTeamLikeShowingCount)}"
                 android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
 
                 app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"

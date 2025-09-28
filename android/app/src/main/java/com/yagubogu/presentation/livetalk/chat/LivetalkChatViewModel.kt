@@ -77,9 +77,16 @@ class LivetalkChatViewModel(
             addSource(myTeam) { value = myTeam.value?.getEmoji() }
         }
 
-    private val _myTeamLikeCount = MutableLiveData<Int>()
-    val myTeamLikeCount: LiveData<Int> get() = _myTeamLikeCount
+    private val _myTeamLikeRealCount = MutableLiveData<Int>()
+    val myTeamLikeRealCount: LiveData<Int> get() = _myTeamLikeRealCount
 
+    private val _myTeamLikeShowingCount = MutableLiveData<Int>()
+    val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
+
+    private val _myTeamCheerAnimationEvent = MutableSingleLiveData<Int>()
+    val myTeamCheerAnimationEvent: SingleLiveData<Int> get() = _myTeamCheerAnimationEvent
+
+    // TODO: 상대팀 응원수 받는 API 추가할 경우 활용
     private val _otherTeam = MutableLiveData<Team>()
     val otherTeam: LiveData<Team> get() = _otherTeam
     val otherTeamEmoji =
@@ -93,6 +100,10 @@ class LivetalkChatViewModel(
 
     init {
         fetchInitialTalks()
+    }
+
+    fun addMyTeamShowingCount(addValue: Int = 1) {
+        _myTeamLikeShowingCount.value = _myTeamLikeShowingCount.value?.plus(addValue)
     }
 
     fun fetchBeforeTalks() {
@@ -201,6 +212,9 @@ class LivetalkChatViewModel(
     fun addLikeToBatch() {
         viewModelScope.launch {
             likeMutex.withLock {
+                _myTeamLikeRealCount.value?.let { currentLikeCount ->
+                    _myTeamLikeRealCount.value = currentLikeCount + 1
+                }
                 pendingLikeCount++
                 if (likeBatchingJob?.isActive != true) {
                     likeBatchingJob =
@@ -222,6 +236,7 @@ class LivetalkChatViewModel(
                     launch {
                         while (true) {
                             fetchAfterTalks()
+                            getLikeCount()
                             delay(POLLING_INTERVAL_MILLS)
                         }
                     }
@@ -246,7 +261,24 @@ class LivetalkChatViewModel(
                 )
             result
                 .onSuccess { gameLikesResponse ->
-                    _myTeamLikeCount.value = gameLikesResponse.counts[0].totalCount
+                    val newTotalCount = gameLikesResponse.counts[0].totalCount
+                    val currentMyTeamCount = _myTeamLikeRealCount.value ?: 0
+
+                    if (currentMyTeamCount == 0) {
+                        _myTeamLikeRealCount.value = newTotalCount
+                        _myTeamLikeShowingCount.value = newTotalCount
+                        return@onSuccess
+                    }
+
+                    if (currentMyTeamCount < newTotalCount) {
+                        val diffCount = newTotalCount - currentMyTeamCount
+
+                        _myTeamLikeRealCount.value = newTotalCount
+                        _myTeamCheerAnimationEvent.setValue(diffCount)
+                    } else if (_myTeamLikeRealCount.value == null) {
+                        _myTeamLikeRealCount.value = newTotalCount
+                    }
+
                     Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
                 }.onFailure { exception ->
                     Timber.w(exception, "응원수 로드 실패")
@@ -267,7 +299,7 @@ class LivetalkChatViewModel(
                 gameRepository.likeBatches(
                     gameId,
                     LikeUpdateRequest(
-                        windowStartEpochSec = getCurrentWindowStartEpochSec(),
+                        windowStartEpochSec = Instant.now().epochSecond,
                         likeDelta = LikeDelta(myTeamHomeOrAwayID.value!!, countToSend),
                     ),
                 )
@@ -278,11 +310,6 @@ class LivetalkChatViewModel(
                     Timber.w(exception, "응원 배치 전송 실패")
                 }
         }
-    }
-
-    fun getCurrentWindowStartEpochSec(): Long {
-        val nowInSeconds = Instant.now().epochSecond
-        return nowInSeconds - (nowInSeconds % 60)
     }
 
     private fun fetchInitialTalks() {
