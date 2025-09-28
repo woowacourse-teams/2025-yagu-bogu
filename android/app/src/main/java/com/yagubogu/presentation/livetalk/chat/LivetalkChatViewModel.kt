@@ -261,7 +261,8 @@ class LivetalkChatViewModel(
                 )
             result
                 .onSuccess { gameLikesResponse ->
-                    val newTotalCount = gameLikesResponse.counts[0].totalCount
+                    val newTotalCount =
+                        if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
                     val currentMyTeamCount = _myTeamLikeRealCount.value ?: 0
 
                     if (currentMyTeamCount == 0) {
