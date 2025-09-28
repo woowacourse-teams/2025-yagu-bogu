@@ -118,36 +118,55 @@
 
             <TextView
                 android:id="@+id/tv_cheer_button"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
                 android:elevation="6dp"
                 android:gravity="center"
                 android:text="@{viewModel.myTeamEmoji}"
                 android:textSize="24sp"
                 android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="@id/rv_chat_messages"
-                app:layout_constraintEnd_toEndOf="@id/rv_chat_messages" />
+                app:layout_constraintBottom_toBottomOf="@+id/floating_hearts_view"
+                app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
+                app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
+                tools:text="🦍" />
+
+            <TextView
+                android:id="@+id/tv_cheer_count"
+                style="@style/TextView.Pretendard.Medium.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="6dp"
+                android:gravity="center"
+                android:text="@{@string/livetalk_like_count_message(viewModel.myTeam.shortname, viewModel.myTeamLikeCount)}"
+                android:visibility="@{viewModel.myTeam != null ? View.VISIBLE : View.GONE}"
+
+                app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"
+                app:layout_constraintEnd_toStartOf="@+id/tv_cheer_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
+                tools:text="실시간 한화 123,456회 응원중!" />
 
             <com.yagubogu.presentation.livetalk.chat.FloatingHeartsView
                 android:id="@+id/floating_hearts_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@id/rv_chat_messages"
+                app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
                 app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
                 app:layout_constraintStart_toStartOf="@id/rv_chat_messages"
-                app:layout_constraintTop_toTopOf="@id/rv_chat_messages" />
+                app:layout_constraintTop_toTopOf="@id/rv_chat_messages"
+                app:layout_constraintVertical_bias="1.0" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="0.4dp"
-                android:layout_marginVertical="16dp"
                 app:dividerColor="@color/gray300"
                 app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_talk_divider_marginBottom="@{viewModel.myTeam != null ? @dimen/margin_my_team_active : @dimen/margin_team_default}"
+                tools:layout_marginBottom="50dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraint_input_message"

@@ -239,17 +239,19 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        val result =
-            gameRepository.likeCounts(
-                gameId,
-            )
-        result
-            .onSuccess { gameLikesResponse ->
-                _myTeamLikeCount.value = gameLikesResponse.counts[0].totalCount
-                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
-            }.onFailure { exception ->
-                Timber.w(exception, "응원수 로드 실패")
-            }
+        if (myTeam.value != null) {
+            val result =
+                gameRepository.likeCounts(
+                    gameId,
+                )
+            result
+                .onSuccess { gameLikesResponse ->
+                    _myTeamLikeCount.value = gameLikesResponse.counts[0].totalCount
+                    Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
+                }.onFailure { exception ->
+                    Timber.w(exception, "응원수 로드 실패")
+                }
+        }
     }
 
     private suspend fun sendLikeBatch() {
@@ -320,7 +322,7 @@ class LivetalkChatViewModel(
                         _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
                         _otherTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
                         myTeamHomeOrAwayID.value = HOME_TEAM
-                    } else {
+                    } else if (livetalkResponseItem.value?.awayTeamName == favoriteTeam) {
                         _myTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
                         _otherTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
                         myTeamHomeOrAwayID.value = AWAY_TEAM
