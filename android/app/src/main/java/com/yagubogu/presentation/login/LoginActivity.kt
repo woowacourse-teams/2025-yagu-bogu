@@ -14,6 +14,7 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
@@ -104,6 +105,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupView() {
         enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityLoginRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
