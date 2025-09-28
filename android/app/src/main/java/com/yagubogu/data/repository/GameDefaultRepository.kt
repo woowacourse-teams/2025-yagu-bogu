@@ -18,8 +18,8 @@ class GameDefaultRepository(
 
     override suspend fun likeBatches(
         gameId: Long,
-        likeRequest: LikeUpdateRequest,
-    ): Result<Unit> = gameDataSource.likeBatches(gameId, likeRequest)
+        likeUpdateRequest: LikeUpdateRequest,
+    ): Result<Unit> = gameDataSource.likeBatches(gameId, likeUpdateRequest)
 
     override suspend fun likeCounts(gameId: Long): Result<GameLikesResponse> = gameDataSource.likeCounts(gameId)
 }

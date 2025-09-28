@@ -77,6 +77,9 @@ class LivetalkChatViewModel(
             addSource(myTeam) { value = myTeam.value?.getEmoji() }
         }
 
+    private val _myTeamLikeCount = MutableLiveData<Int>()
+    val myTeamLikeCount: LiveData<Int> get() = _myTeamLikeCount
+
     private val _otherTeam = MutableLiveData<Team>()
     val otherTeam: LiveData<Team> get() = _otherTeam
     val otherTeamEmoji =
@@ -123,8 +126,8 @@ class LivetalkChatViewModel(
                 talkRepository.postTalks(gameId, message.trim())
             talksResult
                 .onSuccess {
-                    stopChatPolling()
-                    startChatPolling()
+                    stopPolling()
+                    startPolling()
                     messageFormText.value = ""
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -195,7 +198,22 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun startChatPolling() {
+    fun addLikeToBatch() {
+        viewModelScope.launch {
+            likeMutex.withLock {
+                pendingLikeCount++
+                if (likeBatchingJob?.isActive != true) {
+                    likeBatchingJob =
+                        launch {
+                            delay(LIKE_BATCH_INTERVAL_MILLS)
+                            sendLikeBatch()
+                        }
+                }
+            }
+        }
+    }
+
+    private fun startPolling() {
         viewModelScope.launch {
             pollingControlLock.withLock {
                 if (pollingJob?.isActive == true) return@launch
@@ -211,7 +229,7 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun stopChatPolling() {
+    private fun stopPolling() {
         viewModelScope.launch {
             pollingControlLock.withLock {
                 pollingJob?.cancel()
@@ -220,19 +238,18 @@ class LivetalkChatViewModel(
         }
     }
 
-    fun addLikeToBatch() {
-        viewModelScope.launch {
-            likeMutex.withLock {
-                pendingLikeCount++
-                if (likeBatchingJob?.isActive != true) {
-                    likeBatchingJob =
-                        launch {
-                            delay(LIKE_BATCH_INTERVAL_MILLS)
-                            sendLikeBatch()
-                        }
-                }
+    private suspend fun getLikeCount() {
+        val result =
+            gameRepository.likeCounts(
+                gameId,
+            )
+        result
+            .onSuccess { gameLikesResponse ->
+                _myTeamLikeCount.value = gameLikesResponse.counts[0].totalCount
+                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
+            }.onFailure { exception ->
+                Timber.w(exception, "응원수 로드 실패")
             }
-        }
     }
 
     private suspend fun sendLikeBatch() {
@@ -285,6 +302,7 @@ class LivetalkChatViewModel(
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
 
                         getTeamEmojis()
+                        getLikeCount()
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
                         _livetalkUiState.value = LivetalkUiState.Error
@@ -336,7 +354,7 @@ class LivetalkChatViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        stopChatPolling()
+        stopPolling()
         likeBatchingJob?.cancel()
 
         if (pendingLikeCount > 0) {

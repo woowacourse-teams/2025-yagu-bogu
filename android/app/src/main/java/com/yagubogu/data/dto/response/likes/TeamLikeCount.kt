@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class TeamLikeCount(
     @SerialName("teamId")
     val teamId: Long,
-    @SerialName("likeCount")
-    val likeCount: Int,
+    @SerialName("totalCount")
+    val totalCount: Int,
 )
