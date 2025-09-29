@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
 import com.yagubogu.presentation.util.DateFormatter
-import com.yagubogu.ui.badge.model.BADGE_NOT_ACQUIRED_FIXTURE
+import com.yagubogu.ui.badge.model.BADGE_ID_0_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -66,7 +66,11 @@ fun BadgeBottomSheet(
             Badge(badge = badgeInfo.badge)
             Spacer(modifier = Modifier.height(10.dp))
             Row {
-                Text(text = "${badgeInfo.achievedRate}", style = PretendardBold12, color = Primary700)
+                Text(
+                    text = "${badgeInfo.achievedRate}",
+                    style = PretendardBold12,
+                    color = Primary700,
+                )
                 Text(
                     text = stringResource(R.string.badge_achieved_rate_message),
                     style = PretendardRegular12,
@@ -156,7 +160,7 @@ fun BadgeBottomSheet(
 @Composable
 private fun BadgeBottomSheetPreview() {
     BadgeBottomSheet(
-        badgeInfo = BADGE_NOT_ACQUIRED_FIXTURE,
+        badgeInfo = BADGE_ID_0_NOT_ACQUIRED_FIXTURE,
         isEnabled = true,
         onRegisterClick = {},
         onDismiss = {},
