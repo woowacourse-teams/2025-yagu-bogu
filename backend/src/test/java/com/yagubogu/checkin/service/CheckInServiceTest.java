@@ -526,6 +526,44 @@ class CheckInServiceTest {
         assertThat(myRanking.winPercent()).isEqualTo(100.0);
     }
 
+    @DisplayName("승리 요정 랭킹 조회 - 인증을 한 번도 하지않은 회원의 순위는 0위이다")
+    @Test
+    void findVictoryFairyRankings_withoutCheckIn() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        Member mint = memberFactory.save(b -> b.team(kia).nickname("밍트"));
+        LocalDate startDate = LocalDate.of(2025, 7, 21);
+
+        Game g1 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .date(startDate)
+                .gameState(GameState.COMPLETED)
+        );
+        Game g2 = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(kia).homeScore(1)
+                .awayTeam(lg).awayScore(10)
+                .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .date(startDate.plusDays(1))
+                .gameState(GameState.CANCELED)
+        );
+        checkInFavorite(mint, g1, g2);
+
+        // when
+        VictoryFairyRankingResponse myRanking = checkInService.findVictoryFairyRankings(fora.getId(),
+                TeamFilter.ALL,
+                startDate.getYear()).myRanking();
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(myRanking.winPercent()).isEqualTo(0.0);
+            softAssertions.assertThat(myRanking.victoryFairyScore()).isEqualTo(0);
+        });
+    }
+
     private void checkInFavorite(Member member, Game... games) {
         for (Game g : games) {
             boolean participates =
@@ -549,7 +587,7 @@ class CheckInServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(1);
+            softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(0);
             softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(fora.getNickname().getValue());
             softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(fora.getTeam().getShortName());
             softAssertions.assertThat(actual.myRanking().winPercent()).isEqualTo(0.0);
