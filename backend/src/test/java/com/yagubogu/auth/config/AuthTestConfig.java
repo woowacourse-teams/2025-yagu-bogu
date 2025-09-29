@@ -26,6 +26,7 @@ import com.yagubogu.talk.repository.TalkRepository;
 import com.yagubogu.team.repository.TeamRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
@@ -85,14 +86,16 @@ public class AuthTestConfig {
     }
 
     @Bean
-    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository, final AuthTokenProperties authTokenProperties) {
+    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository,
+                                                   final AuthTokenProperties authTokenProperties) {
         return new RefreshTokenService(refreshTokenRepository, authTokenProperties);
     }
 
     @Bean
-    public MemberService memberService(final MemberRepository memberRepository, final TeamRepository teamRepository, final MemberBadgeRepository memberBadgeRepository, final
-                                       BadgeRepository badgeRepository) {
-        return new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository);
+    public MemberService memberService(final MemberRepository memberRepository, final TeamRepository teamRepository,
+                                       final MemberBadgeRepository memberBadgeRepository, final
+                                       BadgeRepository badgeRepository, final ApplicationEventPublisher publisher) {
+        return new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository, publisher);
     }
 
     @Bean

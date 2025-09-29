@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -62,13 +61,10 @@ class AuthServiceTest {
     @Autowired
     private MemberService memberService;
 
-    @Autowired
-    private ApplicationEventPublisher publisher;
-
     @BeforeEach
     void setUp() {
         authService = new AuthService(fakeAuthGateway, authTokenProvider,
-                List.of(googleAuthValidator), refreshTokenRepository, publisher, memberService, refreshTokenService);
+                List.of(googleAuthValidator), refreshTokenRepository, memberService, refreshTokenService);
     }
 
     @DisplayName("회원가입을 수행한다")

@@ -1,12 +1,13 @@
 package com.yagubogu.member.service;
 
-import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
@@ -22,6 +23,7 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class MemberService {
     private final TeamRepository teamRepository;
     private final BadgeRepository badgeRepository;
     private final MemberBadgeRepository memberBadgeRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
@@ -120,6 +123,7 @@ public class MemberService {
                 .map(m -> new MemberFindResult(m, false))
                 .orElseGet(() -> {
                     Member savedMember = memberRepository.save(response.toMember());
+                    publisher.publishEvent(new SignUpEvent(savedMember));
                     return new MemberFindResult(savedMember, true);
                 });
     }

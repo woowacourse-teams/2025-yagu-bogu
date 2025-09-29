@@ -8,7 +8,6 @@ import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
 import com.yagubogu.auth.dto.LogoutRequest;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.dto.TokenResponse;
-import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
@@ -21,7 +20,6 @@ import com.yagubogu.member.dto.MemberFindResult;
 import com.yagubogu.member.service.MemberService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +33,6 @@ public class AuthService {
     private final AuthTokenProvider authTokenProvider;
     private final List<AuthValidator<? extends AuthResponse>> authValidators;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final ApplicationEventPublisher publisher;
     private final MemberService memberService;
     private final RefreshTokenService refreshTokenService;
 
@@ -47,9 +44,6 @@ public class AuthService {
         MemberFindResult memberFindResult = memberService.findMember(response);
         Member member = memberFindResult.member();
         boolean isNew = memberFindResult.isNew();
-        if (isNew) {
-            publisher.publishEvent(new SignUpEvent(member));
-        }
 
         String accessToken = authTokenProvider.issueAccessToken(MemberClaims.from(member));
         String refreshToken = refreshTokenService.issue(member);
