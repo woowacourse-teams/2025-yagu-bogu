@@ -24,18 +24,23 @@ class BadgeViewModel(
                 memberRepository.patchRepresentativeBadge(badgeId)
             patchRepresentativeBadgeResult
                 .onSuccess {
-                    val currentBadgeUiState: BadgeUiState = badgeUiState.value
-
-                    if (currentBadgeUiState is BadgeUiState.Success) {
-                        val selectedBadge: BadgeInfoUiModel? = currentBadgeUiState.badges.find { it.badge.id == badgeId }
-                        selectedBadge?.let { badgeInfo: BadgeInfoUiModel ->
-                            badgeUiState.value =
-                                currentBadgeUiState.copy(representativeBadge = badgeInfo.badge)
-                        }
-                    }
+                    updateRepresentativeBadge(badgeId)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
+        }
+    }
+
+    private fun updateRepresentativeBadge(badgeId: Long) {
+        val currentBadgeUiState: BadgeUiState = badgeUiState.value
+
+        if (currentBadgeUiState is BadgeUiState.Success) {
+            val selectedBadge: BadgeInfoUiModel? =
+                currentBadgeUiState.badges.find { it.badge.id == badgeId }
+            selectedBadge?.let { badgeInfo: BadgeInfoUiModel ->
+                badgeUiState.value =
+                    currentBadgeUiState.copy(representativeBadge = badgeInfo.badge)
+            }
         }
     }
 
