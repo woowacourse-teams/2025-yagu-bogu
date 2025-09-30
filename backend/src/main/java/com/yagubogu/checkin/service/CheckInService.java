@@ -131,7 +131,7 @@ public class CheckInService {
         VictoryFairyRankingResponse myRankingResponse;
         VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
         if (myRanking == null) {
-            myRankingResponse = VictoryFairyRankingResponse.emptyRanking(member, 0);
+            myRankingResponse = VictoryFairyRankingResponse.emptyRanking(member);
         } else {
             myRankingResponse = findMyVictoryRanking(myRanking, teamFilter, year, m, c);
         }

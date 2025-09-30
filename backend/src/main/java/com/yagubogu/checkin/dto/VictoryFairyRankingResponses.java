@@ -21,11 +21,10 @@ public record VictoryFairyRankingResponses(
     ) {
 
         public static VictoryFairyRankingResponse emptyRanking(
-                Member myRankingData,
-                int myRanking
+                Member myRankingData
         ) {
             return new VictoryFairyRankingResponse(
-                    myRanking,
+                    0,
                     myRankingData.getNickname().toString(),
                     myRankingData.getImageUrl(),
                     myRankingData.getTeam().getShortName(),
