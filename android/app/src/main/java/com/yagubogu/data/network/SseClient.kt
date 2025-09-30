@@ -8,22 +8,22 @@ import com.launchdarkly.eventsource.background.BackgroundEventSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import okhttp3.OkHttpClient
 import java.net.URI
-import java.util.concurrent.TimeUnit
 
 class SseClient(
     private val baseUrl: String,
-    private val tokenManager: TokenManager,
+    private val httpClient: OkHttpClient,
 ) {
     private var eventSource: BackgroundEventSource? = null
 
     fun connect(sseHandler: SseHandler) {
-        val eventHandler: BackgroundEventHandler = SseEventHandler(sseHandler)
-        eventSource =
-            BackgroundEventSource.Builder(eventHandler, getEventSource()).build()
-        eventSource?.start()
+        if (eventSource == null) {
+            val eventHandler: BackgroundEventHandler = SseEventHandler(sseHandler)
+            eventSource =
+                BackgroundEventSource.Builder(eventHandler, getEventSource()).build()
+            eventSource?.start()
+        }
     }
 
     fun disconnect() {
@@ -35,19 +35,14 @@ class SseClient(
         }
     }
 
-    private fun getEventSource(): EventSource.Builder {
-        val accessToken: String? = runBlocking { tokenManager.getAccessToken() }
-
-        return EventSource
+    private fun getEventSource(): EventSource.Builder =
+        EventSource
             .Builder(
                 ConnectStrategy
                     .http(URI.create("$baseUrl$EVENT_STREAM_ENDPOINT"))
-                    .header("Authorization", "Bearer $accessToken")
-                    .header("Accept", "text/event-stream")
-                    .connectTimeout(0, TimeUnit.SECONDS)
-                    .readTimeout(0, TimeUnit.SECONDS),
+                    .httpClient(httpClient)
+                    .header("Accept", "text/event-stream"),
             )
-    }
 
     private class SseEventHandler(
         private val sseHandler: SseHandler,

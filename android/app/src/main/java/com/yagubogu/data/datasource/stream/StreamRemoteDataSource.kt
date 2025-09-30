@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource.stream
 
 import com.launchdarkly.eventsource.MessageEvent
+import com.launchdarkly.eventsource.StreamHttpErrorException
 import com.yagubogu.data.dto.response.stream.SseFanRateDto
 import com.yagubogu.data.dto.response.stream.SseResponse
 import com.yagubogu.data.network.SseClient
@@ -51,9 +52,6 @@ class StreamRemoteDataSource(
             }
 
             override fun onError(t: Throwable) {
-                // 서버가 2XX 이외의 오류 응답시 com.launchdarkly.eventsource.StreamHttpErrorException: Server returned HTTP error 401 예외가 발생
-                // 클라이언트에서 서버의 연결 유지 시간보다 짧게 설정시 error=com.launchdarkly.eventsource.StreamIOException: java.net.SocketTimeoutException: timeout 예외가 발생
-                // 서버가 연결 유지 시간 초과로 종료시 error=com.launchdarkly.eventsource.StreamClosedByServerException: Stream closed by server 예외가 발생
                 Timber.d("SSE error: $t")
             }
         }

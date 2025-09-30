@@ -38,7 +38,7 @@ class YaguBoguApplication : Application() {
 
     private val retrofit by lazy { RetrofitInstance(baseUrl, tokenManager) }
 
-    private val sseClient by lazy { SseClient(baseUrl, tokenManager) }
+    private val sseClient by lazy { SseClient(baseUrl, retrofit.streamClient) }
     private val streamDataSource by lazy { StreamRemoteDataSource(sseClient) }
     val streamRepository by lazy { StreamDefaultRepository(streamDataSource) }
 
