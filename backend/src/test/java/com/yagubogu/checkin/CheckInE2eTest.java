@@ -526,7 +526,6 @@ public class CheckInE2eTest extends E2eTestBase {
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
                     softAssertions.assertThat(actual.size()).isOne();
-                    softAssertions.assertThat(actual).hasSize(1);
                     softAssertions.assertThat(actual.getFirst().nickname()).isEqualTo("두리");
                 }
         );
