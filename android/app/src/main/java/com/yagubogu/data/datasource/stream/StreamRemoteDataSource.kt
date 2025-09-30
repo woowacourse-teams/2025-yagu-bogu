@@ -27,7 +27,6 @@ class StreamRemoteDataSource(
             // SSE 연결 종료
             override fun onClosed() {
                 Timber.d("SSE onClosed")
-                sseClient.disconnect()
             }
 
             // SSE 이벤트 도착
@@ -50,7 +49,6 @@ class StreamRemoteDataSource(
 
                         else -> SseResponse.Unknown
                     }
-//                val response: SseResponse = SseResponse.CheckInCreated(json.decodeFromString("[{\"gameId\":101,\"homeTeam\":{\"name\":\"LG 트윈스\",\"code\":\"LG\",\"fanRate\":0.64},\"awayTeam\":{\"name\":\"두산 베어스\",\"code\":\"OB\",\"fanRate\":0.36}},{\"gameId\":102,\"homeTeam\":{\"name\":\"SSG 렌더스\",\"code\":\"SK\",\"fanRate\":0.55},\"awayTeam\":{\"name\":\"KIA 타이거즈\",\"code\":\"HT\",\"fanRate\":0.45}}]"))
                 eventFlow.tryEmit(response)
             }
 

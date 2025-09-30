@@ -69,11 +69,34 @@ class HomeViewModel(
 
     init {
         fetchAll()
-        observeStream()
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    fun startStreaming() {
+        viewModelScope.launch {
+            streamRepository.connect().collect { event: SseEvent ->
+                when (event) {
+                    is SseEvent.CheckInCreated -> {
+                        val newItems: List<StadiumFanRateItem> = event.items
+
+                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
+                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
+
+                        newItems.forEach { item: StadiumFanRateItem ->
+                            cachedStadiumFanRateItems[item.gameId] = item
+                        }
+                        stadiumFanRateItems.value = newItems
+                    }
+
+                    SseEvent.Connect,
+                    SseEvent.Timeout,
+                    SseEvent.Unknown,
+                    -> Unit
+                }
+            }
+        }
+    }
+
+    fun stopStreaming() {
         streamRepository.disconnect()
     }
 
@@ -121,31 +144,6 @@ class HomeViewModel(
 
     fun updateRefreshTime() {
         stadiumStatsUiModel.value = updateStadiumStats(isRefreshed = true)
-    }
-
-    private fun observeStream() {
-        viewModelScope.launch {
-            streamRepository.connect().collect { event: SseEvent ->
-                when (event) {
-                    is SseEvent.CheckInCreated -> {
-                        val newItems: List<StadiumFanRateItem> = event.items
-
-                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
-                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
-
-                        newItems.forEach { item: StadiumFanRateItem ->
-                            cachedStadiumFanRateItems[item.gameId] = item
-                        }
-                        stadiumFanRateItems.value = newItems
-                    }
-
-                    SseEvent.Connect,
-                    SseEvent.Timeout,
-                    SseEvent.Unknown,
-                    -> Unit
-                }
-            }
-        }
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {

@@ -93,6 +93,16 @@ class HomeFragment :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.startStreaming()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopStreaming()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
