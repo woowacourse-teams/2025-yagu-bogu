@@ -23,6 +23,7 @@ public class SseEmitterRegistry {
 
         sseEmitter.onTimeout(() -> {
             try {
+                log.info("SSE time out");
                 sseEmitter.send(SseEmitter.event()
                         .name("timeout")
                         .data("server-timeout")
@@ -34,7 +35,10 @@ public class SseEmitterRegistry {
             }
         });
 
-        sseEmitter.onCompletion(cleanup);
+        sseEmitter.onCompletion(() -> {
+            log.info("SSE completed: emitter={}", sseEmitter.hashCode());
+            cleanup.run();
+        });
         sseEmitter.onError(t -> {
             if (isClientDisconnect(t)) {
                 log.warn("SSE client disconnect: emitterId={}, cause={}", id, rootMessage(t));
