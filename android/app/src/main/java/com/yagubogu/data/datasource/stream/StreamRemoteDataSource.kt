@@ -33,9 +33,9 @@ class StreamRemoteDataSource(
                 Timber.d("SSE event: $event, data: ${messageEvent.data}")
                 val response: SseResponse =
                     when (event) {
-                        "timeout" -> SseResponse.Timeout
-                        "connect" -> SseResponse.Connect
-                        "check-in-created" -> {
+                        EVENT_TIMEOUT -> SseResponse.Timeout
+                        EVENT_CONNECT -> SseResponse.Connect
+                        EVENT_CHECK_IN_CREATED -> {
                             val checkInItems: List<SseFanRateDto> =
                                 json.decodeFromString(messageEvent.data)
                             SseResponse.CheckInCreated(checkInItems)
@@ -65,5 +65,11 @@ class StreamRemoteDataSource(
 
     fun disconnect() {
         sseClient.disconnect()
+    }
+
+    companion object {
+        private const val EVENT_TIMEOUT = "timeout"
+        private const val EVENT_CONNECT = "connect"
+        private const val EVENT_CHECK_IN_CREATED = "check-in-created"
     }
 }
