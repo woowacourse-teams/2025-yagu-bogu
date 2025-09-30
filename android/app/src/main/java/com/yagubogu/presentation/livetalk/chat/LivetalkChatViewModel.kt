@@ -60,7 +60,7 @@ class LivetalkChatViewModel(
     private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
     val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
-    private val fetchLock = Mutex()
+    private val fetchTalksLock = Mutex()
     private val pollingControlLock = Mutex()
     private var oldestMessageCursor: Long? = null
     private var newestMessageCursor: Long? = null
@@ -94,7 +94,7 @@ class LivetalkChatViewModel(
             addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
         }
 
-    private val likeMutex = Mutex()
+    private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
     private var likeBatchingJob: Job? = null
 
@@ -110,7 +110,7 @@ class LivetalkChatViewModel(
         if (!hasNext) return
 
         viewModelScope.launch {
-            fetchLock.withLock {
+            fetchTalksLock.withLock {
                 val result =
                     talkRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
                 result
@@ -148,7 +148,7 @@ class LivetalkChatViewModel(
 
     fun deleteMessage(chatId: Long) {
         viewModelScope.launch {
-            fetchLock.withLock {
+            fetchTalksLock.withLock {
                 talkRepository
                     .deleteTalks(gameId, chatId)
                     .onSuccess {
@@ -211,7 +211,7 @@ class LivetalkChatViewModel(
 
     fun addLikeToBatch() {
         viewModelScope.launch {
-            likeMutex.withLock {
+            fetchLikesLock.withLock {
                 _myTeamLikeRealCount.value?.let { currentLikeCount ->
                     _myTeamLikeRealCount.value = currentLikeCount + 1
                 }
@@ -289,7 +289,7 @@ class LivetalkChatViewModel(
 
     private suspend fun sendLikeBatch() {
         val countToSend =
-            likeMutex.withLock {
+            fetchLikesLock.withLock {
                 val count = pendingLikeCount
                 pendingLikeCount = 0
                 count
@@ -315,7 +315,7 @@ class LivetalkChatViewModel(
 
     private fun fetchInitialTalks() {
         viewModelScope.launch {
-            fetchLock.withLock {
+            fetchTalksLock.withLock {
                 val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
                 result
                     .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
@@ -362,7 +362,7 @@ class LivetalkChatViewModel(
 
     private fun fetchAfterTalks() {
         viewModelScope.launch {
-            fetchLock.withLock {
+            fetchTalksLock.withLock {
                 val result =
                     talkRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
                 result
