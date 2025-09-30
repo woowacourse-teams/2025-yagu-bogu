@@ -553,12 +553,15 @@ class CheckInServiceTest {
         checkInFavorite(mint, g1, g2);
 
         // when
-        VictoryFairyRankingResponse myRanking = checkInService.findVictoryFairyRankings(fora.getId(),
+        VictoryFairyRankingResponses responses = checkInService.findVictoryFairyRankings(fora.getId(),
                 TeamFilter.ALL,
-                startDate.getYear()).myRanking();
+                startDate.getYear());
+        List<VictoryFairyRankingResponse> victoryFairyRankingResponses = responses.topRankings();
+        VictoryFairyRankingResponse myRanking = responses.myRanking();
 
         // then
         assertSoftly(softAssertions -> {
+            softAssertions.assertThat(victoryFairyRankingResponses).hasSize(1);
             softAssertions.assertThat(myRanking.winPercent()).isEqualTo(0.0);
             softAssertions.assertThat(myRanking.victoryFairyScore()).isEqualTo(0);
         });

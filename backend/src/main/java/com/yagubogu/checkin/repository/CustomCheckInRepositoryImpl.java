@@ -177,7 +177,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
                 .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(isMemberNotDeleted(), filterByTeam(teamFilter))

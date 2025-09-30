@@ -502,6 +502,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
+        checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -525,6 +526,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
                     softAssertions.assertThat(actual.size()).isOne();
+                    softAssertions.assertThat(actual).hasSize(1);
                     softAssertions.assertThat(actual.getFirst().nickname()).isEqualTo("두리");
                 }
         );

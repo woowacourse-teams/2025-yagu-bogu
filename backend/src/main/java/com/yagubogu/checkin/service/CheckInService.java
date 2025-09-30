@@ -171,9 +171,12 @@ public class CheckInService {
         return result;
     }
 
-    private List<VictoryFairyRankingResponse> findTopVictoryRanking(final TeamFilter teamFilter,
-                                                                    final int year, final double m,
-                                                                    final double c) {
+    private List<VictoryFairyRankingResponse> findTopVictoryRanking(
+            final TeamFilter teamFilter,
+            final int year,
+            final double m,
+            final double c
+    ) {
         List<VictoryFairyRank> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
                 VICTORY_RANKING_LIMIT);
         double previousScore = -1.0;
