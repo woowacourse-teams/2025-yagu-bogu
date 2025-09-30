@@ -2,6 +2,7 @@ package com.yagubogu.talk.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.talk.dto.TalkCursorResult;
+import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/talks")
 public interface TalkControllerInterface {
 
+    @Operation(summary = "첫 요청에 톡 조회", description = "채팅방 첫 진입시 지정한 경기에서 과거 톡 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "톡 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
+    })
+    @GetMapping("/{gameId}/initial")
+    ResponseEntity<TalkCursorResultIncludeTeam> findInitialTalks(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @PathVariable long gameId,
+            @RequestParam("limit") int limit
+    );
+
     @Operation(summary = "톡 조회", description = "지정한 경기에서 과거 톡 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "톡 조회 성공"),
@@ -42,7 +55,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}/latest")
-    ResponseEntity<TalkCursorResult> findNewTalks(
+    ResponseEntity<TalkCursorResultIncludeTeam> findNewTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("after") long cursorId,
