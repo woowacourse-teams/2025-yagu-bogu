@@ -1,7 +1,5 @@
 package com.yagubogu.ui.badge.component
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,11 +52,15 @@ fun Badge(
         ) {
             AsyncImage(
                 model =
-                    ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(badge.imageUrl)
-                        .crossfade(true)
-                        .build(),
+                    if (LocalInspectionMode.current) {
+                        R.drawable.img_badge_lock
+                    } else {
+                        ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(badge.imageUrl)
+                            .crossfade(true)
+                            .build()
+                    },
                 contentDescription = stringResource(R.string.badge_image_description),
                 colorFilter =
                     if (!badge.isAcquired) {
@@ -90,32 +92,8 @@ fun Badge(
     }
 }
 
-@Composable
-private fun Badge(
-    @DrawableRes image: Int,
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(image),
-            contentDescription = stringResource(R.string.badge_image_description),
-            modifier = Modifier.size(120.dp),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = name,
-            style = PretendardSemiBold,
-            fontSize = 14.sp,
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun BadgePreview() {
-    Badge(image = R.drawable.img_badge_lock, name = "공포의 주둥아리")
+    Badge(badge = BadgeUiModel(0, "공포의 주둥아리", "", true))
 }
