@@ -36,7 +36,6 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -362,7 +361,6 @@ public class CheckInE2eTest extends E2eTestBase {
 
     @DisplayName("승리 요정 랭킹을 조회한다")
     @Test
-    @Disabled
     void findVictoryFairyRankings() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
@@ -432,10 +430,10 @@ public class CheckInE2eTest extends E2eTestBase {
         assertSoftly(
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
-                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(40.0);
-                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(40.0);
-                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(31.7);
-                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(23.3);
+                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(53.3);
+                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(53.3);
+                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(42.2);
+                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(31.1);
                 }
         );
     }
@@ -502,6 +500,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
+        checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
