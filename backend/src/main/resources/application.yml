@@ -65,12 +65,6 @@ api:
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics
-
 sse:
   heartbeat:
     enabled: true

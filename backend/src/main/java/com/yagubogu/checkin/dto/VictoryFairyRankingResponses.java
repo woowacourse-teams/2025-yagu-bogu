@@ -1,6 +1,6 @@
 package com.yagubogu.checkin.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yagubogu.member.domain.Member;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +15,21 @@ public record VictoryFairyRankingResponses(
             String profileImageUrl,
             String teamShortName,
             double winPercent,
-            @JsonIgnore
             double victoryFairyScore
     ) {
+
+        public static VictoryFairyRankingResponse emptyRanking(
+                Member myRankingData
+        ) {
+            return new VictoryFairyRankingResponse(
+                    0,
+                    myRankingData.getNickname().toString(),
+                    myRankingData.getImageUrl(),
+                    myRankingData.getTeam().getShortName(),
+                    0,
+                    0
+            );
+        }
     }
 
     public static VictoryFairyRankingResponses from(

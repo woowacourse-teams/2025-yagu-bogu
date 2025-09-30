@@ -5,6 +5,7 @@ import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StatCounts;
 import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.member.domain.Member;
@@ -15,6 +16,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface CustomCheckInRepository {
+
+    StatCounts findStatCounts(Member member, int year);
 
     int findWinCounts(Member member, int year);
 

@@ -17,6 +17,7 @@ import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
 import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
+import com.yagubogu.checkin.dto.StatCounts;
 import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.game.domain.GameState;
@@ -47,6 +48,28 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private static final QNickname NICKNAME = QNickname.nickname;
     private static final QStadium STADIUM = QStadium.stadium;
 
+    @Override
+    public StatCounts findStatCounts(final Member member, final int year) {
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
+
+        NumberExpression<Integer> winExpr = new CaseBuilder().when(winCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> drawExpr = new CaseBuilder().when(drawCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> loseExpr = new CaseBuilder().when(loseCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+
+        return jpaQueryFactory.select(
+                        Projections.constructor(
+                                StatCounts.class,
+                                winExpr.sum(),
+                                drawExpr.sum(),
+                                loseExpr.sum()
+                        )).from(CHECK_IN)
+                .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isFinished())
+                .where(
+                        CHECK_IN.member.eq(member),
+                        GAME.date.between(start, end)
+                ).fetchOne();
+    }
 
     @Override
     public int findWinCounts(final Member member, final int year) {
@@ -154,7 +177,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
                 .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(isMemberNotDeleted(), filterByTeam(teamFilter))
@@ -191,7 +214,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
                 .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(
