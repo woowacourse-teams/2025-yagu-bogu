@@ -35,17 +35,20 @@ class SseClient(
     }
 
     private fun getEventSource(): EventSource.Builder {
-        val path = "/api/event-stream" // SSE endpoint path
         val accessToken: String? = runBlocking { tokenManager.getAccessToken() }
 
         return EventSource
             .Builder(
                 ConnectStrategy
-                    .http(URI.create("$baseUrl$path"))
+                    .http(URI.create("$baseUrl$EVENT_STREAM_ENDPOINT"))
                     .header("Authorization", "Bearer $accessToken")
                     .header("Accept", "text/event-stream")
                     .connectTimeout(0, TimeUnit.SECONDS)
                     .readTimeout(0, TimeUnit.SECONDS),
             )
+    }
+
+    companion object {
+        private const val EVENT_STREAM_ENDPOINT = "/api/event-stream"
     }
 }
