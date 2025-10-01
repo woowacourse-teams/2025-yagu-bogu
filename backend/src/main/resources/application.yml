@@ -65,6 +65,18 @@ api:
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8
 
+kbo:
+  crawler:
+    navigation-timeout: 60s
+    table-timeout: 30s
+    max-retries: 3
+    retry-delay: 2s
+    runner:
+      enabled: true
+      schedule-type: regular
+      start-date: 2025-09-01
+      end-date: 2025-10-31
+
 sse:
   heartbeat:
     enabled: true
