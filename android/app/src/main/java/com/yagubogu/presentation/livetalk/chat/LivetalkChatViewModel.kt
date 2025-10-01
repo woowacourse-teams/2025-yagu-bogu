@@ -92,8 +92,7 @@ class LivetalkChatViewModel(
     private var hasNext: Boolean = true
     private var pollingJob: Job? = null
 
-    private val _myTeamLikeRealCount = MutableLiveData<Int>()
-    val myTeamLikeRealCount: LiveData<Int> get() = _myTeamLikeRealCount
+    private var myTeamLikeRealCount: Int = 0
 
     private val _myTeamLikeShowingCount = MutableLiveData<Int>()
     val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
@@ -227,9 +226,7 @@ class LivetalkChatViewModel(
     fun addLikeToBatch() {
         viewModelScope.launch {
             fetchLikesLock.withLock {
-                _myTeamLikeRealCount.value?.let { currentLikeCount ->
-                    _myTeamLikeRealCount.value = currentLikeCount + 1
-                }
+                myTeamLikeRealCount++
                 pendingLikeCount++
                 if (likeBatchingJob?.isActive != true) {
                     likeBatchingJob =
@@ -278,21 +275,20 @@ class LivetalkChatViewModel(
             .onSuccess { gameLikesResponse ->
                 val newTotalCount =
                     if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
-                val currentMyTeamCount = _myTeamLikeRealCount.value ?: 0
 
-                if (currentMyTeamCount == 0) {
-                    _myTeamLikeRealCount.value = newTotalCount
+                if (myTeamLikeRealCount == 0) {
+                    myTeamLikeRealCount = newTotalCount
                     _myTeamLikeShowingCount.value = newTotalCount
                     return@onSuccess
                 }
 
-                if (currentMyTeamCount < newTotalCount) {
-                    val diffCount = newTotalCount - currentMyTeamCount
+                if (myTeamLikeRealCount < newTotalCount) {
+                    val diffCount = newTotalCount - myTeamLikeRealCount
 
-                    _myTeamLikeRealCount.value = newTotalCount
+                    myTeamLikeRealCount = newTotalCount
                     _myTeamLikeAnimationEvent.setValue(diffCount)
-                } else if (_myTeamLikeRealCount.value == null) {
-                    _myTeamLikeRealCount.value = newTotalCount
+                } else {
+                    myTeamLikeRealCount = newTotalCount
                 }
 
                 Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
