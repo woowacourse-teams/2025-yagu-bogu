@@ -7,21 +7,18 @@ public record TalkCursorResultIncludeTeam(
         String stadiumName,
         String homeTeamCode,
         String awayTeamCode,
-        String myTeamCode,
-        CursorResult<TalkResponse> cursorResult
+        String myTeamCode
 ) {
 
     public static TalkCursorResultIncludeTeam from(
             Game game,
-            Member member,
-            CursorResult<TalkResponse> cursorResult
+            Member member
     ) {
         return new TalkCursorResultIncludeTeam(
                 game.getStadium().getFullName(),
                 game.getHomeTeam().getTeamCode(),
                 game.getAwayTeam().getTeamCode(),
-                member.getTeam().getTeamCode(),
-                cursorResult
+                member.getTeam().getTeamCode()
         );
     }
 }

@@ -54,7 +54,7 @@ public class TalkService {
                 talkResponses.hasNext());
         Member member = getMember(memberId);
 
-        return TalkCursorResultIncludeTeam.from(game, member, cursorResult);
+        return TalkCursorResultIncludeTeam.from(game, member);
     }
 
     public TalkCursorResult findTalksExcludingReported(
@@ -75,7 +75,7 @@ public class TalkService {
         return new TalkCursorResult(cursorResult);
     }
 
-    public TalkCursorResultIncludeTeam findNewTalks(
+    public TalkCursorResult findNewTalks(
             final long gameId,
             final long cursorId,
             final long memberId,
@@ -86,12 +86,10 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
-        Game game = getGame(gameId);
-        Member member = getMember(memberId);
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
-        return TalkCursorResultIncludeTeam.from(game, member, cursorResult);
+        return new TalkCursorResult(cursorResult);
     }
 
     @Transactional
@@ -173,7 +171,7 @@ public class TalkService {
             return talks.map(talk -> TalkResponse.from(talk, memberId));
         }
         Slice<Talk> talks = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
-        
+
         return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 

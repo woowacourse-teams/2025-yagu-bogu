@@ -55,7 +55,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}/latest")
-    ResponseEntity<TalkCursorResultIncludeTeam> findNewTalks(
+    ResponseEntity<TalkCursorResult> findNewTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("after") long cursorId,

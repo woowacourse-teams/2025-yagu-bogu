@@ -47,13 +47,13 @@ public class TalkController implements TalkControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<TalkCursorResultIncludeTeam> findNewTalks(
+    public ResponseEntity<TalkCursorResult> findNewTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        TalkCursorResultIncludeTeam response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
+        TalkCursorResult response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
 
         return ResponseEntity.ok(response);
     }
