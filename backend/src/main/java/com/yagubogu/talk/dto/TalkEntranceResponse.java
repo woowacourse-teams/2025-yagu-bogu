@@ -3,18 +3,18 @@ package com.yagubogu.talk.dto;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 
-public record TalkCursorResultIncludeTeam(
+public record TalkEntranceResponse(
         String stadiumName,
         String homeTeamCode,
         String awayTeamCode,
         String myTeamCode
 ) {
 
-    public static TalkCursorResultIncludeTeam from(
+    public static TalkEntranceResponse from(
             Game game,
             Member member
     ) {
-        return new TalkCursorResultIncludeTeam(
+        return new TalkEntranceResponse(
                 game.getStadium().getFullName(),
                 game.getHomeTeam().getTeamCode(),
                 game.getAwayTeam().getTeamCode(),

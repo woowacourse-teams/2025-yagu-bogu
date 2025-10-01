@@ -10,7 +10,7 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
+import com.yagubogu.talk.dto.TalkEntranceResponse;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -38,7 +38,7 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
 
-    public TalkCursorResultIncludeTeam findInitialTalksExcludingReported(
+    public TalkEntranceResponse findInitialTalksExcludingReported(
             final long gameId,
             final int limit,
             final long memberId
@@ -54,7 +54,7 @@ public class TalkService {
                 talkResponses.hasNext());
         Member member = getMember(memberId);
 
-        return TalkCursorResultIncludeTeam.from(game, member);
+        return TalkEntranceResponse.from(game, member);
     }
 
     public TalkCursorResult findTalksExcludingReported(

@@ -3,7 +3,7 @@ package com.yagubogu.talk.controller;
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
+import com.yagubogu.talk.dto.TalkEntranceResponse;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.service.TalkReportService;
@@ -25,12 +25,12 @@ public class TalkController implements TalkControllerInterface {
     private final TalkService talkService;
     private final TalkReportService talkReportService;
 
-    public ResponseEntity<TalkCursorResultIncludeTeam> findInitialTalks(
+    public ResponseEntity<TalkEntranceResponse> findInitialTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam("limit") final int limit
     ) {
-        TalkCursorResultIncludeTeam response = talkService.findInitialTalksExcludingReported(gameId, limit,
+        TalkEntranceResponse response = talkService.findInitialTalksExcludingReported(gameId, limit,
                 memberClaims.id());
 
         return ResponseEntity.ok(response);
