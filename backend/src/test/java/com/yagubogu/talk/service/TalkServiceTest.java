@@ -20,7 +20,6 @@ import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -101,18 +100,15 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResultIncludeTeam actual = talkService.findInitialTalksExcludingReported(
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
                 game.getId(),
+                null,
                 limit,
                 firstEnterMember.getId()
         );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadium.getFullName());
-            softAssertions.assertThat(actual.homeTeamCode()).isEqualTo(expectedHomeTeam.getTeamCode());
-            softAssertions.assertThat(actual.awayTeamCode()).isEqualTo(expectedAwayTeam.getTeamCode());
-            softAssertions.assertThat(actual.myTeamCode()).isEqualTo(expectedMyTeam.getTeamCode());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedTalk.getId());
             softAssertions.assertThat(actual.cursorResult().content().size()).isOne();
             softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
@@ -150,18 +146,15 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResultIncludeTeam actual = talkService.findInitialTalksExcludingReported(
+        TalkCursorResult actual = talkService.findTalksExcludingReported(
                 game.getId(),
+                null,
                 limit,
                 firstEnterMember.getId()
         );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(expectedStadium.getFullName());
-            softAssertions.assertThat(actual.homeTeamCode()).isEqualTo(expectedHomeTeam.getTeamCode());
-            softAssertions.assertThat(actual.awayTeamCode()).isEqualTo(expectedAwayTeam.getTeamCode());
-            softAssertions.assertThat(actual.myTeamCode()).isEqualTo(expectedMyTeam.getTeamCode());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
                     .isEqualTo(expectedSecondPageTalk.getId());
             softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
@@ -343,7 +336,7 @@ class TalkServiceTest {
                 .awayTeam(awayTeam)
                 .stadium(stadium));
 
-        Long cursorId = 2L;
+        long cursorId = 2L;
         int limit = 2;
 
         talkFactory.save(builder ->
@@ -364,7 +357,7 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResultIncludeTeam actual = talkService.findNewTalks(
+        TalkCursorResult actual = talkService.findNewTalks(
                 game.getId(),
                 cursorId,
                 me.getId(),
@@ -378,13 +371,6 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.stadiumName()).isEqualTo(thirdTalk.getGame().getStadium().getFullName());
-            softAssertions.assertThat(actual.homeTeamCode())
-                    .isEqualTo(thirdTalk.getGame().getHomeTeam().getTeamCode());
-            softAssertions.assertThat(actual.awayTeamCode())
-                    .isEqualTo(thirdTalk.getGame().getAwayTeam().getTeamCode());
-            softAssertions.assertThat(actual.myTeamCode())
-                    .isEqualTo(thirdTalk.getMember().getTeam().getTeamCode());
             softAssertions.assertThat(actual.cursorResult().content()).hasSize(expectedCursorResult.size());
             softAssertions.assertThat(actual.cursorResult().content()).containsExactlyElementsOf(expectedCursorResult);
             softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(thirdTalk.getId());
@@ -414,7 +400,7 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResultIncludeTeam actual = talkService.findNewTalks(game.getId(), fristTalk.getId(), me.getId(),
+        TalkCursorResult actual = talkService.findNewTalks(game.getId(), fristTalk.getId(), me.getId(),
                 limit);
 
         // then

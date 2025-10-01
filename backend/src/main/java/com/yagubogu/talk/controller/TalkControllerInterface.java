@@ -2,7 +2,7 @@ package com.yagubogu.talk.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
+import com.yagubogu.talk.dto.TalkEntranceResponse;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +30,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}/initial")
-    ResponseEntity<TalkCursorResultIncludeTeam> findInitialTalks(
+    ResponseEntity<TalkEntranceResponse> findInitialTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("limit") int limit
@@ -55,7 +55,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}/latest")
-    ResponseEntity<TalkCursorResultIncludeTeam> findNewTalks(
+    ResponseEntity<TalkCursorResult> findNewTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("after") long cursorId,

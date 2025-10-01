@@ -100,8 +100,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .body("stadiumName", is("사직야구장"))
                 .body("homeTeamCode", is("LT"))
                 .body("awayTeamCode", is("HH"))
-                .body("myTeamCode", is("HH"))
-                .body("cursorResult.content[0].id", is(1));
+                .body("myTeamCode", is("HH"));
     }
 
     @DisplayName("톡의 중간 페이지를 조회한다")
