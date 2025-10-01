@@ -49,7 +49,7 @@ public class LikeService {
         existsGame(gameId);
         existsMember(memberId);
 
-        List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
+        List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId, memberId);
 
         return new LikeCountsResponse(gameId, teamLikeCounts);
     }

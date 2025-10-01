@@ -17,15 +17,17 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             """, nativeQuery = true)
     int upsertDelta(long gameId, long teamId, long delta);
 
-    List<Like> findAllByGameId(long gameId);
-
     @Query("""
                 select new com.yagubogu.like.dto.TeamLikeCountResponse(
-                    l.team.id,
+                    t.teamCode,
+                    case when t = m.team then true else false end,
                     l.totalCount
                 )
-                from Like l
-                where l.game.id = :gameId
+                from Game g
+                join Member m on m.id = :memberId
+                join Team t on (t = g.homeTeam or t = g.awayTeam)
+                left join Like l on l.game = g and l.team = t
+                where g.id = :gameId
             """)
-    List<TeamLikeCountResponse> findTeamCountsByGameId(Long gameId);
+    List<TeamLikeCountResponse> findTeamCountsByGameId(Long gameId, Long memberId);
 }
