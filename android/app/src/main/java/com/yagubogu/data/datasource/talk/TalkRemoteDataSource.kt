@@ -2,6 +2,7 @@ package com.yagubogu.data.datasource.talk
 
 import com.yagubogu.data.dto.request.talk.TalkRequest
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkCursorResultIncludeTeamResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.util.safeApiCall
@@ -49,5 +50,10 @@ class TalkRemoteDataSource(
     override suspend fun reportTalks(talkId: Long): Result<Unit> =
         safeApiCall {
             talkApiService.reportTalks(talkId)
+        }
+
+    override suspend fun getInitial(gameId: Long): Result<TalkCursorResultIncludeTeamResponse> =
+        safeApiCall {
+            talkApiService.getInitial(gameId)
         }
 }

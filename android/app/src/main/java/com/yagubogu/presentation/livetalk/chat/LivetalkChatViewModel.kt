@@ -100,19 +100,12 @@ class LivetalkChatViewModel(
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
     val myTeamLikeAnimationEvent: SingleLiveData<Int> get() = _myTeamLikeAnimationEvent
 
-    // TODO: 상대팀 응원수 받는 API 추가할 경우 활용
-//    private val _otherTeam = MutableLiveData<Team>()
-//    val otherTeam: LiveData<Team> get() = _otherTeam
-//    val otherTeamEmoji =
-//        MediatorLiveData<String>().apply {
-//            addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
-//        }
-
     private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
     private var likeBatchingJob: Job? = null
 
     init {
+        fetchTeams(gameId)
         fetchInitialTalks()
     }
 
@@ -321,14 +314,21 @@ class LivetalkChatViewModel(
             result
                 .onSuccess {
                     Timber.d("응원 배치 전송 성공: $countToSend 건")
-                }.onFailure { exception ->
+                }.onFailure { exception: Throwable ->
                     Timber.w(exception, "응원 배치 전송 실패")
                 }
         }
     }
 
-    private fun fetchTeams() {
+    private fun fetchTeams(gameId: Long) {
         viewModelScope.launch {
+            val result = talkRepository.getInitial(gameId)
+            result
+                .onSuccess { livetalkTeams: LivetalkTeams ->
+                    _livetalkTeams.value = livetalkTeams
+                }.onFailure { exception ->
+                    Timber.w(exception, "최초 팀 정보 가져오기 실패")
+                }
         }
     }
 
