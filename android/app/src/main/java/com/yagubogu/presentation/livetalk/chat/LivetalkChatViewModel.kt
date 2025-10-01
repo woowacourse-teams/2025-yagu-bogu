@@ -8,11 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
-import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.GlobalScope
@@ -23,31 +21,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
-
-enum class HomeAwayType(
-    val id: Long,
-) {
-    HOME(1L),
-    AWAY(2L),
-}
-
-class LivetalkTeams(
-    val stadiumName: String,
-    homeTeamCode: String,
-    awayTeamCode: String,
-    myTeamCode: String,
-) {
-    val homeTeam: Team = Team.getByCode(homeTeamCode)
-    val awayTeam: Team = Team.getByCode(awayTeamCode)
-    val myTeam: Team? = Team.getByCode(myTeamCode)
-    val myTeamEmoji: String? = myTeam?.getEmoji()
-    val myTeamType: HomeAwayType? =
-        when (myTeam) {
-            homeTeam -> HomeAwayType.HOME
-            awayTeam -> HomeAwayType.AWAY
-            else -> null
-        }
-}
 
 class LivetalkChatViewModel(
     private val gameId: Long,
