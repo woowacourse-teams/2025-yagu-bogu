@@ -10,11 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.GameRepository
-import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.getEmoji
-import com.yagubogu.presentation.util.getTeam
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.GlobalScope
@@ -26,10 +24,34 @@ import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
 
+enum class HomeAwayType(
+    val id: Long,
+) {
+    HOME(1L),
+    AWAY(2L),
+}
+
+class LivetalkTeams(
+    val stadiumName: String,
+    homeTeamCode: String,
+    awayTeamCode: String,
+    myTeamCode: String,
+) {
+    val homeTeam: Team = Team.getByCode(homeTeamCode)
+    val awayTeam: Team = Team.getByCode(awayTeamCode)
+    val myTeam: Team? = Team.getByCode(myTeamCode)
+    val myTeamEmoji: String? = myTeam?.getEmoji()
+    val myTeamType: HomeAwayType? =
+        when (myTeam) {
+            homeTeam -> HomeAwayType.HOME
+            awayTeam -> HomeAwayType.AWAY
+            else -> null
+        }
+}
+
 class LivetalkChatViewModel(
     private val gameId: Long,
     private val talkRepository: TalkRepository,
-    private val memberRepository: MemberRepository,
     private val gameRepository: GameRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
@@ -41,6 +63,9 @@ class LivetalkChatViewModel(
         MediatorLiveData<Boolean>().apply {
             addSource(livetalkUiState) { value = it !is LivetalkUiState.Success }
         }
+
+    private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
+    val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
 
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
     val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
@@ -67,16 +92,6 @@ class LivetalkChatViewModel(
     private var hasNext: Boolean = true
     private var pollingJob: Job? = null
 
-    private val _myTeam = MutableLiveData<Team>()
-    val myTeam: LiveData<Team> get() = _myTeam
-
-    val myTeamHomeOrAwayID = MutableLiveData<Long>()
-
-    val myTeamEmoji =
-        MediatorLiveData<String>().apply {
-            addSource(myTeam) { value = myTeam.value?.getEmoji() }
-        }
-
     private val _myTeamLikeRealCount = MutableLiveData<Int>()
     val myTeamLikeRealCount: LiveData<Int> get() = _myTeamLikeRealCount
 
@@ -87,12 +102,12 @@ class LivetalkChatViewModel(
     val myTeamLikeAnimationEvent: SingleLiveData<Int> get() = _myTeamLikeAnimationEvent
 
     // TODO: 상대팀 응원수 받는 API 추가할 경우 활용
-    private val _otherTeam = MutableLiveData<Team>()
-    val otherTeam: LiveData<Team> get() = _otherTeam
-    val otherTeamEmoji =
-        MediatorLiveData<String>().apply {
-            addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
-        }
+//    private val _otherTeam = MutableLiveData<Team>()
+//    val otherTeam: LiveData<Team> get() = _otherTeam
+//    val otherTeamEmoji =
+//        MediatorLiveData<String>().apply {
+//            addSource(otherTeam) { value = otherTeam.value?.getEmoji() }
+//        }
 
     private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
@@ -254,37 +269,36 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        if (myTeam.value != null) {
-            val result =
-                gameRepository.likeCounts(
-                    gameId,
-                )
-            result
-                .onSuccess { gameLikesResponse ->
-                    val newTotalCount =
-                        if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
-                    val currentMyTeamCount = _myTeamLikeRealCount.value ?: 0
-
-                    if (currentMyTeamCount == 0) {
-                        _myTeamLikeRealCount.value = newTotalCount
-                        _myTeamLikeShowingCount.value = newTotalCount
-                        return@onSuccess
-                    }
-
-                    if (currentMyTeamCount < newTotalCount) {
-                        val diffCount = newTotalCount - currentMyTeamCount
-
-                        _myTeamLikeRealCount.value = newTotalCount
-                        _myTeamLikeAnimationEvent.setValue(diffCount)
-                    } else if (_myTeamLikeRealCount.value == null) {
-                        _myTeamLikeRealCount.value = newTotalCount
-                    }
-
-                    Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
-                }.onFailure { exception ->
-                    Timber.w(exception, "응원수 로드 실패")
-                }
+        if (livetalkTeams.value?.myTeam == null) {
+            return
         }
+
+        val result = gameRepository.likeCounts(gameId)
+        result
+            .onSuccess { gameLikesResponse ->
+                val newTotalCount =
+                    if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
+                val currentMyTeamCount = _myTeamLikeRealCount.value ?: 0
+
+                if (currentMyTeamCount == 0) {
+                    _myTeamLikeRealCount.value = newTotalCount
+                    _myTeamLikeShowingCount.value = newTotalCount
+                    return@onSuccess
+                }
+
+                if (currentMyTeamCount < newTotalCount) {
+                    val diffCount = newTotalCount - currentMyTeamCount
+
+                    _myTeamLikeRealCount.value = newTotalCount
+                    _myTeamLikeAnimationEvent.setValue(diffCount)
+                } else if (_myTeamLikeRealCount.value == null) {
+                    _myTeamLikeRealCount.value = newTotalCount
+                }
+
+                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
+            }.onFailure { exception ->
+                Timber.w(exception, "응원수 로드 실패")
+            }
     }
 
     private suspend fun sendLikeBatch() {
@@ -295,13 +309,17 @@ class LivetalkChatViewModel(
                 count
             }
 
-        if (countToSend > 0 && myTeamHomeOrAwayID.value != null) {
+        if (countToSend > 0 && livetalkTeams.value?.myTeamType != null) {
             val result =
                 gameRepository.likeBatches(
                     gameId,
                     LikeUpdateRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
-                        likeDelta = LikeDelta(myTeamHomeOrAwayID.value!!, countToSend),
+                        likeDelta =
+                            LikeDelta(
+                                livetalkTeams.value?.myTeamType?.id ?: 1L,
+                                countToSend,
+                            ),
                     ),
                 )
             result
@@ -310,6 +328,11 @@ class LivetalkChatViewModel(
                 }.onFailure { exception ->
                     Timber.w(exception, "응원 배치 전송 실패")
                 }
+        }
+    }
+
+    private fun fetchTeams() {
+        viewModelScope.launch {
         }
     }
 
@@ -331,31 +354,11 @@ class LivetalkChatViewModel(
                         newestMessageCursor =
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
 
-                        getTeamEmojis()
                         getLikeCount()
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
                         _livetalkUiState.value = LivetalkUiState.Error
                     }
-            }
-        }
-    }
-
-    private fun getTeamEmojis() {
-        viewModelScope.launch {
-            val result = memberRepository.getFavoriteTeam()
-            result.onSuccess { favoriteTeam ->
-                favoriteTeam?.let { favoriteTeam ->
-                    if (livetalkResponseItem.value?.homeTeamName == favoriteTeam) {
-                        _myTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
-                        _otherTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
-                        myTeamHomeOrAwayID.value = HOME_TEAM
-                    } else if (livetalkResponseItem.value?.awayTeamName == favoriteTeam) {
-                        _myTeam.value = livetalkResponseItem.value?.awayTeamName?.getTeam()
-                        _otherTeam.value = livetalkResponseItem.value?.homeTeamName?.getTeam()
-                        myTeamHomeOrAwayID.value = AWAY_TEAM
-                    }
-                }
             }
         }
     }
@@ -400,8 +403,5 @@ class LivetalkChatViewModel(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
-
-        private const val HOME_TEAM = 1L
-        private const val AWAY_TEAM = 2L
     }
 }

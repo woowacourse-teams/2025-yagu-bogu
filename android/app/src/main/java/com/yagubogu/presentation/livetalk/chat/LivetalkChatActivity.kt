@@ -36,7 +36,6 @@ class LivetalkChatActivity : AppCompatActivity() {
         LivetalkChatViewModelFactory(
             gameId,
             app.talksRepository,
-            app.memberRepository,
             app.gamesRepository,
             intent.getBooleanExtra(KEY_IS_VERIFIED, false),
         )
