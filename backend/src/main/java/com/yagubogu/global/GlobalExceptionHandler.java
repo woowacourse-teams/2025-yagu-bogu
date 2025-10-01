@@ -9,8 +9,11 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,12 +36,26 @@ public class GlobalExceptionHandler {
     /**
      * 401 UnAuthorized
      */
-    @ExceptionHandler(value = UnAuthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ExceptionResponse handleUnAuthorizedException(final UnAuthorizedException e) {
-        log.warn("[UnAuthorizedException]- {}", e.getMessage());
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<?> handleUnAuthorizedException(
+            final UnAuthorizedException e,
+            final HttpServletRequest request
+    ) {
+        final String accept = request.getHeader(org.springframework.http.HttpHeaders.ACCEPT);
+        final boolean isSse = accept != null && accept.contains(MediaType.TEXT_EVENT_STREAM_VALUE);
 
-        return new ExceptionResponse(e.getMessage());
+        log.warn("[UnAuthorizedException] {}", e.getMessage());
+
+        if (isSse) {
+            // ⚠️ SSE는 JSON 바디를 쓰면 협상 충돌(406/500) 위험 → 상태코드만
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 일반 요청: JSON 바디 반환
+        ExceptionResponse body = new ExceptionResponse(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body);
     }
 
     /**
