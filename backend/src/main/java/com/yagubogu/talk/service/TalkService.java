@@ -71,6 +71,7 @@ public class TalkService {
 
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
                 talkResponses.hasNext());
+
         return new TalkCursorResult(cursorResult);
     }
 
@@ -172,6 +173,7 @@ public class TalkService {
             return talks.map(talk -> TalkResponse.from(talk, memberId));
         }
         Slice<Talk> talks = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
+        
         return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 
