@@ -27,10 +27,10 @@ class SseClient(
     }
 
     fun disconnect() {
-        eventSource?.let {
+        eventSource?.let { source ->
+            eventSource = null
             CoroutineScope(Dispatchers.IO).launch {
-                it.close()
-                eventSource = null
+                source.close()
             }
         }
     }

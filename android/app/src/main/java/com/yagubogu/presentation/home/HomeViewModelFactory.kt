@@ -2,7 +2,6 @@ package com.yagubogu.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.yagubogu.data.network.SseClient
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
