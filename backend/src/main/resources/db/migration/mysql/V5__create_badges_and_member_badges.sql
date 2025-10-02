@@ -31,3 +31,6 @@ ALTER TABLE members
     ADD COLUMN representative_badge_id BIGINT NULL,
     ADD CONSTRAINT fk_member_representative_badge
         FOREIGN KEY (representative_badge_id) REFERENCES badges (badge_id);
+
+ALTER TABLE stadiums
+    ADD COLUMN level ENUM ('MAIN', 'SECONDARY') NOT NULL;
