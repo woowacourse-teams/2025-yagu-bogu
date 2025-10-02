@@ -1,6 +1,5 @@
 package com.yagubogu.ui.badge
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,7 +23,6 @@ class BadgeActivity : ComponentActivity() {
         setContent {
             val view = LocalView.current
             LaunchedEffect(Unit) {
-                val window = (view.context as Activity).window
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
             }
             YaguBoguTheme {
