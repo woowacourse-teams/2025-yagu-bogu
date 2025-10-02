@@ -10,7 +10,7 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.CursorResult;
 import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkEntranceResponse;
+import com.yagubogu.talk.dto.TalkCursorResultIncludeTeam;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
@@ -38,7 +38,7 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
 
-    public TalkEntranceResponse findInitialTalksExcludingReported(
+    public TalkCursorResultIncludeTeam findInitialTalksExcludingReported(
             final long gameId,
             final int limit,
             final long memberId
@@ -54,7 +54,7 @@ public class TalkService {
                 talkResponses.hasNext());
         Member member = getMember(memberId);
 
-        return TalkEntranceResponse.from(game, member);
+        return TalkCursorResultIncludeTeam.from(game, member, cursorResult);
     }
 
     public TalkCursorResult findTalksExcludingReported(
@@ -75,7 +75,7 @@ public class TalkService {
         return new TalkCursorResult(cursorResult);
     }
 
-    public TalkCursorResult findNewTalks(
+    public TalkCursorResultIncludeTeam findNewTalks(
             final long gameId,
             final long cursorId,
             final long memberId,
@@ -86,10 +86,12 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
+        Game game = getGame(gameId);
+        Member member = getMember(memberId);
         CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
-        return new TalkCursorResult(cursorResult);
+        return TalkCursorResultIncludeTeam.from(game, member, cursorResult);
     }
 
     @Transactional
@@ -171,7 +173,7 @@ public class TalkService {
             return talks.map(talk -> TalkResponse.from(talk, memberId));
         }
         Slice<Talk> talks = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
-
+        
         return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 
