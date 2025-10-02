@@ -49,8 +49,7 @@ class MainActivity : AppCompatActivity() {
             val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
             switchFragment(
                 HomeFragment::class.java,
-                homeMenuItem.title.toString(),
-                homeMenuItem.itemId,
+                homeMenuItem,
             )
         }
     }
@@ -96,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
             if (fragmentClass != null) {
-                switchFragment(fragmentClass, item.title.toString(), item.itemId)
+                switchFragment(fragmentClass, item)
                 true
             } else {
                 false
@@ -115,8 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchFragment(
         fragmentClass: Class<out Fragment>,
-        screenName: String,
-        @IdRes selectedItemId: Int,
+        item: MenuItem,
     ) {
         val tag: String = fragmentClass.name
         val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
@@ -132,10 +130,10 @@ class MainActivity : AppCompatActivity() {
                 show(targetFragment)
             }
         }
-        setToolbarTitle(selectedItemId)
+        setToolbarTitle(item.itemId)
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            param(FirebaseAnalytics.Param.SCREEN_NAME, "$screenName Fragment")
+            param(FirebaseAnalytics.Param.SCREEN_NAME, "${item.title} Fragment")
         }
     }
 
