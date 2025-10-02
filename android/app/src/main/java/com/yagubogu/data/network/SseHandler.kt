@@ -1,7 +1,5 @@
 package com.yagubogu.data.network
 
-import com.launchdarkly.eventsource.MessageEvent
-
 interface SseHandler {
     fun onConnectionOpened()
 
@@ -9,7 +7,7 @@ interface SseHandler {
 
     fun onEventReceived(
         event: String,
-        messageEvent: MessageEvent,
+        data: String,
     )
 
     fun onComment(comment: String)

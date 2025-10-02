@@ -41,7 +41,7 @@ class SseClient(
                 ConnectStrategy
                     .http(URI.create("$baseUrl$EVENT_STREAM_ENDPOINT"))
                     .httpClient(httpClient)
-                    .header("Accept", "text/event-stream"),
+                    .header(HEADER_ACCEPT, HEADER_ACCEPT_EVENT_STREAM),
             )
 
     private class SseEventHandler(
@@ -62,7 +62,7 @@ class SseClient(
             event: String,
             messageEvent: MessageEvent,
         ) {
-            sseHandler.onEventReceived(event, messageEvent)
+            sseHandler.onEventReceived(event, messageEvent.data)
         }
 
         // SSE 연결 오류 발생
@@ -77,5 +77,7 @@ class SseClient(
 
     companion object {
         private const val EVENT_STREAM_ENDPOINT = "/api/event-stream"
+        private const val HEADER_ACCEPT = "Accept"
+        private const val HEADER_ACCEPT_EVENT_STREAM = "text/event-stream"
     }
 }

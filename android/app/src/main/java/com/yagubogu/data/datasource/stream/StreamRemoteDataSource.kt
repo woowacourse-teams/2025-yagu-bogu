@@ -1,7 +1,5 @@
 package com.yagubogu.data.datasource.stream
 
-import com.launchdarkly.eventsource.MessageEvent
-import com.launchdarkly.eventsource.StreamHttpErrorException
 import com.yagubogu.data.dto.response.stream.SseFanRateDto
 import com.yagubogu.data.dto.response.stream.SseResponse
 import com.yagubogu.data.network.SseClient
@@ -29,16 +27,16 @@ class StreamRemoteDataSource(
 
             override fun onEventReceived(
                 event: String,
-                messageEvent: MessageEvent,
+                data: String,
             ) {
-                Timber.d("SSE event: $event, data: ${messageEvent.data}")
+                Timber.d("SSE event: $event, data: $data")
                 val response: SseResponse =
                     when (event) {
                         EVENT_TIMEOUT -> SseResponse.Timeout
                         EVENT_CONNECT -> SseResponse.Connect
                         EVENT_CHECK_IN_CREATED -> {
                             val checkInItems: List<SseFanRateDto> =
-                                json.decodeFromString(messageEvent.data)
+                                json.decodeFromString(data)
                             SseResponse.CheckInCreated(checkInItems)
                         }
 

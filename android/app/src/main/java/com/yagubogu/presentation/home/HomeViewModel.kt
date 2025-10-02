@@ -15,11 +15,11 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.domain.repository.StreamRepository
+import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.home.stadium.SseEvent
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -73,9 +73,9 @@ class HomeViewModel(
 
     fun startStreaming() {
         viewModelScope.launch {
-            streamRepository.connect().collect { event: SseEvent ->
+            streamRepository.connect().collect { event: CheckInSseEvent ->
                 when (event) {
-                    is SseEvent.CheckInCreated -> {
+                    is CheckInSseEvent.CheckInCreated -> {
                         val newItems: List<StadiumFanRateItem> = event.items
 
                         val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
@@ -87,9 +87,9 @@ class HomeViewModel(
                         stadiumFanRateItems.value = newItems
                     }
 
-                    SseEvent.Connect,
-                    SseEvent.Timeout,
-                    SseEvent.Unknown,
+                    CheckInSseEvent.Connect,
+                    CheckInSseEvent.Timeout,
+                    CheckInSseEvent.Unknown,
                     -> Unit
                 }
             }
