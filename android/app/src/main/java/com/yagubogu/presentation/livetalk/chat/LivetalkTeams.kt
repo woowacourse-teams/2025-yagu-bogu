@@ -12,8 +12,8 @@ class LivetalkTeams(
 ) {
     val homeTeam: Team = Team.Companion.getByCode(homeTeamCode)
     val awayTeam: Team = Team.Companion.getByCode(awayTeamCode)
-    val myTeam: Team? = Team.Companion.getByCode(myTeamCode)
-    val myTeamEmoji: String? = myTeam?.getEmoji()
+    val myTeam: Team = Team.Companion.getByCode(myTeamCode)
+    val myTeamEmoji: String = myTeam.getEmoji()
     val myTeamType: HomeAwayType? =
         when (myTeam) {
             homeTeam -> HomeAwayType.HOME

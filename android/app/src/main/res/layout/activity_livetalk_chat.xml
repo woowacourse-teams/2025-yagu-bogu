@@ -125,7 +125,7 @@
                 android:gravity="center"
                 android:text="@{viewModel.livetalkTeams.myTeamEmoji}"
                 android:textSize="24sp"
-                android:visibility="@{viewModel.livetalkTeams.myTeam != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.livetalkTeams.myTeamType != null ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@+id/floating_emojis_view"
                 app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
                 app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
@@ -139,7 +139,7 @@
                 android:elevation="6dp"
                 android:gravity="center"
                 android:text="@{@string/livetalk_like_count_message(viewModel.livetalkTeams.myTeam.shortname, viewModel.myTeamLikeShowingCount)}"
-                android:visibility="@{viewModel.livetalkTeams.myTeam != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.livetalkTeams.myTeamType != null ? View.VISIBLE : View.GONE}"
 
                 app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"
                 app:layout_constraintEnd_toStartOf="@+id/tv_like_button"
@@ -154,8 +154,7 @@
                 app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
                 app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
                 app:layout_constraintStart_toStartOf="@id/rv_chat_messages"
-                app:layout_constraintTop_toTopOf="@id/rv_chat_messages"
-                app:layout_constraintVertical_bias="1.0" />
+                app:layout_constraintTop_toTopOf="@id/rv_chat_messages" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
@@ -165,7 +164,7 @@
                 app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_talk_divider_marginBottom="@{viewModel.livetalkTeams.myTeam != null ? @dimen/margin_my_team_active : @dimen/margin_team_default}"
+                app:layout_talk_divider_marginBottom="@{viewModel.livetalkTeams.myTeamType != null ? @dimen/margin_my_team_active : @dimen/margin_team_default}"
                 tools:layout_marginBottom="50dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
