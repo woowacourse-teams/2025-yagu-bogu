@@ -16,7 +16,7 @@ interface CheckInRepository {
 
     suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>>
 
-    suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking>
+    suspend fun getVictoryFairyRankings(year: Int): Result<VictoryFairyRanking>
 
     suspend fun getCheckInHistories(
         year: Int,

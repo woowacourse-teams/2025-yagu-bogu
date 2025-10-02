@@ -39,9 +39,9 @@ class CheckInRemoteDataSource(
             checkInApiService.getStadiumFanRates(date.toString())
         }
 
-    override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRankingResponse> =
+    override suspend fun getVictoryFairyRankings(year: Int): Result<VictoryFairyRankingResponse> =
         safeApiCall {
-            checkInApiService.getVictoryFairyRankings()
+            checkInApiService.getVictoryFairyRankings(year)
         }
 
     override suspend fun getCheckInHistories(

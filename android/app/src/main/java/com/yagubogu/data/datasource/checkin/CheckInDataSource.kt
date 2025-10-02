@@ -18,7 +18,7 @@ interface CheckInDataSource {
 
     suspend fun getStadiumFanRates(date: LocalDate): Result<FanRateResponse>
 
-    suspend fun getVictoryFairyRankings(): Result<VictoryFairyRankingResponse>
+    suspend fun getVictoryFairyRankings(year: Int): Result<VictoryFairyRankingResponse>
 
     suspend fun getCheckInHistories(
         year: Int,

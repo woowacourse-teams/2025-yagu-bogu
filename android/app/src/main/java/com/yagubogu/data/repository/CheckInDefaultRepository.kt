@@ -39,9 +39,9 @@ class CheckInDefaultRepository(
                 }
             }
 
-    override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking> =
+    override suspend fun getVictoryFairyRankings(year: Int): Result<VictoryFairyRanking> =
         checkInDataSource
-            .getVictoryFairyRankings()
+            .getVictoryFairyRankings(year)
             .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
                 victoryFairyRankingResponse.toPresentation()
             }
