@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupBindings()
         setupView()
+        setupBindings()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -66,6 +66,16 @@ class MainActivity : AppCompatActivity() {
         binding.cpiCheckInLoading.visibility = visibility
     }
 
+    private fun setupView() {
+        enableEdgeToEdge()
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
+
     private fun setupBindings() {
         binding.ivBadge.setOnClickListener {
             val intent = BadgeActivity.newIntent(this)
@@ -75,16 +85,6 @@ class MainActivity : AppCompatActivity() {
         binding.ivSettings.setOnClickListener {
             val intent = SettingActivity.newIntent(this)
             startActivity(intent)
-        }
-    }
-
-    private fun setupView() {
-        enableEdgeToEdge()
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
         }
     }
 
