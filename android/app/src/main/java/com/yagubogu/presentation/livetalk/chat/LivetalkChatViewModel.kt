@@ -67,7 +67,7 @@ class LivetalkChatViewModel(
 
     private var myTeamLikeRealCount: Int = 0
 
-    private val _myTeamLikeShowingCount = MutableLiveData<Int>()
+    private val _myTeamLikeShowingCount = MutableLiveData(0)
     val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
 
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Int>()

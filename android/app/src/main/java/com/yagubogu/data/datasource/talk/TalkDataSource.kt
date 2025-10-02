@@ -1,7 +1,7 @@
 package com.yagubogu.data.datasource.talk
 
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
-import com.yagubogu.data.dto.response.talk.TalkCursorResultIncludeTeamResponse
+import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 
 interface TalkDataSource {
@@ -29,5 +29,5 @@ interface TalkDataSource {
 
     suspend fun reportTalks(talkId: Long): Result<Unit>
 
-    suspend fun getInitial(gameId: Long): Result<TalkCursorResultIncludeTeamResponse>
+    suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse>
 }
