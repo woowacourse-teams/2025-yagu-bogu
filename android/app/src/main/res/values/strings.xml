@@ -49,6 +49,8 @@
     <string name="home_show_more">더보기</string>
     <string name="home_show_less">접기</string>
     <string name="home_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="home_victory_fairy_score">승요 점수</string>
+    <string name="home_victory_fairy_score_format">%.1f점</string>
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
     <string name="home_victory_fairy_tooltip">직관 승률이 높은 팬들의 순위예요.</string>
 
