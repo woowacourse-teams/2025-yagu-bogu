@@ -32,8 +32,7 @@ public interface TalkControllerInterface {
     @GetMapping("/{gameId}/initial")
     ResponseEntity<TalkEntranceResponse> findInitialTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @PathVariable long gameId,
-            @RequestParam("limit") int limit
+            @PathVariable long gameId
     );
 
     @Operation(summary = "톡 조회", description = "지정한 경기에서 과거 톡 목록을 조회합니다.")

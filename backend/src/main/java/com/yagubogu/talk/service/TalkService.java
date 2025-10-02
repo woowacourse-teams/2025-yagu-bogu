@@ -40,18 +40,9 @@ public class TalkService {
 
     public TalkEntranceResponse findInitialTalksExcludingReported(
             final long gameId,
-            final int limit,
             final long memberId
     ) {
-        Pageable pageable = PageRequest.of(0, limit);
-        Slice<TalkResponse> talkResponses = getInitialTalkResponses(gameId, memberId, pageable);
-
-        Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
-        List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
-
         Game game = getGame(gameId);
-        CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
-                talkResponses.hasNext());
         Member member = getMember(memberId);
 
         return TalkEntranceResponse.from(game, member);
