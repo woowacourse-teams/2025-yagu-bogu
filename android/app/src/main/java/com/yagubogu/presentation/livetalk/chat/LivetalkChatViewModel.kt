@@ -7,6 +7,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.likes.GameLikesResponse
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.TalkRepository
@@ -238,7 +239,8 @@ class LivetalkChatViewModel(
 
         val result = gameRepository.likeCounts(gameId)
         result
-            .onSuccess { gameLikesResponse ->
+            .onSuccess { gameLikesResponse: GameLikesResponse ->
+                // 서버에서 받아온 좋아요 수
                 val newTotalCount =
                     if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
 
@@ -257,7 +259,7 @@ class LivetalkChatViewModel(
                     myTeamLikeRealCount = newTotalCount
                 }
 
-                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts[0].totalCount} 건")
+                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts.firstOrNull()?.totalCount} 건")
             }.onFailure { exception ->
                 Timber.w(exception, "응원수 로드 실패")
             }
@@ -323,6 +325,7 @@ class LivetalkChatViewModel(
                         newestMessageCursor =
                             livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
 
+                        startPolling()
                         getLikeCount()
                     }.onFailure { exception ->
                         Timber.w(exception, "초기 메시지 API 호출 실패")
