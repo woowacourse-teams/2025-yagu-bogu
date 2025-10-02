@@ -1,7 +1,7 @@
 package com.yagubogu.data.datasource.stream
 
-import com.yagubogu.data.dto.response.stream.SseFanRateDto
-import com.yagubogu.data.dto.response.stream.SseResponse
+import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
+import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import com.yagubogu.data.network.SseClient
 import com.yagubogu.data.network.SseHandler
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ class StreamRemoteDataSource(
     private val sseClient: SseClient,
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
-    private val eventFlow = MutableSharedFlow<SseResponse>(replay = 1)
+    private val eventFlow = MutableSharedFlow<SseCheckInResponse>(replay = 1)
 
     private val checkInSseHandler =
         object : SseHandler {
@@ -30,17 +30,17 @@ class StreamRemoteDataSource(
                 data: String,
             ) {
                 Timber.d("SSE event: $event, data: $data")
-                val response: SseResponse =
+                val response: SseCheckInResponse =
                     when (event) {
-                        EVENT_TIMEOUT -> SseResponse.Timeout
-                        EVENT_CONNECT -> SseResponse.Connect
+                        EVENT_TIMEOUT -> SseCheckInResponse.Timeout
+                        EVENT_CONNECT -> SseCheckInResponse.Connect
                         EVENT_CHECK_IN_CREATED -> {
-                            val checkInItems: List<SseFanRateDto> =
+                            val checkInItems: List<FanRateByGameDto> =
                                 json.decodeFromString(data)
-                            SseResponse.CheckInCreated(checkInItems)
+                            SseCheckInResponse.CheckInCreated(checkInItems)
                         }
 
-                        else -> SseResponse.Unknown
+                        else -> SseCheckInResponse.Unknown
                     }
                 eventFlow.tryEmit(response)
             }
@@ -54,7 +54,7 @@ class StreamRemoteDataSource(
             }
         }
 
-    fun connect(): Flow<SseResponse> {
+    fun connect(): Flow<SseCheckInResponse> {
         sseClient.connect(checkInSseHandler)
         return eventFlow
     }

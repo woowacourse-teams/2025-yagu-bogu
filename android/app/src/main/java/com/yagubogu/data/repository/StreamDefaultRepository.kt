@@ -1,7 +1,7 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
-import com.yagubogu.data.dto.response.stream.SseResponse
+import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
@@ -12,17 +12,17 @@ class StreamDefaultRepository(
     private val streamDataSource: StreamRemoteDataSource,
 ) : StreamRepository {
     override suspend fun connect(): Flow<CheckInSseEvent> =
-        streamDataSource.connect().map { sseResponse: SseResponse ->
+        streamDataSource.connect().map { sseResponse: SseCheckInResponse ->
             when (sseResponse) {
-                is SseResponse.CheckInCreated -> {
+                is SseCheckInResponse.CheckInCreated -> {
                     val items: List<StadiumFanRateItem> =
                         sseResponse.items.map { it.toPresentation() }
                     CheckInSseEvent.CheckInCreated(items)
                 }
 
-                SseResponse.Connect -> CheckInSseEvent.Connect
-                SseResponse.Timeout -> CheckInSseEvent.Timeout
-                SseResponse.Unknown -> CheckInSseEvent.Unknown
+                SseCheckInResponse.Connect -> CheckInSseEvent.Connect
+                SseCheckInResponse.Timeout -> CheckInSseEvent.Timeout
+                SseCheckInResponse.Unknown -> CheckInSseEvent.Unknown
             }
         }
 
