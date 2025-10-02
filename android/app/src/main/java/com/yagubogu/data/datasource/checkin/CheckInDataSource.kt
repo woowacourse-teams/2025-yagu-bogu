@@ -6,6 +6,7 @@ import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
+import com.yagubogu.domain.model.Team
 import java.time.LocalDate
 
 interface CheckInDataSource {
@@ -18,7 +19,10 @@ interface CheckInDataSource {
 
     suspend fun getStadiumFanRates(date: LocalDate): Result<FanRateResponse>
 
-    suspend fun getVictoryFairyRankings(year: Int): Result<VictoryFairyRankingResponse>
+    suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRankingResponse>
 
     suspend fun getCheckInHistories(
         year: Int,
