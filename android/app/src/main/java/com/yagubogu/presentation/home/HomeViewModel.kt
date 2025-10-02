@@ -45,12 +45,17 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
 
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
 
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
+
+    val isShowMoreVisible: LiveData<Boolean> =
+        MediatorLiveData<Boolean>().apply {
+            addSource(stadiumFanRateItems) { value = it.size > 1 }
+        }
 
     val stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
         MediatorLiveData<StadiumStatsUiModel>().apply {
