@@ -44,7 +44,7 @@ interface TalkApiService {
         @Path("talkId") talkId: Long,
     ): Response<Unit>
 
-    @GET("/api/talks/{gameId}")
+    @GET("/api/talks/{gameId}/initial")
     suspend fun getInitial(
         @Path("gameId") gameId: Long,
     ): Response<TalkEntranceResponse>
