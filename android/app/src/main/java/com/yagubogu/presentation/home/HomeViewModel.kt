@@ -45,9 +45,8 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
-
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
+    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
 
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
@@ -57,11 +56,12 @@ class HomeViewModel(
             addSource(stadiumFanRateItems) { value = it.size > 1 }
         }
 
-    val stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
+    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
         MediatorLiveData<StadiumStatsUiModel>().apply {
-            addSource(stadiumFanRateItems) { value = updateStadiumStats(isRefreshed = true) }
-            addSource(isStadiumStatsExpanded) { value = updateStadiumStats() }
+            addSource(stadiumFanRateItems) { updateStadiumStats() }
+            addSource(isStadiumStatsExpanded) { updateStadiumStats() }
         }
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
     private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
     val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
@@ -82,7 +82,6 @@ class HomeViewModel(
                 when (event) {
                     is CheckInSseEvent.CheckInCreated -> {
                         val newItems: List<StadiumFanRateItem> = event.items
-
                         val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
                         cachedStadiumFanRateItems.keys.retainAll(validKeys)
 
@@ -143,12 +142,20 @@ class HomeViewModel(
         }
     }
 
-    fun toggleStadiumStats() {
-        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    fun updateStadiumStats() {
+        val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
+        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+        val currentStadiumStats: StadiumStatsUiModel =
+            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
+
+        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
+        val newStadiumStats =
+            currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
+        _stadiumStatsUiModel.value = newStadiumStats
     }
 
-    fun updateRefreshTime() {
-        stadiumStatsUiModel.value = updateStadiumStats(isRefreshed = true)
+    fun toggleStadiumStats() {
+        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
@@ -254,20 +261,6 @@ class HomeViewModel(
                 _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
                 _isCheckInLoading.value = false
             }
-    }
-
-    private fun updateStadiumStats(isRefreshed: Boolean = false): StadiumStatsUiModel {
-        val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
-        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
-        val currentStadiumStats: StadiumStatsUiModel =
-            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
-
-        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
-        return if (isRefreshed) {
-            currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
-        } else {
-            currentStadiumStats.copy(stadiumFanRates = newItems)
-        }
     }
 
     companion object {
