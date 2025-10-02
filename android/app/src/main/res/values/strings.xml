@@ -9,6 +9,7 @@
     <string name="all_fan">%s 팬</string>
     <string name="all_count">%d회</string>
     <string name="all_null_nick_name">(알 수 없음)</string>
+    <string name="all_back_button_content_description">뒤로가기</string>
 
     <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
 
@@ -124,6 +125,17 @@
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
     <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
+
+    <string name="badge_icon_description">배지 아이콘</string>
+    <string name="badge_title">배지</string>
+    <string name="badge_image_description">배지 이미지</string>
+    <string name="badge_main_badge_title">대표 배지</string>
+    <string name="badge_empty_badge_message">대표 배지를 선택해 주세요</string>
+    <string name="badge_list_title">배지 목록</string>
+    <string name="badge_register_main_badge">대표 배지로 사용하기</string>
+    <string name="badge_achieved_rate_message">%의 사용자가 획득했어요</string>
+    <string name="badge_achieved_date">획득한 날: %s</string>
+    <string name="badge_progress_rate">달성률: %.1f%%</string>
 
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>

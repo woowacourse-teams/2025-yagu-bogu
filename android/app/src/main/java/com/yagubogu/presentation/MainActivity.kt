@@ -25,6 +25,7 @@ import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.stats.StatsFragment
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.badge.BadgeActivity
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -66,6 +67,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBindings() {
+        binding.ivBadge.setOnClickListener {
+            val intent = BadgeActivity.newIntent(this)
+            startActivity(intent)
+        }
+
         binding.ivSettings.setOnClickListener {
             val intent = SettingActivity.newIntent(this)
             startActivity(intent)
