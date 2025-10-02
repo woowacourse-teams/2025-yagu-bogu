@@ -1,5 +1,7 @@
 package com.yagubogu.presentation
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -183,5 +185,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val BACK_PRESS_INTERVAL = 1500L
+
+        fun newIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
     }
 }
