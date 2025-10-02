@@ -79,7 +79,7 @@ public class LikeE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .body("gameId", is(game.getId().intValue()))
-                .body("counts.size()", is(0));
+                .body("counts.size()", is(2));
     }
 
     @DisplayName("좋아요 배치를 적용하고 카운트를 반환한다")
@@ -97,7 +97,6 @@ public class LikeE2eTest extends E2eTestBase {
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         LikeBatchRequest request = new LikeBatchRequest(
-                1L,
                 1L,
                 new LikeDelta(homeTeam.getId(), 3L)
         );
