@@ -27,11 +27,9 @@ public class TalkController implements TalkControllerInterface {
 
     public ResponseEntity<TalkEntranceResponse> findInitialTalks(
             final MemberClaims memberClaims,
-            @PathVariable final long gameId,
-            @RequestParam("limit") final int limit
+            @PathVariable final long gameId
     ) {
-        TalkEntranceResponse response = talkService.findInitialTalksExcludingReported(gameId, limit,
-                memberClaims.id());
+        TalkEntranceResponse response = talkService.findInitialTalksExcludingReported(gameId, memberClaims.id());
 
         return ResponseEntity.ok(response);
     }
