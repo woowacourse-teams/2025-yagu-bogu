@@ -5,6 +5,4 @@ import com.yagubogu.badge.dto.BadgeAwardCandidate;
 
 public interface BadgePolicy {
     BadgeAwardCandidate determineAwardCandidate(BadgeEvent event);
-
-    void award(BadgeAwardCandidate member);
 }

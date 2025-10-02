@@ -3,11 +3,9 @@ package com.yagubogu.badge.policy;
 import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
 import com.yagubogu.badge.domain.Badge;
-import com.yagubogu.badge.domain.MemberBadge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.dto.BadgeAwardCandidate;
 import com.yagubogu.badge.repository.BadgeRepository;
-import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.checkin.event.StadiumVisitEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.member.domain.Member;
@@ -22,7 +20,6 @@ public class GrandSlamBadgePolicy implements BadgePolicy {
 
     private final BadgePolicyRegistry badgePolicyRegistry;
     private final BadgeRepository badgeRepository;
-    private final MemberBadgeRepository memberBadgeRepository;
     private final CheckInRepository checkInRepository;
 
     @PostConstruct
@@ -50,19 +47,5 @@ public class GrandSlamBadgePolicy implements BadgePolicy {
         }
 
         return new BadgeAwardCandidate(member, notAcquired);
-    }
-
-    @Override
-    public void award(final BadgeAwardCandidate candidate) {
-        Member member = candidate.member();
-
-        for (Badge badge : candidate.badges()) {
-            MemberBadge memberBadge = memberBadgeRepository.findByMemberAndBadge(member, badge)
-                    .orElseGet(() -> {
-                        MemberBadge newBadge = new MemberBadge(badge, member);
-                        return memberBadgeRepository.save(newBadge);
-                    });
-            memberBadge.increaseProgress(badge.getThreshold());
-        }
     }
 }
