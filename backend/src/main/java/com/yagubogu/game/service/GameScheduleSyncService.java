@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,27 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 public class GameScheduleSyncService {
-
-    private static final Map<String, String> STADIUM_NAME_MAP = Map.ofEntries(
-            Map.entry("광주", "챔피언스필드"),
-            Map.entry("잠실", "잠실구장"),
-            Map.entry("고척", "고척돔"),
-            Map.entry("수원", "위즈파크"),
-            Map.entry("대구", "라이온즈파크"),
-            Map.entry("사직", "사직구장"),
-            Map.entry("문학", "랜더스필드"),
-            Map.entry("창원", "엔씨파크"),
-            Map.entry("대전", "볼파크"),
-            Map.entry("울산", "문수구장"),
-            Map.entry("군산", "군산구장"),
-            Map.entry("청주", "청주구장"),
-            Map.entry("포항", "포항구장"),
-            Map.entry("한밭", "이글스파크"),
-            Map.entry("시민", "시민운동장"),
-            Map.entry("무등", "무등야구장"),
-            Map.entry("마산", "마산야구장"),
-            Map.entry("인천", "숭의야구장")
-    );
 
     private final KboGameSyncClient kboGameSyncClient;
     private final KboScheduleCrawler kboScheduleCrawler;
@@ -182,18 +160,13 @@ public class GameScheduleSyncService {
     }
 
     private Stadium getStadiumByLocation(final String location) {
-        if (!STADIUM_NAME_MAP.containsKey(location)) {
-            throw new NotFoundException("location not found" + location);
-        }
-        String shortName = STADIUM_NAME_MAP.get(location);
-
-        return stadiumRepository.findByShortName(shortName)
-                .orElseThrow(() -> new GameSyncException("Stadium name match failed: " + shortName + ":" + location));
+        return stadiumRepository.findByLocation(location)
+                .orElseThrow(() -> new NotFoundException("Location match failed: " + location));
     }
 
     private Team getTeamByCode(final String teamCode) {
         return teamRepository.findByTeamCode(teamCode)
-                .orElseThrow(() -> new GameSyncException("Team code match failed: " + teamCode));
+                .orElseThrow(() -> new NotFoundException("Team code match failed: " + teamCode));
     }
 
     private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,
