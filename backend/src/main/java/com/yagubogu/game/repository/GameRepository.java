@@ -5,6 +5,7 @@ import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,10 +19,9 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByGameCode(String gameCode);
 
-    List<Game> findByDate(LocalDate date);
-
-    List<Game> findGameByDate(LocalDate date);
-
+    Optional<Game> findByDateAndHomeTeamAndAwayTeamAndStartAt(LocalDate date, com.yagubogu.team.domain.Team homeTeam,
+                                                              com.yagubogu.team.domain.Team awayTeam,
+                                                              LocalTime startAt);
 
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(

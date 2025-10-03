@@ -71,11 +71,6 @@ kbo:
     table-timeout: 30s
     max-retries: 3
     retry-delay: 2s
-    runner:
-      enabled: true
-      schedule-type: regular
-      start-date: 2025-09-01
-      end-date: 2025-10-31
 
 sse:
   heartbeat:
