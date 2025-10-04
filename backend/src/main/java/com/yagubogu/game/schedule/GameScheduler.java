@@ -1,8 +1,7 @@
 package com.yagubogu.game.schedule;
 
 import com.yagubogu.game.exception.GameSyncException;
-import com.yagubogu.game.service.GameResultSyncService;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
+import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,24 +13,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameScheduler {
 
-    private final GameScheduleSyncService gameScheduleSyncService;
-    private final GameResultSyncService gameResultSyncService;
+    private final KboScoreboardService kboScoreboardService;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void fetchDailyGameSchedule() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDate today = LocalDate.now();
         try {
-            gameScheduleSyncService.syncGameSchedule(today);
-        } catch (GameSyncException e) {
-            log.error("[GameSyncException]- {}", e.getMessage());
-        }
-    }
-
-    @Scheduled(cron = "0 0 0 * * *")
-    public void fetchDailyGameResult() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        try {
-            gameResultSyncService.syncGameResult(yesterday);
+            kboScoreboardService.fetchScoreboardRange(yesterday, today);
         } catch (GameSyncException e) {
             log.error("[GameSyncException]- {}", e.getMessage());
         }
