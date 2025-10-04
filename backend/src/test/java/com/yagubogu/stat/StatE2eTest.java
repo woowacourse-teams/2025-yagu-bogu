@@ -357,7 +357,7 @@ public class StatE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(9);
+            s.assertThat(actual.opponents()).hasSize(11);
 
             // 1위: SS(2-0-0, 100.0)
             var first = actual.opponents().get(0);
@@ -384,17 +384,18 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(ncRes.draws()).isEqualTo(1);
             s.assertThat(ncRes.winRate()).isEqualTo(0.0);
 
-            // 미대결 0.0 팀코드 (정렬/로케일 영향 최소화를 위해 any-order)
             var zeros = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
                     .map(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::teamCode)
                     .toList();
+
             s.assertThat(zeros)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK2", "SK", "OB", "WO", "HH", "HD");
 
             // 전체 정렬 검증: winRate desc → name asc
             var sorted = actual.opponents().stream()
-                    .sorted(Comparator.comparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::winRate).reversed()
+                    .sorted(Comparator
+                            .comparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::winRate).reversed()
                             .thenComparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::name))
                     .toList();
             s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);

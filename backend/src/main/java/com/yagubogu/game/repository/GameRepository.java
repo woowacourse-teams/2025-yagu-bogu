@@ -50,4 +50,13 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             GROUP BY g.id
             """)
     List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
+
+    @Query("""
+        select g from Game g
+        where g.date = :date
+          and g.homeTeam.teamCode = :homeTeamCode
+          and g.awayTeam.teamCode = :awayTeamCode
+          and g.startAt = :startAt
+    """)
+    Optional<Game> findByNaturalKey(LocalDate date, String homeTeamCode, String awayTeamCode, LocalTime startAt);
 }

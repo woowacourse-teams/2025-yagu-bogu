@@ -1,6 +1,7 @@
 package com.yagubogu.game.controller;
 
 import com.yagubogu.game.dto.CrawlResponse;
+import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.dto.TeamWinRateResponse;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
@@ -39,5 +40,15 @@ public interface KboCrawlerControllerInterface {
     @GetMapping("/teams/win-rate")
     ResponseEntity<TeamWinRateResponse> fetchTeamWinRates(
             @RequestParam(defaultValue = "REGULAR") final SeriesType seriesType
+    );
+
+    @Operation(summary = "KBO 스코어보드 조회", description = "지정한 날짜의 스코어보드를 KBO 공식 홈페이지에서 실시간으로 가져옵니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "스코어보드 조회 성공"),
+            @ApiResponse(responseCode = "500", description = "크롤링 중 오류 발생")
+    })
+    @GetMapping("/scoreboard")
+    ResponseEntity<ScoreboardResponse> fetchScoreboard(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     );
 }

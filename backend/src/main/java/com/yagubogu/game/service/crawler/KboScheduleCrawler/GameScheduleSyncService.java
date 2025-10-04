@@ -1,15 +1,11 @@
-package com.yagubogu.game.service;
+package com.yagubogu.game.service.crawler.KboScheduleCrawler;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.KboGameResponse;
 import com.yagubogu.game.dto.KboGamesResponse;
-import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameSyncClient;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.KboGame;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.KboScheduleCrawler;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -161,7 +157,7 @@ public class GameScheduleSyncService {
 
     private Stadium getStadiumByLocation(final String location) {
         return stadiumRepository.findByLocation(location)
-                .orElseThrow(() -> new NotFoundException("Location match failed: " + location));
+                .orElseThrow(() -> new NotFoundException("Stadium name match failed: " + location));
     }
 
     private Team getTeamByCode(final String teamCode) {
@@ -173,7 +169,7 @@ public class GameScheduleSyncService {
                                     final int headerOrder) {
         final String yyyymmdd = date.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
 
-        return yyyymmdd + homeTeam.getTeamCode() + awayTeam.getTeamCode() + headerOrder;
+        return yyyymmdd + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
     }
 
     private LocalTime parseGameTime(final String raw) {

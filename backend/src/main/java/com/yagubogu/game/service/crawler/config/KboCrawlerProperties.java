@@ -1,53 +1,43 @@
 package com.yagubogu.game.service.crawler.config;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "kbo.crawler")
+@Getter
+@Setter
 public class KboCrawlerProperties {
 
-    private Duration navigationTimeout = Duration.ofSeconds(60);
-    private Duration tableTimeout = Duration.ofSeconds(30);
-    private int maxRetries = 3;
-    private Duration retryDelay = Duration.ofSeconds(2);
+    @NotNull
+    private Duration navigationTimeout;
+
+    @NotNull
+    private Duration tableTimeout;
+    private int maxRetries;
+
+    @NotNull
+    private Duration retryDelay;
+
+    @NotNull
+    private Duration waitTimeout;
+    @NotBlank
+    private String dateFieldSelector;
+    @NotBlank
+    private String dateLabelSelector;
+    @NotBlank
+    private String updatePanelSelector;
+    @NotBlank
+    private String scoreSelector;
+
+    @NotBlank
+    private String eventTarget;
+
     private final Runner runner = new Runner();
-
-    public Duration getNavigationTimeout() {
-        return navigationTimeout;
-    }
-
-    public void setNavigationTimeout(final Duration navigationTimeout) {
-        this.navigationTimeout = navigationTimeout;
-    }
-
-    public Duration getTableTimeout() {
-        return tableTimeout;
-    }
-
-    public void setTableTimeout(final Duration tableTimeout) {
-        this.tableTimeout = tableTimeout;
-    }
-
-    public int getMaxRetries() {
-        return maxRetries;
-    }
-
-    public void setMaxRetries(final int maxRetries) {
-        this.maxRetries = maxRetries;
-    }
-
-    public Duration getRetryDelay() {
-        return retryDelay;
-    }
-
-    public void setRetryDelay(final Duration retryDelay) {
-        this.retryDelay = retryDelay;
-    }
-
-    public Runner getRunner() {
-        return runner;
-    }
 
     public static class Runner {
         private boolean enabled;

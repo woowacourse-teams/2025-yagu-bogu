@@ -1,7 +1,6 @@
 package com.yagubogu.game.service.crawler.KboScheduleCrawler;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import lombok.Getter;
 import lombok.Setter;
 

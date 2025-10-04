@@ -3,11 +3,13 @@ package com.yagubogu.game.controller;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 import com.yagubogu.game.dto.CrawlResponse;
+import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.dto.TeamWinRateResponse;
-import com.yagubogu.game.service.GameScheduleSyncService;
-import com.yagubogu.game.service.TeamWinRateService;
+import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
+import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
+import com.yagubogu.game.service.crawler.KboWinRateCrawler.TeamWinRateService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +23,7 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
 
     private final GameScheduleSyncService gameScheduleSyncService;
     private final TeamWinRateService teamWinRateService;
+    private final KboScoreboardService kboScoreboardService;
 
     public ResponseEntity<CrawlResponse> crawlSchedule(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
@@ -40,5 +43,12 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
         TeamWinRateResponse response = teamWinRateService.fetchTeamWinRates(seriesType);
         return ResponseEntity.ok(response);
     }
-}
 
+    @Override
+    public ResponseEntity<ScoreboardResponse> fetchScoreboard(
+            @RequestParam @DateTimeFormat(iso = DATE) final LocalDate date
+    ) {
+        ScoreboardResponse response = kboScoreboardService.fetchScoreboard(date);
+        return ResponseEntity.ok(response);
+    }
+}

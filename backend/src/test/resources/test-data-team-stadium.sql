@@ -10,12 +10,8 @@ VALUES ('KIA 타이거즈', 'KIA', 'HT'),
        ('한화 이글스', '한화', 'HH'),
        ('두산 베어스', '두산', 'OB'),
        ('SK 와이번스', 'SK', 'SK2'),
-       ('현대 유니콘스', '현대', 'HD')
+       ('현대 유니콘스', '현대', 'HD');
 
-ON DUPLICATE KEY UPDATE name=VALUES(name),
-                        short_name=VALUES(short_name);
-
--- TODO : 부산 -> 사직, 인천 -> 문학 으로 변경
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude)
 VALUES (1, '광주 기아 챔피언스필드', '챔피언스필드', '광주', 35.168139, 126.889111),
        (2, '잠실 야구장', '잠실구장', '잠실', 37.512150, 127.071976),
@@ -34,9 +30,4 @@ VALUES (1, '광주 기아 챔피언스필드', '챔피언스필드', '광주', 3
        (15, '대구시민운동장 야구장', '시민운동장', '시민', 35.881162, 128.586371),
        (16, '무등 야구장', '무등야구장', '무등', 35.169165, 126.887245),
        (17, '마산 야구장', '마산야구장', '마산', 35.220855, 128.581050),
-       (18, '숭의 야구장', '숭의야구장', '인천', 37.466591, 126.643239)
-ON DUPLICATE KEY UPDATE full_name=VALUES(full_name),
-                        short_name=VALUES(short_name),
-                        location=VALUES(location),
-                        latitude=VALUES(latitude),
-                        longitude=VALUES(longitude);
+       (18, '숭의 야구장', '숭의야구장', '인천', 37.466591, 126.643239);

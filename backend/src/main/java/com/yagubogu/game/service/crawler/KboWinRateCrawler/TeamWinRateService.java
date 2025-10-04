@@ -1,9 +1,7 @@
-package com.yagubogu.game.service;
+package com.yagubogu.game.service.crawler.KboWinRateCrawler;
 
 import com.yagubogu.game.dto.TeamWinRateResponse;
 import com.yagubogu.game.dto.TeamWinRateRow;
-import com.yagubogu.game.service.crawler.KboWinRateCrawler.KboTeamWinRateCrawler;
-import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.util.List;

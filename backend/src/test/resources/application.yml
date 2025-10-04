@@ -28,6 +28,27 @@ api:
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8
 
+kbo:
+  crawler:
+    navigation-timeout: 30s     # 최초 페이지 진입
+    table-timeout: 15s          # 특정 요소/테이블 대기
+    wait-timeout: 20s           # Ajax/부분갱신 포함 종합 대기
+    max-retries: 2
+    retry-delay: 2s
+
+    # 셀렉터
+    date-field-selector: "#cphContents_cphContents_cphContents_hfSearchDate"
+    date-label-selector: "#cphContents_cphContents_cphContents_lblGameDate"
+    update-panel-selector: "#cphContents_cphContents_cphContents_udpRecord"
+    score-selector: ".smsScore"
+
+    # WebForms 포스트백 타겟
+    event-target: "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$btnCalendarSelect"
+
+    runner:
+      enabled: false
+      schedule-type: "regular"
+
 sse:
   heartbeat:
     enabled: true

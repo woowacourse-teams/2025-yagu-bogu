@@ -1,0 +1,404 @@
+package com.yagubogu.game.service.crawler.KboScoardboardCrawler;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.options.SelectOption;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import com.yagubogu.game.dto.KboScoreboardGame;
+import com.yagubogu.game.dto.KboScoreboardTeam;
+import com.yagubogu.game.dto.Pitcher;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class KboScoreboardCrawler {
+
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KboScoreboardCrawler.class);
+    private static final String BASE_URL = "https://www.koreabaseball.com/Schedule/ScoreBoard.aspx";
+    private static final DateTimeFormatter REQUEST_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter LABEL_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+    private static final Pattern LABELED =
+            Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
+
+    private final Duration navigationTimeout;
+    private final int maxRetries;
+    private final Duration retryDelay;
+    private final Duration waitTimeout;
+
+    public KboScoreboardCrawler(final Duration navigationTimeout,
+                                final Duration waitTimeout,
+                                final int maxRetries,
+                                final Duration retryDelay) {
+        this.navigationTimeout = Objects.requireNonNull(navigationTimeout, "navigationTimeout");
+        this.waitTimeout = Objects.requireNonNull(waitTimeout, "waitTimeout");
+        this.maxRetries = maxRetries;
+        this.retryDelay = Objects.requireNonNull(retryDelay, "retryDelay");
+    }
+
+    public List<KboScoreboardGame> crawlScoreboard(final LocalDate date) {
+        return crawlScoreboard(date, DEFAULT_LOGGER);
+    }
+
+    public List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
+        Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
+        String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
+
+        log.info("{} 스코어보드 크롤링 시작", formattedRequestDate);
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try (Playwright playwright = Playwright.create();
+                 Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))) {
+                Page page = browser.newPage();
+                page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
+
+                navigateToDateUsingCalendar(page, date, waitTimeout);
+
+                List<KboScoreboardGame> games = extractScoreboards(page, log, date);
+                log.info("{} 스코어보드 크롤링 완료 ({}경기)", formattedRequestDate, games.size());
+                return games;
+            } catch (PlaywrightException exception) {
+                log.error("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
+                if (attempt == maxRetries) {
+                    break;
+                }
+                sleep(retryDelay);
+            }
+        }
+
+        log.warn("{} 스코어보드 데이터를 가져오지 못했습니다.", formattedRequestDate);
+        return List.of();
+    }
+
+    private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate,
+                                             final Duration waitTimeout) {
+        // 1) 달력 열기
+        page.click(".ui-datepicker-trigger", new Page.ClickOptions()
+                .setTimeout(waitTimeout.toMillis()));
+        page.waitForSelector("#ui-datepicker-div",
+                new Page.WaitForSelectorOptions().setTimeout(waitTimeout.toMillis())
+                        .setState(WaitForSelectorState.VISIBLE));
+
+        // 2) 연/월 선택 (월은 0-based)
+        String year = String.valueOf(targetDate.getYear());
+        String monthZeroBased = String.valueOf(targetDate.getMonthValue() - 1);
+
+        // 연도 먼저
+        page.selectOption(".ui-datepicker-year",
+                new SelectOption().setValue(year));
+        // 월 다음
+        page.selectOption(".ui-datepicker-month",
+                new SelectOption().setValue(monthZeroBased));
+
+        // 3) 일자 클릭 (다른 달 날짜 제외)
+        String day = String.valueOf(targetDate.getDayOfMonth());
+        // XPath가 가장 안전
+        String dayXpath = String.format(
+                "//div[@id='ui-datepicker-div']//td[not(contains(@class,'ui-datepicker-other-month'))]//a[normalize-space(text())='%s']",
+                day);
+        page.click(dayXpath, new Page.ClickOptions().setTimeout(waitTimeout.toMillis()));
+
+        // 4) 라벨로 로딩 완료 확인 (예: 2025.10.04)
+        String expected = LABEL_FMT.format(targetDate);
+        page.waitForFunction("(args) => {" +
+                        "  const [exp, sel] = args;" +
+                        "  const el = document.querySelector(sel);" +
+                        "  return el && el.textContent && el.textContent.includes(exp);" +
+                        "}",
+                new Object[]{expected, "#cphContents_cphContents_cphContents_lblGameDate"},
+                new Page.WaitForFunctionOptions().setTimeout(waitTimeout.toMillis()));
+
+        // 5) 스코어 요소 등장 대기
+        page.waitForSelector("#cphContents_cphContents_cphContents_udpRecord",
+                new Page.WaitForSelectorOptions().setTimeout(waitTimeout.toMillis())
+                        .setState(WaitForSelectorState.ATTACHED));
+        page.waitForSelector(".smsScore",
+                new Page.WaitForSelectorOptions().setTimeout(waitTimeout.toMillis())
+                        .setState(WaitForSelectorState.ATTACHED));
+    }
+
+    List<KboScoreboardGame> extractScoreboards(final Page page, final Logger logger, final LocalDate date) {
+        List<ElementHandle> scoreboards = page.querySelectorAll(".smsScore");
+        if (scoreboards.isEmpty()) {
+            logger.info("스코어보드가 존재하지 않습니다.");
+            return List.of();
+        }
+
+        List<KboScoreboardGame> games = new ArrayList<>();
+        for (ElementHandle scoreboard : scoreboards) {
+            Optional<KboScoreboardGame> parsed = parseScoreboard(scoreboard, logger, date);
+            parsed.ifPresent(games::add);
+        }
+
+        return games;
+    }
+
+    private Optional<KboScoreboardGame> parseScoreboard(final ElementHandle scoreboard,
+                                                        final Logger logger, final LocalDate date) {
+        String status = safeText(scoreboard, ".flag span");
+        String stadium = safeText(scoreboard, ".place");
+        String startTime = safeText(scoreboard, ".place span");
+        if (stadium != null && startTime != null) {
+            stadium = stadium.replace(startTime, "").trim();
+        } else if (stadium != null) {
+            stadium = stadium.trim();
+        }
+
+        String awayName = safeText(scoreboard, ".leftTeam .teamT");
+        String homeName = safeText(scoreboard, ".rightTeam .teamT");
+        Integer awayScore = parseNullableInt(safeText(scoreboard, ".leftTeam .score span"));
+        Integer homeScore = parseNullableInt(safeText(scoreboard, ".rightTeam .score span"));
+
+        ElementHandle boxScoreAnchor = scoreboard.querySelector(".btnSms a[href*='gameId=']");
+        String boxScoreUrl = boxScoreAnchor != null ? resolveUrl(boxScoreAnchor.getAttribute("href")) : null;
+        String gameId = extractGameId(boxScoreUrl);
+
+        ElementHandle table = scoreboard.querySelector("table.tScore");
+        Map<String, KboScoreboardTeam> tableScores = parseTableScores(table, logger);
+
+        KboScoreboardTeam awayTeam = mergeTeamData(awayName, awayScore, tableScores);
+        KboScoreboardTeam homeTeam = mergeTeamData(homeName, homeScore, tableScores);
+
+        if (awayTeam == null && homeTeam == null) {
+            logger.warn("스코어보드 파싱 실패: 팀 정보를 찾을 수 없습니다.");
+            return Optional.empty();
+        }
+
+        Pitcher pitcher = parsePitcher(scoreboard);
+
+        return Optional.of(new KboScoreboardGame(
+                date,
+                gameId,
+                emptyToNull(status),
+                emptyToNull(stadium),
+                emptyToNull(startTime),
+                emptyToNull(boxScoreUrl),
+                awayTeam,
+                homeTeam,
+                awayScore,
+                homeScore,
+                pitcher.winning(),
+                pitcher.saving(),
+                pitcher.losing()
+        ));
+    }
+
+    private Map<String, KboScoreboardTeam> parseTableScores(final ElementHandle table,
+                                                            final Logger logger) {
+        Map<String, KboScoreboardTeam> scores = new LinkedHashMap<>();
+        if (table == null) {
+            return scores;
+        }
+
+        List<ElementHandle> rows = table.querySelectorAll("tbody tr");
+        for (ElementHandle row : rows) {
+            String teamName = safeText(row, "th");
+            if (teamName == null || teamName.isBlank()) {
+                continue;
+            }
+
+            List<ElementHandle> cells = row.querySelectorAll("td");
+            if (cells.isEmpty()) {
+                continue;
+            }
+
+            int size = cells.size();
+            int statsStart = Math.max(size - 4, 0);
+            List<String> inningScores = new ArrayList<>();
+            for (int i = 0; i < statsStart; i++) {
+                inningScores.add(normalizeScore(cells.get(i).innerText()));
+            }
+
+            Integer runs = statsStart < size ? parseNullableInt(cells.get(size - 4).innerText()) : null;
+            Integer hits = statsStart < size ? parseNullableInt(cells.get(size - 3).innerText()) : null;
+            Integer errors = statsStart < size ? parseNullableInt(cells.get(size - 2).innerText()) : null;
+            Integer bases = statsStart < size ? parseNullableInt(cells.get(size - 1).innerText()) : null;
+
+            scores.put(teamName.trim(), new KboScoreboardTeam(
+                    teamName.trim(),
+                    runs,
+                    hits,
+                    errors,
+                    bases,
+                    inningScores
+            ));
+        }
+
+        return scores;
+    }
+
+    private KboScoreboardTeam mergeTeamData(final String teamName,
+                                            final Integer displayScore,
+                                            final Map<String, KboScoreboardTeam> tableScores) {
+        if (tableScores.isEmpty() && teamName == null) {
+            return null;
+        }
+
+        KboScoreboardTeam tableTeam = null;
+        if (teamName != null) {
+            tableTeam = tableScores.remove(teamName.trim());
+        }
+        if (tableTeam == null && !tableScores.isEmpty()) {
+            String firstKey = tableScores.keySet().iterator().next();
+            tableTeam = tableScores.remove(firstKey);
+        }
+
+        if (tableTeam == null) {
+            if (teamName == null && displayScore == null) {
+                return null;
+            }
+            return new KboScoreboardTeam(
+                    teamName,
+                    displayScore,
+                    null,
+                    null,
+                    null,
+                    List.of()
+            );
+        }
+
+        Integer runs = tableTeam.runs() != null ? tableTeam.runs() : displayScore;
+        return new KboScoreboardTeam(
+                teamName != null ? teamName : tableTeam.name(),
+                runs,
+                tableTeam.hits(),
+                tableTeam.errors(),
+                tableTeam.basesOnBalls(),
+                tableTeam.inningScores()
+        );
+    }
+
+    private String safeText(final ElementHandle parent, final String selector) {
+        if (parent == null) {
+            return null;
+        }
+        try {
+            ElementHandle element = parent.querySelector(selector);
+            if (element == null) {
+                return null;
+            }
+            String text = element.innerText();
+            return text != null ? text.trim() : null;
+        } catch (PlaywrightException exception) {
+            return null;
+        }
+    }
+
+    private Integer parseNullableInt(final String text) {
+        if (text == null) {
+            return null;
+        }
+        String normalized = text.replaceAll("[^0-9-]", "").trim();
+        if (normalized.isEmpty() || "-".equals(normalized)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(normalized);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    private String normalizeScore(final String text) {
+        return text == null ? "" : text.trim();
+    }
+
+    private void sleep(final Duration delay) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(delay.toMillis());
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private String resolveUrl(final String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) {
+            return null;
+        }
+        if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+            return rawUrl;
+        }
+        if (rawUrl.startsWith("//")) {
+            return "https:" + rawUrl;
+        }
+        if (rawUrl.startsWith("/")) {
+            return "https://www.koreabaseball.com" + rawUrl;
+        }
+        return "https://www.koreabaseball.com/" + rawUrl;
+    }
+
+    private String extractGameId(final String boxScoreUrl) {
+        if (boxScoreUrl == null) {
+            return null;
+        }
+        int index = boxScoreUrl.indexOf("gameId=");
+        if (index < 0) {
+            return null;
+        }
+        String substring = boxScoreUrl.substring(index + "gameId=".length());
+        int ampIndex = substring.indexOf('&');
+        if (ampIndex >= 0) {
+            substring = substring.substring(0, ampIndex);
+        }
+        return substring;
+    }
+
+    private String emptyToNull(final String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private Pitcher parsePitcher(ElementHandle scoreboard) {
+        String win = null, save = null, lose = null;
+
+        try {
+            ElementHandle container = scoreboard.querySelector(".score_wrap p.win");
+            if (container != null) {
+                List<ElementHandle> spans = container.querySelectorAll("span");
+                for (ElementHandle s : spans) {
+                    String raw = s.innerText();
+                    if (raw == null || raw.isBlank()) {
+                        continue;
+                    }
+                    raw = raw.replace('\u00A0', ' ').trim(); // nbsp 정리
+                    Matcher m = LABELED.matcher(raw);
+                    if (!m.find()) {
+                        continue;
+                    }
+
+                    String label = m.group(1);   // 승 | 세 | 패
+                    String name = m.group(2).trim();
+
+                    if (name.isEmpty() || "-".equals(name)) {
+                        continue;
+                    }
+
+                    switch (label) {
+                        case "승" -> win = name;
+                        case "세" -> save = name;
+                        case "패" -> lose = name;
+                    }
+                }
+            }
+        } catch (PlaywrightException ignored) {
+        }
+
+        return new Pitcher(win, save, lose);
+    }
+}
