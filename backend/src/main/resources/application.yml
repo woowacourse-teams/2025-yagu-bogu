@@ -72,6 +72,7 @@ kbo:
     wait-timeout: 8s
     max-retries: 1
     retry-delay: 1s
+    context-pool-size: 2
 
     # 셀렉터
     date-field-selector: "#cphContents_cphContents_cphContents_hfSearchDate"

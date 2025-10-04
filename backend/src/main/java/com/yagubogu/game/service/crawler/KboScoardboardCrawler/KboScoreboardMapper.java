@@ -18,11 +18,9 @@ class KboScoreboardMapper {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
 
-    Team resolveTeamFromShort(String shortCodeOrName) {
-        // 크롤링 값은 보통 'SSG', 'KIA', 'NC' 같은 약칭이므로 teamCode 우선
-        return teamRepository.findByTeamCode(shortCodeOrName)
-                .or(() -> teamRepository.findByShortName(shortCodeOrName))
-                .orElseThrow(() -> new IllegalArgumentException("팀 매핑 실패: " + shortCodeOrName));
+    Team resolveTeamFromShortName(String shortName) {
+        return teamRepository.findByShortName(shortName)
+                .orElseThrow(() -> new IllegalArgumentException("팀 매핑 실패: " + shortName));
     }
 
     Stadium resolveStadium(String stadiumText) {

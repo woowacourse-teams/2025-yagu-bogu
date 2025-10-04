@@ -37,6 +37,8 @@ public class KboCrawlerProperties {
     @NotBlank
     private String eventTarget;
 
+    private int contextPoolSize;
+
     private final Runner runner = new Runner();
 
     public static class Runner {
