@@ -29,12 +29,29 @@ public class KboScoreboardService {
     private final KboScoreboardMapper mapper;
 
     @Transactional
+    public List<ScoreboardResponse> fetchScoreboardRange(final LocalDate startDate, final LocalDate endDate) {
+        List<ScoreboardResponse> responses = new ArrayList<>();
+        LocalDate date = startDate;
+
+        while (date.isBefore(endDate) || date.isEqual(endDate)) {
+            List<KboScoreboardGame> games = kboScoreboardCrawler.crawlScoreboard(date);
+            applyDoubleHeaderOrder(games);
+
+            upsertAll(games, date);
+            ScoreboardResponse response = new ScoreboardResponse(date, games);
+            responses.add(response);
+
+            date = date.plusDays(1);
+        }
+        return responses;
+    }
+
+    @Transactional
     public ScoreboardResponse fetchScoreboard(final LocalDate date) {
         List<KboScoreboardGame> games = kboScoreboardCrawler.crawlScoreboard(date);
         applyDoubleHeaderOrder(games);
 
         upsertAll(games, date);
-        ;
         return new ScoreboardResponse(date, games);
     }
 

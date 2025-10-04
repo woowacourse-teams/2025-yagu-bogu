@@ -67,6 +67,10 @@ public class KboScoreboardCrawler {
 
                 navigateToDateUsingCalendar(page, date, waitTimeout);
 
+                if (!waitForScoreboardsOrSkip(page, waitTimeout, log, date)) {
+                    return List.of();
+                }
+
                 List<KboScoreboardGame> games = extractScoreboards(page, log, date);
                 log.info("{} 스코어보드 크롤링 완료 ({}경기)", formattedRequestDate, games.size());
                 return games;
@@ -125,12 +129,30 @@ public class KboScoreboardCrawler {
         page.waitForSelector("#cphContents_cphContents_cphContents_udpRecord",
                 new Page.WaitForSelectorOptions().setTimeout(waitTimeout.toMillis())
                         .setState(WaitForSelectorState.ATTACHED));
-        page.waitForSelector(".smsScore",
-                new Page.WaitForSelectorOptions().setTimeout(waitTimeout.toMillis())
-                        .setState(WaitForSelectorState.ATTACHED));
     }
 
-    List<KboScoreboardGame> extractScoreboards(final Page page, final Logger logger, final LocalDate date) {
+    private boolean waitForScoreboardsOrSkip(final Page page,
+                                             final Duration timeout,
+                                             final Logger log,
+                                             final LocalDate date) {
+        try {
+            page.waitForSelector(".smsScore",
+                    new Page.WaitForSelectorOptions()
+                            .setTimeout(timeout.toMillis())
+                            .setState(WaitForSelectorState.ATTACHED));
+            return true; // 스코어보드 있음
+        } catch (PlaywrightException e) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("Timeout")) {
+                log.info("[AUTO] {} 스코어보드 데이터 없음(휴식/우천/미개최 등), 스킵",
+                        REQUEST_DATE_FORMAT.format(date));
+                return false;
+            }
+            throw e; // 다른 오류는 그대로 던짐
+        }
+    }
+
+    private List<KboScoreboardGame> extractScoreboards(final Page page, final Logger logger, final LocalDate date) {
         List<ElementHandle> scoreboards = page.querySelectorAll(".smsScore");
         if (scoreboards.isEmpty()) {
             logger.info("스코어보드가 존재하지 않습니다.");
