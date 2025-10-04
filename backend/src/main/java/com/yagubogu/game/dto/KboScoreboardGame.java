@@ -16,8 +16,8 @@ public final class KboScoreboardGame {
     private final String boxScoreUrl;
     private final KboScoreboardTeam awayTeam;
     private final KboScoreboardTeam homeTeam;
-    private final int awayScore;
-    private final int homeScore;
+    private final Integer awayScore;
+    private final Integer homeScore;
     private final String winningPitcher;
     private final String savingPitcher;
     private final String losingPitcher;
@@ -32,8 +32,8 @@ public final class KboScoreboardGame {
             String boxScoreUrl,
             KboScoreboardTeam awayTeam,
             KboScoreboardTeam homeTeam,
-            int awayScore,
-            int homeScore,
+            Integer awayScore,
+            Integer homeScore,
             String winningPitcher,
             String savingPitcher,
             String losingPitcher

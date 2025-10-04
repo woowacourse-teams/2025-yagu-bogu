@@ -11,9 +11,9 @@ public final class KboGame {
     private final LocalDate date;
     private final String gameTime;
     private final String homeTeam;
-    private final int homeScore;
+    private final Integer homeScore;
     private final String awayTeam;
-    private final int awayScore;
+    private final Integer awayScore;
     private final String result;
     private final String stadium;
     private final boolean cancelled;
@@ -48,10 +48,13 @@ public final class KboGame {
         this.tvChannel = tvChannel;
     }
 
-    private int parseScore(final String homeScore) {
-        if (homeScore.equals("-")) {
+    private Integer parseScore(final String score) {
+        if (score == null) {
+            return null;
+        }
+        if (score.equals("-")) {
             return 0;
         }
-        return Integer.parseInt(homeScore);
+        return Integer.parseInt(score);
     }
 }
