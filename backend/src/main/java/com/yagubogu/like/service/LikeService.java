@@ -27,6 +27,7 @@ public class LikeService {
     @Transactional
     public void applyBatch(
             final long gameId,
+            final long memberId,
             final LikeBatchRequest request
     ) {
         existsGame(gameId);
@@ -34,7 +35,7 @@ public class LikeService {
         // 멱등성 키 insert (INSERT IGNORE -> 이미 처리된 배치면 재적용 금지)
         boolean inserted = likeWindowRepository.tryInsertWindow(
                 gameId,
-                request.memberId(),
+                memberId,
                 request.windowStartEpochSec()
         );
         if (!inserted) {
@@ -45,9 +46,8 @@ public class LikeService {
         likeRepository.upsertDelta(gameId, likeDelta.teamId(), likeDelta.delta());
     }
 
-    public LikeCountsResponse findCounts(final long gameId, final long memberId) {
+    public LikeCountsResponse findCounts(final long gameId) {
         existsGame(gameId);
-        existsMember(memberId);
 
         List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
 
@@ -57,12 +57,6 @@ public class LikeService {
     private void existsGame(final long gameId) {
         if (!gameRepository.existsById(gameId)) {
             throw new NotFoundException("Game not found");
-        }
-    }
-
-    private void existsMember(final long memberId) {
-        if (!memberRepository.existsById(memberId)) {
-            throw new NotFoundException("Member not found");
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.yagubogu.like.dto;
 
 public record TeamLikeCountResponse(
-        Long teamId,
+        String teamCode,
         Long totalCount
 ) {
 }
