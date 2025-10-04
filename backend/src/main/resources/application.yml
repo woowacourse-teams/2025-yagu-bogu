@@ -67,11 +67,11 @@ api:
 
 kbo:
   crawler:
-    navigation-timeout: 15s
-    table-timeout: 6s
-    wait-timeout: 8s
+    navigation-timeout: 7s
+    table-timeout: 3s
+    wait-timeout: 3s
     max-retries: 1
-    retry-delay: 1s
+    retry-delay: 500ms
     context-pool-size: 2
 
     # 셀렉터
