@@ -10,8 +10,9 @@ VALUES ('KIA 타이거즈', 'KIA', 'HT'),
        ('한화 이글스', '한화', 'HH'),
        ('두산 베어스', '두산', 'OB'),
        ('SK 와이번스', 'SK', 'SK2'),
-       ('현대 유니콘스', '현대', 'HD')
-
+       ('현대 유니콘스', '현대', 'HD'),
+       ('나눔 올스타', '나눔', 'NN'),
+       ('드림 올스타', '드림', 'DR')
 ON DUPLICATE KEY UPDATE name=VALUES(name),
                         short_name=VALUES(short_name);
 

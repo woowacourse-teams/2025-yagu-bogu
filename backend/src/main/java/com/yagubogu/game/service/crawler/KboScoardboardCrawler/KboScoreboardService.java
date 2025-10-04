@@ -1,13 +1,19 @@
 package com.yagubogu.game.service.crawler.KboScoardboardCrawler;
 
+import static java.util.stream.Collectors.toMap;
+
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboScoreboardGame;
 import com.yagubogu.game.dto.ScoreboardResponse;
+import com.yagubogu.game.repository.GameJdbcBatchUpsertRepository;
+import com.yagubogu.game.repository.GameJdbcBatchUpsertRepository.BatchResult;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -16,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,37 +36,76 @@ import org.springframework.util.StopWatch;
 public class KboScoreboardService {
 
     private final KboScoreboardCrawler kboScoreboardCrawler;
-    private final GameRepository gameRepository;
     private final KboScoreboardMapper mapper;
+    private final GameJdbcBatchUpsertRepository batchUpsertRepository;
+    private final TeamRepository teamRepository;
+    private final StadiumRepository stadiumRepository;
 
     @Transactional
     public List<ScoreboardResponse> fetchScoreboardRange(final LocalDate startDate, final LocalDate endDate) {
         StopWatch total = new StopWatch("scoreboardRange:" + startDate + "~" + endDate);
-        total.start("scoreboard");
-        List<ScoreboardResponse> responses = new ArrayList<>();
-        StopWatch sw = new StopWatch("scoreboard:" + startDate);
+        total.start("crawl+persist");
 
+        // 1) 크롤링(여러 날짜)
         List<LocalDate> dates = getDatesBetweenInclusive(startDate, endDate);
-        sw.start("crawl");
         Map<LocalDate, List<KboScoreboardGame>> gamesByDate = kboScoreboardCrawler.crawlManyScoreboard(dates);
-        sw.stop();
 
-        for (Entry<LocalDate, List<KboScoreboardGame>> entry : gamesByDate.entrySet()) {
-            LocalDate date = entry.getKey();
-            List<KboScoreboardGame> games = entry.getValue();
+        // 2) 팀/구장 1회 로딩(매핑 SELECT 제거)
+        Map<String, Team> teamByShort = teamRepository.findAll().stream()
+                .collect(toMap(Team::getShortName, Function.identity()));
+        Map<String, Stadium> stadiumByLocation = stadiumRepository.findAll().stream()
+                .collect(toMap(Stadium::getLocation, Function.identity()));
 
-            sw.start("doubleHeaderOrder");
-            applyDoubleHeaderOrder(games);
-            sw.stop();
-
-            sw.start("upsertAll");
-            upsertAll(games, date);
-            sw.stop();
-
-            log.info("[SCOREBOARD] date={} phases={} total={}ms", date, sw.prettyPrint(), sw.getTotalTimeMillis());
-            ScoreboardResponse response = new ScoreboardResponse(date, games);
-            responses.add(response);
+        // 3) 더블헤더 순서 적용 + 평탄화
+        List<KboScoreboardGame> allGames = new ArrayList<>();
+        for (Map.Entry<LocalDate, List<KboScoreboardGame>> e : gamesByDate.entrySet()) {
+            applyDoubleHeaderOrder(e.getValue());
+            allGames.addAll(e.getValue());
         }
+
+        // 4) 전체를 한 번에 "행"으로 변환
+        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = new ArrayList<>(allGames.size());
+        for (KboScoreboardGame dto : allGames) {
+            Team away = teamByShort.get(dto.getAwayTeam().name());
+            Team home = teamByShort.get(dto.getHomeTeam().name());
+            Stadium stadium = stadiumByLocation.get(dto.getStadium());
+            LocalDate date = dto.getDate();
+            LocalTime startAt = parseStartAt(dto.getStartTime());
+
+            ScoreBoard h = mapper.toScoreBoard(dto.getHomeTeam());
+            ScoreBoard a = mapper.toScoreBoard(dto.getAwayTeam());
+            GameState state = mapper.toState(dto.getStatus(), h.getRuns(), a.getRuns());
+
+            String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
+
+            rows.add(new GameJdbcBatchUpsertRepository.GameUpsertRow(
+                    gameCode, stadium.getId(), home.getId(), away.getId(),
+                    date, startAt, h.getRuns(), a.getRuns(),
+                    dto.getWinningPitcher(), dto.getLosingPitcher(), state.name()
+            ));
+        }
+
+        // 5) 청크로 잘라 일괄 업서트
+        final int CHUNK = 1000;
+        int ok = 0;
+        List<Integer> failures = new ArrayList<>();
+        long begin = System.currentTimeMillis();
+        for (int i = 0; i < rows.size(); i += CHUNK) {
+            int to = Math.min(i + CHUNK, rows.size());
+            var res = batchUpsertRepository.batchUpsert(rows.subList(i, to));
+            ok += res.success();
+            if (res.hasFailures()) failures.addAll(res.failedIndices());
+        }
+        long took = System.currentTimeMillis() - begin;
+        log.info("[UPSERT-BATCH/ALL] period={}~{} rows={} success={} failed={} took={}ms",
+                startDate, endDate, rows.size(), ok, failures.size(), took);
+        if (!failures.isEmpty()) log.warn("failed indices (relative to chunks): {}", failures);
+
+        // 6) 응답은 날짜별로 묶어 내려주고 싶으면 여기서만 그룹
+        List<ScoreboardResponse> responses = new ArrayList<>();
+        gamesByDate.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(e -> responses.add(new ScoreboardResponse(e.getKey(), e.getValue())));
 
         total.stop();
         log.info("[SCOREBOARD_RANGE] {}~{} total={}ms", startDate, endDate, total.getTotalTimeMillis());
@@ -68,191 +114,58 @@ public class KboScoreboardService {
 
     @Transactional
     public ScoreboardResponse fetchScoreboard(final LocalDate date) {
-        StopWatch sw = new StopWatch("scoreboard:" + date);
-        sw.start("crawl");
         List<KboScoreboardGame> games = kboScoreboardCrawler.crawlScoreboard(date);
-        sw.stop();
-
-        sw.start("doubleHeaderOrder");
         applyDoubleHeaderOrder(games);
-        sw.stop();
+        upsertAllWithJdbcBatch(games, date);
 
-        sw.start("upsertAll");
-        upsertAll(games, date);
-        sw.stop();
-
-        log.info("[SCOREBOARD] date={} phases={} total={}ms", date, sw.prettyPrint(), sw.getTotalTimeMillis());
         return new ScoreboardResponse(date, games);
     }
 
-    private List<Game> upsertAll(final List<KboScoreboardGame> list, final LocalDate date) {
+    private void upsertAllWithJdbcBatch(List<KboScoreboardGame> list, LocalDate date) {
         if (list == null || list.isEmpty()) {
-            return List.of();
+            return;
         }
 
-        StopWatch sw = new StopWatch("upsertAll:" + date);
-        List<Game> saved = new ArrayList<>(list.size());
+        Map<String, Team> teamByShort = teamRepository.findAll().stream()
+                .collect(toMap(Team::getShortName, Function.identity()));
 
-        sw.start("persist");
+        Map<String, Stadium> stadiumByLocation = stadiumRepository.findAll().stream()
+                .collect(toMap(Stadium::getLocation, Function.identity()));
+
+        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = new ArrayList<>(list.size());
         for (KboScoreboardGame dto : list) {
-            saved.add(upsertOne(dto, date));
+            Team away = teamByShort.get(dto.getAwayTeam().name());
+            Team home = teamByShort.get(dto.getHomeTeam().name());
+            Stadium stadium = stadiumByLocation.get(dto.getStadium());
+
+            LocalTime startAt = parseStartAt(dto.getStartTime());
+            String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
+
+            ScoreBoard h = mapper.toScoreBoard(dto.getHomeTeam());
+            ScoreBoard a = mapper.toScoreBoard(dto.getAwayTeam());
+            GameState state = mapper.toState(dto.getStatus(), h.getRuns(), a.getRuns());
+
+            rows.add(new GameJdbcBatchUpsertRepository.GameUpsertRow(
+                    gameCode,
+                    stadium.getId(),
+                    home.getId(),
+                    away.getId(),
+                    date,
+                    startAt,
+                    h.getRuns(),
+                    a.getRuns(),
+                    dto.getWinningPitcher(),
+                    dto.getLosingPitcher(),
+                    state.name()
+            ));
         }
-        sw.stop();
 
-        log.info("[UPSERT] date={} phases={} total={}ms size={}", date, sw.prettyPrint(), sw.getTotalTimeMillis(),
-                list.size());
-        return saved;
-    }
-
-//    private Game upsertOne(KboScoreboardGame dto, final LocalDate date) {
-//        final String gameKeyForLog = dto.getDate() + "|" + dto.getHomeTeam().name() + " vs " + dto.getAwayTeam().name();
-//
-//        StopWatch sw = new StopWatch("upsertOne:" + date);
-//        Game result;
-//
-//        // 1) 매핑
-//        sw.start("mapping");
-//        Team awayTeam = mapper.resolveTeamFromShortName(dto.getAwayTeam().name());
-//        Team homeTeam = mapper.resolveTeamFromShortName(dto.getHomeTeam().name());
-//        Stadium stadium = mapper.resolveStadium(dto.getStadium());
-//        LocalTime startAt = parseStartAt(dto.getStartTime());
-//
-//        ScoreBoard awaySb = mapper.toScoreBoard(dto.getAwayTeam());
-//        ScoreBoard homeSb = mapper.toScoreBoard(dto.getHomeTeam());
-//        GameState state = mapper.toState(dto.getStatus(), homeSb.getRuns(), awaySb.getRuns());
-//        int headerOrder = dto.getDoubleHeaderGameOrder();
-//        sw.stop(); // mapping
-//
-//        // 2) 조회 (자연키 or gameCode)
-//        sw.start("repo.find");
-//        Optional<Game> found = gameRepository.findByNaturalKey(
-//                date, homeTeam.getTeamCode(), awayTeam.getTeamCode(), startAt
-//        );
-//        sw.stop(); // repo.find
-//
-//        if (found.isPresent()) {
-//            Game existing = found.get();
-//
-//            // 3-a) 메모리 내 갱신
-//            sw.start("update.fields");
-//            existing.updateSchedule(stadium, homeTeam, awayTeam, date, startAt, state);
-//            if (state != GameState.SCHEDULED) {
-//                existing.updateScoreBoard(homeSb, awaySb, dto.getWinningPitcher(), dto.getLosingPitcher());
-//            }
-//            existing.updateGameState(state);
-//            sw.stop(); // update.fields
-//
-//            // 4-a) 저장 (save는 merge가 아니라 dirty checking으로 넘어갈 수 있으니 flush로 실제 시간 측정)
-//            sw.start("repo.save(existing)");
-//            // save 호출이 불필요해도 호출해 둬도 무해(JPA 구현에 따라 no-op일 수 있음)
-//            gameRepository.save(existing);
-//            sw.stop(); // repo.save(existing)
-//
-//            sw.start("repo.flush(existing)");
-//            // 실제 DB 왕복/쓰기 시간 강제 측정
-//            gameRepository.flush();
-//            sw.stop(); // repo.flush(existing)
-//
-//            result = existing;
-//        } else {
-//            // 3-b) 신규 생성
-//            sw.start("create.entity");
-//            String gameCode = generateGameCode(date, homeTeam, awayTeam, headerOrder);
-//            Game created = new Game(
-//                    stadium,
-//                    homeTeam,
-//                    awayTeam,
-//                    date,
-//                    startAt,
-//                    gameCode,
-//                    homeSb.getRuns(),
-//                    awaySb.getRuns(),
-//                    homeSb,
-//                    awaySb,
-//                    dto.getWinningPitcher(),
-//                    dto.getLosingPitcher(),
-//                    state
-//            );
-//            sw.stop(); // create.entity
-//
-//            // 4-b) 저장/flush
-//            sw.start("repo.save(new)");
-//            Game saved = gameRepository.save(created);
-//            sw.stop(); // repo.save(new)
-//
-//            sw.start("repo.flush(new)");
-//            gameRepository.flush();
-//            sw.stop(); // repo.flush(new)
-//
-//            result = saved;
-//        }
-//
-//        // 최종 로그
-//        log.info("[UPSERT_ONE] key={} status={} total={}ms phases={}",
-//                gameKeyForLog,
-//                (found.isPresent() ? "UPDATE" : "CREATE"),
-//                sw.getTotalTimeMillis(),
-//                sw.prettyPrint());
-//
-//        return result;
-//    }
-
-    private Game upsertOne(KboScoreboardGame dto, final LocalDate date) {
-        StopWatch sw = new StopWatch("upsertOne:" + date);
-        // 1) 매핑
-        sw.start("mapping");
-        Team awayTeam = mapper.resolveTeamFromShortName(dto.getAwayTeam().name());
-        Team homeTeam = mapper.resolveTeamFromShortName(dto.getHomeTeam().name());
-        log.info("날짜: {}, {} vs {}", date, awayTeam.getName(), homeTeam.getName());
-
-        Stadium stadium = mapper.resolveStadium(dto.getStadium());
-        LocalTime startAt = parseStartAt(dto.getStartTime());
-
-        ScoreBoard awaySb = mapper.toScoreBoard(dto.getAwayTeam());
-        ScoreBoard homeSb = mapper.toScoreBoard(dto.getHomeTeam());
-        GameState state = mapper.toState(dto.getStatus(), homeSb.getRuns(), awaySb.getRuns());
-        int headerOrder = dto.getDoubleHeaderGameOrder();
-        sw.stop();
-
-        // 2) upsert by gameCode
-        Game game = gameRepository.findByNaturalKey(date, homeTeam.getTeamCode(), awayTeam.getTeamCode(), startAt)
-                .map(existing -> {
-                    sw.start("upsert when existing");
-                    // 스케줄 정보 갱신(시간/구장 바뀔 수 있음)
-                    existing.updateSchedule(stadium, homeTeam, awayTeam, date, startAt, state);
-
-                    // 스코어/투수 갱신(경기 전이면 점수보드가 0일 수 있으므로 상태 보고 반영)
-                    if (state != GameState.SCHEDULED) {
-                        existing.updateScoreBoard(homeSb, awaySb, dto.getWinningPitcher(), dto.getLosingPitcher());
-                    }
-                    // 상태 최종 보정
-                    existing.updateGameState(state);
-                    sw.stop();
-                    return existing;
-                })
-                .orElseGet(() -> {
-                    // 신규 생성
-                    sw.start("upsert when create");
-                    String gameCode = generateGameCode(date, homeTeam, awayTeam, headerOrder);
-                    sw.stop();
-                    return gameRepository.save(new Game(
-                            stadium,
-                            homeTeam,
-                            awayTeam,
-                            date,
-                            startAt,
-                            gameCode,
-                            homeSb.getRuns(),
-                            awaySb.getRuns(),
-                            homeSb,
-                            awaySb,
-                            dto.getWinningPitcher(),
-                            dto.getLosingPitcher(),
-                            state
-                    ));
-                });
-
-        return game;
+        BatchResult batchResult = batchUpsertRepository.batchUpsert(rows);
+        log.info("[UPSERT-BATCH] date={} size={} success={} failed={} took={}ms",
+                date, rows.size(), batchResult.success(), batchResult.failedIndices().size(), batchResult.tookMs());
+        if (batchResult.hasFailures()) {
+            log.warn("[UPSERT-BATCH] failed indices: {}", batchResult.failedIndices());
+        }
     }
 
     private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,

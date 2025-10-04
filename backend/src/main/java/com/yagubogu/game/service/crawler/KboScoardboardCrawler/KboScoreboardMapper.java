@@ -3,6 +3,7 @@ package com.yagubogu.game.service.crawler.KboScoardboardCrawler;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboScoreboardTeam;
+import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -20,15 +21,15 @@ class KboScoreboardMapper {
 
     Team resolveTeamFromShortName(String shortName) {
         return teamRepository.findByShortName(shortName)
-                .orElseThrow(() -> new IllegalArgumentException("팀 매핑 실패: " + shortName));
+                .orElseThrow(() -> new NotFoundException("팀 매핑 실패: " + shortName));
     }
 
     Stadium resolveStadium(String stadiumText) {
         if (stadiumText != null && !stadiumText.isBlank()) {
             return stadiumRepository.findByLocation(stadiumText.trim())
-                    .orElseThrow(() -> new IllegalArgumentException("구장(단축명) 매핑 실패: " + stadiumText));
+                    .orElseThrow(() -> new NotFoundException("구장(단축명) 매핑 실패: " + stadiumText));
         }
-        throw new IllegalArgumentException("구장 정보가 비어있습니다.");
+        throw new NotFoundException("구장 정보가 비어있습니다.");
     }
 
     ScoreBoard toScoreBoard(KboScoreboardTeam t) {
