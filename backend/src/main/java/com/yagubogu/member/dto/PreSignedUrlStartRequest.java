@@ -1,6 +1,6 @@
 package com.yagubogu.member.dto;
 
-public record PreSignedUrlRequest(
+public record PreSignedUrlStartRequest(
         String contentType,
         long contentLength
 ) {

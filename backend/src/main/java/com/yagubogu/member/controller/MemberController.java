@@ -8,8 +8,10 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.member.dto.PreSignedUrlRequest;
-import com.yagubogu.member.dto.PresignedUrlResponse;
+import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
+import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
+import com.yagubogu.member.dto.PreSignedUrlStartRequest;
+import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import com.yagubogu.member.service.MemberService;
 import com.yagubogu.member.service.ProfileImageService;
 import lombok.RequiredArgsConstructor;
@@ -78,10 +80,18 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<PresignedUrlResponse> start(
-            @RequestBody final PreSignedUrlRequest preSignedUrlRequest
+    public ResponseEntity<PresignedUrlStartResponse> start(
+            @RequestBody final PreSignedUrlStartRequest request
     ) {
-        PresignedUrlResponse response = profileImageService.issuePreSignedUrl(preSignedUrlRequest);
+        PresignedUrlStartResponse response = profileImageService.issuePreSignedUrl(request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<PreSignedUrlCompleteResponse> complete(
+            @RequestBody final PreSignedUrlCompleteRequest request
+    ) {
+        PreSignedUrlCompleteResponse response = profileImageService.completeUpload(request);
 
         return ResponseEntity.ok(response);
     }

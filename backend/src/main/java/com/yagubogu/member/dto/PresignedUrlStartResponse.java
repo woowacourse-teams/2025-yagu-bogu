@@ -1,6 +1,6 @@
 package com.yagubogu.member.dto;
 
-public record PresignedUrlResponse(
+public record PresignedUrlStartResponse(
         String key,
         String url
 ) {

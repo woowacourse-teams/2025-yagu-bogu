@@ -1,8 +1,10 @@
 package com.yagubogu.member.service;
 
 import com.yagubogu.global.exception.PayloadTooLargeException;
-import com.yagubogu.member.dto.PreSignedUrlRequest;
-import com.yagubogu.member.dto.PresignedUrlResponse;
+import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
+import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
+import com.yagubogu.member.dto.PreSignedUrlStartRequest;
+import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,27 +27,32 @@ public class ProfileImageService {
     @Value("${app.s3.bucket}")
     String bucket;
 
-    public PresignedUrlResponse issuePreSignedUrl(PreSignedUrlRequest preSignedUrlRequest) {
-        validateContentLength(preSignedUrlRequest);
+    public PresignedUrlStartResponse issuePreSignedUrl(PreSignedUrlStartRequest preSignedUrlStartRequest) {
+        validateContentLength(preSignedUrlStartRequest);
         String uniqueFileName = UUID.randomUUID().toString();
         String key = "yagubogu/images/profiles/" + uniqueFileName;
 
         PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-                .contentType(preSignedUrlRequest.contentType())
+                .contentType(preSignedUrlStartRequest.contentType())
                 .build();
 
         PresignedPutObjectRequest presigned = presigner.presignPutObject(b -> b
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(putReq));
 
-        return new PresignedUrlResponse(key, presigned.url().toString());
+        return new PresignedUrlStartResponse(key, presigned.url().toString());
     }
 
-    private void validateContentLength(final PreSignedUrlRequest preSignedUrlRequest) {
-        if (preSignedUrlRequest.contentLength() > MAX_FILE_SIZE) {
-            throw new PayloadTooLargeException("Content length is too large: " + preSignedUrlRequest.contentLength());
+    public PreSignedUrlCompleteResponse completeUpload(final PreSignedUrlCompleteRequest request) {
+
+    }
+
+    private void validateContentLength(final PreSignedUrlStartRequest preSignedUrlStartRequest) {
+        if (preSignedUrlStartRequest.contentLength() > MAX_FILE_SIZE) {
+            throw new PayloadTooLargeException(
+                    "Content length is too large: " + preSignedUrlStartRequest.contentLength());
         }
     }
 }

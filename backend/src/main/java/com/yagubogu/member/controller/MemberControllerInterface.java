@@ -6,8 +6,8 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.member.dto.PreSignedUrlRequest;
-import com.yagubogu.member.dto.PresignedUrlResponse;
+import com.yagubogu.member.dto.PreSignedUrlStartRequest;
+import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -83,7 +83,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
     })
     @PostMapping("/me/profile-image/pre-signed")
-    ResponseEntity<PresignedUrlResponse> start(
-            @RequestBody final PreSignedUrlRequest preSignedUrlRequest
+    ResponseEntity<PresignedUrlStartResponse> start(
+            @RequestBody final PreSignedUrlStartRequest preSignedUrlStartRequest
     );
 }
