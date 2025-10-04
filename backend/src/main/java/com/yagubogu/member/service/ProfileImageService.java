@@ -10,7 +10,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -23,9 +22,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 public class ProfileImageService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
-    public static final String IMAGES_PROFILES_PREFIX = "yagubogu/images/profiles/";
+    private static final String IMAGES_PROFILES_PREFIX = "yagubogu/images/profiles/";
 
-    private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
     @Value("${app.s3.bucket}")
@@ -40,6 +38,7 @@ public class ProfileImageService {
                 .bucket(bucket)
                 .key(key)
                 .contentType(preSignedUrlStartRequest.contentType())
+                .contentLength(preSignedUrlStartRequest.contentLength())
                 .build();
 
         PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(b -> b
@@ -68,7 +67,8 @@ public class ProfileImageService {
     private void validateContentLength(final PreSignedUrlStartRequest preSignedUrlStartRequest) {
         if (preSignedUrlStartRequest.contentLength() > MAX_FILE_SIZE) {
             throw new PayloadTooLargeException(
-                    "Content length is too large: " + preSignedUrlStartRequest.contentLength());
+                    "Content length is too large: " + preSignedUrlStartRequest.contentLength()
+            );
         }
     }
 }
