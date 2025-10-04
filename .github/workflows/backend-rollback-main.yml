@@ -28,42 +28,15 @@ jobs:
           set -euo pipefail
           INPUT='${{ github.event.inputs.version }}'
 
-          # v 접두사 정규화
-          if [[ "$INPUT" =~ ^v ]]; then
-            V="$INPUT"
-            P="${INPUT#v}"
-          else
-            P="$INPUT"
-            V="v$INPUT"
-          fi
+          # Docker Registry에서만 입력받은 태그로 다이제스트를 조회합니다.
+          DIGEST="$(docker buildx imagetools inspect "$IMAGE:$INPUT" \
+            | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
 
-          LOG="/var/log/yagubogu/deployments.log"
-
-          # 1) 운영 로그에서 다이제스트 우선 검색 (최근 행 우선)
-          DIGEST=""
-          if sudo test -f "$LOG"; then
-            # release/alias/전달 포맷 모두 수용
-            DIGEST="$(sudo tac "$LOG" | awk -v v="$V" -v p="$P" '
-              tolower($0) ~ ("release=" v) || tolower($0) ~ ("version=" p) {
-                for (i=1; i<=NF; i++) if ($i ~ /^digest=/) { sub(/^digest=/,"",$i); print $i; exit }
-              }')"
-          fi
-
-          # 2) 로그에 없으면 레지스트리 태그 조회 (vX.Y.Z 우선, 실패 시 X.Y.Z도 시도)
-          if [ -z "${DIGEST:-}" ]; then
-            for TAG in "$V" "$P"; do
-              if docker buildx imagetools inspect "$IMAGE:$TAG" >/dev/null 2>&1; then
-                DIGEST="$(docker buildx imagetools inspect "$IMAGE:$TAG" \
-                  | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
-                [ -n "$DIGEST" ] && break
-              fi
-            done
-          fi
-
-          [ -n "${DIGEST:-}" ] || { echo "해당 버전의 다이제스트를 찾을 수 없음: $INPUT" >&2; exit 1; }
+          # 다이제스트를 찾지 못했으면 워크플로우를 실패 처리합니다.
+          [ -n "${DIGEST:-}" ] || { echo "해당 버전('$INPUT')의 다이제스트를 Docker Registry에서 찾을 수 없음" >&2; exit 1; }
+          
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-          echo "VER=$V" >> "$GITHUB_OUTPUT"
-          echo "Resolved digest: $DIGEST (input=$INPUT)"
+          echo "Resolved digest: $DIGEST from registry (input=$INPUT)"
 
       - name: Pull image
         run: docker pull $IMAGE@${{ steps.digest.outputs.digest }}
@@ -106,11 +79,22 @@ jobs:
             -l release.digest="$DIGEST" \
             "$IMAGE@$DIGEST"
 
+          # Health check (exit if failed)
+          sleep 10;
+          healthy=false
           for i in {1..30}; do
             if curl -fsS "http://127.0.0.1:$PORT/actuator/health" >/dev/null; then
-              echo "healthy"; break; fi
-            echo "waiting ($i/30)"; sleep 2
+              echo "NEW healthy"; healthy=true; break;
+            fi
+            echo "waiting health... ($i/30)"; sleep 2
           done
+          
+          if [ "$healthy" != true ]; then
+            echo "Health check failed after 30 attempts. Aborting deploy." >&2
+            docker logs "$INACTIVE" || true
+            docker rm -f "$INACTIVE" || true
+            exit 1
+          fi
 
           if [ "$COLOR" = "blue" ]; then
             TARGET="/etc/nginx/sites-available/yagubogu-blue.conf"
