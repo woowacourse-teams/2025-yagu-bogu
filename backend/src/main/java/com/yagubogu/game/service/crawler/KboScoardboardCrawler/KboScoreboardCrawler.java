@@ -21,10 +21,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 
+@Slf4j
 @RequiredArgsConstructor
 public class KboScoreboardCrawler {
 
@@ -45,7 +47,7 @@ public class KboScoreboardCrawler {
         return crawlScoreboard(date, DEFAULT_LOGGER);
     }
 
-    public List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
+    private List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
         StopWatch sw = new StopWatch("crawl:" + date);
         Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
         String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
@@ -87,6 +89,27 @@ public class KboScoreboardCrawler {
         }
 
         return List.of();
+    }
+
+    public Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
+        Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
+        if (dates == null || dates.isEmpty()) return result;
+
+        Page page = null;
+        try {
+            page = pwManager.acquirePage();
+            page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
+
+            for (LocalDate date : dates) {
+                log.debug("조회 날짜: {}", date);
+                navigateToDateUsingCalendar(page, date, waitTimeout);
+                List<KboScoreboardGame> games = extractScoreboards(page, DEFAULT_LOGGER, date);
+                result.put(date, games);
+            }
+            return result;
+        } finally {
+            if (page != null) pwManager.releasePage(page);
+        }
     }
 
     private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate,
