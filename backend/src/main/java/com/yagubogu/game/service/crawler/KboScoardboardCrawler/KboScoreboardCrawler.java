@@ -1,16 +1,14 @@
 package com.yagubogu.game.service.crawler.KboScoardboardCrawler;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.SelectOption;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.yagubogu.game.dto.KboScoreboardGame;
 import com.yagubogu.game.dto.KboScoreboardTeam;
 import com.yagubogu.game.dto.Pitcher;
+import com.yagubogu.game.service.crawler.manager.PlaywrightManager;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,14 +16,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
+@RequiredArgsConstructor
 public class KboScoreboardCrawler {
 
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KboScoreboardCrawler.class);
@@ -36,54 +36,56 @@ public class KboScoreboardCrawler {
             Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
 
     private final Duration navigationTimeout;
+    private final Duration waitTimeout;
     private final int maxRetries;
     private final Duration retryDelay;
-    private final Duration waitTimeout;
-
-    public KboScoreboardCrawler(final Duration navigationTimeout,
-                                final Duration waitTimeout,
-                                final int maxRetries,
-                                final Duration retryDelay) {
-        this.navigationTimeout = Objects.requireNonNull(navigationTimeout, "navigationTimeout");
-        this.waitTimeout = Objects.requireNonNull(waitTimeout, "waitTimeout");
-        this.maxRetries = maxRetries;
-        this.retryDelay = Objects.requireNonNull(retryDelay, "retryDelay");
-    }
+    private final PlaywrightManager pwManager;
 
     public List<KboScoreboardGame> crawlScoreboard(final LocalDate date) {
         return crawlScoreboard(date, DEFAULT_LOGGER);
     }
 
     public List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
+        StopWatch sw = new StopWatch("crawl:" + date);
         Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
         String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
 
         log.info("{} 스코어보드 크롤링 시작", formattedRequestDate);
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try (Playwright playwright = Playwright.create();
-                 Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true))) {
-                Page page = browser.newPage();
+            Page page = null;
+            try {
+                sw.start("navigate");
+                page = pwManager.acquirePage();
                 page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
+                sw.stop();
 
+                sw.start("calendarNav");
                 navigateToDateUsingCalendar(page, date, waitTimeout);
+                sw.stop();
 
-                if (!waitForScoreboardsOrSkip(page, waitTimeout, log, date)) {
-                    return List.of();
-                }
-
+                sw.start("extract");
                 List<KboScoreboardGame> games = extractScoreboards(page, log, date);
+                sw.stop();
+
+                log.info("[UPSERT] date={} phases={} total={}ms size={}", date, sw.prettyPrint(),
+                        sw.getTotalTimeMillis(), games.size());
                 log.info("{} 스코어보드 크롤링 완료 ({}경기)", formattedRequestDate, games.size());
+                pwManager.releasePage(page);
+
                 return games;
             } catch (PlaywrightException exception) {
-                log.error("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
+                log.warn("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
+                if (page != null) {
+                    pwManager.releasePage(page);
+                }
                 if (attempt == maxRetries) {
+                    log.info("[CRAWL_EMPTY] date={} 데이터 없음(타임아웃/무경기 등).", date);
                     break;
                 }
                 sleep(retryDelay);
             }
         }
 
-        log.warn("{} 스코어보드 데이터를 가져오지 못했습니다.", formattedRequestDate);
         return List.of();
     }
 
@@ -99,13 +101,8 @@ public class KboScoreboardCrawler {
         // 2) 연/월 선택 (월은 0-based)
         String year = String.valueOf(targetDate.getYear());
         String monthZeroBased = String.valueOf(targetDate.getMonthValue() - 1);
-
-        // 연도 먼저
-        page.selectOption(".ui-datepicker-year",
-                new SelectOption().setValue(year));
-        // 월 다음
-        page.selectOption(".ui-datepicker-month",
-                new SelectOption().setValue(monthZeroBased));
+        page.selectOption(".ui-datepicker-year", new SelectOption().setValue(year));
+        page.selectOption(".ui-datepicker-month", new SelectOption().setValue(monthZeroBased));
 
         // 3) 일자 클릭 (다른 달 날짜 제외)
         String day = String.valueOf(targetDate.getDayOfMonth());
@@ -132,27 +129,22 @@ public class KboScoreboardCrawler {
     }
 
     private boolean waitForScoreboardsOrSkip(final Page page,
-                                             final Duration timeout,
-                                             final Logger log,
-                                             final LocalDate date) {
+                                             final Duration timeout) {
         try {
             page.waitForSelector(".smsScore",
-                    new Page.WaitForSelectorOptions()
-                            .setTimeout(timeout.toMillis())
+                    new Page.WaitForSelectorOptions().setTimeout(timeout.toMillis())
                             .setState(WaitForSelectorState.ATTACHED));
-            return true; // 스코어보드 있음
-        } catch (PlaywrightException e) {
-            String msg = e.getMessage();
-            if (msg != null && msg.contains("Timeout")) {
-                log.info("[AUTO] {} 스코어보드 데이터 없음(휴식/우천/미개최 등), 스킵",
-                        REQUEST_DATE_FORMAT.format(date));
-                return false;
-            }
-            throw e; // 다른 오류는 그대로 던짐
+            return true;
+        } catch (PlaywrightException ignore) {
+            return false;
         }
     }
 
     private List<KboScoreboardGame> extractScoreboards(final Page page, final Logger logger, final LocalDate date) {
+        if (!waitForScoreboardsOrSkip(page, waitTimeout)) {
+            return List.of();
+        }
+
         List<ElementHandle> scoreboards = page.querySelectorAll(".smsScore");
         if (scoreboards.isEmpty()) {
             logger.info("스코어보드가 존재하지 않습니다.");
@@ -189,7 +181,7 @@ public class KboScoreboardCrawler {
         String gameId = extractGameId(boxScoreUrl);
 
         ElementHandle table = scoreboard.querySelector("table.tScore");
-        Map<String, KboScoreboardTeam> tableScores = parseTableScores(table, logger);
+        Map<String, KboScoreboardTeam> tableScores = parseTableScores(table);
 
         KboScoreboardTeam awayTeam = mergeTeamData(awayName, awayScore, tableScores);
         KboScoreboardTeam homeTeam = mergeTeamData(homeName, homeScore, tableScores);
@@ -218,8 +210,7 @@ public class KboScoreboardCrawler {
         ));
     }
 
-    private Map<String, KboScoreboardTeam> parseTableScores(final ElementHandle table,
-                                                            final Logger logger) {
+    private Map<String, KboScoreboardTeam> parseTableScores(final ElementHandle table) {
         Map<String, KboScoreboardTeam> scores = new LinkedHashMap<>();
         if (table == null) {
             return scores;
@@ -378,35 +369,32 @@ public class KboScoreboardCrawler {
         return substring;
     }
 
-    private String emptyToNull(final String value) {
-        if (value == null) {
+    private String emptyToNull(final String v) {
+        if (v == null) {
             return null;
         }
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
+        String t = v.trim();
+        return t.isEmpty() ? null : t;
     }
 
     private Pitcher parsePitcher(ElementHandle scoreboard) {
         String win = null, save = null, lose = null;
-
         try {
             ElementHandle container = scoreboard.querySelector(".score_wrap p.win");
             if (container != null) {
-                List<ElementHandle> spans = container.querySelectorAll("span");
-                for (ElementHandle s : spans) {
+                for (ElementHandle s : container.querySelectorAll("span")) {
                     String raw = s.innerText();
                     if (raw == null || raw.isBlank()) {
                         continue;
                     }
-                    raw = raw.replace('\u00A0', ' ').trim(); // nbsp 정리
+                    raw = raw.replace('\u00A0', ' ').trim();
                     Matcher m = LABELED.matcher(raw);
                     if (!m.find()) {
                         continue;
                     }
 
-                    String label = m.group(1);   // 승 | 세 | 패
+                    String label = m.group(1); // 승|세|패
                     String name = m.group(2).trim();
-
                     if (name.isEmpty() || "-".equals(name)) {
                         continue;
                     }
@@ -420,7 +408,6 @@ public class KboScoreboardCrawler {
             }
         } catch (PlaywrightException ignored) {
         }
-
         return new Pitcher(win, save, lose);
     }
 }

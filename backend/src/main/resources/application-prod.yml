@@ -20,12 +20,13 @@ spring:
     enabled: true
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
-
+  endpoints.web.exposure.include: health,metrics,prometheus
   metrics:
+    distribution:
+      percentiles:
+        all: 0.5,0.9,0.95,0.99
+      percentiles-histogram:
+        http.server.requests: true
     tags:
       app: yagubogu
       env: prod

@@ -10,6 +10,7 @@ import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.TeamWinRateService;
+import io.micrometer.core.annotation.Timed;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,8 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     private final TeamWinRateService teamWinRateService;
     private final KboScoreboardService kboScoreboardService;
 
+    @Override
+    @Timed(value = "api.schedule.range", description = "스케줄 범위 호출 지연")
     public ResponseEntity<ScheduleResponse> fetchScheduleRange(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
@@ -38,6 +41,7 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
+    @Timed(value = "api.team.winrates", description = "팀 승률 호출 지연")
     public ResponseEntity<TeamWinRateResponse> fetchTeamWinRates(
             @RequestParam(defaultValue = "REGULAR") final SeriesType seriesType
     ) {
@@ -46,6 +50,7 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
+    @Timed(value = "api.scoreboard.one", description = "단일 날짜 스코어보드 호출 지연")
     public ResponseEntity<ScoreboardResponse> fetchScoreboard(
             @RequestParam @DateTimeFormat(iso = DATE) final LocalDate date
     ) {
@@ -54,9 +59,10 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
+    @Timed(value = "api.scoreboard.range", description = "범위 스코어보드 호출 지연")
     public ResponseEntity<List<ScoreboardResponse>> fetchScoreboardRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate
     ) {
         List<ScoreboardResponse> responses = kboScoreboardService.fetchScoreboardRange(startDate, endDate);
         return ResponseEntity.ok(responses);
