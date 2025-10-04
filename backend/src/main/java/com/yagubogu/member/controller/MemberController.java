@@ -8,7 +8,10 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.PreSignedUrlRequest;
+import com.yagubogu.member.dto.PresignedUrlResponse;
 import com.yagubogu.member.service.MemberService;
+import com.yagubogu.member.service.ProfileImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +24,7 @@ public class MemberController implements MemberControllerInterface {
 
     private final MemberService memberService;
     private final AuthService authService;
+    private final ProfileImageService profileImageService;
 
     public ResponseEntity<MemberNicknameResponse> patchNickname(
             @RequestBody final MemberNicknameRequest request,
@@ -72,5 +76,12 @@ public class MemberController implements MemberControllerInterface {
         MemberFavoriteResponse response = memberService.updateFavorite(memberClaims.id(), memberFavoriteRequest);
 
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<Void> start(
+            final MemberClaims memberClaims,
+            final PreSignedUrlRequest preSignedUrlRequest
+    ) {
+        PresignedUrlResponse response = profileImageService.issuePreSignedUrl(preSignedUrlRequest);
     }
 }

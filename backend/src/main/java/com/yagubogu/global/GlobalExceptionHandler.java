@@ -5,6 +5,7 @@ import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.global.exception.YaguBoguException;
@@ -87,6 +88,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleConflictException(final ConflictException e) {
         log.info("[ConflictException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 413 Payload Too Large
+     */
+    @ExceptionHandler(value = PayloadTooLargeException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ExceptionResponse handlePayloadTooLarge(final PayloadTooLargeException e) {
+        log.info("[PayloadTooLargeException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }

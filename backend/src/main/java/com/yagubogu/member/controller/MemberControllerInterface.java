@@ -15,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member", description = "회원 관련 API")
 @RequestMapping("/api/members")
@@ -73,5 +75,15 @@ public interface MemberControllerInterface {
     ResponseEntity<MemberFavoriteResponse> patchFavorites(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody MemberFavoriteRequest request
+    );
+
+    @Operation(summary = "pre-signed url 조회", description = "프로필 사진 저장을 위한 url 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
+    })
+    @PostMapping("/me/profile-image/pre-signed")
+    ResponseEntity<Void> start(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam int partCount
     );
 }
