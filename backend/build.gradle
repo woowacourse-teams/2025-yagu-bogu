@@ -39,7 +39,6 @@ dependencies {
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'software.amazon.awssdk:s3:2.34.8'
-    implementation 'software.amazon.awssdk:s3-presigner:2.25.60'
 
     compileOnly 'org.projectlombok:lombok'
 

@@ -18,16 +18,17 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 public class ProfileImageService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+
     private final S3Client s3Client;
     private final S3Presigner presigner;
+
     @Value("${app.s3.bucket}")
     String bucket;
-
 
     public PresignedUrlResponse issuePreSignedUrl(PreSignedUrlRequest preSignedUrlRequest) {
         validateContentLength(preSignedUrlRequest);
         String uniqueFileName = UUID.randomUUID().toString();
-        String key = "images/profile/" + uniqueFileName;
+        String key = "yagubogu/images/profile/" + uniqueFileName;
 
         PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(bucket)

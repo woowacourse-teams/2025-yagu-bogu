@@ -78,10 +78,11 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<Void> start(
-            final MemberClaims memberClaims,
-            final PreSignedUrlRequest preSignedUrlRequest
+    public ResponseEntity<PresignedUrlResponse> start(
+            @RequestBody final PreSignedUrlRequest preSignedUrlRequest
     ) {
         PresignedUrlResponse response = profileImageService.issuePreSignedUrl(preSignedUrlRequest);
+
+        return ResponseEntity.ok(response);
     }
 }
