@@ -6,6 +6,8 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
+import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
 import com.yagubogu.member.dto.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,8 +84,17 @@ public interface MemberControllerInterface {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
     })
-    @PostMapping("/me/profile-image/pre-signed")
+    @PostMapping("/me/profile-image/pre-signed/start")
     ResponseEntity<PresignedUrlStartResponse> start(
-            @RequestBody final PreSignedUrlStartRequest preSignedUrlStartRequest
+            @RequestBody PreSignedUrlStartRequest preSignedUrlStartRequest
+    );
+
+    @Operation(summary = "pre-signed url 업로드 확인", description = "프로필 사진 저장을 완료하고 회원의 프로필 사진으로 저장합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
+    })
+    @PostMapping("/me/profile-image/pre-signed/complete")
+    ResponseEntity<PreSignedUrlCompleteResponse> complete(
+            @RequestBody PreSignedUrlCompleteRequest preSignedUrlCompleteRequest
     );
 }
