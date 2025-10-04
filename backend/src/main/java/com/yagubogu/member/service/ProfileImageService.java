@@ -28,7 +28,7 @@ public class ProfileImageService {
     public PresignedUrlResponse issuePreSignedUrl(PreSignedUrlRequest preSignedUrlRequest) {
         validateContentLength(preSignedUrlRequest);
         String uniqueFileName = UUID.randomUUID().toString();
-        String key = "yagubogu/images/profile/" + uniqueFileName;
+        String key = "yagubogu/images/profiles/" + uniqueFileName;
 
         PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(bucket)
