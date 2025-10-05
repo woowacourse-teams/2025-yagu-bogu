@@ -1,30 +1,36 @@
 package com.yagubogu.member.service;
 
 import com.yagubogu.global.exception.PayloadTooLargeException;
+import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
 import com.yagubogu.member.dto.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.PresignedUrlStartResponse;
+import com.yagubogu.member.repository.MemberRepository;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
-@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
 public class ProfileImageService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
     private static final String IMAGES_PROFILES_PREFIX = "yagubogu/images/profiles/";
 
     private final S3Presigner s3Presigner;
+    private final S3Client s3Client;
+    private final MemberRepository memberRepository;
 
     @Value("${app.s3.bucket}")
     String bucket;
@@ -48,20 +54,35 @@ public class ProfileImageService {
         return new PresignedUrlStartResponse(key, presigned.url().toString());
     }
 
-    public PreSignedUrlCompleteResponse completeUpload(final PreSignedUrlCompleteRequest request) {
+    @Transactional
+    public PreSignedUrlCompleteResponse completeUpload(
+            final Long memberId,
+            final PreSignedUrlCompleteRequest request
+    ) {
+        String key = request.key();
+
+        String objectUrl = s3Client.utilities()
+                .getUrl(b -> b.bucket(bucket).key(key))
+                .toExternalForm();
+
+        Member member = getMember(memberId);
+        member.updateImageUrl(objectUrl);
+
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(request.key())
+                .key(key)
                 .build();
 
-        GetObjectPresignRequest presigner = GetObjectPresignRequest.builder()
+        PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(b -> b
                 .signatureDuration(Duration.ofMinutes(10))
-                .getObjectRequest(getObjectRequest)
-                .build();
-
-        PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(presigner);
+                .getObjectRequest(getObjectRequest));
 
         return new PreSignedUrlCompleteResponse(presigned.url().toString());
+    }
+
+    private Member getMember(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
     }
 
     private void validateContentLength(final PreSignedUrlStartRequest preSignedUrlStartRequest) {

@@ -94,7 +94,8 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
     })
     @PostMapping("/me/profile-image/pre-signed/complete")
-    ResponseEntity<PreSignedUrlCompleteResponse> complete(
+    ResponseEntity<PreSignedUrlCompleteResponse> completeAndUpdate(
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody PreSignedUrlCompleteRequest preSignedUrlCompleteRequest
     );
 }

@@ -88,10 +88,11 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<PreSignedUrlCompleteResponse> complete(
+    public ResponseEntity<PreSignedUrlCompleteResponse> completeAndUpdate(
+            final MemberClaims memberClaims,
             @RequestBody final PreSignedUrlCompleteRequest request
     ) {
-        PreSignedUrlCompleteResponse response = profileImageService.completeUpload(request);
+        PreSignedUrlCompleteResponse response = profileImageService.completeUpload(memberClaims.id(), request);
 
         return ResponseEntity.ok(response);
     }
