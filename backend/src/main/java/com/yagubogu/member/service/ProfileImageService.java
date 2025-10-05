@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 @RequiredArgsConstructor
@@ -68,16 +66,7 @@ public class ProfileImageService {
         Member member = getMember(memberId);
         member.updateImageUrl(objectUrl);
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(b -> b
-                .signatureDuration(Duration.ofMinutes(10))
-                .getObjectRequest(getObjectRequest));
-
-        return new PreSignedUrlCompleteResponse(presigned.url().toString());
+        return new PreSignedUrlCompleteResponse(objectUrl);
     }
 
     private Member getMember(final Long memberId) {
