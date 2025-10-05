@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StopWatch;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,7 +47,6 @@ public class KboScoreboardCrawler {
     }
 
     private List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
-        StopWatch sw = new StopWatch("crawl:" + date);
         Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
         String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
 
@@ -56,21 +54,13 @@ public class KboScoreboardCrawler {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             Page page = null;
             try {
-                sw.start("navigate");
                 page = pwManager.acquirePage();
                 page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
-                sw.stop();
 
-                sw.start("calendarNav");
                 navigateToDateUsingCalendar(page, date, waitTimeout);
-                sw.stop();
 
-                sw.start("extract");
                 List<KboScoreboardGame> games = extractScoreboards(page, log, date);
-                sw.stop();
 
-                log.info("[UPSERT] date={} phases={} total={}ms size={}", date, sw.prettyPrint(),
-                        sw.getTotalTimeMillis(), games.size());
                 log.info("{} 스코어보드 크롤링 완료 ({}경기)", formattedRequestDate, games.size());
                 pwManager.releasePage(page);
 
@@ -93,7 +83,9 @@ public class KboScoreboardCrawler {
 
     public Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
         Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
-        if (dates == null || dates.isEmpty()) return result;
+        if (dates == null || dates.isEmpty()) {
+            return result;
+        }
 
         Page page = null;
         try {
@@ -108,7 +100,9 @@ public class KboScoreboardCrawler {
             }
             return result;
         } finally {
-            if (page != null) pwManager.releasePage(page);
+            if (page != null) {
+                pwManager.releasePage(page);
+            }
         }
     }
 
