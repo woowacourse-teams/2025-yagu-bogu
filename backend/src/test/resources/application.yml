@@ -30,11 +30,12 @@ api:
 
 kbo:
   crawler:
-    navigation-timeout: 30s     # 최초 페이지 진입
-    table-timeout: 15s          # 특정 요소/테이블 대기
-    wait-timeout: 20s           # Ajax/부분갱신 포함 종합 대기
-    max-retries: 2
-    retry-delay: 2s
+    navigation-timeout: 7s
+    table-timeout: 3s
+    wait-timeout: 3s
+    max-retries: 1
+    retry-delay: 500ms
+    context-pool-size: 2
 
     # 셀렉터
     date-field-selector: "#cphContents_cphContents_cphContents_hfSearchDate"
