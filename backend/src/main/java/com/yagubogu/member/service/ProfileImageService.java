@@ -1,5 +1,7 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.global.config.S3Properties;
+import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
@@ -10,10 +12,11 @@ import com.yagubogu.member.repository.MemberRepository;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -29,9 +32,7 @@ public class ProfileImageService {
     private final S3Presigner s3Presigner;
     private final S3Client s3Client;
     private final MemberRepository memberRepository;
-
-    @Value("${app.s3.bucket}")
-    String bucket;
+    private final S3Properties s3Properties;
 
     public PresignedUrlStartResponse issuePreSignedUrl(PreSignedUrlStartRequest preSignedUrlStartRequest) {
         validateContentLength(preSignedUrlStartRequest);
@@ -39,7 +40,7 @@ public class ProfileImageService {
         String key = IMAGES_PROFILES_PREFIX + uniqueFileName;
 
         PutObjectRequest putReq = PutObjectRequest.builder()
-                .bucket(bucket)
+                .bucket(s3Properties.bucket())
                 .key(key)
                 .contentType(preSignedUrlStartRequest.contentType())
                 .contentLength(preSignedUrlStartRequest.contentLength())
@@ -58,9 +59,10 @@ public class ProfileImageService {
             final PreSignedUrlCompleteRequest request
     ) {
         String key = request.key();
+        validateObjectExists(key);
 
         String objectUrl = s3Client.utilities()
-                .getUrl(b -> b.bucket(bucket).key(key))
+                .getUrl(b -> b.bucket(s3Properties.bucket()).key(key))
                 .toExternalForm();
 
         Member member = getMember(memberId);
@@ -72,6 +74,19 @@ public class ProfileImageService {
     private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+    }
+
+    private void validateObjectExists(final String key) {
+        try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(s3Properties.bucket())
+                    .key(key)
+                    .build();
+            // 외부 API 호출
+            s3Client.headObject(headObjectRequest);
+        } catch (NoSuchKeyException e) {
+            throw new NotFoundException("File does not exist in S3: " + key);
+        }
     }
 
     private void validateContentLength(final PreSignedUrlStartRequest preSignedUrlStartRequest) {
