@@ -14,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +34,33 @@ public class GlobalExceptionHandler {
         log.info("[BadRequestException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 400 JSON 파싱 실패, 바인딩/검증 실패, 타입/형변환 문제
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleNotReadable(HttpMessageNotReadableException e) {
+        log.info("[HttpMessageNotReadableException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+
+        return new ExceptionResponse("Invalid JSON request body");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleValidation(MethodArgumentNotValidException e) {
+        log.info("[MethodArgumentNotValid] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+
+        return new ExceptionResponse("Validation failed");
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleConversion(HttpMessageConversionException e) {
+        log.info("[HttpMessageConversion] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+
+        return new ExceptionResponse("Type conversion failed");
     }
 
     /**
@@ -119,7 +149,8 @@ public class GlobalExceptionHandler {
         String simpleName = e.getClass().getSimpleName();
         log.error("[{}] - {} AT {}", simpleName, safeMsg(e.getMessage()), firstLine(e));
 
-        return new ExceptionResponse(simpleName + ": unexpected runtime error");
+        String message = "Unexpected server error is occurred";
+        return new ExceptionResponse(message);
     }
 
     /**
