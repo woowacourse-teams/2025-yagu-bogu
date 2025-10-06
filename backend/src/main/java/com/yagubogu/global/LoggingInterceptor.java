@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -76,13 +75,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
             MDC.put("duration", duration + "ms");
             MDC.put("status", String.valueOf(response.getStatus()));
 
-            if (ex != null) {
-                MDC.put("exception", ex.getClass().getSimpleName());
-                log.error("Request is failed", ex);
+            if (response.getStatus() >= 500) {
+                if (ex != null) {
+                    MDC.put("exception", ex.getClass().getSimpleName());
+                }
+                log.error("Request failed (5xx) ({}ms)", duration);
                 return;
             }
-            if (response.getStatus() >= HttpStatus.BAD_REQUEST.value()) {
-                log.warn("Request error");
+            if (response.getStatus() >= 400) {
+                log.info("Request business error (4xx) ({}ms)", duration);
                 return;
             }
             log.info("Request is completed ({}ms)", duration);
