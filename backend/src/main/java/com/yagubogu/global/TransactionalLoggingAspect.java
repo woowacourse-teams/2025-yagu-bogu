@@ -24,8 +24,6 @@ public class TransactionalLoggingAspect {
             log.info("[{}] - [END TX] ({}ms)", signature, elapsedTime);
             return proceed;
         } catch (YaguBoguException e) {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            log.info("[{}] - [BUSINESS FAILED] ({}ms)", signature, elapsedTime);
             throw e;
         } catch (Throwable t) {
             long elapsedTime = System.currentTimeMillis() - startTime;
