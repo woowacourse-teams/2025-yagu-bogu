@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class TransactionalLoggingAspect {
 
-    @Around("@within(org.springframework.stereotype.Service)")
+    @Around("@within(org.springframework.stereotype.Service) && execution(* com.yagubogu..*(..))")
     public Object logWritableTransactions(final ProceedingJoinPoint joinPoint) throws Throwable {
         String signature = joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature().getName();
         long startTime = System.currentTimeMillis();
