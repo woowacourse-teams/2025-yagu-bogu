@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class TransactionalLoggingAspect {
 
+    private static final String LOG_FORMAT = "[{}] - [END TX] ({}ms)";
+
     @Around("@within(org.springframework.stereotype.Service) && execution(* com.yagubogu..*(..))")
     public Object logWritableTransactions(final ProceedingJoinPoint joinPoint) throws Throwable {
         String signature = joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature().getName();
@@ -21,13 +23,15 @@ public class TransactionalLoggingAspect {
         try {
             Object proceed = joinPoint.proceed();
             long elapsedTime = System.currentTimeMillis() - startTime;
-            log.info("[{}] - [END TX] ({}ms)", signature, elapsedTime);
+            log.info(LOG_FORMAT, signature, elapsedTime);
             return proceed;
         } catch (YaguBoguException e) {
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            log.info(LOG_FORMAT, signature, elapsedTime);
             throw e;
         } catch (Throwable t) {
             long elapsedTime = System.currentTimeMillis() - startTime;
-            log.error("[{}] - [FAILED TX] ({}ms)", signature, elapsedTime);
+            log.error(LOG_FORMAT, signature, elapsedTime);
             throw t;
         }
     }
