@@ -82,16 +82,18 @@ public interface MemberControllerInterface {
 
     @Operation(summary = "pre-signed url 조회", description = "프로필 사진 저장을 위한 url 조회합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
+            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공"),
+            @ApiResponse(responseCode = "413", description = "contentLength가 기준을 초과함")
     })
     @PostMapping("/me/profile-image/pre-signed/start")
     ResponseEntity<PresignedUrlStartResponse> start(
             @RequestBody PreSignedUrlStartRequest preSignedUrlStartRequest
     );
 
-    @Operation(summary = "pre-signed url 업로드 확인", description = "프로필 사진 저장을 완료하고 회원의 프로필 사진으로 저장합니다.")
+    @Operation(summary = "회원 프로필 이미지 수정", description = "프로필 사진 저장을 완료하고 회원의 프로필 사진으로 저장합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공")
+            @ApiResponse(responseCode = "200", description = "회원 프로필 이미지 수정성공"),
+            @ApiResponse(responseCode = "404", description = "key로 s3에서 이미지를 찾을 수 없음")
     })
     @PostMapping("/me/profile-image/pre-signed/complete")
     ResponseEntity<PreSignedUrlCompleteResponse> completeAndUpdate(
