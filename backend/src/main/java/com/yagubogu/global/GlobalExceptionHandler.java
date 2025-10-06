@@ -108,17 +108,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        log.error("[YaguBoguException]- {}", e.getMessage());
+        log.error("[{}]- {} AT {}", e.getClass().getSimpleName(), safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
+    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
         String message = "Unexpected server error is occurred";
-        log.error("[RuntimeException] Unhandled runtime exception", runtimeException);
-        log.error("[RuntimeException] Message", runtimeException.getMessage());
+        log.error("[RuntimeException] - {} AT {}", safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(message);
     }
@@ -129,8 +128,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadGatewayException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
-        log.warn("[BadGatewayException]- {}", e.getMessage());
+        log.warn("[BadGatewayException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    private String firstLine(Throwable t) {
+        if (t.getStackTrace().length > 0) {
+            return t.getStackTrace()[0].toString();
+        }
+
+        return "no stack trace";
+    }
+
+    private String safeMsg(String msg) {
+        if (msg == null) {
+            return "";
+        }
+        String trimmed = msg.length() > 300 ? msg.substring(0, 300) + "..." : msg;
+
+        return trimmed.replaceAll("(?i)(token|authorization|password)=\\S+", "$1=***");
     }
 }
