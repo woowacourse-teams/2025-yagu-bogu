@@ -83,7 +83,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
                 return;
             }
             if (response.getStatus() >= 400) {
-                log.info("Request business error (4xx) ({}ms)", duration);
+                log.info("Request client error (4xx) ({}ms)", duration);
                 return;
             }
             log.info("Request is completed ({}ms)", duration);
