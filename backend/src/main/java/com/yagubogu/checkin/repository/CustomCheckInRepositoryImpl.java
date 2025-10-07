@@ -92,6 +92,24 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
+    public List<Long> findWinMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(winCondition(CHECK_IN, GAME))
+                .fetch();
+    }
+
+    @Override
+    public List<Long> findLoseMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(loseCondition(CHECK_IN, GAME))
+                .fetch();
+    }
+
+    @Override
     public int findRecentGamesLoseCounts(final Member member, final int year, final int limit) {
         return conditionCountOnRecentGames(member, year, loseCondition(QCheckIn.checkIn, QGame.game), limit);
     }

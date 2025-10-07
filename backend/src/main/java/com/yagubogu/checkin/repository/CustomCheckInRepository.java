@@ -65,4 +65,8 @@ public interface CustomCheckInRepository {
     int findRecentGamesLoseCounts(Member member, int year, int limit);
 
     int findRecentGamesWinCounts(Member member, int year, int limit);
+
+    List<Long> findWinMemberIdByGameId(long gameId);
+
+    List<Long> findLoseMemberIdByGameId(long gameId);
 }
