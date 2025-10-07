@@ -7,7 +7,6 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
@@ -18,6 +17,7 @@ import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StadiumStatsDto;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -40,7 +40,7 @@ public class StatService {
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
+    private final VictoryFairyRankingRepository victoryFairyRankingRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -119,6 +119,29 @@ public class StatService {
         List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(winRates);
 
         return new OpponentWinRateResponse(responses);
+    }
+
+    @Transactional
+    public void calculateVictoryScore(int year, long gameId) {
+        double m = checkInRepository.calculateTotalAverageWinRate(year);
+        double c = checkInRepository.calculateAverageCheckInCount(year);
+
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        // 오늘 인증한 member 조회
+        List<Long> winMembers = checkInRepository.findWinMemberIdByGameId(gameId);
+        List<Long> loseMembers = checkInRepository.findLoseMemberIdByGameId(gameId);
+
+        // 오늘 첫 인증자에 대해 통계 테이블에 추가
+        victoryFairyRankingRepository.upsertMembers(winMembers, year);
+        victoryFairyRankingRepository.upsertMembers(loseMembers, year);
+
+        // w, n 증분 업데이트
+        //이긴팀 -> checkIn테이블에서 이긴팀 있는 member
+        //진팀
+
+        // score 값 계산
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
