@@ -1,7 +1,7 @@
 package com.yagubogu.presentation.livetalk.chat
 
-import LikeDelta
-import LikeUpdateRequest
+import com.yagubogu.data.dto.request.game.LikeDeltaDto
+import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.likes.GameLikesResponse
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
@@ -283,10 +282,10 @@ class LivetalkChatViewModel(
             val result =
                 gameRepository.likeBatches(
                     gameId,
-                    LikeUpdateRequest(
+                    LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
                         likeDelta =
-                            LikeDelta(
+                            LikeDeltaDto(
                                 cachedMyTeamType?.id ?: 1L,
                                 countToSend,
                             ),
