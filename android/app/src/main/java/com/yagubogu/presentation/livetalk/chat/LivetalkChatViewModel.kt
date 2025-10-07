@@ -42,9 +42,6 @@ class LivetalkChatViewModel(
     val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
     private var cachedMyTeamType: HomeAwayType? = null
 
-    private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
-    val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
-
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
 
@@ -317,7 +314,6 @@ class LivetalkChatViewModel(
             result
                 .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
                     _livetalkUiState.value = LivetalkUiState.Success
-                    _livetalkResponseItem.value = livetalkResponseItem
 
                     val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
                         livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
