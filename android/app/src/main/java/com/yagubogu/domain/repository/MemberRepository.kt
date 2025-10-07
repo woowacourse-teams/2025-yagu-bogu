@@ -26,7 +26,12 @@ interface MemberRepository {
         contentLength: Long
     ): Result<MemberPresignedUrlItem>
 
-    suspend fun uploadProfileImage(url: String, imageFile: Uri): Result<Unit>
+    suspend fun uploadProfileImage(
+        url: String,
+        imageFile: Uri,
+        contentType: String,
+        contentLength: Long
+    ): Result<Unit>
 
     suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>
 }

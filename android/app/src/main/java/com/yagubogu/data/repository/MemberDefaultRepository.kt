@@ -24,10 +24,10 @@ class MemberDefaultRepository(
 
     override suspend fun getMemberInfo(): Result<MemberInfoItem> =
         memberDataSource.getMemberInfo().map { memberInfoResponse: MemberInfoResponse ->
-                cachedNickname = memberInfoResponse.nickname
-                cachedFavoriteTeam = memberInfoResponse.favoriteTeam
-                memberInfoResponse.toPresentation()
-            }
+            cachedNickname = memberInfoResponse.nickname
+            cachedFavoriteTeam = memberInfoResponse.favoriteTeam
+            memberInfoResponse.toPresentation()
+        }
 
     override suspend fun getNickname(): Result<String> {
         cachedNickname?.let { nickname: String ->
@@ -92,9 +92,9 @@ class MemberDefaultRepository(
     }
 
     override suspend fun uploadProfileImage(
-        url: String, imageFile: Uri
+        url: String, imageFile: Uri, contentType: String, contentLength: Long
     ): Result<Unit> {
-        return memberDataSource.uploadProfileImage(url, imageFile)
+        return memberDataSource.uploadProfileImage(url, imageFile, contentType, contentLength)
     }
 
     override suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> {

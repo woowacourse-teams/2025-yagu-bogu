@@ -1,11 +1,13 @@
 package com.yagubogu.presentation.setting
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -147,8 +149,20 @@ class SettingMainFragment : Fragment() {
                 )
 
                 if (compressedUri != null) {
-//                    viewModel.uploadProfileImage(compressedUri)
-                    requireContext().showToast("이미지 업로드 시작")
+                    val mimeType = requireContext().contentResolver.getType(compressedUri)
+                        ?: "image/jpeg"
+
+                    val fileSize = compressedUri.getFileSize(requireContext())
+
+                    if (fileSize > 0) {
+                        viewModel.uploadProfileImage(
+                            imageUri = compressedUri,
+                            mimeType = mimeType,
+                            size = fileSize
+                        )
+                    } else {
+                        requireContext().showToast(getString(R.string.setting_edit_profile_get_image_size_failed))
+                    }
                 } else {
                     requireContext().showToast(
                         getString(R.string.setting_edit_profile_image_processing_failed)
@@ -160,6 +174,30 @@ class SettingMainFragment : Fragment() {
                     getString(R.string.setting_edit_profile_image_processing_failed)
                 )
             }
+        }
+    }
+
+    private fun Uri.getFileSize(context: Context): Long {
+        return try {
+            context.contentResolver.query(
+                this,
+                arrayOf(MediaStore.Images.Media.SIZE),
+                null, null, null
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val sizeIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+                    cursor.getLong(sizeIndex)
+                } else {
+                    -1L
+                }
+            } ?: run {
+                context.contentResolver.openFileDescriptor(this, "r")?.use { pfd ->
+                    pfd.statSize
+                } ?: -1L
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "파일 사이즈 얻기 실패")
+            -1L
         }
     }
 
