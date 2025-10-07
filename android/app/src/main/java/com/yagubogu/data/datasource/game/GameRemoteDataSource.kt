@@ -2,7 +2,7 @@ package com.yagubogu.data.datasource.game
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameResponse
-import com.yagubogu.data.dto.response.likes.GameLikesResponse
+import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.data.service.GameApiService
 import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate
@@ -23,7 +23,7 @@ class GameRemoteDataSource(
             gameApiService.postLikeBatches(gameId, likeBatchRequest)
         }
 
-    override suspend fun likeCounts(gameId: Long): Result<GameLikesResponse> =
+    override suspend fun likeCounts(gameId: Long): Result<LikeCountsResponse> =
         safeApiCall {
             gameApiService.getLikeCounts(gameId)
         }

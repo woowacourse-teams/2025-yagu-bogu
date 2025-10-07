@@ -7,7 +7,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.dto.response.likes.GameLikesResponse
+import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.TalkRepository
@@ -246,10 +246,10 @@ class LivetalkChatViewModel(
 
         val result = gameRepository.likeCounts(gameId)
         result
-            .onSuccess { gameLikesResponse: GameLikesResponse ->
+            .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 // 서버에서 받아온 좋아요 수
                 val newTotalCount =
-                    if (gameLikesResponse.counts.isEmpty()) 0 else gameLikesResponse.counts[0].totalCount
+                    if (likeCountsResponse.counts.isEmpty()) 0 else likeCountsResponse.counts[0].totalCount
 
                 if (myTeamLikeRealCount == 0) {
                     myTeamLikeRealCount = newTotalCount
@@ -263,7 +263,7 @@ class LivetalkChatViewModel(
                     myTeamLikeRealCount = newTotalCount
                     _myTeamLikeAnimationEvent.setValue(diffCount)
                 }
-                Timber.d("응원수 로드 성공: ${gameLikesResponse.counts.firstOrNull()?.totalCount} 건")
+                Timber.d("응원수 로드 성공: ${likeCountsResponse.counts.firstOrNull()?.totalCount} 건")
             }.onFailure { exception ->
                 Timber.w(exception, "응원수 로드 실패")
             }

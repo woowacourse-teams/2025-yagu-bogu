@@ -1,7 +1,7 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
-import com.yagubogu.data.dto.response.likes.GameLikesResponse
+import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import java.time.LocalDate
 
@@ -13,5 +13,5 @@ interface GameRepository {
         likeBatchRequest: LikeBatchRequest,
     ): Result<Unit>
 
-    suspend fun likeCounts(gameId: Long): Result<GameLikesResponse>
+    suspend fun likeCounts(gameId: Long): Result<LikeCountsResponse>
 }

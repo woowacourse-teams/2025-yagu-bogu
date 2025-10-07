@@ -2,7 +2,7 @@ package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameResponse
-import com.yagubogu.data.dto.response.likes.GameLikesResponse
+import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -25,5 +25,5 @@ interface GameApiService {
     @GET("/api/games/{gameId}/likes/counts")
     suspend fun getLikeCounts(
         @Path("gameId") gameId: Long,
-    ): Response<GameLikesResponse>
+    ): Response<LikeCountsResponse>
 }

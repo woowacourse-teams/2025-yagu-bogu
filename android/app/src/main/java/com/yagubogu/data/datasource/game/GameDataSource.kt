@@ -2,7 +2,7 @@ package com.yagubogu.data.datasource.game
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameResponse
-import com.yagubogu.data.dto.response.likes.GameLikesResponse
+import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import java.time.LocalDate
 
 interface GameDataSource {
@@ -13,5 +13,5 @@ interface GameDataSource {
         likeBatchRequest: LikeBatchRequest,
     ): Result<Unit>
 
-    suspend fun likeCounts(gameId: Long): Result<GameLikesResponse>
+    suspend fun likeCounts(gameId: Long): Result<LikeCountsResponse>
 }
