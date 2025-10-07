@@ -244,7 +244,7 @@ class LivetalkChatViewModel(
             return
         }
 
-        val result = gameRepository.likeCounts(gameId)
+        val result = gameRepository.addLikeCounts(gameId)
         result
             .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 // 서버에서 받아온 좋아요 수
@@ -280,7 +280,7 @@ class LivetalkChatViewModel(
         if (countToSend > 0 && cachedMyTeamType != null) {
             Timber.d("보낸 수 countToSend: $countToSend")
             val result =
-                gameRepository.likeBatches(
+                gameRepository.getLikeBatches(
                     gameId,
                     LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,

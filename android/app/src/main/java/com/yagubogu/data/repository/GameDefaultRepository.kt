@@ -16,10 +16,10 @@ class GameDefaultRepository(
             gameResponse.games.map { it.toPresentation() }
         }
 
-    override suspend fun likeBatches(
+    override suspend fun getLikeBatches(
         gameId: Long,
         likeBatchRequest: LikeBatchRequest,
-    ): Result<Unit> = gameDataSource.likeBatches(gameId, likeBatchRequest)
+    ): Result<Unit> = gameDataSource.getLikeBatches(gameId, likeBatchRequest)
 
-    override suspend fun likeCounts(gameId: Long): Result<LikeCountsResponse> = gameDataSource.likeCounts(gameId)
+    override suspend fun addLikeCounts(gameId: Long): Result<LikeCountsResponse> = gameDataSource.addLikeCounts(gameId)
 }

@@ -15,7 +15,7 @@ class GameRemoteDataSource(
             gameApiService.getGames(date.toString())
         }
 
-    override suspend fun likeBatches(
+    override suspend fun getLikeBatches(
         gameId: Long,
         likeBatchRequest: LikeBatchRequest,
     ): Result<Unit> =
@@ -23,7 +23,7 @@ class GameRemoteDataSource(
             gameApiService.postLikeBatches(gameId, likeBatchRequest)
         }
 
-    override suspend fun likeCounts(gameId: Long): Result<LikeCountsResponse> =
+    override suspend fun addLikeCounts(gameId: Long): Result<LikeCountsResponse> =
         safeApiCall {
             gameApiService.getLikeCounts(gameId)
         }
