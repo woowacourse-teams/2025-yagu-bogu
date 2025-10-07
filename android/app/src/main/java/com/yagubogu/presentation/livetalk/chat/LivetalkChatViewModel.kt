@@ -40,7 +40,7 @@ class LivetalkChatViewModel(
 
     private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
     val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
-    private var cachedMyTeamType: HomeAwayType? = null
+    lateinit var cachedLivetalkTeams: LivetalkTeams
 
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
@@ -65,12 +65,15 @@ class LivetalkChatViewModel(
     private var pollingJob: Job? = null
 
     private var myTeamLikeRealCount: Int = 0
+    private var otherTeamLikeRealCount: Int = 0
 
     private val _myTeamLikeShowingCount = MutableLiveData(0)
     val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
 
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
     val myTeamLikeAnimationEvent: SingleLiveData<Int> get() = _myTeamLikeAnimationEvent
+    private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
+    val otherTeamLikeAnimationEvent: SingleLiveData<Int> get() = _otherTeamLikeAnimationEvent
 
     private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
@@ -237,7 +240,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        if (cachedMyTeamType == null) {
+        if (cachedLivetalkTeams.myTeamType == null) {
             return
         }
 
@@ -245,22 +248,46 @@ class LivetalkChatViewModel(
         result
             .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 // 서버에서 받아온 좋아요 수
-                val newTotalCount =
-                    if (likeCountsResponse.counts.isEmpty()) 0 else likeCountsResponse.counts[0].totalCount
+                // TODO 현재 테스트용, 백엔드 API 수정 부탁
+//                val remoteMyTeamLikeCount =
+//                    if (likeCountsResponse.counts.isEmpty()) 0
+//                    else likeCountsResponse.counts.firstOrNull { it.teamId == cachedLivetalkTeams.myTeam.name }?.totalCount
+//                        ?: 0
+//                val remoteOtherTeamLikeCount =
+//                    if (likeCountsResponse.counts.isEmpty()) 0
+//                    else likeCountsResponse.counts.firstOrNull { it.teamId != cachedLivetalkTeams.myTeam.name }?.totalCount
+//                        ?: 0
+                val remoteMyTeamLikeCount =
+                    if (likeCountsResponse.counts.isEmpty()) 0
+                    else likeCountsResponse.counts.firstOrNull { it.teamId == 2L }?.totalCount
+                        ?: 0
+                val remoteOtherTeamLikeCount =
+                    if (likeCountsResponse.counts.isEmpty()) 0
+                    else likeCountsResponse.counts.firstOrNull { it.teamId != 2L }?.totalCount
+                        ?: 0
+
 
                 if (myTeamLikeRealCount == 0) {
-                    myTeamLikeRealCount = newTotalCount
-                    _myTeamLikeShowingCount.value = newTotalCount
-                    return@onSuccess
+                    myTeamLikeRealCount = remoteMyTeamLikeCount
+                    _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
+                }
+                if (otherTeamLikeRealCount == 0) {
+                    otherTeamLikeRealCount = remoteOtherTeamLikeCount
                 }
 
                 // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
-                if (myTeamLikeRealCount < newTotalCount) {
-                    val diffCount = newTotalCount - myTeamLikeRealCount
-                    myTeamLikeRealCount = newTotalCount
+                if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
+                    val diffCount = remoteMyTeamLikeCount - myTeamLikeRealCount
+                    myTeamLikeRealCount = remoteMyTeamLikeCount
                     _myTeamLikeAnimationEvent.setValue(diffCount)
                 }
-                Timber.d("응원수 로드 성공: ${likeCountsResponse.counts.firstOrNull()?.totalCount} 건")
+                if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
+                    val diffCount = remoteOtherTeamLikeCount - otherTeamLikeRealCount
+                    otherTeamLikeRealCount = remoteOtherTeamLikeCount
+                    _otherTeamLikeAnimationEvent.setValue(diffCount)
+                }
+
+                Timber.d("내 팀 응원수 로드 성공: ${likeCountsResponse.counts.firstOrNull()?.totalCount} 건")
             }.onFailure { exception ->
                 Timber.w(exception, "응원수 로드 실패")
             }
@@ -274,7 +301,7 @@ class LivetalkChatViewModel(
                 count
             }
 
-        if (countToSend > 0 && cachedMyTeamType != null) {
+        if (countToSend > 0 && cachedLivetalkTeams.myTeamType != null) {
             Timber.d("보낸 수 countToSend: $countToSend")
             val result =
                 gameRepository.getLikeBatches(
@@ -283,7 +310,7 @@ class LivetalkChatViewModel(
                         windowStartEpochSec = Instant.now().epochSecond,
                         likeDelta =
                             LikeDeltaDto(
-                                cachedMyTeamType?.id ?: 1L,
+                                cachedLivetalkTeams.myTeamType?.id ?: 1L,
                                 countToSend,
                             ),
                     ),
@@ -302,9 +329,10 @@ class LivetalkChatViewModel(
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
                 _livetalkTeams.value = livetalkTeams
-                cachedMyTeamType = livetalkTeams.myTeamType
+                cachedLivetalkTeams = livetalkTeams
             }.onFailure { exception ->
                 Timber.w(exception, "최초 팀 정보 가져오기 실패")
+                _livetalkUiState.value = LivetalkUiState.Error
             }
     }
 

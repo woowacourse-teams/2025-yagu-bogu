@@ -162,7 +162,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun observePollingLikeAnimation() {
         val likeButton = binding.tvLikeButton
-        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount ->
+        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Int ->
             if (newLikesCount <= 0) return@observe
             val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
 
@@ -173,7 +173,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             val remainder = newLikesCount % animationCount
 
             lifecycleScope.launch {
-                repeat(animationCount) { index ->
+                repeat(animationCount) { index: Int ->
                     launch {
                         // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
                         // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
@@ -183,7 +183,27 @@ class LivetalkChatActivity : AppCompatActivity() {
                         delay(randomDelay)
 
                         viewModel.addMyTeamShowingCount(increment)
-                        showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
+                        showLikeEmojiAnimation(
+                            viewModel.cachedLivetalkTeams.myTeamEmoji,
+                            likeButton
+                        )
+                    }
+                }
+            }
+        }
+        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Int ->
+            if (newLikesCount <= 0) return@observe
+            val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
+
+            lifecycleScope.launch {
+                repeat(animationCount) { index: Int ->
+                    launch {
+                        val randomDelay = (0L..10000L).random()
+                        delay(randomDelay)
+                        showLikeEmojiAnimation(
+                            viewModel.cachedLivetalkTeams.otherTeamEmoji,
+                            likeButton
+                        )
                     }
                 }
             }
