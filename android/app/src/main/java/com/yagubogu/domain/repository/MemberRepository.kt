@@ -1,7 +1,10 @@
 package com.yagubogu.domain.repository
 
+import android.net.Uri
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.setting.MemberCompleteItem
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.MemberPresignedUrlItem
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>
@@ -17,4 +20,13 @@ interface MemberRepository {
     suspend fun deleteMember(): Result<Unit>
 
     fun invalidateCache()
+
+    suspend fun getPresignedProfileImageUrl(
+        contentType: String,
+        contentLength: Long
+    ): Result<MemberPresignedUrlItem>
+
+    suspend fun uploadProfileImage(url: String, imageFile: Uri): Result<Unit>
+
+    suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>
 }

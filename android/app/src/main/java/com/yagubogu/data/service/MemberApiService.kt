@@ -1,15 +1,23 @@
 package com.yagubogu.data.service
 
+import com.yagubogu.data.dto.request.member.MemberCompleteRequest
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
+import com.yagubogu.data.dto.request.member.MemberPresignedUrlRequest
+import com.yagubogu.data.dto.response.member.MemberCompleteResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberPresignedUrlResponse
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Url
 
 interface MemberApiService {
     @GET("/api/members/me")
@@ -33,4 +41,20 @@ interface MemberApiService {
 
     @DELETE("/api/members/me")
     suspend fun deleteMember(): Response<Unit>
+
+    @POST("/api/members/me/profile-image/pre-signed/start")
+    suspend fun postPresignedUrl(
+        @Body request: MemberPresignedUrlRequest
+    ): Response<MemberPresignedUrlResponse>
+
+    @PUT
+    suspend fun putProfileImageToS3(
+        @Url url: String,
+        @Body imageRequestBody: RequestBody
+    ): Response<Unit>
+
+    @POST("/api/members/me/profile-image/pre-signed/complete")
+    suspend fun postCompleteUpload(
+        @Body request: MemberCompleteRequest
+    ): Response<MemberCompleteResponse>
 }
