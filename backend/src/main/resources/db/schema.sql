@@ -94,3 +94,15 @@ CREATE TABLE refresh_tokens (
                                 is_revoked BOOLEAN DEFAULT FALSE NOT NULL,
                                 PRIMARY KEY (id)
 ) ENGINE=InnoDB;
+
+CREATE TABLE victory_fairy_rankings (
+                                victory_fairy_ranking_id VARCHAR(36) NOT NULL,
+                                member_id BIGINT NOT NULL,
+                                score FLOAT(53) NOT NULL DEFAULT 0,
+                                win_count INT NOT NULL DEFAULT 0,
+                                check_in_count INT NOT NULL DEFAULT 0,
+                                game_year INT NOT NULL,
+                                updated_at DATETIME(6) NULL,
+                                PRIMARY KEY (victory_fairy_ranking_id),
+                                FOREIGN KEY (member_id) REFERENCES members(member_id)
+) ENGINE=InnoDB;
