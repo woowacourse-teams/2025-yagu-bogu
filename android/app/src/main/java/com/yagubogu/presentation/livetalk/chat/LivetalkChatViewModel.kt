@@ -250,15 +250,12 @@ class LivetalkChatViewModel(
                     return@onSuccess
                 }
 
+                // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
                 if (myTeamLikeRealCount < newTotalCount) {
                     val diffCount = newTotalCount - myTeamLikeRealCount
-
                     myTeamLikeRealCount = newTotalCount
                     _myTeamLikeAnimationEvent.setValue(diffCount)
-                } else {
-                    myTeamLikeRealCount = newTotalCount
                 }
-
                 Timber.d("응원수 로드 성공: ${gameLikesResponse.counts.firstOrNull()?.totalCount} 건")
             }.onFailure { exception ->
                 Timber.w(exception, "응원수 로드 실패")
@@ -274,6 +271,7 @@ class LivetalkChatViewModel(
             }
 
         if (countToSend > 0 && livetalkTeams.value?.myTeamType != null) {
+            Timber.d("보낸 수 countToSend: $countToSend")
             val result =
                 gameRepository.likeBatches(
                     gameId,
