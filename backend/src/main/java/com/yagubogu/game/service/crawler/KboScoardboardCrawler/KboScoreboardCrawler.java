@@ -66,7 +66,7 @@ public class KboScoreboardCrawler {
 
                 return games;
             } catch (PlaywrightException exception) {
-                log.warn("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
+                log.error("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
                 if (page != null) {
                     pwManager.releasePage(page);
                 }
