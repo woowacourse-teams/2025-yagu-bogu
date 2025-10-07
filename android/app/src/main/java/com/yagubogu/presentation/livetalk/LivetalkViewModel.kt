@@ -25,10 +25,18 @@ class LivetalkViewModel(
             val gamesResult: Result<List<LivetalkStadiumItem>> = gameRepository.getGames(date)
             gamesResult
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
-                    _livetalkStadiumItems.value = livetalkStadiumItems
+                    _livetalkStadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    private fun sortStadiumsByVerification(livetalkStadiumItems: List<LivetalkStadiumItem>): List<LivetalkStadiumItem> {
+        val (verifiedItems, unverifiedItems) =
+            livetalkStadiumItems.partition { liveTalkStadiumItem: LivetalkStadiumItem ->
+                liveTalkStadiumItem.isVerified
+            }
+        return verifiedItems + unverifiedItems
     }
 }

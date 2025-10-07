@@ -12,6 +12,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
@@ -19,7 +23,9 @@ import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.stats.StatsFragment
+import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.badge.BadgeActivity
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -28,10 +34,12 @@ class MainActivity : AppCompatActivity() {
 
     private var lastBackPressedTime: Long = 0L
 
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupBindings()
         setupView()
+        setupBindings()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -39,6 +47,11 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
+            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
+            switchFragment(
+                HomeFragment::class.java,
+                homeMenuItem,
+            )
         }
     }
 
@@ -53,13 +66,6 @@ class MainActivity : AppCompatActivity() {
         binding.cpiCheckInLoading.visibility = visibility
     }
 
-    private fun setupBindings() {
-        binding.ivSettings.setOnClickListener {
-            val intent = SettingActivity.newIntent(this)
-            startActivity(intent)
-        }
-    }
-
     private fun setupView() {
         enableEdgeToEdge()
         setContentView(binding.root)
@@ -70,38 +76,51 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBindings() {
+        binding.ivBadge.setOnClickListener {
+            val intent = BadgeActivity.newIntent(this)
+            startActivity(intent)
+        }
+
+        binding.ivSettings.setOnClickListener {
+            val intent = SettingActivity.newIntent(this)
+            startActivity(intent)
+        }
+    }
+
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
-            when (val itemId: Int = item.itemId) {
-                R.id.item_home -> {
-                    switchFragment(HomeFragment::class.java, itemId)
-                    true
+            val fragmentClass =
+                when (item.itemId) {
+                    R.id.item_home -> HomeFragment::class.java
+                    R.id.item_stats -> StatsFragment::class.java
+                    R.id.item_livetalk -> LivetalkFragment::class.java
+                    R.id.item_attendance_history -> AttendanceHistoryFragment::class.java
+                    else -> null
                 }
 
-                R.id.item_stats -> {
-                    switchFragment(StatsFragment::class.java, itemId)
-                    true
-                }
+            if (fragmentClass != null) {
+                switchFragment(fragmentClass, item)
+                true
+            } else {
+                false
+            }
+        }
 
-                R.id.item_livetalk -> {
-                    switchFragment(LivetalkFragment::class.java, itemId)
-                    true
-                }
+        binding.bnvNavigation.setOnItemReselectedListener {
+            val currentFragment: Fragment? =
+                supportFragmentManager.fragments.firstOrNull { it.isVisible }
 
-                R.id.item_attendance_history -> {
-                    switchFragment(AttendanceHistoryFragment::class.java, itemId)
-                    true
-                }
-
-                else -> false
+            if (currentFragment is ScrollToTop) {
+                currentFragment.scrollToTop()
             }
         }
     }
 
     private fun switchFragment(
         fragmentClass: Class<out Fragment>,
-        selectedItemId: Int,
+        item: MenuItem,
     ) {
         val tag: String = fragmentClass.name
         val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
@@ -109,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            supportFragmentManager.fragments.forEach { if (it.isVisible) hide(it) }
+            supportFragmentManager.fragments.forEach { if (it != targetFragment) hide(it) }
 
             if (targetFragment == null) {
                 add(binding.fcvFragment.id, fragmentClass, null, tag)
@@ -117,7 +136,11 @@ class MainActivity : AppCompatActivity() {
                 show(targetFragment)
             }
         }
-        setToolbarTitle(selectedItemId)
+        setToolbarTitle(item.itemId)
+
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, "${item.title} Fragment")
+        }
     }
 
     private fun setToolbarTitle(

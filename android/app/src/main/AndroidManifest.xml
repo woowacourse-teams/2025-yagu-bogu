@@ -19,6 +19,9 @@
         android:theme="@style/Theme.YaguBogu"
         tools:targetApi="31">
         <activity
+            android:name=".ui.badge.BadgeActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.setting.SettingActivity"
             android:exported="false" />
         <activity
@@ -41,7 +44,6 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="false" />
-
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
             android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
