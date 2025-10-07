@@ -364,6 +364,7 @@ class LivetalkChatViewModel(
         likeBatchingJob?.cancel()
 
         if (pendingLikeCount > 0) {
+            // TODO 추후 리팩터링에서 GlobalScope 제거하기
             GlobalScope.launch {
                 sendLikeBatch()
             }
