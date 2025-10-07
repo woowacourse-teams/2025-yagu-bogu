@@ -349,7 +349,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
-                        isFinished(), // 버저닝 후 삭제 예정(취소된 경기도 보여주도록)
+                        isFinished(),
                         myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
@@ -560,7 +560,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     private BooleanExpression isFinished() {
-        return GAME.gameState.eq(GameState.COMPLETED);
+        return GAME.gameState.eq(GameState.COMPLETED).or(GAME.gameState.eq(GameState.CANCELED));
     }
 
     private BooleanExpression isBetweenYear(final int year) {
