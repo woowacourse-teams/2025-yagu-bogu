@@ -9,16 +9,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingMainBinding
+import com.yagubogu.presentation.util.ImageUtils
+import com.yagubogu.presentation.util.showToast
 import com.yalantis.ucrop.UCrop
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
@@ -35,6 +38,20 @@ class SettingMainFragment : Fragment() {
                 launchUCropActivity(it)
             }
         }
+    private val uCropLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val resultUri = result.data?.let { UCrop.getOutput(it) }
+            resultUri?.let { uri ->
+                handleCroppedImage(uri)
+            }
+        } else if (result.resultCode == UCrop.RESULT_ERROR) {
+            val cropError = result.data?.let { UCrop.getError(it) }
+            Timber.e(cropError, "uCrop Error")
+            requireContext().showToast(getString(R.string.setting_edit_profile_image_crop_failed))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,27 +79,6 @@ class SettingMainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            val resultUri: Uri? = data?.let { UCrop.getOutput(it) }
-            resultUri?.let {
-                // todo: 뷰모델 전달 필요
-                Toast.makeText(requireContext(), "이미지 처리 시작: $it", Toast.LENGTH_SHORT).show()
-            }
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-            val cropError = data?.let { UCrop.getError(it) }
-            Timber.e(cropError, "uCrop Error")
-            Toast.makeText(requireContext(), "이미지 자르기에 실패했습니다.", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun setupBindings() {
@@ -130,12 +126,41 @@ class SettingMainFragment : Fragment() {
         options.setCircleDimmedLayer(true)
         options.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary500))
 
-        UCrop
+        val uCropIntent = UCrop
             .of(sourceUri, destinationUri)
             .withAspectRatio(1f, 1f)
-            .withMaxResultSize(1080, 1080)
+            .withMaxResultSize(1000, 1000)
             .withOptions(options)
-            .start(requireActivity(), this)
+            .getIntent(requireContext())
+
+        uCropLauncher.launch(uCropIntent)
+    }
+
+    private fun handleCroppedImage(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val compressedUri = ImageUtils.compressImageWithCoil(
+                    context = requireContext(),
+                    uri = uri,
+                    maxSize = 500,
+                    quality = 85
+                )
+
+                if (compressedUri != null) {
+//                    viewModel.uploadProfileImage(compressedUri)
+                    requireContext().showToast("이미지 업로드 시작")
+                } else {
+                    requireContext().showToast(
+                        getString(R.string.setting_edit_profile_image_processing_failed)
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Image processing error")
+                requireContext().showToast(
+                    getString(R.string.setting_edit_profile_image_processing_failed)
+                )
+            }
+        }
     }
 
     private fun showAccountManagementFragment() {
