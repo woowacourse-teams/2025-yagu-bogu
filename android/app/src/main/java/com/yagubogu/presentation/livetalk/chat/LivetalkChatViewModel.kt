@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.likes.GameLikesResponse
 import com.yagubogu.data.util.ApiException
+import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
@@ -40,6 +41,7 @@ class LivetalkChatViewModel(
 
     private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
     val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
+    private var cachedMyTeamType: HomeAwayType? = null
 
     private val _livetalkResponseItem = MutableLiveData<LivetalkResponseItem>()
     val livetalkResponseItem: LiveData<LivetalkResponseItem> get() = _livetalkResponseItem
@@ -79,8 +81,7 @@ class LivetalkChatViewModel(
     private var likeBatchingJob: Job? = null
 
     init {
-        fetchTeams(gameId)
-        fetchInitialTalks()
+        fetchAll()
     }
 
     fun addMyTeamShowingCount(addValue: Int = 1) {
@@ -206,6 +207,13 @@ class LivetalkChatViewModel(
         }
     }
 
+    private fun fetchAll() {
+        viewModelScope.launch {
+            fetchTeams(gameId)
+            fetchInitialTalks()
+        }
+    }
+
     private fun startPolling() {
         viewModelScope.launch {
             pollingControlLock.withLock {
@@ -233,7 +241,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        if (livetalkTeams.value?.myTeam == null) {
+        if (cachedMyTeamType == null) {
             return
         }
 
@@ -270,7 +278,7 @@ class LivetalkChatViewModel(
                 count
             }
 
-        if (countToSend > 0 && livetalkTeams.value?.myTeamType != null) {
+        if (countToSend > 0 && cachedMyTeamType != null) {
             Timber.d("보낸 수 countToSend: $countToSend")
             val result =
                 gameRepository.likeBatches(
@@ -279,7 +287,7 @@ class LivetalkChatViewModel(
                         windowStartEpochSec = Instant.now().epochSecond,
                         likeDelta =
                             LikeDelta(
-                                livetalkTeams.value?.myTeamType?.id ?: 1L,
+                                cachedMyTeamType?.id ?: 1L,
                                 countToSend,
                             ),
                     ),
@@ -293,43 +301,39 @@ class LivetalkChatViewModel(
         }
     }
 
-    private fun fetchTeams(gameId: Long) {
-        viewModelScope.launch {
-            val result = talkRepository.getInitial(gameId)
-            result
-                .onSuccess { livetalkTeams: LivetalkTeams ->
-                    _livetalkTeams.value = livetalkTeams
-                }.onFailure { exception ->
-                    Timber.w(exception, "최초 팀 정보 가져오기 실패")
-                }
-        }
+    private suspend fun fetchTeams(gameId: Long) {
+        val result = talkRepository.getInitial(gameId)
+        result
+            .onSuccess { livetalkTeams: LivetalkTeams ->
+                _livetalkTeams.value = livetalkTeams
+                cachedMyTeamType = livetalkTeams.myTeamType
+            }.onFailure { exception ->
+                Timber.w(exception, "최초 팀 정보 가져오기 실패")
+            }
     }
 
-    private fun fetchInitialTalks() {
-        viewModelScope.launch {
-            fetchTalksLock.withLock {
-                val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
-                result
-                    .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
-                        _livetalkUiState.value = LivetalkUiState.Success
-                        _livetalkResponseItem.value = livetalkResponseItem
+    private suspend fun fetchInitialTalks() {
+        fetchTalksLock.withLock {
+            val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
+            result
+                .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
+                    _livetalkUiState.value = LivetalkUiState.Success
+                    _livetalkResponseItem.value = livetalkResponseItem
 
-                        val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
-                            livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
-                        _liveTalkChatBubbleItem.value = livetalkChatBubbleItem
+                    val livetalkChatBubbleItem: List<LivetalkChatBubbleItem> =
+                        livetalkResponseItem.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+                    _liveTalkChatBubbleItem.value = livetalkChatBubbleItem
 
-                        hasNext = livetalkResponseItem.cursor.hasNext
-                        oldestMessageCursor = livetalkResponseItem.cursor.nextCursorId
-                        newestMessageCursor =
-                            livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
+                    hasNext = livetalkResponseItem.cursor.hasNext
+                    oldestMessageCursor = livetalkResponseItem.cursor.nextCursorId
+                    newestMessageCursor =
+                        livetalkChatBubbleItem.firstOrNull()?.livetalkChatItem?.chatId
 
-                        startPolling()
-                        getLikeCount()
-                    }.onFailure { exception ->
-                        Timber.w(exception, "초기 메시지 API 호출 실패")
-                        _livetalkUiState.value = LivetalkUiState.Error
-                    }
-            }
+                    startPolling()
+                }.onFailure { exception ->
+                    Timber.w(exception, "초기 메시지 API 호출 실패")
+                    _livetalkUiState.value = LivetalkUiState.Error
+                }
         }
     }
 
