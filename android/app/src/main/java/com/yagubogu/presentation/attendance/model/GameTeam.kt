@@ -8,7 +8,7 @@ import com.yagubogu.presentation.util.getTeamColor
 data class GameTeam(
     val team: Team,
     val name: String,
-    val score: Int,
+    val score: String,
     val isMyTeam: Boolean,
     val gameResult: GameResult,
 ) {

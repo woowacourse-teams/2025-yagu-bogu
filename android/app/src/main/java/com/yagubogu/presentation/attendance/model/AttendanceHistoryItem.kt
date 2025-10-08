@@ -56,8 +56,13 @@ sealed class AttendanceHistoryItem(
             }
     }
 
+    data class Canceled(
+        val summary: Summary,
+    ) : AttendanceHistoryItem(ViewType.CANCELED)
+
     enum class ViewType {
         SUMMARY,
         DETAIL,
+        CANCELED,
     }
 }

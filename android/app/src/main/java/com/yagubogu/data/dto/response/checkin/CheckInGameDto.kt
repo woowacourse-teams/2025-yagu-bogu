@@ -18,11 +18,11 @@ data class CheckInGameDto(
     @SerialName("attendanceDate")
     val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
     @SerialName("homeScoreBoard")
-    val homeScoreBoard: ScoreBoardDto,
+    val homeScoreBoard: ScoreBoardDto?,
     @SerialName("awayScoreBoard")
-    val awayScoreBoard: ScoreBoardDto,
+    val awayScoreBoard: ScoreBoardDto?,
 ) {
-    fun toPresentation(): AttendanceHistoryItem.Detail {
+    fun toPresentation(): AttendanceHistoryItem {
         val summary =
             AttendanceHistoryItem.Summary(
                 id = checkInId,
@@ -31,6 +31,11 @@ data class CheckInGameDto(
                 awayTeam = awayTeam.toPresentation(homeTeam),
                 homeTeam = homeTeam.toPresentation(awayTeam),
             )
+
+        if (homeScoreBoard == null || awayScoreBoard == null || awayTeam.pitcher == null || homeTeam.pitcher == null) {
+            return AttendanceHistoryItem.Canceled(summary = summary)
+        }
+
         return AttendanceHistoryItem.Detail(
             summary = summary,
             awayTeamPitcher = awayTeam.pitcher,

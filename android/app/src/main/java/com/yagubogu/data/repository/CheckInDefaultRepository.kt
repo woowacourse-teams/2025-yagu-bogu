@@ -50,7 +50,7 @@ class CheckInDefaultRepository(
         year: Int,
         filter: String,
         order: String,
-    ): Result<List<AttendanceHistoryItem.Detail>> =
+    ): Result<List<AttendanceHistoryItem>> =
         checkInDataSource
             .getCheckInHistories(year, filter, order)
             .map { checkInHistoryResponse: CheckInHistoryResponse ->

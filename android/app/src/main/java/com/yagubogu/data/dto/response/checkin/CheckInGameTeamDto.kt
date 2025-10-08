@@ -13,18 +13,23 @@ data class CheckInGameTeamDto(
     @SerialName("name")
     val name: String, // 팀 이름
     @SerialName("score")
-    val score: Int, // 팀 점수
+    val score: Int?, // 팀 점수
     @SerialName("isMyTeam")
     val isMyTeam: Boolean, // 내가 응원하는 팀 여부
     @SerialName("pitcher")
-    val pitcher: String, // 투수 이름
+    val pitcher: String?, // 투수 이름
 ) {
     fun toPresentation(opponent: CheckInGameTeamDto): GameTeam =
         GameTeam(
             team = Team.getByCode(code),
             name = name,
-            score = score,
+            score = score?.toString() ?: "-",
             isMyTeam = isMyTeam,
-            gameResult = GameResult.from(score, opponent.score),
+            gameResult =
+                if (score == null || opponent.score == null) {
+                    GameResult.DRAW
+                } else {
+                    GameResult.from(score, opponent.score)
+                },
         )
 }
