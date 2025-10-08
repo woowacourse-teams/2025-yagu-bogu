@@ -41,9 +41,14 @@ class StreamRemoteDataSource(
                         EVENT_TIMEOUT -> SseCheckInResponse.Timeout
                         EVENT_CONNECT -> SseCheckInResponse.Connect
                         EVENT_CHECK_IN_CREATED -> {
-                            val checkInItems: List<FanRateByGameDto> =
-                                json.decodeFromString(data)
-                            SseCheckInResponse.CheckInCreated(checkInItems)
+                            try {
+                                val checkInItems: List<FanRateByGameDto> =
+                                    json.decodeFromString(data)
+                                SseCheckInResponse.CheckInCreated(checkInItems)
+                            } catch (e: Exception) {
+                                Timber.e(e, "SSE event 파싱 실패: $data")
+                                SseCheckInResponse.Unknown
+                            }
                         }
 
                         else -> SseCheckInResponse.Unknown
