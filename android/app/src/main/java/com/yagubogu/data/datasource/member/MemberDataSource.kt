@@ -29,7 +29,7 @@ interface MemberDataSource {
         url: String,
         imageFileUri: Uri,
         contentType: String,
-        contentLength: Long
+        contentLength: Long,
     ): Result<Unit>
 
     suspend fun postCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse>

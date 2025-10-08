@@ -23,14 +23,14 @@ interface MemberRepository {
 
     suspend fun getPresignedProfileImageUrl(
         contentType: String,
-        contentLength: Long
+        contentLength: Long,
     ): Result<MemberPresignedUrlItem>
 
     suspend fun uploadProfileImage(
         url: String,
         imageFile: Uri,
         contentType: String,
-        contentLength: Long
+        contentLength: Long,
     ): Result<Unit>
 
     suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>

@@ -54,7 +54,7 @@ class YaguBoguApplication : Application() {
         MemberRemoteDataSource(
             applicationContext,
             retrofit.memberApiService,
-            pureClient
+            pureClient,
         )
     }
     val memberRepository by lazy { MemberDefaultRepository(memberDataSource, tokenManager) }

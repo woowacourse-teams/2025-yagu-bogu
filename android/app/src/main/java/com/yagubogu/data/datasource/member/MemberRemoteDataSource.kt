@@ -28,7 +28,7 @@ import timber.log.Timber
 class MemberRemoteDataSource(
     private val context: Context,
     private val memberApiService: MemberApiService,
-    private val pureClient: OkHttpClient
+    private val pureClient: OkHttpClient,
 ) : MemberDataSource {
     override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
         safeApiCall {
@@ -71,47 +71,47 @@ class MemberRemoteDataSource(
         url: String,
         imageFileUri: Uri,
         contentType: String,
-        contentLength: Long
-    ): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            val requestBody = createRequestBody(imageFileUri, contentType, contentLength)
+        contentLength: Long,
+    ): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            try {
+                val requestBody = createRequestBody(imageFileUri, contentType, contentLength)
 
-            val request = Request.Builder()
-                .url(url)
-                .put(requestBody)
-                .build()
+                val request =
+                    Request
+                        .Builder()
+                        .url(url)
+                        .put(requestBody)
+                        .build()
 
-            val response = pureClient
-                .newCall(request)
-                .execute()
+                val response =
+                    pureClient
+                        .newCall(request)
+                        .execute()
 
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                val errorBody = response.body.string()
-                Timber.e("S3 Upload failed: ${response.code}")
-                Timber.e("S3 Error body: $errorBody")
-                Result.failure(Exception("Upload failed: ${response.code}"))
+                if (response.isSuccessful) {
+                    Result.success(Unit)
+                } else {
+                    val errorBody = response.body.string()
+                    Timber.e("S3 Upload failed: ${response.code}")
+                    Timber.e("S3 Error body: $errorBody")
+                    Result.failure(Exception("Upload failed: ${response.code}"))
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "S3 Upload exception")
+                Result.failure(e)
             }
-        } catch (e: Exception) {
-            Timber.e(e, "S3 Upload exception")
-            Result.failure(e)
         }
-    }
 
     private fun createRequestBody(
         uri: Uri,
         contentType: String,
-        contentLength: Long
-    ): RequestBody {
-        return object : RequestBody() {
-            override fun contentType(): MediaType? {
-                return contentType.toMediaTypeOrNull()
-            }
+        contentLength: Long,
+    ): RequestBody =
+        object : RequestBody() {
+            override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
 
-            override fun contentLength(): Long {
-                return contentLength
-            }
+            override fun contentLength(): Long = contentLength
 
             override fun writeTo(sink: BufferedSink) {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -119,7 +119,6 @@ class MemberRemoteDataSource(
                 }
             }
         }
-    }
 
     override suspend fun postCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse> =
         safeApiCall {

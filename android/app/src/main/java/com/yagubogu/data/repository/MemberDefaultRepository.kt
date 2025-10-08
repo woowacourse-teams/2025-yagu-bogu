@@ -34,7 +34,8 @@ class MemberDefaultRepository(
             return Result.success(nickname)
         }
 
-        return memberDataSource.getNickname()
+        return memberDataSource
+            .getNickname()
             .map { memberNicknameResponse: MemberNicknameResponse ->
                 val nickname: String = memberNicknameResponse.nickname
                 cachedNickname = nickname
@@ -43,7 +44,8 @@ class MemberDefaultRepository(
     }
 
     override suspend fun updateNickname(nickname: String): Result<Unit> =
-        memberDataSource.updateNickname(nickname)
+        memberDataSource
+            .updateNickname(nickname)
             .map { memberNicknameResponse: MemberNicknameResponse ->
                 val newNickname: String = memberNicknameResponse.nickname
                 cachedNickname = newNickname
@@ -54,7 +56,8 @@ class MemberDefaultRepository(
             return Result.success(favoriteTeam)
         }
 
-        return memberDataSource.getFavoriteTeam()
+        return memberDataSource
+            .getFavoriteTeam()
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
                 val favoriteTeam: String? = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = favoriteTeam
@@ -63,15 +66,17 @@ class MemberDefaultRepository(
     }
 
     override suspend fun updateFavoriteTeam(team: Team): Result<Unit> =
-        memberDataSource.updateFavoriteTeam(team)
+        memberDataSource
+            .updateFavoriteTeam(team)
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
                 val newFavoriteTeam: String? = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = newFavoriteTeam
             }
 
-    override suspend fun deleteMember(): Result<Unit> = memberDataSource.deleteMember().map {
-        tokenManager.clearTokens()
-    }
+    override suspend fun deleteMember(): Result<Unit> =
+        memberDataSource.deleteMember().map {
+            tokenManager.clearTokens()
+        }
 
     override fun invalidateCache() {
         cachedNickname = null
@@ -79,27 +84,28 @@ class MemberDefaultRepository(
     }
 
     override suspend fun getPresignedProfileImageUrl(
-        contentType: String, contentLength: Long
-    ): Result<MemberPresignedUrlItem> {
-        return memberDataSource.getPresignedProfileImageUrl(
-            MemberPresignedUrlRequest(
-                contentType, contentLength
-            )
-        ).map { memberPresignedUrlResponse: MemberPresignedUrlResponse ->
-            MemberPresignedUrlItem(memberPresignedUrlResponse.key, memberPresignedUrlResponse.url)
-
-        }
-    }
+        contentType: String,
+        contentLength: Long,
+    ): Result<MemberPresignedUrlItem> =
+        memberDataSource
+            .getPresignedProfileImageUrl(
+                MemberPresignedUrlRequest(
+                    contentType,
+                    contentLength,
+                ),
+            ).map { memberPresignedUrlResponse: MemberPresignedUrlResponse ->
+                MemberPresignedUrlItem(memberPresignedUrlResponse.key, memberPresignedUrlResponse.url)
+            }
 
     override suspend fun uploadProfileImage(
-        url: String, imageFile: Uri, contentType: String, contentLength: Long
-    ): Result<Unit> {
-        return memberDataSource.uploadProfileImage(url, imageFile, contentType, contentLength)
-    }
+        url: String,
+        imageFile: Uri,
+        contentType: String,
+        contentLength: Long,
+    ): Result<Unit> = memberDataSource.uploadProfileImage(url, imageFile, contentType, contentLength)
 
-    override suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> {
-        return memberDataSource.postCompleteUploadProfileImage(MemberCompleteRequest(key)).map {
+    override suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
+        memberDataSource.postCompleteUploadProfileImage(MemberCompleteRequest(key)).map {
             MemberCompleteItem(it.url)
         }
-    }
 }

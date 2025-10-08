@@ -84,16 +84,21 @@ class SettingViewModel(
         _deleteAccountCancelEvent.setValue(Unit)
     }
 
-    fun uploadProfileImage(imageUri: Uri, mimeType: String, size: Long) {
+    fun uploadProfileImage(
+        imageUri: Uri,
+        mimeType: String,
+        size: Long,
+    ) {
         viewModelScope.launch {
             try {
                 // 1. Presigned URL 요청
-                val presignedUrlItem = memberRepository
-                    .getPresignedProfileImageUrl(mimeType, size)
-                    .getOrElse { exception ->
-                        Timber.e(exception, "Presigned URL 요청 실패")
-                        return@launch
-                    }
+                val presignedUrlItem =
+                    memberRepository
+                        .getPresignedProfileImageUrl(mimeType, size)
+                        .getOrElse { exception ->
+                            Timber.e(exception, "Presigned URL 요청 실패")
+                            return@launch
+                        }
 
                 // 2. S3 업로드
                 memberRepository
@@ -107,12 +112,12 @@ class SettingViewModel(
                 memberRepository
                     .postCompleteUploadProfileImage(presignedUrlItem.key)
                     .onSuccess { completeItem ->
-                        _myMemberInfoItem.value = myMemberInfoItem.value?.copy(
-                            profileImageUrl = completeItem.url
-                        )
+                        _myMemberInfoItem.value =
+                            myMemberInfoItem.value?.copy(
+                                profileImageUrl = completeItem.url,
+                            )
                         Timber.d("프로필 이미지 업로드 성공: ${completeItem.url}")
-                    }
-                    .onFailure { exception ->
+                    }.onFailure { exception ->
                         Timber.e(exception, "Complete API 호출 실패")
                     }
             } catch (e: Exception) {
