@@ -64,7 +64,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 drawExpr.sum(),
                                 loseExpr.sum()
                         )).from(CHECK_IN)
-                .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isFinished())
+                .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
                 .where(
                         CHECK_IN.member.eq(member),
                         GAME.date.between(start, end)
@@ -144,7 +144,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         Tuple tuple = jpaQueryFactory.select(w, n)
                 .from(MEMBER)
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year))
                 .where(isMemberNotDeleted()).fetchOne();
 
         long winCounts =
@@ -205,7 +205,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(isMemberNotDeleted(), filterByTeam(teamFilter))
                 .groupBy(MEMBER.id, MEMBER.nickname, MEMBER.imageUrl, MEMBER.team.shortName)
@@ -242,7 +242,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), isMyTeamInGame())
                 .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
                 .where(
                         MEMBER.eq(targetMember),
@@ -280,7 +280,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.selectOne()
                 .from(MEMBER)
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year))
                 .leftJoin(TEAM).on(CHECK_IN.team.eq(TEAM))
                 .where(filterByTeam(teamFilter), isMemberNotDeleted())
                 .groupBy(MEMBER)
@@ -376,7 +376,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
-                        isFinished(), // 버저닝 후 삭제 예정(취소된 경기도 보여주도록)
+                        isCompleteOrCanceled(),
                         myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
@@ -452,7 +452,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(CHECK_IN.game, GAME)
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.homeTeam.eq(CHECK_IN.team).or(GAME.awayTeam.eq(CHECK_IN.team)),
+                        isCompleteOrCanceled(),
                         isMyCurrentFavorite(member, CHECK_IN),
                         GAME.gameState.eq(GameState.COMPLETED)
                 ).fetchOne();
@@ -586,8 +586,12 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .otherwise(0.0);
     }
 
-    private BooleanExpression isFinished() {
+    private BooleanExpression isComplete() {
         return GAME.gameState.eq(GameState.COMPLETED);
+    }
+
+    private BooleanExpression isCompleteOrCanceled() {
+        return GAME.gameState.eq(GameState.COMPLETED).or(GAME.gameState.eq(GameState.CANCELED));
     }
 
     private BooleanExpression isBetweenYear(final int year) {
@@ -608,8 +612,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private Long calculateTotalCheckInCount(final int year) {
         return jpaQueryFactory.select(CHECK_IN.count())
                 .from(CHECK_IN)
-                .join(GAME)
-                .on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
+                .join(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }
@@ -639,8 +642,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private Long calculatePerCheckInCount(final int year) {
         return jpaQueryFactory.select(MEMBER.countDistinct())
                 .from(CHECK_IN)
-                .join(GAME)
-                .on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
+                .join(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }

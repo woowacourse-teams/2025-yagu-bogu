@@ -8,7 +8,8 @@ import com.yagubogu.like.dto.LikeCountsResponse;
 import com.yagubogu.like.dto.TeamLikeCountResponse;
 import com.yagubogu.like.repository.LikeRepository;
 import com.yagubogu.like.repository.LikeWindowRepository;
-import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final LikeWindowRepository likeWindowRepository;
     private final GameRepository gameRepository;
-    private final MemberRepository memberRepository;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public void applyBatch(
@@ -43,7 +44,8 @@ public class LikeService {
         }
 
         LikeDelta likeDelta = request.likeDelta();
-        likeRepository.upsertDelta(gameId, likeDelta.teamId(), likeDelta.delta());
+        Team team = getTeamByCode(likeDelta);
+        likeRepository.upsertDelta(gameId, team.getId(), likeDelta.delta());
     }
 
     public LikeCountsResponse findCounts(final long gameId) {
@@ -52,6 +54,11 @@ public class LikeService {
         List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
 
         return new LikeCountsResponse(gameId, teamLikeCounts);
+    }
+
+    private Team getTeamByCode(final LikeDelta likeDelta) {
+        return teamRepository.findByTeamCode(likeDelta.teamCode())
+                .orElseThrow(() -> new NotFoundException("Team not found"));
     }
 
     private void existsGame(final long gameId) {
