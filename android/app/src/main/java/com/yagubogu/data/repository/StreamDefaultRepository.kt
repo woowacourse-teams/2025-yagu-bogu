@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 class StreamDefaultRepository(
     private val streamDataSource: StreamRemoteDataSource,
 ) : StreamRepository {
-    override suspend fun connect(): Flow<CheckInSseEvent> =
+    override fun connect(): Flow<CheckInSseEvent> =
         streamDataSource.connect().map { sseResponse: SseCheckInResponse ->
             when (sseResponse) {
                 is SseCheckInResponse.CheckInCreated -> {
