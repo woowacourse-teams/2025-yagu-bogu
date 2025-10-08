@@ -20,7 +20,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     @Query("""
                 select new com.yagubogu.like.dto.TeamLikeCountResponse(
                     t.teamCode,
-                    l.totalCount
+                    case when l.totalCount is null then 0L else l.totalCount end
                 )
                 from Game g
                 join Team t on (t = g.homeTeam or t = g.awayTeam)
