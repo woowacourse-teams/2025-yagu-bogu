@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -40,20 +41,21 @@ class SettingMainFragment : Fragment() {
                 launchUCropActivity(it)
             }
         }
-    private val uCropLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val resultUri = result.data?.let { UCrop.getOutput(it) }
-            resultUri?.let { uri ->
-                handleCroppedImage(uri)
+    private val uCropLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val resultUri = result.data?.let { UCrop.getOutput(it) }
+                resultUri?.let { uri: Uri ->
+                    handleCroppedImage(uri)
+                }
+            } else if (result.resultCode == UCrop.RESULT_ERROR) {
+                val cropError = result.data?.let { UCrop.getError(it) }
+                Timber.e(cropError, "uCrop Error")
+                requireContext().showToast(getString(R.string.setting_edit_profile_image_crop_failed))
             }
-        } else if (result.resultCode == UCrop.RESULT_ERROR) {
-            val cropError = result.data?.let { UCrop.getError(it) }
-            Timber.e(cropError, "uCrop Error")
-            requireContext().showToast(getString(R.string.setting_edit_profile_image_crop_failed))
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -128,12 +130,13 @@ class SettingMainFragment : Fragment() {
         options.setCircleDimmedLayer(true)
         options.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary500))
 
-        val uCropIntent = UCrop
-            .of(sourceUri, destinationUri)
-            .withAspectRatio(1f, 1f)
-            .withMaxResultSize(1000, 1000)
-            .withOptions(options)
-            .getIntent(requireContext())
+        val uCropIntent =
+            UCrop
+                .of(sourceUri, destinationUri)
+                .withAspectRatio(1f, 1f)
+                .withMaxResultSize(1000, 1000)
+                .withOptions(options)
+                .getIntent(requireContext())
 
         uCropLauncher.launch(uCropIntent)
     }
@@ -141,16 +144,18 @@ class SettingMainFragment : Fragment() {
     private fun handleCroppedImage(uri: Uri) {
         lifecycleScope.launch {
             try {
-                val compressedUri = ImageUtils.compressImageWithCoil(
-                    context = requireContext(),
-                    uri = uri,
-                    maxSize = 500,
-                    quality = 85
-                )
+                val compressedUri =
+                    ImageUtils.compressImageWithCoil(
+                        context = requireContext(),
+                        uri = uri,
+                        maxSize = 500,
+                        quality = 85,
+                    )
 
                 if (compressedUri != null) {
-                    val mimeType = requireContext().contentResolver.getType(compressedUri)
-                        ?: "image/jpeg"
+                    val mimeType =
+                        requireContext().contentResolver.getType(compressedUri)
+                            ?: "image/jpeg"
 
                     val fileSize = compressedUri.getFileSize(requireContext())
 
@@ -158,39 +163,42 @@ class SettingMainFragment : Fragment() {
                         viewModel.uploadProfileImage(
                             imageUri = compressedUri,
                             mimeType = mimeType,
-                            size = fileSize
+                            size = fileSize,
                         )
                     } else {
                         requireContext().showToast(getString(R.string.setting_edit_profile_get_image_size_failed))
                     }
                 } else {
                     requireContext().showToast(
-                        getString(R.string.setting_edit_profile_image_processing_failed)
+                        getString(R.string.setting_edit_profile_image_processing_failed),
                     )
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Image processing error")
                 requireContext().showToast(
-                    getString(R.string.setting_edit_profile_image_processing_failed)
+                    getString(R.string.setting_edit_profile_image_processing_failed),
                 )
             }
         }
     }
 
-    private fun Uri.getFileSize(context: Context): Long {
-        return try {
-            context.contentResolver.query(
-                this,
-                arrayOf(MediaStore.Images.Media.SIZE),
-                null, null, null
-            )?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val sizeIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
-                    cursor.getLong(sizeIndex)
-                } else {
-                    -1L
-                }
-            } ?: run {
+    private fun Uri.getFileSize(context: Context): Long =
+        try {
+            context.contentResolver
+                .query(
+                    this,
+                    arrayOf(MediaStore.Images.Media.SIZE),
+                    null,
+                    null,
+                    null,
+                )?.use { cursor: Cursor ->
+                    if (cursor.moveToFirst()) {
+                        val sizeIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+                        cursor.getLong(sizeIndex)
+                    } else {
+                        -1L
+                    }
+                } ?: run {
                 context.contentResolver.openFileDescriptor(this, "r")?.use { pfd ->
                     pfd.statSize
                 } ?: -1L
@@ -199,7 +207,6 @@ class SettingMainFragment : Fragment() {
             Timber.e(e, "파일 사이즈 얻기 실패")
             -1L
         }
-    }
 
     private fun showAccountManagementFragment() {
         parentFragmentManager

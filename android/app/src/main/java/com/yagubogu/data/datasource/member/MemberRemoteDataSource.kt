@@ -75,19 +75,17 @@ class MemberRemoteDataSource(
     ): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
-                val requestBody = createRequestBody(imageFileUri, contentType, contentLength)
+                val requestBody: RequestBody =
+                    createRequestBody(imageFileUri, contentType, contentLength)
 
-                val request =
+                val request: Request =
                     Request
                         .Builder()
                         .url(url)
                         .put(requestBody)
                         .build()
 
-                val response =
-                    pureClient
-                        .newCall(request)
-                        .execute()
+                val response = pureClient.newCall(request).execute()
 
                 if (response.isSuccessful) {
                     Result.success(Unit)
