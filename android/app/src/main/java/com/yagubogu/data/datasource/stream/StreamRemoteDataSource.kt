@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
 import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import com.yagubogu.data.network.SseClient
 import com.yagubogu.data.network.SseHandler
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
@@ -13,7 +14,12 @@ class StreamRemoteDataSource(
     private val sseClient: SseClient,
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
-    private val eventFlow = MutableSharedFlow<SseCheckInResponse>(replay = 1)
+    private val eventFlow =
+        MutableSharedFlow<SseCheckInResponse>(
+            replay = 1,
+            extraBufferCapacity = 64,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
 
     private val checkInSseHandler =
         object : SseHandler {
