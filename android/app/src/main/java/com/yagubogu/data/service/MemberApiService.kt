@@ -44,17 +44,11 @@ interface MemberApiService {
 
     @POST("/api/members/me/profile-image/pre-signed/start")
     suspend fun postPresignedUrl(
-        @Body request: MemberPresignedUrlRequest
+        @Body request: MemberPresignedUrlRequest,
     ): Response<MemberPresignedUrlResponse>
-
-    @PUT
-    suspend fun putProfileImageToS3(
-        @Url url: String,
-        @Body imageRequestBody: RequestBody
-    ): Response<Unit>
 
     @POST("/api/members/me/profile-image/pre-signed/complete")
     suspend fun postCompleteUpload(
-        @Body request: MemberCompleteRequest
+        @Body request: MemberCompleteRequest,
     ): Response<MemberCompleteResponse>
 }
