@@ -13,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -128,7 +127,7 @@ class SettingMainFragment : Fragment() {
         options.setFreeStyleCropEnabled(false)
         options.setHideBottomControls(false)
         options.setCircleDimmedLayer(true)
-        options.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary500))
+        options.setToolbarColor(requireContext().getColor(R.color.primary500))
 
         val uCropIntent =
             UCrop
