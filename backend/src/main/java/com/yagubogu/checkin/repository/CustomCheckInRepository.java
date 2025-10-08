@@ -69,4 +69,6 @@ public interface CustomCheckInRepository {
     List<Long> findWinMemberIdByGameId(long gameId);
 
     List<Long> findLoseMemberIdByGameId(long gameId);
+
+    List<Long> findDrawMemberIdByGameId(long gameId);
 }

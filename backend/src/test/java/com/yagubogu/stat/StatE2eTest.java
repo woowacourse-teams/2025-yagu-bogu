@@ -4,20 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
+import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import com.yagubogu.support.base.E2eTestBase;
+import com.yagubogu.stat.service.StatService;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -49,6 +54,9 @@ public class StatE2eTest extends E2eTestBase {
     private MemberFactory memberFactory;
 
     @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
     private GameFactory gameFactory;
 
     @Autowired
@@ -60,67 +68,76 @@ public class StatE2eTest extends E2eTestBase {
     @Autowired
     private StadiumRepository stadiumRepository;
 
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
+    private StatService statService;
+
     private String accessToken;
 
-    private Team ht, lt, ss;
-    private Stadium kia, lot, sam;
+    private Team kia, lotte, kt, lg, samsung;
+    private Stadium kiaStadium, lottteStadium, samsungStadium, lgDosanStadium;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        ht = teamRepository.findByTeamCode("HT").orElseThrow();
-        lt = teamRepository.findByTeamCode("LT").orElseThrow();
-        ss = teamRepository.findByTeamCode("SS").orElseThrow();
+        kia = teamRepository.findByTeamCode("HT").orElseThrow();
+        lotte = teamRepository.findByTeamCode("LT").orElseThrow();
+        kt = teamRepository.findByTeamCode("KT").orElseThrow();
+        lg = teamRepository.findByTeamCode("LG").orElseThrow();
+        samsung = teamRepository.findByTeamCode("SS").orElseThrow();
 
-        kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
-        lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
-        sam = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
+        kiaStadium = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        lottteStadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        samsungStadium = stadiumRepository.findByShortName("라이온즈파크").orElseThrow();
+        lgDosanStadium = stadiumRepository.findById(2L).orElseThrow();
     }
 
     @DisplayName("승패무 횟수와 총 직관 횟수를 조회한다")
     @Test
     void findStatCounts() {
         // given: ht 즐겨찾기 멤버 + 2025년 6경기(ht 기준 5승 1무) + 체크인 6건
-        Member member = memberFactory.save(b -> b.team(ht));
+        Member member = memberFactory.save(b -> b.team(kia));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 16))
                 .homeScore(10).awayScore(9)
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(lot)
-                .homeTeam(lt).awayTeam(ht)
+        Game g2 = gameFactory.save(b -> b.stadium(lottteStadium)
+                .homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 17))
                 .homeScore(5).awayScore(10)
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(ss)
+        Game g3 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(samsung)
                 .date(LocalDate.of(2025, 7, 18))
                 .homeScore(9).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        Game g4 = gameFactory.save(b -> b.stadium(sam)
-                .homeTeam(ss).awayTeam(ht)
+        Game g4 = gameFactory.save(b -> b.stadium(samsungStadium)
+                .homeTeam(samsung).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 19))
                 .homeScore(3).awayScore(8)
                 .gameState(GameState.COMPLETED));
-        Game g5 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g5 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 20))
                 .homeScore(7).awayScore(6)
                 .gameState(GameState.COMPLETED));
-        Game g6 = gameFactory.save(b -> b.stadium(lot)
-                .homeTeam(lt).awayTeam(ht)
+        Game g6 = gameFactory.save(b -> b.stadium(lottteStadium)
+                .homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 21))
                 .homeScore(5).awayScore(5)
                 .gameState(GameState.COMPLETED)); // 무
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g1).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g2).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g3).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g4).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g5).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g6).member(member).team(kia));
 
         // when
         StatCountsResponse actual = RestAssured.given().log().all()
@@ -141,46 +158,46 @@ public class StatE2eTest extends E2eTestBase {
     @Test
     void findWinRate() {
         // given: ht 즐겨찾기 멤버 + 2025년 6경기(5승 1패) + 체크인 6건 → 83.3%
-        Member member = memberFactory.save(b -> b.team(ht));
+        Member member = memberFactory.save(b -> b.team(kia));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(ss)
+        Game g2 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(samsung)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(7).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g3 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        Game g4 = gameFactory.save(b -> b.stadium(lot)
-                .homeTeam(lt).awayTeam(ht)
+        Game g4 = gameFactory.save(b -> b.stadium(lottteStadium)
+                .homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(4).awayScore(6)
                 .gameState(GameState.COMPLETED)); // 승
-        Game g5 = gameFactory.save(b -> b.stadium(lot)
-                .homeTeam(lt).awayTeam(ht)
+        Game g5 = gameFactory.save(b -> b.stadium(lottteStadium)
+                .homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(7).awayScore(3)
                 .gameState(GameState.COMPLETED)); // 패
-        Game g6 = gameFactory.save(b -> b.stadium(sam)
-                .homeTeam(ss).awayTeam(ht)
+        Game g6 = gameFactory.save(b -> b.stadium(samsungStadium)
+                .homeTeam(samsung).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 15))
                 .homeScore(2).awayScore(5)
                 .gameState(GameState.COMPLETED)); // 승
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g1).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g2).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g3).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g4).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g5).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g6).member(member).team(kia));
 
         // when
         WinRateResponse actual = RestAssured.given().log().all()
@@ -216,17 +233,17 @@ public class StatE2eTest extends E2eTestBase {
     @Test
     void findLuckyStadium() {
         // given: 챔피언스필드에서 최소 1승
-        Member member = memberFactory.save(b -> b.team(ht));
+        Member member = memberFactory.save(b -> b.team(kia));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        Game g1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(6).awayScore(3)
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.game(g1)
                 .member(member)
-                .team(ht));
+                .team(kia));
 
         // when
         LuckyStadiumResponse actual = RestAssured.given().log().all()
@@ -246,16 +263,11 @@ public class StatE2eTest extends E2eTestBase {
     @DisplayName("평균 득, 실, 실책, 안타, 피안타 조회한다")
     @Test
     void findAverageStatistic() {
-        Member member = memberFactory.save(b -> b.team(ht));
+        Member member = memberFactory.save(b -> b.team(kia));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
-        ScoreBoard homeScoreBoard = new ScoreBoard(8, 12, 0, 0,
-                List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-"));
-        ScoreBoard awayScoreBoard = new ScoreBoard(5, 9, 1, 0,
-                List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-"));
-
-        Game g1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(8).awayScore(5)
                 .homeScoreBoard(new ScoreBoard(8, 12, 0, 0,
@@ -263,7 +275,7 @@ public class StatE2eTest extends E2eTestBase {
                 .awayScoreBoard(new ScoreBoard(5, 9, 1, 0,
                         List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
-        Game g2 = gameFactory.save(b -> b.stadium(kia).homeTeam(lt).awayTeam(ht)
+        Game g2 = gameFactory.save(b -> b.stadium(kiaStadium).homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(4).awayScore(10)
                 .homeScoreBoard(new ScoreBoard(4, 8, 0, 0,
@@ -271,8 +283,8 @@ public class StatE2eTest extends E2eTestBase {
                 .awayScoreBoard(new ScoreBoard(10, 13, 0, 0,
                         List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
-        Game g3 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game g3 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(5).awayScore(7)
                 .homeScoreBoard(new ScoreBoard(5, 11, 1, 0,
@@ -281,9 +293,9 @@ public class StatE2eTest extends E2eTestBase {
                         List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
 
-        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
-        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g1).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g2).member(member).team(kia));
+        checkInFactory.save(b -> b.game(g3).member(member).team(kia));
 
         // when
         AverageStatisticResponse actual = RestAssured.given().log().all()
@@ -302,47 +314,47 @@ public class StatE2eTest extends E2eTestBase {
     @Test
     void findOpponentWinRate_opponents_sorted_and_includes_unplayed() {
         // given
-        Member member = memberFactory.save(b -> b.team(ht));
+        Member member = memberFactory.save(b -> b.team(kia));
         accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // SS와는 2전 2승 → 100.0
-        Game s1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(ss)
+        Game s1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(samsung)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(5).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        Game s2 = gameFactory.save(b -> b.stadium(sam)
-                .homeTeam(ss).awayTeam(ht)
+        Game s2 = gameFactory.save(b -> b.stadium(samsungStadium)
+                .homeTeam(samsung).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(2).awayScore(4)
                 .gameState(GameState.COMPLETED));
 
         // LT와는 2전 1승 1패 → 50.0
-        Game l1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(lt)
+        Game l1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(lotte)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(6).awayScore(2)
                 .gameState(GameState.COMPLETED));
-        Game l2 = gameFactory.save(b -> b.stadium(lot)
-                .homeTeam(lt).awayTeam(ht)
+        Game l2 = gameFactory.save(b -> b.stadium(lottteStadium)
+                .homeTeam(lotte).awayTeam(kia)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(7).awayScore(1)
                 .gameState(GameState.COMPLETED));
 
         // NC와는 1전 0승 1무 → 0.0 (무는 분모만 포함)
         Team nc = teamRepository.findByTeamCode("NC").orElseThrow();
-        Game n1 = gameFactory.save(b -> b.stadium(kia)
-                .homeTeam(ht).awayTeam(nc)
+        Game n1 = gameFactory.save(b -> b.stadium(kiaStadium)
+                .homeTeam(kia).awayTeam(nc)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(4).awayScore(4)
                 .gameState(GameState.COMPLETED));
 
         // 체크인(전부 즐겨찾기팀 HT로)
-        checkInFactory.save(b -> b.game(s1).member(member).team(ht));
-        checkInFactory.save(b -> b.game(s2).member(member).team(ht));
-        checkInFactory.save(b -> b.game(l1).member(member).team(ht));
-        checkInFactory.save(b -> b.game(l2).member(member).team(ht));
-        checkInFactory.save(b -> b.game(n1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(s1).member(member).team(kia));
+        checkInFactory.save(b -> b.game(s2).member(member).team(kia));
+        checkInFactory.save(b -> b.game(l1).member(member).team(kia));
+        checkInFactory.save(b -> b.game(l2).member(member).team(kia));
+        checkInFactory.save(b -> b.game(n1).member(member).team(kia));
 
         // when
         var actual = RestAssured.given().log().all()
@@ -416,5 +428,182 @@ public class StatE2eTest extends E2eTestBase {
                 .when().get("/api/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(422);
+    }
+
+    @DisplayName("무승부는 직관 승률에 포함하지 않는다")
+    @Test
+    void findVictoryFairyRankings_withoutDraws() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(10)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED));
+
+        List<Game> games = gameRepository.findAll();
+        for (Game g : games) {
+            checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(g));
+            statService.calculateVictoryScore(startDate.getYear(), g.getId());
+        }
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/stats/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions ->
+                {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(100.0);
+                }
+        );
+    }
+
+    @DisplayName("탈퇴된 회원은 랭킹에 조회되지 않는다")
+    @Test
+    void findVictoryFairyRankings_quit() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String foraAccessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        Member duri = memberFactory.save(b -> b.team(kia).nickname("두리"));
+        String duriAccessToken = authFactory.getAccessTokenByMemberId(duri.getId(), Role.USER);
+
+        Member mint = memberFactory.save(b -> b.team(samsung).nickname("밍트"));
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        Game game = gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
+        checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
+        checkInFactory.save(b -> b.member(mint).team(mint.getTeam()).game(game));
+
+        statService.calculateVictoryScore(startDate.getYear(), game.getId());
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, foraAccessToken)
+                .when().delete("/api/members/me")
+                .then().log().all()
+                .statusCode(204);
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, duriAccessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/stats/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions -> {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.size()).isOne();
+                    softAssertions.assertThat(actual.getFirst().nickname()).isEqualTo("두리");
+                }
+        );
+    }
+
+    @DisplayName("승리 요정 랭킹을 조회한다")
+    @Test
+    void findVictoryFairyRankings() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        memberFactory.save(b -> b.team(kt).nickname("포르"));
+        memberFactory.save(b -> b.team(lg).nickname("두리"));
+        memberFactory.save(b -> b.team(kia).nickname("밍트"));
+        memberFactory.save(b -> b.team(samsung).nickname("우가"));
+
+        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(kt).awayScore(1)
+                .date(startDate)
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(1))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(2))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kt).homeScore(10)
+                .awayTeam(lg).awayScore(1)
+                .date(startDate.plusDays(3))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kt).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(4))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(lg).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(startDate.plusDays(5))
+                .gameState(GameState.COMPLETED));
+        gameFactory.save(b -> b.stadium(lgDosanStadium)
+                .homeTeam(kia).homeScore(10)
+                .awayTeam(samsung).awayScore(1)
+                .date(LocalDate.of(2024, 5, 3))
+                .gameState(GameState.COMPLETED));
+
+        List<Member> members = memberRepository.findAll();
+        List<Game> games = gameRepository.findAll();
+        for (Member m : members) {
+            for (Game g : games) {
+                checkInFactory.save(b -> b.member(m).team(m.getTeam()).game(g));
+                statService.calculateVictoryScore(startDate.getYear(), g.getId());
+            }
+        }
+
+        // when & then
+        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", 2025)
+                .when().get("/api/stats/victory-fairy/rankings")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(VictoryFairyRankingResponses.class);
+
+        assertSoftly(
+                softAssertions -> {
+                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
+                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(83.85);
+                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(70.0);
+                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(55.06);
+                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(32.0);
+                }
+        );
     }
 }

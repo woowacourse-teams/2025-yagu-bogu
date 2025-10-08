@@ -9,8 +9,6 @@ import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -72,17 +70,6 @@ public interface CheckInControllerInterface {
     ResponseEntity<FanRateResponse> findFanRatesByStadiums(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam LocalDate date
-    );
-
-    @Operation(summary = "승리 요정 랭킹 조회", description = "전체 유저 중 상위 승리 요정을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "승리 요정 랭킹 조회 성공")
-    })
-    @GetMapping("/victory-fairy/rankings")
-    ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam(name = "team", defaultValue = "ALL") TeamFilter teamFilter,
-            @RequestParam(required = false) Integer year
     );
 
     @Operation(summary = "당일 인증 여부 조회", description = "해당 날짜에 사용자가 인증했는지 여부를 반환합니다.")

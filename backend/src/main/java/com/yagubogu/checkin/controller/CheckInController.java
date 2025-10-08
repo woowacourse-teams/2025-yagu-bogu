@@ -10,9 +10,8 @@ import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.service.CheckInService;
+import com.yagubogu.stat.service.StatService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckInController implements CheckInControllerInterface {
 
     private final CheckInService checkInService;
+    private final StatService statService;
 
     public ResponseEntity<Void> createCheckIn(
             final MemberClaims memberClaims,
@@ -68,17 +68,6 @@ public class CheckInController implements CheckInControllerInterface {
             @RequestParam final LocalDate date
     ) {
         FanRateResponse response = checkInService.findFanRatesByGames(memberClaims.id(), date);
-
-        return ResponseEntity.ok(response);
-    }
-
-    public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            final MemberClaims memberClaims,
-            @RequestParam(name = "team", defaultValue = "ALL") final TeamFilter teamFilter,
-            @RequestParam(required = false) final Integer year
-    ) {
-        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id(), teamFilter,
-                year);
 
         return ResponseEntity.ok(response);
     }

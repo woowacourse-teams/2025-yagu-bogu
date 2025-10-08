@@ -1,6 +1,10 @@
 package com.yagubogu.stat.service;
 
 import com.yagubogu.checkin.dto.StatCounts;
+import com.yagubogu.checkin.dto.TeamFilter;
+import com.yagubogu.checkin.dto.VictoryFairyRank;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
@@ -32,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class StatService {
 
     private static final int RECENT_LIMIT = 10;
+    private static final int VICTORY_RANKING_LIMIT = 5;
 
     private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
                     OpponentWinRateTeamResponse::winRate)
@@ -135,6 +140,45 @@ public class StatService {
         if (!loseMembers.isEmpty()) {
             victoryFairyRankingRepository.upsertDelta(m, c, loseMembers, 0, year);
         }
+        List<Long> drawMembers = checkInRepository.findDrawMemberIdByGameId(gameId);
+        if (!drawMembers.isEmpty()) {
+            victoryFairyRankingRepository.upsertDelta(m, c, drawMembers, 0.5, year);
+        }
+    }
+
+    public VictoryFairyRankingResponses findVictoryFairyRankings(
+            final long memberId,
+            final TeamFilter teamFilter,
+            Integer year
+    ) {
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        Member member = getMember(memberId);
+        List<VictoryFairyRankingResponse> topRankingResponses = findTopVictoryRanking(teamFilter, year);
+
+        VictoryFairyRankingResponse myRankingResponse = victoryFairyRankingRepository.findByMemberAndTeamFilterAndYear(
+                        member,
+                        teamFilter,
+                        year
+                )
+                .map(victoryFairyRank -> VictoryFairyRankingResponse.from(victoryFairyRank))
+                .orElseGet(() -> VictoryFairyRankingResponse.emptyRanking(member));
+
+        return new VictoryFairyRankingResponses(topRankingResponses, myRankingResponse);
+    }
+
+    private List<VictoryFairyRankingResponse> findTopVictoryRanking(
+            final TeamFilter teamFilter,
+            final int year
+    ) {
+        List<VictoryFairyRank> victoryFairyRankings = victoryFairyRankingRepository.findTopRankingByTeamFilterAndYear(
+                teamFilter,
+                VICTORY_RANKING_LIMIT,
+                year
+        );
+
+        return VictoryFairyRankingResponse.from(victoryFairyRankings);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {

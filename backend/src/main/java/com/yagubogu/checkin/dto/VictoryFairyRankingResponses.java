@@ -28,6 +28,21 @@ public record VictoryFairyRankingResponses(
                     0
             );
         }
+
+        public static List<VictoryFairyRankingResponse> from(final List<VictoryFairyRank> victoryFairyRankings) {
+            return victoryFairyRankings.stream()
+                    .map(VictoryFairyRankingResponse::from)
+                    .toList();
+        }
+
+        public static VictoryFairyRankingResponse from(final VictoryFairyRank victoryFairyRank) {
+            return new VictoryFairyRankingResponse(
+                    victoryFairyRank.rank(),
+                    victoryFairyRank.nickname(),
+                    victoryFairyRank.profileImageUrl(),
+                    victoryFairyRank.teamShortName(),
+                    victoryFairyRank.score());
+        }
     }
 
     public static VictoryFairyRankingResponses from(

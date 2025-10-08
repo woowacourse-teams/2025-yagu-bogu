@@ -110,6 +110,15 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
+    public List<Long> findDrawMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(drawCondition(CHECK_IN, GAME))
+                .fetch();
+    }
+
+    @Override
     public int findRecentGamesLoseCounts(final Member member, final int year, final int limit) {
         return conditionCountOnRecentGames(member, year, loseCondition(QCheckIn.checkIn, QGame.game), limit);
     }
@@ -599,7 +608,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private Long calculateTotalCheckInCount(final int year) {
         return jpaQueryFactory.select(CHECK_IN.count())
                 .from(CHECK_IN)
-                .join(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .join(GAME)
+                .on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }
@@ -629,7 +639,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private Long calculatePerCheckInCount(final int year) {
         return jpaQueryFactory.select(MEMBER.countDistinct())
                 .from(CHECK_IN)
-                .join(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .join(GAME)
+                .on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }
