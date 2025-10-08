@@ -24,6 +24,5 @@ data class CheckInGameTeamDto(
             name = name,
             score = score,
             isMyTeam = isMyTeam,
-            pitcher = pitcher,
         )
 }

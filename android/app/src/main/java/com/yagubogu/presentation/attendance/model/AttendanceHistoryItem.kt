@@ -38,6 +38,8 @@ sealed class AttendanceHistoryItem(
 
     data class Detail(
         val summary: Summary,
+        val awayTeamPitcher: String,
+        val homeTeamPitcher: String,
         val awayTeamScoreBoard: GameScoreBoard,
         val homeTeamScoreBoard: GameScoreBoard,
     ) : AttendanceHistoryItem(ViewType.DETAIL) {

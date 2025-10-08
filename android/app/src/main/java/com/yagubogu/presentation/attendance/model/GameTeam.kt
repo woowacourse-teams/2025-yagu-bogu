@@ -9,7 +9,6 @@ data class GameTeam(
     val name: String,
     val score: Int,
     val isMyTeam: Boolean,
-    val pitcher: String,
 ) {
     @ColorRes
     val teamColor: Int = team.getTeamColor()

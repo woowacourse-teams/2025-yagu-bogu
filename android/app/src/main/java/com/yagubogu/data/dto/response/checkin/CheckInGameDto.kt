@@ -33,6 +33,8 @@ data class CheckInGameDto(
             )
         return AttendanceHistoryItem.Detail(
             summary = summary,
+            awayTeamPitcher = awayTeam.pitcher,
+            homeTeamPitcher = homeTeam.pitcher,
             awayTeamScoreBoard = awayScoreBoard.toPresentation(),
             homeTeamScoreBoard = homeScoreBoard.toPresentation(),
         )
