@@ -40,7 +40,9 @@ class LivetalkChatViewModel(
 
     private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
     val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
+
     lateinit var cachedLivetalkTeams: LivetalkTeams
+    private val cachedTeamId by lazy { (cachedLivetalkTeams.myTeam.ordinal + 1).toLong() }
 
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
@@ -277,7 +279,8 @@ class LivetalkChatViewModel(
                     _otherTeamLikeAnimationEvent.setValue(diffCount)
                 }
 
-                Timber.d("내 팀 응원수 로드 성공: ${likeCountsResponse.counts.firstOrNull()?.totalCount} 건")
+                Timber.d("내 팀 응원수 로드 성공: $remoteMyTeamLikeCount 건")
+                Timber.d("상대 팀 응원수 로드 성공: $remoteOtherTeamLikeCount 건")
             }.onFailure { exception ->
                 Timber.w(exception, "응원수 로드 실패")
             }
@@ -298,11 +301,7 @@ class LivetalkChatViewModel(
                     gameId,
                     LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
-                        likeDelta =
-                            LikeDeltaDto(
-                                cachedLivetalkTeams.myTeamType?.id ?: 1L,
-                                countToSend,
-                            ),
+                        likeDelta = LikeDeltaDto(teamId = cachedTeamId, delta = countToSend),
                     ),
                 )
             result
