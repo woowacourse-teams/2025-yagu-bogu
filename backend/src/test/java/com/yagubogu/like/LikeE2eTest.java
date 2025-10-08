@@ -55,7 +55,7 @@ public class LikeE2eTest extends E2eTestBase {
         RestAssured.port = port;
     }
 
-    @DisplayName("좋아요 카운트: 초기값은 비어있다")
+    @DisplayName("좋아요 카운트: 초기값은 0으로 응답한다")
     @Test
     void findLikeCounts_initiallyEmpty() {
         // given
@@ -79,7 +79,9 @@ public class LikeE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .body("gameId", is(game.getId().intValue()))
-                .body("counts.size()", is(2));
+                .body("counts.size()", is(2))
+                .body("counts.find { it.teamCode == 'LT' }.totalCount", is(0))
+                .body("counts.find { it.teamCode == 'HH' }.totalCount", is(0));
     }
 
     @DisplayName("좋아요 배치를 적용하고 카운트를 반환한다")
@@ -113,4 +115,3 @@ public class LikeE2eTest extends E2eTestBase {
                 .statusCode(204);
     }
 }
-
