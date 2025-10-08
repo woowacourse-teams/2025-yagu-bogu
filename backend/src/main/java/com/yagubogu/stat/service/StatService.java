@@ -126,22 +126,15 @@ public class StatService {
         double m = checkInRepository.calculateTotalAverageWinRate(year);
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
-        LocalDate startDate = LocalDate.of(year, 1, 1);
-        LocalDate endDate = LocalDate.of(year, 12, 31);
-
         // 오늘 인증한 member 조회
         List<Long> winMembers = checkInRepository.findWinMemberIdByGameId(gameId);
+        if (!winMembers.isEmpty()) {
+            victoryFairyRankingRepository.upsertDelta(m, c, winMembers, 1, year);
+        }
         List<Long> loseMembers = checkInRepository.findLoseMemberIdByGameId(gameId);
-
-        // 오늘 첫 인증자에 대해 통계 테이블에 추가
-        victoryFairyRankingRepository.upsertMembers(winMembers, year);
-        victoryFairyRankingRepository.upsertMembers(loseMembers, year);
-
-        // w, n 증분 업데이트
-        //이긴팀 -> checkIn테이블에서 이긴팀 있는 member
-        //진팀
-
-        // score 값 계산
+        if (!loseMembers.isEmpty()) {
+            victoryFairyRankingRepository.upsertDelta(m, c, loseMembers, 0, year);
+        }
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
