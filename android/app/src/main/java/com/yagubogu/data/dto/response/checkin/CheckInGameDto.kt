@@ -28,8 +28,8 @@ data class CheckInGameDto(
                 id = checkInId,
                 attendanceDate = LocalDate.parse(attendanceDate),
                 stadiumName = stadiumFullName,
-                awayTeam = awayTeam.toPresentation(),
-                homeTeam = homeTeam.toPresentation(),
+                awayTeam = awayTeam.toPresentation(homeTeam),
+                homeTeam = homeTeam.toPresentation(awayTeam),
             )
         return AttendanceHistoryItem.Detail(
             summary = summary,

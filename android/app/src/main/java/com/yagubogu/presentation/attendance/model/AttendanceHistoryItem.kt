@@ -17,23 +17,18 @@ sealed class AttendanceHistoryItem(
         val homeTeam: GameTeam,
     ) : AttendanceHistoryItem(ViewType.SUMMARY) {
         @ColorRes
-        val awayTeamColorRes: Int = determineTeamColorRes(awayTeam, homeTeam)
+        val awayTeamColorRes: Int = determineTeamColorRes(awayTeam)
 
         @ColorRes
-        val homeTeamColorRes: Int = determineTeamColorRes(homeTeam, awayTeam)
+        val homeTeamColorRes: Int = determineTeamColorRes(homeTeam)
 
         @ColorRes
-        private fun determineTeamColorRes(
-            thisTeam: GameTeam,
-            otherTeam: GameTeam,
-        ): Int {
-            val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
-            return if (thisTeam.isMyTeam && gameResult == GameResult.WIN) {
-                thisTeam.teamColor
+        private fun determineTeamColorRes(team: GameTeam): Int =
+            if (team.isMyTeam && team.gameResult == GameResult.WIN) {
+                team.teamColor
             } else {
                 R.color.gray400
             }
-        }
     }
 
     data class Detail(
@@ -47,23 +42,18 @@ sealed class AttendanceHistoryItem(
         val homeTeam: GameTeam get() = summary.homeTeam
 
         @StringRes
-        val awayTeamPitcherStringRes: Int = determineTeamPitcher(awayTeam, homeTeam)
+        val awayTeamPitcherStringRes: Int = determineTeamPitcher(awayTeam)
 
         @StringRes
-        val homeTeamPitcherStringRes: Int = determineTeamPitcher(homeTeam, awayTeam)
+        val homeTeamPitcherStringRes: Int = determineTeamPitcher(homeTeam)
 
         @StringRes
-        private fun determineTeamPitcher(
-            thisTeam: GameTeam,
-            otherTeam: GameTeam,
-        ): Int {
-            val gameResult = GameResult.from(thisTeam.score, otherTeam.score)
-            return when (gameResult) {
+        private fun determineTeamPitcher(team: GameTeam): Int =
+            when (team.gameResult) {
                 GameResult.WIN -> R.string.attendance_history_winning_pitcher
                 GameResult.DRAW -> R.string.attendance_history_draw_pitcher
                 GameResult.LOSE -> R.string.attendance_history_losing_pitcher
             }
-        }
     }
 
     enum class ViewType {
