@@ -5,14 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.ParcelFileDescriptor
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.database.getLongOrNull
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,9 +24,12 @@ import com.yagubogu.databinding.FragmentSettingMainBinding
 import com.yagubogu.presentation.util.ImageUtils
 import com.yagubogu.presentation.util.showToast
 import com.yalantis.ucrop.UCrop
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("ktlint:standard:backing-property-naming")
 class SettingMainFragment : Fragment() {
@@ -142,69 +146,61 @@ class SettingMainFragment : Fragment() {
 
     private fun handleCroppedImage(uri: Uri) {
         lifecycleScope.launch {
-            try {
-                val compressedUri =
-                    ImageUtils.compressImageWithCoil(
-                        context = requireContext(),
-                        uri = uri,
-                        maxSize = 500,
-                        quality = 85,
-                    )
+            runCatching {
+                val (compressedUri, mimeType, fileSize) =
+                    withContext(Dispatchers.IO) {
+                        val compressedUri: Uri =
+                            ImageUtils.compressImageWithCoil(
+                                context = requireContext(),
+                                uri = uri,
+                                maxSize = 500,
+                                quality = 85,
+                            ) ?: error("Image compression failed")
 
-                if (compressedUri != null) {
-                    val mimeType =
-                        requireContext().contentResolver.getType(compressedUri)
-                            ?: "image/jpeg"
+                        val mimeType: String =
+                            requireContext()
+                                .contentResolver
+                                .getType(compressedUri) ?: "image/jpeg"
 
-                    val fileSize = compressedUri.getFileSize(requireContext())
+                        val fileSize: Long =
+                            compressedUri
+                                .fileSize(requireContext())
+                                .getOrNull()
+                                ?: throw IllegalStateException("파일 사이즈 획득 실패")
 
-                    if (fileSize > 0) {
-                        viewModel.uploadProfileImage(
-                            imageUri = compressedUri,
-                            mimeType = mimeType,
-                            size = fileSize,
-                        )
-                    } else {
-                        requireContext().showToast(getString(R.string.setting_edit_profile_get_image_size_failed))
+                        Triple(compressedUri, mimeType, fileSize)
                     }
-                } else {
-                    requireContext().showToast(
-                        getString(R.string.setting_edit_profile_image_processing_failed),
-                    )
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Image processing error")
-                requireContext().showToast(
-                    getString(R.string.setting_edit_profile_image_processing_failed),
+
+                viewModel.uploadProfileImage(
+                    imageUri = compressedUri,
+                    mimeType = mimeType,
+                    size = fileSize,
                 )
+            }.onFailure { e ->
+                if (e is CancellationException) throw e
+                Timber.e(e, "이미지 처리 실패  ${e.message}")
+                requireContext().showToast(getString(R.string.setting_edit_profile_image_processing_failed))
             }
         }
     }
 
-    private fun Uri.getFileSize(context: Context): Long =
-        try {
+    fun Uri.fileSize(context: Context): Result<Long?> =
+        runCatching {
             context.contentResolver
-                .query(
-                    this,
-                    arrayOf(MediaStore.Images.Media.SIZE),
-                    null,
-                    null,
-                    null,
-                )?.use { cursor: Cursor ->
+                .query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
+                ?.use { cursor ->
                     if (cursor.moveToFirst()) {
-                        val sizeIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
-                        cursor.getLong(sizeIndex)
+                        val idx = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE)
+                        cursor.getLongOrNull(idx)
                     } else {
-                        -1L
+                        null
                     }
-                } ?: run {
-                context.contentResolver.openFileDescriptor(this, "r")?.use { pfd ->
-                    pfd.statSize
-                } ?: -1L
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "파일 사이즈 얻기 실패")
-            -1L
+                }
+                ?: context.contentResolver
+                    .openFileDescriptor(this, "r")
+                    ?.use { parcelFileDescriptor: ParcelFileDescriptor ->
+                        parcelFileDescriptor.statSize.takeIf { it >= 0 }
+                    }
         }
 
     private fun showAccountManagementFragment() {
