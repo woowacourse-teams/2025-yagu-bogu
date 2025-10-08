@@ -52,8 +52,7 @@
     <string name="home_victory_fairy_score">승요 점수</string>
     <string name="home_victory_fairy_score_format">%.1f점</string>
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
-    <string name="home_victory_fairy_tooltip">직관 승률이 높은 팬들의 순위예요.</string>
-
+    <string name="home_victory_fairy_tooltip">직관 횟수와 승률을 바탕으로 점수를 산정했어요.</string>
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_stats_detail">상세 통계</string>
 
