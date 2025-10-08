@@ -1,35 +1,23 @@
 package com.yagubogu.badge.policy;
 
-import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
-import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
-import com.yagubogu.badge.dto.BadgeAwardCandidate;
 import com.yagubogu.badge.repository.BadgeRepository;
 import jakarta.annotation.PostConstruct;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-public class CheckInBadgePolicy implements BadgePolicy {
+public class CheckInBadgePolicy extends AbstractBadgePolicy {
 
-    private final BadgeRepository badgeRepository;
     private final BadgePolicyRegistry badgePolicyRegistry;
+
+    public CheckInBadgePolicy(final BadgeRepository badgeRepository, final BadgePolicyRegistry badgePolicyRegistry) {
+        super(badgeRepository);
+        this.badgePolicyRegistry = badgePolicyRegistry;
+    }
 
     @PostConstruct
     public void init() {
         badgePolicyRegistry.register(Policy.CHECK_IN, this);
-    }
-
-    @Override
-    public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
-        List<Badge> notAcquired = badgeRepository.findNotAchievedBadges(event.member(), event.policy());
-        if (notAcquired.isEmpty()) {
-            return null;
-        }
-
-        return new BadgeAwardCandidate(event.member(), notAcquired);
     }
 }

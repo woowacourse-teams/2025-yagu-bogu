@@ -2,25 +2,28 @@ package com.yagubogu.badge.policy;
 
 import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
-import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
-import com.yagubogu.badge.dto.BadgeAwardCandidate;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.checkin.event.StadiumVisitEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.member.domain.Member;
 import jakarta.annotation.PostConstruct;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
-public class GrandSlamBadgePolicy implements BadgePolicy {
+public class GrandSlamBadgePolicy extends AbstractBadgePolicy {
 
     private final BadgePolicyRegistry badgePolicyRegistry;
-    private final BadgeRepository badgeRepository;
     private final CheckInRepository checkInRepository;
+
+    public GrandSlamBadgePolicy(
+            final BadgePolicyRegistry badgePolicyRegistry,
+            final BadgeRepository badgeRepository,
+            final CheckInRepository checkInRepository) {
+        super(badgeRepository);
+        this.badgePolicyRegistry = badgePolicyRegistry;
+        this.checkInRepository = checkInRepository;
+    }
 
     @PostConstruct
     public void init() {
@@ -28,24 +31,14 @@ public class GrandSlamBadgePolicy implements BadgePolicy {
     }
 
     @Override
-    public BadgeAwardCandidate determineAwardCandidate(final BadgeEvent event) {
+    protected boolean isAwardable(final BadgeEvent event) {
         if (!(event instanceof StadiumVisitEvent visitEvent)) {
-            return null;
+            return false;
         }
 
         Member member = event.member();
         long stadiumId = visitEvent.stadiumId();
 
-        boolean isNewVisit = checkInRepository.isFirstMainStadiumVisit(member, stadiumId);
-        if (!isNewVisit) {
-            return null;
-        }
-
-        List<Badge> notAcquired = badgeRepository.findNotAchievedBadges(member, event.policy());
-        if (notAcquired.isEmpty()) {
-            return null;
-        }
-
-        return new BadgeAwardCandidate(member, notAcquired);
+        return checkInRepository.isFirstMainStadiumVisit(member, stadiumId);
     }
 }
