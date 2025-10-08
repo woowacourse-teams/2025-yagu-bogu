@@ -2,7 +2,6 @@ package com.yagubogu.data.datasource.member
 
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
 import com.yagubogu.data.dto.request.member.MemberCompleteRequest
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
@@ -81,7 +80,6 @@ class MemberRemoteDataSource(
                 .put(requestBody)
                 .build()
 
-
             val response = OkHttpClient()
                 .newCall(request)
                 .execute()
@@ -89,7 +87,7 @@ class MemberRemoteDataSource(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorBody = response.body?.string()
+                val errorBody = response.body.string()
                 Timber.e("S3 Upload failed: ${response.code}")
                 Timber.e("S3 Error body: $errorBody")
                 Result.failure(Exception("Upload failed: ${response.code}"))
@@ -126,32 +124,4 @@ class MemberRemoteDataSource(
         safeApiCall {
             memberApiService.postCompleteUpload(request)
         }
-
-
-    private fun Uri.toRequestBody(): RequestBody {
-        return object : RequestBody() {
-            private val contentResolver = context.contentResolver
-
-            override fun contentType(): MediaType? =
-                contentResolver.getType(this@toRequestBody)?.toMediaTypeOrNull()
-
-            override fun contentLength(): Long {
-                return contentResolver.query(
-                    this@toRequestBody,
-                    arrayOf(MediaStore.Images.Media.SIZE),
-                    null, null, null
-                )?.use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE))
-                    } else -1L
-                } ?: -1L
-            }
-
-            override fun writeTo(sink: BufferedSink) {
-                contentResolver.openInputStream(this@toRequestBody)?.use { inputStream ->
-                    sink.writeAll(inputStream.source())
-                }
-            }
-        }
-    }
 }
