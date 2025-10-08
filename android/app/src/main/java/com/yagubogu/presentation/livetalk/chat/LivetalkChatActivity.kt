@@ -162,12 +162,13 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun observePollingLikeAnimation() {
         val likeButton = binding.tvLikeButton
-        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Int ->
+        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
-            val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
+            val animationCount: Int =
+                if (MAX_ANIMATION_COUNT < newLikesCount) MAX_ANIMATION_COUNT else newLikesCount.toInt()
 
             // 각 애니메이션이 담당할 기본 카운트 (몫)
-            val baseIncrement = newLikesCount / animationCount
+            val baseIncrement: Long = newLikesCount / animationCount
 
             // 기본 카운트를 분배하고 남은 카운트 (나머지)
             val remainder = newLikesCount % animationCount
@@ -177,7 +178,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                     launch {
                         // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
                         // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
-                        val increment = if (index < remainder) baseIncrement + 1 else baseIncrement
+                        val increment: Long = if (index < remainder) baseIncrement + 1 else baseIncrement
 
                         val randomDelay = (0L..10000L).random()
                         delay(randomDelay)
@@ -191,9 +192,10 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             }
         }
-        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Int ->
+        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
-            val animationCount = minOf(newLikesCount, MAX_ANIMATION_COUNT)
+            val animationCount: Int =
+                if (MAX_ANIMATION_COUNT < newLikesCount) MAX_ANIMATION_COUNT else newLikesCount.toInt()
 
             lifecycleScope.launch {
                 repeat(animationCount) { index: Int ->

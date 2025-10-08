@@ -64,16 +64,16 @@ class LivetalkChatViewModel(
     private var hasNext: Boolean = true
     private var pollingJob: Job? = null
 
-    private var myTeamLikeRealCount: Int = 0
-    private var otherTeamLikeRealCount: Int = 0
+    private var myTeamLikeRealCount: Long = 0
+    private var otherTeamLikeRealCount: Long = 0
 
-    private val _myTeamLikeShowingCount = MutableLiveData(0)
-    val myTeamLikeShowingCount: LiveData<Int> get() = _myTeamLikeShowingCount
+    private val _myTeamLikeShowingCount = MutableLiveData(0L)
+    val myTeamLikeShowingCount: LiveData<Long> get() = _myTeamLikeShowingCount
 
-    private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
-    val myTeamLikeAnimationEvent: SingleLiveData<Int> get() = _myTeamLikeAnimationEvent
-    private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Int>()
-    val otherTeamLikeAnimationEvent: SingleLiveData<Int> get() = _otherTeamLikeAnimationEvent
+    private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
+    val myTeamLikeAnimationEvent: SingleLiveData<Long> get() = _myTeamLikeAnimationEvent
+    private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
+    val otherTeamLikeAnimationEvent: SingleLiveData<Long> get() = _otherTeamLikeAnimationEvent
 
     private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
@@ -83,7 +83,7 @@ class LivetalkChatViewModel(
         fetchAll()
     }
 
-    fun addMyTeamShowingCount(addValue: Int = 1) {
+    fun addMyTeamShowingCount(addValue: Long = 1L) {
         _myTeamLikeShowingCount.value = _myTeamLikeShowingCount.value?.plus(addValue)
     }
 
@@ -248,41 +248,31 @@ class LivetalkChatViewModel(
         result
             .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 // 서버에서 받아온 좋아요 수
-                // TODO 현재 테스트용, 백엔드 API 수정 부탁
-//                val remoteMyTeamLikeCount =
-//                    if (likeCountsResponse.counts.isEmpty()) 0
-//                    else likeCountsResponse.counts.firstOrNull { it.teamId == cachedLivetalkTeams.myTeam.name }?.totalCount
-//                        ?: 0
-//                val remoteOtherTeamLikeCount =
-//                    if (likeCountsResponse.counts.isEmpty()) 0
-//                    else likeCountsResponse.counts.firstOrNull { it.teamId != cachedLivetalkTeams.myTeam.name }?.totalCount
-//                        ?: 0
-                val remoteMyTeamLikeCount =
-                    if (likeCountsResponse.counts.isEmpty()) 0
-                    else likeCountsResponse.counts.firstOrNull { it.teamId == 2L }?.totalCount
-                        ?: 0
-                val remoteOtherTeamLikeCount =
-                    if (likeCountsResponse.counts.isEmpty()) 0
-                    else likeCountsResponse.counts.firstOrNull { it.teamId != 2L }?.totalCount
-                        ?: 0
+                val remoteMyTeamLikeCount: Long =
+                    if (likeCountsResponse.counts.isEmpty()) 0L
+                    else likeCountsResponse.counts.firstOrNull { it.teamCode == cachedLivetalkTeams.myTeam.name }?.totalCount
+                        ?: 0L
+                val remoteOtherTeamLikeCount: Long =
+                    if (likeCountsResponse.counts.isEmpty()) 0L
+                    else likeCountsResponse.counts.firstOrNull { it.teamCode != cachedLivetalkTeams.myTeam.name }?.totalCount
+                        ?: 0L
 
-
-                if (myTeamLikeRealCount == 0) {
+                if (myTeamLikeRealCount == 0L) {
                     myTeamLikeRealCount = remoteMyTeamLikeCount
                     _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
                 }
-                if (otherTeamLikeRealCount == 0) {
+                if (otherTeamLikeRealCount == 0L) {
                     otherTeamLikeRealCount = remoteOtherTeamLikeCount
                 }
 
                 // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
                 if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
-                    val diffCount = remoteMyTeamLikeCount - myTeamLikeRealCount
+                    val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
                     myTeamLikeRealCount = remoteMyTeamLikeCount
                     _myTeamLikeAnimationEvent.setValue(diffCount)
                 }
                 if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
-                    val diffCount = remoteOtherTeamLikeCount - otherTeamLikeRealCount
+                    val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
                     otherTeamLikeRealCount = remoteOtherTeamLikeCount
                     _otherTeamLikeAnimationEvent.setValue(diffCount)
                 }
