@@ -1,5 +1,6 @@
 package com.yagubogu.stat.repository;
 
+import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.VictoryFairyRanking;
 import java.util.List;
@@ -11,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFairyRanking, Long> {
+public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFairyRanking, Long>,
+        VictoryFairyRankingRepositoryCustom {
 
     @Modifying(
             flushAutomatically = true, clearAutomatically = true
@@ -39,5 +41,5 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
             @Param("gameYear") int gameYear
     );
 
-    Optional<VictoryFairyRanking> findByMember(Member rWin1);
+    Optional<VictoryFairyRank> findByMemberAndGameYear(Member member, Integer year);
 }

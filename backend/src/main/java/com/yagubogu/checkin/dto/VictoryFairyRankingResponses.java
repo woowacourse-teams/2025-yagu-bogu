@@ -14,7 +14,6 @@ public record VictoryFairyRankingResponses(
             String nickname,
             String profileImageUrl,
             String teamShortName,
-            double winPercent,
             double victoryFairyScore
     ) {
 
@@ -26,7 +25,6 @@ public record VictoryFairyRankingResponses(
                     myRankingData.getNickname().toString(),
                     myRankingData.getImageUrl(),
                     myRankingData.getTeam().getShortName(),
-                    0,
                     0
             );
         }
@@ -44,7 +42,6 @@ public record VictoryFairyRankingResponses(
                 myRankingData.nickname(),
                 myRankingData.profileImageUrl(),
                 myRankingData.teamShortName(),
-                myRankingData.winPercent(),
                 myRankingData.victoryFairyScore()
         );
 
@@ -61,7 +58,6 @@ public record VictoryFairyRankingResponses(
                     data.nickname(),
                     data.profileImageUrl(),
                     data.teamShortName(),
-                    data.winPercent(),
                     data.victoryFairyScore()
             ));
         }
