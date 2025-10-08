@@ -15,6 +15,7 @@ import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.datasource.token.TokenRemoteDataSource
+import com.yagubogu.data.network.PureInstance
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
@@ -35,6 +36,9 @@ class YaguBoguApplication : Application() {
             if (BuildConfig.DEBUG) BuildConfig.BASE_URL_DEBUG else BuildConfig.BASE_URL_RELEASE
         RetrofitInstance(baseUrl, tokenManager)
     }
+    private val pureClient by lazy {
+        PureInstance().pureClient
+    }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
@@ -49,7 +53,8 @@ class YaguBoguApplication : Application() {
     private val memberDataSource by lazy {
         MemberRemoteDataSource(
             applicationContext,
-            retrofit.memberApiService
+            retrofit.memberApiService,
+            pureClient
         )
     }
     val memberRepository by lazy { MemberDefaultRepository(memberDataSource, tokenManager) }

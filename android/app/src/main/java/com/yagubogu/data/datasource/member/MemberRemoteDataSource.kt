@@ -28,6 +28,7 @@ import timber.log.Timber
 class MemberRemoteDataSource(
     private val context: Context,
     private val memberApiService: MemberApiService,
+    private val pureClient: OkHttpClient
 ) : MemberDataSource {
     override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
         safeApiCall {
@@ -80,7 +81,7 @@ class MemberRemoteDataSource(
                 .put(requestBody)
                 .build()
 
-            val response = OkHttpClient()
+            val response = pureClient
                 .newCall(request)
                 .execute()
 
