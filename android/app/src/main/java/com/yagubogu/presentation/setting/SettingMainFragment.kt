@@ -147,42 +147,51 @@ class SettingMainFragment : Fragment() {
     private fun handleCroppedImage(uri: Uri) {
         lifecycleScope.launch {
             runCatching {
-                val (compressedUri, mimeType, fileSize) =
-                    withContext(Dispatchers.IO) {
-                        val compressedUri: Uri =
-                            ImageUtils.compressImageWithCoil(
-                                context = requireContext(),
-                                uri = uri,
-                                maxSize = 500,
-                                quality = 85,
-                            ) ?: error("Image compression failed")
-
-                        val mimeType: String =
-                            requireContext()
-                                .contentResolver
-                                .getType(compressedUri) ?: "image/jpeg"
-
-                        val fileSize: Long =
-                            compressedUri
-                                .fileSize(requireContext())
-                                .getOrNull()
-                                ?: throw IllegalStateException("파일 사이즈 획득 실패")
-
-                        Triple(compressedUri, mimeType, fileSize)
+                val input = getCompressedImageInfos(uri) // 예외시 throw
+                viewModel.uploadProfileImageResult(
+                    input.first,
+                    input.second,
+                    input.third,
+                ) // Result<Unit>
+            }.fold(
+                onSuccess = { result: Result<Unit> ->
+                    result.onFailure { e ->
+                        if (e is CancellationException) throw e
+                        requireContext().showToast(getString(R.string.setting_edit_profile_image_upload_failed))
                     }
-
-                viewModel.uploadProfileImage(
-                    imageUri = compressedUri,
-                    mimeType = mimeType,
-                    size = fileSize,
-                )
-            }.onFailure { e ->
-                if (e is CancellationException) throw e
-                Timber.e(e, "이미지 처리 실패  ${e.message}")
-                requireContext().showToast(getString(R.string.setting_edit_profile_image_processing_failed))
-            }
+                },
+                onFailure = { e: Throwable ->
+                    if (e is CancellationException) throw e
+                    Timber.e(e, "프로필 이미지 전처리 실패")
+                    requireContext().showToast(getString(R.string.setting_edit_profile_image_processing_failed))
+                },
+            )
         }
     }
+
+    private suspend fun getCompressedImageInfos(uri: Uri): Triple<Uri, String, Long> =
+        withContext(Dispatchers.IO) {
+            val compressedUri: Uri =
+                ImageUtils.compressImageWithCoil(
+                    context = requireContext(),
+                    uri = uri,
+                    maxSize = 500,
+                    quality = 85,
+                ) ?: error("이미지 압축 실패")
+
+            val mimeType: String =
+                requireContext()
+                    .contentResolver
+                    .getType(compressedUri) ?: "image/jpeg"
+
+            val fileSize: Long =
+                compressedUri
+                    .fileSize(requireContext())
+                    .getOrNull()
+                    ?: error("파일 사이즈 획득 실패")
+
+            Triple(compressedUri, mimeType, fileSize)
+        }
 
     fun Uri.fileSize(context: Context): Result<Long?> =
         runCatching {

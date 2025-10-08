@@ -84,43 +84,28 @@ class SettingViewModel(
         _deleteAccountCancelEvent.setValue(Unit)
     }
 
-    fun uploadProfileImage(
+    suspend fun uploadProfileImageResult(
         imageUri: Uri,
         mimeType: String,
         size: Long,
-    ) {
-        viewModelScope.launch {
+    ): Result<Unit> =
+        runCatching {
             // 1. Presigned URL 요청
             val presignedUrlItem: MemberPresignedUrlItem =
-                memberRepository
-                    .getPresignedProfileImageUrl(mimeType, size)
-                    .getOrElse { exception: Throwable ->
-                        Timber.e(exception, "Presigned URL 요청 실패")
-                        return@launch
-                    }
+                memberRepository.getPresignedProfileImageUrl(mimeType, size).getOrThrow()
 
             // 2. S3 업로드
             memberRepository
                 .uploadProfileImage(presignedUrlItem.url, imageUri, mimeType, size)
-                .onFailure { exception: Throwable ->
-                    Timber.e(exception, "S3 업로드 실패")
-                    return@launch
-                }
+                .getOrThrow()
 
             // 3. Complete API 호출 및 프로필 업데이트
-            memberRepository
-                .postCompleteUploadProfileImage(presignedUrlItem.key)
-                .onSuccess { completeItem: MemberCompleteItem ->
-                    _myMemberInfoItem.value =
-                        myMemberInfoItem.value?.copy(
-                            profileImageUrl = completeItem.url,
-                        )
-                    Timber.d("프로필 이미지 업로드 성공: ${completeItem.url}")
-                }.onFailure { exception: Throwable ->
-                    Timber.e(exception, "Complete API 호출 실패")
-                }
+            val complete: MemberCompleteItem =
+                memberRepository.postCompleteUploadProfileImage(presignedUrlItem.key).getOrThrow()
+            _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = complete.url)
+        }.onFailure { exception: Throwable ->
+            Timber.e(exception, "프로필 이미지 업로드 실패")
         }
-    }
 
     private fun fetchMemberInfo() {
         viewModelScope.launch {
