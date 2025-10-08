@@ -21,6 +21,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.Response
 import okio.BufferedSink
 import okio.source
 import timber.log.Timber
@@ -74,7 +75,7 @@ class MemberRemoteDataSource(
         contentLength: Long,
     ): Result<Unit> =
         withContext(Dispatchers.IO) {
-            try {
+            runCatching {
                 val requestBody: RequestBody =
                     createRequestBody(imageFileUri, contentType, contentLength)
 
@@ -85,19 +86,16 @@ class MemberRemoteDataSource(
                         .put(requestBody)
                         .build()
 
-                val response = pureClient.newCall(request).execute()
-
-                if (response.isSuccessful) {
-                    Result.success(Unit)
-                } else {
-                    val errorBody = response.body.string()
-                    Timber.e("S3 Upload failed: ${response.code}")
-                    Timber.e("S3 Error body: $errorBody")
-                    Result.failure(Exception("Upload failed: ${response.code}"))
+                pureClient.newCall(request).execute().use { response: Response ->
+                    if (!response.isSuccessful) {
+                        val errorBody = response.body.string()
+                        Timber.e("S3 Upload failed: ${response.code}")
+                        Timber.e("S3 Error body: $errorBody")
+                        throw Exception("Upload failed: ${response.code}")
+                    }
                 }
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 Timber.e(e, "S3 Upload exception")
-                Result.failure(e)
             }
         }
 
