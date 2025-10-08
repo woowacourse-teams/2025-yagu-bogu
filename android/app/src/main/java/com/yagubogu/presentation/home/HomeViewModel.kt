@@ -145,12 +145,13 @@ class HomeViewModel(
     fun updateStadiumStats() {
         val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
         val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
-        val currentStadiumStats: StadiumStatsUiModel =
-            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
 
         val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
         val newStadiumStats =
-            currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
+            StadiumStatsUiModel(
+                stadiumFanRates = newItems,
+                refreshTime = LocalTime.now(),
+            )
         _stadiumStatsUiModel.value = newStadiumStats
     }
 
