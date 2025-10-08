@@ -24,6 +24,7 @@ import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -68,9 +69,12 @@ class StatServiceTest {
     @Autowired
     private StadiumRepository stadiumRepository;
 
+    @Autowired
+    private VictoryFairyRankingRepository victoryFairyRankingRepository;
+
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
+        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")

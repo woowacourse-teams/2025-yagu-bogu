@@ -10,7 +10,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;

@@ -16,7 +16,7 @@ import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;

@@ -43,3 +43,9 @@ spring:
   config:
     activate:
       on-profile: integration
+
+---
+spring:
+  config:
+    activate:
+      on-profile: integration-mysql

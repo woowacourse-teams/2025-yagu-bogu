@@ -1,4 +1,4 @@
-package com.yagubogu.support;
+package com.yagubogu.support.base;
 
 import jakarta.persistence.EntityManager;
 import org.flywaydb.core.Flyway;
@@ -13,8 +13,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.MySQLContainer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("e2e")
-public abstract class E2eTestBase {
+@ActiveProfiles("integration-mysql")
+public abstract class ServiceUsingMysqlTestBase {
 
     protected static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("yagubogu_test_db_mysql")
@@ -65,6 +65,7 @@ public abstract class E2eTestBase {
             em.createNativeQuery("TRUNCATE TABLE talks").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE likes").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE like_windows").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE victory_fairy_rankings").executeUpdate();
 
             em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
         });
