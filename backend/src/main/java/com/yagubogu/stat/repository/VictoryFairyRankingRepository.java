@@ -18,23 +18,28 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
     @Query(value = """
             INSERT INTO victory_fairy_rankings(member_id, score, win_count, check_in_count, game_year)
             SELECT
-              m.member_id, ROUND(100.0 * (:winDelta + :c * :m) / (1 + :c), 2), :winDelta, 1, :gameYear
+              m.member_id,
+              COALESCE(ROUND(100.0 * (
+                (:winDelta + :c * :m) / NULLIF((:checkInDelta + :c), 0)
+              ), 2), 0) AS score,
+              :winDelta,
+              :checkInDelta,
+              :gameYear
             FROM members m
             WHERE m.member_id IN (:memberIds)
             ON DUPLICATE KEY UPDATE
               win_count      = win_count + :winDelta,
-              check_in_count = check_in_count + 1,
-              score = ROUND(100.0 * (
-                win_count + :c * :m
-              ) / (
-                check_in_count + :c
-              ), 2)
+              check_in_count = check_in_count + :checkInDelta,
+              score = COALESCE(ROUND(100.0 * (
+                (win_count + :c * :m) / NULLIF((check_in_count + :c), 0)
+              ), 2), 0)
             """, nativeQuery = true)
     int upsertDelta(
             @Param("m") double m,
             @Param("c") double c,
             @Param("memberIds") List<Long> memberIds,
-            @Param("winDelta") double winDelta,
+            @Param("winDelta") int winDelta,
+            @Param("checkInDelta") int checkInDelta,
             @Param("gameYear") int gameYear
     );
 

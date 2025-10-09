@@ -12,7 +12,7 @@ import com.yagubogu.checkin.dto.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
-import com.yagubogu.stadium.domain.QVictoryFairyRanking;
+import com.yagubogu.stat.domain.QVictoryFairyRanking;
 import com.yagubogu.stat.dto.InsertDto;
 import com.yagubogu.stat.dto.UpdateDto;
 import com.yagubogu.team.domain.QTeam;

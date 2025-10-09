@@ -2,22 +2,19 @@ package com.yagubogu.stat.service;
 
 import com.yagubogu.checkin.dto.VictoryFairyCountResult;
 import com.yagubogu.checkin.repository.CheckInRepository;
-import com.yagubogu.checkin.repository.CustomCheckInRepository;
 import com.yagubogu.stat.domain.VictoryFairyRanking;
 import com.yagubogu.stat.dto.InsertDto;
 import com.yagubogu.stat.dto.UpdateDto;
 import com.yagubogu.stat.dto.VictoryFairyChunkResult;
 import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,52 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class VictoryFairyRankingBatchService {
+public class VictoryFairyRankingSyncService {
 
     private final CheckInRepository checkInRepository;
-    private final CustomCheckInRepository customCheckInRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
 
-    private static final int CHUNK_SIZE = 2000;
     private static final int BATCH_SIZE = 200;
-
-    public void updateRankings(final LocalDate date) {
-        int currentYear = date.getYear();
-        int page = 0;
-        int totalProcessed = 0;
-        int totalUpdated = 0;
-        int totalInserted = 0;
-
-        try {
-            Slice<Long> slice;
-            do {
-                Pageable pageable = PageRequest.of(page, CHUNK_SIZE);
-                slice = checkInRepository.findDistinctMemberIdsByDate(date, pageable);
-
-                if (slice.hasContent()) {
-                    List<Long> memberIds = slice.getContent();
-
-                    VictoryFairyChunkResult result = processChunk(memberIds, currentYear);
-
-                    totalProcessed += memberIds.size();
-                    totalUpdated += result.updatedCount();
-                    totalInserted += result.insertedCount();
-
-                    log.info("Progress: page {}, {} members processed (updated: {}, inserted: {})",
-                            page, totalProcessed, totalUpdated, totalInserted);
-                }
-                page++;
-
-            } while (slice.hasNext());
-
-            log.info("=== Batch Completed === total: {}, updated: {}, inserted: {}, skipped: {}",
-                    totalProcessed, totalUpdated, totalInserted,
-                    totalProcessed - totalUpdated - totalInserted);
-        } catch (RuntimeException e) {
-            log.error("Batch failed", e);
-            throw e;
-        }
-    }
 
     @Transactional
     public VictoryFairyChunkResult processChunk(List<Long> memberIds, int year) {
@@ -82,7 +39,7 @@ public class VictoryFairyRankingBatchService {
                                 ranking -> ranking
                         ));
 
-        List<VictoryFairyCountResult> checkInAndWinCounts = customCheckInRepository.findCheckInAndWinCountBatch(
+        List<VictoryFairyCountResult> checkInAndWinCounts = checkInRepository.findCheckInAndWinCountBatch(
                 memberIds, year);
 
         List<UpdateDto> toUpdate = new ArrayList<>();
@@ -95,8 +52,7 @@ public class VictoryFairyRankingBatchService {
             int checkInCount = checkInAndWinCount.checkInCount();
             int winCount = checkInAndWinCount.winCount();
 
-            double score = 100.0 * (winCount + c * m) / (checkInCount + c);
-            double roundedScore = Math.round(score * 100) / 100.0;
+            double roundedScore = getScore((winCount + c * m) / (checkInCount + c));
 
             Long memberId = checkInAndWinCount.memberId();
             VictoryFairyRanking existingVictoryRanking = existingMap.get(memberId);
@@ -105,19 +61,19 @@ public class VictoryFairyRankingBatchService {
                 if (!isSameData(existingVictoryRanking, winCount, checkInCount, roundedScore)) {
                     toUpdate.add(new UpdateDto(
                             existingVictoryRanking.getId(),
-                            score,
+                            roundedScore,
                             winCount,
                             checkInCount
                     ));
                     log.warn("Data consistency warning. {}, {}, {} vs {}, {}, {}",
                             existingVictoryRanking.getWinCount(), existingVictoryRanking.getCheckInCount(),
-                            existingVictoryRanking.getScore(), winCount, checkInAndWinCount, score);
+                            existingVictoryRanking.getScore(), winCount, checkInAndWinCount, roundedScore);
                 }
             } else {
                 toInsert.add(new InsertDto(
                         memberId,
                         year,
-                        score,
+                        roundedScore,
                         winCount,
                         checkInCount
                 ));
@@ -139,6 +95,13 @@ public class VictoryFairyRankingBatchService {
         }
 
         return new VictoryFairyChunkResult(updatedCount, insertedCount);
+    }
+
+    private double getScore(double value) {
+        return BigDecimal.valueOf(value)
+                .multiply(BigDecimal.valueOf(100)) // 100.0 *
+                .setScale(2, RoundingMode.HALF_UP) // ROUND(..., 2)
+                .doubleValue();
     }
 
     private boolean isSameData(final VictoryFairyRanking existingVictoryRanking, final int checkInCount,
