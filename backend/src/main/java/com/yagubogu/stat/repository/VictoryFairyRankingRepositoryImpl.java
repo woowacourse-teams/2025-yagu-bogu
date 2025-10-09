@@ -13,10 +13,13 @@ import com.yagubogu.checkin.dto.VictoryFairyRank;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
 import com.yagubogu.stadium.domain.QVictoryFairyRanking;
+import com.yagubogu.stat.dto.InsertDto;
+import com.yagubogu.stat.dto.UpdateDto;
 import com.yagubogu.team.domain.QTeam;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @RequiredArgsConstructor
 public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRepositoryCustom {
@@ -26,6 +29,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     private static final QVictoryFairyRanking VICTORY_FAIRY_RANKING = QVictoryFairyRanking.victoryFairyRanking;
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<VictoryFairyRank> findTopRankingByTeamFilterAndYear(final TeamFilter teamFilter, final int limit,
@@ -94,6 +98,48 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 .fetchOne();
 
         return Optional.ofNullable(victoryFairyRank);
+    }
+
+    @Override
+    public void batchUpdate(List<UpdateDto> updates, int batchSize) {
+        jdbcTemplate.batchUpdate(
+                """
+                        UPDATE victory_fairy_rankings 
+                        SET score = ?, 
+                            win_count = ?, 
+                            check_in_count = ?, 
+                            updated_at = NOW()
+                        WHERE victory_fairy_ranking_id = ?
+                        """,
+                updates,
+                batchSize,
+                (ps, dto) -> {
+                    ps.setDouble(1, dto.score());
+                    ps.setInt(2, dto.winCount());
+                    ps.setInt(3, dto.checkInCount());
+                    ps.setLong(4, dto.id());
+                }
+        );
+    }
+
+    @Override
+    public void batchInsert(final List<InsertDto> inserts, final int batchSize) {
+        jdbcTemplate.batchUpdate(
+                """
+                        INSERT INTO victory_fairy_rankings 
+                        (member_id, game_year, score, win_count, check_in_count, updated_at)
+                        VALUES (?, ?, ?, ?, ?, NOW())
+                        """,
+                inserts,
+                batchSize,
+                (ps, dto) -> {
+                    ps.setLong(1, dto.memberId());
+                    ps.setInt(2, dto.year());
+                    ps.setDouble(3, dto.score());
+                    ps.setInt(4, dto.winCount());
+                    ps.setInt(5, dto.checkInCount());
+                }
+        );
     }
 
     private BooleanExpression filterByTeam(final TeamFilter teamFilter, final QTeam team) {

@@ -1,4 +1,4 @@
-package com.yagubogu.stadium.domain;
+package com.yagubogu.stat.domain;
 
 import com.yagubogu.member.domain.Member;
 import jakarta.persistence.Column;
@@ -49,22 +49,4 @@ public class VictoryFairyRanking {
     @LastModifiedDate
     @Column(name = "updated_at", columnDefinition = "DATETIME(6)")
     private LocalDateTime updatedAt;
-
-    public VictoryFairyRanking(
-            final Long id,
-            final Member member,
-            final double score,
-            final int winCount,
-            final int checkInCount,
-            final int gameYear,
-            final LocalDateTime updatedAt
-    ) {
-        this.id = id;
-        this.member = member;
-        this.score = score;
-        this.winCount = winCount;
-        this.checkInCount = checkInCount;
-        this.gameYear = gameYear;
-        this.updatedAt = updatedAt;
-    }
 }

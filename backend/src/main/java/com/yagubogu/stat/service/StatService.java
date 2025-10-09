@@ -140,10 +140,6 @@ public class StatService {
         if (!loseMembers.isEmpty()) {
             victoryFairyRankingRepository.upsertDelta(m, c, loseMembers, 0, year);
         }
-        List<Long> drawMembers = checkInRepository.findDrawMemberIdByGameId(gameId);
-        if (!drawMembers.isEmpty()) {
-            victoryFairyRankingRepository.upsertDelta(m, c, drawMembers, 0.5, year);
-        }
     }
 
     public VictoryFairyRankingResponses findVictoryFairyRankings(

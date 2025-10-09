@@ -1,6 +1,6 @@
 package com.yagubogu.stat.repository;
 
-import com.yagubogu.stadium.domain.VictoryFairyRanking;
+import com.yagubogu.stat.domain.VictoryFairyRanking;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,5 +36,16 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
             @Param("memberIds") List<Long> memberIds,
             @Param("winDelta") double winDelta,
             @Param("gameYear") int gameYear
+    );
+
+    @Query("""
+            SELECT vfr
+            FROM VictoryFairyRanking vfr 
+            WHERE vfr.member.id IN :memberIds 
+            AND vfr.gameYear = :year
+            """)
+    List<VictoryFairyRanking> findByMemberIdsAndYear(
+            @Param("memberIds") List<Long> memberIds,
+            @Param("year") int year
     );
 }
