@@ -110,6 +110,121 @@ class CheckInServiceTest {
         stadiumIncheon = stadiumRepository.findById(4L).orElseThrow();
     }
 
+    @DisplayName("취소된 경기도 직관 내역에 포함된다 - 최신순")
+    @Test
+    void findCheckInHistory_includesCanceled_orderByLatest() {
+        // given
+        Member member = memberFactory.save(b -> b.team(lotte));
+        long memberId = member.getId();
+        int year = 2025;
+        LocalDate startDate = LocalDate.of(year, 7, 25);
+
+        // COMPLETED
+        Game completed1 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate)
+                .homeTeam(lotte).homeScore(3).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(3))
+                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(completed1));
+
+        // CANCELED - 스코어보드 없음
+        Game canceled = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(1))
+                .homeTeam(lotte)
+                .awayTeam(kia)
+                .homeScoreBoard(null)
+                .awayScoreBoard(null)
+                .gameState(GameState.CANCELED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(canceled));
+
+        // COMPLETED
+        Game completed2 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(2))
+                .homeTeam(lotte).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(completed2));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(
+                memberId,
+                year,
+                CheckInResultFilter.ALL,
+                CheckInOrderFilter.LATEST
+        );
+
+        // then
+        assertThat(actual.checkInHistory()).hasSize(3)
+                .extracting(
+                        CheckInGameResponse::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.awayTeam().name()
+                ).containsExactly(
+                        tuple(startDate.plusDays(2), "롯데", "KIA"),
+                        tuple(startDate.plusDays(1), "롯데", "KIA"),
+                        tuple(startDate, "롯데", "KIA")
+                );
+
+        CheckInGameResponse canceledResponse = actual.checkInHistory().get(1);
+        assertThat(canceledResponse.homeScoreBoard()).isNull();
+        assertThat(canceledResponse.awayScoreBoard()).isNull();
+    }
+
+    @DisplayName("이긴 내역 필터 시 취소 경기는 제외된다")
+    @Test
+    void findCheckInWinHistory_excludesCanceled() {
+        // given
+        Member member = memberFactory.save(b -> b.team(kia));
+        long memberId = member.getId();
+        int year = 2025;
+        LocalDate startDate = LocalDate.of(year, 7, 25);
+
+        // CANCELED
+        Game canceled = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(2))
+                .homeTeam(kia)
+                .awayTeam(samsung)
+                .homeScoreBoard(null)
+                .awayScoreBoard(null)
+                .gameState(GameState.CANCELED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(canceled));
+
+        // COMPLETED win
+        Game win = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(1))
+                .homeTeam(kia).homeScore(4).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(4))
+                .awayTeam(samsung).awayScore(0).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(0))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(win));
+
+        // COMPLETED lose
+        Game lose = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(lose));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(
+                memberId,
+                year,
+                CheckInResultFilter.WIN,
+                CheckInOrderFilter.LATEST
+        );
+
+        // then
+        assertThat(actual.checkInHistory()).hasSize(1)
+                .extracting(CheckInGameResponse::attendanceDate)
+                .containsExactly(startDate.plusDays(1));
+    }
+
     @DisplayName("인증을 저장한다")
     @Test
     void findOccupancyRate() {
@@ -190,12 +305,23 @@ class CheckInServiceTest {
             );
             checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
         }
+        for (int i = 0; i < expectedSize; i++) {
+            final int index = i;
+            Game game = gameFactory.save(gameBuilder ->
+                    gameBuilder.date(startDate.plusDays(index + expectedSize))
+                            .stadium(stadiumJamsil)
+                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                            .awayTeam(kia).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                            .gameState(GameState.CANCELED)
+            );
+            checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
+        }
 
         // when
         CheckInCountsResponse actual = checkInService.findCheckInCounts(member.getId(), year);
 
         // then
-        assertThat(actual.checkInCounts()).isEqualTo(expectedSize);
+        assertThat(actual.checkInCounts()).isEqualTo(expectedSize * 2);
     }
 
     @DisplayName("직관 인증 내역을 모두 최신순으로 조회한다")
