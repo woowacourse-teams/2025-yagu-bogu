@@ -15,7 +15,6 @@ import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.datasource.token.TokenRemoteDataSource
-import com.yagubogu.data.network.PureInstance
 import com.yagubogu.data.network.RetrofitInstance
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.repository.AuthDefaultRepository
@@ -31,13 +30,13 @@ import timber.log.Timber
 
 class YaguBoguApplication : Application() {
     private val tokenManager by lazy { TokenManager(this) }
-    private val retrofit by lazy {
+    private val retrofit: RetrofitInstance by lazy {
         val baseUrl =
             if (BuildConfig.DEBUG) BuildConfig.BASE_URL_DEBUG else BuildConfig.BASE_URL_RELEASE
         RetrofitInstance(baseUrl, tokenManager)
     }
     private val pureClient by lazy {
-        PureInstance().pureClient
+        retrofit.loggingClient
     }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }

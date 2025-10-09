@@ -20,6 +20,13 @@ class RetrofitInstance(
     baseUrl: String,
     tokenManager: TokenManager,
 ) {
+    val loggingClient: OkHttpClient by lazy {
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
+    }
+
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level =
@@ -31,18 +38,11 @@ class RetrofitInstance(
         }
     }
 
-    private val tokenClient: OkHttpClient by lazy {
-        OkHttpClient()
-            .newBuilder()
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
-    }
-
     private val tokenRetrofit: Retrofit by lazy {
         Retrofit
             .Builder()
             .baseUrl(baseUrl)
-            .client(tokenClient)
+            .client(loggingClient)
             .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
     }
