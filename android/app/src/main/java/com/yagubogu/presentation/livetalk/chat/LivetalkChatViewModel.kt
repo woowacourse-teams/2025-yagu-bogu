@@ -42,7 +42,6 @@ class LivetalkChatViewModel(
     val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
 
     lateinit var cachedLivetalkTeams: LivetalkTeams
-    private val cachedTeamId by lazy { (cachedLivetalkTeams.myTeam.ordinal + 1).toLong() }
 
     private val _liveTalkChatBubbleItem = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItem: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItem
@@ -301,7 +300,7 @@ class LivetalkChatViewModel(
                     gameId,
                     LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
-                        likeDelta = LikeDeltaDto(teamId = cachedTeamId, delta = countToSend),
+                        likeDelta = LikeDeltaDto(teamCode = cachedLivetalkTeams.myTeam.name, delta = countToSend),
                     ),
                 )
             result

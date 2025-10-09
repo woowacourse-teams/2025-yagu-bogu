@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LikeDeltaDto(
-    @SerialName("teamId")
-    val teamId: Long, // 좋아요가 적용되는 팀 ID
+    @SerialName("teamCode")
+    val teamCode: String, // 좋아요가 적용되는 팀 코드
     @SerialName("delta")
     val delta: Int, // 좋아요의 증감 수치.
 )
