@@ -24,7 +24,6 @@ import com.yagubogu.sse.dto.CheckInCreatedEvent;
 import com.yagubogu.sse.dto.GameWithFanRateResponse;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ public class CheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
-    private final VictoryFairyRankingRepository victoryFairyRankingRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional

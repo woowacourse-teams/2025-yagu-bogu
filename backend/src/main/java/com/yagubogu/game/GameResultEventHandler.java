@@ -24,6 +24,7 @@ public class GameResultEventHandler {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleGameComplete(final GameCompletedEvent event) {
         int year = LocalDate.now().getYear();
+        
         statService.calculateVictoryScore(year, event.gameId());
     }
 }
