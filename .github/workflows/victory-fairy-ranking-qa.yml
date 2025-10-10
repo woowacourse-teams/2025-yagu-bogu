@@ -3,8 +3,6 @@ name: YaguBogu Backend Dev
 on:
   push:
     branches: [ "refactor/651" ]
-    paths:
-      - "backend/**"
   workflow_dispatch:
 
 env:
