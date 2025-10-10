@@ -24,16 +24,15 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     COALESCE(mb.progress, 0),
                     COALESCE(mb.achieved, false),
                     mb.achievedAt,
-                    COUNT(CASE WHEN mb2.achieved = true THEN 1 ELSE NULL END),
+                    (SELECT COUNT(mb2.id)
+                     FROM MemberBadge mb2
+                     WHERE mb2.badge.id = b.id AND mb2.achieved = true),
                     b.threshold,
                     b.badgeImageUrl
                 )
                 FROM Badge b
                 LEFT JOIN MemberBadge mb
                     ON b.id = mb.badge.id AND mb.member.id = :memberId
-                LEFT JOIN MemberBadge mb2
-                    ON b.id = mb2.badge.id
-                GROUP BY b.id, b.name, b.description, b.policy, mb.progress, mb.achieved, mb.achievedAt, b.threshold
             """)
     List<BadgeRawResponse> findAllBadgesWithAchievedCount(@Param("memberId") Long memberId);
 
