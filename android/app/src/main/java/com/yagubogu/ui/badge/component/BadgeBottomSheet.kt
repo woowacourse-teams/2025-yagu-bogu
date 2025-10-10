@@ -20,6 +20,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +40,6 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.White
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +54,7 @@ fun BadgeBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        containerColor = Color.White,
         modifier = modifier,
     ) {
         Column(
@@ -65,94 +66,111 @@ fun BadgeBottomSheet(
         ) {
             Badge(badge = badgeInfo.badge)
             Spacer(modifier = Modifier.height(10.dp))
-            Row {
-                Text(
-                    text = "${badgeInfo.achievedRate}",
-                    style = PretendardBold12,
-                    color = Primary700,
-                )
-                Text(
-                    text = stringResource(R.string.badge_achieved_rate_message),
-                    style = PretendardRegular12,
-                    color = Primary700,
-                )
-            }
-            HorizontalDivider(
-                thickness = 0.4.dp,
-                color = Gray300,
-                modifier = Modifier.padding(vertical = 20.dp),
-            )
-            Text(
-                text = badgeInfo.description,
-                style = PretendardMedium,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-            )
+            BadgeDescriptionHeader(badgeInfo)
             Spacer(modifier = Modifier.height(30.dp))
-            if (badgeInfo.badge.isAcquired) {
-                Button(
-                    onClick = { onRegisterClick(badgeInfo.badge.id) },
-                    enabled = !isRepresentativeBadge,
-                    colors =
-                        ButtonColors(
-                            containerColor = Primary500,
-                            contentColor = White,
-                            disabledContainerColor = Gray400,
-                            disabledContentColor = White,
-                        ),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text =
-                            stringResource(
-                                if (isRepresentativeBadge) {
-                                    R.string.badge_already_used_badge
-                                } else {
-                                    R.string.badge_register_main_badge
-                                },
-                            ),
-                        style = PretendardBold16,
-                    )
-                }
-                Text(
-                    text =
-                        stringResource(
-                            R.string.badge_achieved_date,
-                            badgeInfo.achievedAt?.format(DateFormatter.yyyyMMdd) ?: "",
-                        ),
-                    style = PretendardRegular12,
-                    color = Gray500,
-                    modifier = Modifier.padding(top = 12.dp),
-                )
-            } else {
-                LinearProgressIndicator(
-                    progress = { badgeInfo.progressRate.toFloat() / 100 },
-                    color = Primary500,
-                    trackColor = Gray300,
-                    gapSize = (-12).dp,
-                    drawStopIndicator = {},
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(12.dp),
-                )
-                Text(
-                    text =
-                        stringResource(
-                            R.string.badge_progress_rate,
-                            badgeInfo.progressRate.roundToInt(),
-                        ),
-                    style = PretendardRegular12,
-                    color = Gray500,
-                    modifier = Modifier.padding(top = 12.dp),
-                )
+            when (badgeInfo.badge.isAcquired) {
+                true -> AcquiredBadgeContent(onRegisterClick, badgeInfo, isRepresentativeBadge)
+                false -> UnacquiredBadgeContent(badgeInfo)
             }
-
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
+}
+
+@Composable
+private fun BadgeDescriptionHeader(badgeInfo: BadgeInfoUiModel) {
+    Row {
+        Text(
+            text = "${badgeInfo.achievedRate}",
+            style = PretendardBold12,
+            color = Primary700,
+        )
+        Text(
+            text = stringResource(R.string.badge_achieved_rate_message),
+            style = PretendardRegular12,
+            color = Primary700,
+        )
+    }
+    HorizontalDivider(
+        thickness = 0.4.dp,
+        color = Gray300,
+        modifier = Modifier.padding(vertical = 20.dp),
+    )
+    Text(
+        text = badgeInfo.description,
+        style = PretendardMedium,
+        fontSize = 14.sp,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun AcquiredBadgeContent(
+    onRegisterClick: (Long) -> Unit,
+    badgeInfo: BadgeInfoUiModel,
+    isRepresentativeBadge: Boolean,
+) {
+    Button(
+        onClick = { onRegisterClick(badgeInfo.badge.id) },
+        enabled = !isRepresentativeBadge,
+        colors =
+            ButtonColors(
+                containerColor = Primary500,
+                contentColor = White,
+                disabledContainerColor = Gray400,
+                disabledContentColor = White,
+            ),
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text =
+                stringResource(
+                    if (isRepresentativeBadge) {
+                        R.string.badge_already_used_badge
+                    } else {
+                        R.string.badge_register_main_badge
+                    },
+                ),
+            style = PretendardBold16,
+        )
+    }
+    Text(
+        text =
+            stringResource(
+                R.string.badge_achieved_date,
+                badgeInfo.achievedAt?.format(DateFormatter.yyyyMMdd) ?: "",
+            ),
+        style = PretendardRegular12,
+        color = Gray500,
+        modifier = Modifier.padding(top = 12.dp),
+    )
+}
+
+@Composable
+private fun UnacquiredBadgeContent(badgeInfo: BadgeInfoUiModel) {
+    LinearProgressIndicator(
+        progress = { (badgeInfo.progressRate / 100).toFloat() },
+        color = Primary500,
+        trackColor = Gray300,
+        gapSize = (-12).dp,
+        drawStopIndicator = {},
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(12.dp),
+    )
+    Text(
+        text =
+            stringResource(
+                R.string.badge_progress_rate,
+                badgeInfo.progressRate,
+            ),
+        style = PretendardRegular12,
+        color = Gray500,
+        modifier = Modifier.padding(top = 12.dp),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
