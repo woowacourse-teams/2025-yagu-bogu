@@ -54,7 +54,7 @@ class MemberFakeRepository(
             }
         }
 
-    override suspend fun patchRepresentativeBadge(badgeId: Long): Result<Unit> =
+    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> =
         when (isFailureMode) {
             true -> {
                 Result.failure(Exception())

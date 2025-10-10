@@ -18,20 +18,20 @@ class BadgeViewModel(
         fetchBadges()
     }
 
-    fun patchRepresentativeBadge(badgeId: Long) {
+    fun updateRepresentativeBadge(badgeId: Long) {
         viewModelScope.launch {
             val patchRepresentativeBadgeResult: Result<Unit> =
-                memberRepository.patchRepresentativeBadge(badgeId)
+                memberRepository.updateRepresentativeBadge(badgeId)
             patchRepresentativeBadgeResult
                 .onSuccess {
-                    updateRepresentativeBadge(badgeId)
+                    updateBadgeUiState(badgeId)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
     }
 
-    private fun updateRepresentativeBadge(badgeId: Long) {
+    private fun updateBadgeUiState(badgeId: Long) {
         val currentBadgeUiState: BadgeUiState = badgeUiState.value
 
         if (currentBadgeUiState is BadgeUiState.Success) {

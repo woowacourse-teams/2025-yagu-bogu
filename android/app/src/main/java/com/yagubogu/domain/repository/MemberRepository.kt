@@ -19,7 +19,7 @@ interface MemberRepository {
 
     suspend fun getBadges(): Result<BadgeUiState>
 
-    suspend fun patchRepresentativeBadge(badgeId: Long): Result<Unit>
+    suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit>
 
     fun invalidateCache()
 }

@@ -59,10 +59,10 @@ class BadgeViewModelTest :
                             listOf(BADGE_ID_0_ACQUIRED_FIXTURE_, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
                 badgeViewModel = BadgeViewModel(memberRepository)
-                badgeViewModel.patchRepresentativeBadge(0)
+                badgeViewModel.updateRepresentativeBadge(0)
 
                 // when - 대표 배지 1번으로 설정 요청
-                badgeViewModel.patchRepresentativeBadge(1)
+                badgeViewModel.updateRepresentativeBadge(1)
 
                 advanceUntilIdle()
 
@@ -88,7 +88,7 @@ class BadgeViewModelTest :
 
                 // when - 대표 배지 1번으로 설정 요청, 실패
                 memberRepository.isFailureMode = true
-                badgeViewModel.patchRepresentativeBadge(1)
+                badgeViewModel.updateRepresentativeBadge(1)
                 advanceUntilIdle()
 
                 // then
