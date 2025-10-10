@@ -802,7 +802,8 @@ class CheckInServiceTest {
                         new StadiumCheckInCountResponse(15L, "시민", 0L),
                         new StadiumCheckInCountResponse(16L, "무등", 0L),
                         new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L)
+                        new StadiumCheckInCountResponse(18L, "인천", 0L),
+                        new StadiumCheckInCountResponse(19L, "경산", 0L)
                 )
         );
 
@@ -846,7 +847,8 @@ class CheckInServiceTest {
                         new StadiumCheckInCountResponse(15L, "시민", 0L),
                         new StadiumCheckInCountResponse(16L, "무등", 0L),
                         new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L)
+                        new StadiumCheckInCountResponse(18L, "인천", 0L),
+                        new StadiumCheckInCountResponse(19L, "경산", 0L)
                 )
         );
 

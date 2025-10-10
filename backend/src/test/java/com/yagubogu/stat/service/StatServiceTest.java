@@ -652,7 +652,7 @@ class StatServiceTest {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(11);
+            s.assertThat(actual.opponents()).hasSize(13);
             OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
@@ -709,7 +709,7 @@ class StatServiceTest {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(11);
+            s.assertThat(actual.opponents()).hasSize(13);
             OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();

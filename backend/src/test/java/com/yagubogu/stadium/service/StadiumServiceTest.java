@@ -49,15 +49,14 @@ class StadiumServiceTest {
                 new StadiumResponse(15L, "대구시민운동장 야구장", "시민운동장", "시민", 35.881162, 128.586371),
                 new StadiumResponse(16L, "무등 야구장", "무등야구장", "무등", 35.169165, 126.887245),
                 new StadiumResponse(17L, "마산 야구장", "마산야구장", "마산", 35.220855, 128.581050),
-                new StadiumResponse(18L, "숭의 야구장", "숭의야구장", "인천", 37.466591, 126.643239)
+                new StadiumResponse(18L, "숭의 야구장", "숭의야구장", "인천", 37.466591, 126.643239),
+                new StadiumResponse(19L, "삼성 라이온즈 볼파크", "라이온즈볼파크", "경산", 35.864844, 128.805667)
         );
 
         // when
         StadiumsResponse actual = stadiumService.findAll();
 
         // then
-        Assertions.assertThat(actual.stadiums()).
-
-                isEqualTo(expected);
+        Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
     }
 }
