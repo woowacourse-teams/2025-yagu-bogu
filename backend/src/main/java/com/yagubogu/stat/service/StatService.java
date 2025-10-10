@@ -7,9 +7,9 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
+import com.yagubogu.stat.dto.CheckInSummary;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
@@ -40,7 +40,6 @@ public class StatService {
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -119,6 +118,19 @@ public class StatService {
         List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(winRates);
 
         return new OpponentWinRateResponse(responses);
+    }
+
+    public CheckInSummary findCheckInSummary(final long memberId, final int year) {
+        Member member = getMember(memberId);
+        validateUser(member);
+
+        StatCounts statCounts = checkInRepository.findStatCounts(member, year);
+        int totalCount = statCounts.winCounts() + statCounts.drawCounts() + statCounts.loseCounts();
+
+        int totalGamesForWinRate = statCounts.winCounts() + statCounts.loseCounts();
+        double winRate = calculateWinRate(statCounts.winCounts(), totalGamesForWinRate);
+
+        return new CheckInSummary(totalCount, winRate);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {

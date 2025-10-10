@@ -1,21 +1,21 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.dto.MemberCheckInResponse;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberProfileResponse;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stat.dto.CheckInSummary;
+import com.yagubogu.stat.service.StatService;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
@@ -23,15 +23,29 @@ import com.yagubogu.team.repository.TeamRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 public class MemberServiceTest {
 
     private MemberService memberService;
+
+    @Mock
+    private StatService statService;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -44,7 +58,7 @@ public class MemberServiceTest {
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberService(memberRepository, teamRepository);
+        memberService = new MemberService(memberRepository, teamRepository, statService);
     }
 
     @DisplayName("멤버가 응원하는 팀을 조회한다")
@@ -279,6 +293,76 @@ public class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.findMember(invalidMemberId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Member is not found");
+    }
+
+    @DisplayName("사용자의 프로필 정보를 조회한다")
+    @Test
+    void findProfileInformation() {
+        // given
+        Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        Member me = memberFactory.save(builder -> builder.nickname("진짜우가")
+                .team(favoriteTeam)
+                .build()
+        );
+        Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("우가")
+                .team(favoriteTeam)
+                .build()
+        );
+
+        CheckInSummary fakeSummary = new CheckInSummary(25, 75.0);
+        when(statService.findCheckInSummary(anyLong(), anyInt())).thenReturn(fakeSummary);
+        MemberCheckInResponse expectedCheckInResponse = MemberCheckInResponse.from(fakeSummary);
+
+        // when
+        MemberProfileResponse actual = memberService.findProfileInformation(me.getId(), profileOwneredMember.getId());
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.nickname()).isEqualTo(profileOwneredMember.getNickname().getValue());
+            softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(profileOwneredMember.getTeam().getShortName());
+            softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(profileOwneredMember.getImageUrl());
+            softAssertions.assertThat(actual.enterDate()).isEqualTo(profileOwneredMember.getCreatedAt().toLocalDate());
+            softAssertions.assertThat(actual.representativeBadge()).isNull();
+            softAssertions.assertThat(actual.victoryFairy()).isNull();
+            softAssertions.assertThat(actual.checkIn().counts()).isEqualTo(expectedCheckInResponse.counts());
+            softAssertions.assertThat(actual.checkIn().winRate()).isEqualTo(expectedCheckInResponse.winRate());
+        });
+    }
+
+    @DisplayName("예외: 로그인한 회원을 찾을 수 없으면 예외가 발생한다")
+    @Test
+    void findProfileInformation_notFoundLoginMember() {
+        // given
+        Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        long invalidLoginMemberId = 999999L;
+        Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("우가")
+                .team(favoriteTeam)
+                .build()
+        );
+
+        // when & then
+        assertThatThrownBy(
+                () -> memberService.findProfileInformation(invalidLoginMemberId, profileOwneredMember.getId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Member is not found");
+    }
+
+    @DisplayName("예외: 프로필 소유자의 회원을 찾을 수 없으면 예외가 발생한다")
+    @Test
+    void findProfileInformation_notFoundProfileOwnerMember() {
+        // given
+        Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        long invalidProfileOwnerMemberId = 999999L;
+        Member me = memberFactory.save(builder -> builder.nickname("우가")
+                .team(favoriteTeam)
+                .build()
+        );
+
+        // when & then
+        assertThatThrownBy(
+                () -> memberService.findProfileInformation(me.getId(), invalidProfileOwnerMemberId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }

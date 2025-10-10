@@ -8,9 +8,11 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberProfileResponse;
 import com.yagubogu.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -70,6 +72,15 @@ public class MemberController implements MemberControllerInterface {
             @RequestBody final MemberFavoriteRequest memberFavoriteRequest
     ) {
         MemberFavoriteResponse response = memberService.updateFavorite(memberClaims.id(), memberFavoriteRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<MemberProfileResponse> findProfileInformation(
+            final MemberClaims memberClaims,
+            @PathVariable final Long memberId
+    ) {
+        MemberProfileResponse response = memberService.findProfileInformation(memberClaims.id(), memberId);
 
         return ResponseEntity.ok(response);
     }

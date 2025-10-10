@@ -1,9 +1,5 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
@@ -39,6 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
 class StatServiceTest {
@@ -70,7 +70,7 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, stadiumRepository);
+        statService = new StatService(checkInRepository, memberRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
