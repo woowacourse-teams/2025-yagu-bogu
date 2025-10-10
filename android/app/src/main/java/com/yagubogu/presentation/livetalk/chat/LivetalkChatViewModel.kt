@@ -306,7 +306,11 @@ class LivetalkChatViewModel(
                     gameId,
                     LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
-                        likeDelta = LikeDeltaDto(teamCode = cachedLivetalkTeams.myTeam.name, delta = countToSend),
+                        likeDelta =
+                            LikeDeltaDto(
+                                teamCode = cachedLivetalkTeams.myTeam.name,
+                                delta = countToSend,
+                            ),
                     ),
                 )
             result
