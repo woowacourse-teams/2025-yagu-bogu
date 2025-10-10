@@ -49,7 +49,6 @@ class BadgeViewModel(
             val badgesResult: Result<BadgeUiState> = memberRepository.getBadges()
             badgesResult
                 .onSuccess { badges: BadgeUiState ->
-                    Timber.d("$badges")
                     badgeUiState.value = badges
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
