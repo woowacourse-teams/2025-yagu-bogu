@@ -8,10 +8,10 @@ import java.time.LocalDate
 interface GameRepository {
     suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>>
 
-    suspend fun getLikeBatches(
+    suspend fun addLikeBatches(
         gameId: Long,
         likeBatchRequest: LikeBatchRequest,
     ): Result<Unit>
 
-    suspend fun addLikeCounts(gameId: Long): Result<LikeCountsResponse>
+    suspend fun getLikeCounts(gameId: Long): Result<LikeCountsResponse>
 }

@@ -8,10 +8,10 @@ import java.time.LocalDate
 interface GameDataSource {
     suspend fun getGames(date: LocalDate): Result<GameResponse>
 
-    suspend fun getLikeBatches(
+    suspend fun addLikeBatches(
         gameId: Long,
         likeBatchRequest: LikeBatchRequest,
     ): Result<Unit>
 
-    suspend fun addLikeCounts(gameId: Long): Result<LikeCountsResponse>
+    suspend fun getLikeCounts(gameId: Long): Result<LikeCountsResponse>
 }

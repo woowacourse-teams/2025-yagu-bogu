@@ -1,12 +1,12 @@
 package com.yagubogu.presentation.livetalk.chat
 
-import com.yagubogu.data.dto.request.game.LikeDeltaDto
-import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.request.game.LikeBatchRequest
+import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.GameRepository
@@ -245,18 +245,24 @@ class LivetalkChatViewModel(
             return
         }
 
-        val result = gameRepository.addLikeCounts(gameId)
+        val result = gameRepository.getLikeCounts(gameId)
         result
             .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 // 서버에서 받아온 좋아요 수
                 val remoteMyTeamLikeCount: Long =
-                    if (likeCountsResponse.counts.isEmpty()) 0L
-                    else likeCountsResponse.counts.firstOrNull { it.teamCode == cachedLivetalkTeams.myTeam.name }?.totalCount
-                        ?: 0L
+                    if (likeCountsResponse.counts.isEmpty()) {
+                        0L
+                    } else {
+                        likeCountsResponse.counts.firstOrNull { it.teamCode == cachedLivetalkTeams.myTeam.name }?.totalCount
+                            ?: 0L
+                    }
                 val remoteOtherTeamLikeCount: Long =
-                    if (likeCountsResponse.counts.isEmpty()) 0L
-                    else likeCountsResponse.counts.firstOrNull { it.teamCode != cachedLivetalkTeams.myTeam.name }?.totalCount
-                        ?: 0L
+                    if (likeCountsResponse.counts.isEmpty()) {
+                        0L
+                    } else {
+                        likeCountsResponse.counts.firstOrNull { it.teamCode != cachedLivetalkTeams.myTeam.name }?.totalCount
+                            ?: 0L
+                    }
 
                 if (myTeamLikeRealCount == 0L) {
                     myTeamLikeRealCount = remoteMyTeamLikeCount
@@ -296,7 +302,7 @@ class LivetalkChatViewModel(
         if (countToSend > 0 && cachedLivetalkTeams.myTeamType != null) {
             Timber.d("보낸 수 countToSend: $countToSend")
             val result =
-                gameRepository.getLikeBatches(
+                gameRepository.addLikeBatches(
                     gameId,
                     LikeBatchRequest(
                         windowStartEpochSec = Instant.now().epochSecond,
