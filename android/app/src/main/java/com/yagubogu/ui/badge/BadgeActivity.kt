@@ -14,7 +14,7 @@ import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.theme.YaguBoguTheme
 
 class BadgeActivity : ComponentActivity() {
-    val viewModel: BadgeViewModel by viewModels { BadgeViewModelFactory((application as YaguBoguApplication).memberRepository) }
+    private val viewModel: BadgeViewModel by viewModels { BadgeViewModelFactory((application as YaguBoguApplication).memberRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,7 @@ class BadgeActivity : ComponentActivity() {
                 BadgeScreen(
                     badgeUiState = viewModel.badgeUiState.value,
                     onBackClick = { finish() },
-                    onRegisterClick = { badgeId: Long -> viewModel.patchRepresentativeBadge(badgeId) },
+                    onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
