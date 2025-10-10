@@ -20,9 +20,16 @@ class LivetalkTeams(
             awayTeam -> HomeAwayType.AWAY
             else -> null
         }
-    val otherTeamEmoji: String = when (myTeamType) {
-        HomeAwayType.HOME -> awayTeam.getEmoji()
-        HomeAwayType.AWAY -> homeTeam.getEmoji()
-        null -> ""
-    }
+    val otherTeam: Team? =
+        when (myTeamType) {
+            HomeAwayType.HOME -> awayTeam
+            HomeAwayType.AWAY -> homeTeam
+            null -> null
+        }
+    val otherTeamEmoji: String =
+        when (myTeamType) {
+            HomeAwayType.HOME -> awayTeam.getEmoji()
+            HomeAwayType.AWAY -> homeTeam.getEmoji()
+            null -> ""
+        }
 }

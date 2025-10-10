@@ -260,7 +260,7 @@ class LivetalkChatViewModel(
                     if (likeCountsResponse.counts.isEmpty()) {
                         0L
                     } else {
-                        likeCountsResponse.counts.firstOrNull { it.teamCode != cachedLivetalkTeams.myTeam.name }?.totalCount
+                        likeCountsResponse.counts.firstOrNull { it.teamCode != cachedLivetalkTeams.otherTeam?.name }?.totalCount
                             ?: 0L
                     }
 
