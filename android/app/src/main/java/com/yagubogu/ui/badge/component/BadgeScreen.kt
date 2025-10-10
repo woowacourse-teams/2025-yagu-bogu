@@ -93,11 +93,12 @@ private fun BadgeSuccessContent(
     val selectedBadge = rememberSaveable { mutableStateOf<BadgeInfoUiModel?>(null) }
 
     selectedBadge.value?.let { badgeInfo: BadgeInfoUiModel ->
-        val isEnabled = badgeInfo.badge.id != (badgeUiState.representativeBadge?.id ?: -1)
+        val isRepresentativeBadge =
+            badgeInfo.badge.id == (badgeUiState.representativeBadge?.id ?: -1)
 
         BadgeBottomSheet(
             badgeInfo = badgeInfo,
-            isEnabled = isEnabled,
+            isRepresentativeBadge = isRepresentativeBadge,
             onRegisterClick = { badgeId: Long ->
                 onRegisterClick(badgeId)
                 selectedBadge.value = null

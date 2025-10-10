@@ -45,7 +45,7 @@ import kotlin.math.roundToInt
 @Composable
 fun BadgeBottomSheet(
     badgeInfo: BadgeInfoUiModel,
-    isEnabled: Boolean,
+    isRepresentativeBadge: Boolean,
     onRegisterClick: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -92,7 +92,7 @@ fun BadgeBottomSheet(
             if (badgeInfo.badge.isAcquired) {
                 Button(
                     onClick = { onRegisterClick(badgeInfo.badge.id) },
-                    enabled = isEnabled,
+                    enabled = !isRepresentativeBadge,
                     colors =
                         ButtonColors(
                             containerColor = Primary500,
@@ -107,10 +107,10 @@ fun BadgeBottomSheet(
                     Text(
                         text =
                             stringResource(
-                                if (isEnabled) {
-                                    R.string.badge_register_main_badge
-                                } else {
+                                if (isRepresentativeBadge) {
                                     R.string.badge_already_used_badge
+                                } else {
+                                    R.string.badge_register_main_badge
                                 },
                             ),
                         style = PretendardBold16,
@@ -161,7 +161,7 @@ fun BadgeBottomSheet(
 private fun BadgeBottomSheetPreview() {
     BadgeBottomSheet(
         badgeInfo = BADGE_ID_0_NOT_ACQUIRED_FIXTURE,
-        isEnabled = true,
+        isRepresentativeBadge = true,
         onRegisterClick = {},
         onDismiss = {},
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
