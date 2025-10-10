@@ -2,6 +2,7 @@ package com.yagubogu.auth.service;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
+import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.dto.LoginResponse;
 import com.yagubogu.auth.dto.TokenResponse;
@@ -12,6 +13,7 @@ import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.dto.MemberFindResult;
 import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.member.MemberBuilder;
@@ -22,6 +24,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -29,9 +34,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @ActiveProfiles("integration")
+@ExtendWith(MockitoExtension.class)
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 class AuthServiceTest {
 
@@ -58,7 +66,7 @@ class AuthServiceTest {
     @Autowired
     private RefreshTokenFactory refreshTokenFactory;
 
-    @Autowired
+    @Mock
     private MemberService memberService;
 
     @BeforeEach
@@ -73,6 +81,11 @@ class AuthServiceTest {
         // given
         LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
 
+        Member fakeMember = memberFactory.save(builder -> builder.nickname("우가")
+                .build()
+        );
+        MemberFindResult newMemberResult = new MemberFindResult(fakeMember, true);
+        when(memberService.findMember(any(AuthResponse.class))).thenReturn(newMemberResult);
         // when
         LoginResponse response = authService.login(loginRequest);
 
@@ -89,6 +102,13 @@ class AuthServiceTest {
     void login() {
         // given
         LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
+
+        Member fakeExistingMember = memberFactory.save(builder -> builder.nickname("우가")
+                .build()
+        );
+        MemberFindResult existingMemberResult = new MemberFindResult(fakeExistingMember, false);
+        when(memberService.findMember(any(AuthResponse.class))).thenReturn(existingMemberResult);
+
         LoginResponse registerResponse = authService.login(loginRequest);
         String expectedNickname = registerResponse.member().nickname();
 
