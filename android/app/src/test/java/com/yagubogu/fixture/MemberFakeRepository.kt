@@ -4,7 +4,7 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE_
+import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 
 /**
@@ -47,7 +47,7 @@ class MemberFakeRepository(
             false -> {
                 Result.success(
                     BadgeUiState.Success(
-                        BADGE_ID_0_ACQUIRED_FIXTURE_.badge,
+                        BADGE_ID_0_ACQUIRED_FIXTURE.badge,
                         badgeList,
                     ),
                 )

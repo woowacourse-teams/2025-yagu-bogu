@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
 import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE_
+import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_0_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
@@ -220,7 +220,7 @@ private fun BadgeScreenPreview() {
             BadgeUiState.Success(
                 BADGE_ID_0_NOT_ACQUIRED_FIXTURE.badge,
                 listOf(
-                    BADGE_ID_0_ACQUIRED_FIXTURE_,
+                    BADGE_ID_0_ACQUIRED_FIXTURE,
                     BADGE_ID_1_ACQUIRED_FIXTURE,
                     BADGE_ID_0_NOT_ACQUIRED_FIXTURE,
                 ),

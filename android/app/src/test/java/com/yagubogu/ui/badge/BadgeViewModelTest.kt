@@ -1,7 +1,7 @@
 package com.yagubogu.ui.badge
 
 import com.yagubogu.fixture.MemberFakeRepository
-import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE_
+import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -56,7 +56,7 @@ class BadgeViewModelTest :
                     MemberFakeRepository(
                         isFailureMode = false,
                         badgeList =
-                            listOf(BADGE_ID_0_ACQUIRED_FIXTURE_, BADGE_ID_1_ACQUIRED_FIXTURE),
+                            listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
                 badgeViewModel = BadgeViewModel(memberRepository)
                 badgeViewModel.updateRepresentativeBadge(0)
@@ -81,7 +81,7 @@ class BadgeViewModelTest :
                     MemberFakeRepository(
                         isFailureMode = false,
                         badgeList =
-                            listOf(BADGE_ID_0_ACQUIRED_FIXTURE_, BADGE_ID_1_ACQUIRED_FIXTURE),
+                            listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
                 badgeViewModel = BadgeViewModel(memberRepository)
                 advanceUntilIdle()
