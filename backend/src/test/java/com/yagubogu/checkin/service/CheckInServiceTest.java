@@ -95,7 +95,6 @@ class CheckInServiceTest {
                 memberRepository,
                 stadiumRepository,
                 gameRepository,
-                victoryRankingRepository,
                 applicationEventPublisher
         );
 
