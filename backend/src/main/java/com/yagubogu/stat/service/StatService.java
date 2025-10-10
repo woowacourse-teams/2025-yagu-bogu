@@ -170,7 +170,7 @@ public class StatService {
                         teamFilter,
                         year
                 )
-                .map(victoryFairyRank -> VictoryFairyRankingResponse.from(victoryFairyRank))
+                .map(VictoryFairyRankingResponse::from)
                 .orElseGet(() -> VictoryFairyRankingResponse.emptyRanking(member));
 
         return new VictoryFairyRankingResponses(topRankingResponses, myRankingResponse);

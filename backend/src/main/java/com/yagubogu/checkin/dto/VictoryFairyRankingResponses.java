@@ -11,6 +11,7 @@ public record VictoryFairyRankingResponses(
 
     public record VictoryFairyRankingResponse(
             int ranking,
+            long memberId,
             String nickname,
             String profileImageUrl,
             String teamShortName,
@@ -18,13 +19,14 @@ public record VictoryFairyRankingResponses(
     ) {
 
         public static VictoryFairyRankingResponse emptyRanking(
-                Member myRankingData
+                Member member
         ) {
             return new VictoryFairyRankingResponse(
                     0,
-                    myRankingData.getNickname().toString(),
-                    myRankingData.getImageUrl(),
-                    myRankingData.getTeam().getShortName(),
+                    member.getId(),
+                    member.getNickname().toString(),
+                    member.getImageUrl(),
+                    member.getTeam().getShortName(),
                     0
             );
         }
@@ -38,6 +40,7 @@ public record VictoryFairyRankingResponses(
         public static VictoryFairyRankingResponse from(final VictoryFairyRank victoryFairyRank) {
             return new VictoryFairyRankingResponse(
                     victoryFairyRank.rank(),
+                    victoryFairyRank.memberId(),
                     victoryFairyRank.nickname(),
                     victoryFairyRank.profileImageUrl(),
                     victoryFairyRank.teamShortName(),
@@ -54,6 +57,7 @@ public record VictoryFairyRankingResponses(
 
         VictoryFairyRankingResponse myRankingResponse = new VictoryFairyRankingResponse(
                 myRanking,
+                myRankingData.memberId(),
                 myRankingData.nickname(),
                 myRankingData.profileImageUrl(),
                 myRankingData.teamShortName(),
@@ -70,6 +74,7 @@ public record VictoryFairyRankingResponses(
             VictoryFairyRankingEntryResponse data = topRankings.get(i);
             rankingResponses.add(new VictoryFairyRankingResponse(
                     i + 1,
+                    data.memberId(),
                     data.nickname(),
                     data.profileImageUrl(),
                     data.teamShortName(),
