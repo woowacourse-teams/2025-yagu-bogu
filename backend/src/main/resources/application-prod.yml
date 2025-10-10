@@ -30,3 +30,14 @@ springdoc:
 server:
   shutdown: graceful
   forward-headers-strategy: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+
+  metrics:
+    tags:
+      app: yagubogu
+      env: prod
