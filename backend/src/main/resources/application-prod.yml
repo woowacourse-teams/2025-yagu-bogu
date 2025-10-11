@@ -37,7 +37,21 @@ management:
       exposure:
         include: health, prometheus
 
+  tracing:
+    sampling:
+      probability: 0.2
+
+  otlp:
+    tracing:
+      endpoint: ${MONITORING_SERVER_URL}
+
   metrics:
     tags:
       app: yagubogu
       env: prod
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
