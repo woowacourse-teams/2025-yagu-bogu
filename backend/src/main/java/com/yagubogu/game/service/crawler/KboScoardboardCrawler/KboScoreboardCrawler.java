@@ -46,7 +46,32 @@ public class KboScoreboardCrawler {
         return crawlScoreboard(date, DEFAULT_LOGGER);
     }
 
-    private List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
+    public synchronized Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
+        Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
+        if (dates == null || dates.isEmpty()) {
+            return result;
+        }
+
+        Page page = null;
+        try {
+            page = pwManager.acquirePage();
+            page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
+
+            for (LocalDate date : dates) {
+                log.debug("조회 날짜: {}", date);
+                navigateToDateUsingCalendar(page, date, waitTimeout);
+                List<KboScoreboardGame> games = extractScoreboards(page, DEFAULT_LOGGER, date);
+                result.put(date, games);
+            }
+            return result;
+        } finally {
+            if (page != null) {
+                pwManager.releasePage(page);
+            }
+        }
+    }
+
+    private synchronized List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
         Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
         String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
 
@@ -79,31 +104,6 @@ public class KboScoreboardCrawler {
         }
 
         return List.of();
-    }
-
-    public Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
-        Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
-        if (dates == null || dates.isEmpty()) {
-            return result;
-        }
-
-        Page page = null;
-        try {
-            page = pwManager.acquirePage();
-            page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
-
-            for (LocalDate date : dates) {
-                log.debug("조회 날짜: {}", date);
-                navigateToDateUsingCalendar(page, date, waitTimeout);
-                List<KboScoreboardGame> games = extractScoreboards(page, DEFAULT_LOGGER, date);
-                result.put(date, games);
-            }
-            return result;
-        } finally {
-            if (page != null) {
-                pwManager.releasePage(page);
-            }
-        }
     }
 
     private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate,
