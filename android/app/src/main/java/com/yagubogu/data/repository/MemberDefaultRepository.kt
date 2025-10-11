@@ -4,10 +4,12 @@ import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.ui.dialog.model.MemberProfile
 
 class MemberDefaultRepository(
     private val memberDataSource: MemberDataSource,
@@ -73,6 +75,13 @@ class MemberDefaultRepository(
         memberDataSource.deleteMember().map {
             tokenManager.clearTokens()
         }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfile> =
+        memberDataSource
+            .getMemberProfile(memberId)
+            .map { memberProfileResponse: MemberProfileResponse ->
+                memberProfileResponse.toPresentation()
+            }
 
     override fun invalidateCache() {
         cachedNickname = null

@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
 import com.yagubogu.domain.model.Team
@@ -42,5 +43,10 @@ class MemberRemoteDataSource(
     override suspend fun deleteMember(): Result<Unit> =
         safeApiCall {
             memberApiService.deleteMember()
+        }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> =
+        safeApiCall {
+            memberApiService.getMemberProfile(memberId)
         }
 }

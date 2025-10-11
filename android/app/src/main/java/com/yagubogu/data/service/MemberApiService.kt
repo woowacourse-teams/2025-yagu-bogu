@@ -5,11 +5,13 @@ import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.Path
 
 interface MemberApiService {
     @GET("/api/members/me")
@@ -33,4 +35,9 @@ interface MemberApiService {
 
     @DELETE("/api/members/me")
     suspend fun deleteMember(): Response<Unit>
+
+    @GET("/api/members/{memberId}")
+    suspend fun getMemberProfile(
+        @Path("memberId") memberId: Long,
+    ): Response<MemberProfileResponse>
 }
