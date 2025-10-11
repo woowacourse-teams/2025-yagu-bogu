@@ -10,6 +10,8 @@
     <string name="all_count">%d회</string>
     <string name="all_null_nick_name">(알 수 없음)</string>
     <string name="all_back_button_content_description">뒤로가기</string>
+    <string name="all_ranking">%d등</string>
+    <string name="all_score">%d점</string>
 
     <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
 

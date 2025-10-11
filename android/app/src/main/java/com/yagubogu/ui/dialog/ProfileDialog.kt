@@ -24,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.yagubogu.R
+import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold20
@@ -39,7 +41,10 @@ import com.yagubogu.ui.theme.Primary600
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileDialog(modifier: Modifier = Modifier) {
+fun ProfileDialog(
+    memberProfile: MemberProfile,
+    modifier: Modifier = Modifier,
+) {
     BasicAlertDialog(
         onDismissRequest = {},
         modifier =
@@ -55,35 +60,38 @@ fun ProfileDialog(modifier: Modifier = Modifier) {
                     contentDescription = "프로필 이미지",
                     modifier = modifier.clip(CircleShape),
                 )
-                ProfileHeader()
+                ProfileHeader(memberProfile)
                 HorizontalDivider(
                     thickness = 0.4.dp,
                     color = Gray300,
                     modifier = modifier.padding(vertical = 12.dp),
                 )
-                ProfileContent()
+                ProfileContent(memberProfile)
             }
         },
     )
 }
 
 @Composable
-fun ProfileHeader(modifier: Modifier = Modifier) {
+fun ProfileHeader(
+    memberProfile: MemberProfile,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier.padding(top = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             Text(
-                "말문이 트이다",
+                text = memberProfile.representativeBadgeName,
                 style = PretendardMedium,
                 fontSize = 14.sp,
                 color = Primary600,
             )
-            Text("우가우가귀여운보욱이우가", style = PretendardSemiBold, fontSize = 20.sp)
+            Text(text = memberProfile.nickname, style = PretendardSemiBold, fontSize = 20.sp)
             Spacer(modifier = modifier.height(12.dp))
             Text(
-                "가입한 날 : 2025.08.14",
+                text = "가입한 날 : 2025.08.14",
                 style = PretendardRegular12,
                 color = Gray500,
             )
@@ -97,7 +105,10 @@ fun ProfileHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ProfileContent(modifier: Modifier = Modifier) {
+fun ProfileContent(
+    memberProfile: MemberProfile,
+    modifier: Modifier = Modifier,
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -111,11 +122,15 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f, true),
         ) {
-            Text("\uD83C\uDF96\uFE0F", fontSize = 24.sp)
+            Text(text = "\uD83C\uDF96\uFE0F", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("275등", style = PretendardSemiBold, fontSize = 20.sp)
+            Text(
+                text = stringResource(R.string.all_ranking, memberProfile.victoryFairyRanking),
+                style = PretendardSemiBold,
+                fontSize = 20.sp,
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text("승리 요정 랭킹", style = PretendardRegular12)
+            Text(text = "승리 요정 랭킹", style = PretendardRegular12)
         }
         VerticalDivider(
             thickness = 0.4.dp,
@@ -126,11 +141,15 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f, true),
         ) {
-            Text("\uD83E\uDDDA", fontSize = 24.sp)
+            Text(text = "\uD83E\uDDDA", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("33점", style = PretendardSemiBold, fontSize = 20.sp)
+            Text(
+                text = stringResource(R.string.all_score, memberProfile.victoryFairyScore),
+                style = PretendardSemiBold,
+                fontSize = 20.sp,
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text("승리 요정 점수", style = PretendardRegular12)
+            Text(text = "승리 요정 점수", style = PretendardRegular12)
         }
     }
 
@@ -147,7 +166,7 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f, true),
         ) {
-            Text("KIA", style = PretendardBold20)
+            Text(text = memberProfile.favoriteTeam, style = PretendardBold20)
             Spacer(modifier = Modifier.height(4.dp))
             Text("응원 팀", style = PretendardRegular12)
         }
@@ -160,9 +179,9 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f, true),
         ) {
-            Text("25", style = PretendardBold20)
+            Text(text = "25", style = PretendardBold20)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("인증 횟수", style = PretendardRegular12)
+            Text(text = "인증 횟수", style = PretendardRegular12)
         }
         VerticalDivider(
             thickness = 0.4.dp,
@@ -173,9 +192,9 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f, true),
         ) {
-            Text("75%", style = PretendardBold20)
+            Text(text = "75%", style = PretendardBold20)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("직관 승률", style = PretendardRegular12)
+            Text(text = "직관 승률", style = PretendardRegular12)
         }
     }
 }
@@ -183,5 +202,18 @@ fun ProfileContent(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun ProfileDialogPreview() {
-    ProfileDialog()
+    ProfileDialog(
+        MemberProfile(
+            nickname = "우가우가귀여운보욱이우가",
+            enterDate = "2025-08-22",
+            profileImageUrl = "",
+            favoriteTeam = "KIA",
+            representativeBadgeName = "말문이 트이다",
+            representativeBadgeImageUrl = "",
+            victoryFairyRanking = 275,
+            victoryFairyScore = 33,
+            checkInCounts = 11,
+            checkInWinRate = "60%",
+        ),
+    )
 }

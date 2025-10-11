@@ -18,7 +18,7 @@ class VictoryFairyViewHolder private constructor(
     }
 
     interface Handler {
-        fun onProfileImageClick(item: VictoryFairyItem)
+        fun onProfileImageClick(memberId: Long)
     }
 
     companion object {

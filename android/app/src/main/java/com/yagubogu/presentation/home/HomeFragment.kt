@@ -34,7 +34,6 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
-import com.yagubogu.presentation.home.ranking.VictoryFairyItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
@@ -42,6 +41,8 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.dialog.ProfileDialog
+import com.yagubogu.ui.dialog.model.MemberProfile
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -164,6 +165,10 @@ class HomeFragment :
 
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)
+        }
+
+        viewModel.profileImageClickEvent.observe(viewLifecycleOwner) { value: MemberProfile ->
+            showMemberProfileDialog(value)
         }
     }
 
@@ -311,8 +316,14 @@ class HomeFragment :
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
-    override fun onProfileImageClick(item: VictoryFairyItem) {
-        // TODO ViewModel API 호출 로직 추가
+    private fun showMemberProfileDialog(memberProfile: MemberProfile) {
+        binding.composeView.setContent {
+            ProfileDialog(memberProfile)
+        }
+    }
+
+    override fun onProfileImageClick(memberId: Long) {
+        viewModel.fetchMemberProfile(memberId)
     }
 
     companion object {

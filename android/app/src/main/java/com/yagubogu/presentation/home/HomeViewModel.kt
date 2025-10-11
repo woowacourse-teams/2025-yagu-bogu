@@ -21,6 +21,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.dialog.model.MemberProfile
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -63,6 +64,9 @@ class HomeViewModel(
     private val _hasAlreadyCheckedIn = MutableLiveData<Boolean>()
     val hasAlreadyCheckedIn: LiveData<Boolean> get() = _hasAlreadyCheckedIn
 
+    private val _profileImageClickEvent = MutableSingleLiveData<MemberProfile>()
+    val profileImageClickEvent: SingleLiveData<MemberProfile> = _profileImageClickEvent
+
     init {
         fetchAll()
     }
@@ -103,6 +107,34 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    fun fetchMemberProfile(memberId: Long) {
+//        viewModelScope.launch {
+//            val memberProfileResult: Result<MemberProfile> =
+//                memberRepository.getMemberProfile(memberId)
+//            memberProfileResult
+//                .onSuccess { memberProfile: MemberProfile ->
+//                    _profileImageClickEvent.setValue(memberProfile)
+//                }.onFailure { exception: Throwable ->
+//                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+//                }
+//        }
+        // TODO API 배포되면 주석 제거
+        _profileImageClickEvent.setValue(
+            MemberProfile(
+                nickname = "우가우가귀여운보욱이우가",
+                enterDate = "2025-08-22",
+                profileImageUrl = "",
+                favoriteTeam = "KIA",
+                representativeBadgeName = "말문이 트이다",
+                representativeBadgeImageUrl = "",
+                victoryFairyRanking = 275,
+                victoryFairyScore = 33,
+                checkInCounts = 11,
+                checkInWinRate = "60%",
+            ),
+        )
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
