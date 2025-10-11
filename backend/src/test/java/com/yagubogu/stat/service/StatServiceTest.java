@@ -33,6 +33,7 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -520,14 +521,14 @@ class StatServiceTest {
         Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
 
         // 2025-07: HT vs SS → 2승
-        var g1 = gameFactory.save(b -> b.stadium(kia)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(SS)
                 .date(LocalDate.of(2025, 7, 10))
                 .homeScore(5).awayScore(3)
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.member(member).team(HT).game(g1));
 
-        var g2 = gameFactory.save(b -> b.stadium(sam)
+        Game g2 = gameFactory.save(b -> b.stadium(sam)
                 .homeTeam(SS).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 11))
                 .homeScore(2).awayScore(4)
@@ -535,14 +536,14 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(g2));
 
         // 2025-07: HT vs LT → 1승 1패
-        var g3 = gameFactory.save(b -> b.stadium(kia)
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 12))
                 .homeScore(6).awayScore(2)
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.member(member).team(HT).game(g3));
 
-        var g4 = gameFactory.save(b -> b.stadium(lot)
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 7, 13))
                 .homeScore(7).awayScore(1)
@@ -550,7 +551,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(g4));
 
         // 2025-07: HT vs NC → 1무
-        var g5 = gameFactory.save(b -> b.stadium(kia)
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(NC)
                 .date(LocalDate.of(2025, 7, 14))
                 .homeScore(4).awayScore(4)
@@ -573,14 +574,14 @@ class StatServiceTest {
             s.assertThat(actual.opponents()).hasSize(expectedOpponents);
 
             // 2) 상단 랭킹 고정값 검증
-            var first = actual.opponents().get(0);
+            OpponentWinRateTeamResponse first = actual.opponents().get(0);
             s.assertThat(first.teamCode()).isEqualTo("SS");
             s.assertThat(first.wins()).isEqualTo(2);
             s.assertThat(first.losses()).isEqualTo(0);
             s.assertThat(first.draws()).isEqualTo(0);
             s.assertThat(first.winRate()).isEqualTo(100.0);
 
-            var second = actual.opponents().get(1);
+            OpponentWinRateTeamResponse second = actual.opponents().get(1);
             s.assertThat(second.teamCode()).isEqualTo("LT");
             s.assertThat(second.wins()).isEqualTo(1);
             s.assertThat(second.losses()).isEqualTo(1);
@@ -588,7 +589,7 @@ class StatServiceTest {
             s.assertThat(second.winRate()).isEqualTo(50.0);
 
             // 3) NC는 1무로 승률 0.0
-            var ncRes = actual.opponents().stream()
+            OpponentWinRateTeamResponse ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
             s.assertThat(ncRes.wins()).isZero();
@@ -597,13 +598,13 @@ class StatServiceTest {
             s.assertThat(ncRes.winRate()).isEqualTo(0.0);
 
             // 4) 미대결(또는 무만 있는) 팀: winRate == 0.0
-            var zeroCodesActual = actual.opponents().stream()
+            Set<String> zeroCodesActual = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
                     .map(OpponentWinRateTeamResponse::teamCode)
                     .collect(Collectors.toSet());
 
             // 기대 집합 = 전체 팀코드 - {내 팀 HT, SS, LT}  (SS/LT는 100/50이라 제외)
-            var zeroCodesExpected = teamRepository.findAll().stream()
+            Set<String> zeroCodesExpected = teamRepository.findAll().stream()
                     .map(Team::getTeamCode)
                     .filter(code -> !code.equals(HT.getTeamCode()))
                     .filter(code -> !code.equals("SS"))
@@ -613,7 +614,7 @@ class StatServiceTest {
             s.assertThat(zeroCodesActual).isEqualTo(zeroCodesExpected);
 
             // 5) 전체 정렬 규칙 검증: 승률 desc → 이름 asc
-            var sorted = actual.opponents().stream()
+            List<OpponentWinRateTeamResponse> sorted = actual.opponents().stream()
                     .sorted(Comparator
                             .comparing(OpponentWinRateTeamResponse::winRate).reversed()
                             .thenComparing(OpponentWinRateTeamResponse::name))
@@ -689,7 +690,7 @@ class StatServiceTest {
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
         // 미기록(제외: SCHEDULED)
-        var gScheduled = gameFactory.save(b -> b.stadium(kia)
+        Game gScheduled = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 30))
                 .homeScore(null).awayScore(null)
@@ -697,7 +698,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(gScheduled));
 
         // 기록(포함, 승)
-        var gCompleted = gameFactory.save(b -> b.stadium(kia)
+        Game gCompleted = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 8, 2))
                 .homeScore(2).awayScore(1)
@@ -740,7 +741,7 @@ class StatServiceTest {
         Member other = memberFactory.save(b -> b.team(HT));
 
         // 2025-08-01: HT(home) vs LT — COMPLETED (대상 회원 체크인 없음 → 제외)
-        var gHome = gameFactory.save(b -> b.stadium(kia)
+        Game gHome = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 8, 1))
                 .homeScore(3).awayScore(2)
@@ -748,7 +749,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(other).team(HT).game(gHome));
 
         // 2025-08-02: LT(home) vs HT — COMPLETED (대상 회원 체크인 없음 → 제외)
-        var gAway = gameFactory.save(b -> b.stadium(lot)
+        Game gAway = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 8, 2))
                 .homeScore(1).awayScore(5)
