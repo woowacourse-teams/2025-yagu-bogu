@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.gms.common.api.ResolvableApiException
@@ -33,7 +34,9 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
+import com.yagubogu.presentation.home.ranking.VictoryFairyItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
+import com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
@@ -43,7 +46,8 @@ import com.yagubogu.presentation.util.showSnackbar
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
     Fragment(),
-    ScrollToTop {
+    ScrollToTop,
+    VictoryFairyViewHolder.Handler {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -61,7 +65,7 @@ class HomeFragment :
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
-    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
+    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter(this) }
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
@@ -83,6 +87,7 @@ class HomeFragment :
         setupObservers()
         setupFragmentResultListener()
         setupBalloons()
+        setupComposeView()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -300,6 +305,14 @@ class HomeFragment :
             victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
             firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
         }
+    }
+
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    }
+
+    override fun onProfileImageClick(item: VictoryFairyItem) {
+        // TODO ViewModel API 호출 로직 추가
     }
 
     companion object {

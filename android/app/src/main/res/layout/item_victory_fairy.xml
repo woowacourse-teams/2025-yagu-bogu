@@ -8,6 +8,10 @@
         <variable
             name="victoryFairyItem"
             type="com.yagubogu.presentation.home.ranking.VictoryFairyItem" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder.Handler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,6 +46,7 @@
             app:strokeColor="@color/gray300"
             app:strokeWidth="1dp"
             app:userProfileImage="@{victoryFairyItem.profileImageUrl}"
+            android:onClick="@{() -> handler.onProfileImageClick(victoryFairyItem)}"
             tools:src="@drawable/ic_user" />
 
         <TextView
