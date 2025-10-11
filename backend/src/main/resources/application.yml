@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: yagubogu-backend
+
   profiles:
     active: local
 
