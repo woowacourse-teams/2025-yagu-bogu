@@ -43,7 +43,6 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -234,36 +233,20 @@ class CheckInServiceTest {
                 builder.stadium(stadiumJamsil)
                         .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1)));
-        CreateCheckInRequest request = new CreateCheckInRequest(stadiumJamsil.getId(), game.getDate());
+        CreateCheckInRequest request = new CreateCheckInRequest(game.getId());
 
         // when & then
         assertThatCode(() -> checkInService.createCheckIn(member.getId(), request))
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("구장을 찾을 수 없으면 예외가 발생한다")
-    @Test
-    void createCheckIn_notFoundStadium() {
-        // given
-        long memberId = 1L;
-        long invalidStadiumId = 999L;
-        LocalDate date = TestFixture.getToday();
-        CreateCheckInRequest request = new CreateCheckInRequest(invalidStadiumId, date);
-
-        // when & then
-        Assertions.assertThatThrownBy(() -> checkInService.createCheckIn(memberId, request))
-                .isExactlyInstanceOf(NotFoundException.class)
-                .hasMessage("Stadium is not found");
-    }
-
     @DisplayName("경기를 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundGame() {
         // given
+        long invalidGameId = 999999L;
         long memberId = 1L;
-        long stadiumId = 1L;
-        LocalDate invalidDate = TestFixture.getInvalidDate();
-        CreateCheckInRequest request = new CreateCheckInRequest(stadiumId, invalidDate);
+        CreateCheckInRequest request = new CreateCheckInRequest(invalidGameId);
 
         // when & then
         assertThatThrownBy(() -> checkInService.createCheckIn(memberId, request))
@@ -278,7 +261,7 @@ class CheckInServiceTest {
         long invalidMemberId = 999L;
         Game game = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
                 .homeTeam(kia).awayTeam(kt).date(LocalDate.now()));
-        CreateCheckInRequest request = new CreateCheckInRequest(stadiumJamsil.getId(), game.getDate());
+        CreateCheckInRequest request = new CreateCheckInRequest(game.getId());
 
         // when & then
         assertThatThrownBy(() -> checkInService.createCheckIn(invalidMemberId, request))
