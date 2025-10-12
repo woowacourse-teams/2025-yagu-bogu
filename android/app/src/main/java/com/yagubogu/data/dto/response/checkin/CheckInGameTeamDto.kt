@@ -23,7 +23,7 @@ data class CheckInGameTeamDto(
         GameTeam(
             team = Team.getByCode(code),
             name = name,
-            score = score?.toString() ?: "-",
+            score = score?.toString() ?: DEFAULT_SCORE,
             isMyTeam = isMyTeam,
             gameResult =
                 if (score == null || opponent.score == null) {
@@ -32,4 +32,8 @@ data class CheckInGameTeamDto(
                     GameResult.from(score, opponent.score)
                 },
         )
+
+    companion object {
+        private const val DEFAULT_SCORE = "-"
+    }
 }
