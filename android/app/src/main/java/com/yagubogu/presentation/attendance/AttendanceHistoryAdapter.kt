@@ -64,6 +64,10 @@ class AttendanceHistoryAdapter(
                             newItem is AttendanceHistoryItem.Detail ->
                             oldItem.summary.id == newItem.summary.id
 
+                        oldItem is AttendanceHistoryItem.Canceled &&
+                            newItem is AttendanceHistoryItem.Canceled ->
+                            oldItem.summary.id == newItem.summary.id
+
                         else -> false
                     }
 
