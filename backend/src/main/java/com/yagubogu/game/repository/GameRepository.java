@@ -18,11 +18,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByGameCode(String gameCode);
 
-    List<Game> findByDate(LocalDate date);
-
-    List<Game> findGameByDate(LocalDate date);
-
-
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
                 g.id,
@@ -50,4 +45,12 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             GROUP BY g.id
             """)
     List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
+
+    @Query("""
+                select g
+                from Game g
+                join fetch g.stadium s
+                where g.date = :date
+            """)
+    List<Game> findByDateWithStadium(LocalDate date);
 }
