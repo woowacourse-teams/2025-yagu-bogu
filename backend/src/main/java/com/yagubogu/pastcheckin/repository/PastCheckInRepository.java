@@ -1,5 +1,6 @@
 package com.yagubogu.pastcheckin.repository;
 
+import com.yagubogu.member.domain.Member;
 import com.yagubogu.pastcheckin.domain.PastCheckIn;
 import com.yagubogu.stat.dto.StadiumStatsDto;
 import java.time.LocalDate;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PastCheckInRepository extends JpaRepository<PastCheckIn, Long> {
+
+    boolean existsByMemberAndGameDate(Member member, LocalDate date);
 
     @Query("""
                 SELECT new com.yagubogu.stat.dto.StadiumStatsDto(
