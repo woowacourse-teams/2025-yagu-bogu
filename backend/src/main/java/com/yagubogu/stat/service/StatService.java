@@ -7,7 +7,7 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
@@ -20,8 +20,11 @@ import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,8 +42,8 @@ public class StatService {
             .thenComparing(OpponentWinRateTeamResponse::name);
 
     private final CheckInRepository checkInRepository;
+    private final PastCheckInRepository pastCheckInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -83,14 +86,11 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        List<StadiumStatsDto> hello = checkInRepository.findWinAndNonDrawCountByStadium(
-                memberId,
-                LocalDate.of(year, 1, 1),
-                LocalDate.of(year, 12, 31)
-        );
+        List<StadiumStatsDto> combinedStats = getCombinedStadiumStats(memberId, year);
+
         double lowestWinRate = 0;
         String luckyStadiumName = null;
-        for (StadiumStatsDto stadiumStatsDto : hello) {
+        for (StadiumStatsDto stadiumStatsDto : combinedStats) {
             long winCounts = stadiumStatsDto.winCounts();
             long totalCountsWithoutDraw = stadiumStatsDto.totalCountsWithoutDraw();
 
@@ -102,6 +102,39 @@ public class StatService {
         }
 
         return new LuckyStadiumResponse(luckyStadiumName);
+    }
+
+    private List<StadiumStatsDto> getCombinedStadiumStats(final long memberId, final int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        List<StadiumStatsDto> checkInStats = checkInRepository.findWinAndNonDrawCountByStadium(
+                memberId, startDate, endDate
+        );
+        List<StadiumStatsDto> pastCheckInStats = pastCheckInRepository.findWinAndNonDrawCountByStadiumFromPastCheckIn(
+                memberId, startDate, endDate
+        );
+
+        Map<String, StadiumStatsDto> statsMap = new HashMap<>();
+        for (StadiumStatsDto stat : checkInStats) {
+            statsMap.put(stat.stadiumName(), stat);
+        }
+
+        for (StadiumStatsDto stat : pastCheckInStats) {
+            if (statsMap.containsKey(stat.stadiumName())) {
+                StadiumStatsDto existing = statsMap.get(stat.stadiumName());
+                StadiumStatsDto combined = new StadiumStatsDto(
+                        stat.stadiumName(),
+                        existing.winCounts() + stat.winCounts(),
+                        existing.totalCountsWithoutDraw() + stat.totalCountsWithoutDraw()
+                );
+                statsMap.put(stat.stadiumName(), combined);
+            } else {
+                statsMap.put(stat.stadiumName(), stat);
+            }
+        }
+
+        return new ArrayList<>(statsMap.values());
     }
 
     public AverageStatisticResponse findAverageStatistic(final long memberId) {

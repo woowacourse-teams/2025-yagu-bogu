@@ -15,9 +15,11 @@ import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
+import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.support.refreshtoken.RefreshTokenFactory;
 import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
+import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import com.yagubogu.team.repository.TeamRepository;
@@ -64,6 +66,11 @@ public class AuthTestConfig {
     @Bean
     public CheckInFactory checkInFactory(final CheckInRepository checkInRepository) {
         return new CheckInFactory(checkInRepository);
+    }
+
+    @Bean
+    public PastCheckInFactory pastCheckInFactory(final PastCheckInRepository pastCheckInRepository) {
+        return new PastCheckInFactory(pastCheckInRepository);
     }
 
     @Bean

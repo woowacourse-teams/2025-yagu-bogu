@@ -1,7 +1,9 @@
 package com.yagubogu.pastcheckin.service;
 
+import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -25,6 +27,7 @@ public class PastCheckInService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
+    private final CheckInRepository checkInRepository;
 
     @Transactional
     public void createPastCheckIn(final Long memberId, final CreatePastCheckInRequest request) {
@@ -36,8 +39,17 @@ public class PastCheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
+        validateCheckIn(member, game);
+
         PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
         pastCheckInRepository.save(pastCheckIn);
+    }
+
+    private void validateCheckIn(final Member member, final Game game) {
+        boolean hasCheckIn = checkInRepository.existsByMemberAndGameDate(member, game.getDate());
+        if (hasCheckIn) {
+            throw new BadRequestException("CheckIn already exists");
+        }
     }
 
     private Stadium getStadiumById(final long stadiumId) {

@@ -1,7 +1,6 @@
 package com.yagubogu.pastcheckin.domain;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
@@ -21,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "past_check_ins")
 @Entity
-public class PastCheckIn extends BaseEntity {
+public class PastCheckIn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
