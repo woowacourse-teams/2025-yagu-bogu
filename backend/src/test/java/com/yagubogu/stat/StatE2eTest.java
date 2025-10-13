@@ -212,6 +212,80 @@ public class StatE2eTest extends E2eTestBase {
                 .statusCode(403);
     }
 
+    @DisplayName("팀 변경 시 승률이 현재 팀 기준으로 반영된다")
+    @Test
+    void findWinRate_changesWithFavoriteTeam() {
+        // given: 초기 즐겨찾기 KIA → 승률 100%
+        Team kiaTeam = ht; // HT
+        Team doosanTeam = teamRepository.findByTeamCode("OB").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(kiaTeam));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 22);
+        Game winGame = gameFactory.save(b -> b
+                .stadium(kia)
+                .homeTeam(kiaTeam).awayTeam(ss)
+                .date(date)
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED)
+        );
+        checkInFactory.save(b -> b.game(winGame).member(member).team(kiaTeam));
+
+        // when: HT 기준 승률 확인 → 100.0
+        WinRateResponse winRateAsHT = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAsHT.winRate()).isEqualTo(100.0);
+
+        // 팀을 두산(OB)으로 변경
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(doosanTeam.getTeamCode()))
+                .when().patch("/api/members/favorites")
+                .then().log().all()
+                .statusCode(200);
+
+        // then: OB 기준 승률 확인 → 0.0 (현재 팀에서 인증한 체크인이 없음)
+        WinRateResponse winRateAsOB = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAsOB.winRate()).isEqualTo(0.0);
+
+        // 다시 KIA(HT)로 변경
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(kiaTeam.getTeamCode()))
+                .when().patch("/api/members/favorites")
+                .then().log().all()
+                .statusCode(200);
+
+        // 최종: HT 기준 승률 확인 → 100.0으로 복원
+        WinRateResponse winRateAgainAsHT = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAgainAsHT.winRate()).isEqualTo(100.0);
+    }
+
     @DisplayName("행운의 구장을 조회한다")
     @Test
     void findLuckyStadium() {
