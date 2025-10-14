@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
@@ -32,6 +33,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
 
     private fun setupView() {
         enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.constraintFavoriteTeamRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
