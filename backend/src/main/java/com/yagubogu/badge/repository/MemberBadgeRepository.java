@@ -12,5 +12,5 @@ public interface MemberBadgeRepository extends JpaRepository<MemberBadge, Long> 
 
     Optional<MemberBadge> findByMemberAndBadge(Member member, Badge badge);
 
-    boolean existsByMemberAndBadgeAndAchievedTrue(Member member, Badge badge);
+    boolean existsByMemberAndBadgeAndIsAchievedTrue(Member member, Badge badge);
 }
