@@ -49,16 +49,16 @@ public class MemberBadge extends BaseEntity {
         this.member = member;
     }
 
-    public void increaseProgress(final int threshold) {
+    public void increaseProgress() {
         if (achieved) {
             return;
         }
         progress++;
-        checkUpdateAchieved(threshold);
+        checkUpdateAchieved();
     }
 
-    private void checkUpdateAchieved(final int threshold) {
-        if (progress >= threshold) {
+    private void checkUpdateAchieved() {
+        if (progress >= badge.getThreshold()) {
             achieved = true;
             achievedAt = LocalDateTime.now();
         }

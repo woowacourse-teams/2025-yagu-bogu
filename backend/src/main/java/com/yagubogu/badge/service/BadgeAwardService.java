@@ -22,7 +22,7 @@ public class BadgeAwardService {
         for (Badge badge : candidate.badges()) {
             MemberBadge memberBadge = memberBadgeRepository.findByMemberAndBadge(member, badge)
                     .orElseGet(() -> memberBadgeRepository.save(new MemberBadge(badge, member)));
-            memberBadge.increaseProgress(badge.getThreshold());
+            memberBadge.increaseProgress();
         }
     }
 }

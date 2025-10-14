@@ -32,7 +32,7 @@ public class MemberBadgeBuilder {
     public MemberBadge build() {
         MemberBadge mb = new MemberBadge(badge, member);
         if (isAchieved) {
-            mb.increaseProgress(badge.getThreshold());
+            mb.increaseProgress();
         }
         return mb;
     }
