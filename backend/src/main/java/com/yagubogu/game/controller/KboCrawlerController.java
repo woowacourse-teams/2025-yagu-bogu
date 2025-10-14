@@ -2,6 +2,7 @@ package com.yagubogu.game.controller;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
+import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.dto.ScheduleResponse;
 import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.dto.TeamWinRateResponse;
@@ -10,6 +11,7 @@ import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
 import com.yagubogu.game.service.crawler.KboWinRateCrawler.TeamWinRateService;
+import com.yagubogu.member.domain.Role;
 import io.micrometer.core.annotation.Timed;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequireRole(value = Role.ADMIN)
 @RestController
 public class KboCrawlerController implements KboCrawlerControllerInterface {
 
