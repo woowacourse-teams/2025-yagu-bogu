@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingMainBinding
+import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.util.ImageUtils
 import com.yagubogu.presentation.util.showToast
 import com.yalantis.ucrop.UCrop
@@ -95,6 +96,10 @@ class SettingMainFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        binding.layoutEditFavoriteTeam.root.setOnClickListener {
+            startActivity(Intent(requireContext(), FavoriteTeamActivity::class.java))
+        }
+
         binding.layoutEditProfileImage.root.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }

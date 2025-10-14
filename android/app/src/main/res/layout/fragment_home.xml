@@ -330,7 +330,7 @@
                     style="@style/TextView.Pretendard.Medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_winning_percentage"
+                    android:text="@string/home_victory_fairy_score"
                     android:textColor="@color/gray400"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/tv_victory_fairy_ranking"

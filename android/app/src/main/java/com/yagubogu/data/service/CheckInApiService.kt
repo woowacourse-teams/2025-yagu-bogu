@@ -30,7 +30,10 @@ interface CheckInApiService {
     ): Response<FanRateResponse>
 
     @GET("/api/check-ins/victory-fairy/rankings")
-    suspend fun getVictoryFairyRankings(): Response<VictoryFairyRankingResponse>
+    suspend fun getVictoryFairyRankings(
+        @Query("year") year: Int,
+        @Query("team") team: String?,
+    ): Response<VictoryFairyRankingResponse>
 
     @GET("/api/check-ins/members")
     suspend fun getCheckInHistories(

@@ -8,6 +8,7 @@ import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
+import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
@@ -39,9 +40,12 @@ class CheckInDefaultRepository(
                 }
             }
 
-    override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking> =
+    override suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRanking> =
         checkInDataSource
-            .getVictoryFairyRankings()
+            .getVictoryFairyRankings(year, team)
             .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
                 victoryFairyRankingResponse.toPresentation()
             }
