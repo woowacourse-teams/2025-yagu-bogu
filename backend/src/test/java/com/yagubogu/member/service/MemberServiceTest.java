@@ -323,27 +323,32 @@ public class MemberServiceTest {
                 new BadgeResponseWithRates(
                         1L, "리드오프", "회원가입한 회원",
                         Policy.SIGN_UP, true, LocalDateTime.now(),
-                        100.0, 100.0, "https://github.com/user-attachments/assets/68f40c11-e0ac-4917-9cab-d482bd44bdea"
+                        100.0, 100.0,
+                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/leadoff_500.png"
                 ),
                 new BadgeResponseWithRates(
                         2L, "말문이 트이다", "첫 현장톡 작성",
                         Policy.CHAT, false, null,
-                        0.0, 0.0, "https://github.com/user-attachments/assets/7f6cc5ae-e4af-41c7-96f1-e531c661f771"
+                        0.0, 0.0,
+                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/open_mouth_500.png"
                 ),
                 new BadgeResponseWithRates(
                         3L, "공포의 주둥아리", "현장톡 누적 100회",
                         Policy.CHAT, false, null,
-                        0.0, 0.0, "https://github.com/user-attachments/assets/b393d494-7168-4c4a-821d-113db6f6d7f0"
+                        0.0, 0.0,
+                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/terrible_mouth_500.png"
                 ),
                 new BadgeResponseWithRates(
                         4L, "플레이볼", "첫 직관 인증",
                         Policy.CHECK_IN, false, null,
-                        0.0, 0.0, "https://github.com/user-attachments/assets/36a27348-0870-4910-b106-c35319eb4ac6"
+                        0.0, 0.0,
+                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/playball_500.png"
                 ),
                 new BadgeResponseWithRates(
                         5L, "그랜드슬램", "9개 전구장 방문",
                         Policy.GRAND_SLAM, false, null,
-                        0.0, 0.0, "https://github.com/user-attachments/assets/7ef1ead4-78cf-472e-a610-48f9d0439ded"
+                        0.0, 0.0,
+                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/grandslam_500.png"
                 )
         );
 
