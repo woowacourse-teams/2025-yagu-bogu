@@ -39,7 +39,7 @@ ON DUPLICATE KEY UPDATE full_name  = new_data.full_name,
                         level      = new_data.level;
 
 -- badges
-INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, badge_image_url)
+INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
     VALUES ('리드오프',
             '리드오프 타자처럼, 이제 당신의 야구보구 여정이 시작됐어요! ⚾🎉\n앱을 처음 설치한 팬에게만 주어지는 특별한 시작의 배지랍니다.',
             'SIGN_UP', 1,
@@ -63,7 +63,7 @@ INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, 
         AS new_data
 ON DUPLICATE KEY UPDATE badge_name        = new_data.badge_name,
                         badge_description = new_data.badge_description,
-                        badge_type        = new_data.badge_type,
+                        badge_policy      = new_data.badge_policy,
                         badge_threshold   = new_data.badge_threshold,
                         badge_image_url   = new_data.badge_image_url;
 

@@ -131,7 +131,7 @@ VALUES
     (5021, 5, 2);
 
 -- badges
-INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, badge_image_url)
+INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
 VALUES ('리드오프',
         '리드오프 타자처럼, 이제 당신의 야구보구 여정이 시작됐어요! ⚾🎉\n앱을 처음 설치한 팬에게만 주어지는 특별한 시작의 배지랍니다.',
         'SIGN_UP', 1,

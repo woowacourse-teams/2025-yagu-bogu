@@ -24,7 +24,7 @@ VALUES (1, '챔피언스필드', '챔피언스필드', '광주', 35.1683, 126.88
        (9, '이글스파크', '볼파크', '대전', 36.3173, 127.4280, 'MAIN');
 
 -- 3. 회원가입 뱃지 데이터
-INSERT INTO badges (badge_name, badge_description, badge_type, badge_threshold, badge_image_url)
+INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
 VALUES ('리드오프', '회원가입한 회원', 'SIGN_UP', 1,
         'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/leadoff_500.png'),
        ('말문이 트이다', '첫 현장톡 작성', 'CHAT', 1,

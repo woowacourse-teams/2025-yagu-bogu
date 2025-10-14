@@ -29,7 +29,7 @@ public class Badge {
     @Column(name = "badge_description", nullable = false)
     private String description;
 
-    @Column(name = "badge_type", nullable = false)
+    @Column(name = "badge_policy", nullable = false)
     @Enumerated(EnumType.STRING)
     private Policy policy;
 
