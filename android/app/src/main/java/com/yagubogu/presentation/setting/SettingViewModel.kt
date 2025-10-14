@@ -101,7 +101,7 @@ class SettingViewModel(
 
             // 3. Complete API 호출 및 프로필 업데이트
             val complete: MemberCompleteItem =
-                memberRepository.postCompleteUploadProfileImage(presignedUrlItem.key).getOrThrow()
+                memberRepository.addCompleteUploadProfileImage(presignedUrlItem.key).getOrThrow()
             _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = complete.url)
         }.onFailure { exception: Throwable ->
             Timber.e(exception, "프로필 이미지 업로드 실패")

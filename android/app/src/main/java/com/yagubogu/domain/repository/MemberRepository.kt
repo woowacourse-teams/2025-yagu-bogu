@@ -33,5 +33,5 @@ interface MemberRepository {
         contentLength: Long,
     ): Result<Unit>
 
-    suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>
+    suspend fun addCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>
 }

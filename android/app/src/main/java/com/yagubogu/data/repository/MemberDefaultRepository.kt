@@ -107,8 +107,8 @@ class MemberDefaultRepository(
         contentLength: Long,
     ): Result<Unit> = memberDataSource.updateProfileImage(url, imageFile, contentType, contentLength)
 
-    override suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
-        memberDataSource.postCompleteUploadProfileImage(MemberCompleteRequest(key)).map {
+    override suspend fun addCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
+        memberDataSource.addCompleteUploadProfileImage(MemberCompleteRequest(key)).map {
             MemberCompleteItem(it.url)
         }
 }

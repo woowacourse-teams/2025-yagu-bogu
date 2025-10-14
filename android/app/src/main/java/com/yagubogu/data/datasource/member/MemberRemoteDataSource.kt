@@ -116,7 +116,7 @@ class MemberRemoteDataSource(
             }
         }
 
-    override suspend fun postCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse> =
+    override suspend fun addCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse> =
         safeApiCall {
             memberApiService.postCompleteUpload(request)
         }

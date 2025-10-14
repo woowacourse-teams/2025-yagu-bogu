@@ -32,5 +32,5 @@ interface MemberDataSource {
         contentLength: Long,
     ): Result<Unit>
 
-    suspend fun postCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse>
+    suspend fun addCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse>
 }
