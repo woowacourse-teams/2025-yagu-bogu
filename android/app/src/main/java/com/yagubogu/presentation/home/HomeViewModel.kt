@@ -64,8 +64,8 @@ class HomeViewModel(
     private val _hasAlreadyCheckedIn = MutableLiveData<Boolean>()
     val hasAlreadyCheckedIn: LiveData<Boolean> get() = _hasAlreadyCheckedIn
 
-    private val _profileImageClickEvent = MutableSingleLiveData<MemberProfile>()
-    val profileImageClickEvent: SingleLiveData<MemberProfile> = _profileImageClickEvent
+    private val _profileImageClickEvent = MutableLiveData<MemberProfile?>()
+    val profileImageClickEvent: LiveData<MemberProfile?> = _profileImageClickEvent
 
     init {
         fetchAll()
@@ -135,6 +135,10 @@ class HomeViewModel(
                 checkInWinRate = "60%",
             ),
         )
+    }
+
+    fun clearMemberProfileEvent() {
+        _profileImageClickEvent.setValue(null)
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
