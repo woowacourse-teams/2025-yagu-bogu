@@ -22,7 +22,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     Optional<Game> findByDateAndHomeTeamAndAwayTeamAndStartAt(LocalDate date, com.yagubogu.team.domain.Team homeTeam,
                                                               com.yagubogu.team.domain.Team awayTeam,
                                                               LocalTime startAt);
-
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
                 g.id,

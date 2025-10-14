@@ -4,10 +4,13 @@ import static java.util.stream.Collectors.toMap;
 
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.dto.BatchResult;
+import com.yagubogu.game.dto.FailedGame;
+import com.yagubogu.game.dto.GameUpsertRow;
 import com.yagubogu.game.dto.KboScoreboardGame;
 import com.yagubogu.game.dto.ScoreboardResponse;
+import com.yagubogu.game.dto.UpsertResult;
 import com.yagubogu.game.repository.GameJdbcBatchUpsertRepository;
-import com.yagubogu.game.repository.GameJdbcBatchUpsertRepository.BatchResult;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -60,7 +63,7 @@ public class KboScoreboardService {
         }
 
         // 4) 전체를 한 번에 "행"으로 변환
-        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = convertToRows(
+        List<GameUpsertRow> rows = convertToRows(
                 allGames, teamByShort, stadiumByLocation);
 
         // 5) CHUNK별로 트랜잭션 분리하여 업서트
@@ -94,7 +97,7 @@ public class KboScoreboardService {
 
         Map<String, Team> teamByShort = loadTeams();
         Map<String, Stadium> stadiumByLocation = loadStadiums();
-        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = convertToRowsSingle(
+        List<GameUpsertRow> rows = convertToRowsSingle(
                 games, date, teamByShort, stadiumByLocation);
 
         UpsertResult result = upsertInChunks(rows);
@@ -123,7 +126,7 @@ public class KboScoreboardService {
     }
 
     // CHUNK별 트랜잭션 분리 업서트
-    private UpsertResult upsertInChunks(List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows) {
+    private UpsertResult upsertInChunks(List<GameUpsertRow> rows) {
         final int CHUNK = 1000;
         int totalSuccess = 0;
         List<FailedGame> failedGames = new ArrayList<>();
@@ -131,7 +134,7 @@ public class KboScoreboardService {
         for (int i = 0; i < rows.size(); i += CHUNK) {
             int from = i;
             int to = Math.min(i + CHUNK, rows.size());
-            List<GameJdbcBatchUpsertRepository.GameUpsertRow> chunk = rows.subList(from, to);
+            List<GameUpsertRow> chunk = rows.subList(from, to);
 
             // 각 CHUNK를 별도 트랜잭션으로 실행
             BatchResult result = transactionTemplate.execute(status -> {
@@ -152,7 +155,7 @@ public class KboScoreboardService {
                 for (Integer failedIndex : result.failedIndices()) {
                     int absoluteIndex = from + failedIndex;
                     if (absoluteIndex < rows.size()) {
-                        GameJdbcBatchUpsertRepository.GameUpsertRow failedRow = rows.get(absoluteIndex);
+                        GameUpsertRow failedRow = rows.get(absoluteIndex);
                         failedGames.add(new FailedGame(
                                 failedRow.date(),
                                 failedRow.gameCode(),
@@ -172,12 +175,12 @@ public class KboScoreboardService {
         return new UpsertResult(totalSuccess, failedGames);
     }
 
-    private List<GameJdbcBatchUpsertRepository.GameUpsertRow> convertToRows(
+    private List<GameUpsertRow> convertToRows(
             List<KboScoreboardGame> allGames,
             Map<String, Team> teamByShort,
             Map<String, Stadium> stadiumByLocation) {
 
-        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = new ArrayList<>(allGames.size());
+        List<GameUpsertRow> rows = new ArrayList<>(allGames.size());
 
         for (KboScoreboardGame dto : allGames) {
             Team away = teamByShort.get(dto.getAwayTeam().name());
@@ -192,7 +195,7 @@ public class KboScoreboardService {
 
             String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
 
-            rows.add(new GameJdbcBatchUpsertRepository.GameUpsertRow(
+            rows.add(new GameUpsertRow(
                     gameCode, stadium.getId(), home.getId(), away.getId(),
                     date, startAt, h.getRuns(), a.getRuns(),
                     dto.getWinningPitcher(), dto.getLosingPitcher(), state.name()
@@ -202,12 +205,12 @@ public class KboScoreboardService {
         return rows;
     }
 
-    private List<GameJdbcBatchUpsertRepository.GameUpsertRow> convertToRowsSingle(
+    private List<GameUpsertRow> convertToRowsSingle(
             List<KboScoreboardGame> games, LocalDate date,
             Map<String, Team> teamByShort,
             Map<String, Stadium> stadiumByLocation) {
 
-        List<GameJdbcBatchUpsertRepository.GameUpsertRow> rows = new ArrayList<>(games.size());
+        List<GameUpsertRow> rows = new ArrayList<>(games.size());
 
         for (KboScoreboardGame dto : games) {
             Team away = teamByShort.get(dto.getAwayTeam().name());
@@ -221,7 +224,7 @@ public class KboScoreboardService {
 
             String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
 
-            rows.add(new GameJdbcBatchUpsertRepository.GameUpsertRow(
+            rows.add(new GameUpsertRow(
                     gameCode, stadium.getId(), home.getId(), away.getId(),
                     date, startAt, h.getRuns(), a.getRuns(),
                     dto.getWinningPitcher(), dto.getLosingPitcher(), state.name()
@@ -294,12 +297,5 @@ public class KboScoreboardService {
             current = current.plusDays(1);
         }
         return dates;
-    }
-
-    // 결과 레코드들
-    private record UpsertResult(int successCount, List<FailedGame> failedGames) {
-    }
-
-    public record FailedGame(LocalDate date, String gameCode, Long awayTeamId, Long homeTeamId) {
     }
 }

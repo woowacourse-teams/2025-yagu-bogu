@@ -1,11 +1,11 @@
 package com.yagubogu.game.repository;
 
+import com.yagubogu.game.dto.BatchResult;
+import com.yagubogu.game.dto.GameUpsertRow;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -188,30 +188,5 @@ public class GameJdbcBatchUpsertRepository {
             ps.setString(p++, r.awayPitcher());
         }
         ps.setString(p++, r.gameState());
-    }
-
-    public record BatchResult(int success, List<Integer> failedIndices, long tookMs) {
-        public static BatchResult empty() {
-            return new BatchResult(0, List.of(), 0);
-        }
-
-        public boolean hasFailures() {
-            return !failedIndices.isEmpty();
-        }
-    }
-
-    public record GameUpsertRow(
-            String gameCode,
-            Long stadiumId,
-            Long homeTeamId,
-            Long awayTeamId,
-            LocalDate date,
-            LocalTime startAt,
-            Integer homeScore,
-            Integer awayScore,
-            String homePitcher,
-            String awayPitcher,
-            String gameState
-    ) {
     }
 }
