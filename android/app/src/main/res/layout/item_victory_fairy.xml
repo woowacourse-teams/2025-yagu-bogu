@@ -17,13 +17,14 @@
 
         <TextView
             android:id="@+id/tv_rank"
-            style="@style/TextView.Pretendard.Regular.16"
+            style="@style/TextView.Pretendard.Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="2"
             android:gravity="center"
             android:text="@{String.valueOf(victoryFairyItem.rank)}"
             android:textColor="@color/gray500"
+            android:textSize="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -82,10 +83,10 @@
             style="@style/TextView.Pretendard.Regular.16"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/all_win_rate(victoryFairyItem.winRate)}"
+            android:text="@{@string/home_victory_fairy_score_format(victoryFairyItem.score)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="100.0%" />
+            tools:text="100.0점" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
