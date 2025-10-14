@@ -16,6 +16,11 @@ public class BadgePolicyRegistry {
     }
 
     public BadgePolicy getPolicy(final Policy policy) {
+        BadgePolicy badgePolicy = policyMap.get(policy);
+        if (badgePolicy == null) {
+            throw new IllegalStateException("No BadgePolicy registered for policy: " + policy);
+        }
+
         return policyMap.get(policy);
     }
 }
