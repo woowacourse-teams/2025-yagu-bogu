@@ -35,9 +35,6 @@ class YaguBoguApplication : Application() {
             if (BuildConfig.DEBUG) BuildConfig.BASE_URL_DEBUG else BuildConfig.BASE_URL_RELEASE
         RetrofitInstance(baseUrl, tokenManager)
     }
-    private val pureClient by lazy {
-        retrofit.loggingClient
-    }
 
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val locationDataSource by lazy { LocationLocalDataSource(locationClient) }
@@ -53,7 +50,7 @@ class YaguBoguApplication : Application() {
         MemberRemoteDataSource(
             applicationContext,
             retrofit.memberApiService,
-            pureClient,
+            retrofit.loggingClient,
         )
     }
     val memberRepository by lazy { MemberDefaultRepository(memberDataSource, tokenManager) }
