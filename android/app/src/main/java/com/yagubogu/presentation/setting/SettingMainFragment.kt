@@ -198,7 +198,7 @@ class SettingMainFragment : Fragment() {
             Triple(compressedUri, mimeType, fileSize)
         }
 
-    fun Uri.fileSize(context: Context): Result<Long?> =
+    private fun Uri.fileSize(context: Context): Result<Long?> =
         runCatching {
             context.contentResolver
                 .query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
