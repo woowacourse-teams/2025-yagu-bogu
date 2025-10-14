@@ -67,7 +67,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.date.between(start, end)
+                        GAME.date.between(start, end),
+                        isMyCurrentFavorite(member, CHECK_IN)
                 ).fetchOne();
     }
 
@@ -79,11 +80,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     @Override
     public int findLoseCounts(final Member member, final int year) {
         return conditionCount(member, year, loseCondition(QCheckIn.checkIn, QGame.game));
-    }
-
-    @Override
-    public int findDrawCounts(final Member member, final int year) {
-        return conditionCount(member, year, drawCondition(QCheckIn.checkIn, QGame.game));
     }
 
     @Override
@@ -527,6 +523,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         qCheckIn.member.eq(member),
                         qGame.date.between(start, end),
                         qGame.gameState.eq(GameState.COMPLETED),
+                        isMyCurrentFavorite(member, CHECK_IN),
                         condition
                 )
                 .fetchOne();
