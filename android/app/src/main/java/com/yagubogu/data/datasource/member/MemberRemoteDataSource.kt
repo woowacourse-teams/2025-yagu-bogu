@@ -68,7 +68,7 @@ class MemberRemoteDataSource(
             memberApiService.postPresignedUrl(request)
         }
 
-    override suspend fun uploadProfileImage(
+    override suspend fun updateProfileImage(
         url: String,
         imageFileUri: Uri,
         contentType: String,

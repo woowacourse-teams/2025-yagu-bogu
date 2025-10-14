@@ -94,15 +94,18 @@ class MemberDefaultRepository(
                     contentLength,
                 ),
             ).map { memberPresignedUrlResponse: MemberPresignedUrlResponse ->
-                MemberPresignedUrlItem(memberPresignedUrlResponse.key, memberPresignedUrlResponse.url)
+                MemberPresignedUrlItem(
+                    memberPresignedUrlResponse.key,
+                    memberPresignedUrlResponse.url,
+                )
             }
 
-    override suspend fun uploadProfileImage(
+    override suspend fun updateProfileImage(
         url: String,
         imageFile: Uri,
         contentType: String,
         contentLength: Long,
-    ): Result<Unit> = memberDataSource.uploadProfileImage(url, imageFile, contentType, contentLength)
+    ): Result<Unit> = memberDataSource.updateProfileImage(url, imageFile, contentType, contentLength)
 
     override suspend fun postCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
         memberDataSource.postCompleteUploadProfileImage(MemberCompleteRequest(key)).map {

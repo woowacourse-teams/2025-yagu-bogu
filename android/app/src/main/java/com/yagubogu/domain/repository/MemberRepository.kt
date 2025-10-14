@@ -26,7 +26,7 @@ interface MemberRepository {
         contentLength: Long,
     ): Result<MemberPresignedUrlItem>
 
-    suspend fun uploadProfileImage(
+    suspend fun updateProfileImage(
         url: String,
         imageFile: Uri,
         contentType: String,

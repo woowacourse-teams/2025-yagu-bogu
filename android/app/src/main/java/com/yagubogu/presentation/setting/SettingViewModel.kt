@@ -96,7 +96,7 @@ class SettingViewModel(
 
             // 2. S3 업로드
             memberRepository
-                .uploadProfileImage(presignedUrlItem.url, imageUri, mimeType, size)
+                .updateProfileImage(presignedUrlItem.url, imageUri, mimeType, size)
                 .getOrThrow()
 
             // 3. Complete API 호출 및 프로필 업데이트

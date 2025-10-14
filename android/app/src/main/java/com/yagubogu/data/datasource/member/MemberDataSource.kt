@@ -25,7 +25,7 @@ interface MemberDataSource {
 
     suspend fun getPresignedProfileImageUrl(request: MemberPresignedUrlRequest): Result<MemberPresignedUrlResponse>
 
-    suspend fun uploadProfileImage(
+    suspend fun updateProfileImage(
         url: String,
         imageFileUri: Uri,
         contentType: String,
