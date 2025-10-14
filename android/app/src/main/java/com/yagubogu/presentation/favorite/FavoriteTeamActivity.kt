@@ -1,6 +1,5 @@
 package com.yagubogu.presentation.favorite
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -77,7 +76,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
     }
 
     private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(MainActivity.newIntent(this))
         finish()
     }
 }
