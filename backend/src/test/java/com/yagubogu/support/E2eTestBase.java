@@ -35,6 +35,7 @@ public abstract class E2eTestBase {
 
     @Autowired
     private EntityManager em;
+
     @Autowired
     private TransactionTemplate txTemplate;
 
