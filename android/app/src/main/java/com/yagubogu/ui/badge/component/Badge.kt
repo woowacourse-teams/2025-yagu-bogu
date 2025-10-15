@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +35,7 @@ fun Badge(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.noRippleClickable(onClick),
     ) {
-        var isLoading by remember { mutableStateOf(true) }
+        var isLoading by rememberSaveable { mutableStateOf(true) }
 
         Box(
             modifier =
