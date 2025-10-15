@@ -166,6 +166,7 @@ private fun BadgeLoadingContent(modifier: Modifier = Modifier) {
                     text = stringResource(R.string.badge_main_badge_title),
                     style = PretendardBold20,
                 )
+                Spacer(modifier = Modifier.height(10.dp))
                 Box(
                     modifier =
                         shimmeringBadgeModifier
