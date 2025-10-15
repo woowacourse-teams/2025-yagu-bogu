@@ -82,7 +82,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
 
         LocalDate date = LocalDate.of(2025, 1, 1);
 
-        gameFactory.save(builder ->
+        Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumGocheok)
                         .date(date)
                         .homeTeam(lotte).homeScore(5).homeScoreBoard(TestFixture.getHomeScoreBoard())
@@ -94,7 +94,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(stadiumGocheok.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId(), date))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
                 .statusCode(201);
@@ -127,10 +127,10 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(stadiumGocheok.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId(), date))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
     }
 
     @DisplayName("예외: 동일 날짜에 이미 PastCheckIn이 존재하면 400 발생한다")
@@ -156,9 +156,9 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(stadiumGocheok.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId(), date))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(409);
     }
 }
