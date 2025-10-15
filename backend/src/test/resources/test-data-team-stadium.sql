@@ -9,7 +9,11 @@ VALUES ('KIA 타이거즈', 'KIA', 'HT'),
        ('SSG 랜더스', 'SSG', 'SK'),
        ('NC 다이노스', 'NC', 'NC'),
        ('한화 이글스', '한화', 'HH'),
-       ('두산 베어스', '두산', 'OB');
+       ('두산 베어스', '두산', 'OB'),
+       ('SK 와이번스', 'SK', 'SK2'),
+       ('현대 유니콘스', '현대', 'HD'),
+       ('나눔 올스타', '나눔', 'NN'),
+       ('드림 올스타', '드림', 'DR');
 
 -- 2. 구장 데이터
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude, level)
