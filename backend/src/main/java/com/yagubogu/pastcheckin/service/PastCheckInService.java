@@ -35,14 +35,14 @@ public class PastCheckInService {
         Stadium stadium = getStadiumById(stadiumId);
         LocalDate date = request.date();
         Game game = getGame(stadium, date);
-
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
         validateCheckInExists(member, game);
 
-        PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
         validatePastCheckInExists(member, game);
+
+        PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
         pastCheckInRepository.save(pastCheckIn);
     }
 
