@@ -153,7 +153,8 @@ public class KboScoreboardService {
     private List<GameUpsertRow> convertToRows(
             List<KboScoreboardGame> allGames,
             Map<String, Team> teamByShort,
-            Map<String, Stadium> stadiumByLocation) {
+            Map<String, Stadium> stadiumByLocation
+    ) {
 
         List<GameUpsertRow> rows = new ArrayList<>(allGames.size());
 
