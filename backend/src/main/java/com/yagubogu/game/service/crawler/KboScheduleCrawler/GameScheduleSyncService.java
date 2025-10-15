@@ -73,7 +73,7 @@ public class GameScheduleSyncService {
             Stadium stadium = getStadiumByLocation(kboGame.getStadium());
             LocalDate date = kboGame.getDate();
             LocalTime startAt = parseGameTime(kboGame.getGameTime());
-            int headerOrder = Math.max(0, kboGame.getDoubleHeaderGameOrder());
+            int headerOrder = kboGame.getDoubleHeaderGameOrder();
             Integer homeScore = kboGame.getHomeScore();
             Integer awayScore = kboGame.getAwayScore();
             String gameCode = generateGameCode(date, homeTeam, awayTeam, headerOrder);

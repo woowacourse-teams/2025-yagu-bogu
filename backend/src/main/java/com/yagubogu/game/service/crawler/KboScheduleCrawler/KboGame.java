@@ -20,7 +20,7 @@ public final class KboGame {
     private final String cancelReason;
     private final ScheduleType scheduleType;
     private final String tvChannel;
-    private int doubleHeaderGameOrder = -1;
+    private int doubleHeaderGameOrder = 0;
 
     public KboGame(final LocalDate date,
                    final String gameTime,
