@@ -31,12 +31,7 @@ VALUES (1, '광주 기아 챔피언스필드', '챔피언스필드', '광주', 3
        (16, '무등 야구장', '무등야구장', '무등', 35.169165, 126.887245, 'SECONDARY'),
        (17, '마산 야구장', '마산야구장', '마산', 35.220855, 128.581050, 'SECONDARY'),
        (18, '숭의 야구장', '숭의야구장', '인천', 37.466591, 126.643239, 'SECONDARY'),
-       (19, '삼성 라이온즈 볼파크', '라이온즈볼파크', '경산', 35.864844, 128.805667, 'SECONDARY')
-ON DUPLICATE KEY UPDATE full_name=VALUES(full_name),
-                        short_name=VALUES(short_name),
-                        location=VALUES(location),
-                        latitude=VALUES(latitude),
-                        longitude=VALUES(longitude);
+       (19, '삼성 라이온즈 볼파크', '라이온즈볼파크', '경산', 35.864844, 128.805667, 'SECONDARY');
 
 -- 3. 회원가입 뱃지 데이터
 INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
