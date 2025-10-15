@@ -88,7 +88,7 @@ class MemberDefaultRepository(
             BadgeUiState.Success(representativeBadge, badges)
         }
 
-    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.patchRepresentativeBadge(badgeId)
+    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.updateRepresentativeBadge(badgeId)
 
     override fun invalidateCache() {
         cachedNickname = null

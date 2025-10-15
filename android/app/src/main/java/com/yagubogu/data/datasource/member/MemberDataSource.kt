@@ -21,5 +21,5 @@ interface MemberDataSource {
 
     suspend fun getBadges(): Result<BadgeResponse>
 
-    suspend fun patchRepresentativeBadge(badgeId: Long): Result<Unit>
+    suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit>
 }
