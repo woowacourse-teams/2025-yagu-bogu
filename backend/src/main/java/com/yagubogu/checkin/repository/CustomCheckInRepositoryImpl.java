@@ -1133,7 +1133,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetch();
 
         // 두 리스트를 합치고 중복 제거 후 limit 적용
-        List<Long> allGameIds = new java.util.ArrayList<>(checkInGameIds);
+        List<Long> allGameIds = new ArrayList<>(checkInGameIds);
         allGameIds.addAll(pastCheckInGameIds);
         return allGameIds.stream().distinct().limit(limit).toList();
     }

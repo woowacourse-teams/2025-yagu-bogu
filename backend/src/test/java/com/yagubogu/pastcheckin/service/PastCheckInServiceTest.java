@@ -10,6 +10,7 @@ import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.BadRequestException;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
@@ -133,7 +134,7 @@ class PastCheckInServiceTest {
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("CheckIn already exists");
     }
 
@@ -158,7 +159,7 @@ class PastCheckInServiceTest {
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("CheckIn already exists");
     }
 
