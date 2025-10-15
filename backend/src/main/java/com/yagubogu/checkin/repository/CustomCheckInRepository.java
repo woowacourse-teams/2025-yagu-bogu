@@ -23,8 +23,6 @@ public interface CustomCheckInRepository {
 
     int findLoseCounts(Member member, int year);
 
-    int findDrawCounts(Member member, int year);
-
     int countByMemberAndYear(Member member, int year);
 
     List<CheckInGameResponse> findCheckInHistory(

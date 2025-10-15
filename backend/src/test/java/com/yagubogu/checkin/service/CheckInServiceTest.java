@@ -920,9 +920,9 @@ class CheckInServiceTest {
                         new StadiumCheckInCountResponse(3L, "고척", 0L),
                         new StadiumCheckInCountResponse(4L, "수원", 0L),
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "부산", 0L),
-                        new StadiumCheckInCountResponse(7L, "인천", 0L),
-                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(6L, "사직", 0L),
+                        new StadiumCheckInCountResponse(7L, "문학", 0L),
+                        new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L)
                 )
         );
@@ -955,9 +955,9 @@ class CheckInServiceTest {
                         new StadiumCheckInCountResponse(3L, "고척", 1L),
                         new StadiumCheckInCountResponse(4L, "수원", 0L),
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "부산", 0L),
-                        new StadiumCheckInCountResponse(7L, "인천", 0L),
-                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(6L, "사직", 0L),
+                        new StadiumCheckInCountResponse(7L, "문학", 0L),
+                        new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L)
                 )
         );
@@ -1145,9 +1145,9 @@ class CheckInServiceTest {
                         new StadiumCheckInCountResponse(3L, "고척", 1L),  // CheckIn 1
                         new StadiumCheckInCountResponse(4L, "수원", 0L),
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "부산", 0L),
-                        new StadiumCheckInCountResponse(7L, "인천", 2L),  // PastCheckIn 2
-                        new StadiumCheckInCountResponse(8L, "마산", 0L),
+                        new StadiumCheckInCountResponse(6L, "사직", 0L),
+                        new StadiumCheckInCountResponse(7L, "문학", 2L),  // PastCheckIn 2
+                        new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L)
                 )
         );

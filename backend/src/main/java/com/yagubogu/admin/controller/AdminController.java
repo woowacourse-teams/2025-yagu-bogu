@@ -2,7 +2,7 @@ package com.yagubogu.admin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.service.GameResultSyncService;
-import com.yagubogu.game.service.GameScheduleSyncService;
+import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.member.domain.Role;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.time.LocalDate;

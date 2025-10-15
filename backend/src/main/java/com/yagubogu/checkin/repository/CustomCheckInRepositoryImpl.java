@@ -29,6 +29,7 @@ import com.yagubogu.member.domain.QNickname;
 import com.yagubogu.pastcheckin.domain.QPastCheckIn;
 import com.yagubogu.stadium.domain.QStadium;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.domain.StadiumLevel;
 import com.yagubogu.stat.dto.AverageStatistic;
 import com.yagubogu.stat.dto.OpponentWinRateRow;
 import com.yagubogu.team.domain.QTeam;
@@ -73,7 +74,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.date.between(start, end)
+                        GAME.date.between(start, end),
+                        isMyCurrentFavorite(member, CHECK_IN)
                 ).fetchOne();
 
         // PastCheckIn 통계
@@ -126,16 +128,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 year,
                 this::loseCondition,
                 this::loseCondition
-        );
-    }
-
-    @Override
-    public int findDrawCounts(final Member member, final int year) {
-        return conditionCount(
-                member,
-                year,
-                this::drawCondition,
-                this::drawCondition
         );
     }
 
@@ -689,7 +681,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 STADIUM.id,
                                 STADIUM.location,
                                 CHECK_IN.id.count()
-                        )).from(STADIUM)
+                        ))
+                .from(STADIUM)
+                .where(STADIUM.level.eq(StadiumLevel.MAIN))
                 .leftJoin(CHECK_IN).on(
                         CHECK_IN.game.stadium.eq(STADIUM)
                                 .and(CHECK_IN.member.eq(member))
@@ -706,7 +700,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                                 pastStadium.id,
                                 pastStadium.location,
                                 PAST_CHECK_IN.id.count()
-                        )).from(pastStadium)
+                        ))
+                .from(pastStadium)
+                .where(pastStadium.level.eq(StadiumLevel.MAIN))
                 .leftJoin(PAST_CHECK_IN).on(
                         PAST_CHECK_IN.game.stadium.eq(pastStadium)
                                 .and(PAST_CHECK_IN.member.eq(member))
@@ -902,6 +898,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         qCheckIn.member.eq(member),
                         qGame.date.between(start, end),
                         qGame.gameState.eq(GameState.COMPLETED),
+                        isMyCurrentFavorite(member, CHECK_IN),
                         checkInCondition
                 )
                 .fetchOne();

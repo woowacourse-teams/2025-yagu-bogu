@@ -14,6 +14,8 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.support.E2eTestBase;
@@ -216,6 +218,80 @@ public class StatE2eTest extends E2eTestBase {
                 .statusCode(403);
     }
 
+    @DisplayName("팀 변경 시 승률이 현재 팀 기준으로 반영된다")
+    @Test
+    void findWinRate_changesWithFavoriteTeam() {
+        // given: 초기 즐겨찾기 KIA → 승률 100%
+        Team kiaTeam = ht; // HT
+        Team doosanTeam = teamRepository.findByTeamCode("OB").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(kiaTeam));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 22);
+        Game winGame = gameFactory.save(b -> b
+                .stadium(kia)
+                .homeTeam(kiaTeam).awayTeam(ss)
+                .date(date)
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED)
+        );
+        checkInFactory.save(b -> b.game(winGame).member(member).team(kiaTeam));
+
+        // when: HT 기준 승률 확인 → 100.0
+        WinRateResponse winRateAsHT = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAsHT.winRate()).isEqualTo(100.0);
+
+        // 팀을 두산(OB)으로 변경
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(doosanTeam.getTeamCode()))
+                .when().patch("/api/members/favorites")
+                .then().log().all()
+                .statusCode(200);
+
+        // then: OB 기준 승률 확인 → 0.0 (현재 팀에서 인증한 체크인이 없음)
+        WinRateResponse winRateAsOB = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAsOB.winRate()).isEqualTo(0.0);
+
+        // 다시 KIA(HT)로 변경
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(kiaTeam.getTeamCode()))
+                .when().patch("/api/members/favorites")
+                .then().log().all()
+                .statusCode(200);
+
+        // 최종: HT 기준 승률 확인 → 100.0으로 복원
+        WinRateResponse winRateAgainAsHT = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParams("year", 2025)
+                .when().get("/api/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+        assertThat(winRateAgainAsHT.winRate()).isEqualTo(100.0);
+    }
+
     @DisplayName("행운의 구장을 조회한다")
     @Test
     void findLuckyStadium() {
@@ -347,7 +423,7 @@ public class StatE2eTest extends E2eTestBase {
         checkInFactory.save(b -> b.game(n1).member(member).team(ht));
 
         // when
-        var actual = RestAssured.given().log().all()
+        OpponentWinRateResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
@@ -355,14 +431,14 @@ public class StatE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
+                .as(OpponentWinRateResponse.class);
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(9);
+            s.assertThat(actual.opponents()).hasSize(13);
 
             // 1위: SS(2-0-0, 100.0)
-            var first = actual.opponents().get(0);
+            OpponentWinRateTeamResponse first = actual.opponents().get(0);
             s.assertThat(first.teamCode()).isEqualTo("SS");
             s.assertThat(first.wins()).isEqualTo(2);
             s.assertThat(first.losses()).isEqualTo(0);
@@ -370,7 +446,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(first.winRate()).isEqualTo(100.0);
 
             // 2위: LT(1-1-0, 50.0)
-            var second = actual.opponents().get(1);
+            OpponentWinRateTeamResponse second = actual.opponents().get(1);
             s.assertThat(second.teamCode()).isEqualTo("LT");
             s.assertThat(second.wins()).isEqualTo(1);
             s.assertThat(second.losses()).isEqualTo(1);
@@ -378,7 +454,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(second.winRate()).isEqualTo(50.0);
 
             // NC(0-0-1, 0.0) 포함 검증
-            var ncRes = actual.opponents().stream()
+            OpponentWinRateTeamResponse ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
             s.assertThat(ncRes.wins()).isZero();
@@ -386,18 +462,19 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(ncRes.draws()).isEqualTo(1);
             s.assertThat(ncRes.winRate()).isEqualTo(0.0);
 
-            // 미대결 0.0 팀코드 (정렬/로케일 영향 최소화를 위해 any-order)
-            var zeros = actual.opponents().stream()
+            List<String> zeros = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
-                    .map(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::teamCode)
+                    .map(OpponentWinRateTeamResponse::teamCode)
                     .toList();
+
             s.assertThat(zeros)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK2", "SK", "OB", "WO", "HH", "HD", "NN", "DR");
 
             // 전체 정렬 검증: winRate desc → name asc
-            var sorted = actual.opponents().stream()
-                    .sorted(Comparator.comparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::winRate).reversed()
-                            .thenComparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::name))
+            List<OpponentWinRateTeamResponse> sorted = actual.opponents().stream()
+                    .sorted(Comparator
+                            .comparing(OpponentWinRateTeamResponse::winRate).reversed()
+                            .thenComparing(OpponentWinRateTeamResponse::name))
                     .toList();
             s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
@@ -662,7 +739,7 @@ public class StatE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(9);
+            s.assertThat(actual.opponents()).hasSize(13);
 
             // SS: 1승 0패 = 100%
             var ssRes = actual.opponents().stream()

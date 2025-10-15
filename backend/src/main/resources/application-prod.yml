@@ -20,11 +20,7 @@ spring:
     enabled: true
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
-
+  endpoints.web.exposure.include: health, metrics, prometheus
   metrics:
     tags:
       app: yagubogu

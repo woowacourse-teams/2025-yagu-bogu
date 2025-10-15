@@ -49,11 +49,11 @@ public abstract class E2eTestBase {
     private EntityManager em;
 
     @Autowired
-    private TransactionTemplate txTemplate;
+    private TransactionTemplate transactionTemplate;
 
     @AfterEach
     void cleanData() {
-        txTemplate.executeWithoutResult(status -> {
+        transactionTemplate.executeWithoutResult(status -> {
             em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
 
             // Keep lookup tables (teams, stadiums) seeded by Flyway
@@ -66,6 +66,7 @@ public abstract class E2eTestBase {
             em.createNativeQuery("TRUNCATE TABLE likes").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE like_windows").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE past_check_ins").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE member_badges").executeUpdate();
 
             em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
         });

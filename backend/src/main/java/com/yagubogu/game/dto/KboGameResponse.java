@@ -1,11 +1,12 @@
 package com.yagubogu.game.dto;
 
+import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yagubogu.game.domain.GameState;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public record KboGameResponse(
         String gameCode,
@@ -31,7 +32,7 @@ public record KboGameResponse(
     ) {
         return new KboGameResponse(
                 gameCode,
-                LocalDate.parse(gameDate, DateTimeFormatter.BASIC_ISO_DATE),
+                LocalDate.parse(gameDate, BASIC_ISO_DATE),
                 Integer.valueOf(headerNumber),
                 LocalTime.parse(startAt),
                 stadiumName,

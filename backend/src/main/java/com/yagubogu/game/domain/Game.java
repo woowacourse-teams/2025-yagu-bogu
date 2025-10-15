@@ -116,6 +116,22 @@ public class Game {
         this.awayPitcher = awayPitcher;
     }
 
+    public void updateSchedule(
+            final Stadium stadium,
+            final Team homeTeam,
+            final Team awayTeam,
+            final LocalDate date,
+            final LocalTime startAt,
+            final GameState gameState
+    ) {
+        this.stadium = stadium;
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.date = date;
+        this.startAt = startAt;
+        this.gameState = gameState;
+    }
+
     public boolean hasTeam(final Team team) {
         return homeTeam.equals(team) || awayTeam.equals(team);
     }
