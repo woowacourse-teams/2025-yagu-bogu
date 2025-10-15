@@ -653,7 +653,7 @@ class StatServiceTest {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(13);
+            s.assertThat(actual.opponents()).hasSize(9);
             OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
@@ -710,7 +710,7 @@ class StatServiceTest {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(13);
+            s.assertThat(actual.opponents()).hasSize(9);
             OpponentWinRateTeamResponse lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
@@ -760,10 +760,7 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
         // then
-        // 내 팀(HT) 제외한 전체 상대 팀 수를 동적으로 계산 (레거시 팀 포함 대응)
-        int expectedOpponents = (int) teamRepository.findAll().stream()
-                .filter(t -> !t.getTeamCode().equals(HT.getTeamCode()))
-                .count();
+        int expectedOpponents = 9;
 
         assertSoftly(s -> {
             s.assertThat(actual.opponents()).hasSize(expectedOpponents);
