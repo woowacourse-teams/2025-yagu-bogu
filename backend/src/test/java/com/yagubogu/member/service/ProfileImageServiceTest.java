@@ -73,8 +73,8 @@ class ProfileImageServiceTest {
         profileImageService = new ProfileImageService(s3Presigner, s3Client, s3Properties, memberService);
     }
 
-    @Test
     @DisplayName("pre-signed url을 발급한다")
+    @Test
     void issuePreSignedUrl_success() throws Exception {
         // given
         PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/jpeg", 1_000_000L);
@@ -91,8 +91,8 @@ class ProfileImageServiceTest {
         });
     }
 
-    @Test
     @DisplayName("예외: contentLength가 최대 길이를 초과하면 예외를 던진다")
+    @Test
     void issuePreSignedUrl_tooLarge() {
         // given
         long tooLargeContentLength = 5L * 1024 * 1024 + 1L;
@@ -104,8 +104,8 @@ class ProfileImageServiceTest {
                 .hasMessageContaining("Content length is too large");
     }
 
-    @Test
     @DisplayName("s3에 업로드된 이미지로 회원의 프로필 이미지 주소를 수정한다")
+    @Test
     void completeUpload_success() {
         // given
         String key = "yagubogu/images/profiles/abc-123";
