@@ -5,12 +5,9 @@ import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.dto.ScheduleResponse;
 import com.yagubogu.game.dto.ScoreboardResponse;
-import com.yagubogu.game.dto.TeamWinRateResponse;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
-import com.yagubogu.game.service.crawler.KboWinRateCrawler.SeriesType;
-import com.yagubogu.game.service.crawler.KboWinRateCrawler.TeamWinRateService;
 import com.yagubogu.member.domain.Role;
 import io.micrometer.core.annotation.Timed;
 import java.time.LocalDate;
@@ -27,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class KboCrawlerController implements KboCrawlerControllerInterface {
 
     private final GameScheduleSyncService gameScheduleSyncService;
-    private final TeamWinRateService teamWinRateService;
     private final KboScoreboardService kboScoreboardService;
 
     @Override
@@ -41,15 +37,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
         int crawled = gameScheduleSyncService.syncByCrawler(now, startDate, endDate, scheduleType);
 
         return ResponseEntity.ok(new ScheduleResponse(crawled));
-    }
-
-    @Override
-    @Timed(value = "api.team.winrates", description = "팀 승률 호출 지연")
-    public ResponseEntity<TeamWinRateResponse> fetchTeamWinRates(
-            @RequestParam(defaultValue = "REGULAR") final SeriesType seriesType
-    ) {
-        TeamWinRateResponse response = teamWinRateService.fetchTeamWinRates(seriesType);
-        return ResponseEntity.ok(response);
     }
 
     @Override
