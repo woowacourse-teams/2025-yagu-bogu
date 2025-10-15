@@ -14,6 +14,7 @@ import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.member.MemberFactory;
 import java.net.URL;
+import java.time.Duration;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +35,13 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 class ProfileImageServiceTest {
 
     private static final String TEST_BUCKET = "test-bucket";
+    private static final Duration TEST_PRESIGN_EXPIRATION = Duration.ofMinutes(10);
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    MemberService memberService;
 
     @Autowired
     private MemberFactory memberFactory;
@@ -66,16 +71,16 @@ class ProfileImageServiceTest {
         org.mockito.Mockito.doReturn(software.amazon.awssdk.services.s3.model.HeadObjectResponse.builder().build())
                 .when(s3Client).headObject(org.mockito.ArgumentMatchers.any(HeadObjectRequest.class));
 
-        s3Properties = new S3Properties(TEST_BUCKET);
+        s3Properties = new S3Properties(TEST_BUCKET, TEST_PRESIGN_EXPIRATION);
 
-        profileImageService = new ProfileImageService(s3Presigner, s3Client, memberRepository, s3Properties);
+        profileImageService = new ProfileImageService(s3Presigner, s3Client, s3Properties, memberService);
     }
 
     @Test
     @DisplayName("pre-signed url을발급한다")
     void issuePreSignedUrl_success() throws Exception {
         // given
-        PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/png", 1_000_000L);
+        PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/jpeg", 1_000_000L);
 
         // when
         PresignedUrlStartResponse response = profileImageService.issuePreSignedUrl(request);

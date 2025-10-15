@@ -1,7 +1,7 @@
 package com.yagubogu.member.service;
 
-import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
@@ -89,6 +89,12 @@ public class MemberService {
                     Member savedMember = memberRepository.save(response.toMember());
                     return new MemberFindResult(savedMember, true);
                 });
+    }
+
+    @Transactional
+    public void updateProfileImageUrl(final Long memberId, final String imageUrl) {
+        Member member = getMember(memberId);
+        member.updateImageUrl(imageUrl);
     }
 
     private Member getMember(final long memberId) {

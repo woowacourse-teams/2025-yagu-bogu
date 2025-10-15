@@ -71,13 +71,13 @@ public class ProfileImageE2eTest extends E2eTestBase {
                 .headObject(org.mockito.ArgumentMatchers.any(HeadObjectRequest.class));
     }
 
-    @DisplayName("pre-signed url을발급한다")
+    @DisplayName("pre-signed url을 발급한다")
     @Test
     void start_success() throws Exception {
         // given
         Member member = memberFactory.save(MemberBuilder::build);
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
-        PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/png", 1_000_000L);
+        PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/jpeg", 1_000_000L);
 
         // when
         PresignedUrlStartResponse response = RestAssured.given().log().all()
