@@ -18,7 +18,7 @@ public class BadgeEventListener {
     private final BadgePolicyRegistry badgePolicyRegistry;
     private final BadgeAwardService badgeAwardService;
 
-    @Async
+    @Async("badgeAsyncExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBadgeEvent(final BadgeEvent event) {
