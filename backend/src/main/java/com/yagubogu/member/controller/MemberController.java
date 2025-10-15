@@ -80,7 +80,7 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<PresignedUrlStartResponse> start(
+    public ResponseEntity<PresignedUrlStartResponse> generatePresignedUrl(
             @RequestBody final PreSignedUrlStartRequest request
     ) {
         PresignedUrlStartResponse response = profileImageService.issuePreSignedUrl(request);
@@ -88,7 +88,7 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<PreSignedUrlCompleteResponse> completeAndUpdate(
+    public ResponseEntity<PreSignedUrlCompleteResponse> updateProfileImage(
             final MemberClaims memberClaims,
             @RequestBody final PreSignedUrlCompleteRequest request
     ) {

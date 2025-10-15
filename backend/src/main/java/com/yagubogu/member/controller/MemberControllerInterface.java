@@ -86,7 +86,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "413", description = "contentLength가 기준을 초과함")
     })
     @PostMapping("/me/profile-image/pre-signed/start")
-    ResponseEntity<PresignedUrlStartResponse> start(
+    ResponseEntity<PresignedUrlStartResponse> generatePresignedUrl(
             @RequestBody PreSignedUrlStartRequest preSignedUrlStartRequest
     );
 
@@ -96,7 +96,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "404", description = "key로 s3에서 이미지를 찾을 수 없음")
     })
     @PostMapping("/me/profile-image/pre-signed/complete")
-    ResponseEntity<PreSignedUrlCompleteResponse> completeAndUpdate(
+    ResponseEntity<PreSignedUrlCompleteResponse> updateProfileImage(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody PreSignedUrlCompleteRequest preSignedUrlCompleteRequest
     );
