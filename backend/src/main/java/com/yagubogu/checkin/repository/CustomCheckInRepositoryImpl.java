@@ -498,8 +498,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 ).orderBy(pastOrder)
                 .fetch();
 
-        // 두 리스트 합치기 및 정렬
-        List<CheckInGameResponse> allHistory = new java.util.ArrayList<>(checkInHistory);
+        List<CheckInGameResponse> allHistory = new ArrayList<>(checkInHistory);
         allHistory.addAll(pastCheckInHistory);
 
         // 정렬 방향에 따라 정렬
