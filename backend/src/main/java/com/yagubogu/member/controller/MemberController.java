@@ -3,14 +3,17 @@ package com.yagubogu.member.controller;
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.auth.service.AuthService;
+import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.member.dto.MemberFavoriteRequest;
 import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -70,6 +73,23 @@ public class MemberController implements MemberControllerInterface {
             @RequestBody final MemberFavoriteRequest memberFavoriteRequest
     ) {
         MemberFavoriteResponse response = memberService.updateFavorite(memberClaims.id(), memberFavoriteRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<BadgeListResponse> findBadges(final MemberClaims memberClaims) {
+        BadgeListResponse response = memberService.findBadges(memberClaims.id());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<MemberRepresentativeBadgeResponse> patchRepresentativeBadge(
+            final MemberClaims memberClaims,
+            @PathVariable final long badgeId
+    ) {
+        MemberRepresentativeBadgeResponse response = memberService.patchRepresentativeBadge(memberClaims.id(), badgeId);
 
         return ResponseEntity.ok(response);
     }
