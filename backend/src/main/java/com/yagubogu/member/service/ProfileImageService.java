@@ -32,7 +32,7 @@ public class ProfileImageService {
     private final S3Properties s3Properties;
     private final MemberService memberService;
 
-    public PresignedUrlStartResponse issuePreSignedUrl(PreSignedUrlStartRequest preSignedUrlStartRequest) {
+    public PresignedUrlStartResponse issuePreSignedUrl(final PreSignedUrlStartRequest preSignedUrlStartRequest) {
         validateContentLength(preSignedUrlStartRequest);
         validateContentType(preSignedUrlStartRequest.contentType());
 
