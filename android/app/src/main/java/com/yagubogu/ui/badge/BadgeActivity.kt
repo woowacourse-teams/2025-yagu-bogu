@@ -29,7 +29,7 @@ class BadgeActivity : ComponentActivity() {
             }
             YaguBoguTheme {
                 BadgeScreen(
-                    badgeUiState = viewModel.badgeUiState.value,
+                    viewModel = viewModel,
                     onBackClick = { finish() },
                     onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
                     modifier = Modifier.fillMaxSize(),

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
 import com.yagubogu.ui.badge.BadgeUiState
+import com.yagubogu.ui.badge.BadgeViewModel
 import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_0_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
@@ -42,9 +43,24 @@ import com.yagubogu.ui.util.shimmerLoading
 
 private const val COLUMN_SIZE = 2
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeScreen(
+    viewModel: BadgeViewModel,
+    onBackClick: () -> Unit,
+    onRegisterClick: (Long) -> Unit,
+    modifier: Modifier,
+) {
+    BadgeScreen(
+        badgeUiState = viewModel.badgeUiState.value,
+        onBackClick = onBackClick,
+        onRegisterClick = onRegisterClick,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BadgeScreen(
     badgeUiState: BadgeUiState,
     onBackClick: () -> Unit,
     onRegisterClick: (Long) -> Unit,
