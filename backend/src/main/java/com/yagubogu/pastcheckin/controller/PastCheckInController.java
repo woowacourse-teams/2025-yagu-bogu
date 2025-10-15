@@ -4,6 +4,7 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
 import com.yagubogu.pastcheckin.service.PastCheckInService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class PastCheckInController implements PastCheckInControllerInterface {
     @Override
     public ResponseEntity<Void> createPastCheckIn(
             final MemberClaims memberClaims,
-            @RequestBody final CreatePastCheckInRequest request
+            @RequestBody @Valid final CreatePastCheckInRequest request
     ) {
         pastCheckInService.createPastCheckIn(memberClaims.id(), request);
 

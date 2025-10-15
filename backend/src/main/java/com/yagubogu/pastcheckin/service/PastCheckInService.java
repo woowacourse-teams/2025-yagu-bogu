@@ -38,22 +38,22 @@ public class PastCheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        validateCheckInExists(member, game);
+        validateCheckInNotExists(member, game);
 
-        validatePastCheckInExists(member, game);
+        validatePastCheckInNotExists(member, game);
 
         PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
         pastCheckInRepository.save(pastCheckIn);
     }
 
-    private void validatePastCheckInExists(final Member member, final Game game) {
+    private void validatePastCheckInNotExists(final Member member, final Game game) {
         boolean hasCheckIn = pastCheckInRepository.existsByMemberAndGameDate(member, game.getDate());
         if (hasCheckIn) {
             throw new ConflictException("CheckIn already exists");
         }
     }
 
-    private void validateCheckInExists(final Member member, final Game game) {
+    private void validateCheckInNotExists(final Member member, final Game game) {
         boolean hasCheckIn = checkInRepository.existsByMemberAndGameDate(member, game.getDate());
         if (hasCheckIn) {
             throw new ConflictException("CheckIn already exists");
