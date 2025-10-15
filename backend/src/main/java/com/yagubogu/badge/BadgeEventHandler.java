@@ -13,7 +13,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @RequiredArgsConstructor
 @Component
-public class BadgeEventListener {
+public class BadgeEventHandler {
 
     private final BadgePolicyRegistry badgePolicyRegistry;
     private final BadgeAwardService badgeAwardService;
