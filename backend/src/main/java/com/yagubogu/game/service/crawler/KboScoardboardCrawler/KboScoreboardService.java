@@ -47,7 +47,7 @@ public class KboScoreboardService {
 
     public List<ScoreboardResponse> fetchScoreboardRange(final LocalDate startDate, final LocalDate endDate) {
         StopWatch total = new StopWatch("scoreboardRange:" + startDate + "~" + endDate);
-        total.start("crawl+persist");
+        total.start("crawl + persist");
 
         // 1) 크롤링 (트랜잭션 밖에서 실행)
         List<LocalDate> dates = getDatesBetweenInclusive(startDate, endDate);
@@ -65,8 +65,7 @@ public class KboScoreboardService {
         }
 
         // 4) 전체를 한 번에 "행"으로 변환
-        List<GameUpsertRow> rows = convertToRows(
-                allGames, teamByShort, stadiumByLocation);
+        List<GameUpsertRow> rows = convertToRows(allGames, teamByShort, stadiumByLocation);
 
         // 5) CHUNK별로 트랜잭션 분리하여 업서트
         UpsertResult upsertResult = upsertInChunks(rows);
@@ -75,8 +74,7 @@ public class KboScoreboardService {
         if (!upsertResult.failedGames().isEmpty()) {
             log.error("[FAILED GAMES] 다음 경기들의 저장에 실패했습니다:");
             for (FailedGame failed : upsertResult.failedGames()) {
-                log.error("  - {} vs {} ({})",
-                        failed.awayTeamId(), failed.homeTeamId(), failed.date());
+                log.error("  - {} vs {} ({})", failed.awayTeamId(), failed.homeTeamId(), failed.date());
             }
         }
 
@@ -88,8 +86,8 @@ public class KboScoreboardService {
 
         total.stop();
         log.info("[SCOREBOARD_RANGE] {}~{} total={}ms success={} failed={}",
-                startDate, endDate, total.getTotalTimeMillis(),
-                upsertResult.successCount(), upsertResult.failedGames().size());
+                startDate, endDate, total.getTotalTimeMillis(), upsertResult.successCount(),
+                upsertResult.failedGames().size());
         return responses;
     }
 
@@ -125,10 +123,8 @@ public class KboScoreboardService {
                 try {
                     return batchUpsertRepository.batchUpsert(chunk);
                 } catch (Exception e) {
-                    log.error("[CHUNK ERROR] chunk {}-{} 실패: {}", from, to, e.getMessage());
                     status.setRollbackOnly();
-                    return new BatchResult(0,
-                            IntStream.range(0, chunk.size()).boxed().toList(), 0);
+                    return new BatchResult(0, IntStream.range(0, chunk.size()).boxed().toList(), 0);
                 }
             });
 
@@ -148,12 +144,7 @@ public class KboScoreboardService {
                         ));
                     }
                 }
-                log.warn("[CHUNK FAILURE] chunk {}-{} 실패 인덱스: {}",
-                        from, to, result.failedIndices());
             }
-
-            log.info("[CHUNK COMMITTED] chunk {}-{} success={} failed={}",
-                    from, to, result.success(), result.failedIndices().size());
         }
 
         return new UpsertResult(totalSuccess, failedGames);

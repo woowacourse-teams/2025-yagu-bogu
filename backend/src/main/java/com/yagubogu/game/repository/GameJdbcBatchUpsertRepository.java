@@ -91,7 +91,7 @@ public class GameJdbcBatchUpsertRepository {
                         } else {
                             ps.setString(p++, r.awayPitcher());
                         }
-                        ps.setString(p++, r.gameState());  // Enum -> name()
+                        ps.setString(p++, r.gameState());
                     }
 
                     @Override
