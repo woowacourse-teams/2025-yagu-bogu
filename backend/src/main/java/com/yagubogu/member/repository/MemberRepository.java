@@ -15,5 +15,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m.team.id from Member m where m.id = :memberId and m.deletedAt is null")
     Optional<Long> findTeamIdById(Long memberId);
 
+    long countByDeletedAtIsNull();
+
     boolean existsByNickname(Nickname nickname);
 }

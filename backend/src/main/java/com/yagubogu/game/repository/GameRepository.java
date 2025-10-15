@@ -18,11 +18,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByGameCode(String gameCode);
 
-    List<Game> findByDate(LocalDate date);
-
-    List<Game> findGameByDate(LocalDate date);
-
-
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
                 g.id,
