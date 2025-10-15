@@ -9,7 +9,6 @@ import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
 import com.yagubogu.member.dto.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import com.yagubogu.member.repository.MemberRepository;
-import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class ProfileImageService {
                 .build();
 
         PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(b -> b
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(s3Properties.presignExpiration())
                 .putObjectRequest(putReq));
 
         return new PresignedUrlStartResponse(key, presigned.url().toString());
