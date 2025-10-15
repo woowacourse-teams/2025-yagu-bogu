@@ -1,10 +1,7 @@
 package com.yagubogu.talk.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -22,6 +19,7 @@ import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.TalkCursorResult;
 import com.yagubogu.talk.dto.TalkRequest;
 import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.event.TalkEvent;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import com.yagubogu.team.domain.Team;
@@ -30,12 +28,20 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -74,7 +80,7 @@ class TalkServiceTest {
     @Autowired
     private TalkReportRepository talkReportRepository;
 
-    @Autowired
+    @Mock
     private ApplicationEventPublisher publisher;
 
     @BeforeEach
@@ -613,7 +619,7 @@ class TalkServiceTest {
                 .hasMessage("Invalid member for the talk");
     }
 
-    @DisplayName("처음으로 톡을 입력하면 뱃지를 발행한다")
+    @DisplayName("처음으로 톡을 입력하면 톡이 발생했다는 이벤트를 발행한다")
     @Test
     void createTalk_publishEvent() {
         // given
@@ -631,6 +637,15 @@ class TalkServiceTest {
         TalkRequest request = new TalkRequest(content);
 
         // when
-        TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());
+        talkService.createTalk(game.getId(), request, me.getId());
+        ArgumentCaptor<TalkEvent> eventCaptor = ArgumentCaptor.forClass(TalkEvent.class);
+        verify(publisher, times(1)).publishEvent(eventCaptor.capture());
+        TalkEvent publishedEvent = eventCaptor.getValue();
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(publishedEvent.member()).isEqualTo(me);
+            softAssertions.assertThat(publishedEvent.policy()).isEqualTo(Policy.CHAT);
+        });
     }
 }
