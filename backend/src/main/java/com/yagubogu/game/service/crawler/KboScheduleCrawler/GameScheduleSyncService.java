@@ -14,6 +14,7 @@ import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +49,13 @@ public class GameScheduleSyncService {
      * - 기존 존재 시 업데이트, 없으면 생성
      */
     @Transactional
-    public void syncByCrawler(final LocalDate now, final LocalDate startDate, final LocalDate endDate,
+    public void syncByCrawler(final LocalDateTime now, final LocalDate startDate, final LocalDate endDate,
                               final ScheduleType scheduleType) {
         List<KboGame> games = kboScheduleCrawler.crawlKboSchedule(startDate, endDate, scheduleType);
         upsertByCrawlerGames(now, games);
     }
 
-    private void upsertByCrawlerGames(final LocalDate now, final List<KboGame> games) {
+    private void upsertByCrawlerGames(final LocalDateTime now, final List<KboGame> games) {
         for (KboGame kboGame : games) {
             String homeTeamName = kboGame.getHomeTeam();
             Optional<Team> homeTeamOpt = teamRepository.findByShortName(homeTeamName);
@@ -80,17 +81,15 @@ public class GameScheduleSyncService {
             Integer awayScore = kboGame.getAwayScore();
             String gameCode = generateGameCode(date, homeTeam, awayTeam, headerOrder);
 
-            Optional<Game> existingOpt = gameRepository.findByGameCode(gameCode)
-                    .or(() -> gameRepository.findByDateAndHomeTeamAndAwayTeamAndStartAt(date, homeTeam, awayTeam,
-                            startAt));
+            Optional<Game> existingOpt = gameRepository.findByGameCode(gameCode);
             if (existingOpt.isPresent()) {
                 Game existing = existingOpt.get();
-                GameState state = getGameState(now, kboGame, date);
+                GameState state = getGameState(now, kboGame);
                 existing.updateSchedule(stadium, homeTeam, awayTeam, date, startAt, state);
                 return;
             }
 
-            GameState state = getGameState(now, kboGame, date);
+            GameState state = getGameState(now, kboGame);
             Game game = new Game(
                     stadium,
                     homeTeam,
@@ -110,11 +109,11 @@ public class GameScheduleSyncService {
         }
     }
 
-    private GameState getGameState(final LocalDate now, final KboGame k, final LocalDate date) {
-        if (k.isCancelled()) {
-            return GameState.CANCELED;
-        }
-        if (date.isBefore(now)) {
+    private GameState getGameState(final LocalDateTime now, final KboGame k) {
+        LocalTime time = LocalTime.parse(k.getGameTime());
+        LocalDateTime gameTime = LocalDateTime.of(k.getDate(), time);
+        // 해당 사이트에서는 완료 여부 확인 불가
+        if (gameTime.isBefore(now)) {
             return GameState.COMPLETED;
         }
         return GameState.SCHEDULED;

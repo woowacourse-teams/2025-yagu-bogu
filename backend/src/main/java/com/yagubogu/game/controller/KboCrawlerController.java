@@ -9,6 +9,7 @@ import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import com.yagubogu.member.domain.Role;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,7 +31,7 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
     ) {
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         gameScheduleSyncService.syncByCrawler(now, startDate, endDate, scheduleType);
 
         return ResponseEntity.ok().build();

@@ -32,8 +32,7 @@ public class KboScoreboardCrawler {
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KboScoreboardCrawler.class);
     private static final String BASE_URL = "https://www.koreabaseball.com/Schedule/ScoreBoard.aspx";
     private static final DateTimeFormatter LABEL_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    private static final Pattern LABELED =
-            Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
+    private static final Pattern LABELED = Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
 
     private final Duration navigationTimeout;
     private final Duration waitTimeout;
