@@ -762,7 +762,7 @@ public class CheckInE2eTest extends E2eTestBase {
         for (int i = 0; i < 4; i++) {
             final int index = i;
             Game game = gameFactory.save(builder ->
-                    builder.date(pastCheckInStartDate.plusDays(index)) // minus -> plus 로 변경
+                    builder.date(pastCheckInStartDate.plusDays(index))
                             .stadium(stadiumGocheok)
                             .homeTeam(lotte).homeScore(5).homeScoreBoard(TestFixture.getHomeScoreBoard())
                             .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoard())
