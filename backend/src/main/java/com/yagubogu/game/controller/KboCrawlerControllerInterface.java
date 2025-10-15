@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/kbo")
 public interface KboCrawlerControllerInterface {
 
-    @Operation(summary = "특정 날짜 범위의 경기 목록 크롤링", description = "KBO 공식 사이트에서 지정한 날짜 범위의 경기 정보를 가져옵니다.")
+    @Operation(summary = "특정 날짜 범위의 경기 일정 크롤링", description = "KBO 공식 사이트에서 지정한 날짜 범위의 경기 일정을 가져옵니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")
     })
@@ -31,7 +31,7 @@ public interface KboCrawlerControllerInterface {
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
     );
 
-    @Operation(summary = "특정 날짜 범위의 경기 목록 크롤링", description = "KBO 공식 사이트에서 지정한 날짜 범위의 경기 정보를 가져옵니다.")
+    @Operation(summary = "특정 날짜 범위의 스코어보드 크롤링", description = "KBO 공식 사이트에서 지정한 날짜 범위의 스코어보드를 가져옵니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")
     })

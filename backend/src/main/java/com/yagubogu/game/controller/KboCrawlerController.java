@@ -37,14 +37,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
-    public ResponseEntity<ScoreboardResponse> fetchScoreboard(
-            @RequestParam @DateTimeFormat(iso = DATE) final LocalDate date
-    ) {
-        ScoreboardResponse response = kboScoreboardService.fetchScoreboard(date);
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
     public ResponseEntity<List<ScoreboardResponse>> fetchScoreboardRange(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate

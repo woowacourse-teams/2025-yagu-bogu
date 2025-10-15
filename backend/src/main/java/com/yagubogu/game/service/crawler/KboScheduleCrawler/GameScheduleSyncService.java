@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -47,18 +49,21 @@ public class GameScheduleSyncService {
     public void syncByCrawler(final LocalDate now, final LocalDate startDate, final LocalDate endDate,
                               final ScheduleType scheduleType) {
         List<KboGame> games = kboScheduleCrawler.crawlKboSchedule(startDate, endDate, scheduleType);
-        upsertByCrawlerGames(now, games, true, true);
+        upsertByCrawlerGames(now, games);
     }
 
-    private void upsertByCrawlerGames(final LocalDate now,
-                                      final List<KboGame> games,
-                                      final boolean updateExisting,
-                                      final boolean insertIfMissing
-    ) {
+    private void upsertByCrawlerGames(final LocalDate now, final List<KboGame> games) {
         for (KboGame kboGame : games) {
-            Optional<Team> homeTeamOpt = teamRepository.findByShortName(kboGame.getHomeTeam());
-            Optional<Team> awayTeamOpt = teamRepository.findByShortName(kboGame.getAwayTeam());
-            if (homeTeamOpt.isEmpty() || awayTeamOpt.isEmpty()) {
+            String homeTeamName = kboGame.getHomeTeam();
+            Optional<Team> homeTeamOpt = teamRepository.findByShortName(homeTeamName);
+            String awayTeamName = kboGame.getAwayTeam();
+            Optional<Team> awayTeamOpt = teamRepository.findByShortName(awayTeamName);
+            if (homeTeamOpt.isEmpty()) {
+                log.error("팀이 존재하지 않습니다 : homeTeam {}", homeTeamName);
+                continue;
+            }
+            if (awayTeamOpt.isEmpty()) {
+                log.error("팀이 존재하지 않습니다 : awayTeam {}", awayTeamName);
                 continue;
             }
 
@@ -77,33 +82,29 @@ public class GameScheduleSyncService {
                     .or(() -> gameRepository.findByDateAndHomeTeamAndAwayTeamAndStartAt(date, homeTeam, awayTeam,
                             startAt));
             if (existingOpt.isPresent()) {
-                if (updateExisting) {
-                    Game existing = existingOpt.get();
-                    GameState state = getGameState(now, kboGame, date);
-                    existing.updateSchedule(stadium, homeTeam, awayTeam, date, startAt, state);
-                }
+                Game existing = existingOpt.get();
+                GameState state = getGameState(now, kboGame, date);
+                existing.updateSchedule(stadium, homeTeam, awayTeam, date, startAt, state);
                 return;
             }
 
-            if (insertIfMissing) {
-                GameState state = getGameState(now, kboGame, date);
-                Game game = new Game(
-                        stadium,
-                        homeTeam,
-                        awayTeam,
-                        date,
-                        startAt,
-                        gameCode,
-                        homeScore,
-                        awayScore,
-                        null,
-                        null,
-                        null,
-                        null,
-                        state
-                );
-                gameRepository.save(game);
-            }
+            GameState state = getGameState(now, kboGame, date);
+            Game game = new Game(
+                    stadium,
+                    homeTeam,
+                    awayTeam,
+                    date,
+                    startAt,
+                    gameCode,
+                    homeScore,
+                    awayScore,
+                    null,
+                    null,
+                    null,
+                    null,
+                    state
+            );
+            gameRepository.save(game);
         }
     }
 
