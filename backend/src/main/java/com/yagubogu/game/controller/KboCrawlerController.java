@@ -3,7 +3,6 @@ package com.yagubogu.game.controller;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 import com.yagubogu.auth.annotation.RequireRole;
-import com.yagubogu.game.dto.ScheduleResponse;
 import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
@@ -26,15 +25,15 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     private final KboScoreboardService kboScoreboardService;
 
     @Override
-    public ResponseEntity<ScheduleResponse> fetchScheduleRange(
+    public ResponseEntity<Void> fetchScheduleRange(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
     ) {
         LocalDate now = LocalDate.now();
-        int crawled = gameScheduleSyncService.syncByCrawler(now, startDate, endDate, scheduleType);
+        gameScheduleSyncService.syncByCrawler(now, startDate, endDate, scheduleType);
 
-        return ResponseEntity.ok(new ScheduleResponse(crawled));
+        return ResponseEntity.ok().build();
     }
 
     @Override

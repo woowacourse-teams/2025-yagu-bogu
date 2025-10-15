@@ -42,14 +42,12 @@ public class GameScheduleSyncService {
     /**
      * 지정한 기간(start~end)에 대해 크롤러로 수집 후 upsert 수행합니다.
      * - 기존 존재 시 업데이트, 없으면 생성
-     * - 반환값은 크롤링으로 수집한 경기 수입니다.
      */
     @Transactional
-    public int syncByCrawler(final LocalDate now, final LocalDate startDate, final LocalDate endDate,
-                             final ScheduleType scheduleType) {
+    public void syncByCrawler(final LocalDate now, final LocalDate startDate, final LocalDate endDate,
+                              final ScheduleType scheduleType) {
         List<KboGame> games = kboScheduleCrawler.crawlKboSchedule(startDate, endDate, scheduleType);
         upsertByCrawlerGames(now, games, true, true);
-        return games.size();
     }
 
     private void upsertByCrawlerGames(final LocalDate now,

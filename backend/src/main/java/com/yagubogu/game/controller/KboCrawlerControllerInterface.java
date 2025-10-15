@@ -1,6 +1,5 @@
 package com.yagubogu.game.controller;
 
-import com.yagubogu.game.dto.ScheduleResponse;
 import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +23,7 @@ public interface KboCrawlerControllerInterface {
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")
     })
     @PostMapping("/schedule")
-    ResponseEntity<ScheduleResponse> fetchScheduleRange(
+    ResponseEntity<Void> fetchScheduleRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
