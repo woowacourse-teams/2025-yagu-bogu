@@ -30,6 +30,7 @@ public class KboCrawlerConfig {
     public KboScoreboardCrawler kboScoreboardCrawler(final KboCrawlerProperties p,
                                                      final PlaywrightManager playwrightManager) {
         return new KboScoreboardCrawler(
+                p.getBaseUrl(),
                 p.getNavigationTimeout(),
                 p.getWaitTimeout(),
                 playwrightManager

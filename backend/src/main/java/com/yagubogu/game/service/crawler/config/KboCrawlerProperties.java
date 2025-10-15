@@ -13,11 +13,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class KboCrawlerProperties {
 
+    @NotBlank
+    private String baseUrl;
+
     @NotNull
     private Duration navigationTimeout;
 
     @NotNull
     private Duration tableTimeout;
+
     private int maxRetries;
 
     @NotNull
@@ -25,12 +29,16 @@ public class KboCrawlerProperties {
 
     @NotNull
     private Duration waitTimeout;
+
     @NotBlank
     private String dateFieldSelector;
+
     @NotBlank
     private String dateLabelSelector;
+
     @NotBlank
     private String updatePanelSelector;
+
     @NotBlank
     private String scoreSelector;
 
@@ -42,9 +50,13 @@ public class KboCrawlerProperties {
     private final Runner runner = new Runner();
 
     public static class Runner {
+
         private boolean enabled;
+
         private String scheduleType = "regular";
+
         private LocalDate startDate;
+
         private LocalDate endDate;
 
         public boolean isEnabled() {

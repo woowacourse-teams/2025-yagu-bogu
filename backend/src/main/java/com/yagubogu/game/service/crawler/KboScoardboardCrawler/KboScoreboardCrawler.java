@@ -22,18 +22,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 @RequiredArgsConstructor
 public class KboScoreboardCrawler {
 
-    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KboScoreboardCrawler.class);
-    private static final String BASE_URL = "https://www.koreabaseball.com/Schedule/ScoreBoard.aspx";
     private static final DateTimeFormatter LABEL_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private static final Pattern LABELED = Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
 
+    private final String baseUrl;
     private final Duration navigationTimeout;
     private final Duration waitTimeout;
     private final PlaywrightManager pwManager;
@@ -47,12 +44,12 @@ public class KboScoreboardCrawler {
         Page page = null;
         try {
             page = pwManager.acquirePage();
-            page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
+            page.navigate(baseUrl, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
 
             for (LocalDate date : dates) {
                 log.debug("조회 날짜: {}", date);
                 navigateToDateUsingCalendar(page, date, waitTimeout);
-                List<KboScoreboardGame> games = extractScoreboards(page, DEFAULT_LOGGER, date);
+                List<KboScoreboardGame> games = extractScoreboards(page, date);
                 result.put(date, games);
             }
             return result;
@@ -114,28 +111,27 @@ public class KboScoreboardCrawler {
         }
     }
 
-    private List<KboScoreboardGame> extractScoreboards(final Page page, final Logger logger, final LocalDate date) {
+    private List<KboScoreboardGame> extractScoreboards(final Page page, final LocalDate date) {
         if (!waitForScoreboardsOrSkip(page, waitTimeout)) {
             return List.of();
         }
 
         List<ElementHandle> scoreboards = page.querySelectorAll(".smsScore");
         if (scoreboards.isEmpty()) {
-            logger.info("스코어보드가 존재하지 않습니다.");
+            log.info("스코어보드가 존재하지 않습니다.");
             return List.of();
         }
 
         List<KboScoreboardGame> games = new ArrayList<>();
         for (ElementHandle scoreboard : scoreboards) {
-            Optional<KboScoreboardGame> parsed = parseScoreboard(scoreboard, logger, date);
+            Optional<KboScoreboardGame> parsed = parseScoreboard(scoreboard, date);
             parsed.ifPresent(games::add);
         }
 
         return games;
     }
 
-    private Optional<KboScoreboardGame> parseScoreboard(final ElementHandle scoreboard,
-                                                        final Logger logger, final LocalDate date) {
+    private Optional<KboScoreboardGame> parseScoreboard(final ElementHandle scoreboard, final LocalDate date) {
         String status = safeText(scoreboard, ".flag span");
         String stadium = safeText(scoreboard, ".place");
         String startTime = safeText(scoreboard, ".place span");
@@ -161,7 +157,7 @@ public class KboScoreboardCrawler {
         KboScoreboardTeam homeTeam = mergeTeamData(homeName, homeScore, tableScores);
 
         if (awayTeam == null && homeTeam == null) {
-            logger.warn("스코어보드 파싱 실패: 팀 정보를 찾을 수 없습니다.");
+            log.warn("스코어보드 파싱 실패: 팀 정보를 찾을 수 없습니다.");
             return Optional.empty();
         }
 
