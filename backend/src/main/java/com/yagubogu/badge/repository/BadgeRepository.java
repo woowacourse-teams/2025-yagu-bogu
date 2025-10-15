@@ -17,22 +17,23 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
 
     @Query("""
                 SELECT new com.yagubogu.badge.dto.BadgeRawResponse(
-                    b.id,
-                    b.name,
-                    b.description,
-                    b.policy,
-                    COALESCE(mb.progress, 0),
-                    COALESCE(mb.isAchieved, false),
-                    mb.achievedAt,
-                    (SELECT COUNT(mb2.id)
-                     FROM MemberBadge mb2
-                     WHERE mb2.badge.id = b.id AND mb2.isAchieved = true),
-                    b.threshold,
-                    b.badgeImageUrl
-                )
-                FROM Badge b
-                LEFT JOIN MemberBadge mb
-                    ON b.id = mb.badge.id AND mb.member.id = :memberId
+                        b.id,
+                        b.name,
+                        b.description,
+                        b.policy,
+                        COALESCE(currentUserMb.progress, 0),
+                        COALESCE(currentUserMb.isAchieved, false),
+                        currentUserMb.achievedAt,
+                        COUNT(achievedMb.id),
+                        b.threshold,
+                        b.badgeImageUrl
+                    )
+                    FROM Badge b
+                    LEFT JOIN MemberBadge currentUserMb
+                        ON b.id = currentUserMb.badge.id AND currentUserMb.member.id = :memberId
+                    LEFT JOIN MemberBadge achievedMb
+                        ON b.id = achievedMb.badge.id AND achievedMb.isAchieved = true
+                    GROUP BY b.id, currentUserMb.progress, currentUserMb.isAchieved, currentUserMb.achievedAt
             """)
     List<BadgeRawResponse> findAllBadgesWithAchievedCount(@Param("memberId") Long memberId);
 
