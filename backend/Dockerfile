@@ -18,6 +18,17 @@ RUN ./gradlew --no-daemon --build-cache bootJar -x test
 # --- Run stage ---
 FROM amazoncorretto:21-alpine
 
+# Playwright 실행에 필요한 브라우저 및 시스템 라이브러리 설치
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    udev \
+    xvfb
+
 # 환경 변수 설정
 # Dockerfile에는 JVM 옵션, 프로필 정도만 기본값으로
 ENV TZ=Asia/Seoul
