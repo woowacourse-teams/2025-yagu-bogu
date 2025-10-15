@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleNotReadable(HttpMessageNotReadableException e) {
-        log.info("[HttpMessageNotReadableException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+        log.info("[HttpMessageNotReadableException] {}", safeMsg(e.getMessage()));
 
         return new ExceptionResponse("Invalid JSON request body");
     }
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleValidation(MethodArgumentNotValidException e) {
-        log.info("[MethodArgumentNotValid] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+        log.info("[MethodArgumentNotValid] {}", safeMsg(e.getMessage()));
 
         return new ExceptionResponse("Validation failed");
     }
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageConversionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleConversion(HttpMessageConversionException e) {
-        log.info("[HttpMessageConversion] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
+        log.info("[HttpMessageConversion] {}", safeMsg(e.getMessage()));
 
         return new ExceptionResponse("Type conversion failed");
     }
