@@ -11,7 +11,6 @@ import com.yagubogu.pastcheckin.domain.PastCheckIn;
 import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
 import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +24,12 @@ public class PastCheckInService {
 
     private final PastCheckInRepository pastCheckInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
 
     @Transactional
     public void createPastCheckIn(final Long memberId, final CreatePastCheckInRequest request) {
-        long stadiumId = request.stadiumId();
-        Stadium stadium = getStadiumById(stadiumId);
-        LocalDate date = request.date();
-        Game game = getGame(stadium, date);
+        Game game = getGameById(request.gameId());
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
@@ -60,9 +55,9 @@ public class PastCheckInService {
         }
     }
 
-    private Stadium getStadiumById(final long stadiumId) {
-        return stadiumRepository.findById(stadiumId)
-                .orElseThrow(() -> new NotFoundException("Stadium is not found"));
+    private Game getGameById(final long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
     private Game getGame(final Stadium stadium, final LocalDate date) {
