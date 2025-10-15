@@ -14,6 +14,8 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.StatCountsResponse;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.support.E2eTestBase;
@@ -419,7 +421,7 @@ public class StatE2eTest extends E2eTestBase {
         checkInFactory.save(b -> b.game(n1).member(member).team(ht));
 
         // when
-        var actual = RestAssured.given().log().all()
+        OpponentWinRateResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
@@ -427,14 +429,14 @@ public class StatE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
+                .as(OpponentWinRateResponse.class);
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(9);
+            s.assertThat(actual.opponents()).hasSize(13);
 
             // 1위: SS(2-0-0, 100.0)
-            var first = actual.opponents().get(0);
+            OpponentWinRateTeamResponse first = actual.opponents().get(0);
             s.assertThat(first.teamCode()).isEqualTo("SS");
             s.assertThat(first.wins()).isEqualTo(2);
             s.assertThat(first.losses()).isEqualTo(0);
@@ -442,7 +444,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(first.winRate()).isEqualTo(100.0);
 
             // 2위: LT(1-1-0, 50.0)
-            var second = actual.opponents().get(1);
+            OpponentWinRateTeamResponse second = actual.opponents().get(1);
             s.assertThat(second.teamCode()).isEqualTo("LT");
             s.assertThat(second.wins()).isEqualTo(1);
             s.assertThat(second.losses()).isEqualTo(1);
@@ -450,7 +452,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(second.winRate()).isEqualTo(50.0);
 
             // NC(0-0-1, 0.0) 포함 검증
-            var ncRes = actual.opponents().stream()
+            OpponentWinRateTeamResponse ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
             s.assertThat(ncRes.wins()).isZero();
@@ -458,18 +460,19 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(ncRes.draws()).isEqualTo(1);
             s.assertThat(ncRes.winRate()).isEqualTo(0.0);
 
-            // 미대결 0.0 팀코드 (정렬/로케일 영향 최소화를 위해 any-order)
-            var zeros = actual.opponents().stream()
+            List<String> zeros = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
-                    .map(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::teamCode)
+                    .map(OpponentWinRateTeamResponse::teamCode)
                     .toList();
+
             s.assertThat(zeros)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK2", "SK", "OB", "WO", "HH", "HD", "NN", "DR");
 
             // 전체 정렬 검증: winRate desc → name asc
-            var sorted = actual.opponents().stream()
-                    .sorted(Comparator.comparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::winRate).reversed()
-                            .thenComparing(com.yagubogu.stat.dto.OpponentWinRateTeamResponse::name))
+            List<OpponentWinRateTeamResponse> sorted = actual.opponents().stream()
+                    .sorted(Comparator
+                            .comparing(OpponentWinRateTeamResponse::winRate).reversed()
+                            .thenComparing(OpponentWinRateTeamResponse::name))
                     .toList();
             s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
