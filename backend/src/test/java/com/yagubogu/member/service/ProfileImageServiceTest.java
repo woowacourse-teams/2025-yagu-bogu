@@ -74,7 +74,7 @@ class ProfileImageServiceTest {
     }
 
     @Test
-    @DisplayName("pre-signed url을발급한다")
+    @DisplayName("pre-signed url을 발급한다")
     void issuePreSignedUrl_success() throws Exception {
         // given
         PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/jpeg", 1_000_000L);
@@ -92,7 +92,7 @@ class ProfileImageServiceTest {
     }
 
     @Test
-    @DisplayName("contentLength가 최대 길이를 초과하면 예외를 던진다")
+    @DisplayName("예외: contentLength가 최대 길이를 초과하면 예외를 던진다")
     void issuePreSignedUrl_tooLarge() {
         // given
         long tooLargeContentLength = 5L * 1024 * 1024 + 1L;
