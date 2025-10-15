@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -50,14 +51,20 @@ public class ProfileImageE2eTest extends E2eTestBase {
     @MockitoSpyBean
     private S3Client s3Client;
 
+    @Value("${aws.access-key-id}")
+    private String accessKeyId;
+
+    @Value("${aws.secret-access-key}")
+    private String secretAccessKey;
+
     @Autowired
     private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        System.setProperty("aws.accessKeyId", "test");
-        System.setProperty("aws.secretAccessKey", "test");
+        System.setProperty("aws.accessKeyId", accessKeyId);
+        System.setProperty("aws.secretAccessKey", secretAccessKey);
         org.mockito.Mockito.doReturn(HeadObjectResponse.builder().build())
                 .when(s3Client)
                 .headObject(org.mockito.ArgumentMatchers.any(HeadObjectRequest.class));
