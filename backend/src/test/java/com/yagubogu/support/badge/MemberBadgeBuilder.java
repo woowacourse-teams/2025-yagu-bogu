@@ -8,7 +8,6 @@ public class MemberBadgeBuilder {
 
     private Badge badge;
     private Member member;
-    private int progress = 0;
     private boolean isAchieved = false;
 
     public MemberBadgeBuilder badge(final Badge badge) {
@@ -34,6 +33,7 @@ public class MemberBadgeBuilder {
         if (isAchieved) {
             mb.increaseProgress();
         }
+
         return mb;
     }
 }
