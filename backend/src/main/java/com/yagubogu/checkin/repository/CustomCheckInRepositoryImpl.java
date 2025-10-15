@@ -44,8 +44,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
-
     private static final QCheckIn CHECK_IN = QCheckIn.checkIn;
     private static final QPastCheckIn PAST_CHECK_IN = QPastCheckIn.pastCheckIn;
     private static final QGame GAME = QGame.game;
@@ -53,6 +51,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private static final QTeam TEAM = QTeam.team;
     private static final QNickname NICKNAME = QNickname.nickname;
     private static final QStadium STADIUM = QStadium.stadium;
+
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public StatCounts findStatCounts(final Member member, final int year) {
