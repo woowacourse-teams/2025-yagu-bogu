@@ -1,5 +1,6 @@
 package com.yagubogu.domain.repository
 
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
@@ -16,13 +17,16 @@ interface CheckInRepository {
 
     suspend fun getStadiumFanRates(date: LocalDate): Result<List<StadiumFanRateItem>>
 
-    suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking>
+    suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRanking>
 
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
         order: String,
-    ): Result<List<AttendanceHistoryItem.Detail>>
+    ): Result<List<AttendanceHistoryItem>>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>
 

@@ -16,6 +16,8 @@ data class VictoryFairyRankingDto(
     val teamShortName: String, // 팀 이름
     @SerialName("winPercent")
     val winPercent: Double, // 승률(%)
+    @SerialName("victoryFairyScore")
+    val victoryFairyScore: Double, // 승리요정 점수
 ) {
     fun toPresentation(): VictoryFairyItem =
         VictoryFairyItem(
@@ -24,5 +26,6 @@ data class VictoryFairyRankingDto(
             profileImageUrl = profileImageUrl,
             teamName = teamShortName,
             winRate = winPercent,
+            score = victoryFairyScore,
         )
 }

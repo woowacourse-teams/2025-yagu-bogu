@@ -8,7 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.theme.YaguBoguTheme
@@ -20,6 +23,10 @@ class BadgeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val view = LocalView.current
+            LaunchedEffect(Unit) {
+                WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
+            }
             YaguBoguTheme {
                 BadgeScreen(
                     badgeUiState = viewModel.badgeUiState.value,

@@ -150,6 +150,10 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+    // sse
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.eventsource)
+
     // kotest
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
