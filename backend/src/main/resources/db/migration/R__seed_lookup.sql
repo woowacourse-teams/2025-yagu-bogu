@@ -72,21 +72,3 @@ ON DUPLICATE KEY UPDATE badge_name        = new_data.badge_name,
                         badge_policy      = new_data.badge_policy,
                         badge_threshold   = new_data.badge_threshold,
                         badge_image_url   = new_data.badge_image_url;
-
-INSERT INTO games (game_code, date, start_at, stadium_id, home_team_id, away_team_id,
-                   home_score, away_score, home_score_board_id, away_score_board_id,
-                   home_pitcher, away_pitcher, game_state)
-    VALUES ('G001', '2025-09-15', '18:30:00', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'SCHEDULED')
-        AS new_data
-ON DUPLICATE KEY UPDATE date                = new_data.date,
-                        start_at            = new_data.start_at,
-                        stadium_id          = new_data.stadium_id,
-                        home_team_id        = new_data.home_team_id,
-                        away_team_id        = new_data.away_team_id,
-                        home_score          = new_data.home_score,
-                        away_score          = new_data.away_score,
-                        home_score_board_id = new_data.home_score_board_id,
-                        away_score_board_id = new_data.away_score_board_id,
-                        home_pitcher        = new_data.home_pitcher,
-                        away_pitcher        = new_data.away_pitcher,
-                        game_state          = new_data.game_state;
