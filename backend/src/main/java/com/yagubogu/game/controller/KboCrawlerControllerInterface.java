@@ -1,5 +1,7 @@
 package com.yagubogu.game.controller;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+
 import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,8 +26,8 @@ public interface KboCrawlerControllerInterface {
     })
     @PostMapping("/schedule")
     ResponseEntity<Void> fetchScheduleRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
     );
 
@@ -35,7 +37,7 @@ public interface KboCrawlerControllerInterface {
     })
     @PostMapping("/scoreboards/range")
     ResponseEntity<List<ScoreboardResponse>> fetchScoreboardRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate
     );
 }
