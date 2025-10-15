@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Configuration
 @EnableConfigurationProperties(S3Properties.class)
 public class S3Config {
+    
     @Bean
     S3Client s3() {
         return S3Client.builder().region(Region.AP_NORTHEAST_2).build();

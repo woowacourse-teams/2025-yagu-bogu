@@ -1,6 +1,7 @@
 package com.yagubogu.member;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.doReturn;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -65,7 +66,7 @@ public class ProfileImageE2eTest extends E2eTestBase {
         RestAssured.port = port;
         System.setProperty("aws.accessKeyId", accessKeyId);
         System.setProperty("aws.secretAccessKey", secretAccessKey);
-        org.mockito.Mockito.doReturn(HeadObjectResponse.builder().build())
+        doReturn(HeadObjectResponse.builder().build())
                 .when(s3Client)
                 .headObject(org.mockito.ArgumentMatchers.any(HeadObjectRequest.class));
     }
