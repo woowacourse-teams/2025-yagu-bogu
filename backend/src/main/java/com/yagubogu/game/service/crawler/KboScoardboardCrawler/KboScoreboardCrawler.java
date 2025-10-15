@@ -31,20 +31,13 @@ public class KboScoreboardCrawler {
 
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KboScoreboardCrawler.class);
     private static final String BASE_URL = "https://www.koreabaseball.com/Schedule/ScoreBoard.aspx";
-    private static final DateTimeFormatter REQUEST_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter LABEL_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private static final Pattern LABELED =
             Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
 
     private final Duration navigationTimeout;
     private final Duration waitTimeout;
-    private final int maxRetries;
-    private final Duration retryDelay;
     private final PlaywrightManager pwManager;
-
-    public List<KboScoreboardGame> crawlScoreboard(final LocalDate date) {
-        return crawlScoreboard(date, DEFAULT_LOGGER);
-    }
 
     public synchronized Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
         Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
@@ -69,41 +62,6 @@ public class KboScoreboardCrawler {
                 pwManager.releasePage(page);
             }
         }
-    }
-
-    private synchronized List<KboScoreboardGame> crawlScoreboard(final LocalDate date, final Logger logger) {
-        Logger log = Optional.ofNullable(logger).orElse(DEFAULT_LOGGER);
-        String formattedRequestDate = REQUEST_DATE_FORMAT.format(date);
-
-        log.info("{} 스코어보드 크롤링 시작", formattedRequestDate);
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            Page page = null;
-            try {
-                page = pwManager.acquirePage();
-                page.navigate(BASE_URL, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
-
-                navigateToDateUsingCalendar(page, date, waitTimeout);
-
-                List<KboScoreboardGame> games = extractScoreboards(page, log, date);
-
-                log.info("{} 스코어보드 크롤링 완료 ({}경기)", formattedRequestDate, games.size());
-                pwManager.releasePage(page);
-
-                return games;
-            } catch (PlaywrightException exception) {
-                log.error("스코어보드 크롤링 중 오류 발생(시도 {}/{}): {}", attempt, maxRetries, exception.getMessage());
-                if (page != null) {
-                    pwManager.releasePage(page);
-                }
-                if (attempt == maxRetries) {
-                    log.info("[CRAWL_EMPTY] date={} 데이터 없음(타임아웃/무경기 등).", date);
-                    break;
-                }
-                sleep(retryDelay);
-            }
-        }
-
-        return List.of();
     }
 
     private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate,

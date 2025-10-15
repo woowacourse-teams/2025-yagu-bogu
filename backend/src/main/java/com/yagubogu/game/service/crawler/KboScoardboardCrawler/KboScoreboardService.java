@@ -91,24 +91,6 @@ public class KboScoreboardService {
         return responses;
     }
 
-    public ScoreboardResponse fetchScoreboard(final LocalDate date) {
-        List<KboScoreboardGame> games = kboScoreboardCrawler.crawlScoreboard(date);
-        applyDoubleHeaderOrder(games);
-
-        Map<String, Team> teamByShort = loadTeams();
-        Map<String, Stadium> stadiumByLocation = loadStadiums();
-        List<GameUpsertRow> rows = convertToRowsSingle(
-                games, date, teamByShort, stadiumByLocation);
-
-        UpsertResult result = upsertInChunks(rows);
-
-        if (!result.failedGames().isEmpty()) {
-            log.error("[FAILED GAMES] 실패한 경기: {}", result.failedGames());
-        }
-
-        return new ScoreboardResponse(date, games);
-    }
-
     // 팀 로딩 (READ_ONLY 트랜잭션)
     private Map<String, Team> loadTeams() {
         return readOnlyTransactionTemplate.execute(status ->
@@ -187,35 +169,6 @@ public class KboScoreboardService {
             Team home = teamByShort.get(dto.getHomeTeam().name());
             Stadium stadium = stadiumByLocation.get(dto.getStadium());
             LocalDate date = dto.getDate();
-            LocalTime startAt = parseStartAt(dto.getStartTime());
-
-            ScoreBoard h = mapper.toScoreBoard(dto.getHomeTeam());
-            ScoreBoard a = mapper.toScoreBoard(dto.getAwayTeam());
-            GameState state = mapper.toState(dto.getStatus(), h.getRuns(), a.getRuns());
-
-            String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
-
-            rows.add(new GameUpsertRow(
-                    gameCode, stadium.getId(), home.getId(), away.getId(),
-                    date, startAt, h.getRuns(), a.getRuns(),
-                    dto.getWinningPitcher(), dto.getLosingPitcher(), state.name()
-            ));
-        }
-
-        return rows;
-    }
-
-    private List<GameUpsertRow> convertToRowsSingle(
-            List<KboScoreboardGame> games, LocalDate date,
-            Map<String, Team> teamByShort,
-            Map<String, Stadium> stadiumByLocation) {
-
-        List<GameUpsertRow> rows = new ArrayList<>(games.size());
-
-        for (KboScoreboardGame dto : games) {
-            Team away = teamByShort.get(dto.getAwayTeam().name());
-            Team home = teamByShort.get(dto.getHomeTeam().name());
-            Stadium stadium = stadiumByLocation.get(dto.getStadium());
             LocalTime startAt = parseStartAt(dto.getStartTime());
 
             ScoreBoard h = mapper.toScoreBoard(dto.getHomeTeam());

@@ -29,16 +29,6 @@ public interface KboCrawlerControllerInterface {
             @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
     );
 
-    @Operation(summary = "KBO 스코어보드 조회", description = "KBO 공식 사이트에서 지정한 날짜의 스코어보드를 실시간으로 가져옵니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "스코어보드 조회 성공"),
-            @ApiResponse(responseCode = "500", description = "크롤링 중 오류 발생")
-    })
-    @PostMapping("/scoreboards")
-    ResponseEntity<ScoreboardResponse> fetchScoreboard(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    );
-
     @Operation(summary = "특정 날짜 범위의 경기 목록 크롤링", description = "KBO 공식 사이트에서 지정한 날짜 범위의 경기 정보를 가져옵니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")

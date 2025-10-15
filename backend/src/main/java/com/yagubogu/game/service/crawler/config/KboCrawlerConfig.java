@@ -32,8 +32,6 @@ public class KboCrawlerConfig {
         return new KboScoreboardCrawler(
                 p.getNavigationTimeout(),
                 p.getWaitTimeout(),
-                p.getMaxRetries(),
-                p.getRetryDelay(),
                 playwrightManager
         );
     }
