@@ -9,7 +9,6 @@ import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncServ
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import com.yagubogu.member.domain.Role;
-import io.micrometer.core.annotation.Timed;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     private final KboScoreboardService kboScoreboardService;
 
     @Override
-    @Timed(value = "api.schedule.range", description = "스케줄 범위 호출 지연")
     public ResponseEntity<ScheduleResponse> fetchScheduleRange(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
@@ -40,7 +38,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
-    @Timed(value = "api.scoreboard.one", description = "단일 날짜 스코어보드 호출 지연")
     public ResponseEntity<ScoreboardResponse> fetchScoreboard(
             @RequestParam @DateTimeFormat(iso = DATE) final LocalDate date
     ) {
@@ -49,7 +46,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     }
 
     @Override
-    @Timed(value = "api.scoreboard.range", description = "범위 스코어보드 호출 지연")
     public ResponseEntity<List<ScoreboardResponse>> fetchScoreboardRange(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate
