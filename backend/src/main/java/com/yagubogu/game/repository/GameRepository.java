@@ -4,6 +4,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -19,9 +20,9 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByGameCode(String gameCode);
 
-    Optional<Game> findByDateAndHomeTeamAndAwayTeamAndStartAt(LocalDate date, com.yagubogu.team.domain.Team homeTeam,
-                                                              com.yagubogu.team.domain.Team awayTeam,
-                                                              LocalTime startAt);
+    Optional<Game> findByDateAndHomeTeamAndAwayTeamAndStartAt(LocalDate date, Team homeTeam,
+                                                              Team awayTeam, LocalTime startAt);
+
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckIn(
                 g.id,
@@ -49,13 +50,4 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             GROUP BY g.id
             """)
     List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
-
-    @Query("""
-        select g from Game g
-        where g.date = :date
-          and g.homeTeam.teamCode = :homeTeamCode
-          and g.awayTeam.teamCode = :awayTeamCode
-          and g.startAt = :startAt
-    """)
-    Optional<Game> findByNaturalKey(LocalDate date, String homeTeamCode, String awayTeamCode, LocalTime startAt);
 }

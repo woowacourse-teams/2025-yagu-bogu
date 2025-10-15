@@ -12,6 +12,7 @@ import com.yagubogu.game.dto.KboScoreboardGame;
 import com.yagubogu.game.dto.ScoreboardResponse;
 import com.yagubogu.game.dto.UpsertResult;
 import com.yagubogu.game.repository.GameJdbcBatchUpsertRepository;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -236,11 +237,11 @@ public class KboScoreboardService {
 
     public static List<LocalDate> getDatesBetweenInclusive(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("startDate와 endDate는 null일 수 없습니다.");
+            throw new BadRequestException("startDate와 endDate는 null일 수 없습니다.");
         }
 
         if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("endDate는 startDate보다 이후여야 합니다.");
+            throw new BadRequestException("endDate는 startDate보다 이후여야 합니다.");
         }
 
         List<LocalDate> dates = new ArrayList<>();
