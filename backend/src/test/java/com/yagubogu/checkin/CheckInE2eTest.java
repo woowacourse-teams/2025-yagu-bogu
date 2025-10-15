@@ -36,7 +36,6 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -362,7 +361,6 @@ public class CheckInE2eTest extends E2eTestBase {
 
     @DisplayName("승리 요정 랭킹을 조회한다")
     @Test
-    @Disabled
     void findVictoryFairyRankings() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
@@ -432,10 +430,10 @@ public class CheckInE2eTest extends E2eTestBase {
         assertSoftly(
                 softAssertions -> {
                     List<VictoryFairyRankingResponse> actual = responses.topRankings();
-                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(40.0);
-                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(40.0);
-                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(31.7);
-                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(23.3);
+                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(53.3);
+                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(53.3);
+                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(42.2);
+                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(31.1);
                 }
         );
     }
@@ -502,6 +500,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .gameState(GameState.COMPLETED));
 
         checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
+        checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -607,15 +606,20 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(3L, "고척", 0L),
                         new StadiumCheckInCountResponse(4L, "수원", 0L),
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "부산", 0L),
-                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(6L, "사직", 0L),
+                        new StadiumCheckInCountResponse(7L, "문학", 0L),
                         new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L),
                         new StadiumCheckInCountResponse(10L, "울산", 0L),
                         new StadiumCheckInCountResponse(11L, "군산", 0L),
                         new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L)
-
+                        new StadiumCheckInCountResponse(13L, "포항", 0L),
+                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
+                        new StadiumCheckInCountResponse(15L, "시민", 0L),
+                        new StadiumCheckInCountResponse(16L, "무등", 0L),
+                        new StadiumCheckInCountResponse(17L, "마산", 0L),
+                        new StadiumCheckInCountResponse(18L, "인천", 0L),
+                        new StadiumCheckInCountResponse(19L, "경산", 0L)
                 )
         );
 
@@ -656,14 +660,20 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountResponse(3L, "고척", 0L),
                         new StadiumCheckInCountResponse(4L, "수원", 0L),
                         new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "부산", 0L),
-                        new StadiumCheckInCountResponse(7L, "인천", 0L),
+                        new StadiumCheckInCountResponse(6L, "사직", 0L),
+                        new StadiumCheckInCountResponse(7L, "문학", 0L),
                         new StadiumCheckInCountResponse(8L, "창원", 0L),
                         new StadiumCheckInCountResponse(9L, "대전", 0L),
                         new StadiumCheckInCountResponse(10L, "울산", 0L),
                         new StadiumCheckInCountResponse(11L, "군산", 0L),
                         new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L)
+                        new StadiumCheckInCountResponse(13L, "포항", 0L),
+                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
+                        new StadiumCheckInCountResponse(15L, "시민", 0L),
+                        new StadiumCheckInCountResponse(16L, "무등", 0L),
+                        new StadiumCheckInCountResponse(17L, "마산", 0L),
+                        new StadiumCheckInCountResponse(18L, "인천", 0L),
+                        new StadiumCheckInCountResponse(19L, "경산", 0L)
                 )
         );
 

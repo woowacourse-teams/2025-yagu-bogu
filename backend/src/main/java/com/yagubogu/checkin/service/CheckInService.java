@@ -132,8 +132,13 @@ public class CheckInService {
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
         List<VictoryFairyRankingResponse> topRankingResponses = findTopVictoryRanking(teamFilter, year, m, c);
-        VictoryFairyRankingResponse myRankingResponse = findMyVictoryRanking(teamFilter, year, m, c, member);
-
+        VictoryFairyRankingResponse myRankingResponse;
+        VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
+        if (myRanking == null) {
+            myRankingResponse = VictoryFairyRankingResponse.emptyRanking(member);
+        } else {
+            myRankingResponse = findMyVictoryRanking(myRanking, teamFilter, year, m, c);
+        }
         return new VictoryFairyRankingResponses(topRankingResponses, myRankingResponse);
     }
 
@@ -170,9 +175,12 @@ public class CheckInService {
         return result;
     }
 
-    private List<VictoryFairyRankingResponse> findTopVictoryRanking(final TeamFilter teamFilter,
-                                                                    final int year, final double m,
-                                                                    final double c) {
+    private List<VictoryFairyRankingResponse> findTopVictoryRanking(
+            final TeamFilter teamFilter,
+            final int year,
+            final double m,
+            final double c
+    ) {
         List<VictoryFairyRank> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
                 VICTORY_RANKING_LIMIT);
         double previousScore = -1.0;
@@ -200,10 +208,13 @@ public class CheckInService {
         return topRankingResponses;
     }
 
-    private VictoryFairyRankingResponse findMyVictoryRanking(final TeamFilter teamFilter, final int year,
-                                                             final double m, final double c,
-                                                             final Member member) {
-        VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
+    private VictoryFairyRankingResponse findMyVictoryRanking(
+            final VictoryFairyRank myRanking,
+            final TeamFilter teamFilter,
+            final int year,
+            final double m,
+            final double c
+    ) {
         double score = Math.round(myRanking.score() * 100 * ROUND_FACTOR) / ROUND_FACTOR;
         int myRankingOrder = checkInRepository.calculateMyRankingOrder(myRanking.score(), m, c, year, teamFilter) + 1;
         double winPercent = Math.round(myRanking.winPercent() * ROUND_FACTOR) / ROUND_FACTOR;

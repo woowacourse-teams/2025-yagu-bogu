@@ -5,7 +5,7 @@ import com.yagubogu.game.domain.Game;
 
 public record FanRateByGameResponse(
         @JsonIgnore long totalCounts,
-        @JsonIgnore long gameId,
+        long gameId,
         TeamFanRateResponse homeTeam,
         TeamFanRateResponse awayTeam
 ) implements Comparable<FanRateByGameResponse> {

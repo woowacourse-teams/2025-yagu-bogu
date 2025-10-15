@@ -37,6 +37,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.flywaydb:flyway-mysql:10.20.1'
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'com.microsoft.playwright:playwright:1.48.0'
 
     compileOnly 'org.projectlombok:lombok'
 

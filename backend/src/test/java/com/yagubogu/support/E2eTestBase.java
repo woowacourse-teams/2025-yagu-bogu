@@ -33,12 +33,6 @@ public abstract class E2eTestBase {
         mysql.start();
     }
 
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private TransactionTemplate txTemplate;
-
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysql::getJdbcUrl);
@@ -51,9 +45,15 @@ public abstract class E2eTestBase {
         flyway.migrate(); // DDL 한 번만 실행
     }
 
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     @AfterEach
     void cleanData() {
-        txTemplate.executeWithoutResult(status -> {
+        transactionTemplate.executeWithoutResult(status -> {
             em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
 
             // Keep lookup tables (teams, stadiums) seeded by Flyway
