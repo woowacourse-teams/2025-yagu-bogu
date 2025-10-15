@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,7 +19,12 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "member_badges")
+@Table(name = "member_badges", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "UK_MEMBER_BADGE",
+                columnNames = {"member_id", "badge_id"}
+        )
+})
 @Entity
 public class MemberBadge extends BaseEntity {
 

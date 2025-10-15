@@ -24,7 +24,8 @@ CREATE TABLE member_badges
     deleted_at      DATETIME(6) NULL,
     PRIMARY KEY (member_badge_id),
     FOREIGN KEY (badge_id) REFERENCES badges (badge_id),
-    FOREIGN KEY (member_id) REFERENCES members (member_id)
+    FOREIGN KEY (member_id) REFERENCES members (member_id),
+    CONSTRAINT UK_MEMBER_BADGE UNIQUE (member_id, badge_id)
 ) ENGINE = InnoDB;
 
 ALTER TABLE members
