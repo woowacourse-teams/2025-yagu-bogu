@@ -77,7 +77,6 @@ class PastCheckInServiceTest {
         pastCheckInService = new PastCheckInService(
                 pastCheckInRepository,
                 memberRepository,
-                stadiumRepository,
                 gameRepository,
                 checkInRepository
         );
@@ -103,7 +102,7 @@ class PastCheckInServiceTest {
                 .gameState(GameState.COMPLETED)
         );
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(stadiumGocheok.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
 
         // when
         pastCheckInService.createPastCheckIn(member.getId(), request);
@@ -130,7 +129,7 @@ class PastCheckInServiceTest {
 
         checkInFactory.save(b -> b.team(lotte).member(member).game(game));
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(stadiumGocheok.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -155,7 +154,7 @@ class PastCheckInServiceTest {
 
         pastCheckInFactory.save(b -> b.game(game).member(member).team(lotte));
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(stadiumGocheok.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -163,20 +162,66 @@ class PastCheckInServiceTest {
                 .hasMessageContaining("CheckIn already exists");
     }
 
-    @DisplayName("예외: stadium이 존재하지 않으면 NotFoundException이 발생한다")
+    @DisplayName("예외: 오늘 날짜에 PastCheckIn이 있는 경우 BadRequest가 발생한다")
+    @Test
+    void createPastCheckIn_fail_whenIsToday() {
+        // given
+        Member member = memberFactory.save(b -> b.team(lotte));
+        LocalDate date = LocalDate.now();
+
+        Game game = gameFactory.save(b -> b
+                .stadium(stadiumGocheok)
+                .date(date)
+                .homeTeam(lotte).homeScore(6).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .gameState(GameState.COMPLETED)
+        );
+
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+
+        // when & then
+        assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Past CheckIn should be add in past");
+    }
+
+    @DisplayName("예외: 오늘 날짜에 PastCheckIn이 있는 경우 BadRequest가 발생한다")
+    @Test
+    void createPastCheckIn_fail_whenIsFuture() {
+        // given
+        Member member = memberFactory.save(b -> b.team(lotte));
+        LocalDate date = LocalDate.now().plusDays(1);
+
+        Game game = gameFactory.save(b -> b
+                .stadium(stadiumGocheok)
+                .date(date)
+                .homeTeam(lotte).homeScore(6).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoard())
+                .gameState(GameState.COMPLETED)
+        );
+
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+
+        // when & then
+        assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Past CheckIn should be add in past");
+    }
+
+        @DisplayName("예외: 경기가 존재하지 않으면 NotFoundException이 발생한다")
     @Test
     void createPastCheckIn_fail_whenStadiumNotFound() {
         // given
         Member member = memberFactory.save(b -> b.team(lotte));
         LocalDate date = LocalDate.of(2025, 4, 4);
 
-        long nonExistingStadiumId = 9999L;
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(nonExistingStadiumId, date);
+        long nonExistingGameId = 9999L;
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(nonExistingGameId, date);
 
         // when / then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Stadium is not found");
+                .hasMessageContaining("Game is not found");
     }
 
     @DisplayName("예외: game이 존재하지 않으면 NotFoundException 발생한다")
@@ -187,7 +232,7 @@ class PastCheckInServiceTest {
         LocalDate date = LocalDate.of(2025, 5, 5);
 
         // 같은 구장 but 해당 날짜에 게임이 없음
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(stadiumGocheok.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(999L, date);
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -211,7 +256,7 @@ class PastCheckInServiceTest {
                 .gameState(GameState.COMPLETED)
         );
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(stadiumGocheok.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(nonExistingMemberId, request))

@@ -3,6 +3,7 @@ package com.yagubogu.pastcheckin.service;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -36,9 +37,17 @@ public class PastCheckInService {
         validateCheckInNotExists(member, game);
 
         validatePastCheckInNotExists(member, game);
+        validatePast(request.date());
 
         PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
         pastCheckInRepository.save(pastCheckIn);
+    }
+
+    private void validatePast(final LocalDate date) {
+        LocalDate now = LocalDate.now();
+        if (date.isEqual(now) || date.isAfter(now)) {
+            throw new BadRequestException("Past CheckIn should be add in past");
+        }
     }
 
     private void validatePastCheckInNotExists(final Member member, final Game game) {
