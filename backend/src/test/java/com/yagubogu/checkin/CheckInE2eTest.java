@@ -728,11 +728,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("order", CheckInOrderFilter.LATEST)
                 .when().get("/api/check-ins/members")
                 .then().log().all()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("checkInHistory")
-                .size();
+                .statusCode(200);
     }
 
     @DisplayName("PastCheckIn과 CheckIn을 통합하여 총 인증 횟수를 조회한다")
