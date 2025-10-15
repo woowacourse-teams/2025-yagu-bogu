@@ -3,9 +3,11 @@ package com.yagubogu.presentation.livetalk.chat
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Firebase
@@ -20,6 +22,8 @@ import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
@@ -32,6 +36,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         LivetalkChatViewModelFactory(
             gameId,
             app.talksRepository,
+            app.gamesRepository,
             intent.getBooleanExtra(KEY_IS_VERIFIED, false),
         )
     }
@@ -126,6 +131,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 firebaseAnalytics.logEvent("livetalk_send_message", null)
             }
         }
+        setupLikeButton()
     }
 
     private fun setupRecyclerView() {
@@ -151,6 +157,88 @@ class LivetalkChatActivity : AppCompatActivity() {
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
+        observePollingLikeAnimation()
+    }
+
+    private fun observePollingLikeAnimation() {
+        val likeButton = binding.tvLikeButton
+        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+            if (newLikesCount <= 0) return@observe
+            val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
+
+            // 각 애니메이션이 담당할 기본 카운트 (몫)
+            val baseIncrement: Long = newLikesCount / animationCount
+
+            // 기본 카운트를 분배하고 남은 카운트 (나머지)
+            val remainder = newLikesCount % animationCount
+
+            lifecycleScope.launch {
+                repeat(animationCount) { index: Int ->
+                    launch {
+                        // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
+                        // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
+                        val increment: Long =
+                            if (index < remainder) baseIncrement + 1 else baseIncrement
+
+                        val randomDelay = (0L..10000L).random()
+                        delay(randomDelay)
+
+                        viewModel.addMyTeamShowingCount(increment)
+                        showLikeEmojiAnimation(
+                            viewModel.cachedLivetalkTeams.myTeamEmoji,
+                            likeButton,
+                        )
+                    }
+                }
+            }
+        }
+        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+            if (newLikesCount <= 0) return@observe
+            val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
+
+            lifecycleScope.launch {
+                repeat(animationCount) { index: Int ->
+                    launch {
+                        val randomDelay = (0L..10000L).random()
+                        delay(randomDelay)
+                        showLikeEmojiAnimation(
+                            viewModel.cachedLivetalkTeams.otherTeamEmoji,
+                            likeButton,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLikeButton() {
+        val likeButton = binding.tvLikeButton
+
+        likeButton.setOnClickListener {
+            viewModel.addMyTeamShowingCount()
+            viewModel.addLikeToBatch()
+            showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
+        }
+    }
+
+    private fun showLikeEmojiAnimation(
+        emoji: String,
+        likeButtonView: TextView,
+    ) {
+        val emojiView = binding.floatingEmojisView
+        // 1. 버튼의 화면상 절대 좌표를 가져옵니다. (결과는 likeBtnPosition 배열에 저장됨)
+        val likeBtnPosition = IntArray(2)
+        likeButtonView.getLocationOnScreen(likeBtnPosition)
+
+        // 2. 애니메이션 컨테이너(emojisView)의 화면상 절대 좌표를 가져옵니다.
+        val containerPosition = IntArray(2)
+        emojiView.getLocationOnScreen(containerPosition)
+
+        // containerPosition을 빼서 상대 좌표를 정확히 계산합니다.
+        val startX = (likeBtnPosition[0] - containerPosition[0]) + (likeButtonView.width / 2f)
+        val startY = (likeBtnPosition[1] - containerPosition[1]) + (likeButtonView.height / 2f)
+
+        emojiView.addLikeEmoji(emoji, startX, startY)
     }
 
     private fun handleLivetalkResponseUiState(uiState: LivetalkUiState) {
@@ -234,6 +322,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         private const val KEY_IS_VERIFIED = "isVerified"
         private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
         private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
+        private const val MAX_ANIMATION_COUNT = 50
 
         fun newIntent(
             context: Context,

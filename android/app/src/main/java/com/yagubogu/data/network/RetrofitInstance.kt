@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.util.concurrent.TimeUnit
 
 class RetrofitInstance(
     baseUrl: String,
@@ -53,6 +54,17 @@ class RetrofitInstance(
 
     private val tokenInterceptor = TokenInterceptor(tokenManager)
     private val tokenAuthenticator = TokenAuthenticator(tokenManager, tokenApiService)
+
+    val streamClient: OkHttpClient by lazy {
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(tokenInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
+            .authenticator(tokenAuthenticator)
+            .connectTimeout(0, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.SECONDS)
+            .build()
+    }
 
     private val baseClient: OkHttpClient by lazy {
         OkHttpClient()

@@ -26,7 +26,7 @@ interface CheckInRepository {
         year: Int,
         filter: String,
         order: String,
-    ): Result<List<AttendanceHistoryItem.Detail>>
+    ): Result<List<AttendanceHistoryItem>>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>
 

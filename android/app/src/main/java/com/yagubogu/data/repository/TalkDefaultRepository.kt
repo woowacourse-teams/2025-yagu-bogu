@@ -6,6 +6,7 @@ import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
 
 class TalkDefaultRepository(
     private val talkDataSource: TalkDataSource,
@@ -65,4 +66,10 @@ class TalkDefaultRepository(
             .reportTalks(
                 talkId = talkId,
             )
+
+    override suspend fun getInitial(gameId: Long): Result<LivetalkTeams> =
+        talkDataSource
+            .getInitial(
+                gameId,
+            ).map { it.toPresentation() }
 }

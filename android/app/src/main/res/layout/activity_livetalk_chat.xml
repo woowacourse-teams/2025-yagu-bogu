@@ -17,177 +17,222 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/gray050"
-        android:fitsSystemWindows="true"
-        tools:context=".presentation.livetalk.chat.LivetalkChatActivity">
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_stadium_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:isShimmering="@{viewModel.isStadiumLoading}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <View
-                android:layout_width="120dp"
-                android:layout_height="20dp"
-                android:background="@drawable/bg_radius_4dp"
-                android:backgroundTint="@color/gray300" />
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <TextView
-            android:id="@+id/tv_stadium_name"
-            style="@style/TextView.Pretendard.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@{viewModel.livetalkResponseItem.stadiumName}"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="고척 스카이돔" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_away_vs_home_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            app:isShimmering="@{viewModel.isStadiumLoading}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name">
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="16dp"
-                android:background="@drawable/bg_radius_4dp"
-                android:backgroundTint="@color/gray300" />
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <TextView
-            android:id="@+id/tv_away_vs_home_name"
-            style="@style/TextView.Pretendard.Regular.12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="@{@string/livetalk_away_home_name(viewModel.livetalkResponseItem.awayTeamName, viewModel.livetalkResponseItem.homeTeamName)}"
-            android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
-            tools:text="두산 vs 키움" />
-
-        <ImageView
-            android:id="@+id/iv_arrow_left"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/livetalk_return_stadiums_description"
-            android:src="@drawable/ic_arrow_left"
-            app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
-            app:tint="@color/gray500" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_chat_messages"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@color/gray050"
-            android:clipToPadding="false"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="12dp"
-            app:layout_constraintBottom_toTopOf="@id/divider"
-            app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
-            tools:listitem="@layout/item_livetalk_other_bubble" />
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.4dp"
-            android:layout_marginVertical="16dp"
-            app:dividerColor="@color/gray300"
-            app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_input_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_gray100_stroke_gray300_radius_12dp"
-            android:minHeight="40dp"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/constraint_btn_send"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent">
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gray050"
+            android:fitsSystemWindows="true"
+            tools:context=".presentation.livetalk.chat.LivetalkChatActivity">
 
-            <EditText
-                android:id="@+id/edit_message"
-                android:layout_width="0dp"
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_stadium_name"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
-                android:enabled="@{isVerified}"
-                android:gravity="center_vertical"
-                android:hint="@{isVerified? @string/livetalk_chat_input_hint(viewModel.livetalkResponseItem.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
-                android:importantForAutofill="no"
-                android:inputType="textMultiLine"
-                android:maxLength="200"
-                android:maxLines="4"
-                android:minHeight="16dp"
-                android:scrollHorizontally="false"
-                android:text="@={viewModel.messageFormText}"
-                android:textColor="@color/gray900"
-                android:textColorHint="@color/gray500"
-                android:textSize="16sp"
-                android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="12dp"
+                app:isShimmering="@{viewModel.isStadiumLoading}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/bg_radius_4dp"
+                    android:backgroundTint="@color/gray300" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <TextView
+                android:id="@+id/tv_stadium_name"
+                style="@style/TextView.Pretendard.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@{viewModel.livetalkTeams.stadiumName}"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:hint="현재 고척돔은..." />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                tools:text="고척 스카이돔" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_btn_send"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginVertical="16dp"
-            android:layout_marginEnd="20dp"
-            android:background="@{viewModel.canSendMessage ? @drawable/bg_primary500_radius_12dp_ripple : @drawable/bg_gray400_radius_12dp}"
-            android:enabled="@{isVerified}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/constraint_input_message">
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_away_vs_home_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                app:isShimmering="@{viewModel.isStadiumLoading}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_name">
+
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="16dp"
+                    android:background="@drawable/bg_radius_4dp"
+                    android:backgroundTint="@color/gray300" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <TextView
+                android:id="@+id/tv_away_vs_home_name"
+                style="@style/TextView.Pretendard.Regular.12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@{@string/livetalk_away_home_name(viewModel.livetalkTeams.awayTeam.shortname, viewModel.livetalkTeams.homeTeam.shortname)}"
+                android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_stadium_name"
+                tools:text="두산 vs 키움" />
 
             <ImageView
-                android:id="@+id/iv_paper_airplane"
+                android:id="@+id/iv_arrow_left"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="@string/livetalk_send_btn_description"
-                android:src="@{isVerified ? @drawable/ic_send : @drawable/ic_lock}"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="20dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/livetalk_return_stadiums_description"
+                android:src="@drawable/ic_arrow_left"
+                app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_stadium_name"
+                app:tint="@color/gray500" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_chat_messages"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:background="@color/gray050"
+                android:clipToPadding="false"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="12dp"
+                app:layout_constraintBottom_toTopOf="@id/divider"
+                app:layout_constraintTop_toBottomOf="@id/tv_away_vs_home_name"
+                tools:listitem="@layout/item_livetalk_other_bubble" />
+
+            <TextView
+                android:id="@+id/tv_like_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:elevation="6dp"
+                android:gravity="center"
+                android:text="@{viewModel.livetalkTeams.myTeamEmoji}"
+                android:textSize="24sp"
+                android:visibility="@{viewModel.livetalkTeams.myTeamType != null ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/floating_emojis_view"
+                app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
+                app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
+                tools:text="🦍" />
+
+            <TextView
+                android:id="@+id/tv_like_count"
+                style="@style/TextView.Pretendard.Medium.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="6dp"
+                android:gravity="center"
+                android:text="@{@string/livetalk_like_count_message(viewModel.livetalkTeams.myTeam.shortname, viewModel.myTeamLikeShowingCount)}"
+                android:visibility="@{viewModel.livetalkTeams.myTeamType != null ? View.VISIBLE : View.GONE}"
+
+                app:layout_constraintBottom_toTopOf="@+id/constraint_input_message"
+                app:layout_constraintEnd_toStartOf="@+id/tv_like_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rv_chat_messages"
+                tools:text="실시간 한화 123,456회 응원중!" />
+
+            <com.yagubogu.presentation.livetalk.chat.FloatingLiveTalkEmojiView
+                android:id="@+id/floating_emojis_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
+                app:layout_constraintEnd_toEndOf="@id/rv_chat_messages"
+                app:layout_constraintStart_toStartOf="@id/rv_chat_messages"
+                app:layout_constraintTop_toTopOf="@id/rv_chat_messages" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.4dp"
+                app:dividerColor="@color/gray300"
+                app:layout_constraintBottom_toTopOf="@id/constraint_input_message"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_talk_divider_marginBottom="@{viewModel.livetalkTeams.myTeamType != null ? @dimen/margin_my_team_active : @dimen/margin_team_default}"
+                tools:layout_marginBottom="50dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_input_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_gray100_stroke_gray300_radius_12dp"
+                android:minHeight="40dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/constraint_btn_send"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <EditText
+                    android:id="@+id/edit_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:enabled="@{isVerified}"
+                    android:gravity="center_vertical"
+                    android:hint="@{isVerified? @string/livetalk_chat_input_hint(viewModel.livetalkTeams.stadiumName) : @string/livetalk_chat_input_hint_unverified}"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine"
+                    android:maxLength="200"
+                    android:maxLines="4"
+                    android:minHeight="16dp"
+                    android:scrollHorizontally="false"
+                    android:text="@={viewModel.messageFormText}"
+                    android:textColor="@color/gray900"
+                    android:textColorHint="@color/gray500"
+                    android:textSize="16sp"
+                    android:visibility="@{viewModel.isStadiumLoading ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:hint="현재 고척돔은..." />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_btn_send"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginVertical="16dp"
+                android:layout_marginEnd="20dp"
+                android:background="@{viewModel.canSendMessage ? @drawable/bg_primary500_radius_12dp_ripple : @drawable/bg_gray400_radius_12dp}"
+                android:enabled="@{isVerified}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/constraint_input_message">
+
+                <ImageView
+                    android:id="@+id/iv_paper_airplane"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/livetalk_send_btn_description"
+                    android:src="@{isVerified ? @drawable/ic_send : @drawable/ic_lock}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/white" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

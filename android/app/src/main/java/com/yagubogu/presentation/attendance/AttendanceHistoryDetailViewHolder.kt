@@ -25,9 +25,9 @@ class AttendanceHistoryDetailViewHolder private constructor(
         binding.attendanceHistoryItem = item
 
         binding.tvAwayTeamPitcher.text =
-            itemView.context.getString(item.awayTeamPitcherStringRes, item.awayTeam.pitcher)
+            itemView.context.getString(item.awayTeamPitcherStringRes, item.awayTeamPitcher)
         binding.tvHomeTeamPitcher.text =
-            itemView.context.getString(item.homeTeamPitcherStringRes, item.homeTeam.pitcher)
+            itemView.context.getString(item.homeTeamPitcherStringRes, item.homeTeamPitcher)
 
         updateScoreRow(tableRows[1], item.awayTeam.name, item.awayTeamScoreBoard)
         updateScoreRow(tableRows[2], item.homeTeam.name, item.homeTeamScoreBoard)
