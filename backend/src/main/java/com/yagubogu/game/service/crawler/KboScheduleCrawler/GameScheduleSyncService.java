@@ -1,5 +1,7 @@
 package com.yagubogu.game.service.crawler.KboScheduleCrawler;
 
+import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
+
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.KboGameResponse;
@@ -166,7 +168,7 @@ public class GameScheduleSyncService {
 
     private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,
                                     final int headerOrder) {
-        final String yyyymmdd = date.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+        final String yyyymmdd = date.format(BASIC_ISO_DATE);
 
         return yyyymmdd + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
     }

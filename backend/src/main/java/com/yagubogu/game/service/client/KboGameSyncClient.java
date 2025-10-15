@@ -1,11 +1,12 @@
 package com.yagubogu.game.service.client;
 
+import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.dto.KboGamesResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,7 +28,7 @@ public class KboGameSyncClient {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("leId", "1");
         param.add("srId", "0,1,3,4,5,6,7,8,9");
-        param.add("date", date.format(DateTimeFormatter.BASIC_ISO_DATE));
+        param.add("date", date.format(BASIC_ISO_DATE));
 
         try {
             String responseBody = kboRestClient.post()

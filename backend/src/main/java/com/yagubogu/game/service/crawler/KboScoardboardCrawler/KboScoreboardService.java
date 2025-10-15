@@ -1,5 +1,6 @@
 package com.yagubogu.game.service.crawler.KboScoardboardCrawler;
 
+import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.util.stream.Collectors.toMap;
 
 import com.yagubogu.game.domain.GameState;
@@ -189,8 +190,7 @@ public class KboScoreboardService {
 
     private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,
                                     final int headerOrder) {
-        final String yyyymmdd = date.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
-        return yyyymmdd + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
+        return date.format(BASIC_ISO_DATE) + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
     }
 
     private void applyDoubleHeaderOrder(final List<KboScoreboardGame> games) {
