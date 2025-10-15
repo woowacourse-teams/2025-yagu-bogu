@@ -1,6 +1,8 @@
 package com.yagubogu.member.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.doReturn;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -11,11 +13,9 @@ import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
 import com.yagubogu.member.dto.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.PresignedUrlStartResponse;
-import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.member.MemberFactory;
 import java.net.URL;
 import java.time.Duration;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,6 @@ class ProfileImageServiceTest {
 
     private static final String TEST_BUCKET = "test-bucket";
     private static final Duration TEST_PRESIGN_EXPIRATION = Duration.ofMinutes(10);
-
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Autowired
     MemberService memberService;
@@ -68,7 +65,7 @@ class ProfileImageServiceTest {
                 .build();
 
         s3Client = org.mockito.Mockito.spy(realS3Client);
-        org.mockito.Mockito.doReturn(software.amazon.awssdk.services.s3.model.HeadObjectResponse.builder().build())
+        doReturn(software.amazon.awssdk.services.s3.model.HeadObjectResponse.builder().build())
                 .when(s3Client).headObject(org.mockito.ArgumentMatchers.any(HeadObjectRequest.class));
 
         s3Properties = new S3Properties(TEST_BUCKET, TEST_PRESIGN_EXPIRATION);
@@ -87,7 +84,7 @@ class ProfileImageServiceTest {
 
         // then
         URL url = new URL(response.url());
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(response.key()).startsWith("yagubogu/images/profiles/");
             softAssertions.assertThat(url.getHost()).contains(TEST_BUCKET);
             softAssertions.assertThat(response.url()).contains(response.key());
@@ -122,7 +119,7 @@ class ProfileImageServiceTest {
         PreSignedUrlCompleteResponse response = profileImageService.completeUpload(member.getId(), request);
 
         // then
-        SoftAssertions.assertSoftly(softAssertions -> {
+        assertSoftly(softAssertions -> {
             softAssertions.assertThat(response.url()).isEqualTo(expectedUrl);
             softAssertions.assertThat(member.getImageUrl()).isEqualTo(expectedUrl);
         });
