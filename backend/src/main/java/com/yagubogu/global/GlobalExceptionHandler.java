@@ -8,6 +8,7 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
+import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -99,6 +100,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
     public ExceptionResponse handlePayloadTooLarge(final PayloadTooLargeException e) {
         log.info("[PayloadTooLargeException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 415 Unsupported Media Type
+     */
+    @ExceptionHandler(value = UnsupportedMediaTypeException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public ExceptionResponse handleUnsupportedMediaType(final PayloadTooLargeException e) {
+        log.info("[UnsupportedMediaTypeException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }

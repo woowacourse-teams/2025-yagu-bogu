@@ -3,12 +3,14 @@ package com.yagubogu.member.service;
 import com.yagubogu.global.config.S3Properties;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.PayloadTooLargeException;
+import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
 import com.yagubogu.member.dto.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import com.yagubogu.member.repository.MemberRepository;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class ProfileImageService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
     private static final String IMAGES_PROFILES_PREFIX = "yagubogu/images/profiles/";
+    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg");
 
     private final S3Presigner s3Presigner;
     private final S3Client s3Client;
@@ -35,6 +38,8 @@ public class ProfileImageService {
 
     public PresignedUrlStartResponse issuePreSignedUrl(PreSignedUrlStartRequest preSignedUrlStartRequest) {
         validateContentLength(preSignedUrlStartRequest);
+        validateContentType(preSignedUrlStartRequest.contentType());
+
         String uniqueFileName = UUID.randomUUID().toString();
         String key = IMAGES_PROFILES_PREFIX + uniqueFileName;
 
@@ -92,6 +97,14 @@ public class ProfileImageService {
         if (preSignedUrlStartRequest.contentLength() > MAX_FILE_SIZE) {
             throw new PayloadTooLargeException(
                     "Content length is too large: " + preSignedUrlStartRequest.contentLength()
+            );
+        }
+    }
+
+    private void validateContentType(final String contentType) {
+        if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
+            throw new UnsupportedMediaTypeException(
+                    "Content type is invalid: " + contentType
             );
         }
     }
