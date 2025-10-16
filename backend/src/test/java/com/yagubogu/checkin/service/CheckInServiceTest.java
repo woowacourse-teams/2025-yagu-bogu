@@ -781,7 +781,7 @@ class CheckInServiceTest {
 
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @Test
-    void findCheckInStatus() {
+    void findLocationCheckInStatus() {
         // given
         Member checkedInMember = memberFactory.save(b -> b.team(kt).nickname("포라"));
         Member notCheckedInMember = memberFactory.save(b -> b.team(kt).nickname("파이브라"));
@@ -800,8 +800,8 @@ class CheckInServiceTest {
         );
 
         // when
-        CheckInStatusResponse actual1 = checkInService.findCheckInStatus(checkedInMember.getId(), date);
-        CheckInStatusResponse actual2 = checkInService.findCheckInStatus(notCheckedInMember.getId(), date);
+        CheckInStatusResponse actual1 = checkInService.findLocationCheckInStatus(checkedInMember.getId(), date);
+        CheckInStatusResponse actual2 = checkInService.findLocationCheckInStatus(notCheckedInMember.getId(), date);
 
         // then
         assertThat(actual1.isCheckIn()).isTrue();

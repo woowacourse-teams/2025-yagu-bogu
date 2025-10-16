@@ -87,7 +87,7 @@ public class CheckInController implements CheckInControllerInterface {
             final MemberClaims memberClaims,
             @RequestParam final LocalDate date
     ) {
-        CheckInStatusResponse response = checkInService.findCheckInStatus(memberClaims.id(), date);
+        CheckInStatusResponse response = checkInService.findLocationCheckInStatus(memberClaims.id(), date);
 
         return ResponseEntity.ok(response);
     }

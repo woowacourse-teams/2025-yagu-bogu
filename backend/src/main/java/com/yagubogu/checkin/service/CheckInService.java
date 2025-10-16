@@ -151,9 +151,13 @@ public class CheckInService {
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
-    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+    public CheckInStatusResponse findLocationCheckInStatus(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
-        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDateAndCheckInType(
+                member,
+                date,
+                CheckInType.LOCATION_CHECK_IN
+        );
 
         return new CheckInStatusResponse(isCheckIn);
     }

@@ -1,6 +1,7 @@
 package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsDto;
 import java.time.LocalDate;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Repository;
 public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomCheckInRepository {
 
     boolean existsByMemberAndGameDate(Member member, LocalDate date);
+
+    boolean existsByMemberAndGameDateAndCheckInType(Member member, LocalDate date, CheckInType checkInType);
 
     @Query("""
                 SELECT CASE
