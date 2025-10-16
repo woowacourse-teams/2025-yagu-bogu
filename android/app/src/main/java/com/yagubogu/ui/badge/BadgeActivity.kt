@@ -31,7 +31,6 @@ class BadgeActivity : ComponentActivity() {
                 BadgeScreen(
                     viewModel = viewModel,
                     onBackClick = { finish() },
-                    onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
                     modifier = Modifier.fillMaxSize(),
                 )
             }

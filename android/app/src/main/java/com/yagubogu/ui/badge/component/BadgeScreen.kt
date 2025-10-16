@@ -47,13 +47,12 @@ private const val COLUMN_SIZE = 2
 fun BadgeScreen(
     viewModel: BadgeViewModel,
     onBackClick: () -> Unit,
-    onRegisterClick: (Long) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     BadgeScreen(
         badgeUiState = viewModel.badgeUiState.value,
         onBackClick = onBackClick,
-        onRegisterClick = onRegisterClick,
+        onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
         modifier = modifier,
     )
 }
