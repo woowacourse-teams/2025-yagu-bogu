@@ -11,9 +11,7 @@ public record StadiumsWithGamesResponse(
         List<StadiumWithGameResponse> stadiums
 ) {
     public static StadiumsWithGamesResponse from(final Map<Stadium, List<Game>> gamesByStadium) {
-        // Sort stadiums by id to ensure deterministic order
         List<StadiumWithGameResponse> stadiums = gamesByStadium.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Stadium::getId)))
                 .map(entry -> new StadiumWithGameResponse(
                         entry.getKey().getId(),
                         entry.getKey().getFullName(),
@@ -21,10 +19,8 @@ public record StadiumsWithGamesResponse(
                         entry.getKey().getLocation(),
                         entry.getKey().getLatitude(),
                         entry.getKey().getLongitude(),
-                        // Sort games by start time for stable comparison
                         GameResponse.from(entry.getValue().stream()
-                                .sorted(Comparator.comparing(Game::getStartAt)
-                                        .thenComparing(Game::getId))
+                                .sorted(Comparator.comparing(Game::getStartAt))
                                 .collect(Collectors.toList()))
                 ))
                 .toList();
