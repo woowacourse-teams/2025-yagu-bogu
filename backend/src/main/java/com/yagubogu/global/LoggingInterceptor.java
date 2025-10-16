@@ -79,7 +79,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
                 if (ex != null) {
                     MDC.put("exception", ex.getClass().getSimpleName());
                 }
-                log.error("Request failed (5xx) ({}ms)", duration);
+                log.error("Internal server error while processing request (5xx) ({}ms)", duration);
                 return;
             }
             if (response.getStatus() >= 400) {
