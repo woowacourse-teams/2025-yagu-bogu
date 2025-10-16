@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.domain.repository.ThirdPartyRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.launch
@@ -15,6 +16,7 @@ import timber.log.Timber
 class SettingViewModel(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
+    private val thirdPartyRepository: ThirdPartyRepository,
 ) : ViewModel() {
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
@@ -95,8 +97,8 @@ class SettingViewModel(
                 memberRepository.getPresignedProfileImageUrl(mimeType, size).getOrThrow()
 
             // 2. S3 업로드
-            memberRepository
-                .updateProfileImage(presignedUrlItem.url, imageUri, mimeType, size)
+            thirdPartyRepository
+                .uploadImageToS3(presignedUrlItem.url, imageUri, mimeType, size)
                 .getOrThrow()
 
             // 3. Complete API 호출 및 프로필 업데이트

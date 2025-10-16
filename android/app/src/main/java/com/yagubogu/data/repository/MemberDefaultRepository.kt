@@ -1,6 +1,5 @@
 package com.yagubogu.data.repository
 
-import android.net.Uri
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
 import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
@@ -99,13 +98,6 @@ class MemberDefaultRepository(
                     presignedUrlStartResponse.url,
                 )
             }
-
-    override suspend fun updateProfileImage(
-        url: String,
-        imageFile: Uri,
-        contentType: String,
-        contentLength: Long,
-    ): Result<Unit> = memberDataSource.updateProfileImage(url, imageFile, contentType, contentLength)
 
     override suspend fun addCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
         memberDataSource.addCompleteUploadProfileImage(PreSignedUrlCompleteRequest(key)).map {

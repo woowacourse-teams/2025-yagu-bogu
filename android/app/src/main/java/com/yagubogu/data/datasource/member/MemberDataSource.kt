@@ -1,6 +1,5 @@
 package com.yagubogu.data.datasource.member
 
-import android.net.Uri
 import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
 import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
@@ -24,13 +23,6 @@ interface MemberDataSource {
     suspend fun deleteMember(): Result<Unit>
 
     suspend fun getPresignedProfileImageUrl(request: PreSignedUrlStartRequest): Result<PresignedUrlStartResponse>
-
-    suspend fun updateProfileImage(
-        url: String,
-        imageFileUri: Uri,
-        contentType: String,
-        contentLength: Long,
-    ): Result<Unit>
 
     suspend fun addCompleteUploadProfileImage(request: PreSignedUrlCompleteRequest): Result<PreSignedUrlCompleteResponse>
 }

@@ -6,6 +6,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yagubogu.common.YaguBoguDebugTree
 import com.yagubogu.common.YaguBoguReleaseTree
+import com.yagubogu.data.datasource.ThirdPartyDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
 import com.yagubogu.data.datasource.game.GameRemoteDataSource
@@ -28,6 +29,7 @@ import com.yagubogu.data.repository.StadiumDefaultRepository
 import com.yagubogu.data.repository.StatsDefaultRepository
 import com.yagubogu.data.repository.StreamDefaultRepository
 import com.yagubogu.data.repository.TalkDefaultRepository
+import com.yagubogu.data.repository.ThirdPartyDefaultRepository
 import com.yagubogu.data.repository.TokenDefaultRepository
 import timber.log.Timber
 
@@ -52,13 +54,7 @@ class YaguBoguApplication : Application() {
     private val authDataSource by lazy { AuthRemoteDataSource(retrofit.authApiService) }
     val authRepository by lazy { AuthDefaultRepository(authDataSource, tokenManager) }
 
-    private val memberDataSource by lazy {
-        MemberRemoteDataSource(
-            applicationContext,
-            retrofit.memberApiService,
-            retrofit.baseClient,
-        )
-    }
+    private val memberDataSource by lazy { MemberRemoteDataSource(retrofit.memberApiService) }
     val memberRepository by lazy { MemberDefaultRepository(memberDataSource, tokenManager) }
 
     private val stadiumDataSource by lazy { StadiumRemoteDataSource(retrofit.stadiumApiService) }
@@ -75,6 +71,14 @@ class YaguBoguApplication : Application() {
 
     private val talksDataSource by lazy { TalkRemoteDataSource(retrofit.talkApiService) }
     val talksRepository by lazy { TalkDefaultRepository(talksDataSource) }
+
+    private val thirdPartyDataSource by lazy {
+        ThirdPartyDataSource(
+            retrofit.thirdPartyApiService,
+            contentResolver,
+        )
+    }
+    val thirdPartyRepository by lazy { ThirdPartyDefaultRepository(thirdPartyDataSource) }
 
     override fun onCreate() {
         super.onCreate()
