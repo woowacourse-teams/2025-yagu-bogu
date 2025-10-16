@@ -39,12 +39,12 @@ interface MemberApiService {
     @DELETE("/api/members/me")
     suspend fun deleteMember(): Response<Unit>
 
-    @POST("/api/me/profile-image/pre-signed")
+    @POST("/api/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
         @Body request: PreSignedUrlStartRequest,
     ): Response<PresignedUrlStartResponse>
 
-    @POST("/api/me/profile-image/update")
+    @POST("/api/members/me/profile-image/update")
     suspend fun postCompleteUpload(
         @Body request: PreSignedUrlCompleteRequest,
     ): Response<PreSignedUrlCompleteResponse>

@@ -74,14 +74,6 @@ class RetrofitInstance(
             .build()
     }
 
-    private val thirdPartyRetrofit: Retrofit by lazy {
-        Retrofit
-            .Builder()
-            .client(baseClient)
-            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
-            .build()
-    }
-
     val tokenApiService: TokenApiService by lazy {
         baseRetrofit.create(TokenApiService::class.java)
     }
@@ -118,7 +110,7 @@ class RetrofitInstance(
     }
 
     val thirdPartyApiService: ThirdPartyApiService by lazy {
-        thirdPartyRetrofit.create(ThirdPartyApiService::class.java)
+        baseTokenRetrofit.create(ThirdPartyApiService::class.java)
     }
 
     companion object {
