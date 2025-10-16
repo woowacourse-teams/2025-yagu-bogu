@@ -1,6 +1,7 @@
 package com.yagubogu.member.service;
 
 import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.dto.BadgeListResponse;
@@ -126,6 +127,12 @@ public class MemberService {
                     publisher.publishEvent(new SignUpEvent(savedMember));
                     return new MemberFindResult(savedMember, true);
                 });
+    }
+
+    @Transactional
+    public void updateProfileImageUrl(final Long memberId, final String imageUrl) {
+        Member member = getMember(memberId);
+        member.updateImageUrl(imageUrl);
     }
 
     private void validateMemberHasBadge(final Member member, final Badge badge) {

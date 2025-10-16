@@ -15,3 +15,14 @@ spring:
 
   flyway:
     enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+
+  metrics:
+    tags:
+      app: yagubogu
+      env: prod
