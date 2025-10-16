@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,6 +35,33 @@ public class GlobalExceptionHandler {
         log.info("[BadRequestException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 400 JSON 파싱 실패, 바인딩/검증 실패, 타입/형변환 문제
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleNotReadable(HttpMessageNotReadableException e) {
+        log.info("[HttpMessageNotReadableException] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Invalid JSON request body");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleValidation(MethodArgumentNotValidException e) {
+        log.info("[MethodArgumentNotValid] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Validation failed");
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleConversion(HttpMessageConversionException e) {
+        log.info("[HttpMessageConversion] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Type conversion failed");
     }
 
     /**
@@ -120,18 +150,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        log.error("[YaguBoguException]- {}", e.getMessage());
+        log.error("[{}]- {} AT {}", e.getClass().getSimpleName(), safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
-        String message = "Unexpected server error is occurred";
-        log.error("[RuntimeException] Unhandled runtime exception", runtimeException);
-        log.error("[RuntimeException] Message", runtimeException.getMessage());
+    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
+        String simpleName = e.getClass().getSimpleName();
+        log.error("[{}] - {} AT {}", simpleName, safeMsg(e.getMessage()), firstLine(e));
 
+        String message = "Unexpected server error is occurred";
         return new ExceptionResponse(message);
     }
 
@@ -141,8 +171,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadGatewayException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
-        log.warn("[BadGatewayException]- {}", e.getMessage());
+        log.warn("[BadGatewayException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    private String firstLine(Throwable t) {
+        if (t.getStackTrace().length > 0) {
+            return t.getStackTrace()[0].toString();
+        }
+
+        return "no stack trace";
+    }
+
+    private String safeMsg(String msg) {
+        if (msg == null) {
+            return "";
+        }
+        String trimmed = msg.length() > 300 ? msg.substring(0, 300) + "..." : msg;
+
+        return trimmed.replaceAll("(?i)(token|authorization|password)=\\S+", "$1=***");
     }
 }
