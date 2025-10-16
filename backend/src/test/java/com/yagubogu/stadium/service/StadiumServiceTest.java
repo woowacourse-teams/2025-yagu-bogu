@@ -1,5 +1,7 @@
 package com.yagubogu.stadium.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
@@ -17,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ class StadiumServiceTest {
         StadiumsResponse actual = stadiumService.findAll();
 
         // then
-        Assertions.assertThat(actual.stadiums()).isEqualTo(expected);
+        assertThat(actual.stadiums()).isEqualTo(expected);
     }
 
     @DisplayName("해당 날짜에 경기가 있는 구장들과 각 경기들을 조회한다")
@@ -107,7 +108,7 @@ class StadiumServiceTest {
         StadiumsWithGamesResponse actual = stadiumService.findWithGameByDate(date);
 
         // then
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     private Game makeGame(LocalDate date, LocalTime startAt, Team home, Team away, Stadium stadium) {
