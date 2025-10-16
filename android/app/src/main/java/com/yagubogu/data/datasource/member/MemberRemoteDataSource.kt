@@ -2,15 +2,15 @@ package com.yagubogu.data.datasource.member
 
 import android.content.Context
 import android.net.Uri
-import com.yagubogu.data.dto.request.member.MemberCompleteRequest
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
-import com.yagubogu.data.dto.request.member.MemberPresignedUrlRequest
-import com.yagubogu.data.dto.response.member.MemberCompleteResponse
+import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
+import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.member.MemberPresignedUrlResponse
+import com.yagubogu.data.dto.response.presigned.PreSignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
 import com.yagubogu.domain.model.Team
@@ -63,7 +63,7 @@ class MemberRemoteDataSource(
             memberApiService.deleteMember()
         }
 
-    override suspend fun getPresignedProfileImageUrl(request: MemberPresignedUrlRequest): Result<MemberPresignedUrlResponse> =
+    override suspend fun getPresignedProfileImageUrl(request: PreSignedUrlStartRequest): Result<PresignedUrlStartResponse> =
         safeApiCall {
             memberApiService.postPresignedUrl(request)
         }
@@ -116,7 +116,7 @@ class MemberRemoteDataSource(
             }
         }
 
-    override suspend fun addCompleteUploadProfileImage(request: MemberCompleteRequest): Result<MemberCompleteResponse> =
+    override suspend fun addCompleteUploadProfileImage(request: PreSignedUrlCompleteRequest): Result<PreSignedUrlCompleteResponse> =
         safeApiCall {
             memberApiService.postCompleteUpload(request)
         }

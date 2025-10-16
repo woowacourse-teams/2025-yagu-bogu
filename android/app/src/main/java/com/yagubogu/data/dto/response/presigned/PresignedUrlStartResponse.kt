@@ -1,10 +1,10 @@
-package com.yagubogu.data.dto.response.member
+package com.yagubogu.data.dto.response.presigned
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class MemberPresignedUrlResponse(
+class PresignedUrlStartResponse(
     @SerialName("key")
     val key: String, // S3 객체 키(클라이언트가 이 키로 업로드)
     @SerialName("url")

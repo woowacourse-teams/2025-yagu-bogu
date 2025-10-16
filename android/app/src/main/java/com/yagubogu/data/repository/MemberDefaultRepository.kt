@@ -2,12 +2,12 @@ package com.yagubogu.data.repository
 
 import android.net.Uri
 import com.yagubogu.data.datasource.member.MemberDataSource
-import com.yagubogu.data.dto.request.member.MemberCompleteRequest
-import com.yagubogu.data.dto.request.member.MemberPresignedUrlRequest
+import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
+import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.member.MemberPresignedUrlResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
@@ -89,14 +89,14 @@ class MemberDefaultRepository(
     ): Result<MemberPresignedUrlItem> =
         memberDataSource
             .getPresignedProfileImageUrl(
-                MemberPresignedUrlRequest(
+                PreSignedUrlStartRequest(
                     contentType,
                     contentLength,
                 ),
-            ).map { memberPresignedUrlResponse: MemberPresignedUrlResponse ->
+            ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
                 MemberPresignedUrlItem(
-                    memberPresignedUrlResponse.key,
-                    memberPresignedUrlResponse.url,
+                    presignedUrlStartResponse.key,
+                    presignedUrlStartResponse.url,
                 )
             }
 
@@ -108,7 +108,7 @@ class MemberDefaultRepository(
     ): Result<Unit> = memberDataSource.updateProfileImage(url, imageFile, contentType, contentLength)
 
     override suspend fun addCompleteUploadProfileImage(key: String): Result<MemberCompleteItem> =
-        memberDataSource.addCompleteUploadProfileImage(MemberCompleteRequest(key)).map {
+        memberDataSource.addCompleteUploadProfileImage(PreSignedUrlCompleteRequest(key)).map {
             MemberCompleteItem(it.url)
         }
 }
