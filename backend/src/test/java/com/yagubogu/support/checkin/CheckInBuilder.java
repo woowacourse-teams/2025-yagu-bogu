@@ -37,7 +37,6 @@ public class CheckInBuilder {
         return this;
     }
 
-
     public CheckIn build() {
         return new CheckIn(game, member, team, checkInType);
     }
