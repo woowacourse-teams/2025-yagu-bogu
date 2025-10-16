@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
@@ -23,7 +24,6 @@ import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
@@ -62,9 +62,6 @@ public class StatE2eTest extends E2eTestBase {
 
     @Autowired
     private StadiumRepository stadiumRepository;
-
-    @Autowired
-    private PastCheckInFactory pastCheckInFactory;
 
     private String accessToken;
 
@@ -532,14 +529,14 @@ public class StatE2eTest extends E2eTestBase {
                 .date(LocalDate.of(2025, 6, 19))
                 .homeScore(7).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 6, 20))
                 .homeScore(8).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         StatCountsResponse actual = RestAssured.given().log().all()
@@ -591,14 +588,14 @@ public class StatE2eTest extends E2eTestBase {
                 .date(LocalDate.of(2025, 6, 13))
                 .homeScore(8).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(lt).awayTeam(ht)
                 .date(LocalDate.of(2025, 6, 14))
                 .homeScore(9).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         WinRateResponse actual = RestAssured.given().log().all()
@@ -636,7 +633,7 @@ public class StatE2eTest extends E2eTestBase {
                 .date(LocalDate.of(2025, 6, 2))
                 .homeScore(6).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         LuckyStadiumResponse actual = RestAssured.given().log().all()
@@ -681,7 +678,7 @@ public class StatE2eTest extends E2eTestBase {
                 .awayScoreBoard(new ScoreBoard(8, 12, 1, 0,
                         List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         AverageStatisticResponse actual = RestAssured.given().log().all()
@@ -717,14 +714,14 @@ public class StatE2eTest extends E2eTestBase {
                 .date(LocalDate.of(2025, 6, 2))
                 .homeScore(6).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(ht).awayTeam(ss)
                 .date(LocalDate.of(2025, 6, 3))
                 .homeScore(7).awayScore(2)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         var actual = RestAssured.given().log().all()

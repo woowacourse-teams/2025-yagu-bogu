@@ -1,19 +1,16 @@
-package com.yagubogu.pastcheckin.service;
+package com.yagubogu.checkin.service;
 
+import com.yagubogu.checkin.domain.CheckIn;
+import com.yagubogu.checkin.domain.CheckInType;
+import com.yagubogu.checkin.dto.CreatePastCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.pastcheckin.domain.PastCheckIn;
-import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
-import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
-import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.team.domain.Team;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PastCheckInService {
 
-    private final PastCheckInRepository pastCheckInRepository;
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
     private final CheckInRepository checkInRepository;
@@ -36,25 +32,8 @@ public class PastCheckInService {
 
         validateCheckInNotExists(member, game);
 
-        validatePastCheckInNotExists(member, game);
-        validatePast(request.date());
-
-        PastCheckIn pastCheckIn = new PastCheckIn(game, member, team);
-        pastCheckInRepository.save(pastCheckIn);
-    }
-
-    private void validatePast(final LocalDate date) {
-        LocalDate now = LocalDate.now();
-        if (date.isEqual(now) || date.isAfter(now)) {
-            throw new BadRequestException("Past CheckIn should be add in past");
-        }
-    }
-
-    private void validatePastCheckInNotExists(final Member member, final Game game) {
-        boolean hasCheckIn = pastCheckInRepository.existsByMemberAndGameDate(member, game.getDate());
-        if (hasCheckIn) {
-            throw new ConflictException("CheckIn already exists");
-        }
+        CheckIn pastCheckIn = new CheckIn(game, member, team, CheckInType.NON_LOCATION_CHECK_IN);
+        checkInRepository.save(pastCheckIn);
     }
 
     private void validateCheckInNotExists(final Member member, final Game game) {
@@ -66,11 +45,6 @@ public class PastCheckInService {
 
     private Game getGameById(final long gameId) {
         return gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game is not found"));
-    }
-
-    private Game getGame(final Stadium stadium, final LocalDate date) {
-        return gameRepository.findByStadiumAndDate(stadium, date)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 

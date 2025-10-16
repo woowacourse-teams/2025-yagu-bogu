@@ -4,25 +4,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.dto.CreatePastCheckInRequest;
 import com.yagubogu.checkin.repository.CheckInRepository;
+import com.yagubogu.checkin.service.PastCheckInService;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
-import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
-import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
@@ -40,9 +38,6 @@ class PastCheckInServiceTest {
     private PastCheckInService pastCheckInService;
 
     @Autowired
-    private PastCheckInFactory pastCheckInFactory;
-
-    @Autowired
     private CheckInFactory checkInFactory;
 
     @Autowired
@@ -53,9 +48,6 @@ class PastCheckInServiceTest {
 
     @Autowired
     private TeamRepository teamRepository;
-
-    @Autowired
-    private PastCheckInRepository pastCheckInRepository;
 
     @Autowired
     private CheckInRepository checkInRepository;
@@ -75,7 +67,6 @@ class PastCheckInServiceTest {
     @BeforeEach
     void setUp() {
         pastCheckInService = new PastCheckInService(
-                pastCheckInRepository,
                 memberRepository,
                 gameRepository,
                 checkInRepository
@@ -108,7 +99,7 @@ class PastCheckInServiceTest {
         pastCheckInService.createPastCheckIn(member.getId(), request);
 
         // then
-        boolean exists = pastCheckInRepository.existsByMemberAndGameDate(member, date);
+        boolean exists = checkInRepository.existsByMemberAndGameDate(member, date);
         assertThat(exists).isTrue();
     }
 
@@ -152,7 +143,7 @@ class PastCheckInServiceTest {
                 .gameState(GameState.COMPLETED)
         );
 
-        pastCheckInFactory.save(b -> b.game(game).member(member).team(lotte));
+        checkInFactory.save(b -> b.game(game).member(member).team(lotte));
 
         CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
 
@@ -162,53 +153,7 @@ class PastCheckInServiceTest {
                 .hasMessageContaining("CheckIn already exists");
     }
 
-    @DisplayName("예외: 오늘 날짜에 PastCheckIn이 있는 경우 BadRequest가 발생한다")
-    @Test
-    void createPastCheckIn_fail_whenIsToday() {
-        // given
-        Member member = memberFactory.save(b -> b.team(lotte));
-        LocalDate date = LocalDate.now();
-
-        Game game = gameFactory.save(b -> b
-                .stadium(stadiumGocheok)
-                .date(date)
-                .homeTeam(lotte).homeScore(6).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                .gameState(GameState.COMPLETED)
-        );
-
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
-
-        // when & then
-        assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Past CheckIn should be add in past");
-    }
-
-    @DisplayName("예외: 오늘 날짜에 PastCheckIn이 있는 경우 BadRequest가 발생한다")
-    @Test
-    void createPastCheckIn_fail_whenIsFuture() {
-        // given
-        Member member = memberFactory.save(b -> b.team(lotte));
-        LocalDate date = LocalDate.now().plusDays(1);
-
-        Game game = gameFactory.save(b -> b
-                .stadium(stadiumGocheok)
-                .date(date)
-                .homeTeam(lotte).homeScore(6).homeScoreBoard(TestFixture.getHomeScoreBoard())
-                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoard())
-                .gameState(GameState.COMPLETED)
-        );
-
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
-
-        // when & then
-        assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Past CheckIn should be add in past");
-    }
-
-        @DisplayName("예외: 경기가 존재하지 않으면 NotFoundException이 발생한다")
+    @DisplayName("예외: 경기가 존재하지 않으면 NotFoundException이 발생한다")
     @Test
     void createPastCheckIn_fail_whenStadiumNotFound() {
         // given

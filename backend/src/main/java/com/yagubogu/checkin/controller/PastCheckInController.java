@@ -1,9 +1,9 @@
-package com.yagubogu.pastcheckin.controller;
+package com.yagubogu.checkin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
-import com.yagubogu.pastcheckin.service.PastCheckInService;
+import com.yagubogu.checkin.dto.CreatePastCheckInRequest;
+import com.yagubogu.checkin.service.PastCheckInService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

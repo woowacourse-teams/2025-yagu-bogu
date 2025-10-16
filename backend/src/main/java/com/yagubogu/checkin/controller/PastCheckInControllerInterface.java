@@ -1,7 +1,7 @@
-package com.yagubogu.pastcheckin.controller;
+package com.yagubogu.checkin.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
+import com.yagubogu.checkin.dto.CreatePastCheckInRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

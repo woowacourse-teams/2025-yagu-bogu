@@ -1,4 +1,4 @@
-package com.yagubogu.pastcheckin.dto;
+package com.yagubogu.checkin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

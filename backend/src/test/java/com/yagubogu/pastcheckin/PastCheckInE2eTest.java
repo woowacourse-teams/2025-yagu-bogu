@@ -3,13 +3,13 @@ package com.yagubogu.pastcheckin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.dto.CreatePastCheckInRequest;
+import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.pastcheckin.dto.CreatePastCheckInRequest;
-import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.E2eTestBase;
@@ -18,7 +18,6 @@ import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
@@ -51,16 +50,13 @@ public class PastCheckInE2eTest extends E2eTestBase {
     private CheckInFactory checkInFactory;
 
     @Autowired
-    private PastCheckInFactory pastCheckInFactory;
-
-    @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
-    private PastCheckInRepository pastCheckInRepository;
+    private StadiumRepository stadiumRepository;
 
     @Autowired
-    private StadiumRepository stadiumRepository;
+    private CheckInRepository checkInRepository;
 
     private Team kia, lotte;
     private Stadium stadiumGocheok;
@@ -99,7 +95,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(201);
 
-        boolean exists = pastCheckInRepository.existsByMemberAndGameDate(mint, date);
+        boolean exists = checkInRepository.existsByMemberAndGameDate(mint, date);
         assertThat(exists).isTrue();
     }
 
@@ -150,7 +146,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
                         .gameState(GameState.COMPLETED)
         );
 
-        pastCheckInFactory.save(b -> b.game(game).member(member).team(lotte));
+        checkInFactory.save(b -> b.game(game).member(member).team(lotte));
 
         // when & then
         RestAssured.given().log().all()

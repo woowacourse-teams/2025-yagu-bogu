@@ -3,6 +3,7 @@ package com.yagubogu.checkin.service;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -63,7 +64,7 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        CheckIn checkIn = new CheckIn(game, member, team);
+        CheckIn checkIn = new CheckIn(game, member, team, CheckInType.LOCATION_CHECK_IN);
         checkInRepository.save(checkIn);
 
         applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));

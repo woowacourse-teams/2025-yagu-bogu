@@ -6,6 +6,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.CreateCheckInRequest;
@@ -29,7 +30,6 @@ import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
@@ -61,9 +61,6 @@ public class CheckInE2eTest extends E2eTestBase {
 
     @Autowired
     private CheckInFactory checkInFactory;
-
-    @Autowired
-    private PastCheckInFactory pastCheckInFactory;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -709,7 +706,8 @@ public class CheckInE2eTest extends E2eTestBase {
                         .homeTeam(kia).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoard())
                         .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame1).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame2 = gameFactory.save(builder ->
                 builder.stadium(stadiumGocheok)
@@ -717,7 +715,8 @@ public class CheckInE2eTest extends E2eTestBase {
                         .homeTeam(doosan).homeScore(8).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoard())
                         .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame2).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when & then
         RestAssured.given().log().all()
@@ -764,7 +763,8 @@ public class CheckInE2eTest extends E2eTestBase {
                             .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoard())
                             .gameState(GameState.COMPLETED)
             );
-            pastCheckInFactory.save(b -> b.game(game).member(member).team(lotte));
+            checkInFactory.save(
+                    b -> b.game(game).member(member).team(lotte).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
         }
 
         // when
@@ -825,7 +825,8 @@ public class CheckInE2eTest extends E2eTestBase {
                 .awayTeam(samsung)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame1).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame2 = gameFactory.save(builder -> builder
                 .date(LocalDate.of(2025, 1, 11))
@@ -834,7 +835,8 @@ public class CheckInE2eTest extends E2eTestBase {
                 .awayTeam(kt)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(doosan));
+        checkInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(doosan)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame3 = gameFactory.save(builder -> builder
                 .date(LocalDate.of(2025, 1, 12))
@@ -843,7 +845,8 @@ public class CheckInE2eTest extends E2eTestBase {
                 .awayTeam(lg)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame3).member(member).team(lotte));
+        checkInFactory.save(b -> b.game(pastCheckInGame3).member(member).team(lotte)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(

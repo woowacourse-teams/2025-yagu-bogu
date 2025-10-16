@@ -10,6 +10,7 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameResponse;
 import com.yagubogu.checkin.dto.CheckInHistoryResponse;
@@ -38,7 +39,6 @@ import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
@@ -67,9 +67,6 @@ class CheckInServiceTest {
 
     @Autowired
     private GameFactory gameFactory;
-
-    @Autowired
-    private PastCheckInFactory pastCheckInFactory;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -1003,7 +1000,8 @@ class CheckInServiceTest {
                 .homeTeam(kia).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
                 .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame1).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame2 = gameFactory.save(b -> b
                 .stadium(stadiumGocheok)
@@ -1011,7 +1009,8 @@ class CheckInServiceTest {
                 .homeTeam(doosan).homeScore(8).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(8))
                 .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame2).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         CheckInHistoryResponse actual = checkInService.findCheckInHistory(
@@ -1066,7 +1065,8 @@ class CheckInServiceTest {
                             .awayTeam(samsung).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
                             .gameState(GameState.COMPLETED)
             );
-            pastCheckInFactory.save(b -> b.game(game).member(member).team(lotte));
+            checkInFactory.save(
+                    b -> b.game(game).member(member).team(lotte).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
         }
 
         // when
@@ -1118,7 +1118,8 @@ class CheckInServiceTest {
                 .awayTeam(samsung)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame1).member(member).team(kia));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame2 = gameFactory.save(builder -> builder
                 .date(TestFixture.getYesterday().minusDays(9))
@@ -1127,7 +1128,8 @@ class CheckInServiceTest {
                 .awayTeam(kt)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(doosan));
+        checkInFactory.save(b -> b.game(pastCheckInGame2).member(member).team(doosan)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game pastCheckInGame3 = gameFactory.save(builder -> builder
                 .date(TestFixture.getYesterday().minusDays(8))
@@ -1136,7 +1138,8 @@ class CheckInServiceTest {
                 .awayTeam(lg)
                 .gameState(GameState.COMPLETED)
         );
-        pastCheckInFactory.save(b -> b.game(pastCheckInGame3).member(member).team(lotte));
+        checkInFactory.save(b -> b.game(pastCheckInGame3).member(member).team(lotte)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(

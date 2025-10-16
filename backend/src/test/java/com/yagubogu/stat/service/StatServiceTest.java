@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -16,9 +17,7 @@ import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.pastcheckin.repository.PastCheckInRepository;
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.support.pastcheckin.PastCheckInFactory;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
@@ -73,15 +72,9 @@ class StatServiceTest {
     @Autowired
     private StadiumRepository stadiumRepository;
 
-    @Autowired
-    private PastCheckInRepository pastCheckInRepository;
-
-    @Autowired
-    private PastCheckInFactory pastCheckInFactory;
-
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, pastCheckInRepository, memberRepository);
+        statService = new StatService(checkInRepository, memberRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -829,14 +822,14 @@ class StatServiceTest {
                 .date(LocalDate.of(2025, 6, 4))
                 .homeScore(7).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g4).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 6, 5))
                 .homeScore(8).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g5).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         int year = 2025;
 
@@ -889,14 +882,14 @@ class StatServiceTest {
                 .date(LocalDate.of(2025, 6, 4))
                 .homeScore(8).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g4).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g5 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 6, 5))
                 .homeScore(9).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g5).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         int year = 2025;
 
@@ -932,21 +925,21 @@ class StatServiceTest {
                 .date(LocalDate.of(2025, 6, 2))
                 .homeScore(6).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g3 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 6, 3))
                 .homeScore(2).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g3).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g4 = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 6, 4))
                 .homeScore(3).awayScore(7)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g4).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         int year = 2025;
 
@@ -988,7 +981,7 @@ class StatServiceTest {
                 .awayScoreBoard(new ScoreBoard(8, 12, 1, 0,
                         List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
         AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
@@ -1027,14 +1020,14 @@ class StatServiceTest {
                 .date(LocalDate.of(2025, 6, 2))
                 .homeScore(6).awayScore(4)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         Game g3 = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(SS)
                 .date(LocalDate.of(2025, 6, 3))
                 .homeScore(7).awayScore(2)
                 .gameState(GameState.COMPLETED));
-        pastCheckInFactory.save(b -> b.game(g3).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         int year = 2025;
 
