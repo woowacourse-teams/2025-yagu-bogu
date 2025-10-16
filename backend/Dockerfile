@@ -18,8 +18,6 @@ RUN ./gradlew --no-daemon --build-cache bootJar -x test
 # --- Run stage ---
 FROM amazoncorretto:21-alpine
 
-FROM mcr.microsoft.com/playwright/java:v1.44.0-jammy
-
 # 환경 변수 설정
 # Dockerfile에는 JVM 옵션, 프로필 정도만 기본값으로
 ENV TZ=Asia/Seoul
