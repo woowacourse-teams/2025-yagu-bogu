@@ -97,8 +97,8 @@ class StadiumServiceTest {
         Game game3 = makeGame(date, LocalTime.of(2, 30), kt, samsung, stadiumIncheon);
         Game game4 = makeGame(date, LocalTime.of(18, 30), kt, samsung, stadiumIncheon);
 
-        // 해당 날짜가 아닌 경기는 포함되지 않는다
-        Game game5 = makeGame(date.minusDays(1), LocalTime.of(18, 30), kt, samsung, stadiumIncheon);
+        LocalDate invalidDate = date.minusDays(1);
+        Game game5 = makeGame(invalidDate, LocalTime.of(18, 30), kt, samsung, stadiumIncheon);
 
         Map<Stadium, List<Game>> map = Map.of(stadiumJamsil, List.of(game1), stadiumGocheok, List.of(game2),
                 stadiumIncheon, List.of(game3, game4));
