@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
@@ -12,6 +13,7 @@ import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.database.getLongOrNull
 import androidx.core.net.toUri
@@ -22,12 +24,9 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingMainBinding
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.util.ImageUtils
 import com.yagubogu.presentation.util.showToast
 import com.yalantis.ucrop.UCrop
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
@@ -48,16 +47,19 @@ class SettingMainFragment : Fragment() {
     private val uCropLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val resultUri = result.data?.let { UCrop.getOutput(it) }
-                resultUri?.let { uri: Uri ->
-                    handleCroppedImage(uri)
+        ) { result: ActivityResult ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    val intent: Intent = result.data ?: return@registerForActivityResult
+                    val resultUri: Uri = UCrop.getOutput(intent) ?: return@registerForActivityResult
+                    handleCroppedImage(resultUri)
                 }
-            } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                val cropError = result.data?.let { UCrop.getError(it) }
-                Timber.e(cropError, "uCrop Error")
-                requireContext().showToast(getString(R.string.setting_edit_profile_image_crop_failed))
+
+                UCrop.RESULT_ERROR -> {
+                    val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
+                    Timber.e(cropError, "uCrop Error")
+                    requireContext().showToast(getString(R.string.setting_edit_profile_image_crop_failed))
+                }
             }
         }
 
@@ -118,10 +120,10 @@ class SettingMainFragment : Fragment() {
             showAccountManagementFragment()
         }
         binding.layoutNotice.root.setOnClickListener {
-            openUrl("https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74")
+            openUrl(NOTICE_URL)
         }
         binding.layoutContactUs.root.setOnClickListener {
-            openUrl("https://forms.gle/wBhXjfTLyobZa19K8")
+            openUrl(CONTACT_URL)
         }
         binding.layoutOpenSourceLicense.root.setOnClickListener {
             startActivity(Intent(requireContext(), OssLicensesMenuActivity::class.java))
@@ -129,20 +131,24 @@ class SettingMainFragment : Fragment() {
     }
 
     private fun launchUCropActivity(sourceUri: Uri) {
-        val fileName = "cropped_image_${System.currentTimeMillis()}.jpg"
+        val fileName = "cropped_image_${System.currentTimeMillis()}"
         val destinationUri = Uri.fromFile(File(requireContext().cacheDir, fileName))
 
-        val options = UCrop.Options()
-        options.setFreeStyleCropEnabled(false)
-        options.setHideBottomControls(false)
-        options.setCircleDimmedLayer(true)
-        options.setToolbarColor(requireContext().getColor(R.color.primary500))
+        val options: UCrop.Options =
+            UCrop.Options().apply {
+                setFreeStyleCropEnabled(false)
+                setHideBottomControls(false)
+                setCircleDimmedLayer(true)
+                setToolbarColor(requireContext().getColor(R.color.gray050))
+                setCompressionFormat(Bitmap.CompressFormat.JPEG)
+                setCompressionQuality(85)
+            }
 
-        val uCropIntent =
+        val uCropIntent: Intent? =
             UCrop
                 .of(sourceUri, destinationUri)
                 .withAspectRatio(1f, 1f)
-                .withMaxResultSize(1000, 1000)
+                .withMaxResultSize(500, 500)
                 .withOptions(options)
                 .getIntent(requireContext())
 
@@ -152,12 +158,21 @@ class SettingMainFragment : Fragment() {
     private fun handleCroppedImage(uri: Uri) {
         lifecycleScope.launch {
             runCatching {
-                val input = getCompressedImageInfos(uri) // 예외시 throw
+                val mimeType: String =
+                    requireContext()
+                        .contentResolver
+                        .getType(uri) ?: "image/jpeg"
+
+                val fileSize: Long =
+                    uri
+                        .fileSize(requireContext())
+                        .getOrNull()
+                        ?: error("파일 사이즈 획득 실패")
                 viewModel.uploadProfileImageResult(
-                    input.first,
-                    input.second,
-                    input.third,
-                ) // Result<Unit>
+                    uri,
+                    mimeType,
+                    fileSize,
+                )
             }.fold(
                 onSuccess = { result: Result<Unit> ->
                     result.onFailure { e ->
@@ -173,30 +188,6 @@ class SettingMainFragment : Fragment() {
             )
         }
     }
-
-    private suspend fun getCompressedImageInfos(uri: Uri): Triple<Uri, String, Long> =
-        withContext(Dispatchers.IO) {
-            val compressedUri: Uri =
-                ImageUtils.compressImageWithCoil(
-                    context = requireContext(),
-                    uri = uri,
-                    maxSize = 500,
-                    quality = 85,
-                ) ?: error("이미지 압축 실패")
-
-            val mimeType: String =
-                requireContext()
-                    .contentResolver
-                    .getType(compressedUri) ?: "image/jpeg"
-
-            val fileSize: Long =
-                compressedUri
-                    .fileSize(requireContext())
-                    .getOrNull()
-                    ?: error("파일 사이즈 획득 실패")
-
-            Triple(compressedUri, mimeType, fileSize)
-        }
 
     private fun Uri.fileSize(context: Context): Result<Long?> =
         runCatching {
@@ -242,6 +233,9 @@ class SettingMainFragment : Fragment() {
         }
 
     companion object {
+        private const val NOTICE_URL =
+            "https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74"
+        private const val CONTACT_URL = "https://forms.gle/wBhXjfTLyobZa19K8"
         private const val DEFAULT_VERSION_NAME = "x.x.x"
     }
 }
