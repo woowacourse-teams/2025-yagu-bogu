@@ -23,7 +23,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 @Service
 public class ProfileImageService {
 
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+    private static final long MAX_FILE_SIZE_MB = 5;
+    private static final long MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
     private static final String IMAGES_PROFILES_PREFIX = "yagubogu/images/profiles/";
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg");
 
