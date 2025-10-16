@@ -78,7 +78,10 @@ fun BadgeBottomSheet(
 }
 
 @Composable
-private fun BadgeDescriptionHeader(badgeInfo: BadgeInfoUiModel) {
+private fun BadgeDescriptionHeader(
+    badgeInfo: BadgeInfoUiModel,
+    modifier: Modifier = Modifier,
+) {
     Row {
         Text(
             text = "${badgeInfo.achievedRate}",
@@ -94,7 +97,7 @@ private fun BadgeDescriptionHeader(badgeInfo: BadgeInfoUiModel) {
     HorizontalDivider(
         thickness = 0.4.dp,
         color = Gray300,
-        modifier = Modifier.padding(vertical = 20.dp),
+        modifier = modifier.padding(vertical = 20.dp),
     )
     Text(
         text = badgeInfo.description,
@@ -109,6 +112,7 @@ private fun AcquiredBadgeContent(
     onRegisterClick: (Long) -> Unit,
     badgeInfo: BadgeInfoUiModel,
     isRepresentativeBadge: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Button(
         onClick = { onRegisterClick(badgeInfo.badge.id) },
@@ -122,7 +126,7 @@ private fun AcquiredBadgeContent(
             ),
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Text(
             text =
@@ -144,12 +148,15 @@ private fun AcquiredBadgeContent(
             ),
         style = PretendardRegular12,
         color = Gray500,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = modifier.padding(top = 12.dp),
     )
 }
 
 @Composable
-private fun UnacquiredBadgeContent(badgeInfo: BadgeInfoUiModel) {
+private fun UnacquiredBadgeContent(
+    badgeInfo: BadgeInfoUiModel,
+    modifier: Modifier = Modifier,
+) {
     LinearProgressIndicator(
         progress = { (badgeInfo.progressRate / 100).toFloat() },
         color = Primary500,
@@ -157,7 +164,7 @@ private fun UnacquiredBadgeContent(badgeInfo: BadgeInfoUiModel) {
         gapSize = (-12).dp,
         drawStopIndicator = {},
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .height(12.dp),
     )
@@ -169,7 +176,7 @@ private fun UnacquiredBadgeContent(badgeInfo: BadgeInfoUiModel) {
             ),
         style = PretendardRegular12,
         color = Gray500,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = modifier.padding(top = 12.dp),
     )
 }
 
