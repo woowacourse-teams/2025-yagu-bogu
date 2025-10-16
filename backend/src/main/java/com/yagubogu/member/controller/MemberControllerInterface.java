@@ -7,6 +7,10 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
+import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
+import com.yagubogu.member.dto.PreSignedUrlStartRequest;
+import com.yagubogu.member.dto.PresignedUrlStartResponse;
 import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,6 +81,27 @@ public interface MemberControllerInterface {
     ResponseEntity<MemberFavoriteResponse> patchFavorites(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestBody MemberFavoriteRequest request
+    );
+
+    @Operation(summary = "pre-signed url 조회", description = "프로필 사진 저장을 위한 url 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "pre-signed url 조회 성공"),
+            @ApiResponse(responseCode = "413", description = "contentLength가 기준을 초과함")
+    })
+    @PostMapping("/me/profile-image/pre-signed")
+    ResponseEntity<PresignedUrlStartResponse> generatePresignedUrl(
+            @RequestBody PreSignedUrlStartRequest preSignedUrlStartRequest
+    );
+
+    @Operation(summary = "회원 프로필 이미지 수정", description = "프로필 사진 저장을 완료하고 회원의 프로필 사진으로 저장합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 프로필 이미지 수정성공"),
+            @ApiResponse(responseCode = "404", description = "key로 s3에서 이미지를 찾을 수 없음")
+    })
+    @PostMapping("/me/profile-image/update")
+    ResponseEntity<PreSignedUrlCompleteResponse> updateProfileImage(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestBody PreSignedUrlCompleteRequest preSignedUrlCompleteRequest
     );
 
     @Operation(summary = "뱃지 조회", description = "모든 뱃지와 현재 로그인된 회원이 보유한 뱃지를 보여준다.")

@@ -16,7 +16,7 @@ public class MemberBuilder {
     private OAuthProvider provider = OAuthProvider.GOOGLE;
     private String oauthId = UUID.randomUUID().toString();
     private Role role = Role.USER;
-    private String imageUrl = "image.png";
+    private String imageUrl = "image.jpeg";
     private Badge representativeBadge = null;
 
     public MemberBuilder team(final Team team) {
