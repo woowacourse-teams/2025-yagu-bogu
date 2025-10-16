@@ -67,14 +67,15 @@ class LoginActivity : AppCompatActivity() {
             if (shouldImmediateUpdate && result.resultCode != RESULT_OK) {
                 showToast(getString(R.string.login_should_immediate_update_message), true)
                 finish()
+            } else if (!shouldImmediateUpdate) {
+                handleAutoLogin()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         super.onCreate(savedInstanceState)
-        handleInAppUpdate()
-        handleAutoLogin()
+        handleInAppUpdate(onSuccess = { handleAutoLogin() })
         setupView()
         setupBindings()
     }
@@ -147,7 +148,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun handleInAppUpdate() {
+    private fun handleInAppUpdate(onSuccess: () -> Unit) {
         val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
 
         val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
@@ -174,6 +175,7 @@ class LoginActivity : AppCompatActivity() {
                     // 업데이트 할 수 없거나, 네트워크 등 오류 발생했을 때 splash 종료
                     UpdateAvailability.UNKNOWN, UpdateAvailability.UPDATE_NOT_AVAILABLE -> {
                         shouldImmediateUpdate = false
+                        onSuccess()
                         return@addOnSuccessListener
                     }
 
@@ -205,12 +207,14 @@ class LoginActivity : AppCompatActivity() {
                             )
                         } else {
                             shouldImmediateUpdate = false
+                            onSuccess()
                         }
                     }
 
                     // 권장 업데이트 (사용자가 원할 때 업데이트 가능)
                     InAppUpdateType.FLEXIBLE -> {
                         shouldImmediateUpdate = false
+
                         if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                             appUpdateManager.startUpdateFlowForResult(
                                 appUpdateInfo,
@@ -222,10 +226,14 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
 
-                    InAppUpdateType.NONE -> shouldImmediateUpdate = false
+                    InAppUpdateType.NONE -> {
+                        shouldImmediateUpdate = false
+                        onSuccess()
+                    }
                 }
             }.addOnFailureListener {
                 shouldImmediateUpdate = false
+                onSuccess()
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
             }
     }

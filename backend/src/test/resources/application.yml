@@ -54,6 +54,12 @@ sse:
   heartbeat:
     enabled: true
     interval-ms: 25000
+
+app:
+  s3:
+    bucket: techcourse-project-2025
+    presign-expiration: 10m
+
 ---
 spring:
   config:

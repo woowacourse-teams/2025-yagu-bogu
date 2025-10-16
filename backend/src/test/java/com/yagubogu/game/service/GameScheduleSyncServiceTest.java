@@ -17,7 +17,6 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.KboScheduleCrawler;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -59,14 +58,11 @@ class GameScheduleSyncServiceTest {
     private KboGameSyncClient kboGameSyncClient;
 
     @Mock
-    private KboScheduleCrawler kboScheduleCrawler;
-
-    @Mock
     private KboGameResultClient kboGameResultClient;
 
     @BeforeEach
     void setUp() {
-        gameScheduleSyncService = new GameScheduleSyncService(kboGameSyncClient, kboScheduleCrawler, gameRepository,
+        gameScheduleSyncService = new GameScheduleSyncService(kboGameSyncClient, gameRepository,
                 teamRepository, stadiumRepository);
         gameResultSyncService = new GameResultSyncService(kboGameSyncClient, kboGameResultClient, gameRepository);
     }
