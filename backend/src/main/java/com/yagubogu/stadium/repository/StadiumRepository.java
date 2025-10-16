@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface StadiumRepository extends JpaRepository<Stadium, Long> {
 
     Optional<Stadium> findByShortName(String shortName);
+
+    Optional<Stadium> findByLocation(String location);
 }

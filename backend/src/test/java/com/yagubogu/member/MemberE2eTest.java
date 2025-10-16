@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.domain.Policy;
+import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -14,6 +17,7 @@ import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
@@ -42,6 +46,12 @@ public class MemberE2eTest extends E2eTestBase {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private BadgeRepository badgeRepository;
+
+    @Autowired
+    private MemberBadgeFactory memberBadgeFactory;
 
     @BeforeEach
     void setUp() {
@@ -228,5 +238,62 @@ public class MemberE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
         });
+    }
+
+    @DisplayName("뱃지를 조회한다")
+    @Test
+    void findBadges() {
+        // given
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/members/me/badges")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("대표 뱃지를 수정한다")
+    @Test
+    void patchRepresentativeBadge() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+        memberBadgeFactory.save(builder ->
+                builder.badge(badge)
+                        .member(member)
+                        .isAchieved(true)
+        );
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외: 대표 뱃지가 수정이 될 때 소유하지 않은 뱃지면 예외가 발생한다")
+    @Test
+    void patchRepresentativeBadge_noOwnBadgeThrowNotFoundException() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(404);
     }
 }

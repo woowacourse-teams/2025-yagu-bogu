@@ -1,5 +1,6 @@
 package com.yagubogu.support.member;
 
+import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
@@ -16,6 +17,7 @@ public class MemberBuilder {
     private String oauthId = UUID.randomUUID().toString();
     private Role role = Role.USER;
     private String imageUrl = "image.jpeg";
+    private Badge representativeBadge = null;
 
     public MemberBuilder team(final Team team) {
         this.team = team;
@@ -35,7 +37,13 @@ public class MemberBuilder {
         return this;
     }
 
+    public MemberBuilder representativeBadge(final Badge badge) {
+        this.representativeBadge = badge;
+
+        return this;
+    }
+
     public Member build() {
-        return new Member(team, nickname, email, provider, oauthId, role, imageUrl);
+        return new Member(team, nickname, email, provider, oauthId, role, imageUrl, representativeBadge);
     }
 }

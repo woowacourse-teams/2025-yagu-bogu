@@ -1,5 +1,6 @@
 package com.yagubogu.global;
 
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
@@ -122,6 +123,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ExceptionResponse handleUnprocessableException(final UnprocessableEntityException e) {
         log.info("[UnprocessableEntityException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 500 GameSyncException
+     */
+    @ExceptionHandler(GameSyncException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleGameSyncException(final GameSyncException e) {
+        log.warn("[GameSyncException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
