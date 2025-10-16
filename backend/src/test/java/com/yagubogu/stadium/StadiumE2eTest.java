@@ -100,7 +100,7 @@ public class StadiumE2eTest extends E2eTestBase {
                 stadiumIncheon, List.of(game3, game4));
         StadiumsWithGamesResponse expected = StadiumsWithGamesResponse.from(map);
 
-        // when
+        // when & then
         StadiumsWithGamesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("date", date.toString())
