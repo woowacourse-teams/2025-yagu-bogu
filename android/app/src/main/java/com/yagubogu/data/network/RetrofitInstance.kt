@@ -21,13 +21,6 @@ class RetrofitInstance(
     baseUrl: String,
     tokenManager: TokenManager,
 ) {
-    val loggingClient: OkHttpClient by lazy {
-        OkHttpClient()
-            .newBuilder()
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
-    }
-
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level =
@@ -39,39 +32,26 @@ class RetrofitInstance(
         }
     }
 
-    private val tokenRetrofit: Retrofit by lazy {
-        Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .client(loggingClient)
-            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+    val baseClient: OkHttpClient by lazy {
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 
-    val tokenApiService: TokenApiService by lazy {
-        tokenRetrofit.create(TokenApiService::class.java)
+    private val baseTokenClient: OkHttpClient by lazy {
+        baseClient
+            .newBuilder()
+            .addInterceptor(tokenInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
     }
-
-    private val tokenInterceptor = TokenInterceptor(tokenManager)
-    private val tokenAuthenticator = TokenAuthenticator(tokenManager, tokenApiService)
 
     val streamClient: OkHttpClient by lazy {
-        OkHttpClient()
+        baseTokenClient
             .newBuilder()
-            .addInterceptor(tokenInterceptor)
-            .addInterceptor(httpLoggingInterceptor)
-            .authenticator(tokenAuthenticator)
             .connectTimeout(0, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.SECONDS)
-            .build()
-    }
-
-    private val baseClient: OkHttpClient by lazy {
-        OkHttpClient()
-            .newBuilder()
-            .addInterceptor(tokenInterceptor)
-            .addInterceptor(httpLoggingInterceptor)
-            .authenticator(tokenAuthenticator)
             .build()
     }
 
@@ -84,32 +64,48 @@ class RetrofitInstance(
             .build()
     }
 
+    private val baseTokenRetrofit: Retrofit by lazy {
+        Retrofit
+            .Builder()
+            .baseUrl(baseUrl)
+            .client(baseTokenClient)
+            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .build()
+    }
+
+    val tokenApiService: TokenApiService by lazy {
+        baseRetrofit.create(TokenApiService::class.java)
+    }
+
+    private val tokenInterceptor = TokenInterceptor(tokenManager)
+    private val tokenAuthenticator = TokenAuthenticator(tokenManager, tokenApiService)
+
     val authApiService: AuthApiService by lazy {
-        baseRetrofit.create(AuthApiService::class.java)
+        baseTokenRetrofit.create(AuthApiService::class.java)
     }
 
     val memberApiService: MemberApiService by lazy {
-        baseRetrofit.create(MemberApiService::class.java)
+        baseTokenRetrofit.create(MemberApiService::class.java)
     }
 
     val stadiumApiService: StadiumApiService by lazy {
-        baseRetrofit.create(StadiumApiService::class.java)
+        baseTokenRetrofit.create(StadiumApiService::class.java)
     }
 
     val checkInApiService: CheckInApiService by lazy {
-        baseRetrofit.create(CheckInApiService::class.java)
+        baseTokenRetrofit.create(CheckInApiService::class.java)
     }
 
     val statsApiService: StatsApiService by lazy {
-        baseRetrofit.create(StatsApiService::class.java)
+        baseTokenRetrofit.create(StatsApiService::class.java)
     }
 
     val gameApiService: GameApiService by lazy {
-        baseRetrofit.create(GameApiService::class.java)
+        baseTokenRetrofit.create(GameApiService::class.java)
     }
 
     val talkApiService: TalkApiService by lazy {
-        baseRetrofit.create(TalkApiService::class.java)
+        baseTokenRetrofit.create(TalkApiService::class.java)
     }
 
     companion object {
