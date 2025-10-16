@@ -1,7 +1,5 @@
 package com.yagubogu.data.datasource.member
 
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -22,7 +20,10 @@ interface MemberDataSource {
 
     suspend fun deleteMember(): Result<Unit>
 
-    suspend fun getPresignedProfileImageUrl(request: PreSignedUrlStartRequest): Result<PresignedUrlStartResponse>
+    suspend fun getPresignedProfileImageUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlStartResponse>
 
-    suspend fun addCompleteUploadProfileImage(request: PreSignedUrlCompleteRequest): Result<PreSignedUrlCompleteResponse>
+    suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteResponse>
 }

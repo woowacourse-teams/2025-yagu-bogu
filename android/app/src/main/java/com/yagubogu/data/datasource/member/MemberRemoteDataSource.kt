@@ -48,13 +48,22 @@ class MemberRemoteDataSource(
             memberApiService.deleteMember()
         }
 
-    override suspend fun getPresignedProfileImageUrl(request: PreSignedUrlStartRequest): Result<PresignedUrlStartResponse> =
+    override suspend fun getPresignedProfileImageUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlStartResponse> =
         safeApiCall {
+            val request =
+                PreSignedUrlStartRequest(
+                    contentType,
+                    contentLength,
+                )
             memberApiService.postPresignedUrl(request)
         }
 
-    override suspend fun addCompleteUploadProfileImage(request: PreSignedUrlCompleteRequest): Result<PreSignedUrlCompleteResponse> =
+    override suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteResponse> =
         safeApiCall {
+            val request = PreSignedUrlCompleteRequest(key)
             memberApiService.postCompleteUpload(request)
         }
 }

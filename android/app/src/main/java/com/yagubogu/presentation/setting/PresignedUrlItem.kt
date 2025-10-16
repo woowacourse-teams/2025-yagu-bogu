@@ -1,5 +1,6 @@
 package com.yagubogu.presentation.setting
 
-data class MemberCompleteItem(
+data class PresignedUrlItem(
+    val key: String,
     val url: String,
 )

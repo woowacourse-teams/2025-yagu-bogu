@@ -1,9 +1,9 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.setting.MemberCompleteItem
 import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.MemberPresignedUrlItem
+import com.yagubogu.presentation.setting.PreSignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlItem
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>
@@ -23,7 +23,7 @@ interface MemberRepository {
     suspend fun getPresignedProfileImageUrl(
         contentType: String,
         contentLength: Long,
-    ): Result<MemberPresignedUrlItem>
+    ): Result<PresignedUrlItem>
 
-    suspend fun addCompleteUploadProfileImage(key: String): Result<MemberCompleteItem>
+    suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteItem>
 }

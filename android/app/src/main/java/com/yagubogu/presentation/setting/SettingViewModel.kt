@@ -86,14 +86,14 @@ class SettingViewModel(
         _deleteAccountCancelEvent.setValue(Unit)
     }
 
-    suspend fun uploadProfileImageResult(
+    suspend fun uploadProfileImage(
         imageUri: Uri,
         mimeType: String,
         size: Long,
     ): Result<Unit> =
         runCatching {
             // 1. Presigned URL 요청
-            val presignedUrlItem: MemberPresignedUrlItem =
+            val presignedUrlItem: PresignedUrlItem =
                 memberRepository.getPresignedProfileImageUrl(mimeType, size).getOrThrow()
 
             // 2. S3 업로드
@@ -102,9 +102,9 @@ class SettingViewModel(
                 .getOrThrow()
 
             // 3. Complete API 호출 및 프로필 업데이트
-            val complete: MemberCompleteItem =
-                memberRepository.addCompleteUploadProfileImage(presignedUrlItem.key).getOrThrow()
-            _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = complete.url)
+            val completeItem: PreSignedUrlCompleteItem =
+                memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
+            _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
             Timber.e(exception, "프로필 이미지 업로드 실패")
         }
