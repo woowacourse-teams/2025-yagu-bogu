@@ -43,7 +43,7 @@ fun BadgeImage(
             },
         onSuccess = { onLoadSuccess() },
         onError = { onLoadError() },
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     )
 }
 
