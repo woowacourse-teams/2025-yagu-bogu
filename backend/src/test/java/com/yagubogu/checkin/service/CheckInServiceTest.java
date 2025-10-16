@@ -240,7 +240,7 @@ class CheckInServiceTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("경기를 찾을 수 없으면 예외가 발생한다")
+    @DisplayName("예외: 경기를 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundGame() {
         // given
