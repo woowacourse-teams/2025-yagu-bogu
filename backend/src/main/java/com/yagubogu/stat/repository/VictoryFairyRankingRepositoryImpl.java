@@ -82,6 +82,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                         Projections.constructor(
                                 VictoryFairyRank.class,
                                 myRankingQuery,
+                                MEMBER.id,
                                 VICTORY_FAIRY_RANKING.score,
                                 MEMBER.nickname.value,
                                 MEMBER.imageUrl,
