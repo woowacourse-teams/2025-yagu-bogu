@@ -45,6 +45,7 @@ class RetrofitInstance(
             .newBuilder()
             .addInterceptor(tokenInterceptor)
             .authenticator(tokenAuthenticator)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 
@@ -78,6 +79,10 @@ class RetrofitInstance(
         baseRetrofit.create(TokenApiService::class.java)
     }
 
+    val thirdPartyApiService: ThirdPartyApiService by lazy {
+        baseRetrofit.create(ThirdPartyApiService::class.java)
+    }
+
     private val tokenInterceptor = TokenInterceptor(tokenManager)
     private val tokenAuthenticator = TokenAuthenticator(tokenManager, tokenApiService)
 
@@ -107,10 +112,6 @@ class RetrofitInstance(
 
     val talkApiService: TalkApiService by lazy {
         baseTokenRetrofit.create(TalkApiService::class.java)
-    }
-
-    val thirdPartyApiService: ThirdPartyApiService by lazy {
-        baseTokenRetrofit.create(ThirdPartyApiService::class.java)
     }
 
     companion object {
