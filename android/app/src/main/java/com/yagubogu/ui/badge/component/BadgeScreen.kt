@@ -108,8 +108,8 @@ private fun BadgeSuccessContent(
     val selectedBadge = rememberSaveable { mutableStateOf<BadgeInfoUiModel?>(null) }
 
     selectedBadge.value?.let { badgeInfo: BadgeInfoUiModel ->
-        val isRepresentativeBadge =
-            badgeInfo.badge.id == (badgeUiState.representativeBadge?.id ?: -1)
+        val isRepresentativeBadge: Boolean =
+            badgeInfo.badge.id == badgeUiState.representativeBadge?.id
 
         BadgeBottomSheet(
             badgeInfo = badgeInfo,
