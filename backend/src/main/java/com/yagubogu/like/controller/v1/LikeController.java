@@ -1,9 +1,9 @@
-package com.yagubogu.like.controller;
+package com.yagubogu.like.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.like.dto.LikeBatchRequest;
-import com.yagubogu.like.dto.LikeCountsResponse;
+import com.yagubogu.like.dto.v1.LikeBatchRequest;
+import com.yagubogu.like.dto.v1.LikeCountsResponse;
 import com.yagubogu.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

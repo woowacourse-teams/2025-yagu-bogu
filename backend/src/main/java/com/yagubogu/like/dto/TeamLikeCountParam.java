@@ -1,6 +1,6 @@
 package com.yagubogu.like.dto;
 
-public record TeamLikeCountResponse(
+public record TeamLikeCountParam(
         String teamCode,
         long totalCount
 ) {

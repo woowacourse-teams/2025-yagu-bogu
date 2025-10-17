@@ -1,4 +1,4 @@
-package com.yagubogu.like.dto;
+package com.yagubogu.like.dto.v1;
 
 import jakarta.validation.constraints.Min;
 

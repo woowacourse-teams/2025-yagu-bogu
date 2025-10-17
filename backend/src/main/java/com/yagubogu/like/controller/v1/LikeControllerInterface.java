@@ -1,8 +1,8 @@
-package com.yagubogu.like.controller;
+package com.yagubogu.like.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.like.dto.LikeBatchRequest;
-import com.yagubogu.like.dto.LikeCountsResponse;
+import com.yagubogu.like.dto.v1.LikeBatchRequest;
+import com.yagubogu.like.dto.v1.LikeCountsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
