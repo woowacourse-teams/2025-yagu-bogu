@@ -3,6 +3,8 @@ package com.yagubogu.fixture
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
@@ -66,6 +68,17 @@ class MemberFakeRepository(
         }
 
     override fun invalidateCache() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPresignedUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlItem> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> {
         TODO("Not yet implemented")
     }
 }
