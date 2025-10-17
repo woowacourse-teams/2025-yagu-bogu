@@ -1,4 +1,4 @@
-package com.yagubogu.checkin.event;
+package com.yagubogu.checkin.dto.event;
 
 import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.domain.Policy;
