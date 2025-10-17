@@ -3,19 +3,19 @@ package com.yagubogu.checkin.service;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.FanRateByGameParam;
+import com.yagubogu.checkin.dto.FanRateGameParam;
+import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.FanRateByGameParam;
-import com.yagubogu.checkin.dto.FanRateGameParam;
 import com.yagubogu.checkin.dto.v1.FanRateResponse;
-import com.yagubogu.checkin.dto.GameWithFanCountsParam;
-import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankParam;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.event.CheckInEvent;
@@ -26,8 +26,8 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.sse.dto.CheckInCreatedEvent;
-import com.yagubogu.sse.dto.GameWithFanRateResponse;
+import com.yagubogu.sse.dto.GameWithFanRateParam;
+import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -157,8 +157,8 @@ public class CheckInService {
         return new CheckInStatusResponse(isCheckIn);
     }
 
-    public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
-        List<GameWithFanRateResponse> result = new ArrayList<>();
+    public List<GameWithFanRateParam> buildCheckInEventData(final LocalDate date) {
+        List<GameWithFanRateParam> result = new ArrayList<>();
 
         List<GameWithFanCountsParam> responses = checkInRepository.findGamesWithFanCountsByDate(date);
         for (GameWithFanCountsParam response : responses) {
@@ -169,7 +169,7 @@ public class CheckInService {
 
             double homeTeamRate = calculateRoundRate(homeTeamCounts, totalCounts);
             double awayTeamRate = calculateRoundRate(awayTeamCounts, totalCounts);
-            result.add(GameWithFanRateResponse.from(game, homeTeamRate, awayTeamRate));
+            result.add(GameWithFanRateParam.from(game, homeTeamRate, awayTeamRate));
         }
 
         return result;

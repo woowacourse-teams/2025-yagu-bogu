@@ -1,4 +1,4 @@
-package com.yagubogu.sse.controller;
+package com.yagubogu.sse.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.sse.service.SseEmitterService;

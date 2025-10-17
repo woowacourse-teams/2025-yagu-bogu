@@ -1,4 +1,4 @@
-package com.yagubogu.sse.dto;
+package com.yagubogu.sse.dto.event;
 
 import java.time.LocalDate;
 
