@@ -237,7 +237,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         );
     }
 
-    @DisplayName("승리 요정 랭킹을 조회한다. 베이즈 정리로 정렬되어 반환된다")
+    @DisplayName("베이즈 정리로 정렬된 승리 요정 랭킹을 조회한다")
     @Test
     void findVictoryFairyRankings() {
         // given

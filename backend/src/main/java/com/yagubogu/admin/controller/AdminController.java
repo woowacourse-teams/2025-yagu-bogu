@@ -4,7 +4,6 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.service.GameResultSyncService;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.stat.service.StatService;
 import com.yagubogu.stat.service.StatSyncService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ public class AdminController {
 
     private final GameResultSyncService gameResultSyncService;
     private final GameScheduleSyncService gameScheduleSyncService;
-    private final StatService statService;
     private final StatSyncService statSyncService;
 
 

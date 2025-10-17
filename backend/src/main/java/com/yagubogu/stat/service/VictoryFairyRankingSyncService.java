@@ -34,7 +34,7 @@ public class VictoryFairyRankingSyncService {
     private static final double SCORE_COMPARISON_THRESHOLD = 0.0001;
 
     @Transactional
-    public VictoryFairyChunkResult processChunk(List<Long> memberIds, int year) {
+    public VictoryFairyChunkResult processChunk(final List<Long> memberIds, final int year) {
         Map<Long, VictoryFairyRanking> existingRankingMap = buildExistingRankingMap(memberIds, year);
         List<VictoryFairyCountResult> checkInAndWinCounts = checkInRepository.findCheckInAndWinCountBatch(
                 memberIds, year);
