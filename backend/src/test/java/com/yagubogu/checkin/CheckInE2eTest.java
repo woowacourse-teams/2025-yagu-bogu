@@ -427,17 +427,7 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountParam(6L, "사직", 0L),
                         new StadiumCheckInCountParam(7L, "문학", 0L),
                         new StadiumCheckInCountParam(8L, "창원", 0L),
-                        new StadiumCheckInCountParam(9L, "대전", 0L),
-                        new StadiumCheckInCountParam(10L, "울산", 0L),
-                        new StadiumCheckInCountParam(11L, "군산", 0L),
-                        new StadiumCheckInCountParam(12L, "청주", 0L),
-                        new StadiumCheckInCountParam(13L, "포항", 0L),
-                        new StadiumCheckInCountParam(14L, "한밭", 0L),
-                        new StadiumCheckInCountParam(15L, "시민", 0L),
-                        new StadiumCheckInCountParam(16L, "무등", 0L),
-                        new StadiumCheckInCountParam(17L, "마산", 0L),
-                        new StadiumCheckInCountParam(18L, "인천", 0L),
-                        new StadiumCheckInCountParam(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(9L, "대전", 0L)
                 )
         );
 
@@ -481,17 +471,7 @@ public class CheckInE2eTest extends E2eTestBase {
                         new StadiumCheckInCountParam(6L, "사직", 0L),
                         new StadiumCheckInCountParam(7L, "문학", 0L),
                         new StadiumCheckInCountParam(8L, "창원", 0L),
-                        new StadiumCheckInCountParam(9L, "대전", 0L),
-                        new StadiumCheckInCountParam(10L, "울산", 0L),
-                        new StadiumCheckInCountParam(11L, "군산", 0L),
-                        new StadiumCheckInCountParam(12L, "청주", 0L),
-                        new StadiumCheckInCountParam(13L, "포항", 0L),
-                        new StadiumCheckInCountParam(14L, "한밭", 0L),
-                        new StadiumCheckInCountParam(15L, "시민", 0L),
-                        new StadiumCheckInCountParam(16L, "무등", 0L),
-                        new StadiumCheckInCountParam(17L, "마산", 0L),
-                        new StadiumCheckInCountParam(18L, "인천", 0L),
-                        new StadiumCheckInCountParam(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(9L, "대전", 0L)
                 )
         );
 
