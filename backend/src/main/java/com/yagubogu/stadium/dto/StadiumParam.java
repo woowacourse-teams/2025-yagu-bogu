@@ -2,7 +2,7 @@ package com.yagubogu.stadium.dto;
 
 import com.yagubogu.stadium.domain.Stadium;
 
-public record StadiumResponse(
+public record StadiumParam(
         Long id,
         String fullName,
         String shortName,
@@ -12,8 +12,8 @@ public record StadiumResponse(
 
 ) {
 
-    public static StadiumResponse from(final Stadium stadium) {
-        return new StadiumResponse(
+    public static StadiumParam from(final Stadium stadium) {
+        return new StadiumParam(
                 stadium.getId(),
                 stadium.getFullName(),
                 stadium.getShortName(),

@@ -1,6 +1,6 @@
-package com.yagubogu.stadium.controller;
+package com.yagubogu.stadium.controller.v1;
 
-import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsResponse;
 import com.yagubogu.stadium.service.StadiumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
