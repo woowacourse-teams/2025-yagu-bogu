@@ -1,7 +1,6 @@
 package com.yagubogu.stat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
@@ -86,9 +85,9 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
 
-        Member win1 = memberFactory.save(b -> b.team(HT));
-        Member win2 = memberFactory.save(b -> b.team(HT));
-        Member lose1 = memberFactory.save(b -> b.team(LT));
+        Member member1 = memberFactory.save(b -> b.team(HT));
+        Member member2 = memberFactory.save(b -> b.team(HT));
+        Member member3 = memberFactory.save(b -> b.team(LT));
 
         Stadium stadium = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
         Game game1 = gameFactory.save(b -> b.stadium(stadium)
@@ -108,11 +107,11 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .gameState(GameState.COMPLETED)); // LG 승
 
         // 각 회원이 자신의 응원팀으로 체크인
-        checkInFactory.save(b -> b.game(game1).member(win1).team(HT));  // 승
-        checkInFactory.save(b -> b.game(game2).member(win1).team(HT));  // 승
-        checkInFactory.save(b -> b.game(game2).member(win2).team(HT));  // 승
-        checkInFactory.save(b -> b.game(game2).member(lose1).team(LT)); // 패
-        checkInFactory.save(b -> b.game(lastYearGame).member(lose1).team(LT)); // 승 -> 작년 경기이므로 영향 없음
+        checkInFactory.save(b -> b.game(game1).member(member1).team(HT));  // 승
+        checkInFactory.save(b -> b.game(game2).member(member1).team(HT));  // 승
+        checkInFactory.save(b -> b.game(game2).member(member2).team(HT));  // 승
+        checkInFactory.save(b -> b.game(game2).member(member3).team(LT)); // 패
+        checkInFactory.save(b -> b.game(lastYearGame).member(member3).team(LT)); // 승 -> 작년 경기이므로 영향 없음
 
         int lastYear = 2024;
         int year = 2025;
@@ -122,40 +121,40 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
         // when
-        statService.calculateVictoryScore(year, game1.getId());
-        statService.calculateVictoryScore(year, game2.getId());
-        statService.calculateVictoryScore(lastYear, lastYearGame.getId());
+        statService.calculateVictoryFairyScore(year, game1.getId());
+        statService.calculateVictoryFairyScore(year, game2.getId());
+        statService.calculateVictoryFairyScore(lastYear, lastYearGame.getId());
 
         // then
         List<VictoryFairyRanking> rankings = victoryFairyRankingRepository.findAll();
         VictoryFairyRanking rWin1 = rankings.stream()
-                .filter(v -> v.getMember().getId().equals(win1.getId()) && v.getGameYear() == year)
+                .filter(v -> v.getMember().getId().equals(member1.getId()) && v.getGameYear() == year)
                 .findFirst().orElseThrow();
         VictoryFairyRanking rWin2 = rankings.stream()
-                .filter(v -> v.getMember().getId().equals(win2.getId()) && v.getGameYear() == year)
+                .filter(v -> v.getMember().getId().equals(member2.getId()) && v.getGameYear() == year)
                 .findFirst().orElseThrow();
         VictoryFairyRanking rLose1 = rankings.stream()
-                .filter(v -> v.getMember().getId().equals(lose1.getId()) && v.getGameYear() == year).findFirst()
+                .filter(v -> v.getMember().getId().equals(member3.getId()) && v.getGameYear() == year).findFirst()
                 .orElseThrow();
 
-        double expectedWinScoreByFirstRank = getScore((2 + c * m) / (2 + c));
-        double expectedWinScore = getScore((1 + c * m) / (1 + c));
-        double expectedLoseScore = getScore((0 + c * m) / (1 + c));
+        double expectedMember1Score = getScore((2 + c * m) / (2 + c));
+        double expectedMember2Score = getScore((1 + c * m) / (1 + c));
+        double expectedMember3Score = getScore((0 + c * m) / (1 + c));
 
         assertSoftly(s -> {
             // 승리 회원: winCount=1, checkInCount=1, 점수는 승리 공식
             s.assertThat(rWin1.getWinCount()).isEqualTo(2);
             s.assertThat(rWin1.getCheckInCount()).isEqualTo(2);
-            s.assertThat(rWin1.getScore()).isCloseTo(expectedWinScoreByFirstRank, within(1e-9));
+            s.assertThat(rWin1.getScore()).isEqualTo(expectedMember1Score);
 
             s.assertThat(rWin2.getWinCount()).isEqualTo(1);
             s.assertThat(rWin2.getCheckInCount()).isEqualTo(1);
-            s.assertThat(rWin2.getScore()).isCloseTo(expectedWinScore, within(1e-9));
+            s.assertThat(rWin2.getScore()).isEqualTo(expectedMember2Score);
 
             // 패배 회원: winCount=0, checkInCount=1, 점수는 패배 공식
             s.assertThat(rLose1.getWinCount()).isEqualTo(0);
             s.assertThat(rLose1.getCheckInCount()).isEqualTo(1);
-            s.assertThat(rLose1.getScore()).isCloseTo(expectedLoseScore, within(1e-9));
+            s.assertThat(rLose1.getScore()).isEqualTo(expectedMember3Score);
 
             // 승리 점수가 패배 점수보다 커야 한다
             s.assertThat(rWin1.getScore()).isGreaterThan(rLose1.getScore());
@@ -181,7 +180,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         });
     }
 
-    @DisplayName("회원이 응원하는 팀의 경기를 한번도 관람하지 않은 경우 승률이 0이다")
+    @DisplayName("회원이 응원하지 않는 팀의 경기를 관람하는 경우에 대한 승리 요정 랭킹을 조회한다")
     @Test
     void findVictoryFairyRankings_noFavoriteCheckIn() {
         // given
@@ -219,8 +218,8 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .game(game2)
         );
 
-        statService.calculateVictoryScore(startDate.getYear(), game1.getId());
-        statService.calculateVictoryScore(startDate.getYear(), game2.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), game1.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), game2.getId());
 
         // when
         VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
@@ -238,7 +237,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         );
     }
 
-    @DisplayName("승리 요정 랭킹 조회 - 베이즈 정리로 정렬되어 반환된다")
+    @DisplayName("승리 요정 랭킹을 조회한다. 베이즈 정리로 정렬되어 반환된다")
     @Test
     void findVictoryFairyRankings() {
         // given
@@ -301,18 +300,18 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         Game g7 = gameFactory.save(b -> b.stadium(stadiumJamsil)
                 .homeTeam(lg)
                 .awayTeam(samsung)
-                .homeScoreBoard(null)
-                .awayScoreBoard(null)
-                .date(startDate.plusDays(6))
-                .gameState(GameState.SCHEDULED)
-        );
-        Game g8 = gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(lg)
-                .awayTeam(samsung)
                 .homeScoreBoard(TestFixture.getHomeScoreBoardAbout(0))
                 .awayScoreBoard(TestFixture.getAwayScoreBoardAbout(0))
                 .date(startDate.plusDays(6))
                 .gameState(GameState.COMPLETED)
+        );
+        Game scheduledGame = gameFactory.save(b -> b.stadium(stadiumJamsil)
+                .homeTeam(lg)
+                .awayTeam(samsung)
+                .homeScoreBoard(null)
+                .awayScoreBoard(null)
+                .date(startDate.plusDays(6))
+                .gameState(GameState.SCHEDULED)
         );
 
         // 체크인: "응원팀이 출전한 경기"에만 체크인시켜 승률/표본이 의도대로 형성되게 함
@@ -324,19 +323,19 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         checkInFavorite(fora, g4, g5);
 
         // LG 팬: 두리(2경기 중 0승 → 0%)
-        checkInFavorite(duri, g1, g4, g8); // LG는 위 셋에서 모두 패배
+        checkInFavorite(duri, g1, g4, g7); // LG는 위 셋에서 모두 패배
 
         // 삼성 팬: 우가(3경기 중 0승 → 0%)
-        checkInFavorite(uga, g3, g5, g6, g7);
+        checkInFavorite(uga, g3, g5, g6, scheduledGame);
 
-        statService.calculateVictoryScore(startDate.getYear(), g1.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g2.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g3.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g4.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g5.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g6.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g7.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g8.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g1.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g3.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g4.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g5.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g6.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g7.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), scheduledGame.getId());
 
         // when
         VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(duri.getId(), TeamFilter.ALL,
@@ -355,7 +354,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         );
     }
 
-    @DisplayName("승리 요정 랭킹 조회 - 베이즈 정리로 정렬되어 반환된다")
+    @DisplayName("승리 요정 랭킹을 팀별로 조회한다")
     @Test
     void findVictoryFairyRankings_filterByTeam() {
         // given
@@ -394,9 +393,9 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         checkInFavorite(por, g1, g2);
         checkInFavorite(duri, g1, g3);
 
-        statService.calculateVictoryScore(startDate.getYear(), g1.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g2.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g3.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g1.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g3.getId());
 
         // when
         VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.HT, 2025);
@@ -439,8 +438,8 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
 
         checkInFavorite(mint, g1, g2);
 
-        statService.calculateVictoryScore(startDate.getYear(), g1.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g2.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g1.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
 
         // when
         VictoryFairyRankingResponse myRanking = statService.findVictoryFairyRankings(mint.getId(),
@@ -477,8 +476,8 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         );
         checkInFavorite(mint, g1, g2);
 
-        statService.calculateVictoryScore(startDate.getYear(), g1.getId());
-        statService.calculateVictoryScore(startDate.getYear(), g2.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g1.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
 
         // when
         VictoryFairyRankingResponses responses = statService.findVictoryFairyRankings(fora.getId(),

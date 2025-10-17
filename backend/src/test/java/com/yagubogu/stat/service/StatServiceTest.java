@@ -74,8 +74,6 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        victoryRankingSyncService = new VictoryFairyRankingSyncService(checkInRepository,
-                victoryFairyRankingRepository);
         statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository);
     }
 

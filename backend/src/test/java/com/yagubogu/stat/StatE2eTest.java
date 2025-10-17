@@ -452,7 +452,7 @@ public class StatE2eTest extends E2eTestBase {
         List<Game> games = gameRepository.findAll();
         for (Game g : games) {
             checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(g));
-            statService.calculateVictoryScore(startDate.getYear(), g.getId());
+            statService.calculateVictoryFairyScore(startDate.getYear(), g.getId());
         }
 
         // when & then
@@ -498,7 +498,7 @@ public class StatE2eTest extends E2eTestBase {
         checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
         checkInFactory.save(b -> b.member(mint).team(mint.getTeam()).game(game));
 
-        statService.calculateVictoryScore(startDate.getYear(), game.getId());
+        statService.calculateVictoryFairyScore(startDate.getYear(), game.getId());
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -581,7 +581,7 @@ public class StatE2eTest extends E2eTestBase {
         for (Member m : members) {
             for (Game g : games) {
                 checkInFactory.save(b -> b.member(m).team(m.getTeam()).game(g));
-                statService.calculateVictoryScore(startDate.getYear(), g.getId());
+                statService.calculateVictoryFairyScore(startDate.getYear(), g.getId());
             }
         }
 
