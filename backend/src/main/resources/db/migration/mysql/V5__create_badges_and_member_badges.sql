@@ -4,7 +4,7 @@ CREATE TABLE badges
     badge_id          BIGINT       NOT NULL AUTO_INCREMENT,
     badge_name        VARCHAR(255) NOT NULL UNIQUE,
     badge_description VARCHAR(255),
-    badge_type        VARCHAR(50)  NOT NULL,
+    badge_policy      VARCHAR(50)  NOT NULL,
     badge_threshold   INT          NOT NULL,
     badge_image_url   VARCHAR(512) NOT NULL,
     PRIMARY KEY (badge_id)
@@ -24,7 +24,8 @@ CREATE TABLE member_badges
     deleted_at      DATETIME(6) NULL,
     PRIMARY KEY (member_badge_id),
     FOREIGN KEY (badge_id) REFERENCES badges (badge_id),
-    FOREIGN KEY (member_id) REFERENCES members (member_id)
+    FOREIGN KEY (member_id) REFERENCES members (member_id),
+    CONSTRAINT UK_MEMBER_BADGE UNIQUE (member_id, badge_id)
 ) ENGINE = InnoDB;
 
 ALTER TABLE members
