@@ -86,11 +86,15 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         List<VictoryFairyRanking> results = victoryFairyRankingRepository
                 .findByMemberIdsAndYear(List.of(m1.getId(), m2.getId()), year);
 
-        assertSoftly(s -> {
-            s.assertThat(results).hasSize(2);
-            s.assertThat(results).extracting("winCount").containsExactlyInAnyOrder(1, 1);
-            s.assertThat(results).extracting("checkInCount").containsExactlyInAnyOrder(1, 1);
-            s.assertThat(results).extracting("score").containsExactlyInAnyOrder(100.0, 100.0);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(results).hasSize(2);
+            softAssertions.assertThat(results);
+            softAssertions.assertThat(results).extracting(VictoryFairyRanking::getWinCount)
+                    .containsExactlyInAnyOrder(1, 1);
+            softAssertions.assertThat(results).extracting(VictoryFairyRanking::getCheckInCount)
+                    .containsExactlyInAnyOrder(1, 1);
+            softAssertions.assertThat(results).extracting(VictoryFairyRanking::getScore)
+                    .containsExactlyInAnyOrder(100.0, 100.0);
         });
     }
 
@@ -135,13 +139,13 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         VictoryFairyRanking r2 = results.stream().filter(r -> r.getMember().getId().equals(m2.getId())).findFirst()
                 .orElseThrow();
 
-        assertSoftly(s -> {
-            s.assertThat(r1.getWinCount()).isEqualTo(1);
-            s.assertThat(r1.getCheckInCount()).isEqualTo(2);
-            s.assertThat(r1.getScore()).isEqualTo(57.14);
-            s.assertThat(r2.getWinCount()).isEqualTo(1);
-            s.assertThat(r2.getCheckInCount()).isEqualTo(1);
-            s.assertThat(r2.getScore()).isEqualTo(100.0);
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(r1.getWinCount()).isEqualTo(1);
+            softAssertions.assertThat(r1.getCheckInCount()).isEqualTo(2);
+            softAssertions.assertThat(r1.getScore()).isEqualTo(57.14);
+            softAssertions.assertThat(r2.getWinCount()).isEqualTo(1);
+            softAssertions.assertThat(r2.getCheckInCount()).isEqualTo(1);
+            softAssertions.assertThat(r2.getScore()).isEqualTo(100.0);
         });
     }
 
