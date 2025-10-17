@@ -1,8 +1,5 @@
 package com.yagubogu.stat;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -38,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class StatE2eTest extends E2eTestBase {
@@ -130,7 +130,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/counts")
+                .when().get("/api/v1/stats/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -190,7 +190,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -210,7 +210,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(403);
     }
@@ -239,7 +239,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -251,7 +251,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberFavoriteRequest(doosanTeam.getTeamCode()))
-                .when().patch("/api/members/favorites")
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200);
 
@@ -260,7 +260,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -272,7 +272,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberFavoriteRequest(kiaTeam.getTeamCode()))
-                .when().patch("/api/members/favorites")
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200);
 
@@ -281,7 +281,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -310,7 +310,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/lucky-stadiums")
+                .when().get("/api/v1/stats/lucky-stadiums")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -366,7 +366,7 @@ public class StatE2eTest extends E2eTestBase {
         AverageStatisticResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/stats/me")
+                .when().get("/api/v1/stats/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(AverageStatisticResponse.class);
@@ -426,7 +426,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/stats/win-rate/opponents")
+                .when().get("/api/v1/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -491,7 +491,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/stats/win-rate/opponents")
+                .when().get("/api/v1/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(422);
     }

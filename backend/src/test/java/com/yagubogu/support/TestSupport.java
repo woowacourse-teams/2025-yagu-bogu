@@ -13,7 +13,7 @@ public class TestSupport {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginParam(idToken))
-                .when().post("/api/auth/login")
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

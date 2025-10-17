@@ -1,14 +1,12 @@
 package com.yagubogu.game;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
+import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -34,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class GameE2eTest extends E2eTestBase {
@@ -99,7 +99,7 @@ public class GameE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .when().get("/api/games")
+                .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -123,7 +123,7 @@ public class GameE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", invalidDate.toString())
-                .when().get("/api/games")
+                .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(422);
     }

@@ -1,8 +1,5 @@
 package com.yagubogu.member;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.mockito.Mockito.doReturn;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.config.S3Properties;
@@ -33,6 +30,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.doReturn;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class ProfileImageE2eTest extends E2eTestBase {
@@ -84,7 +84,7 @@ public class ProfileImageE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(request)
-                .when().post("/api/members/me/profile-image/pre-signed")
+                .when().post("/api/v1/members/me/profile-image/pre-signed")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -115,7 +115,7 @@ public class ProfileImageE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new PreSignedUrlCompleteRequest(key))
-                .when().post("/api/members/me/profile-image/update")
+                .when().post("/api/v1/members/me/profile-image/update")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

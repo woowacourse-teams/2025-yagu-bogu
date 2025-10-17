@@ -1,15 +1,12 @@
 package com.yagubogu.checkin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
@@ -42,6 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class CheckInE2eTest extends E2eTestBase {
@@ -111,7 +111,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumJamsil.getId(), date))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(201);
     }
@@ -149,7 +149,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/check-ins/counts")
+                .when().get("/api/v1/check-ins/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -174,7 +174,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(invalidStadiumId, date))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -194,7 +194,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumId, invalidDate))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -234,7 +234,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -274,7 +274,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -314,7 +314,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -354,7 +354,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -421,7 +421,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/victory-fairy/rankings")
+                .when().get("/api/v1/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -467,7 +467,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/victory-fairy/rankings")
+                .when().get("/api/v1/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -505,7 +505,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, foraAccessToken)
-                .when().delete("/api/members/me")
+                .when().delete("/api/v1/members/me")
                 .then().log().all()
                 .statusCode(204);
 
@@ -514,7 +514,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, duriAccessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/victory-fairy/rankings")
+                .when().get("/api/v1/check-ins/victory-fairy/rankings")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -550,7 +550,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .when().get("/api/check-ins/status")
+                .when().get("/api/v1/check-ins/status")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -587,7 +587,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", TestFixture.getToday().toString())
-                .when().get("/api/check-ins/stadiums/fan-rates")
+                .when().get("/api/v1/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -628,7 +628,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/stadiums/counts")
+                .when().get("/api/v1/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -682,7 +682,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/stadiums/counts")
+                .when().get("/api/v1/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

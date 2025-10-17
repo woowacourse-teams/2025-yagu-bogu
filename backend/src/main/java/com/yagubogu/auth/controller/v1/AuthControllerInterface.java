@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Auth", description = "인증 및 토큰 관련 API")
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public interface AuthControllerInterface {
 
     @Operation(summary = "로그인", description = "OAuth 인증 정보를 통해 로그인합니다.")

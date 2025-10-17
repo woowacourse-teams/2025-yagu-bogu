@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Like", description = "좋아요 인증 관련 API")
-@RequestMapping("/api/games")
+@RequestMapping("/games")
 public interface LikeControllerInterface {
 
     @Operation(

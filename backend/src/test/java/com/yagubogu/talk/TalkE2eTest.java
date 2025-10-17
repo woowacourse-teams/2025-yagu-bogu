@@ -1,8 +1,5 @@
 package com.yagubogu.talk;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -30,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class TalkE2eTest extends E2eTestBase {
@@ -94,7 +94,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .queryParam("limit", 1)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/talks/{gameId}/initial")
+                .get("/api/v1/talks/{gameId}/initial")
                 .then()
                 .statusCode(200)
                 .body("stadiumName", is("사직야구장"))
@@ -136,7 +136,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .queryParam("limit", 1)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/talks/{gameId}")
+                .get("/api/v1/talks/{gameId}")
                 .then()
                 .statusCode(200)
                 .body("cursorResultParam.content[0].id", is(2))
@@ -176,7 +176,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .queryParam("limit", 1)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/talks/{gameId}")
+                .get("/api/v1/talks/{gameId}")
                 .then()
                 .statusCode(200)
                 .body("cursorResultParam.content[0].id", is(1))
@@ -212,7 +212,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .queryParam("limit", 1)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/talks/{gameId}/latest")
+                .get("/api/v1/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("cursorResultParam.content[-1].id", is(2))
@@ -249,7 +249,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .queryParam("limit", 1)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/talks/{gameId}/latest")
+                .get("/api/v1/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
                 .body("cursorResultParam.content.size()", is(0))
@@ -275,7 +275,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
                 .pathParam("gameId", game.getId())
-                .when().post("/api/talks/{gameId}")
+                .when().post("/api/v1/talks/{gameId}")
                 .then().log().all()
                 .statusCode(201)
                 .body("content", is(content));
@@ -358,7 +358,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .body(new TalkRequest(content))
                 .pathParam("gameId", game.getId())
                 .when()
-                .post("/api/talks/{gameId}")
+                .post("/api/v1/talks/{gameId}")
                 .then().log().all()
                 .statusCode(403);
     }
@@ -376,7 +376,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new TalkRequest(content))
                 .pathParam("gameId", invalidGameId)
-                .when().post("/api/talks/{gameId}")
+                .when().post("/api/v1/talks/{gameId}")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -401,7 +401,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("gameId", game.getId())
                 .pathParam("talkId", myTalk.getId())
-                .when().delete("/api/talks/{gameId}/{talkId}")
+                .when().delete("/api/v1/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -425,7 +425,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("gameId", game.getId())
                 .pathParam("talkId", invalidTalkId)
-                .when().delete("/api/talks/{gameId}/{talkId}")
+                .when().delete("/api/v1/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -453,7 +453,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("gameId", invalidGame.getId())
                 .pathParam("talkId", myTalk.getId())
-                .when().delete("/api/talks/{gameId}/{talkId}")
+                .when().delete("/api/v1/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(400);
     }
@@ -479,7 +479,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessTokenByInvalidMember)
                 .pathParam("gameId", game.getId())
                 .pathParam("talkId", myTalk.getId())
-                .when().delete("/api/talks/{gameId}/{talkId}")
+                .when().delete("/api/v1/talks/{gameId}/{talkId}")
                 .then().log().all()
                 .statusCode(403);
     }
@@ -503,7 +503,7 @@ public class TalkE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("talkId", reportedTalk.getId())
-                .when().post("/api/talks/{talkId}/reports")
+                .when().post("/api/v1/talks/{talkId}/reports")
                 .then().log().all()
                 .statusCode(201);
     }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/event-stream")
+@RequestMapping("/event-stream")
 @RestController
 public class StreamController {
 

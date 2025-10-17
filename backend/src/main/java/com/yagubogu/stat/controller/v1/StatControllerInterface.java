@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Stat", description = "야구 기록 통계 관련 API")
-@RequestMapping("/api/stats")
+@RequestMapping("/stats")
 public interface StatControllerInterface {
 
     @Operation(summary = "연도별 승패무/인증 횟수 조회", description = "멤버의 해당 연도 승/패/무/인증 횟수를 조회합니다.")

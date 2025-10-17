@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Game", description = "경기 조회 관련 API")
-@RequestMapping("/api/games")
+@RequestMapping("/games")
 public interface GameControllerInterface {
 
     @Operation(summary = "특정 날짜의 경기 목록 조회", description = "지정한 날짜에 해당하는 경기 정보를 조회합니다.")

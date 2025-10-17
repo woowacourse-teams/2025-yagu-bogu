@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Talk", description = "경기별 톡(Talk) 관련 API")
-@RequestMapping("/api/talks")
+@RequestMapping("/talks")
 public interface TalkControllerInterface {
 
     @Operation(summary = "첫 요청에 톡 조회", description = "채팅방 첫 진입시 지정한 경기에서 과거 톡 목록을 조회합니다.")

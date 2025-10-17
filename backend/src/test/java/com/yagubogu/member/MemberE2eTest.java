@@ -1,8 +1,5 @@
 package com.yagubogu.member;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
@@ -31,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class MemberE2eTest extends E2eTestBase {
@@ -71,7 +71,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/favorites")
+                .when().get("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -93,7 +93,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberNicknameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/me/nickname")
+                .when().get("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -117,7 +117,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(newNickname))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -141,7 +141,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(existNickname))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(409);
     }
@@ -160,7 +160,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(longNickName))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(422);
     }
@@ -176,7 +176,7 @@ public class MemberE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().delete("/api/members/me")
+                .when().delete("/api/v1/members/me")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -200,7 +200,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(request)
-                .when().patch("/api/members/favorites")
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -225,7 +225,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberInfoResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/me")
+                .when().get("/api/v1/members/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -251,7 +251,7 @@ public class MemberE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/me/badges")
+                .when().get("/api/v1/members/me/badges")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -274,7 +274,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("badgeId", badge.getId())
-                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .when().patch("/api/v1/members/me/badges/{badgeId}/representative")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -292,7 +292,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("badgeId", badge.getId())
-                .when().patch("/api/members/me/badges/{badgeId}/representative")
+                .when().patch("/api/v1/members/me/badges/{badgeId}/representative")
                 .then().log().all()
                 .statusCode(404);
     }

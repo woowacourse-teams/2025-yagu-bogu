@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Stadium", description = "구장 관련 API")
-@RequestMapping("/api/stadiums")
+@RequestMapping("/stadiums")
 public interface StadiumControllerInterface {
 
     @Operation(summary = "전체 구장 목록 조회", description = "등록된 모든 구장 목록을 조회합니다.")

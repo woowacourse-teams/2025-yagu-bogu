@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Member", description = "회원 관련 API")
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 public interface MemberControllerInterface {
 
     @Operation(summary = "닉네임 수정", description = "현재 로그인된 회원의 닉네임을 수정합니다.")

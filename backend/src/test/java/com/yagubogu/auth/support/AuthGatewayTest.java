@@ -1,7 +1,5 @@
 package com.yagubogu.auth.support;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.dto.LoginParam;
 import com.yagubogu.auth.dto.v1.LoginResponse;
@@ -16,6 +14,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import(AuthTestConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -37,7 +37,7 @@ public class AuthGatewayTest {
         LoginResponse loginResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginParam("ID_TOKEN"))
-                .when().post("/api/auth/login")
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

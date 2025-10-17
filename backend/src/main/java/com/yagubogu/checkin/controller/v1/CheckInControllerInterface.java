@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "CheckIn", description = "경기 인증 관련 API")
-@RequestMapping("/api/check-ins")
+@RequestMapping("/check-ins")
 public interface CheckInControllerInterface {
 
     @Operation(summary = "경기 인증 생성", description = "지정한 경기의 인증을 생성합니다.")
