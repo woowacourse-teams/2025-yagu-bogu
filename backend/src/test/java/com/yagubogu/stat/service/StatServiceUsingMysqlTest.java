@@ -490,7 +490,6 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(victoryFairyRankingResponses).hasSize(1);
             softAssertions.assertThat(myRanking.victoryFairyScore()).isEqualTo(0.0);
-            softAssertions.assertThat(myRanking.victoryFairyScore()).isEqualTo(0);
         });
     }
 
