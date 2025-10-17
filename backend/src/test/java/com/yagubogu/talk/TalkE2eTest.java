@@ -139,8 +139,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("cursorResult.content[0].id", is(2))
-                .body("cursorResult.nextCursorId", is(2));
+                .body("cursorResultParam.content[0].id", is(2))
+                .body("cursorResultParam.nextCursorId", is(2));
     }
 
     @DisplayName("톡의 마지막 페이지를 조회한다")
@@ -179,8 +179,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("cursorResult.content[0].id", is(1))
-                .body("cursorResult.nextCursorId", is(nullValue()));
+                .body("cursorResultParam.content[0].id", is(1))
+                .body("cursorResultParam.nextCursorId", is(nullValue()));
     }
 
     @DisplayName("새 톡을 가져온다")
@@ -215,9 +215,9 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("cursorResult.content.size()", is(1))
-                .body("cursorResult.content[-1].id", is(2))
-                .body("cursorResult.nextCursorId", is(2));
+                .body("cursorResultParam.content[-1].id", is(2))
+                .body("cursorResultParam.content.size()", is(1))
+                .body("cursorResultParam.nextCursorId", is(2));
     }
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
@@ -252,8 +252,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("cursorResult.content.size()", is(0))
-                .body("cursorResult.nextCursorId", is(2));
+                .body("cursorResultParam.content.size()", is(0))
+                .body("cursorResultParam.nextCursorId", is(2));
     }
 
     @DisplayName("정상적으로 톡을 저장하고 응답을 반환한다")
