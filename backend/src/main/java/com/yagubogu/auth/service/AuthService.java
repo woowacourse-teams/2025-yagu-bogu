@@ -16,7 +16,7 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.member.dto.MemberFindResult;
+import com.yagubogu.member.dto.MemberFindResultParam;
 import com.yagubogu.member.service.MemberService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +41,9 @@ public class AuthService {
         AuthParam response = authGateway.validateToken(request);
         validateToken(response, OAuthProvider.GOOGLE);
 
-        MemberFindResult memberFindResult = memberService.findMember(response);
-        Member member = memberFindResult.member();
-        boolean isNew = memberFindResult.isNew();
+        MemberFindResultParam memberFindResultParam = memberService.findMember(response);
+        Member member = memberFindResultParam.member();
+        boolean isNew = memberFindResultParam.isNew();
 
         String accessToken = authTokenProvider.issueAccessToken(MemberClaims.from(member));
         String refreshToken = refreshTokenService.issue(member);

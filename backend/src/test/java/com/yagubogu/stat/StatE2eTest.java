@@ -10,6 +10,7 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
@@ -249,7 +250,7 @@ public class StatE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(doosanTeam.getTeamCode()))
+                .body(new MemberFavoriteRequest(doosanTeam.getTeamCode()))
                 .when().patch("/api/members/favorites")
                 .then().log().all()
                 .statusCode(200);
@@ -270,7 +271,7 @@ public class StatE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(kiaTeam.getTeamCode()))
+                .body(new MemberFavoriteRequest(kiaTeam.getTeamCode()))
                 .when().patch("/api/members/favorites")
                 .then().log().all()
                 .statusCode(200);

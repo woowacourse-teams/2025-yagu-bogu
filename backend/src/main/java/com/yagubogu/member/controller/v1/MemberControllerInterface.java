@@ -1,17 +1,17 @@
-package com.yagubogu.member.controller;
+package com.yagubogu.member.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.badge.dto.BadgeListResponse;
-import com.yagubogu.member.dto.MemberFavoriteRequest;
-import com.yagubogu.member.dto.MemberFavoriteResponse;
-import com.yagubogu.member.dto.MemberInfoResponse;
-import com.yagubogu.member.dto.MemberNicknameRequest;
-import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.member.dto.PreSignedUrlCompleteRequest;
-import com.yagubogu.member.dto.PreSignedUrlCompleteResponse;
-import com.yagubogu.member.dto.PreSignedUrlStartRequest;
-import com.yagubogu.member.dto.PresignedUrlStartResponse;
-import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
+import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
+import com.yagubogu.member.dto.v1.MemberInfoResponse;
+import com.yagubogu.member.dto.v1.MemberNicknameRequest;
+import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
+import com.yagubogu.member.dto.v1.PreSignedUrlCompleteRequest;
+import com.yagubogu.member.dto.v1.PreSignedUrlCompleteResponse;
+import com.yagubogu.member.dto.v1.PreSignedUrlStartRequest;
+import com.yagubogu.member.dto.v1.PresignedUrlStartResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,8 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 

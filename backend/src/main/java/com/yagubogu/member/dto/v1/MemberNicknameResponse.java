@@ -1,4 +1,4 @@
-package com.yagubogu.member.dto;
+package com.yagubogu.member.dto.v1;
 
 import com.yagubogu.member.domain.Nickname;
 
