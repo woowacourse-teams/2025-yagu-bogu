@@ -11,7 +11,7 @@ import com.yagubogu.auth.dto.TokenRequest;
 import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
 import com.yagubogu.support.member.MemberBuilder;

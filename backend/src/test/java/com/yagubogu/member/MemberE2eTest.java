@@ -15,7 +15,7 @@ import com.yagubogu.member.dto.MemberFavoriteResponse;
 import com.yagubogu.member.dto.MemberInfoResponse;
 import com.yagubogu.member.dto.MemberNicknameRequest;
 import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;

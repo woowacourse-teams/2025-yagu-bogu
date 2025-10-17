@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.stadium.dto.StadiumResponse;
 import com.yagubogu.stadium.dto.StadiumsResponse;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;

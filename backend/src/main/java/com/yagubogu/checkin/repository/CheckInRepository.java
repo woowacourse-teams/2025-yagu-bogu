@@ -5,6 +5,8 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsDto;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -48,4 +50,16 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     List<StadiumStatsDto> findWinAndNonDrawCountByStadium(@Param("memberId") Long memberId,
                                                           @Param("startDate") LocalDate startDate,
                                                           @Param("endDate") LocalDate endDate);
+
+    @Query("""
+            SELECT DISTINCT c.member.id
+            FROM CheckIn c
+            JOIN c.game g
+            WHERE g.date = :date
+            ORDER BY c.member.id
+            """)
+    Slice<Long> findDistinctMemberIdsByDate(
+            @Param("date") LocalDate date,
+            Pageable pageable
+    );
 }

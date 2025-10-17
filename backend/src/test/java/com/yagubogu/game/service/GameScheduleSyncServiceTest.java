@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 
 @Import(AuthTestConfig.class)
@@ -54,6 +55,9 @@ class GameScheduleSyncServiceTest {
     @Autowired
     private GameFactory gameFactory;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Mock
     private KboGameSyncClient kboGameSyncClient;
 
@@ -62,9 +66,10 @@ class GameScheduleSyncServiceTest {
 
     @BeforeEach
     void setUp() {
-        gameScheduleSyncService = new GameScheduleSyncService(kboGameSyncClient, gameRepository,
-                teamRepository, stadiumRepository);
-        gameResultSyncService = new GameResultSyncService(kboGameSyncClient, kboGameResultClient, gameRepository);
+        gameScheduleSyncService = new GameScheduleSyncService(kboGameSyncClient, gameRepository, teamRepository,
+                stadiumRepository);
+        gameResultSyncService = new GameResultSyncService(kboGameSyncClient, kboGameResultClient, gameRepository,
+                applicationEventPublisher);
     }
 
     @DisplayName("경기 목록을 성공적으로 가져와서 저장한다")

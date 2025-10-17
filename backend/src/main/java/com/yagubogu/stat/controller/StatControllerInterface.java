@@ -1,6 +1,8 @@
 package com.yagubogu.stat.controller;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.checkin.dto.TeamFilter;
+import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
 import com.yagubogu.stat.dto.AverageStatisticResponse;
 import com.yagubogu.stat.dto.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.OpponentWinRateResponse;
@@ -86,5 +88,16 @@ public interface StatControllerInterface {
     ResponseEntity<OpponentWinRateResponse> findOpponentWinRate(
             @Parameter(hidden = true) MemberClaims memberClaim,
             @RequestParam final int year
+    );
+
+    @Operation(summary = "승리 요정 랭킹 조회", description = "전체 유저 중 상위 승리 요정을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "승리 요정 랭킹 조회 성공")
+    })
+    @GetMapping("/victory-fairy/rankings")
+    ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam(name = "team", defaultValue = "ALL") TeamFilter teamFilter,
+            @RequestParam(required = false) Integer year
     );
 }
