@@ -102,8 +102,13 @@ public class VictoryFairyRankingSyncService {
             double averageWinRate,
             double averageCheckInCount
     ) {
+        double denominator = checkInCount + averageCheckInCount;
+        if (denominator == 0.0) {
+            return 0;
+        }
         double rawScore = (winCount + averageCheckInCount * averageWinRate)
-                / (checkInCount + averageCheckInCount);
+                / denominator;
+
         return getScore(rawScore);
     }
 
