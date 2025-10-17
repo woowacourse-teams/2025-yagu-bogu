@@ -3,7 +3,7 @@ package com.yagubogu.game.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record GameUpsertRow(
+public record GameUpsertRowParam(
         String gameCode,
         Long stadiumId,
         Long homeTeamId,

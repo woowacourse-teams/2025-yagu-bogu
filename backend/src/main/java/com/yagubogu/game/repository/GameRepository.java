@@ -1,7 +1,7 @@
 package com.yagubogu.game.repository;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.GameWithCheckIn;
+import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     Optional<Game> findByGameCode(String gameCode);
 
     @Query("""
-            SELECT new com.yagubogu.game.dto.GameWithCheckIn(
+            SELECT new com.yagubogu.game.dto.GameWithCheckInParam(
                 g.id,
                 COUNT(c),
                 CASE WHEN MAX(CASE WHEN c.member = :member THEN 1 ELSE 0 END) = 1
@@ -44,5 +44,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             WHERE g.date = :date
             GROUP BY g.id
             """)
-    List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
+    List<GameWithCheckInParam> findGamesWithCheckInsByDate(LocalDate date, Member member);
 }

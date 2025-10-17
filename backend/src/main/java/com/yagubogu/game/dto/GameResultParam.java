@@ -4,23 +4,23 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
 import java.util.List;
 
-public record GameResultResponse(
-        ScoreBoardResponse homeTeamScoreBoard,
-        ScoreBoardResponse awayTeamScoreBoard,
+public record GameResultParam(
+        ScoreBoardParam homeTeamScoreBoard,
+        ScoreBoardParam awayTeamScoreBoard,
         String homePitcher,
         String awayPitcher
 ) {
 
-    public static GameResultResponse from(Game game) {
-        return new GameResultResponse(
-                ScoreBoardResponse.from(game.getHomeScoreBoard()),
-                ScoreBoardResponse.from(game.getAwayScoreBoard()),
+    public static GameResultParam from(Game game) {
+        return new GameResultParam(
+                ScoreBoardParam.from(game.getHomeScoreBoard()),
+                ScoreBoardParam.from(game.getAwayScoreBoard()),
                 game.getHomePitcher(),
                 game.getAwayPitcher()
         );
     }
 
-    public record ScoreBoardResponse(
+    private record ScoreBoardParam(
             Integer runs,
             Integer hits,
             Integer errors,
@@ -28,14 +28,14 @@ public record GameResultResponse(
             List<String> inningScores
     ) {
 
-        public static ScoreBoardResponse from(ScoreBoard sb) {
+        public static ScoreBoardParam from(ScoreBoard sb) {
             if (sb == null) {
                 return null;
             }
             List<String> inningScores = sb.getInningScores().stream()
                     .toList();
 
-            return new ScoreBoardResponse(
+            return new ScoreBoardParam(
                     sb.getRuns(),
                     sb.getHits(),
                     sb.getErrors(),

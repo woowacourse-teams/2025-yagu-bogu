@@ -8,7 +8,7 @@ import com.yagubogu.game.domain.GameState;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record KboGameResponse(
+public record KboGameParam(
         String gameCode,
         LocalDate gameDate,
         Integer headerNumber,
@@ -20,7 +20,7 @@ public record KboGameResponse(
 ) {
 
     @JsonCreator
-    public static KboGameResponse create(
+    public static KboGameParam create(
             @JsonProperty("G_ID") String gameCode,
             @JsonProperty("G_DT") String gameDate,
             @JsonProperty("HEADER_NO") String headerNumber,
@@ -30,7 +30,7 @@ public record KboGameResponse(
             @JsonProperty("HOME_ID") String homeTeamCode,
             @JsonProperty("GAME_STATE_SC") String gameState
     ) {
-        return new KboGameResponse(
+        return new KboGameParam(
                 gameCode,
                 LocalDate.parse(gameDate, BASIC_ISO_DATE),
                 Integer.valueOf(headerNumber),

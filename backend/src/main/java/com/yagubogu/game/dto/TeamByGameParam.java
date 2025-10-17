@@ -1,6 +1,6 @@
 package com.yagubogu.game.dto;
 
-public record TeamByGame(
+public record TeamByGameParam(
         Long id,
         String name,
         String code

@@ -1,8 +1,8 @@
-package com.yagubogu.game.controller;
+package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

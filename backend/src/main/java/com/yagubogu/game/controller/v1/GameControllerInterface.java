@@ -1,7 +1,7 @@
-package com.yagubogu.game.controller;
+package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.v1.GameResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

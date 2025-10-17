@@ -3,8 +3,8 @@ package com.yagubogu.game.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-public record KboGamesResponse(
-        @JsonProperty("game") List<KboGameResponse> games,
+public record KboGamesParam(
+        @JsonProperty("game") List<KboGameParam> games,
         @JsonProperty("code") String statusCode,
         String msg
 ) {

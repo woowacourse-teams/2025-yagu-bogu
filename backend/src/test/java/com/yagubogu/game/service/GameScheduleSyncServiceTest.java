@@ -10,9 +10,9 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGameResultResponse;
-import com.yagubogu.game.dto.KboGamesResponse;
+import com.yagubogu.game.dto.KboGameParam;
+import com.yagubogu.game.dto.KboGameResultParam;
+import com.yagubogu.game.dto.KboGamesParam;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
@@ -72,10 +72,10 @@ class GameScheduleSyncServiceTest {
     void syncGameSchedule() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
-        KboGameResponse gameItem = new KboGameResponse(
+        KboGameParam gameItem = new KboGameParam(
                 "20250721OBLG3", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
-        KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
+        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
@@ -91,10 +91,10 @@ class GameScheduleSyncServiceTest {
     void syncGameSchedule_stadiumNotFound() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
-        KboGameResponse gameItem = new KboGameResponse(
+        KboGameParam gameItem = new KboGameParam(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
-        KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
+        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
@@ -109,10 +109,10 @@ class GameScheduleSyncServiceTest {
     void syncGameSchedule_homeTeamNotFound() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
-        KboGameResponse gameItem = new KboGameResponse(
+        KboGameParam gameItem = new KboGameParam(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "존재하지않는원정팀", "SS", GameState.COMPLETED);
-        KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
+        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
@@ -127,10 +127,10 @@ class GameScheduleSyncServiceTest {
     void syncGameSchedule_awayTeamNotFound() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
-        KboGameResponse gameItem = new KboGameResponse(
+        KboGameParam gameItem = new KboGameParam(
                 "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
                 "잠실", "HH", "존재하지않는원정팀", GameState.COMPLETED);
-        KboGamesResponse response = new KboGamesResponse(List.of(gameItem), "100", "success");
+        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
 
@@ -149,11 +149,11 @@ class GameScheduleSyncServiceTest {
         Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
         // 1. kboGameSyncClient Mocking (경기 목록 조회)
-        KboGameResponse kboGameResponse = new KboGameResponse(
+        KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(yesterday))
-                .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
+                .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
         // 2. kboGameResultClient Mocking (상세 경기 결과 조회)
         ScoreBoard homeScoreBoard = new ScoreBoard(5, 8, 1, 3,
@@ -163,7 +163,7 @@ class GameScheduleSyncServiceTest {
         String homePitcher = "이포라";
         String awayPitcher = "포라리";
 
-        KboGameResultResponse mockGameResult = new KboGameResultResponse(
+        KboGameResultParam mockGameResult = new KboGameResultParam(
                 homeScoreBoard,
                 awayScoreBoard,
                 homePitcher,
@@ -196,11 +196,11 @@ class GameScheduleSyncServiceTest {
         String gameCode = "20250721LTSS0";
         Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
-        KboGameResponse kboGameResponse = new KboGameResponse(
+        KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.LIVE);
         given(kboGameSyncClient.fetchGames(yesterday))
-                .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
+                .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
         // when
         gameResultSyncService.syncGameResult(yesterday);
@@ -221,11 +221,11 @@ class GameScheduleSyncServiceTest {
         String gameCode = "20250721LTSS0";
         Game game = makeGame(yesterday, "OB", "HT", "잠실구장", gameCode);
 
-        KboGameResponse kboGameResponse = new KboGameResponse(
+        KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.CANCELED);
         given(kboGameSyncClient.fetchGames(yesterday))
-                .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
+                .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
         // when
         gameResultSyncService.syncGameResult(yesterday);
@@ -245,11 +245,11 @@ class GameScheduleSyncServiceTest {
         LocalDate yesterday = TestFixture.getYesterday();
         String unknownGameCode = "20250721XXXX0";
 
-        KboGameResponse kboGameResponse = new KboGameResponse(
+        KboGameParam kboGameParam = new KboGameParam(
                 unknownGameCode, yesterday, 0, LocalTime.of(18, 30),
                 "잠실", "HT", "OB", GameState.COMPLETED);
         given(kboGameSyncClient.fetchGames(yesterday))
-                .willReturn(new KboGamesResponse(List.of(kboGameResponse), "100", "success"));
+                .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
         // when
         gameResultSyncService.syncGameResult(yesterday);

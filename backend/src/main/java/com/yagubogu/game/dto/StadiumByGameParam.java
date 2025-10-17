@@ -1,6 +1,6 @@
 package com.yagubogu.game.dto;
 
-public record StadiumByGame(
+public record StadiumByGameParam(
         Long id,
         String name
 ) {

@@ -3,7 +3,7 @@ package com.yagubogu.game.service.client;
 import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yagubogu.game.dto.KboGamesResponse;
+import com.yagubogu.game.dto.KboGamesParam;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.time.LocalDate;
@@ -24,7 +24,7 @@ public class KboGameSyncClient {
     private final ObjectMapper objectMapper;
     private final KboClientExceptionHandler kboClientExceptionHandler;
 
-    public KboGamesResponse fetchGames(final LocalDate date) {
+    public KboGamesParam fetchGames(final LocalDate date) {
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("leId", "1");
         param.add("srId", "0,1,3,4,5,6,7,8,9");
@@ -37,19 +37,19 @@ public class KboGameSyncClient {
                     .retrieve()
                     .onStatus(kboClientExceptionHandler)
                     .body(String.class);
-            KboGamesResponse kboGamesResponse = objectMapper.readValue(
+            KboGamesParam kboGamesParam = objectMapper.readValue(
                     responseBody,
-                    KboGamesResponse.class
+                    KboGamesParam.class
             );
-            validateGameScheduleResponse(kboGamesResponse);
+            validateGameScheduleResponse(kboGamesParam);
 
-            return kboGamesResponse;
+            return kboGamesParam;
         } catch (Exception e) {
             throw new GameSyncException("Failed to fetch game data from Kbo api", e);
         }
     }
 
-    private void validateGameScheduleResponse(final KboGamesResponse response) {
+    private void validateGameScheduleResponse(final KboGamesParam response) {
         if (isResponseErrorCode(response.statusCode())) {
             throw new GameSyncException("Unexpected response code from Kbo api: " + response.msg());
         }

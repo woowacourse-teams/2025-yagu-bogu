@@ -2,7 +2,7 @@ package com.yagubogu.game.dto;
 
 import java.util.List;
 
-public record KboScoreboardTeam(
+public record KboScoreboardTeamParam(
         String name,
         Integer runs,
         Integer hits,
