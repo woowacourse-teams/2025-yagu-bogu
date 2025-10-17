@@ -49,6 +49,6 @@ public class VictoryFairyRanking {
     private int gameYear;
 
     @LastModifiedDate
-    @Column(name = "updated_at", columnDefinition = "DATETIME(6)")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
