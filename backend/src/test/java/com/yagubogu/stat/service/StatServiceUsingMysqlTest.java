@@ -228,7 +228,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting("nickname")
+                            .extracting(VictoryFairyRankingResponse::nickname)
                             .containsExactly("포르");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("삼성");
@@ -344,7 +344,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting("nickname")
+                            .extracting(VictoryFairyRankingResponse::nickname)
                             .containsExactly("밍트", "포르", "포라", "두리", "우가");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(duri.getNickname().getValue());
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(duri.getTeam().getShortName());
@@ -403,7 +403,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting("nickname")
+                            .extracting(VictoryFairyRankingResponse::nickname)
                             .containsExactly("포르", "밍트");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("KIA");
