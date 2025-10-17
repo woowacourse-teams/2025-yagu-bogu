@@ -49,12 +49,12 @@ interface MemberApiService {
         @Path("badgeId") badgeId: Long,
     ): Response<Unit>
 
-    @POST("/api/members/me/profile-image/pre-signed")
+    @POST("/api/v1/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
         @Body request: PresignedUrlStartRequest,
     ): Response<PresignedUrlStartResponse>
 
-    @POST("/api/members/me/profile-image/update")
+    @POST("/api/v1/members/me/profile-image/update")
     suspend fun postCompleteUpload(
         @Body request: PresignedUrlCompleteRequest,
     ): Response<PresignedUrlCompleteResponse>
