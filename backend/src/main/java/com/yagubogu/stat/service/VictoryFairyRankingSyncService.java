@@ -63,11 +63,11 @@ public class VictoryFairyRankingSyncService {
     }
 
     private SyncBatchData prepareBatchData(
-            List<VictoryFairyCountResult> checkInAndWinCounts,
-            Map<Long, VictoryFairyRanking> existingRankingMap,
-            double averageWinRate,
-            double averageCheckInCount,
-            int year
+            final List<VictoryFairyCountResult> checkInAndWinCounts,
+            final Map<Long, VictoryFairyRanking> existingRankingMap,
+            final double averageWinRate,
+            final double averageCheckInCount,
+            final int year
     ) {
         List<UpdateDto> toUpdate = new ArrayList<>();
         List<InsertDto> toInsert = new ArrayList<>();
