@@ -55,8 +55,7 @@
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:exported="false"
-            tools:ignore="LockedOrientationActivity" />
+            android:exported="false" />
     </application>
 
 </manifest>

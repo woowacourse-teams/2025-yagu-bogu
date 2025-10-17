@@ -3,7 +3,7 @@ package com.yagubogu.data.datasource.member
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.presigned.PreSignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.domain.model.Team
 
@@ -20,10 +20,10 @@ interface MemberDataSource {
 
     suspend fun deleteMember(): Result<Unit>
 
-    suspend fun getPresignedProfileImageUrl(
+    suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
     ): Result<PresignedUrlStartResponse>
 
-    suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteResponse>
+    suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse>
 }

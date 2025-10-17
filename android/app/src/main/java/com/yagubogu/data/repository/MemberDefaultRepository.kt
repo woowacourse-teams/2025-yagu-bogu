@@ -4,13 +4,13 @@ import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.presigned.PreSignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.PreSignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
 
 class MemberDefaultRepository(
@@ -86,7 +86,7 @@ class MemberDefaultRepository(
         contentLength: Long,
     ): Result<PresignedUrlItem> =
         memberDataSource
-            .getPresignedProfileImageUrl(
+            .getPresignedUrl(
                 contentType,
                 contentLength,
             ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
@@ -96,10 +96,10 @@ class MemberDefaultRepository(
                 )
             }
 
-    override suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteItem> =
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> =
         memberDataSource
             .completeUploadProfileImage(key)
-            .map { preSignedUrlCompleteResponse: PreSignedUrlCompleteResponse ->
-                PreSignedUrlCompleteItem(preSignedUrlCompleteResponse.url)
+            .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
+                PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
             }
 }

@@ -2,12 +2,12 @@ package com.yagubogu.data.datasource.member
 
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
+import com.yagubogu.data.dto.request.presigned.PresignedUrlCompleteRequest
+import com.yagubogu.data.dto.request.presigned.PresignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.presigned.PreSignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
@@ -48,22 +48,22 @@ class MemberRemoteDataSource(
             memberApiService.deleteMember()
         }
 
-    override suspend fun getPresignedProfileImageUrl(
+    override suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
     ): Result<PresignedUrlStartResponse> =
         safeApiCall {
             val request =
-                PreSignedUrlStartRequest(
+                PresignedUrlStartRequest(
                     contentType,
                     contentLength,
                 )
             memberApiService.postPresignedUrl(request)
         }
 
-    override suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteResponse> =
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse> =
         safeApiCall {
-            val request = PreSignedUrlCompleteRequest(key)
+            val request = PresignedUrlCompleteRequest(key)
             memberApiService.postCompleteUpload(request)
         }
 }

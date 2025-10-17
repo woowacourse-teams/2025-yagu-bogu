@@ -1,5 +1,5 @@
 package com.yagubogu.presentation.setting
 
-data class PreSignedUrlCompleteItem(
+data class PresignedUrlCompleteItem(
     val imageUrl: String,
 )

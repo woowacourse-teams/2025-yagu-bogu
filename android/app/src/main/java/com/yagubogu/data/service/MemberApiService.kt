@@ -2,12 +2,12 @@ package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlCompleteRequest
-import com.yagubogu.data.dto.request.presigned.PreSignedUrlStartRequest
+import com.yagubogu.data.dto.request.presigned.PresignedUrlCompleteRequest
+import com.yagubogu.data.dto.request.presigned.PresignedUrlStartRequest
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.presigned.PreSignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -41,11 +41,11 @@ interface MemberApiService {
 
     @POST("/api/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
-        @Body request: PreSignedUrlStartRequest,
+        @Body request: PresignedUrlStartRequest,
     ): Response<PresignedUrlStartResponse>
 
     @POST("/api/members/me/profile-image/update")
     suspend fun postCompleteUpload(
-        @Body request: PreSignedUrlCompleteRequest,
-    ): Response<PreSignedUrlCompleteResponse>
+        @Body request: PresignedUrlCompleteRequest,
+    ): Response<PresignedUrlCompleteResponse>
 }

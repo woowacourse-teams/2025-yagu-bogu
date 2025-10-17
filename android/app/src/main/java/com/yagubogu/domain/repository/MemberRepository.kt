@@ -2,7 +2,7 @@ package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.PreSignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
 
 interface MemberRepository {
@@ -25,5 +25,5 @@ interface MemberRepository {
         contentLength: Long,
     ): Result<PresignedUrlItem>
 
-    suspend fun completeUploadProfileImage(key: String): Result<PreSignedUrlCompleteItem>
+    suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem>
 }

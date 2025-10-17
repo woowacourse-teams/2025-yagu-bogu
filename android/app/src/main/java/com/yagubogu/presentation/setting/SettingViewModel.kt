@@ -102,7 +102,7 @@ class SettingViewModel(
                 .getOrThrow()
 
             // 3. Complete API 호출 및 프로필 업데이트
-            val completeItem: PreSignedUrlCompleteItem =
+            val completeItem: PresignedUrlCompleteItem =
                 memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
             _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
