@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
+    implementation(libs.ucrop)
 
     // firebase
     implementation(platform(libs.firebase.bom))

@@ -31,6 +31,7 @@ playServicesOssLicenses = "17.2.2"
 retrofit = "3.0.0"
 shimmer = "0.5.0"
 timber = "5.0.1"
+ucrop = "2.2.11"
 viewpager2 = "1.1.0"
 playServicesLocation = "21.3.0"
 mpandroidchart = "v3.1.0"
@@ -94,6 +95,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

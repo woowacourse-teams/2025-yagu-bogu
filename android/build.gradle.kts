@@ -8,3 +8,7 @@ plugins {
     alias(libs.plugins.google.oss.licenses.plugin) apply false
     alias(libs.plugins.kotlin.compose) apply false
 }
+
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+}

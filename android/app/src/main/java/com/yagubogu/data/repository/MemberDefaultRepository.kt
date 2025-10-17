@@ -6,10 +6,14 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
@@ -22,13 +26,11 @@ class MemberDefaultRepository(
     private var cachedFavoriteTeam: String? = null
 
     override suspend fun getMemberInfo(): Result<MemberInfoItem> =
-        memberDataSource
-            .getMemberInfo()
-            .map { memberInfoResponse: MemberInfoResponse ->
-                cachedNickname = memberInfoResponse.nickname
-                cachedFavoriteTeam = memberInfoResponse.favoriteTeam
-                memberInfoResponse.toPresentation()
-            }
+        memberDataSource.getMemberInfo().map { memberInfoResponse: MemberInfoResponse ->
+            cachedNickname = memberInfoResponse.nickname
+            cachedFavoriteTeam = memberInfoResponse.favoriteTeam
+            memberInfoResponse.toPresentation()
+        }
 
     override suspend fun getNickname(): Result<String> {
         cachedNickname?.let { nickname: String ->
@@ -94,4 +96,26 @@ class MemberDefaultRepository(
         cachedNickname = null
         cachedFavoriteTeam = null
     }
+
+    override suspend fun getPresignedUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlItem> =
+        memberDataSource
+            .getPresignedUrl(
+                contentType,
+                contentLength,
+            ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
+                PresignedUrlItem(
+                    presignedUrlStartResponse.key,
+                    presignedUrlStartResponse.url,
+                )
+            }
+
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> =
+        memberDataSource
+            .completeUploadProfileImage(key)
+            .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
+                PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
+            }
 }
