@@ -6,10 +6,8 @@ import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
-import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.util.safeApiCall
-import com.yagubogu.domain.model.Team
 import java.time.LocalDate
 import kotlinx.datetime.LocalDate.Companion as KLocalDate
 
@@ -38,14 +36,6 @@ class CheckInRemoteDataSource(
     override suspend fun getStadiumFanRates(date: LocalDate): Result<FanRateResponse> =
         safeApiCall {
             checkInApiService.getStadiumFanRates(date.toString())
-        }
-
-    override suspend fun getVictoryFairyRankings(
-        year: Int,
-        team: Team?,
-    ): Result<VictoryFairyRankingResponse> =
-        safeApiCall {
-            checkInApiService.getVictoryFairyRankings(year, team?.name)
         }
 
     override suspend fun getCheckInHistories(

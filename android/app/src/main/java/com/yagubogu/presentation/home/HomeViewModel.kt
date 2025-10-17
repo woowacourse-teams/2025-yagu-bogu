@@ -209,7 +209,7 @@ class HomeViewModel(
     private fun fetchVictoryFairyRanking(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                checkInRepository.getVictoryFairyRankings(year, null)
+                statsRepository.getVictoryFairyRankings(year, null)
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
