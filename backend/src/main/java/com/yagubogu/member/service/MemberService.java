@@ -1,6 +1,6 @@
 package com.yagubogu.member.service;
 
-import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.badge.domain.Badge;
@@ -8,7 +8,6 @@ import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
-import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
@@ -119,7 +118,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberFindResult findMember(final AuthResponse response) {
+    public MemberFindResult findMember(final AuthParam response) {
         return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
                 .map(m -> new MemberFindResult(m, false))
                 .orElseGet(() -> {

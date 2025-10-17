@@ -13,13 +13,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.domain.QCheckIn;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
-import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.StatCounts;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
+import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.CheckInGameTeamParam;
+import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.StatCountsParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
+import com.yagubogu.checkin.dto.VictoryFairyRankParam;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.game.domain.QScoreBoard;
@@ -49,7 +49,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     private static final QStadium STADIUM = QStadium.stadium;
 
     @Override
-    public StatCounts findStatCounts(final Member member, final int year) {
+    public StatCountsParam findStatCounts(final Member member, final int year) {
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
@@ -59,7 +59,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                StatCounts.class,
+                                StatCountsParam.class,
                                 winExpr.sum(),
                                 drawExpr.sum(),
                                 loseExpr.sum()
@@ -154,7 +154,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @return VictoryFairyRank DTO 리스트 (상위 랭킹)
      */
     @Override
-    public List<VictoryFairyRank> findTopVictoryRanking(
+    public List<VictoryFairyRankParam> findTopVictoryRanking(
             final double m,
             final double c,
             final int year,
@@ -170,7 +170,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
+                                VictoryFairyRankParam.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
@@ -191,7 +191,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
      * @param teamFilter   팀 필터
      * @return VictoryFairyRank DTO (단일 유저의 랭킹 정보)
      */
-    public VictoryFairyRank findMyRanking(
+    public VictoryFairyRankParam findMyRanking(
             final double m,
             final double c,
             final Member targetMember,
@@ -207,7 +207,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         NumberExpression<Double> safeWinPercent = getSafeWinPercent(n, calculatePercent);
 
         return jpaQueryFactory.select(
-                        Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
+                        Projections.constructor(VictoryFairyRankParam.class, score, NICKNAME.value, MEMBER.imageUrl,
                                 MEMBER.team.shortName, safeWinPercent))
                 .from(MEMBER)
                 .join(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
@@ -312,7 +312,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 내 직관 내역 조회
     // 내 응원 팀 여부 관계 o, 게임 완료 여부 관계 x(취소된 경기도 보여줌)
-    public List<CheckInGameResponse> findCheckInHistory(
+    public List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
             int year,
@@ -327,7 +327,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, CHECK_IN);
         OrderSpecifier<LocalDate> order = getOrderByFilter(orderFilter, GAME);
         return jpaQueryFactory.select(Projections.constructor(
-                        CheckInGameResponse.class,
+                        CheckInGameParam.class,
                         CHECK_IN.id,
                         STADIUM.fullName,
                         homeTeamResp(GAME, home, team),
@@ -351,7 +351,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetch();
     }
 
-    public List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date) {
+    public List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date) {
         QCheckIn CHECK_IN = QCheckIn.checkIn;
         QTeam home = new QTeam("home");
         QTeam away = new QTeam("away");
@@ -366,7 +366,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                GameWithFanCountsResponse.class,
+                                GameWithFanCountsParam.class,
                                 GAME,
                                 CHECK_IN.id.count(),
                                 homeFans,
@@ -429,14 +429,14 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 구장별 인증 횟수
     // 내가 응원하는 팀 o, 완료된 경기만 x
-    public List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
+    public List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
             int year
     ) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
-                                StadiumCheckInCountResponse.class,
+                                StadiumCheckInCountParam.class,
                                 STADIUM.id,
                                 STADIUM.location,
                                 CHECK_IN.id.count()
@@ -706,9 +706,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
 
-    private ConstructorExpression<CheckInGameTeamResponse> homeTeamResp(QGame g, final QTeam home, Team team) {
+    private ConstructorExpression<CheckInGameTeamParam> homeTeamResp(QGame g, final QTeam home, Team team) {
         return Projections.constructor(
-                CheckInGameTeamResponse.class,
+                CheckInGameTeamParam.class,
                 home.teamCode,
                 home.shortName,
                 g.homeScore,
@@ -717,9 +717,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         );
     }
 
-    private ConstructorExpression<CheckInGameTeamResponse> awayTeamResp(QGame g, final QTeam away, Team team) {
+    private ConstructorExpression<CheckInGameTeamParam> awayTeamResp(QGame g, final QTeam away, Team team) {
         return Projections.constructor(
-                CheckInGameTeamResponse.class,
+                CheckInGameTeamParam.class,
                 away.teamCode,
                 away.shortName,
                 g.awayScore,

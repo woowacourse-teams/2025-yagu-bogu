@@ -10,19 +10,19 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.CheckInCountsResponse;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.CheckInHistoryResponse;
-import com.yagubogu.checkin.dto.CheckInStatusResponse;
-import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.FanRateByGameResponse;
-import com.yagubogu.checkin.dto.FanRateResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.TeamFanRateResponse;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.v1.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
+import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateByGameParam;
+import com.yagubogu.checkin.dto.v1.FanRateResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.TeamFanRateParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -159,7 +159,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.checkInHistory()).hasSize(3)
                 .extracting(
-                        CheckInGameResponse::attendanceDate,
+                        CheckInGameParam::attendanceDate,
                         r -> r.homeTeam().name(),
                         r -> r.awayTeam().name()
                 ).containsExactly(
@@ -168,7 +168,7 @@ class CheckInServiceTest {
                         tuple(startDate, "롯데", "KIA")
                 );
 
-        CheckInGameResponse canceledResponse = actual.checkInHistory().get(1);
+        CheckInGameParam canceledResponse = actual.checkInHistory().get(1);
         assertThat(canceledResponse.homeScoreBoard()).isNull();
         assertThat(canceledResponse.awayScoreBoard()).isNull();
     }
@@ -221,7 +221,7 @@ class CheckInServiceTest {
 
         // then
         assertThat(actual.checkInHistory()).hasSize(1)
-                .extracting(CheckInGameResponse::attendanceDate)
+                .extracting(CheckInGameParam::attendanceDate)
                 .containsExactly(startDate.plusDays(1));
     }
 
@@ -344,7 +344,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.checkInHistory()).hasSize(4) // 먼저 승리한 경기 4개만 필터링되었는지 확인
                 .extracting(
-                        CheckInGameResponse::attendanceDate,
+                        CheckInGameParam::attendanceDate,
                         r -> r.homeTeam().name(),
                         r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
@@ -377,7 +377,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.checkInHistory()).hasSize(4)
                 .extracting(
-                        CheckInGameResponse::attendanceDate,
+                        CheckInGameParam::attendanceDate,
                         r -> r.homeTeam().name(),
                         r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
@@ -414,7 +414,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
                 .extracting(
-                        CheckInGameResponse::attendanceDate,
+                        CheckInGameParam::attendanceDate,
                         r -> r.homeTeam().name(),
                         r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
@@ -450,7 +450,7 @@ class CheckInServiceTest {
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
                 .extracting(
-                        CheckInGameResponse::attendanceDate,
+                        CheckInGameParam::attendanceDate,
                         r -> r.homeTeam().name(),
                         r -> r.homeScoreBoard().getRuns(),
                         r -> r.awayTeam().name(),
@@ -829,21 +829,21 @@ class CheckInServiceTest {
         createCheckInsForGame(lotte, gameEandF, 1);
 
         FanRateResponse expected = new FanRateResponse(List.of(
-                new FanRateByGameResponse(
+                new FanRateByGameParam(
                         30L,
                         gameAandB.getId(),
-                        new TeamFanRateResponse("KIA", "HT", 66.7),
-                        new TeamFanRateResponse("KT", "KT", 33.3)),
-                new FanRateByGameResponse(
+                        new TeamFanRateParam("KIA", "HT", 66.7),
+                        new TeamFanRateParam("KT", "KT", 33.3)),
+                new FanRateByGameParam(
                         14L,
                         gameCandD.getId(),
-                        new TeamFanRateResponse("LG", "LG", 71.4),
-                        new TeamFanRateResponse("삼성", "SS", 28.6)),
-                new FanRateByGameResponse(
+                        new TeamFanRateParam("LG", "LG", 71.4),
+                        new TeamFanRateParam("삼성", "SS", 28.6)),
+                new FanRateByGameParam(
                         7L,
                         gameEandF.getId(),
-                        new TeamFanRateResponse("두산", "OB", 85.7),
-                        new TeamFanRateResponse("롯데", "LT", 14.3))
+                        new TeamFanRateParam("두산", "OB", 85.7),
+                        new TeamFanRateParam("롯데", "LT", 14.3))
         ));
 
         // when
@@ -883,17 +883,17 @@ class CheckInServiceTest {
         Game game2 = gameFactory.save(
                 b -> b.stadium(stadiumIncheon).homeTeam(doosan).awayTeam(lotte).date(gameDate));
 
-        List<FanRateByGameResponse> expected = List.of(
-                new FanRateByGameResponse(
+        List<FanRateByGameParam> expected = List.of(
+                new FanRateByGameParam(
                         0L,
                         game2.getId(),
-                        new TeamFanRateResponse("두산", "OB", 0),
-                        new TeamFanRateResponse("롯데", "LT", 0)),
-                new FanRateByGameResponse(
+                        new TeamFanRateParam("두산", "OB", 0),
+                        new TeamFanRateParam("롯데", "LT", 0)),
+                new FanRateByGameParam(
                         0L,
                         game1.getId(),
-                        new TeamFanRateResponse("KIA", "HT", 0),
-                        new TeamFanRateResponse("KT", "KT", 0))
+                        new TeamFanRateParam("KIA", "HT", 0),
+                        new TeamFanRateParam("KT", "KT", 0))
         );
 
         // when
@@ -911,25 +911,25 @@ class CheckInServiceTest {
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(
-                        new StadiumCheckInCountResponse(1L, "광주", 0L),
-                        new StadiumCheckInCountResponse(2L, "잠실", 0L),
-                        new StadiumCheckInCountResponse(3L, "고척", 0L),
-                        new StadiumCheckInCountResponse(4L, "수원", 0L),
-                        new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "사직", 0L),
-                        new StadiumCheckInCountResponse(7L, "문학", 0L),
-                        new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L),
-                        new StadiumCheckInCountResponse(10L, "울산", 0L),
-                        new StadiumCheckInCountResponse(11L, "군산", 0L),
-                        new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L),
-                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
-                        new StadiumCheckInCountResponse(15L, "시민", 0L),
-                        new StadiumCheckInCountResponse(16L, "무등", 0L),
-                        new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L),
-                        new StadiumCheckInCountResponse(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(1L, "광주", 0L),
+                        new StadiumCheckInCountParam(2L, "잠실", 0L),
+                        new StadiumCheckInCountParam(3L, "고척", 0L),
+                        new StadiumCheckInCountParam(4L, "수원", 0L),
+                        new StadiumCheckInCountParam(5L, "대구", 0L),
+                        new StadiumCheckInCountParam(6L, "사직", 0L),
+                        new StadiumCheckInCountParam(7L, "문학", 0L),
+                        new StadiumCheckInCountParam(8L, "창원", 0L),
+                        new StadiumCheckInCountParam(9L, "대전", 0L),
+                        new StadiumCheckInCountParam(10L, "울산", 0L),
+                        new StadiumCheckInCountParam(11L, "군산", 0L),
+                        new StadiumCheckInCountParam(12L, "청주", 0L),
+                        new StadiumCheckInCountParam(13L, "포항", 0L),
+                        new StadiumCheckInCountParam(14L, "한밭", 0L),
+                        new StadiumCheckInCountParam(15L, "시민", 0L),
+                        new StadiumCheckInCountParam(16L, "무등", 0L),
+                        new StadiumCheckInCountParam(17L, "마산", 0L),
+                        new StadiumCheckInCountParam(18L, "인천", 0L),
+                        new StadiumCheckInCountParam(19L, "경산", 0L)
                 )
         );
 
@@ -956,25 +956,25 @@ class CheckInServiceTest {
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(
-                        new StadiumCheckInCountResponse(1L, "광주", 0L),
-                        new StadiumCheckInCountResponse(2L, "잠실", 0L),
-                        new StadiumCheckInCountResponse(3L, "고척", 1L),
-                        new StadiumCheckInCountResponse(4L, "수원", 0L),
-                        new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "사직", 0L),
-                        new StadiumCheckInCountResponse(7L, "문학", 0L),
-                        new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L),
-                        new StadiumCheckInCountResponse(10L, "울산", 0L),
-                        new StadiumCheckInCountResponse(11L, "군산", 0L),
-                        new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L),
-                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
-                        new StadiumCheckInCountResponse(15L, "시민", 0L),
-                        new StadiumCheckInCountResponse(16L, "무등", 0L),
-                        new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L),
-                        new StadiumCheckInCountResponse(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(1L, "광주", 0L),
+                        new StadiumCheckInCountParam(2L, "잠실", 0L),
+                        new StadiumCheckInCountParam(3L, "고척", 1L),
+                        new StadiumCheckInCountParam(4L, "수원", 0L),
+                        new StadiumCheckInCountParam(5L, "대구", 0L),
+                        new StadiumCheckInCountParam(6L, "사직", 0L),
+                        new StadiumCheckInCountParam(7L, "문학", 0L),
+                        new StadiumCheckInCountParam(8L, "창원", 0L),
+                        new StadiumCheckInCountParam(9L, "대전", 0L),
+                        new StadiumCheckInCountParam(10L, "울산", 0L),
+                        new StadiumCheckInCountParam(11L, "군산", 0L),
+                        new StadiumCheckInCountParam(12L, "청주", 0L),
+                        new StadiumCheckInCountParam(13L, "포항", 0L),
+                        new StadiumCheckInCountParam(14L, "한밭", 0L),
+                        new StadiumCheckInCountParam(15L, "시민", 0L),
+                        new StadiumCheckInCountParam(16L, "무등", 0L),
+                        new StadiumCheckInCountParam(17L, "마산", 0L),
+                        new StadiumCheckInCountParam(18L, "인천", 0L),
+                        new StadiumCheckInCountParam(19L, "경산", 0L)
                 )
         );
 

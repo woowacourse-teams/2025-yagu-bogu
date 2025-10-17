@@ -3,21 +3,21 @@ package com.yagubogu.checkin.service;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.CheckInCountsResponse;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.CheckInHistoryResponse;
-import com.yagubogu.checkin.dto.CheckInStatusResponse;
-import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.FanRateByGameResponse;
-import com.yagubogu.checkin.dto.FanRateGameEntry;
-import com.yagubogu.checkin.dto.FanRateResponse;
-import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.v1.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
+import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateByGameParam;
+import com.yagubogu.checkin.dto.FanRateGameParam;
+import com.yagubogu.checkin.dto.v1.FanRateResponse;
+import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
+import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.checkin.event.CheckInEvent;
 import com.yagubogu.checkin.event.StadiumVisitEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -75,19 +75,19 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team myTeam = member.getTeam();
 
-        List<FanRateGameEntry> fanRatesByGames = new ArrayList<>();
-        FanRateByGameResponse myFanRateByGame = null;
-        List<GameWithFanCountsResponse> gameWithFanCounts = checkInRepository.findGamesWithFanCountsByDate(date);
+        List<FanRateGameParam> fanRatesByGames = new ArrayList<>();
+        FanRateByGameParam myFanRateByGame = null;
+        List<GameWithFanCountsParam> gameWithFanCounts = checkInRepository.findGamesWithFanCountsByDate(date);
 
-        for (GameWithFanCountsResponse gameWithFanCount : gameWithFanCounts) {
+        for (GameWithFanCountsParam gameWithFanCount : gameWithFanCounts) {
             Game game = gameWithFanCount.game();
-            FanRateByGameResponse response = createFanRateByGameResponse(gameWithFanCount);
+            FanRateByGameParam response = createFanRateByGameResponse(gameWithFanCount);
 
             if (game.hasTeam(myTeam)) {
                 myFanRateByGame = createFanRateByGameResponse(gameWithFanCount);
                 continue;
             }
-            fanRatesByGames.add(new FanRateGameEntry(gameWithFanCount.totalCheckInCounts(), response));
+            fanRatesByGames.add(new FanRateGameParam(gameWithFanCount.totalCheckInCounts(), response));
         }
 
         return FanRateResponse.from(myFanRateByGame, fanRatesByGames);
@@ -108,7 +108,7 @@ public class CheckInService {
     ) {
         Member member = getMember(memberId);
         Team team = member.getTeam();
-        List<CheckInGameResponse> checkIns = checkInRepository.findCheckInHistory(
+        List<CheckInGameParam> checkIns = checkInRepository.findCheckInHistory(
                 member,
                 team,
                 year,
@@ -133,7 +133,7 @@ public class CheckInService {
 
         List<VictoryFairyRankingResponse> topRankingResponses = findTopVictoryRanking(teamFilter, year, m, c);
         VictoryFairyRankingResponse myRankingResponse;
-        VictoryFairyRank myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
+        VictoryFairyRankParam myRanking = checkInRepository.findMyRanking(m, c, member, year, teamFilter);
         if (myRanking == null) {
             myRankingResponse = VictoryFairyRankingResponse.emptyRanking(member);
         } else {
@@ -144,7 +144,7 @@ public class CheckInService {
 
     public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
-        List<StadiumCheckInCountResponse> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
+        List<StadiumCheckInCountParam> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
                 year);
 
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
@@ -160,8 +160,8 @@ public class CheckInService {
     public List<GameWithFanRateResponse> buildCheckInEventData(final LocalDate date) {
         List<GameWithFanRateResponse> result = new ArrayList<>();
 
-        List<GameWithFanCountsResponse> responses = checkInRepository.findGamesWithFanCountsByDate(date);
-        for (GameWithFanCountsResponse response : responses) {
+        List<GameWithFanCountsParam> responses = checkInRepository.findGamesWithFanCountsByDate(date);
+        for (GameWithFanCountsParam response : responses) {
             Game game = response.game();
             long homeTeamCounts = response.homeTeamCheckInCounts();
             long awayTeamCounts = response.awayTeamCheckInCounts();
@@ -181,13 +181,13 @@ public class CheckInService {
             final double m,
             final double c
     ) {
-        List<VictoryFairyRank> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
+        List<VictoryFairyRankParam> topRanking = checkInRepository.findTopVictoryRanking(m, c, year, teamFilter,
                 VICTORY_RANKING_LIMIT);
         double previousScore = -1.0;
         int ranking = 0;
         int count = 1;
         List<VictoryFairyRankingResponse> topRankingResponses = new ArrayList<>();
-        for (VictoryFairyRank rank : topRanking) {
+        for (VictoryFairyRankParam rank : topRanking) {
             double currentScore = rank.score();
             if (previousScore != currentScore) {
                 ranking += count;
@@ -209,7 +209,7 @@ public class CheckInService {
     }
 
     private VictoryFairyRankingResponse findMyVictoryRanking(
-            final VictoryFairyRank myRanking,
+            final VictoryFairyRankParam myRanking,
             final TeamFilter teamFilter,
             final int year,
             final double m,
@@ -244,12 +244,12 @@ public class CheckInService {
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
     }
 
-    private FanRateByGameResponse createFanRateByGameResponse(final GameWithFanCountsResponse gameWithFanCounts) {
+    private FanRateByGameParam createFanRateByGameResponse(final GameWithFanCountsParam gameWithFanCounts) {
         Long total = gameWithFanCounts.totalCheckInCounts();
         double homeRate = calculateRoundRate(gameWithFanCounts.homeTeamCheckInCounts(), total);
         double awayRate = calculateRoundRate(gameWithFanCounts.awayTeamCheckInCounts(), total);
 
-        return FanRateByGameResponse.from(gameWithFanCounts.game(), total, homeRate, awayRate);
+        return FanRateByGameParam.from(gameWithFanCounts.game(), total, homeRate, awayRate);
     }
 
     private double calculateRoundRate(final Long checkInCounts, final Long total) {

@@ -1,6 +1,6 @@
 package com.yagubogu.stat.service;
 
-import com.yagubogu.checkin.dto.StatCounts;
+import com.yagubogu.checkin.dto.StatCountsParam;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
@@ -46,13 +46,14 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        StatCounts statCounts = checkInRepository.findStatCounts(member, year);
-        int favoriteCheckInCounts = statCounts.winCounts() + statCounts.drawCounts() + statCounts.loseCounts();
+        StatCountsParam statCountsParam = checkInRepository.findStatCounts(member, year);
+        int favoriteCheckInCounts =
+                statCountsParam.winCounts() + statCountsParam.drawCounts() + statCountsParam.loseCounts();
 
         return new StatCountsResponse(
-                statCounts.winCounts(),
-                statCounts.drawCounts(),
-                statCounts.loseCounts(),
+                statCountsParam.winCounts(),
+                statCountsParam.drawCounts(),
+                statCountsParam.loseCounts(),
                 favoriteCheckInCounts
         );
     }

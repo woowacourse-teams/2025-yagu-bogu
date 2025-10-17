@@ -6,13 +6,13 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.CheckInCountsResponse;
-import com.yagubogu.checkin.dto.CheckInStatusResponse;
-import com.yagubogu.checkin.dto.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
+import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
@@ -601,25 +601,25 @@ public class CheckInE2eTest extends E2eTestBase {
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(
-                        new StadiumCheckInCountResponse(1L, "광주", 0L),
-                        new StadiumCheckInCountResponse(2L, "잠실", 0L),
-                        new StadiumCheckInCountResponse(3L, "고척", 0L),
-                        new StadiumCheckInCountResponse(4L, "수원", 0L),
-                        new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "사직", 0L),
-                        new StadiumCheckInCountResponse(7L, "문학", 0L),
-                        new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L),
-                        new StadiumCheckInCountResponse(10L, "울산", 0L),
-                        new StadiumCheckInCountResponse(11L, "군산", 0L),
-                        new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L),
-                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
-                        new StadiumCheckInCountResponse(15L, "시민", 0L),
-                        new StadiumCheckInCountResponse(16L, "무등", 0L),
-                        new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L),
-                        new StadiumCheckInCountResponse(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(1L, "광주", 0L),
+                        new StadiumCheckInCountParam(2L, "잠실", 0L),
+                        new StadiumCheckInCountParam(3L, "고척", 0L),
+                        new StadiumCheckInCountParam(4L, "수원", 0L),
+                        new StadiumCheckInCountParam(5L, "대구", 0L),
+                        new StadiumCheckInCountParam(6L, "사직", 0L),
+                        new StadiumCheckInCountParam(7L, "문학", 0L),
+                        new StadiumCheckInCountParam(8L, "창원", 0L),
+                        new StadiumCheckInCountParam(9L, "대전", 0L),
+                        new StadiumCheckInCountParam(10L, "울산", 0L),
+                        new StadiumCheckInCountParam(11L, "군산", 0L),
+                        new StadiumCheckInCountParam(12L, "청주", 0L),
+                        new StadiumCheckInCountParam(13L, "포항", 0L),
+                        new StadiumCheckInCountParam(14L, "한밭", 0L),
+                        new StadiumCheckInCountParam(15L, "시민", 0L),
+                        new StadiumCheckInCountParam(16L, "무등", 0L),
+                        new StadiumCheckInCountParam(17L, "마산", 0L),
+                        new StadiumCheckInCountParam(18L, "인천", 0L),
+                        new StadiumCheckInCountParam(19L, "경산", 0L)
                 )
         );
 
@@ -655,25 +655,25 @@ public class CheckInE2eTest extends E2eTestBase {
 
         StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
                 List.of(
-                        new StadiumCheckInCountResponse(1L, "광주", 0L),
-                        new StadiumCheckInCountResponse(2L, "잠실", 1L),
-                        new StadiumCheckInCountResponse(3L, "고척", 0L),
-                        new StadiumCheckInCountResponse(4L, "수원", 0L),
-                        new StadiumCheckInCountResponse(5L, "대구", 0L),
-                        new StadiumCheckInCountResponse(6L, "사직", 0L),
-                        new StadiumCheckInCountResponse(7L, "문학", 0L),
-                        new StadiumCheckInCountResponse(8L, "창원", 0L),
-                        new StadiumCheckInCountResponse(9L, "대전", 0L),
-                        new StadiumCheckInCountResponse(10L, "울산", 0L),
-                        new StadiumCheckInCountResponse(11L, "군산", 0L),
-                        new StadiumCheckInCountResponse(12L, "청주", 0L),
-                        new StadiumCheckInCountResponse(13L, "포항", 0L),
-                        new StadiumCheckInCountResponse(14L, "한밭", 0L),
-                        new StadiumCheckInCountResponse(15L, "시민", 0L),
-                        new StadiumCheckInCountResponse(16L, "무등", 0L),
-                        new StadiumCheckInCountResponse(17L, "마산", 0L),
-                        new StadiumCheckInCountResponse(18L, "인천", 0L),
-                        new StadiumCheckInCountResponse(19L, "경산", 0L)
+                        new StadiumCheckInCountParam(1L, "광주", 0L),
+                        new StadiumCheckInCountParam(2L, "잠실", 1L),
+                        new StadiumCheckInCountParam(3L, "고척", 0L),
+                        new StadiumCheckInCountParam(4L, "수원", 0L),
+                        new StadiumCheckInCountParam(5L, "대구", 0L),
+                        new StadiumCheckInCountParam(6L, "사직", 0L),
+                        new StadiumCheckInCountParam(7L, "문학", 0L),
+                        new StadiumCheckInCountParam(8L, "창원", 0L),
+                        new StadiumCheckInCountParam(9L, "대전", 0L),
+                        new StadiumCheckInCountParam(10L, "울산", 0L),
+                        new StadiumCheckInCountParam(11L, "군산", 0L),
+                        new StadiumCheckInCountParam(12L, "청주", 0L),
+                        new StadiumCheckInCountParam(13L, "포항", 0L),
+                        new StadiumCheckInCountParam(14L, "한밭", 0L),
+                        new StadiumCheckInCountParam(15L, "시민", 0L),
+                        new StadiumCheckInCountParam(16L, "무등", 0L),
+                        new StadiumCheckInCountParam(17L, "마산", 0L),
+                        new StadiumCheckInCountParam(18L, "인천", 0L),
+                        new StadiumCheckInCountParam(19L, "경산", 0L)
                 )
         );
 
