@@ -2,7 +2,7 @@ package com.yagubogu.admin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.service.GameResultSyncService;
-import com.yagubogu.game.service.GameScheduleSyncService;
+import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stat.service.StatService;
 import com.yagubogu.stat.service.StatSyncService;

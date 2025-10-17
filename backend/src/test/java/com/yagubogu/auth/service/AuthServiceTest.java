@@ -237,5 +237,4 @@ class AuthServiceTest {
                 .isNotEmpty()
                 .allMatch(RefreshToken::isRevoked);
     }
-
 }

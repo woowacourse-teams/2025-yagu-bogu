@@ -43,11 +43,12 @@ public class AuthService {
 
         MemberFindResult memberFindResult = memberService.findMember(response);
         Member member = memberFindResult.member();
+        boolean isNew = memberFindResult.isNew();
 
         String accessToken = authTokenProvider.issueAccessToken(MemberClaims.from(member));
         String refreshToken = refreshTokenService.issue(member);
 
-        return new LoginResponse(accessToken, refreshToken, memberFindResult.isNew(), MemberResponse.from(member));
+        return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
     public MemberClaims makeMemberClaims(final String token) {

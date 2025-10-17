@@ -18,6 +18,18 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     boolean existsByMemberAndGameDate(Member member, LocalDate date);
 
     @Query("""
+                SELECT CASE
+                         WHEN COUNT(c) = 1 THEN true
+                         ELSE false
+                       END
+                FROM CheckIn c
+                WHERE c.member = :member
+                  AND c.game.stadium.id = :stadiumId
+                  AND c.game.stadium.level = 'MAIN'
+            """)
+    boolean isFirstMainStadiumVisit(@Param("member") Member member, @Param("stadiumId") Long stadiumId);
+
+    @Query("""
                 SELECT new com.yagubogu.stat.dto.StadiumStatsDto(
                            g.stadium.shortName,
                            SUM(CASE WHEN ci.team.id = ci.member.team.id

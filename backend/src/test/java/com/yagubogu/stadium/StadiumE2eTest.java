@@ -42,7 +42,6 @@ public class StadiumE2eTest extends E2eTestBase {
         assertThat(actual.stadiums()).isEqualTo(expected);
     }
 
-
     private List<StadiumResponse> getStadiums() {
         return List.of(
                 new StadiumResponse(1L, "광주 기아 챔피언스필드", "챔피언스필드", "광주", 35.168139, 126.889111),
@@ -50,14 +49,20 @@ public class StadiumE2eTest extends E2eTestBase {
                 new StadiumResponse(3L, "고척 스카이돔", "고척돔", "고척", 37.498222, 126.867250),
                 new StadiumResponse(4L, "수원 KT 위즈파크", "위즈파크", "수원", 37.299759, 127.009781),
                 new StadiumResponse(5L, "대구 삼성 라이온즈파크", "라이온즈파크", "대구", 35.841111, 128.681667),
-                new StadiumResponse(6L, "사직야구장", "사직구장", "부산", 35.194077, 129.061584),
-                new StadiumResponse(7L, "인천 SSG 랜더스필드", "랜더스필드", "인천", 37.436778, 126.693306),
+                new StadiumResponse(6L, "사직야구장", "사직구장", "사직", 35.194077, 129.061584),
+                new StadiumResponse(7L, "인천 SSG 랜더스필드", "랜더스필드", "문학", 37.436778, 126.693306),
                 new StadiumResponse(8L, "창원 NC 파크", "엔씨파크", "창원", 35.222754, 128.582251),
                 new StadiumResponse(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211),
                 new StadiumResponse(10L, "울산 문수 야구장", "문수구장", "울산", 35.532334, 129.265575),
                 new StadiumResponse(11L, "월명종합경기장 야구장", "군산구장", "군산", 35.966360, 126.748161),
                 new StadiumResponse(12L, "청주 야구장", "청주구장", "청주", 36.638840, 127.470149),
-                new StadiumResponse(13L, "포항 야구장", "포항구장", "포항", 36.008273, 129.359410)
+                new StadiumResponse(13L, "포항 야구장", "포항구장", "포항", 36.008273, 129.359410),
+                new StadiumResponse(14L, "한화생명 이글스파크", "이글스파크", "한밭", 36.317178, 127.429167),
+                new StadiumResponse(15L, "대구시민운동장 야구장", "시민운동장", "시민", 35.881162, 128.586371),
+                new StadiumResponse(16L, "무등 야구장", "무등야구장", "무등", 35.169165, 126.887245),
+                new StadiumResponse(17L, "마산 야구장", "마산야구장", "마산", 35.220855, 128.581050),
+                new StadiumResponse(18L, "숭의 야구장", "숭의야구장", "인천", 37.466591, 126.643239),
+                new StadiumResponse(19L, "삼성 라이온즈 볼파크", "라이온즈볼파크", "경산", 35.864844, 128.805667)
         );
     }
 }

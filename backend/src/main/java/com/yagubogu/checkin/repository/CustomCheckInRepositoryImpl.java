@@ -60,7 +60,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.date.between(start, end)
+                        GAME.date.between(start, end),
+                        isMyCurrentFavorite(member, CHECK_IN)
                 ).fetchOne();
     }
 
@@ -429,6 +430,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         qCheckIn.member.eq(member),
                         qGame.date.between(start, end),
                         qGame.gameState.eq(GameState.COMPLETED),
+                        isMyCurrentFavorite(member, CHECK_IN),
                         condition
                 )
                 .fetchOne();
