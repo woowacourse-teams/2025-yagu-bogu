@@ -17,10 +17,10 @@ public class ApiVersionConfig implements WebMvcConfigurer {
             @Override
             public void configurePathMatch(final PathMatchConfigurer configurer) {
                 configurer.addPathPrefix(API_V1,
-                        c -> c.getPackageName().contains(".v1."));
+                        c -> c.getPackageName().contains(".v1"));
 
                 configurer.addPathPrefix(API_V2,
-                        c -> c.getPackageName().contains(".v2."));
+                        c -> c.getPackageName().contains(".v2"));
             }
         };
     }
