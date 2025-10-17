@@ -1,5 +1,6 @@
-package com.yagubogu.stat.dto;
+package com.yagubogu.stat.dto.v1;
 
+import com.yagubogu.stat.dto.AverageStatisticParam;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -11,13 +12,13 @@ public record AverageStatisticResponse(
         Double concededHits
 ) {
 
-    public static AverageStatisticResponse from(final AverageStatistic averageStatistic) {
+    public static AverageStatisticResponse from(final AverageStatisticParam averageStatisticParam) {
         return new AverageStatisticResponse(
-                round(averageStatistic.averageRuns()),
-                round(averageStatistic.averageConcededRuns()),
-                round(averageStatistic.averageErrors()),
-                round(averageStatistic.averageHits()),
-                round(averageStatistic.averageConcededHits())
+                round(averageStatisticParam.averageRuns()),
+                round(averageStatisticParam.averageConcededRuns()),
+                round(averageStatisticParam.averageErrors()),
+                round(averageStatisticParam.averageHits()),
+                round(averageStatisticParam.averageConcededHits())
         );
     }
 

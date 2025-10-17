@@ -1,6 +1,6 @@
 package com.yagubogu.stat.dto;
 
-public record StadiumStatsDto(
+public record StadiumStatsParam(
         String stadiumName,
         long winCounts,
         long totalCountsWithoutDraw

@@ -1,13 +1,13 @@
-package com.yagubogu.stat.controller;
+package com.yagubogu.stat.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
+import com.yagubogu.stat.dto.v1.StatCountsResponse;
+import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.stat.service.StatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

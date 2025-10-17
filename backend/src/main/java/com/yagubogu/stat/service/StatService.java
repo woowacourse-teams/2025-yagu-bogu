@@ -8,16 +8,16 @@ import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
-import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
-import com.yagubogu.stat.dto.StadiumStatsDto;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.OpponentWinRateRowParam;
+import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.StadiumStatsParam;
+import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
+import com.yagubogu.stat.dto.v1.StatCountsResponse;
+import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -33,10 +33,10 @@ public class StatService {
 
     private static final int RECENT_LIMIT = 10;
 
-    private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
-                    OpponentWinRateTeamResponse::winRate)
+    private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
+                    OpponentWinRateTeamParam::winRate)
             .reversed()
-            .thenComparing(OpponentWinRateTeamResponse::name);
+            .thenComparing(OpponentWinRateTeamParam::name);
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
@@ -84,21 +84,21 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        List<StadiumStatsDto> hello = checkInRepository.findWinAndNonDrawCountByStadium(
+        List<StadiumStatsParam> hello = checkInRepository.findWinAndNonDrawCountByStadium(
                 memberId,
                 LocalDate.of(year, 1, 1),
                 LocalDate.of(year, 12, 31)
         );
         double lowestWinRate = 0;
         String luckyStadiumName = null;
-        for (StadiumStatsDto stadiumStatsDto : hello) {
-            long winCounts = stadiumStatsDto.winCounts();
-            long totalCountsWithoutDraw = stadiumStatsDto.totalCountsWithoutDraw();
+        for (StadiumStatsParam stadiumStatsParam : hello) {
+            long winCounts = stadiumStatsParam.winCounts();
+            long totalCountsWithoutDraw = stadiumStatsParam.totalCountsWithoutDraw();
 
             double currentWinRate = calculateWinRate(winCounts, totalCountsWithoutDraw);
             if (currentWinRate > lowestWinRate) {
                 lowestWinRate = currentWinRate;
-                luckyStadiumName = stadiumStatsDto.stadiumName();
+                luckyStadiumName = stadiumStatsParam.stadiumName();
             }
         }
 
@@ -107,17 +107,17 @@ public class StatService {
 
     public AverageStatisticResponse findAverageStatistic(final long memberId) {
         Member member = getMember(memberId);
-        AverageStatistic averageStatistic = checkInRepository.findAverageStatistic(member);
+        AverageStatisticParam averageStatisticParam = checkInRepository.findAverageStatistic(member);
 
-        return AverageStatisticResponse.from(averageStatistic);
+        return AverageStatisticResponse.from(averageStatisticParam);
     }
 
     public OpponentWinRateResponse findOpponentWinRate(final Long memberId, final int year) {
         Member member = getMember(memberId);
         validateUser(member);
         Team team = member.getTeam();
-        List<OpponentWinRateRow> winRates = checkInRepository.findOpponentWinRates(member, team, year);
-        List<OpponentWinRateTeamResponse> responses = getOpponentWinRateTeamResponse(winRates);
+        List<OpponentWinRateRowParam> winRates = checkInRepository.findOpponentWinRates(member, team, year);
+        List<OpponentWinRateTeamParam> responses = getOpponentWinRateTeamResponse(winRates);
 
         return new OpponentWinRateResponse(responses);
     }
@@ -145,15 +145,15 @@ public class StatService {
         }
     }
 
-    private List<OpponentWinRateTeamResponse> getOpponentWinRateTeamResponse(
-            List<OpponentWinRateRow> winRates
+    private List<OpponentWinRateTeamParam> getOpponentWinRateTeamResponse(
+            List<OpponentWinRateRowParam> winRates
     ) {
         return winRates.stream()
                 .map(row -> {
                     long totalGames = row.wins() + row.losses();
                     double winRate = calculateWinRate(row.wins(), totalGames);
 
-                    return new OpponentWinRateTeamResponse(
+                    return new OpponentWinRateTeamParam(
                             row.teamId(),
                             row.name(),
                             row.shortName(),

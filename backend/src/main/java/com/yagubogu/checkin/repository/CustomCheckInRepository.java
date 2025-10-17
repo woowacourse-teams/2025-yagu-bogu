@@ -6,11 +6,11 @@ import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.GameWithFanCountsParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
-import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
+import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,14 +35,14 @@ public interface CustomCheckInRepository {
 
     List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date);
 
-    AverageStatistic findAverageStatistic(Member member);
+    AverageStatisticParam findAverageStatistic(Member member);
 
     List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
             int year
     );
 
-    List<OpponentWinRateRow> findOpponentWinRates(
+    List<OpponentWinRateRowParam> findOpponentWinRates(
             Member member,
             Team team,
             int year

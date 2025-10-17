@@ -1,6 +1,6 @@
 package com.yagubogu.stat.dto;
 
-public record AverageStatistic(
+public record AverageStatisticParam(
         Double averageRuns,
         Double averageConcededRuns,
         Double averageErrors,

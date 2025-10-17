@@ -18,12 +18,12 @@ import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.StatCountsResponse;
+import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -574,14 +574,14 @@ class StatServiceTest {
             s.assertThat(actual.opponents()).hasSize(expectedOpponents);
 
             // 2) 상단 랭킹 고정값 검증
-            OpponentWinRateTeamResponse first = actual.opponents().get(0);
+            OpponentWinRateTeamParam first = actual.opponents().get(0);
             s.assertThat(first.teamCode()).isEqualTo("SS");
             s.assertThat(first.wins()).isEqualTo(2);
             s.assertThat(first.losses()).isEqualTo(0);
             s.assertThat(first.draws()).isEqualTo(0);
             s.assertThat(first.winRate()).isEqualTo(100.0);
 
-            OpponentWinRateTeamResponse second = actual.opponents().get(1);
+            OpponentWinRateTeamParam second = actual.opponents().get(1);
             s.assertThat(second.teamCode()).isEqualTo("LT");
             s.assertThat(second.wins()).isEqualTo(1);
             s.assertThat(second.losses()).isEqualTo(1);
@@ -589,7 +589,7 @@ class StatServiceTest {
             s.assertThat(second.winRate()).isEqualTo(50.0);
 
             // 3) NC는 1무로 승률 0.0
-            OpponentWinRateTeamResponse ncRes = actual.opponents().stream()
+            OpponentWinRateTeamParam ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
             s.assertThat(ncRes.wins()).isZero();
@@ -600,7 +600,7 @@ class StatServiceTest {
             // 4) 미대결(또는 무만 있는) 팀: winRate == 0.0
             Set<String> zeroCodesActual = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
-                    .map(OpponentWinRateTeamResponse::teamCode)
+                    .map(OpponentWinRateTeamParam::teamCode)
                     .collect(Collectors.toSet());
 
             // 기대 집합 = 전체 팀코드 - {내 팀 HT, SS, LT}  (SS/LT는 100/50이라 제외)
@@ -614,10 +614,10 @@ class StatServiceTest {
             s.assertThat(zeroCodesActual).isEqualTo(zeroCodesExpected);
 
             // 5) 전체 정렬 규칙 검증: 승률 desc → 이름 asc
-            List<OpponentWinRateTeamResponse> sorted = actual.opponents().stream()
+            List<OpponentWinRateTeamParam> sorted = actual.opponents().stream()
                     .sorted(Comparator
-                            .comparing(OpponentWinRateTeamResponse::winRate).reversed()
-                            .thenComparing(OpponentWinRateTeamResponse::name))
+                            .comparing(OpponentWinRateTeamParam::winRate).reversed()
+                            .thenComparing(OpponentWinRateTeamParam::name))
                     .toList();
             s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
@@ -654,7 +654,7 @@ class StatServiceTest {
         // then
         assertSoftly(s -> {
             s.assertThat(actual.opponents()).hasSize(13);
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
             s.assertThat(lt.winRate()).isEqualTo(100.0);
@@ -711,7 +711,7 @@ class StatServiceTest {
         // then
         assertSoftly(s -> {
             s.assertThat(actual.opponents()).hasSize(13);
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
             s.assertThat(lt.winRate()).isEqualTo(100.0);
@@ -769,7 +769,7 @@ class StatServiceTest {
             s.assertThat(actual.opponents()).hasSize(expectedOpponents);
 
             // LT도 대상 회원 체크인이 없으므로 0.0이어야 함
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
             s.assertThat(lt.wins()).isEqualTo(0);

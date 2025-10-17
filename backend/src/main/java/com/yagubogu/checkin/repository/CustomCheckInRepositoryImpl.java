@@ -18,8 +18,8 @@ import com.yagubogu.checkin.dto.CheckInGameTeamParam;
 import com.yagubogu.checkin.dto.GameWithFanCountsParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
-import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.game.domain.QScoreBoard;
@@ -28,8 +28,8 @@ import com.yagubogu.member.domain.QMember;
 import com.yagubogu.member.domain.QNickname;
 import com.yagubogu.stadium.domain.QStadium;
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
+import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.QTeam;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
@@ -383,7 +383,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 현재 내가 응원하는 팀만 통계에 집계한다
     // 내가 응원하는 팀 o, 경기 완료된 것 o(경기 완료된 것만 통계에 집계)
-    public AverageStatistic findAverageStatistic(Member member) {
+    public AverageStatisticParam findAverageStatistic(Member member) {
         NumberExpression<Integer> myRuns = new CaseBuilder()
                 .when(GAME.homeTeam.eq(CHECK_IN.team)).then(GAME.homeScoreBoard.runs)
                 .when(GAME.awayTeam.eq(CHECK_IN.team)).then(GAME.awayScoreBoard.runs)
@@ -411,7 +411,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory
                 .select(Projections.constructor(
-                        AverageStatistic.class,
+                        AverageStatisticParam.class,
                         myRuns.avg(),
                         opponentRuns.avg(),
                         myErrors.avg(),
@@ -449,7 +449,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .fetch();
     }
 
-    public List<OpponentWinRateRow> findOpponentWinRates(
+    public List<OpponentWinRateRowParam> findOpponentWinRates(
             Member member,
             Team team,
             int year
@@ -491,7 +491,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory
                 .select(Projections.constructor(
-                        OpponentWinRateRow.class,
+                        OpponentWinRateRowParam.class,
                         opponentTeam.id,
                         opponentTeam.name,
                         opponentTeam.shortName,

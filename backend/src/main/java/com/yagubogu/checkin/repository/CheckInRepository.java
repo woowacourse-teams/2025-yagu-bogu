@@ -2,7 +2,7 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.stat.dto.StadiumStatsDto;
+import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,7 +28,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     boolean isFirstMainStadiumVisit(@Param("member") Member member, @Param("stadiumId") Long stadiumId);
 
     @Query("""
-                SELECT new com.yagubogu.stat.dto.StadiumStatsDto(
+                SELECT new com.yagubogu.stat.dto.StadiumStatsParam(
                            g.stadium.shortName,
                            SUM(CASE WHEN ci.team.id = ci.member.team.id
                                         AND ((ci.team.id = g.awayTeam.id AND g.awayScore > g.homeScore)
@@ -45,7 +45,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                   AND g.date BETWEEN :startDate AND :endDate
                 GROUP BY g.stadium.id
             """)
-    List<StadiumStatsDto> findWinAndNonDrawCountByStadium(@Param("memberId") Long memberId,
-                                                          @Param("startDate") LocalDate startDate,
-                                                          @Param("endDate") LocalDate endDate);
+    List<StadiumStatsParam> findWinAndNonDrawCountByStadium(@Param("memberId") Long memberId,
+                                                            @Param("startDate") LocalDate startDate,
+                                                            @Param("endDate") LocalDate endDate);
 }
