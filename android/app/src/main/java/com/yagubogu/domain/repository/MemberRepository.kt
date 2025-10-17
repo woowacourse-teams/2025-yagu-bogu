@@ -20,7 +20,7 @@ interface MemberRepository {
 
     fun invalidateCache()
 
-    suspend fun getPresignedProfileImageUrl(
+    suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
     ): Result<PresignedUrlItem>

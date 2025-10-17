@@ -81,7 +81,7 @@ class MemberDefaultRepository(
         cachedFavoriteTeam = null
     }
 
-    override suspend fun getPresignedProfileImageUrl(
+    override suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
     ): Result<PresignedUrlItem> =

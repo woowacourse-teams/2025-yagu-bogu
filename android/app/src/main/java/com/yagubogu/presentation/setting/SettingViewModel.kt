@@ -94,7 +94,7 @@ class SettingViewModel(
         runCatching {
             // 1. Presigned URL 요청
             val presignedUrlItem: PresignedUrlItem =
-                memberRepository.getPresignedProfileImageUrl(mimeType, size).getOrThrow()
+                memberRepository.getPresignedUrl(mimeType, size).getOrThrow()
 
             // 2. S3 업로드
             thirdPartyRepository
