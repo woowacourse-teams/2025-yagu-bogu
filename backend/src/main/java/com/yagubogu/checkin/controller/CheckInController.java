@@ -11,7 +11,6 @@ import com.yagubogu.checkin.dto.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.FanRateResponse;
 import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.service.CheckInService;
-import com.yagubogu.stat.service.StatService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckInController implements CheckInControllerInterface {
 
     private final CheckInService checkInService;
-    private final StatService statService;
 
     public ResponseEntity<Void> createCheckIn(
             final MemberClaims memberClaims,
