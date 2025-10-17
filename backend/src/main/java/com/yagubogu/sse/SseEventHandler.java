@@ -1,8 +1,8 @@
 package com.yagubogu.sse;
 
 import com.yagubogu.checkin.service.CheckInService;
-import com.yagubogu.sse.dto.CheckInCreatedEvent;
-import com.yagubogu.sse.dto.GameWithFanRateResponse;
+import com.yagubogu.sse.dto.GameWithFanRateParam;
+import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +24,7 @@ public class SseEventHandler {
     @Async
     @TransactionalEventListener
     public void onCheckInCreated(final CheckInCreatedEvent event) {
-        List<GameWithFanRateResponse> eventData = checkInService.buildCheckInEventData(event.date());
+        List<GameWithFanRateParam> eventData = checkInService.buildCheckInEventData(event.date());
 
         sseEmitterRegistry.all().forEach(emitter -> {
             try {

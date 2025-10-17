@@ -1,5 +1,11 @@
 package com.yagubogu.talk.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
@@ -16,10 +22,10 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.domain.Talk;
-import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkRequest;
-import com.yagubogu.talk.dto.TalkResponse;
-import com.yagubogu.talk.event.TalkEvent;
+import com.yagubogu.talk.dto.event.TalkEvent;
+import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
+import com.yagubogu.talk.dto.v1.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import com.yagubogu.team.domain.Team;
@@ -36,12 +42,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -111,7 +111,7 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(
+        TalkCursorResultResponse actual = talkService.findTalksExcludingReported(
                 game.getId(),
                 null,
                 limit,
@@ -120,14 +120,15 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id()).isEqualTo(expectedTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().content().size()).isOne();
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
+                    .isEqualTo(expectedTalk.getId());
+            softAssertions.assertThat(actual.cursorResultParam().content().size()).isOne();
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
                     .isEqualTo(expectedTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
                     .isEqualTo(expectedTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isNull();
+            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
         });
     }
 
@@ -157,7 +158,7 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(
+        TalkCursorResultResponse actual = talkService.findTalksExcludingReported(
                 game.getId(),
                 null,
                 limit,
@@ -166,14 +167,15 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
                     .isEqualTo(expectedSecondPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
                     .isEqualTo(expectedFirstPageTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
                     .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(expectedSecondPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
+            softAssertions.assertThat(actual.cursorResultParam().nextCursorId())
+                    .isEqualTo(expectedSecondPageTalk.getId());
+            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isTrue();
         });
     }
 
@@ -203,7 +205,7 @@ class TalkServiceTest {
                         .game(game)
         );
 
-        TalkCursorResult result = talkService.findTalksExcludingReported(
+        TalkCursorResultResponse result = talkService.findTalksExcludingReported(
                 game.getId(),
                 cursorId,
                 limit,
@@ -211,23 +213,23 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(
+        TalkCursorResultResponse actual = talkService.findTalksExcludingReported(
                 game.getId(),
-                result.cursorResult().nextCursorId(),
+                result.cursorResultParam().nextCursorId(),
                 limit,
                 firstEnterMember.getId()
         );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
                     .isEqualTo(expectedFirstPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
                     .isEqualTo(expectedFirstPageTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
                     .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isNull();
+            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
         });
     }
 
@@ -314,13 +316,13 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findTalksExcludingReported(
+        TalkCursorResultResponse actual = talkService.findTalksExcludingReported(
                 game.getId(),
                 cursorId,
                 limit,
                 me.getId()
         );
-        long actualMyTalkCount = actual.cursorResult()
+        long actualMyTalkCount = actual.cursorResultParam()
                 .content()
                 .stream()
                 .filter(TalkResponse::isMine)
@@ -368,7 +370,7 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findNewTalks(
+        TalkCursorResultResponse actual = talkService.findNewTalks(
                 game.getId(),
                 cursorId,
                 me.getId(),
@@ -382,10 +384,11 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResult().content()).hasSize(expectedCursorResult.size());
-            softAssertions.assertThat(actual.cursorResult().content()).containsExactlyElementsOf(expectedCursorResult);
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(thirdTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResultParam().content()).hasSize(expectedCursorResult.size());
+            softAssertions.assertThat(actual.cursorResultParam().content())
+                    .containsExactlyElementsOf(expectedCursorResult);
+            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isEqualTo(thirdTalk.getId());
+            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
         });
     }
 
@@ -411,14 +414,14 @@ class TalkServiceTest {
         );
 
         // when
-        TalkCursorResult actual = talkService.findNewTalks(game.getId(), fristTalk.getId(), me.getId(),
+        TalkCursorResultResponse actual = talkService.findNewTalks(game.getId(), fristTalk.getId(), me.getId(),
                 limit);
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResult().content()).isEmpty();
-            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(fristTalk.getId());
-            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResultParam().content()).isEmpty();
+            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isEqualTo(fristTalk.getId());
+            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
         });
     }
 

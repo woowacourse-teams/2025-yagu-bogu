@@ -1,9 +1,9 @@
 package com.yagubogu.auth.support;
 
-import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.member.domain.OAuthProvider;
 
-public interface AuthValidator<T extends AuthResponse> {
+public interface AuthValidator<T extends AuthParam> {
 
     boolean supports(OAuthProvider provider);
 

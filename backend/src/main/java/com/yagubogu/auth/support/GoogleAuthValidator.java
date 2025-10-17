@@ -1,7 +1,7 @@
 package com.yagubogu.auth.support;
 
 import com.yagubogu.auth.config.GoogleAuthProperties;
-import com.yagubogu.auth.dto.GoogleAuthResponse;
+import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.exception.InvalidTokenException;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.time.Instant;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
+public class GoogleAuthValidator implements AuthValidator<GoogleAuthParam> {
 
     private static final String ISSUER_GOOGLE = "https://accounts.google.com";
     private static final String ISSUER_GOOGLE_NO_SCHEME = "accounts.google.com";
@@ -27,7 +27,7 @@ public class GoogleAuthValidator implements AuthValidator<GoogleAuthResponse> {
     }
 
     @Override
-    public void validate(final GoogleAuthResponse response) {
+    public void validate(final GoogleAuthParam response) {
         String iss = response.iss();
         if (!(ISSUER_GOOGLE.equals(iss) || ISSUER_GOOGLE_NO_SCHEME.equals(iss))) {
             throw new InvalidTokenException("Invalid issuer");
