@@ -40,7 +40,7 @@ class StadiumServiceTest {
                 new StadiumParam(6L, "사직야구장", "사직구장", "사직", 35.194077, 129.061584),
                 new StadiumParam(7L, "인천 SSG 랜더스필드", "랜더스필드", "문학", 37.436778, 126.693306),
                 new StadiumParam(8L, "창원 NC 파크", "엔씨파크", "창원", 35.222754, 128.582251),
-                new StadiumParam(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211),
+                new StadiumParam(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211)
         );
 
         // when
