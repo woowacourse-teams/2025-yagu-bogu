@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StatSyncService {
 
-    private static final int CHUNK_SIZE = 2000;
+    private static final int CHUNK_SIZE = 1000;
 
     private final VictoryFairyRankingSyncService victoryFairyRankingSyncService;
     private final CheckInRepository checkInRepository;
@@ -60,7 +60,6 @@ public class StatSyncService {
                     totalProcessed - totalUpdated - totalInserted);
         } catch (RuntimeException e) {
             log.error("Batch failed", e);
-            throw e;
         }
     }
 }
