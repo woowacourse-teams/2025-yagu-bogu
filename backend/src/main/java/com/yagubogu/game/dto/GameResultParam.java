@@ -20,7 +20,7 @@ public record GameResultParam(
         );
     }
 
-    private record ScoreBoardParam(
+    public record ScoreBoardParam(
             Integer runs,
             Integer hits,
             Integer errors,
