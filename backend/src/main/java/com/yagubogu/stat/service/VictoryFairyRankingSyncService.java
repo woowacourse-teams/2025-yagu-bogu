@@ -53,7 +53,7 @@ public class VictoryFairyRankingSyncService {
         return executeBatchOperations(batchData);
     }
 
-    private Map<Long, VictoryFairyRanking> buildExistingRankingMap(List<Long> memberIds, int year) {
+    private Map<Long, VictoryFairyRanking> buildExistingRankingMap(final List<Long> memberIds, final int year) {
         return victoryFairyRankingRepository.findByMemberIdsAndYear(memberIds, year)
                 .stream()
                 .collect(Collectors.toMap(
