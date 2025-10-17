@@ -47,7 +47,6 @@ class StatServiceTest {
     private final int RECENT_LIMIT = 10;
 
     private StatService statService;
-    private VictoryFairyRankingSyncService victoryRankingSyncService;
 
     @Autowired
     private CheckInRepository checkInRepository;
@@ -77,8 +76,7 @@ class StatServiceTest {
     void setUp() {
         victoryRankingSyncService = new VictoryFairyRankingSyncService(checkInRepository,
                 victoryFairyRankingRepository);
-        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository,
-                victoryRankingSyncService);
+        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
