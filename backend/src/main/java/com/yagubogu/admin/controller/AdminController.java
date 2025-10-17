@@ -5,6 +5,7 @@ import com.yagubogu.game.service.GameResultSyncService;
 import com.yagubogu.game.service.GameScheduleSyncService;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stat.service.StatService;
+import com.yagubogu.stat.service.StatSyncService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AdminController {
     private final GameResultSyncService gameResultSyncService;
     private final GameScheduleSyncService gameScheduleSyncService;
     private final StatService statService;
+    private final StatSyncService statSyncService;
 
 
     @PatchMapping("/game-results")
@@ -51,7 +53,7 @@ public class AdminController {
         LocalDate startDate = LocalDate.of(year, 1, 1);
         LocalDate endDate = LocalDate.of(year, 12, 31);
         for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
-            statService.updateRankings(date);
+            statSyncService.updateRankings(date);
         }
 
         return ResponseEntity.ok().build();

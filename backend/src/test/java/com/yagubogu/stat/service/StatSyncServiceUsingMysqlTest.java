@@ -27,10 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
-class StatServiceUpdateRankingsUsingMysqlTest extends ServiceUsingMysqlTestBase {
+class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
 
     @Autowired
-    private StatService statService;
+    private StatSyncService statSyncService;
 
     @Autowired
     private MemberFactory memberFactory;
@@ -80,7 +80,7 @@ class StatServiceUpdateRankingsUsingMysqlTest extends ServiceUsingMysqlTestBase 
         checkInFactory.save(b -> b.game(g1).member(m2).team(HT));
 
         // when
-        statService.updateRankings(date);
+        statSyncService.updateRankings(date);
 
         // then
         List<VictoryFairyRanking> results = victoryFairyRankingRepository
@@ -112,7 +112,7 @@ class StatServiceUpdateRankingsUsingMysqlTest extends ServiceUsingMysqlTestBase 
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.game(g1).member(m1).team(HT));
         checkInFactory.save(b -> b.game(g1).member(m2).team(HT));
-        statService.updateRankings(date);
+        statSyncService.updateRankings(date);
 
         // 누적용 경기 (8/1 HT 패, m1만 체크인)
         LocalDate later = LocalDate.of(2025, 8, 1);
@@ -124,7 +124,7 @@ class StatServiceUpdateRankingsUsingMysqlTest extends ServiceUsingMysqlTestBase 
         checkInFactory.save(b -> b.game(g2).member(m1).team(HT));
 
         // when
-        statService.updateRankings(later);
+        statSyncService.updateRankings(later);
 
         // then
         List<VictoryFairyRanking> results = victoryFairyRankingRepository
@@ -152,7 +152,7 @@ class StatServiceUpdateRankingsUsingMysqlTest extends ServiceUsingMysqlTestBase 
         LocalDate date = LocalDate.of(2025, 7, 22); // 아무도 체크인하지 않은 날짜
 
         // when
-        statService.updateRankings(date);
+        statSyncService.updateRankings(date);
 
         // then
         assertThat(victoryFairyRankingRepository.findAll()).isEmpty();

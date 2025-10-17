@@ -20,7 +20,6 @@ import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
 import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.StadiumStatsDto;
 import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.VictoryFairyChunkResult;
 import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.team.domain.Team;
@@ -29,11 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -44,7 +39,6 @@ public class StatService {
 
     private static final int RECENT_LIMIT = 10;
     private static final int VICTORY_RANKING_LIMIT = 5;
-    private static final int CHUNK_SIZE = 2000;
     private static final Comparator<OpponentWinRateTeamResponse> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator
             .comparingDouble(OpponentWinRateTeamResponse::winRate)
             .reversed()
@@ -53,7 +47,6 @@ public class StatService {
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
-    private final VictoryFairyRankingSyncService victoryFairyRankingSyncService;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -176,45 +169,6 @@ public class StatService {
         return new VictoryFairyRankingResponses(topRankingResponses, myRankingResponse);
     }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void updateRankings(final LocalDate date) {
-        int currentYear = date.getYear();
-        int page = 0;
-        int totalProcessed = 0;
-        int totalUpdated = 0;
-        int totalInserted = 0;
-
-        try {
-            Slice<Long> slice;
-            do {
-                Pageable pageable = PageRequest.of(page, CHUNK_SIZE);
-                slice = checkInRepository.findDistinctMemberIdsByDate(date, pageable);
-
-                if (slice.hasContent()) {
-                    List<Long> memberIds = slice.getContent();
-
-                    VictoryFairyChunkResult result = victoryFairyRankingSyncService.processChunk(memberIds,
-                            currentYear);
-
-                    totalProcessed += memberIds.size();
-                    totalUpdated += result.updatedCount();
-                    totalInserted += result.insertedCount();
-
-                    log.info("Progress: page {}, {} members processed (updated: {}, inserted: {})",
-                            page, totalProcessed, totalUpdated, totalInserted);
-                }
-                page++;
-
-            } while (slice.hasNext());
-
-            log.info("=== Batch Completed === total: {}, updated: {}, inserted: {}, skipped: {}",
-                    totalProcessed, totalUpdated, totalInserted,
-                    totalProcessed - totalUpdated - totalInserted);
-        } catch (RuntimeException e) {
-            log.error("Batch failed", e);
-            throw e;
-        }
-    }
 
     private List<VictoryFairyRankingResponse> findTopVictoryRanking(
             final TeamFilter teamFilter,
