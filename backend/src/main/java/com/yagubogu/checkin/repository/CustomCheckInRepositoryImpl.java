@@ -352,7 +352,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         )).from(STADIUM)
                 .leftJoin(CHECK_IN).on(
                         CHECK_IN.game.stadium.eq(STADIUM)
-                                .and(CHECK_IN.member.eq(member))
+                                .and(CHECK_IN.member.eq(me\mber))
                                 .and(isBetweenYear(CHECK_IN.game, year))
                 )
                 .where(STADIUM.level.eq(StadiumLevel.MAIN))
