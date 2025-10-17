@@ -6,6 +6,7 @@ import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.GameWithFanCountsParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
+import com.yagubogu.checkin.dto.VictoryFairyCountResult;
 import com.yagubogu.checkin.dto.VictoryFairyRankParam;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.member.domain.Member;
@@ -22,6 +23,10 @@ public interface CustomCheckInRepository {
     int findWinCounts(Member member, int year);
 
     int findLoseCounts(Member member, int year);
+
+    int findDrawCounts(Member member, int year);
+
+    List<VictoryFairyCountResult> findCheckInAndWinCountBatch(List<Long> memberIds, int year);
 
     int countByMemberAndYear(Member member, int year);
 
@@ -63,4 +68,10 @@ public interface CustomCheckInRepository {
     int findRecentGamesLoseCounts(Member member, int year, int limit);
 
     int findRecentGamesWinCounts(Member member, int year, int limit);
+
+    List<Long> findWinMemberIdByGameId(long gameId);
+
+    List<Long> findLoseMemberIdByGameId(long gameId);
+
+    List<Long> findDrawMemberIdByGameId(long gameId);
 }

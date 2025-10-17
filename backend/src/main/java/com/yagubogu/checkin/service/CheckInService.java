@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CheckInService {
 
-    private static final int VICTORY_RANKING_LIMIT = 5;
     private static final double ROUND_FACTOR = 10.0;
 
     private final CheckInRepository checkInRepository;

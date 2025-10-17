@@ -1,27 +1,23 @@
 package com.yagubogu.checkin;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -40,7 +36,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
@@ -63,12 +58,6 @@ public class CheckInE2eTest extends E2eTestBase {
 
     @Autowired
     private TeamRepository teamRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private GameRepository gameRepository;
 
     @Autowired
     private StadiumRepository stadiumRepository;
@@ -111,7 +100,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumJamsil.getId(), date))
-                .when().post("/api/v1/check-ins")
+                .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(201);
     }
@@ -149,7 +138,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/v1/check-ins/counts")
+                .when().get("/api/check-ins/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -174,7 +163,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(invalidStadiumId, date))
-                .when().post("/api/v1/check-ins")
+                .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -194,7 +183,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumId, invalidDate))
-                .when().post("/api/v1/check-ins")
+                .when().post("/api/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -234,7 +223,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/v1/check-ins/members")
+                .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -274,7 +263,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/v1/check-ins/members")
+                .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -314,7 +303,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/v1/check-ins/members")
+                .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -354,7 +343,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/v1/check-ins/members")
+                .when().get("/api/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -550,7 +539,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .when().get("/api/v1/check-ins/status")
+                .when().get("/api/check-ins/status")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -587,7 +576,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", TestFixture.getToday().toString())
-                .when().get("/api/v1/check-ins/stadiums/fan-rates")
+                .when().get("/api/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -628,7 +617,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/v1/check-ins/stadiums/counts")
+                .when().get("/api/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -682,7 +671,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/v1/check-ins/stadiums/counts")
+                .when().get("/api/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

@@ -4,15 +4,19 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameParam;
 import com.yagubogu.game.dto.KboGameResultParam;
+import com.yagubogu.game.dto.GameCompletedEvent;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -21,6 +25,7 @@ public class GameResultSyncService {
     private final KboGameSyncClient kboGameSyncClient;
     private final KboGameResultClient kboGameResultClient;
     private final GameRepository gameRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void syncGameResult(LocalDate date) {
@@ -36,8 +41,12 @@ public class GameResultSyncService {
         game.updateGameState(response.gameState());
 
         if (game.getGameState().isNotCompleted()) {
-            // TODO: gameState가 LIVE 일 때 로깅
+            log.error("Game {} has not completed yet", game.getGameCode());
             return;
+        }
+
+        if (game.getGameState().isCompleted()) {
+            applicationEventPublisher.publishEvent(new GameCompletedEvent(game.getId()));
         }
 
         KboGameResultParam gameResult = kboGameResultClient.fetchGameResult(game);

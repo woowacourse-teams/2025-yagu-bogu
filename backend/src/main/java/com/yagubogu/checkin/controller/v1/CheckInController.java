@@ -4,14 +4,12 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
-import com.yagubogu.checkin.dto.v1.CheckInHistoryResponse;
-import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
-import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
-import com.yagubogu.checkin.dto.v1.FanRateResponse;
-import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.dto.v1.TeamFilter;
-import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.CheckInHistoryResponse;
+import com.yagubogu.checkin.dto.CheckInStatusResponse;
+import com.yagubogu.checkin.dto.CreateCheckInRequest;
+import com.yagubogu.checkin.dto.FanRateResponse;
+import com.yagubogu.checkin.dto.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -68,17 +66,6 @@ public class CheckInController implements CheckInControllerInterface {
             @RequestParam final LocalDate date
     ) {
         FanRateResponse response = checkInService.findFanRatesByGames(memberClaims.id(), date);
-
-        return ResponseEntity.ok(response);
-    }
-
-    public ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
-            final MemberClaims memberClaims,
-            @RequestParam(name = "team", defaultValue = "ALL") final TeamFilter teamFilter,
-            @RequestParam(required = false) final Integer year
-    ) {
-        VictoryFairyRankingResponses response = checkInService.findVictoryFairyRankings(memberClaims.id(), teamFilter,
-                year);
 
         return ResponseEntity.ok(response);
     }

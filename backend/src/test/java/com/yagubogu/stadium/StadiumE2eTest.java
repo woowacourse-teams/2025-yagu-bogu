@@ -1,8 +1,10 @@
 package com.yagubogu.stadium;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.stadium.dto.StadiumParam;
 import com.yagubogu.stadium.dto.v1.StadiumsResponse;
-import com.yagubogu.support.E2eTestBase;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
@@ -10,8 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class StadiumE2eTest extends E2eTestBase {
 
