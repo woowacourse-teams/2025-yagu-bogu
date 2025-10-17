@@ -135,7 +135,7 @@ public class StatService {
     }
 
     @Transactional
-    public void calculateVictoryScore(int year, long gameId) {
+    public void calculateVictoryScore(final int year, final long gameId) {
         double m = checkInRepository.calculateTotalAverageWinRate(year);
         double c = checkInRepository.calculateAverageCheckInCount(year);
 
