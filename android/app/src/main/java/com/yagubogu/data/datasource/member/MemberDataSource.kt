@@ -1,5 +1,6 @@
 package com.yagubogu.data.datasource.member
 
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -19,6 +20,10 @@ interface MemberDataSource {
     suspend fun updateFavoriteTeam(team: Team): Result<MemberFavoriteResponse>
 
     suspend fun deleteMember(): Result<Unit>
+
+    suspend fun getBadges(): Result<BadgeResponse>
+
+    suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit>
 
     suspend fun getPresignedUrl(
         contentType: String,

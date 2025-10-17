@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlCompleteRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlStartRequest
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -46,6 +47,16 @@ class MemberRemoteDataSource(
     override suspend fun deleteMember(): Result<Unit> =
         safeApiCall {
             memberApiService.deleteMember()
+        }
+
+    override suspend fun getBadges(): Result<BadgeResponse> =
+        safeApiCall {
+            memberApiService.getBadges()
+        }
+
+    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> =
+        safeApiCall {
+            memberApiService.patchRepresentativeBadge(badgeId)
         }
 
     override suspend fun getPresignedUrl(

@@ -1,6 +1,8 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.member.MemberDataSource
+import com.yagubogu.data.dto.response.member.BadgeDto
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -12,6 +14,9 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
+import com.yagubogu.ui.badge.BadgeUiState
+import com.yagubogu.ui.badge.model.BadgeInfoUiModel
+import com.yagubogu.ui.badge.model.BadgeUiModel
 
 class MemberDefaultRepository(
     private val memberDataSource: MemberDataSource,
@@ -75,6 +80,17 @@ class MemberDefaultRepository(
         memberDataSource.deleteMember().map {
             tokenManager.clearTokens()
         }
+
+    override suspend fun getBadges(): Result<BadgeUiState> =
+        memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
+            val representativeBadge: BadgeUiModel? =
+                badgeResponse.representativeBadge?.toPresentation()
+            val badges: List<BadgeInfoUiModel> =
+                badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
+            BadgeUiState.Success(representativeBadge, badges)
+        }
+
+    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.updateRepresentativeBadge(badgeId)
 
     override fun invalidateCache() {
         cachedNickname = null

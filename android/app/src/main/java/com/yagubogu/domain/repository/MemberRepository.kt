@@ -4,6 +4,7 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
+import com.yagubogu.ui.badge.BadgeUiState
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>
@@ -17,6 +18,10 @@ interface MemberRepository {
     suspend fun updateFavoriteTeam(team: Team): Result<Unit>
 
     suspend fun deleteMember(): Result<Unit>
+
+    suspend fun getBadges(): Result<BadgeUiState>
+
+    suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit>
 
     fun invalidateCache()
 

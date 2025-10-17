@@ -2,15 +2,12 @@ package com.yagubogu.ui.badge.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.time.LocalDate
 
+// 대표 배지에 필요한 프로퍼티만 담은 data class
 @Parcelize
 data class BadgeUiModel(
-    val imageUrl: String,
+    val id: Long,
     val name: String,
-    val description: String,
+    val imageUrl: String,
     val isAcquired: Boolean,
-    val achievedRate: Int,
-    val achievedAt: LocalDate,
-    val progressRate: Double,
 ) : Parcelable

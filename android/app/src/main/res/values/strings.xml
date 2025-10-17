@@ -135,6 +135,7 @@
     <string name="badge_empty_badge_message">대표 배지를 선택해 주세요</string>
     <string name="badge_list_title">배지 목록</string>
     <string name="badge_register_main_badge">대표 배지로 사용하기</string>
+    <string name="badge_already_used_badge">이미 사용 중인 배지예요</string>
     <string name="badge_achieved_rate_message">%의 사용자가 획득했어요</string>
     <string name="badge_achieved_date">획득한 날: %s</string>
     <string name="badge_progress_rate">달성률: %.1f%%</string>

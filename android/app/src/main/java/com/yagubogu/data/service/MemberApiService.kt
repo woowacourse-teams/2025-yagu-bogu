@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlCompleteRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlStartRequest
+import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
@@ -15,6 +16,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface MemberApiService {
     @GET("/api/members/me")
@@ -38,6 +40,14 @@ interface MemberApiService {
 
     @DELETE("/api/members/me")
     suspend fun deleteMember(): Response<Unit>
+
+    @GET("/api/members/me/badges")
+    suspend fun getBadges(): Response<BadgeResponse>
+
+    @PATCH("/api/members/me/badges/{badgeId}/representative")
+    suspend fun patchRepresentativeBadge(
+        @Path("badgeId") badgeId: Long,
+    ): Response<Unit>
 
     @POST("/api/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
