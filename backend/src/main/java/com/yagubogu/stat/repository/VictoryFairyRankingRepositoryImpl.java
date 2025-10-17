@@ -8,8 +8,8 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
+import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
 import com.yagubogu.stat.domain.QVictoryFairyRanking;
@@ -32,11 +32,11 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<VictoryFairyRank> findTopRankingByTeamFilterAndYear(final TeamFilter teamFilter, final int limit,
-                                                                    final int year) {
+    public List<VictoryFairyRankParam> findTopRankingByTeamFilterAndYear(final TeamFilter teamFilter, final int limit,
+                                                                         final int year) {
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                VictoryFairyRank.class,
+                                VictoryFairyRankParam.class,
                                 calculateRanking(VICTORY_FAIRY_RANKING.score),
                                 MEMBER.id,
                                 VICTORY_FAIRY_RANKING.score,
@@ -58,7 +58,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     }
 
     @Override
-    public Optional<VictoryFairyRank> findByMemberAndTeamFilterAndYear(
+    public Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(
             final Member member,
             final TeamFilter teamFilter,
             final int year
@@ -78,9 +78,9 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                         V2.score.gt(VICTORY_FAIRY_RANKING.score)
                 );
 
-        VictoryFairyRank victoryFairyRank = jpaQueryFactory.select(
+        VictoryFairyRankParam victoryFairyRank = jpaQueryFactory.select(
                         Projections.constructor(
-                                VictoryFairyRank.class,
+                                VictoryFairyRankParam.class,
                                 myRankingQuery,
                                 MEMBER.id,
                                 VICTORY_FAIRY_RANKING.score,

@@ -6,12 +6,12 @@ import com.yagubogu.member.domain.Member;
 import java.util.ArrayList;
 import java.util.List;
 
-public record VictoryFairyRankingResponses(
-        List<VictoryFairyRankingResponse> topRankings,
-        VictoryFairyRankingResponse myRanking
+public record VictoryFairyRankingResponse(
+        List<VictoryFairyRankingParam> topRankings,
+        VictoryFairyRankingParam myRanking
 ) {
 
-    public record VictoryFairyRankingResponse(
+    public record VictoryFairyRankingParam(
             int ranking,
             long memberId,
             String nickname,
@@ -20,10 +20,10 @@ public record VictoryFairyRankingResponses(
             double victoryFairyScore
     ) {
 
-        public static VictoryFairyRankingResponse emptyRanking(
+        public static VictoryFairyRankingParam emptyRanking(
                 Member member
         ) {
-            return new VictoryFairyRankingResponse(
+            return new VictoryFairyRankingParam(
                     0,
                     member.getId(),
                     member.getNickname().toString(),
@@ -33,14 +33,14 @@ public record VictoryFairyRankingResponses(
             );
         }
 
-        public static List<VictoryFairyRankingResponse> from(final List<VictoryFairyRankParam> victoryFairyRankings) {
+        public static List<VictoryFairyRankingParam> from(final List<VictoryFairyRankParam> victoryFairyRankings) {
             return victoryFairyRankings.stream()
-                    .map(VictoryFairyRankingResponse::from)
+                    .map(VictoryFairyRankingParam::from)
                     .toList();
         }
 
-        public static VictoryFairyRankingResponse from(final VictoryFairyRankParam victoryFairyRank) {
-            return new VictoryFairyRankingResponse(
+        public static VictoryFairyRankingParam from(final VictoryFairyRankParam victoryFairyRank) {
+            return new VictoryFairyRankingParam(
                     victoryFairyRank.rank(),
                     victoryFairyRank.memberId(),
                     victoryFairyRank.nickname(),
@@ -50,14 +50,14 @@ public record VictoryFairyRankingResponses(
         }
     }
 
-    public static VictoryFairyRankingResponses from(
+    public static VictoryFairyRankingResponse from(
             List<VictoryFairyRankingEntryParam> topRankings,
             VictoryFairyRankingEntryParam myRankingData,
             int myRanking
     ) {
-        List<VictoryFairyRankingResponse> rankingResponses = getVictoryFairyRankingResponses(topRankings);
+        List<VictoryFairyRankingParam> rankingResponses = getVictoryFairyRankingResponses(topRankings);
 
-        VictoryFairyRankingResponse myRankingResponse = new VictoryFairyRankingResponse(
+        VictoryFairyRankingParam myRankingResponse = new VictoryFairyRankingParam(
                 myRanking,
                 myRankingData.memberId(),
                 myRankingData.nickname(),
@@ -66,15 +66,15 @@ public record VictoryFairyRankingResponses(
                 myRankingData.victoryFairyScore()
         );
 
-        return new VictoryFairyRankingResponses(rankingResponses, myRankingResponse);
+        return new VictoryFairyRankingResponse(rankingResponses, myRankingResponse);
     }
 
-    private static List<VictoryFairyRankingResponse> getVictoryFairyRankingResponses(
+    private static List<VictoryFairyRankingParam> getVictoryFairyRankingResponses(
             final List<VictoryFairyRankingEntryParam> topRankings) {
-        List<VictoryFairyRankingResponse> rankingResponses = new ArrayList<>();
+        List<VictoryFairyRankingParam> rankingResponses = new ArrayList<>();
         for (int i = 0; i < topRankings.size(); i++) {
             VictoryFairyRankingEntryParam data = topRankings.get(i);
-            rankingResponses.add(new VictoryFairyRankingResponse(
+            rankingResponses.add(new VictoryFairyRankingParam(
                     i + 1,
                     data.memberId(),
                     data.nickname(),

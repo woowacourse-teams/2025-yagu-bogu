@@ -2,7 +2,7 @@ package com.yagubogu.stat.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
-import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponses;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
@@ -95,7 +95,7 @@ public interface StatControllerInterface {
             @ApiResponse(responseCode = "200", description = "승리 요정 랭킹 조회 성공")
     })
     @GetMapping("/victory-fairy/rankings")
-    ResponseEntity<VictoryFairyRankingResponses> findVictoryFairyRankings(
+    ResponseEntity<VictoryFairyRankingResponse> findVictoryFairyRankings(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam(name = "team", defaultValue = "ALL") TeamFilter teamFilter,
             @RequestParam(required = false) Integer year

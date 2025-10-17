@@ -7,8 +7,6 @@ import com.yagubogu.checkin.dto.GameWithFanCountsParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
 import com.yagubogu.checkin.dto.VictoryFairyCountResult;
-import com.yagubogu.checkin.dto.VictoryFairyRankParam;
-import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.AverageStatisticParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
@@ -56,12 +54,6 @@ public interface CustomCheckInRepository {
     double calculateTotalAverageWinRate(int year);
 
     double calculateAverageCheckInCount(int year);
-
-    int calculateMyRankingOrder(double targetScore, double m, double c, int year, TeamFilter teamFilter);
-
-    List<VictoryFairyRankParam> findTopVictoryRanking(double m, double c, int year, TeamFilter teamFilter, int limit);
-
-    VictoryFairyRankParam findMyRanking(double m, double c, Member targetMember, int year, TeamFilter teamFilter);
 
     int findRecentGamesDrawCounts(Member member, int year, int limit);
 

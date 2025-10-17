@@ -1,5 +1,8 @@
 package com.yagubogu.stat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -25,6 +28,7 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -35,9 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class StatE2eTest extends E2eTestBase {
@@ -268,7 +269,7 @@ public class StatE2eTest extends E2eTestBase {
         assertThat(winRateAsOB.winRate()).isEqualTo(0.0);
 
         // 다시 KIA(HT)로 변경
-        RestAssured.given().log().all()
+        ValidatableResponse validatableResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberFavoriteRequest(kiaTeam.getTeamCode()))

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
 import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
@@ -35,8 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class CheckInE2eTest extends E2eTestBase {
@@ -100,7 +99,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumJamsil.getId(), date))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(201);
     }
@@ -138,7 +137,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/check-ins/counts")
+                .when().get("/api/v1/check-ins/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -163,7 +162,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(invalidStadiumId, date))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -183,7 +182,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreateCheckInRequest(stadiumId, invalidDate))
-                .when().post("/api/check-ins")
+                .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(404);
     }
@@ -223,7 +222,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -263,7 +262,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -303,7 +302,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.LATEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -343,179 +342,9 @@ public class CheckInE2eTest extends E2eTestBase {
                 .queryParam("year", 2025)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
-                .when().get("/api/check-ins/members")
+                .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
-    }
-
-    @DisplayName("승리 요정 랭킹을 조회한다")
-    @Test
-    void findVictoryFairyRankings() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        memberFactory.save(b -> b.team(kt).nickname("포르"));
-        memberFactory.save(b -> b.team(lg).nickname("두리"));
-        memberFactory.save(b -> b.team(kia).nickname("밍트"));
-        memberFactory.save(b -> b.team(samsung).nickname("우가"));
-
-        LocalDate startDate = LocalDate.of(2025, 7, 25);
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(1)
-                .date(startDate)
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(1))
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(2))
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kt).homeScore(10)
-                .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(3))
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kt).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(4))
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(lg).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(startDate.plusDays(5))
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(samsung).awayScore(1)
-                .date(LocalDate.of(2024, 5, 3))
-                .gameState(GameState.COMPLETED));
-
-        List<Member> members = memberRepository.findAll();
-        List<Game> games = gameRepository.findAll();
-        for (Member m : members) {
-            for (Game g : games) {
-                checkInFactory.save(b -> b.member(m).team(m.getTeam()).game(g));
-            }
-        }
-
-        // when & then
-        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
-                .when().get("/api/v1/check-ins/victory-fairy/rankings")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(VictoryFairyRankingResponses.class);
-
-        assertSoftly(
-                softAssertions -> {
-                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
-                    softAssertions.assertThat(actual.getFirst().victoryFairyScore()).isEqualTo(53.3);
-                    softAssertions.assertThat(actual.get(1).victoryFairyScore()).isEqualTo(53.3);
-                    softAssertions.assertThat(actual.get(2).victoryFairyScore()).isEqualTo(42.2);
-                    softAssertions.assertThat(actual.get(3).victoryFairyScore()).isEqualTo(31.1);
-                }
-        );
-    }
-
-    @DisplayName("무승부는 직관 승률에 포함하지 않는다")
-    @Test
-    void findVictoryFairyRankings_withoutDraws() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        LocalDate startDate = LocalDate.of(2025, 7, 25);
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(10)
-                .date(startDate)
-                .gameState(GameState.COMPLETED));
-        gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(lg).awayScore(1)
-                .date(startDate.plusDays(1))
-                .gameState(GameState.COMPLETED));
-
-        List<Game> games = gameRepository.findAll();
-        for (Game g : games) {
-            checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(g));
-        }
-
-        // when & then
-        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
-                .when().get("/api/v1/check-ins/victory-fairy/rankings")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(VictoryFairyRankingResponses.class);
-
-        assertSoftly(
-                softAssertions ->
-                {
-                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
-                    softAssertions.assertThat(actual.getFirst().winPercent()).isEqualTo(100.0);
-                }
-        );
-    }
-
-    @DisplayName("탈퇴된 회원은 랭킹에 조회되지 않는다")
-    @Test
-    void findVictoryFairyRankings_quit() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia).nickname("포라"));
-        String foraAccessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        Member duri = memberFactory.save(b -> b.team(samsung).nickname("두리"));
-        String duriAccessToken = authFactory.getAccessTokenByMemberId(duri.getId(), Role.USER);
-
-        LocalDate startDate = LocalDate.of(2025, 7, 25);
-        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
-                .homeTeam(kia).homeScore(10)
-                .awayTeam(kt).awayScore(1)
-                .date(startDate)
-                .gameState(GameState.COMPLETED));
-
-        checkInFactory.save(b -> b.member(fora).team(fora.getTeam()).game(game));
-        checkInFactory.save(b -> b.member(duri).team(duri.getTeam()).game(game));
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, foraAccessToken)
-                .when().delete("/api/v1/members/me")
-                .then().log().all()
-                .statusCode(204);
-
-        // when & then
-        VictoryFairyRankingResponses responses = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, duriAccessToken)
-                .queryParam("year", 2025)
-                .when().get("/api/v1/check-ins/victory-fairy/rankings")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(VictoryFairyRankingResponses.class);
-
-        assertSoftly(
-                softAssertions -> {
-                    List<VictoryFairyRankingResponse> actual = responses.topRankings();
-                    softAssertions.assertThat(actual.size()).isOne();
-                    softAssertions.assertThat(actual.getFirst().nickname()).isEqualTo("두리");
-                }
-        );
     }
 
     @DisplayName("인증 여부를 조회한다")
@@ -539,7 +368,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .when().get("/api/check-ins/status")
+                .when().get("/api/v1/check-ins/status")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -576,7 +405,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", TestFixture.getToday().toString())
-                .when().get("/api/check-ins/stadiums/fan-rates")
+                .when().get("/api/v1/check-ins/stadiums/fan-rates")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -617,7 +446,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/stadiums/counts")
+                .when().get("/api/v1/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -671,7 +500,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/check-ins/stadiums/counts")
+                .when().get("/api/v1/check-ins/stadiums/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

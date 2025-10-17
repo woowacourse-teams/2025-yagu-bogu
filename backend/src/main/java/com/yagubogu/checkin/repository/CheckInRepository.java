@@ -30,7 +30,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     boolean isFirstMainStadiumVisit(@Param("member") Member member, @Param("stadiumId") Long stadiumId);
 
     @Query("""
-                SELECT new com.yagubogu.stat.dto.StadiumStatsDto(
+                SELECT new com.yagubogu.stat.dto.StadiumStatsParam(
                            g.stadium.shortName,
                            SUM(CASE WHEN ci.team.id = ci.member.team.id
                                         AND ((ci.team.id = g.awayTeam.id AND g.awayScore > g.homeScore)
@@ -48,8 +48,9 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                 GROUP BY g.stadium.id
             """)
     List<StadiumStatsParam> findWinAndNonDrawCountByStadium(@Param("memberId") Long memberId,
-                                                          @Param("startDate") LocalDate startDate,
-                                                          @Param("endDate") LocalDate endDate);
+                                                            @Param("startDate") LocalDate startDate,
+                                                            @Param("endDate") LocalDate endDate);
+
     @Query("""
             SELECT DISTINCT c.member.id
             FROM CheckIn c
