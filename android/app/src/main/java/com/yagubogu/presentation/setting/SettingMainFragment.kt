@@ -24,7 +24,6 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentSettingMainBinding
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.launch
