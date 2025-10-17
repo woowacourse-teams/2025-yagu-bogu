@@ -2,6 +2,8 @@ package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlItem
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>
@@ -17,4 +19,11 @@ interface MemberRepository {
     suspend fun deleteMember(): Result<Unit>
 
     fun invalidateCache()
+
+    suspend fun getPresignedUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlItem>
+
+    suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem>
 }

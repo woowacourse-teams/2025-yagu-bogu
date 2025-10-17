@@ -52,6 +52,10 @@
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
             tools:replace="android:theme" />
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

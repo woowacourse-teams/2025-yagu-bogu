@@ -24,7 +24,7 @@ class SettingActivity : AppCompatActivity() {
 
     private val viewModel: SettingViewModel by viewModels {
         val app = application as YaguBoguApplication
-        SettingViewModelFactory(app.memberRepository, app.authRepository)
+        SettingViewModelFactory(app.memberRepository, app.authRepository, app.thirdPartyRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
