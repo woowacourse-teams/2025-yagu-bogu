@@ -24,16 +24,16 @@ public interface GameRepository extends JpaRepository<Game, Long> {
                 COUNT(c),
                 CASE WHEN MAX(CASE WHEN c.member = :member THEN 1 ELSE 0 END) = 1
                              THEN true ELSE false END,
-                new com.yagubogu.game.dto.StadiumByGame(
+                new com.yagubogu.game.dto.StadiumByGameParam(
                     g.stadium.id,
                     g.stadium.fullName
                 ),
-                new com.yagubogu.game.dto.TeamByGame(
+                new com.yagubogu.game.dto.TeamByGameParam(
                     g.homeTeam.id,
                     g.homeTeam.shortName,
                     g.homeTeam.teamCode
                 ),
-                new com.yagubogu.game.dto.TeamByGame(
+                new com.yagubogu.game.dto.TeamByGameParam(
                     g.awayTeam.id,
                     g.awayTeam.shortName,
                     g.awayTeam.teamCode
