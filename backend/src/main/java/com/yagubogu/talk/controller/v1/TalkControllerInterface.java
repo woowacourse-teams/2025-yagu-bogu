@@ -1,10 +1,10 @@
-package com.yagubogu.talk.controller;
+package com.yagubogu.talk.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkEntranceResponse;
-import com.yagubogu.talk.dto.TalkRequest;
-import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
+import com.yagubogu.talk.dto.v1.TalkEntranceResponse;
+import com.yagubogu.talk.dto.v1.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,7 +41,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}")
-    ResponseEntity<TalkCursorResult> findTalks(
+    ResponseEntity<TalkCursorResultResponse> findTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam(value = "before", required = false) Long cursorId,
@@ -54,7 +54,7 @@ public interface TalkControllerInterface {
             @ApiResponse(responseCode = "404", description = "경기 또는 회원을 찾을 수 없음")
     })
     @GetMapping("/{gameId}/latest")
-    ResponseEntity<TalkCursorResult> findNewTalks(
+    ResponseEntity<TalkCursorResultResponse> findNewTalks(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable long gameId,
             @RequestParam("after") long cursorId,

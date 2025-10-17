@@ -1,4 +1,4 @@
-package com.yagubogu.talk.event;
+package com.yagubogu.talk.dto.event;
 
 import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.domain.Policy;

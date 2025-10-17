@@ -1,4 +1,4 @@
-package com.yagubogu.talk.dto;
+package com.yagubogu.talk.dto.v1;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;

@@ -18,7 +18,7 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.domain.Talk;
-import com.yagubogu.talk.dto.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkRequest;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;

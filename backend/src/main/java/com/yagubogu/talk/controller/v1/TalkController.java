@@ -1,11 +1,11 @@
-package com.yagubogu.talk.controller;
+package com.yagubogu.talk.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkEntranceResponse;
-import com.yagubogu.talk.dto.TalkRequest;
-import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
+import com.yagubogu.talk.dto.v1.TalkEntranceResponse;
+import com.yagubogu.talk.dto.v1.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkResponse;
 import com.yagubogu.talk.service.TalkReportService;
 import com.yagubogu.talk.service.TalkService;
 import jakarta.validation.Valid;
@@ -34,24 +34,25 @@ public class TalkController implements TalkControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<TalkCursorResult> findTalks(
+    public ResponseEntity<TalkCursorResultResponse> findTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "before", required = false) final Long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        TalkCursorResult response = talkService.findTalksExcludingReported(gameId, cursorId, limit, memberClaims.id());
+        TalkCursorResultResponse response = talkService.findTalksExcludingReported(gameId, cursorId, limit,
+                memberClaims.id());
 
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<TalkCursorResult> findNewTalks(
+    public ResponseEntity<TalkCursorResultResponse> findNewTalks(
             final MemberClaims memberClaims,
             @PathVariable final long gameId,
             @RequestParam(value = "after") final long cursorId,
             @RequestParam("limit") final int limit
     ) {
-        TalkCursorResult response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
+        TalkCursorResultResponse response = talkService.findNewTalks(gameId, cursorId, memberClaims.id(), limit);
 
         return ResponseEntity.ok(response);
     }
