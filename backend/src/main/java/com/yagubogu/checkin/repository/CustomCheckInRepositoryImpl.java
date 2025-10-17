@@ -27,6 +27,7 @@ import com.yagubogu.stat.dto.AverageStatisticParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.QTeam;
 import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.domain.TeamStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -410,7 +411,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(opponentTeam)
                 .leftJoin(GAME).on(gameOnOpponent)
                 .leftJoin(CHECK_IN).on(CHECK_IN.game.eq(GAME).and(checkInFilter))
-                .where(opponentTeam.ne(team))
+                .where(opponentTeam.ne(team).and(opponentTeam.status.eq(TeamStatus.ACTIVE)))
                 .groupBy(opponentTeam.id, opponentTeam.name, opponentTeam.shortName, opponentTeam.teamCode)
                 .fetch();
     }

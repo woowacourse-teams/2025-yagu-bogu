@@ -12,8 +12,8 @@ public class StadiumController implements StadiumControllerInterface {
 
     private final StadiumService stadiumService;
 
-    public ResponseEntity<StadiumsResponse> findStadiums() {
-        StadiumsResponse response = stadiumService.findAll();
+    public ResponseEntity<StadiumsResponse> findAllMainStadiums() {
+        StadiumsResponse response = stadiumService.findAllMainStadiums();
         return ResponseEntity.ok(response);
     }
 }

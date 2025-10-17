@@ -435,7 +435,7 @@ public class StatE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(13);
+            s.assertThat(actual.opponents()).hasSize(9);
 
             // 1위: SS(2-0-0, 100.0)
             OpponentWinRateTeamParam first = actual.opponents().get(0);
@@ -468,7 +468,7 @@ public class StatE2eTest extends E2eTestBase {
                     .toList();
 
             s.assertThat(zeros)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK2", "SK", "OB", "WO", "HH", "HD", "NN", "DR");
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
 
             // 전체 정렬 검증: winRate desc → name asc
             List<OpponentWinRateTeamParam> sorted = actual.opponents().stream()
