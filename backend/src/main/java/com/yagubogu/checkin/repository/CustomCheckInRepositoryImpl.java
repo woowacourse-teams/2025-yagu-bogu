@@ -23,6 +23,7 @@ import com.yagubogu.game.domain.QScoreBoard;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
 import com.yagubogu.stadium.domain.QStadium;
+import com.yagubogu.stadium.domain.StadiumLevel;
 import com.yagubogu.stat.dto.AverageStatisticParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.QTeam;
@@ -353,7 +354,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         CHECK_IN.game.stadium.eq(STADIUM)
                                 .and(CHECK_IN.member.eq(member))
                                 .and(isBetweenYear(CHECK_IN.game, year))
-                ).groupBy(STADIUM.id, STADIUM.location)
+                )
+                .where(STADIUM.level.eq(StadiumLevel.MAIN))
+                .groupBy(STADIUM.id, STADIUM.location)
                 .fetch();
     }
 
