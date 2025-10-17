@@ -10,16 +10,17 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.StatCountsResponse;
+import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -27,6 +28,7 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -129,7 +131,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/counts")
+                .when().get("/api/v1/stats/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -189,7 +191,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -209,7 +211,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(403);
     }
@@ -238,7 +240,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -249,8 +251,8 @@ public class StatE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(doosanTeam.getTeamCode()))
-                .when().patch("/api/members/favorites")
+                .body(new MemberFavoriteRequest(doosanTeam.getTeamCode()))
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200);
 
@@ -259,7 +261,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -267,11 +269,11 @@ public class StatE2eTest extends E2eTestBase {
         assertThat(winRateAsOB.winRate()).isEqualTo(0.0);
 
         // 다시 KIA(HT)로 변경
-        RestAssured.given().log().all()
+        ValidatableResponse validatableResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new com.yagubogu.member.dto.MemberFavoriteRequest(kiaTeam.getTeamCode()))
-                .when().patch("/api/members/favorites")
+                .body(new MemberFavoriteRequest(kiaTeam.getTeamCode()))
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200);
 
@@ -280,7 +282,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -309,7 +311,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/lucky-stadiums")
+                .when().get("/api/v1/stats/lucky-stadiums")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -365,7 +367,7 @@ public class StatE2eTest extends E2eTestBase {
         AverageStatisticResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/stats/me")
+                .when().get("/api/v1/stats/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(AverageStatisticResponse.class);
@@ -425,7 +427,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/stats/win-rate/opponents")
+                .when().get("/api/v1/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -433,10 +435,10 @@ public class StatE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(13);
+            s.assertThat(actual.opponents()).hasSize(9);
 
             // 1위: SS(2-0-0, 100.0)
-            OpponentWinRateTeamResponse first = actual.opponents().get(0);
+            OpponentWinRateTeamParam first = actual.opponents().get(0);
             s.assertThat(first.teamCode()).isEqualTo("SS");
             s.assertThat(first.wins()).isEqualTo(2);
             s.assertThat(first.losses()).isEqualTo(0);
@@ -444,7 +446,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(first.winRate()).isEqualTo(100.0);
 
             // 2위: LT(1-1-0, 50.0)
-            OpponentWinRateTeamResponse second = actual.opponents().get(1);
+            OpponentWinRateTeamParam second = actual.opponents().get(1);
             s.assertThat(second.teamCode()).isEqualTo("LT");
             s.assertThat(second.wins()).isEqualTo(1);
             s.assertThat(second.losses()).isEqualTo(1);
@@ -452,7 +454,7 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(second.winRate()).isEqualTo(50.0);
 
             // NC(0-0-1, 0.0) 포함 검증
-            OpponentWinRateTeamResponse ncRes = actual.opponents().stream()
+            OpponentWinRateTeamParam ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
             s.assertThat(ncRes.wins()).isZero();
@@ -462,17 +464,17 @@ public class StatE2eTest extends E2eTestBase {
 
             List<String> zeros = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
-                    .map(OpponentWinRateTeamResponse::teamCode)
+                    .map(OpponentWinRateTeamParam::teamCode)
                     .toList();
 
             s.assertThat(zeros)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK2", "SK", "OB", "WO", "HH", "HD", "NN", "DR");
+                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
 
             // 전체 정렬 검증: winRate desc → name asc
-            List<OpponentWinRateTeamResponse> sorted = actual.opponents().stream()
+            List<OpponentWinRateTeamParam> sorted = actual.opponents().stream()
                     .sorted(Comparator
-                            .comparing(OpponentWinRateTeamResponse::winRate).reversed()
-                            .thenComparing(OpponentWinRateTeamResponse::name))
+                            .comparing(OpponentWinRateTeamParam::winRate).reversed()
+                            .thenComparing(OpponentWinRateTeamParam::name))
                     .toList();
             s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
@@ -490,7 +492,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/stats/win-rate/opponents")
+                .when().get("/api/v1/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(422);
     }
