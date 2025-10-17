@@ -2,8 +2,8 @@ package com.yagubogu.game.service.crawler.KboScheduleCrawler;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.dto.KboGameResponse;
-import com.yagubogu.game.dto.KboGamesResponse;
+import com.yagubogu.game.dto.KboGameParam;
+import com.yagubogu.game.dto.KboGamesParam;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameSyncClient;
 import com.yagubogu.global.exception.NotFoundException;
@@ -33,23 +33,23 @@ public class GameScheduleSyncService {
 
     @Transactional
     public void syncGameSchedule(final LocalDate date) {
-        KboGamesResponse kboGamesResponse = kboGameSyncClient.fetchGames(date);
-        List<Game> games = convertToGames(kboGamesResponse);
+        KboGamesParam kboGamesParam = kboGameSyncClient.fetchGames(date);
+        List<Game> games = convertToGames(kboGamesParam);
 
         gameRepository.saveAll(games);
     }
 
-    private List<Game> convertToGames(final KboGamesResponse kboGamesResponse) {
+    private List<Game> convertToGames(final KboGamesParam kboGamesParam) {
         List<Game> games = new ArrayList<>();
 
-        for (KboGameResponse kboGameItem : kboGamesResponse.games()) {
+        for (KboGameParam kboGameItem : kboGamesParam.games()) {
             games.add(buildGameFrom(kboGameItem));
         }
 
         return games;
     }
 
-    private Game buildGameFrom(final KboGameResponse kboGameItem) {
+    private Game buildGameFrom(final KboGameParam kboGameItem) {
         Stadium stadium = getStadiumByLocation(kboGameItem.stadiumName());
         Team homeTeam = getTeamByCode(kboGameItem.homeTeamCode());
         Team awayTeam = getTeamByCode(kboGameItem.awayTeamCode());

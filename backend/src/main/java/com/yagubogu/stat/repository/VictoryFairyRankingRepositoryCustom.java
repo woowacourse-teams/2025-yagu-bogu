@@ -1,7 +1,7 @@
 package com.yagubogu.stat.repository;
 
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
+import com.yagubogu.checkin.dto.VictoryFairyRankParam;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.InsertDto;
 import com.yagubogu.stat.dto.UpdateDto;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface VictoryFairyRankingRepositoryCustom {
 
-    List<VictoryFairyRank> findTopRankingByTeamFilterAndYear(TeamFilter teamFilter, int limit, int year);
+    List<VictoryFairyRankParam> findTopRankingByTeamFilterAndYear(TeamFilter teamFilter, int limit, int year);
 
-    Optional<VictoryFairyRank> findByMemberAndTeamFilterAndYear(Member member, TeamFilter teamFilter, int year);
+    Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(Member member, TeamFilter teamFilter, int year);
 
     void batchUpdate(List<UpdateDto> updates, int batchSize);
 

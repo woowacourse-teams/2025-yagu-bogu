@@ -1,14 +1,12 @@
 package com.yagubogu.auth;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.LoginRequest;
-import com.yagubogu.auth.dto.LoginResponse;
-import com.yagubogu.auth.dto.LogoutRequest;
-import com.yagubogu.auth.dto.TokenRequest;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.auth.dto.LogoutParam;
+import com.yagubogu.auth.dto.TokenParam;
+import com.yagubogu.auth.dto.v1.LoginResponse;
+import com.yagubogu.auth.dto.v1.TokenResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.support.base.E2eTestBase;
@@ -31,6 +29,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -60,8 +60,8 @@ public class AuthE2eTest extends E2eTestBase {
         // given & when
         LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginRequest(ID_TOKEN))
-                .when().post("/api/auth/login")
+                .body(new LoginParam(ID_TOKEN))
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -81,8 +81,8 @@ public class AuthE2eTest extends E2eTestBase {
         // given
         LoginResponse registerResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginRequest(ID_TOKEN))
-                .when().post("/api/auth/login")
+                .body(new LoginParam(ID_TOKEN))
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -92,8 +92,8 @@ public class AuthE2eTest extends E2eTestBase {
         // when
         LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginRequest(ID_TOKEN))
-                .when().post("/api/auth/login")
+                .body(new LoginParam(ID_TOKEN))
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -118,8 +118,8 @@ public class AuthE2eTest extends E2eTestBase {
         // when
         TokenResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(refreshToken))
-                .when().post("/api/auth/refresh")
+                .body(new TokenParam(refreshToken))
+                .when().post("/api/v1/auth/refresh")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -142,8 +142,8 @@ public class AuthE2eTest extends E2eTestBase {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(nonExistToken))
-                .when().post("/api/auth/refresh")
+                .body(new TokenParam(nonExistToken))
+                .when().post("/api/v1/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
     }
@@ -160,8 +160,8 @@ public class AuthE2eTest extends E2eTestBase {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(expiredRefreshTokenId))
-                .when().post("/api/auth/refresh")
+                .body(new TokenParam(expiredRefreshTokenId))
+                .when().post("/api/v1/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
     }
@@ -182,8 +182,8 @@ public class AuthE2eTest extends E2eTestBase {
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new TokenRequest(revokedRefreshTokenId))
-                .when().post("/api/auth/refresh")
+                .body(new TokenParam(revokedRefreshTokenId))
+                .when().post("/api/v1/auth/refresh")
                 .then().log().all()
                 .statusCode(401);
     }
@@ -200,8 +200,8 @@ public class AuthE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new LogoutRequest(refreshTokenId))
-                .when().post("/api/auth/logout")
+                .body(new LogoutParam(refreshTokenId))
+                .when().post("/api/v1/auth/logout")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -217,8 +217,8 @@ public class AuthE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new LogoutRequest(nonExistTokenId))
-                .when().post("/api/auth/logout")
+                .body(new LogoutParam(nonExistTokenId))
+                .when().post("/api/v1/auth/logout")
                 .then().log().all()
                 .statusCode(401);
     }
@@ -241,8 +241,8 @@ public class AuthE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new LogoutRequest(expiredTokenId))
-                .when().post("/api/auth/logout")
+                .body(new LogoutParam(expiredTokenId))
+                .when().post("/api/v1/auth/logout")
                 .then().log().all()
                 .statusCode(401);
     }
@@ -266,8 +266,8 @@ public class AuthE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new LogoutRequest(revokedTokenId))
-                .when().post("/api/auth/logout")
+                .body(new LogoutParam(revokedTokenId))
+                .when().post("/api/v1/auth/logout")
                 .then().log().all()
                 .statusCode(401);
     }

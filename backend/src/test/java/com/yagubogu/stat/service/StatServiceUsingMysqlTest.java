@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses;
-import com.yagubogu.checkin.dto.VictoryFairyRankingResponses.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.dto.v1.TeamFilter;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse;
+import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse.VictoryFairyRankingParam;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -169,7 +169,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         long memberId = fora.getId();
 
         // when
-        VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(memberId, TeamFilter.ALL, 2025);
+        VictoryFairyRankingResponse actual = statService.findVictoryFairyRankings(memberId, TeamFilter.ALL, 2025);
 
         // then
         assertSoftly(softAssertions -> {
@@ -222,13 +222,13 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         statService.calculateVictoryFairyScore(startDate.getYear(), game2.getId());
 
         // when
-        VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
+        VictoryFairyRankingResponse actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.ALL,
                 2025);
 
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting(VictoryFairyRankingResponse::nickname)
+                            .extracting(VictoryFairyRankingParam::nickname)
                             .containsExactly("포르");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("삼성");
@@ -338,13 +338,13 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         statService.calculateVictoryFairyScore(startDate.getYear(), scheduledGame.getId());
 
         // when
-        VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(duri.getId(), TeamFilter.ALL,
+        VictoryFairyRankingResponse actual = statService.findVictoryFairyRankings(duri.getId(), TeamFilter.ALL,
                 2025);
 
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting(VictoryFairyRankingResponse::nickname)
+                            .extracting(VictoryFairyRankingParam::nickname)
                             .containsExactly("밍트", "포르", "포라", "두리", "우가");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(duri.getNickname().getValue());
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(duri.getTeam().getShortName());
@@ -398,12 +398,12 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         statService.calculateVictoryFairyScore(startDate.getYear(), g3.getId());
 
         // when
-        VictoryFairyRankingResponses actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.HT, 2025);
+        VictoryFairyRankingResponse actual = statService.findVictoryFairyRankings(por.getId(), TeamFilter.HT, 2025);
 
         // then
         assertSoftly(softAssertions -> {
                     softAssertions.assertThat(actual.topRankings())
-                            .extracting(VictoryFairyRankingResponse::nickname)
+                            .extracting(VictoryFairyRankingParam::nickname)
                             .containsExactly("포르", "밍트");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("KIA");
@@ -442,7 +442,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
 
         // when
-        VictoryFairyRankingResponse myRanking = statService.findVictoryFairyRankings(mint.getId(),
+        VictoryFairyRankingParam myRanking = statService.findVictoryFairyRankings(mint.getId(),
                 TeamFilter.ALL,
                 startDate.getYear()).myRanking();
 
@@ -480,15 +480,15 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         statService.calculateVictoryFairyScore(startDate.getYear(), g2.getId());
 
         // when
-        VictoryFairyRankingResponses responses = statService.findVictoryFairyRankings(fora.getId(),
+        VictoryFairyRankingResponse responses = statService.findVictoryFairyRankings(fora.getId(),
                 TeamFilter.ALL,
                 startDate.getYear());
-        List<VictoryFairyRankingResponse> victoryFairyRankingResponses = responses.topRankings();
-        VictoryFairyRankingResponse myRanking = responses.myRanking();
+        List<VictoryFairyRankingParam> victoryFairyRankingRespons = responses.topRankings();
+        VictoryFairyRankingParam myRanking = responses.myRanking();
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(victoryFairyRankingResponses).hasSize(1);
+            softAssertions.assertThat(victoryFairyRankingRespons).hasSize(1);
             softAssertions.assertThat(myRanking.victoryFairyScore()).isEqualTo(0.0);
         });
     }

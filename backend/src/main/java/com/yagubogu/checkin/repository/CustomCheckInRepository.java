@@ -2,21 +2,21 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.StatCounts;
+import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.StatCountsParam;
 import com.yagubogu.checkin.dto.VictoryFairyCountResult;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
+import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface CustomCheckInRepository {
 
-    StatCounts findStatCounts(Member member, int year);
+    StatCountsParam findStatCounts(Member member, int year);
 
     int findWinCounts(Member member, int year);
 
@@ -28,7 +28,7 @@ public interface CustomCheckInRepository {
 
     int countByMemberAndYear(Member member, int year);
 
-    List<CheckInGameResponse> findCheckInHistory(
+    List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
             int year,
@@ -36,16 +36,16 @@ public interface CustomCheckInRepository {
             CheckInOrderFilter orderFilter
     );
 
-    List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date);
+    List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date);
 
-    AverageStatistic findAverageStatistic(Member member);
+    AverageStatisticParam findAverageStatistic(Member member);
 
-    List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
+    List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
             int year
     );
 
-    List<OpponentWinRateRow> findOpponentWinRates(
+    List<OpponentWinRateRowParam> findOpponentWinRates(
             Member member,
             Team team,
             int year

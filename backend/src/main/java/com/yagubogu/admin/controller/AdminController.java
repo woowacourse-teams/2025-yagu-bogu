@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Hidden
 @RequireRole(Role.ADMIN)
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @RestController
 public class AdminController {
 

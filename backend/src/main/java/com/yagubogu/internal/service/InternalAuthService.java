@@ -2,7 +2,7 @@ package com.yagubogu.internal.service;
 
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.v1.TokenResponse;
 import com.yagubogu.auth.service.RefreshTokenService;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.global.exception.NotFoundException;

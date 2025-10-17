@@ -1,7 +1,7 @@
 package com.yagubogu.stadium.service;
 
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

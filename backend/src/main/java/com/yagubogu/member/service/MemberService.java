@@ -1,7 +1,6 @@
 package com.yagubogu.member.service;
 
-import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.global.exception.ConflictException;
+import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.dto.BadgeListResponse;
@@ -12,13 +11,13 @@ import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
-import com.yagubogu.member.dto.MemberFavoriteRequest;
-import com.yagubogu.member.dto.MemberFavoriteResponse;
-import com.yagubogu.member.dto.MemberFindResult;
-import com.yagubogu.member.dto.MemberInfoResponse;
-import com.yagubogu.member.dto.MemberNicknameRequest;
-import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.member.dto.MemberRepresentativeBadgeResponse;
+import com.yagubogu.member.dto.MemberFindResultParam;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
+import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
+import com.yagubogu.member.dto.v1.MemberInfoResponse;
+import com.yagubogu.member.dto.v1.MemberNicknameRequest;
+import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -119,13 +118,13 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberFindResult findMember(final AuthResponse response) {
+    public MemberFindResultParam findMember(final AuthParam response) {
         return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
-                .map(m -> new MemberFindResult(m, false))
+                .map(m -> new MemberFindResultParam(m, false))
                 .orElseGet(() -> {
                     Member savedMember = memberRepository.save(response.toMember());
                     publisher.publishEvent(new SignUpEvent(savedMember));
-                    return new MemberFindResult(savedMember, true);
+                    return new MemberFindResultParam(savedMember, true);
                 });
     }
 
