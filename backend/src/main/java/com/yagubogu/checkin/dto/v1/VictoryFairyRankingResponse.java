@@ -12,7 +12,7 @@ public record VictoryFairyRankingResponse(
 ) {
 
     public record VictoryFairyRankingParam(
-            int ranking,
+            long ranking,
             long memberId,
             String nickname,
             String profileImageUrl,
