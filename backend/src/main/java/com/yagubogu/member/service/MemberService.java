@@ -157,21 +157,30 @@ public class MemberService {
         existMember(loginMemberId);
 
         Member profileOwnerMember = getMember(profileOwnerId);
-        MemberProfileBadgeResponse memberProfileBadgeResponse = MemberProfileBadgeResponse.from(
-                profileOwnerMember.getRepresentativeBadge()
-        );
-        VictoryFairyProfileResponse victoryFairyProfileResponse = VictoryFairyProfileResponse.from(
-                statService.findVictoryFairySummary(profileOwnerId, LocalDate.now().getYear())
-        );
-        MemberCheckInResponse memberCheckInResponse = MemberCheckInResponse.from(
-                statService.findCheckInSummary(profileOwnerId, LocalDate.now().getYear())
-        );
+        int currentYear = LocalDate.now().getYear();
 
-        return MemberProfileResponse.from(profileOwnerMember,
-                memberProfileBadgeResponse,
-                victoryFairyProfileResponse,
-                memberCheckInResponse
+        MemberProfileBadgeResponse badgeResponse = createBadgeResponse(profileOwnerMember);
+        VictoryFairyProfileResponse victoryFairyResponse = createVictoryFairyResponse(profileOwnerId, currentYear);
+        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, currentYear);
+
+        return MemberProfileResponse.from(
+                profileOwnerMember,
+                badgeResponse,
+                victoryFairyResponse,
+                checkInResponse
         );
+    }
+
+    private MemberProfileBadgeResponse createBadgeResponse(final Member member) {
+        return MemberProfileBadgeResponse.from(member.getRepresentativeBadge());
+    }
+
+    private VictoryFairyProfileResponse createVictoryFairyResponse(final Long memberId, final int year) {
+        return VictoryFairyProfileResponse.from(statService.findVictoryFairySummary(memberId, year));
+    }
+
+    private MemberCheckInResponse createCheckInResponse(final Long memberId, final int year) {
+        return MemberCheckInResponse.from(statService.findCheckInSummary(memberId, year));
     }
 
     private void existMember(final long memberId) {
