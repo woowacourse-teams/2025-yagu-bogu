@@ -14,6 +14,8 @@ import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.domain.repository.StreamRepository
+import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
@@ -36,6 +38,7 @@ class HomeViewModel(
     private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
+    private val streamRepository: StreamRepository,
 ) : ViewModel() {
     private val _memberStatsUiModel = MutableLiveData<MemberStatsUiModel>()
     val memberStatsUiModel: LiveData<MemberStatsUiModel> get() = _memberStatsUiModel
@@ -43,17 +46,23 @@ class HomeViewModel(
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
-    private val _stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
-    val stadiumFanRateItems: LiveData<List<StadiumFanRateItem>> get() = _stadiumFanRateItems
+    private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
+    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
 
     private val _isStadiumStatsExpanded = MutableLiveData(false)
     val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
 
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> =
-        MediatorLiveData<StadiumStatsUiModel>().apply {
-            addSource(stadiumFanRateItems) { value = updateStadiumStats(isRefreshed = true) }
-            addSource(isStadiumStatsExpanded) { value = updateStadiumStats() }
+    val isShowMoreVisible: LiveData<Boolean> =
+        MediatorLiveData<Boolean>().apply {
+            addSource(stadiumFanRateItems) { value = it.size > 1 }
         }
+
+    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
+        MediatorLiveData<StadiumStatsUiModel>().apply {
+            addSource(stadiumFanRateItems) { updateStadiumStats() }
+            addSource(isStadiumStatsExpanded) { updateStadiumStats() }
+        }
+    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
     private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
     val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
@@ -69,6 +78,34 @@ class HomeViewModel(
 
     init {
         fetchAll()
+    }
+
+    fun startStreaming() {
+        viewModelScope.launch {
+            streamRepository.connect().collect { event: CheckInSseEvent ->
+                when (event) {
+                    is CheckInSseEvent.CheckInCreated -> {
+                        val newItems: List<StadiumFanRateItem> = event.items
+                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
+                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
+
+                        newItems.forEach { item: StadiumFanRateItem ->
+                            cachedStadiumFanRateItems[item.gameId] = item
+                        }
+                        stadiumFanRateItems.value = newItems
+                    }
+
+                    CheckInSseEvent.Connect,
+                    CheckInSseEvent.Timeout,
+                    CheckInSseEvent.Unknown,
+                    -> Unit
+                }
+            }
+        }
+    }
+
+    fun stopStreaming() {
+        streamRepository.disconnect()
     }
 
     fun fetchAll() {
@@ -98,11 +135,28 @@ class HomeViewModel(
                 checkInRepository.getStadiumFanRates(date)
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
-                    _stadiumFanRateItems.value = stadiumFanRates
+                    cachedStadiumFanRateItems.clear()
+                    stadiumFanRates.forEach { stadiumFanRateItem: StadiumFanRateItem ->
+                        cachedStadiumFanRateItems[stadiumFanRateItem.gameId] = stadiumFanRateItem
+                    }
+                    stadiumFanRateItems.value = stadiumFanRates
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun updateStadiumStats() {
+        val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
+        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
+
+        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
+        val newStadiumStats =
+            StadiumStatsUiModel(
+                stadiumFanRates = newItems,
+                refreshTime = LocalTime.now(),
+            )
+        _stadiumStatsUiModel.value = newStadiumStats
     }
 
     fun toggleStadiumStats() {
@@ -188,10 +242,10 @@ class HomeViewModel(
         }
     }
 
-    private fun fetchVictoryFairyRanking() {
+    private fun fetchVictoryFairyRanking(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                checkInRepository.getVictoryFairyRankings()
+                statsRepository.getVictoryFairyRankings(year, null)
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
@@ -244,20 +298,6 @@ class HomeViewModel(
                 _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
                 _isCheckInLoading.value = false
             }
-    }
-
-    private fun updateStadiumStats(isRefreshed: Boolean = false): StadiumStatsUiModel {
-        val items: List<StadiumFanRateItem> = stadiumFanRateItems.value.orEmpty()
-        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
-        val currentStadiumStats: StadiumStatsUiModel =
-            stadiumStatsUiModel.value ?: StadiumStatsUiModel(emptyList(), LocalTime.now())
-
-        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
-        return if (isRefreshed) {
-            currentStadiumStats.copy(stadiumFanRates = newItems, refreshTime = LocalTime.now())
-        } else {
-            currentStadiumStats.copy(stadiumFanRates = newItems)
-        }
     }
 
     companion object {

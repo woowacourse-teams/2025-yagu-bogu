@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface StadiumApiService {
-    @GET("/api/stadiums")
+    @GET("/api/v1/stadiums")
     suspend fun getStadiums(): Response<StadiumsResponse>
 }

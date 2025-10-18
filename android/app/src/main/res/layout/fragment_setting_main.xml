@@ -82,12 +82,30 @@
                 android:padding="20dp">
 
                 <include
-                    android:id="@+id/layout_edit_nickname"
+                    android:id="@+id/layout_edit_profile_image"
                     layout="@layout/item_setting_menu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:menuTitle="@{@string/setting_edit_profile_image}" />
+
+                <include
+                    android:id="@+id/layout_edit_nickname"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_edit_profile_image"
                     app:menuTitle="@{@string/setting_edit_nickname}" />
+
+                <include
+                    android:id="@+id/layout_edit_favorite_team"
+                    layout="@layout/item_setting_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_edit_nickname"
+                    app:menuTitle="@{@string/setting_edit_my_team}" />
 
                 <include
                     android:id="@+id/layout_manage_account"
@@ -95,7 +113,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/layout_edit_nickname"
+                    app:layout_constraintTop_toBottomOf="@id/layout_edit_favorite_team"
                     app:menuTitle="@{@string/setting_manage_account}" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

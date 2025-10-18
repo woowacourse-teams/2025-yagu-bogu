@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
-import com.yagubogu.ui.badge.model.BADGE_ACQUIRED_FIXTURE
+import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.theme.PretendardBold20
 
@@ -55,6 +55,6 @@ private class MainBadgeCardPreviewParameterProvider : PreviewParameterProvider<B
     override val values: Sequence<BadgeUiModel?> =
         sequenceOf(
             null,
-            BADGE_ACQUIRED_FIXTURE,
+            BADGE_ID_0_ACQUIRED_FIXTURE.badge,
         )
 }

@@ -62,6 +62,7 @@ class HomeFragment :
             app.statsRepository,
             app.locationRepository,
             app.stadiumRepository,
+            app.streamRepository,
         )
     }
 
@@ -100,6 +101,16 @@ class HomeFragment :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.startStreaming()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopStreaming()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -125,7 +136,7 @@ class HomeFragment :
         binding.rvVictoryFairy.adapter = victoryFairyAdapter
 
         binding.ivRefresh.setOnClickListener { view: View ->
-            viewModel.fetchStadiumStats()
+            viewModel.updateStadiumStats()
             view
                 .animate()
                 .rotationBy(REFRESH_ANIMATION_ROTATION)

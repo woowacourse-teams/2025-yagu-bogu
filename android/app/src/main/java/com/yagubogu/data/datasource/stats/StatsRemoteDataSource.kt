@@ -5,8 +5,10 @@ import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.util.safeApiCall
+import com.yagubogu.domain.model.Team
 
 class StatsRemoteDataSource(
     private val statsApiService: StatsApiService,
@@ -34,5 +36,13 @@ class StatsRemoteDataSource(
     override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =
         safeApiCall {
             statsApiService.getVsTeamStats(year)
+        }
+
+    override suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRankingResponse> =
+        safeApiCall {
+            statsApiService.getVictoryFairyRankings(year, team?.name)
         }
 }

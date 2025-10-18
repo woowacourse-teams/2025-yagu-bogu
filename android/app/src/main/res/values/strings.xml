@@ -51,9 +51,10 @@
     <string name="home_show_more">더보기</string>
     <string name="home_show_less">접기</string>
     <string name="home_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="home_victory_fairy_score">승요 점수</string>
+    <string name="home_victory_fairy_score_format">%.1f점</string>
     <string name="home_victory_fairy_my_nickname">나 (%s)</string>
-    <string name="home_victory_fairy_tooltip">직관 승률이 높은 팬들의 순위예요.</string>
-
+    <string name="home_victory_fairy_tooltip">직관 횟수와 승률을 바탕으로 점수를 산정했어요.</string>
     <string name="stats_tab_my_stats">내 통계</string>
     <string name="stats_tab_stats_detail">상세 통계</string>
 
@@ -127,6 +128,7 @@
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
     <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
+    <string name="livetalk_like_count_message">실시간 %s %,d회 응원중!</string>
 
     <string name="badge_icon_description">배지 아이콘</string>
     <string name="badge_title">배지</string>
@@ -135,6 +137,7 @@
     <string name="badge_empty_badge_message">대표 배지를 선택해 주세요</string>
     <string name="badge_list_title">배지 목록</string>
     <string name="badge_register_main_badge">대표 배지로 사용하기</string>
+    <string name="badge_already_used_badge">이미 사용 중인 배지예요</string>
     <string name="badge_achieved_rate_message">%의 사용자가 획득했어요</string>
     <string name="badge_achieved_date">획득한 날: %s</string>
     <string name="badge_progress_rate">달성률: %.1f%%</string>
@@ -142,9 +145,15 @@
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %s</string>
     <string name="setting_icon_description">설정 아이콘</string>
+    <string name="setting_edit_profile_image">프로필 사진 수정</string>
+    <string name="setting_edit_profile_image_crop_failed">이미지 자르기에 실패했습니다\n다른 이미지를 선택해보세요</string>
+    <string name="setting_edit_profile_image_processing_failed">이미지 처리에 실패했습니다\n다른 이미지를 선택해보세요</string>
+    <string name="setting_edit_profile_image_upload_failed">이미지 업로드에 실패했습니다\n나중에 다시 시도하세요</string>
+    <string name="setting_edit_profile_get_image_size_failed">이미지 파일 크기를 확인할 수 없습니다</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
+    <string name="setting_edit_my_team">응원팀 수정</string>
 
     <string name="setting_manage_account">계정 관리</string>
     <string name="setting_logout">로그아웃</string>

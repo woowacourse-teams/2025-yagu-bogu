@@ -7,6 +7,7 @@ import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StadiumRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.domain.repository.StreamRepository
 
 class HomeViewModelFactory(
     private val memberRepository: MemberRepository,
@@ -14,6 +15,7 @@ class HomeViewModelFactory(
     private val statsRepository: StatsRepository,
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
+    private val streamRepository: StreamRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
@@ -24,6 +26,7 @@ class HomeViewModelFactory(
                 statsRepository,
                 locationRepository,
                 stadiumRepository,
+                streamRepository,
             ) as T
         }
         throw IllegalArgumentException()

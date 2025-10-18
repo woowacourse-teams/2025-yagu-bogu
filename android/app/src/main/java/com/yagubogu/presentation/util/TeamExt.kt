@@ -32,3 +32,5 @@ fun Team.getEmoji(): String =
         Team.HH -> "\uD83E\uDD85"
         Team.OB -> "\uD83D\uDC3B"
     }
+
+fun String.getTeam(): Team? = Team.entries.find { it.shortname == this }

@@ -5,7 +5,7 @@ data class VictoryFairyItem(
     val nickname: String,
     val profileImageUrl: String,
     val teamName: String,
-    val winRate: Double,
+    val score: Double,
     // TODO API 배포 전 테스트
     val memberId: Long = 1,
 )

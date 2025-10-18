@@ -8,12 +8,12 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApiService {
-    @POST("/api/auth/login")
+    @POST("/api/v1/auth/login")
     suspend fun postLogin(
         @Body body: LoginRequest,
     ): Response<LoginResponse>
 
-    @POST("/api/auth/logout")
+    @POST("/api/v1/auth/logout")
     suspend fun logout(
         @Body body: LogoutRequest,
     ): Response<Unit>

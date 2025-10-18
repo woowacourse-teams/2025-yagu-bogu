@@ -1,6 +1,7 @@
 package com.yagubogu.presentation.util
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -121,5 +122,17 @@ fun ShimmerFrameLayout.bindShimmering(isLoading: Boolean) {
     } else {
         this.visibility = View.GONE
         this.stopShimmer()
+    }
+}
+
+@BindingAdapter("layout_talk_divider_marginBottom")
+fun setMarginBottom(
+    view: View,
+    marginBottom: Float,
+) {
+    val layoutParams = view.layoutParams as? ViewGroup.MarginLayoutParams
+    layoutParams?.let {
+        it.bottomMargin = marginBottom.toInt()
+        view.layoutParams = it
     }
 }

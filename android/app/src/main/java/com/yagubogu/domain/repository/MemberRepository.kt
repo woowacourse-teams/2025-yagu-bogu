@@ -2,6 +2,9 @@ package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
+import com.yagubogu.presentation.setting.PresignedUrlItem
+import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.dialog.model.MemberProfile
 
 interface MemberRepository {
@@ -17,7 +20,18 @@ interface MemberRepository {
 
     suspend fun deleteMember(): Result<Unit>
 
-    suspend fun getMemberProfile(memberId: Long): Result<MemberProfile>
+    suspend fun getBadges(): Result<BadgeUiState>
+
+    suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit>
 
     fun invalidateCache()
+
+    suspend fun getPresignedUrl(
+        contentType: String,
+        contentLength: Long,
+    ): Result<PresignedUrlItem>
+
+    suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem>
+
+    suspend fun getMemberProfile(memberId: Long): Result<MemberProfile>
 }

@@ -1,5 +1,7 @@
 package com.yagubogu.presentation
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +12,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.google.firebase.Firebase
@@ -68,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupView() {
         enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -179,5 +183,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val BACK_PRESS_INTERVAL = 1500L
+
+        fun newIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
     }
 }

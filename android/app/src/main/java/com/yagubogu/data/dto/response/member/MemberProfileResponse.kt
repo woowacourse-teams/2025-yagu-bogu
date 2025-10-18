@@ -28,7 +28,7 @@ data class MemberProfileResponse(
             profileImageUrl = profileImageUrl,
             favoriteTeam = favoriteTeam,
             representativeBadgeName = representativeBadge.name,
-            representativeBadgeImageUrl = representativeBadge.imageUrl,
+            representativeBadgeImageUrl = representativeBadge.badgeImageUrl,
             victoryFairyRanking = victoryFairy.ranking,
             victoryFairyScore = victoryFairy.score,
             checkInCounts = checkIn.counts,
