@@ -1,16 +1,20 @@
 package com.yagubogu.member;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.domain.Policy;
+import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.member.dto.MemberFavoriteRequest;
-import com.yagubogu.member.dto.MemberFavoriteResponse;
-import com.yagubogu.member.dto.MemberInfoResponse;
-import com.yagubogu.member.dto.MemberNicknameRequest;
-import com.yagubogu.member.dto.MemberNicknameResponse;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
+import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
+import com.yagubogu.member.dto.v1.MemberInfoResponse;
+import com.yagubogu.member.dto.v1.MemberNicknameRequest;
+import com.yagubogu.member.dto.v1.MemberNicknameResponse;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
@@ -43,6 +47,12 @@ public class MemberE2eTest extends E2eTestBase {
     @Autowired
     private TeamRepository teamRepository;
 
+    @Autowired
+    private BadgeRepository badgeRepository;
+
+    @Autowired
+    private MemberBadgeFactory memberBadgeFactory;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -61,7 +71,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberFavoriteResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/favorites")
+                .when().get("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -83,7 +93,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberNicknameResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/me/nickname")
+                .when().get("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -107,7 +117,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(newNickname))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -131,7 +141,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(existNickname))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(409);
     }
@@ -150,7 +160,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new MemberNicknameRequest(longNickName))
-                .when().patch("/api/members/me/nickname")
+                .when().patch("/api/v1/members/me/nickname")
                 .then().log().all()
                 .statusCode(422);
     }
@@ -166,7 +176,7 @@ public class MemberE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().delete("/api/members/me")
+                .when().delete("/api/v1/members/me")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -190,7 +200,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(request)
-                .when().patch("/api/members/favorites")
+                .when().patch("/api/v1/members/favorites")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -215,7 +225,7 @@ public class MemberE2eTest extends E2eTestBase {
         MemberInfoResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/members/me")
+                .when().get("/api/v1/members/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -228,6 +238,63 @@ public class MemberE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.createdAt()).isEqualTo(member.getCreatedAt().toLocalDate());
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(member.getTeam().getShortName());
         });
+    }
+
+    @DisplayName("뱃지를 조회한다")
+    @Test
+    void findBadges() {
+        // given
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/members/me/badges")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("대표 뱃지를 수정한다")
+    @Test
+    void patchRepresentativeBadge() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+        memberBadgeFactory.save(builder ->
+                builder.badge(badge)
+                        .member(member)
+                        .isAchieved(true)
+        );
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/v1/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외: 대표 뱃지가 수정이 될 때 소유하지 않은 뱃지면 예외가 발생한다")
+    @Test
+    void patchRepresentativeBadge_noOwnBadgeThrowNotFoundException() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member member = memberFactory.save(builder -> builder.nickname("우가"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("badgeId", badge.getId())
+                .when().patch("/api/v1/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(404);
     }
 
     @DisplayName("사용자의 프로필 정보를 조회한다")
@@ -250,7 +317,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", profileOwneredMember.getId())
-                .when().get("/api/members/{memberId}")
+                .when().get("/api/v1/members/{memberId}")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -272,7 +339,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("memberId", invalidProfileOwnerMemberId)
-                .when().get("/api/members/{memberId}")
+                .when().get("/api/v1/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }

@@ -2,7 +2,7 @@ package com.yagubogu.game.schedule;
 
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.service.GameResultSyncService;
-import com.yagubogu.game.service.GameScheduleSyncService;
+import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class GameScheduler {
+
+//    private final KboScoreboardService kboScoreboardService;
 
     private final GameScheduleSyncService gameScheduleSyncService;
     private final GameResultSyncService gameResultSyncService;
@@ -36,4 +38,15 @@ public class GameScheduler {
             log.error("[GameSyncException]- {}", e.getMessage());
         }
     }
+
+//    @Scheduled(cron = "0 0 0 * * *")
+//    public void fetchDailyGameSchedule() {
+//        LocalDate yesterday = LocalDate.now().minusDays(1);
+//        LocalDate today = LocalDate.now();
+//        try {
+//            kboScoreboardService.fetchScoreboardRange(yesterday, today);
+//        } catch (GameSyncException e) {
+//            log.error("[GameSyncException]- {}", e.getMessage());
+//        }
+//    }
 }

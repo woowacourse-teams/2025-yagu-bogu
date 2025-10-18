@@ -1,13 +1,13 @@
 package com.yagubogu.auth.service;
 
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.auth.dto.LoginRequest;
-import com.yagubogu.auth.dto.LoginResponse;
-import com.yagubogu.auth.dto.LoginResponse.MemberResponse;
-import com.yagubogu.auth.dto.LogoutRequest;
+import com.yagubogu.auth.dto.AuthParam;
+import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.auth.dto.LogoutParam;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.v1.LoginResponse;
+import com.yagubogu.auth.dto.v1.LoginResponse.MemberResponse;
+import com.yagubogu.auth.dto.v1.TokenResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
@@ -16,7 +16,7 @@ import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.member.dto.MemberFindResult;
+import com.yagubogu.member.dto.MemberFindResultParam;
 import com.yagubogu.member.service.MemberService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,23 +31,24 @@ public class AuthService {
 
     private final AuthGateway authGateway;
     private final AuthTokenProvider authTokenProvider;
-    private final List<AuthValidator<? extends AuthResponse>> authValidators;
+    private final List<AuthValidator<? extends AuthParam>> authValidators;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberService memberService;
     private final RefreshTokenService refreshTokenService;
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public LoginResponse login(final LoginRequest request) {
-        AuthResponse response = authGateway.validateToken(request);
+    public LoginResponse login(final LoginParam request) {
+        AuthParam response = authGateway.validateToken(request);
         validateToken(response, OAuthProvider.GOOGLE);
 
-        MemberFindResult memberFindResult = memberService.findMember(response);
-        Member member = memberFindResult.member();
+        MemberFindResultParam memberFindResultParam = memberService.findMember(response);
+        Member member = memberFindResultParam.member();
+        boolean isNew = memberFindResultParam.isNew();
 
         String accessToken = authTokenProvider.issueAccessToken(MemberClaims.from(member));
         String refreshToken = refreshTokenService.issue(member);
 
-        return new LoginResponse(accessToken, refreshToken, memberFindResult.isNew(), MemberResponse.from(member));
+        return new LoginResponse(accessToken, refreshToken, isNew, MemberResponse.from(member));
     }
 
     public MemberClaims makeMemberClaims(final String token) {
@@ -73,7 +74,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(final LogoutRequest request) {
+    public void logout(final LogoutParam request) {
         String previousRefreshToken = request.refreshToken();
         RefreshToken refreshToken = getPreviousValidRefreshToken(previousRefreshToken);
         refreshToken.revoke();
@@ -88,7 +89,7 @@ public class AuthService {
     }
 
     private void validateToken(
-            final AuthResponse response,
+            final AuthParam response,
             final OAuthProvider provider
     ) {
         authValidators.stream()
@@ -103,9 +104,9 @@ public class AuthService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AuthResponse> void invokeValidator(
+    private <T extends AuthParam> void invokeValidator(
             final AuthValidator<?> validator,
-            final AuthResponse response
+            final AuthParam response
     ) {
         ((AuthValidator<T>) validator).validate((T) response);
     }

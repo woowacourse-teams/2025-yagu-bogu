@@ -14,12 +14,13 @@ import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
+import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
+import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
+import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.StatCountsResponse;
+import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -27,7 +28,10 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,9 +72,12 @@ class StatServiceTest {
     @Autowired
     private StadiumRepository stadiumRepository;
 
+    @Autowired
+    private VictoryFairyRankingRepository victoryFairyRankingRepository;
+
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository);
+        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository);
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")
@@ -561,39 +568,55 @@ class StatServiceTest {
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), year);
 
         // then
+        // 내 팀(HT) 제외한 상대 팀 수를 동적으로 계산 (레거시/과거팀 포함 대응)
+        int expectedOpponents = 9;
+
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(9);
+            // 1) 사이즈 검증(고정 9 → 동적 계산)
+            s.assertThat(actual.opponents()).hasSize(expectedOpponents);
 
-            // SS
-            s.assertThat(actual.opponents().get(0).teamCode()).isEqualTo("SS");
-            s.assertThat(actual.opponents().get(0).wins()).isEqualTo(2);
-            s.assertThat(actual.opponents().get(0).losses()).isEqualTo(0);
-            s.assertThat(actual.opponents().get(0).draws()).isEqualTo(0);
-            s.assertThat(actual.opponents().get(0).winRate()).isEqualTo(100.0);
+            // 2) 상단 랭킹 고정값 검증
+            OpponentWinRateTeamParam first = actual.opponents().get(0);
+            s.assertThat(first.teamCode()).isEqualTo("SS");
+            s.assertThat(first.wins()).isEqualTo(2);
+            s.assertThat(first.losses()).isEqualTo(0);
+            s.assertThat(first.draws()).isEqualTo(0);
+            s.assertThat(first.winRate()).isEqualTo(100.0);
 
-            // LT
-            s.assertThat(actual.opponents().get(1).teamCode()).isEqualTo("LT");
-            s.assertThat(actual.opponents().get(1).wins()).isEqualTo(1);
-            s.assertThat(actual.opponents().get(1).losses()).isEqualTo(1);
-            s.assertThat(actual.opponents().get(1).draws()).isEqualTo(0);
-            s.assertThat(actual.opponents().get(1).winRate()).isEqualTo(50.0);
+            OpponentWinRateTeamParam second = actual.opponents().get(1);
+            s.assertThat(second.teamCode()).isEqualTo("LT");
+            s.assertThat(second.wins()).isEqualTo(1);
+            s.assertThat(second.losses()).isEqualTo(1);
+            s.assertThat(second.draws()).isEqualTo(0);
+            s.assertThat(second.winRate()).isEqualTo(50.0);
 
-            // NC
-            OpponentWinRateTeamResponse nc = actual.opponents().stream()
+            // 3) NC는 1무로 승률 0.0
+            OpponentWinRateTeamParam ncRes = actual.opponents().stream()
                     .filter(r -> r.teamCode().equals("NC"))
                     .findFirst().orElseThrow();
-            s.assertThat(nc.wins()).isEqualTo(0);
-            s.assertThat(nc.losses()).isEqualTo(0);
-            s.assertThat(nc.draws()).isEqualTo(1);
-            s.assertThat(nc.winRate()).isEqualTo(0.0);
+            s.assertThat(ncRes.wins()).isZero();
+            s.assertThat(ncRes.losses()).isZero();
+            s.assertThat(ncRes.draws()).isEqualTo(1);
+            s.assertThat(ncRes.winRate()).isEqualTo(0.0);
 
-            // 미대결 팀들
-            var zeroTeamCodes = actual.opponents().stream()
+            // 4) 미대결(또는 무만 있는) 팀: winRate == 0.0
+            Set<String> zeroCodesActual = actual.opponents().stream()
                     .filter(r -> r.winRate() == 0.0)
-                    .map(OpponentWinRateTeamResponse::teamCode)
+                    .map(OpponentWinRateTeamParam::teamCode)
+                    .collect(Collectors.toSet());
+
+            // 기대 집합 = 전체 팀코드 - {내 팀 HT, SS, LT}  (SS/LT는 100/50이라 제외)
+            Set<String> zeroCodesExpected = Set.of("HH", "OB", "NC", "SK", "WO", "KT", "LG");
+
+            s.assertThat(zeroCodesActual).isEqualTo(zeroCodesExpected);
+
+            // 5) 전체 정렬 규칙 검증: 승률 desc → 이름 asc
+            List<OpponentWinRateTeamParam> sorted = actual.opponents().stream()
+                    .sorted(Comparator
+                            .comparing(OpponentWinRateTeamParam::winRate).reversed()
+                            .thenComparing(OpponentWinRateTeamParam::name))
                     .toList();
-            s.assertThat(zeroTeamCodes)
-                    .containsExactlyInAnyOrder("KT", "LG", "NC", "SK", "OB", "WO", "HH");
+            s.assertThat(actual.opponents()).containsExactlyElementsOf(sorted);
         });
     }
 
@@ -628,7 +651,7 @@ class StatServiceTest {
         // then
         assertSoftly(s -> {
             s.assertThat(actual.opponents()).hasSize(9);
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
             s.assertThat(lt.winRate()).isEqualTo(100.0);
@@ -664,7 +687,7 @@ class StatServiceTest {
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
 
         // 미기록(제외: SCHEDULED)
-        var gScheduled = gameFactory.save(b -> b.stadium(kia)
+        Game gScheduled = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 7, 30))
                 .homeScore(null).awayScore(null)
@@ -672,7 +695,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(gScheduled));
 
         // 기록(포함, 승)
-        var gCompleted = gameFactory.save(b -> b.stadium(kia)
+        Game gCompleted = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 8, 2))
                 .homeScore(2).awayScore(1)
@@ -685,7 +708,7 @@ class StatServiceTest {
         // then
         assertSoftly(s -> {
             s.assertThat(actual.opponents()).hasSize(9);
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
             s.assertThat(lt.winRate()).isEqualTo(100.0);
@@ -714,45 +737,44 @@ class StatServiceTest {
         // 다른 회원(같은 팀 HT) — 이 회원의 체크인은 대상 회원 집계에 포함되면 안 됨
         Member other = memberFactory.save(b -> b.team(HT));
 
-        // 2025-08-01: HT(home) vs LT — COMPLETED
-        var gHome = gameFactory.save(b -> b.stadium(kia)
+        // 2025-08-01: HT(home) vs LT — COMPLETED (대상 회원 체크인 없음 → 제외)
+        Game gHome = gameFactory.save(b -> b.stadium(kia)
                 .homeTeam(HT).awayTeam(LT)
                 .date(LocalDate.of(2025, 8, 1))
                 .homeScore(3).awayScore(2)
                 .gameState(GameState.COMPLETED));
-        // 대상 회원의 CheckIn 없음
         checkInFactory.save(b -> b.member(other).team(HT).game(gHome));
 
-        // 2025-08-02: LT(home) vs HT — COMPLETED
-        var gAway = gameFactory.save(b -> b.stadium(lot)
+        // 2025-08-02: LT(home) vs HT — COMPLETED (대상 회원 체크인 없음 → 제외)
+        Game gAway = gameFactory.save(b -> b.stadium(lot)
                 .homeTeam(LT).awayTeam(HT)
                 .date(LocalDate.of(2025, 8, 2))
                 .homeScore(1).awayScore(5)
                 .gameState(GameState.COMPLETED));
-        // 대상 회원의 CheckIn 없음
         checkInFactory.save(b -> b.member(other).team(HT).game(gAway));
 
         // when
         OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), 2025);
 
         // then
-        assertSoftly(s -> {
-            // 전체 10개 팀 중 내 팀(HT) 제외 → 9개
-            s.assertThat(actual.opponents()).hasSize(9);
+        int expectedOpponents = 9;
 
-            // LT는 두 경기가 있었지만, 대상 회원의 CheckIn이 없어 집계 제외되어 0.0이어야 한다.
-            OpponentWinRateTeamResponse lt = actual.opponents().stream()
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(expectedOpponents);
+
+            // LT도 대상 회원 체크인이 없으므로 0.0이어야 함
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
                     .filter(it -> it.teamCode().equals("LT"))
                     .findFirst().orElseThrow();
-
             s.assertThat(lt.wins()).isEqualTo(0);
             s.assertThat(lt.losses()).isEqualTo(0);
             s.assertThat(lt.draws()).isEqualTo(0);
             s.assertThat(lt.winRate()).isEqualTo(0.0);
 
-            // 나머지 미대결팀들도 0.0인지 확인 (LT 포함)
+            // 모든 상대팀이 0.0 (집계된 경기가 없음)
             s.assertThat(actual.opponents().stream()
-                    .allMatch(it -> it.winRate() == 0.0)).isTrue();
+                            .allMatch(it -> it.winRate() == 0.0))
+                    .isTrue();
         });
     }
 }

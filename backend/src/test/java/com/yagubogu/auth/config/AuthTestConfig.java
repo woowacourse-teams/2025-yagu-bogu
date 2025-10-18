@@ -6,11 +6,13 @@ import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.service.RefreshTokenService;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.GoogleAuthValidator;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -83,5 +85,10 @@ public class AuthTestConfig {
     public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository,
                                                    final AuthTokenProperties authTokenProperties) {
         return new RefreshTokenService(refreshTokenRepository, authTokenProperties);
+    }
+
+    @Bean
+    public MemberBadgeFactory memberBadgeFactory(final MemberBadgeRepository memberBadgeRepository) {
+        return new MemberBadgeFactory(memberBadgeRepository);
     }
 }
