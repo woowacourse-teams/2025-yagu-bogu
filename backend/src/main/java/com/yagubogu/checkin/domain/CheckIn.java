@@ -6,6 +6,8 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,9 +42,14 @@ public class CheckIn extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    public CheckIn(final Game game, final Member member, final Team team) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "check_in_type", nullable = false)
+    private CheckInType checkInType;
+
+    public CheckIn(final Game game, final Member member, final Team team, final CheckInType checkInType) {
         this.game = game;
         this.member = member;
         this.team = team;
+        this.checkInType = checkInType;
     }
 }

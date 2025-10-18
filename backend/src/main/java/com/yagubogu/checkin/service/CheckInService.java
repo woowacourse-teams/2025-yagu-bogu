@@ -3,6 +3,7 @@ package com.yagubogu.checkin.service;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.FanRateByGameParam;
 import com.yagubogu.checkin.dto.FanRateGameParam;
@@ -58,7 +59,7 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        CheckIn checkIn = new CheckIn(game, member, team);
+        CheckIn checkIn = new CheckIn(game, member, team, CheckInType.LOCATION_CHECK_IN);
         checkInRepository.save(checkIn);
 
         applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));
@@ -123,9 +124,13 @@ public class CheckInService {
         return new StadiumCheckInCountsResponse(stadiumCheckInCounts);
     }
 
-    public CheckInStatusResponse findCheckInStatus(final long memberId, final LocalDate date) {
+    public CheckInStatusResponse findLocationCheckInStatus(final long memberId, final LocalDate date) {
         Member member = getMember(memberId);
-        boolean isCheckIn = checkInRepository.existsByMemberAndGameDate(member, date);
+        boolean isCheckIn = checkInRepository.existsByMemberAndGameDateAndCheckInType(
+                member,
+                date,
+                CheckInType.LOCATION_CHECK_IN
+        );
 
         return new CheckInStatusResponse(isCheckIn);
     }
