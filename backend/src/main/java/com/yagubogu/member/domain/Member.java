@@ -1,5 +1,6 @@
 package com.yagubogu.member.domain;
 
+import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.team.domain.Team;
 import jakarta.persistence.Column;
@@ -55,8 +56,12 @@ public class Member extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "representative_badge_id", nullable = true)
+    private Badge representativeBadge;
+
     public Member(final Team team, final Nickname nickname, final String email, final OAuthProvider provider,
-                  final String oauthId, final Role role, final String imageUrl) {
+                  final String oauthId, final Role role, final String imageUrl, final Badge representativeBadge) {
         this.team = team;
         this.nickname = nickname;
         this.email = email;
@@ -64,6 +69,7 @@ public class Member extends BaseEntity {
         this.oauthId = oauthId;
         this.role = role;
         this.imageUrl = imageUrl;
+        this.representativeBadge = representativeBadge;
     }
 
     public boolean isAdmin() {
@@ -80,5 +86,13 @@ public class Member extends BaseEntity {
 
     public void updateNickname(final Nickname nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateImageUrl(final String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void updateBadge(final Badge badge) {
+        this.representativeBadge = badge;
     }
 }

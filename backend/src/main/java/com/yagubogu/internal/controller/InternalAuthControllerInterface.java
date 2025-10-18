@@ -1,6 +1,6 @@
 package com.yagubogu.internal.controller;
 
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.v1.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

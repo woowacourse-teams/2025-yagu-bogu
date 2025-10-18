@@ -1,20 +1,18 @@
 package com.yagubogu.game;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.GameResponse;
-import com.yagubogu.game.dto.GameWithCheckIn;
-import com.yagubogu.game.dto.StadiumByGame;
-import com.yagubogu.game.dto.TeamByGame;
+import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.StadiumByGameParam;
+import com.yagubogu.game.dto.TeamByGameParam;
+import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.checkin.CheckInFactory;
@@ -34,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class GameE2eTest extends E2eTestBase {
@@ -88,7 +88,7 @@ public class GameE2eTest extends E2eTestBase {
         // game3
         makeCheckIns(game3, team, 5);
 
-        List<GameWithCheckIn> expected = List.of(
+        List<GameWithCheckInParam> expected = List.of(
                 toDto(game1, 3L, true),
                 toDto(game2, 4L, false),
                 toDto(game3, 5L, false)
@@ -99,7 +99,7 @@ public class GameE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", date.toString())
-                .when().get("/api/games")
+                .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -123,7 +123,7 @@ public class GameE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("date", invalidDate.toString())
-                .when().get("/api/games")
+                .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(422);
     }
@@ -170,15 +170,15 @@ public class GameE2eTest extends E2eTestBase {
         return teamRepository.findByTeamCode(code).orElseThrow();
     }
 
-    private GameWithCheckIn toDto(Game game, Long totalCheckIns, boolean isMine) {
-        return new GameWithCheckIn(
+    private GameWithCheckInParam toDto(Game game, Long totalCheckIns, boolean isMine) {
+        return new GameWithCheckInParam(
                 game.getId(),
                 totalCheckIns,
                 isMine,
-                new StadiumByGame(game.getStadium().getId(), game.getStadium().getFullName()),
-                new TeamByGame(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
+                new StadiumByGameParam(game.getStadium().getId(), game.getStadium().getFullName()),
+                new TeamByGameParam(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
                         game.getHomeTeam().getTeamCode()),
-                new TeamByGame(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
+                new TeamByGameParam(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
                         game.getAwayTeam().getTeamCode())
         );
     }

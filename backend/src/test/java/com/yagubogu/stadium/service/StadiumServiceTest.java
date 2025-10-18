@@ -4,12 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.dto.StadiumResponse;
-import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.stadium.dto.StadiumParam;
 import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.game.GameFactory;
@@ -36,9 +35,6 @@ class StadiumServiceTest {
     private StadiumRepository stadiumRepository;
 
     @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
@@ -49,7 +45,7 @@ class StadiumServiceTest {
 
     @BeforeEach
     void setUp() {
-        stadiumService = new StadiumService(stadiumRepository, gameRepository);
+        stadiumService = new StadiumService(stadiumRepository);
 
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
         stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
@@ -63,24 +59,24 @@ class StadiumServiceTest {
         lotte = teamRepository.findByTeamCode("LT").orElseThrow();
     }
 
-    @DisplayName("전체 구장 목록을 조회한다")
+    @DisplayName("제 2 구장을 제외한 전체 구장 목록을 조회한다")
     @Test
-    void findAllStadiums() {
+    void findAllMainStadiumsStadiums() {
         // given
-        List<StadiumResponse> expected = List.of(
-                new StadiumResponse(1L, "챔피언스필드", "챔피언스필드", "광주", 35.1683, 126.8889),
-                new StadiumResponse(2L, "잠실야구장", "잠실구장", "잠실", 37.5121, 127.0710),
-                new StadiumResponse(3L, "고척스카이돔", "고척돔", "고척", 37.4982, 126.8676),
-                new StadiumResponse(4L, "수원KT위즈파크", "위즈파크", "수원", 37.2996, 126.9707),
-                new StadiumResponse(5L, "대구삼성라이온즈파크", "라이온즈파크", "대구", 35.8419, 128.6815),
-                new StadiumResponse(6L, "사직야구장", "사직구장", "부산", 35.1943, 129.0615),
-                new StadiumResponse(7L, "문학야구장", "랜더스필드", "인천", 37.4361, 126.6892),
-                new StadiumResponse(8L, "마산야구장", "엔씨파크", "마산", 35.2281, 128.6819),
-                new StadiumResponse(9L, "이글스파크", "볼파크", "대전", 36.3173, 127.4280)
+        List<StadiumParam> expected = List.of(
+                new StadiumParam(1L, "광주 기아 챔피언스필드", "챔피언스필드", "광주", 35.168139, 126.889111),
+                new StadiumParam(2L, "잠실 야구장", "잠실구장", "잠실", 37.512150, 127.071976),
+                new StadiumParam(3L, "고척 스카이돔", "고척돔", "고척", 37.498222, 126.867250),
+                new StadiumParam(4L, "수원 KT 위즈파크", "위즈파크", "수원", 37.299759, 127.009781),
+                new StadiumParam(5L, "대구 삼성 라이온즈파크", "라이온즈파크", "대구", 35.841111, 128.681667),
+                new StadiumParam(6L, "사직야구장", "사직구장", "사직", 35.194077, 129.061584),
+                new StadiumParam(7L, "인천 SSG 랜더스필드", "랜더스필드", "문학", 37.436778, 126.693306),
+                new StadiumParam(8L, "창원 NC 파크", "엔씨파크", "창원", 35.222754, 128.582251),
+                new StadiumParam(9L, "대전 한화생명 볼파크", "볼파크", "대전", 36.316589, 127.431211)
         );
 
         // when
-        StadiumsResponse actual = stadiumService.findAll();
+        StadiumsResponse actual = stadiumService.findAllMainStadiums();
 
         // then
         assertThat(actual.stadiums()).isEqualTo(expected);

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.yagubogu.checkin.service.CheckInService;
-import com.yagubogu.sse.dto.CheckInCreatedEvent;
+import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.time.LocalDate;
 import java.util.List;

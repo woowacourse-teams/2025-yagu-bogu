@@ -43,7 +43,7 @@ class RetrofitInstance(
             .Builder()
             .baseUrl(baseUrl)
             .client(tokenClient)
-            .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
     }
 
@@ -68,7 +68,7 @@ class RetrofitInstance(
             .Builder()
             .baseUrl(baseUrl)
             .client(baseClient)
-            .addConverterFactory(Json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
     }
 
@@ -102,5 +102,7 @@ class RetrofitInstance(
 
     companion object {
         private const val MEDIA_TYPE = "application/json; charset=UTF8"
+
+        private val json = Json { ignoreUnknownKeys = true }
     }
 }

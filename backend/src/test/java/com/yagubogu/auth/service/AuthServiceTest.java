@@ -1,10 +1,13 @@
 package com.yagubogu.auth.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.auth.domain.RefreshToken;
-import com.yagubogu.auth.dto.LoginRequest;
-import com.yagubogu.auth.dto.LoginResponse;
-import com.yagubogu.auth.dto.TokenResponse;
+import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.auth.dto.v1.LoginResponse;
+import com.yagubogu.auth.dto.v1.TokenResponse;
 import com.yagubogu.auth.gateway.AuthGateway;
 import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
@@ -26,9 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @DataJpaTest
 @ActiveProfiles("integration")
@@ -71,10 +71,10 @@ class AuthServiceTest {
     @Test
     void login_register() {
         // given
-        LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
+        LoginParam loginParam = new LoginParam("ID_TOKEN");
 
         // when
-        LoginResponse response = authService.login(loginRequest);
+        LoginResponse response = authService.login(loginParam);
 
         // then
         assertSoftly(softAssertions -> {
@@ -88,12 +88,12 @@ class AuthServiceTest {
     @Test
     void login() {
         // given
-        LoginRequest loginRequest = new LoginRequest("ID_TOKEN");
-        LoginResponse registerResponse = authService.login(loginRequest);
+        LoginParam loginParam = new LoginParam("ID_TOKEN");
+        LoginResponse registerResponse = authService.login(loginParam);
         String expectedNickname = registerResponse.member().nickname();
 
         // when
-        LoginResponse actual = authService.login(loginRequest);
+        LoginResponse actual = authService.login(loginParam);
 
         // then
         assertSoftly(softAssertions -> {
@@ -237,5 +237,4 @@ class AuthServiceTest {
                 .isNotEmpty()
                 .allMatch(RefreshToken::isRevoked);
     }
-
 }

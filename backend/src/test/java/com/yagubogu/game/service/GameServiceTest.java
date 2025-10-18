@@ -7,12 +7,12 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.GameResponse;
-import com.yagubogu.game.dto.GameResultResponse;
-import com.yagubogu.game.dto.GameResultResponse.ScoreBoardResponse;
-import com.yagubogu.game.dto.GameWithCheckIn;
-import com.yagubogu.game.dto.StadiumByGame;
-import com.yagubogu.game.dto.TeamByGame;
+import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.GameResultParam;
+import com.yagubogu.game.dto.GameResultParam.ScoreBoardParam;
+import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.StadiumByGameParam;
+import com.yagubogu.game.dto.TeamByGameParam;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
@@ -95,7 +95,7 @@ class GameServiceTest {
         // game3
         makeCheckIns(game3, team, 5);
 
-        List<GameWithCheckIn> expected = List.of(
+        List<GameWithCheckInParam> expected = List.of(
                 toDto(game1, 3L, true),
                 toDto(game2, 4L, false),
                 toDto(game3, 5L, false)
@@ -143,14 +143,14 @@ class GameServiceTest {
         Game game = makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
         long gameId = game.getId();
 
-        GameResultResponse expected = new GameResultResponse(
-                ScoreBoardResponse.from(expectedHomeScoreBoard()),
-                ScoreBoardResponse.from(expectedAwayScoreBoard()),
+        GameResultParam expected = new GameResultParam(
+                ScoreBoardParam.from(expectedHomeScoreBoard()),
+                ScoreBoardParam.from(expectedAwayScoreBoard()),
                 "이포라", "김롯데"
         );
 
         // when
-        GameResultResponse scoreBoard = gameService.findScoreBoard(gameId);
+        GameResultParam scoreBoard = gameService.findScoreBoard(gameId);
 
         // then
         assertThat(scoreBoard).isEqualTo(expected);
@@ -235,15 +235,15 @@ class GameServiceTest {
         return teamRepository.findByTeamCode(code).orElseThrow();
     }
 
-    private GameWithCheckIn toDto(Game game, Long totalCheckIns, boolean isMine) {
-        return new GameWithCheckIn(
+    private GameWithCheckInParam toDto(Game game, Long totalCheckIns, boolean isMine) {
+        return new GameWithCheckInParam(
                 game.getId(),
                 totalCheckIns,
                 isMine,
-                new StadiumByGame(game.getStadium().getId(), game.getStadium().getFullName()),
-                new TeamByGame(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
+                new StadiumByGameParam(game.getStadium().getId(), game.getStadium().getFullName()),
+                new TeamByGameParam(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
                         game.getHomeTeam().getTeamCode()),
-                new TeamByGame(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
+                new TeamByGameParam(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
                         game.getAwayTeam().getTeamCode())
         );
     }

@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.oss.licenses.plugin)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -22,8 +23,8 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1_01_00
-        versionName = "1.1.0"
+        versionCode = 1_01_01
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -94,6 +95,7 @@ android {
     buildFeatures {
         dataBinding = true
         buildConfig = true
+        compose = true
     }
 }
 
@@ -119,6 +121,10 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
 
     // firebase
     implementation(platform(libs.firebase.bom))

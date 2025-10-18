@@ -3,7 +3,8 @@ package com.yagubogu.stadium.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.dto.StadiumsResponse;
+import com.yagubogu.stadium.domain.StadiumLevel;
+import com.yagubogu.stadium.dto.v1.StadiumsResponse;
 import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
@@ -22,8 +23,8 @@ public class StadiumService {
     private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
 
-    public StadiumsResponse findAll() {
-        List<Stadium> stadiums = stadiumRepository.findAll();
+    public StadiumsResponse findAllMainStadiums() {
+        List<Stadium> stadiums = stadiumRepository.findAllByLevel(StadiumLevel.MAIN);
 
         return StadiumsResponse.from(stadiums);
     }
