@@ -1,6 +1,6 @@
 package com.yagubogu.internal.controller;
 
-import com.yagubogu.auth.dto.v1.TokenResponse;
+import com.yagubogu.auth.dto.TokenResponse;
 import com.yagubogu.internal.service.InternalAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;

@@ -4,7 +4,7 @@ import com.yagubogu.badge.BadgeEvent;
 import com.yagubogu.badge.BadgePolicyRegistry;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.repository.BadgeRepository;
-import com.yagubogu.checkin.dto.event.StadiumVisitEvent;
+import com.yagubogu.checkin.event.StadiumVisitEvent;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.member.domain.Member;
 import jakarta.annotation.PostConstruct;

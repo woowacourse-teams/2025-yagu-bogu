@@ -1,6 +1,5 @@
 package com.yagubogu.global;
 
-import com.yagubogu.global.exception.YaguBoguException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -12,27 +11,19 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class TransactionalLoggingAspect {
 
-    private static final String LOG_FORMAT = "[{}] - [END TX] ({}ms)";
-
-    @Around("@within(org.springframework.stereotype.Service) && execution(* com.yagubogu..*(..))")
+    @Around("@within(org.springframework.stereotype.Service)")
     public Object logWritableTransactions(final ProceedingJoinPoint joinPoint) throws Throwable {
-        String signature = joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature().getName();
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+
         long startTime = System.currentTimeMillis();
-        log.info("[{}] - [BEGIN TX]", signature);
+        log.info("[{}] - [BEGIN TX]", className + "." + methodName);
 
         try {
-            Object proceed = joinPoint.proceed();
+            return joinPoint.proceed();
+        } finally {
             long elapsedTime = System.currentTimeMillis() - startTime;
-            log.info(LOG_FORMAT, signature, elapsedTime);
-            return proceed;
-        } catch (YaguBoguException e) {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            log.info(LOG_FORMAT, signature, elapsedTime);
-            throw e;
-        } catch (Throwable t) {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            log.error(LOG_FORMAT, signature, elapsedTime);
-            throw t;
+            log.info("[{}] - [END TX] ({}ms)", className + "." + methodName, elapsedTime);
         }
     }
 }

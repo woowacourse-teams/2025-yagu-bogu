@@ -1,9 +1,9 @@
 package com.yagubogu.auth.gateway;
 
-import com.yagubogu.auth.dto.LoginParam;
-import com.yagubogu.auth.dto.AuthParam;
+import com.yagubogu.auth.dto.LoginRequest;
+import com.yagubogu.auth.dto.AuthResponse;
 
 public interface AuthGateway {
 
-    AuthParam validateToken(final LoginParam loginParam);
+    AuthResponse validateToken(final LoginRequest loginRequest);
 }

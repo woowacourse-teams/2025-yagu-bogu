@@ -88,10 +88,6 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void updateImageUrl(final String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public void updateBadge(final Badge badge) {
         this.representativeBadge = badge;
     }

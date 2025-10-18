@@ -1,9 +1,9 @@
 package com.yagubogu.auth.gateway;
 
 import com.yagubogu.auth.config.GoogleAuthProperties;
-import com.yagubogu.auth.dto.AuthParam;
-import com.yagubogu.auth.dto.GoogleAuthParam;
-import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.auth.dto.AuthResponse;
+import com.yagubogu.auth.dto.GoogleAuthResponse;
+import com.yagubogu.auth.dto.LoginRequest;
 import com.yagubogu.auth.exception.GoogleAuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -31,14 +31,14 @@ public class GoogleAuthGateway implements AuthGateway {
     }
 
     @Override
-    public AuthParam validateToken(final LoginParam loginParam) {
+    public AuthResponse validateToken(final LoginRequest loginRequest) {
         return googleRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(googleAuthProperties.tokenInfoUri())
-                        .queryParam(ID_TOKEN, loginParam.idToken())
+                        .queryParam(ID_TOKEN, loginRequest.idToken())
                         .build())
                 .retrieve()
                 .onStatus(googleAuthExceptionHandler)
-                .body(GoogleAuthParam.class);
+                .body(GoogleAuthResponse.class);
     }
 }

@@ -1,7 +1,7 @@
 package com.yagubogu.game.repository;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import java.time.LocalDate;
@@ -19,21 +19,21 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     Optional<Game> findByGameCode(String gameCode);
 
     @Query("""
-            SELECT new com.yagubogu.game.dto.GameWithCheckInParam(
+            SELECT new com.yagubogu.game.dto.GameWithCheckIn(
                 g.id,
                 COUNT(c),
                 CASE WHEN MAX(CASE WHEN c.member = :member THEN 1 ELSE 0 END) = 1
                              THEN true ELSE false END,
-                new com.yagubogu.game.dto.StadiumByGameParam(
+                new com.yagubogu.game.dto.StadiumByGame(
                     g.stadium.id,
                     g.stadium.fullName
                 ),
-                new com.yagubogu.game.dto.TeamByGameParam(
+                new com.yagubogu.game.dto.TeamByGame(
                     g.homeTeam.id,
                     g.homeTeam.shortName,
                     g.homeTeam.teamCode
                 ),
-                new com.yagubogu.game.dto.TeamByGameParam(
+                new com.yagubogu.game.dto.TeamByGame(
                     g.awayTeam.id,
                     g.awayTeam.shortName,
                     g.awayTeam.teamCode
@@ -44,5 +44,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             WHERE g.date = :date
             GROUP BY g.id
             """)
-    List<GameWithCheckInParam> findGamesWithCheckInsByDate(LocalDate date, Member member);
+    List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
 }

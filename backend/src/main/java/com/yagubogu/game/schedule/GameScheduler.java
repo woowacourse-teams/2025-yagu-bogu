@@ -3,6 +3,7 @@ package com.yagubogu.game.schedule;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.service.GameResultSyncService;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
+import com.yagubogu.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

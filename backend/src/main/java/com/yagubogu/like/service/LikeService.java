@@ -2,10 +2,10 @@ package com.yagubogu.like.service;
 
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
-import com.yagubogu.like.dto.TeamLikeCountParam;
-import com.yagubogu.like.dto.v1.LikeBatchRequest;
-import com.yagubogu.like.dto.v1.LikeBatchRequest.LikeDelta;
-import com.yagubogu.like.dto.v1.LikeCountsResponse;
+import com.yagubogu.like.dto.LikeBatchRequest;
+import com.yagubogu.like.dto.LikeBatchRequest.LikeDelta;
+import com.yagubogu.like.dto.LikeCountsResponse;
+import com.yagubogu.like.dto.TeamLikeCountResponse;
 import com.yagubogu.like.repository.LikeRepository;
 import com.yagubogu.like.repository.LikeWindowRepository;
 import com.yagubogu.team.domain.Team;
@@ -51,7 +51,7 @@ public class LikeService {
     public LikeCountsResponse findCounts(final long gameId) {
         existsGame(gameId);
 
-        List<TeamLikeCountParam> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
+        List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
 
         return new LikeCountsResponse(gameId, teamLikeCounts);
     }

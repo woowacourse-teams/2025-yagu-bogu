@@ -8,12 +8,12 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.domain.Talk;
-import com.yagubogu.talk.dto.CursorResultParam;
-import com.yagubogu.talk.dto.event.TalkEvent;
-import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
-import com.yagubogu.talk.dto.v1.TalkEntranceResponse;
-import com.yagubogu.talk.dto.v1.TalkRequest;
-import com.yagubogu.talk.dto.v1.TalkResponse;
+import com.yagubogu.talk.dto.CursorResult;
+import com.yagubogu.talk.dto.TalkCursorResult;
+import com.yagubogu.talk.dto.TalkEntranceResponse;
+import com.yagubogu.talk.dto.TalkRequest;
+import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.event.TalkEvent;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
@@ -51,7 +51,7 @@ public class TalkService {
         return TalkEntranceResponse.from(game, member);
     }
 
-    public TalkCursorResultResponse findTalksExcludingReported(
+    public TalkCursorResult findTalksExcludingReported(
             final long gameId,
             final Long cursorId,
             final int limit,
@@ -63,13 +63,13 @@ public class TalkService {
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
-        CursorResultParam<TalkResponse> cursorResultParam = new CursorResultParam<>(hiddenReportedTalks, nextCursorId,
+        CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
                 talkResponses.hasNext());
 
-        return new TalkCursorResultResponse(cursorResultParam);
+        return new TalkCursorResult(cursorResult);
     }
 
-    public TalkCursorResultResponse findNewTalks(
+    public TalkCursorResult findNewTalks(
             final long gameId,
             final long cursorId,
             final long memberId,
@@ -80,10 +80,10 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
-        CursorResultParam<TalkResponse> cursorResultParam = new CursorResultParam<>(talkResponses.getContent(),
+        CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
-        return new TalkCursorResultResponse(cursorResultParam);
+        return new TalkCursorResult(cursorResult);
     }
 
     @Transactional

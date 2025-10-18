@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.KboGameResultParam;
+import com.yagubogu.game.dto.KboGameResultResponse;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.exception.KboClientExceptionHandler;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class KboGameResultClient {
     private final ObjectMapper objectMapper;
     private final KboClientExceptionHandler kboClientExceptionHandler;
 
-    public KboGameResultParam fetchGameResult(final Game game) {
+    public KboGameResultResponse fetchGameResult(final Game game) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("leId", "1");
         params.add("srId", "0");
@@ -51,7 +51,7 @@ public class KboGameResultClient {
             }
 
             // 4. 결과 조합하여 최종 DTO 생성
-            return new KboGameResultParam(
+            return new KboGameResultResponse(
                     scoreBoards.homeScoreBoard(),
                     scoreBoards.awayScoreBoard(),
                     pitchers.homePitcher(),

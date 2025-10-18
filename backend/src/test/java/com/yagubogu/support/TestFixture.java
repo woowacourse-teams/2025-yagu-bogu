@@ -2,7 +2,6 @@ package com.yagubogu.support;
 
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.domain.TeamStatus;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -47,7 +46,7 @@ public class TestFixture {
     }
 
     public static Team getTeam() {
-        return new Team("한화 이글스", "한화", "HH", TeamStatus.ACTIVE);
+        return new Team("한화 이글스", "한화", "HH");
     }
 
     public static Instant getAfter60Minutes() {

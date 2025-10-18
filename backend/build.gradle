@@ -38,7 +38,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql:10.20.1'
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'software.amazon.awssdk:s3:2.34.8'
+    implementation 'com.microsoft.playwright:playwright:1.48.0'
 
     compileOnly 'org.projectlombok:lombok'
 

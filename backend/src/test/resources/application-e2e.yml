@@ -18,7 +18,3 @@ spring:
       - classpath:db/migration
       - classpath:db/migration/mysql
     clean-disabled: false
-
-aws:
-  accessKeyId: test
-  secretAccessKey: test

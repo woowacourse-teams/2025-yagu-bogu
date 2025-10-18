@@ -1,9 +1,9 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.v1.GameResponse;
-import com.yagubogu.game.dto.GameResultParam;
-import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.GameResponse;
+import com.yagubogu.game.dto.GameResultResponse;
+import com.yagubogu.game.dto.GameWithCheckIn;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
@@ -30,16 +30,16 @@ public class GameService {
         Member member = getMember(memberId);
         validateIsNotFuture(date);
 
-        List<GameWithCheckInParam> gameWithCheckInParams = gameRepository.findGamesWithCheckInsByDate(date, member);
+        List<GameWithCheckIn> gameWithCheckIns = gameRepository.findGamesWithCheckInsByDate(date, member);
 
-        return new GameResponse(gameWithCheckInParams);
+        return new GameResponse(gameWithCheckIns);
     }
 
-    public GameResultParam findScoreBoard(final long gameId) {
+    public GameResultResponse findScoreBoard(final long gameId) {
         Game game = getGame(gameId);
         validateScoreBoard(game);
 
-        return GameResultParam.from(game);
+        return GameResultResponse.from(game);
     }
 
     private static void validateScoreBoard(final Game game) {

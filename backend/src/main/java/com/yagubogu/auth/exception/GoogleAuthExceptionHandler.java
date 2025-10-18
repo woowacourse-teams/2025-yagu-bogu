@@ -1,7 +1,7 @@
 package com.yagubogu.auth.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yagubogu.auth.dto.GoogleErrorParam;
+import com.yagubogu.auth.dto.GoogleErrorResponse;
 import com.yagubogu.global.exception.BadGatewayException;
 import java.io.IOException;
 import java.net.URI;
@@ -31,12 +31,12 @@ public class GoogleAuthExceptionHandler implements ResponseErrorHandler {
             final HttpMethod method,
             final ClientHttpResponse response
     ) throws IOException {
-        GoogleErrorParam errorResponse = parseErrorResponse(response);
+        GoogleErrorResponse errorResponse = parseErrorResponse(response);
         String error = errorResponse.error();
         throw new BadGatewayException(error);
     }
 
-    private GoogleErrorParam parseErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), GoogleErrorParam.class);
+    private GoogleErrorResponse parseErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), GoogleErrorResponse.class);
     }
 }

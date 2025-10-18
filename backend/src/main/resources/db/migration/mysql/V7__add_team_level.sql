@@ -1,2 +1,0 @@
-ALTER TABLE teams
-    ADD COLUMN status ENUM ('ACTIVE', 'INACTIVE') NOT NULL;

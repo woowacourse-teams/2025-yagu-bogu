@@ -1,9 +1,5 @@
 package com.yagubogu.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
@@ -16,11 +12,11 @@ import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
-import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
-import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
-import com.yagubogu.member.dto.v1.MemberInfoResponse;
-import com.yagubogu.member.dto.v1.MemberNicknameRequest;
-import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberFavoriteRequest;
+import com.yagubogu.member.dto.MemberFavoriteResponse;
+import com.yagubogu.member.dto.MemberInfoResponse;
+import com.yagubogu.member.dto.MemberNicknameRequest;
+import com.yagubogu.member.dto.MemberNicknameResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -36,6 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
