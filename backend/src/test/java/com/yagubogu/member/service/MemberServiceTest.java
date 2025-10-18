@@ -434,7 +434,7 @@ public class MemberServiceTest {
         );
         CheckInSummaryParam fakeSummary = new CheckInSummaryParam(14, 75.0, 9, 0, 4, LocalDate.of(2025, 7, 24));
         when(statService.findCheckInSummary(anyLong(), anyInt())).thenReturn(fakeSummary);
-        VictoryFairySummaryParam fakeVictorySummary = new VictoryFairySummaryParam(5, 1, 90.0);
+        VictoryFairySummaryParam fakeVictorySummary = new VictoryFairySummaryParam(5L, 1, 90.0);
         when(statService.findVictoryFairySummary(anyLong(), anyInt())).thenReturn(fakeVictorySummary);
         MemberProfileBadgeResponse expectedBadgeResponse = MemberProfileBadgeResponse.from(
                 profileOwneredMember.getRepresentativeBadge());

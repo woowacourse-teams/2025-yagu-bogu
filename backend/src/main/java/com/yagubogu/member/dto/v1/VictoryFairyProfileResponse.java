@@ -3,7 +3,7 @@ package com.yagubogu.member.dto.v1;
 import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 
 public record VictoryFairyProfileResponse(
-        Integer ranking,
+        Long ranking,
         Integer rankWithinTeam,
         Double score
 ) {
