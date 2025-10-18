@@ -1,10 +1,9 @@
 package com.yagubogu.auth.gateway;
 
 import com.yagubogu.auth.config.GoogleAuthProperties;
-import com.yagubogu.auth.dto.AuthResponse;
-import com.yagubogu.auth.dto.GoogleAuthResponse;
-import com.yagubogu.auth.dto.LoginRequest;
-import java.util.UUID;
+import com.yagubogu.auth.dto.AuthParam;
+import com.yagubogu.auth.dto.GoogleAuthParam;
+import com.yagubogu.auth.dto.LoginParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -17,8 +16,8 @@ public class LocalAuthGateway implements AuthGateway {
     private final GoogleAuthProperties googleAuthProperties;
 
     @Override
-    public AuthResponse validateToken(final LoginRequest loginRequest) {
-        return new GoogleAuthResponse(
+    public AuthParam validateToken(final LoginParam loginParam) {
+        return new GoogleAuthParam(
                 "accounts.google.com",
                 "local-sub-id",
                 "azp",
