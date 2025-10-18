@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface VictoryFairyRankingRepositoryCustom {
 
-    List<VictoryFairyRankParam> findTopRankingByTeamFilterAndYear(TeamFilter teamFilter, int limit, int year);
-
     Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(Member member, TeamFilter teamFilter, int year);
 
     void batchUpdate(List<UpdateDto> updates, int batchSize);

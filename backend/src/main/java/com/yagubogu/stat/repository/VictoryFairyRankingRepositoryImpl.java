@@ -32,32 +32,6 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<VictoryFairyRankParam> findTopRankingByTeamFilterAndYear(final TeamFilter teamFilter, final int limit,
-                                                                         final int year) {
-        return jpaQueryFactory.select(
-                        Projections.constructor(
-                                VictoryFairyRankParam.class,
-                                calculateRanking(VICTORY_FAIRY_RANKING.score),
-                                MEMBER.id,
-                                VICTORY_FAIRY_RANKING.score,
-                                MEMBER.nickname.value,
-                                MEMBER.imageUrl,
-                                TEAM.shortName
-                        )
-                ).from(VICTORY_FAIRY_RANKING)
-                .join(VICTORY_FAIRY_RANKING.member, MEMBER)
-                .join(MEMBER.team, TEAM)
-                .where(
-                        VICTORY_FAIRY_RANKING.gameYear.eq(year),
-                        filterByTeam(teamFilter, TEAM),
-                        MEMBER.deletedAt.isNull()
-                )
-                .orderBy(VICTORY_FAIRY_RANKING.score.desc())
-                .limit(limit)
-                .fetch();
-    }
-
-    @Override
     public Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(
             final Member member,
             final TeamFilter teamFilter,
