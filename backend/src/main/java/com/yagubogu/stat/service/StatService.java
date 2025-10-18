@@ -22,16 +22,6 @@ import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.v1.StatCountsResponse;
 import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.AverageStatisticResponse;
-import com.yagubogu.stat.dto.LuckyStadiumResponse;
-import com.yagubogu.stat.dto.OpponentWinRateResponse;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
-import com.yagubogu.stat.dto.OpponentWinRateTeamResponse;
-import com.yagubogu.stat.dto.RecentGamesWinRateResponse;
-import com.yagubogu.stat.dto.StadiumStatsDto;
-import com.yagubogu.stat.dto.StatCountsResponse;
-import com.yagubogu.stat.dto.WinRateResponse;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -49,7 +39,8 @@ public class StatService {
 
     private static final int RECENT_LIMIT = 10;
     private static final int VICTORY_RANKING_LIMIT = 5;
-    private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
+    private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator
+            .comparingDouble(
                     OpponentWinRateTeamParam::winRate)
             .reversed()
             .thenComparing(OpponentWinRateTeamParam::name);

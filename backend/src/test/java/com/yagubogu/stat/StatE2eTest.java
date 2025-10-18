@@ -545,7 +545,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/counts")
+                .when().get("/api/v1/stats/counts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -604,7 +604,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/win-rate")
+                .when().get("/api/v1/stats/win-rate")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -642,7 +642,7 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParams("year", 2025)
-                .when().get("/api/stats/lucky-stadiums")
+                .when().get("/api/v1/stats/lucky-stadiums")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -686,7 +686,7 @@ public class StatE2eTest extends E2eTestBase {
         AverageStatisticResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/stats/me")
+                .when().get("/api/v1/stats/me")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(AverageStatisticResponse.class);
@@ -730,15 +730,15 @@ public class StatE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
-                .when().get("/api/stats/win-rate/opponents")
+                .when().get("/api/v1/stats/win-rate/opponents")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(com.yagubogu.stat.dto.OpponentWinRateResponse.class);
+                .as(OpponentWinRateResponse.class);
 
         // then
         assertSoftly(s -> {
-            s.assertThat(actual.opponents()).hasSize(13);
+            s.assertThat(actual.opponents()).hasSize(9);
 
             // SS: 1승 0패 = 100%
             var ssRes = actual.opponents().stream()
