@@ -14,8 +14,10 @@ import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.domain.VictoryFairyRanking;
 import com.yagubogu.stat.dto.CheckInSummaryParam;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
@@ -1013,6 +1015,111 @@ class StatServiceTest {
             softAssertions.assertThat(actual.totalCount()).isEqualTo(1);
             softAssertions.assertThat(actual.winRate()).isEqualTo(100.0);
             softAssertions.assertThat(actual.recentCheckInDate()).isEqualTo(LocalDate.of(year, 8, 2));
+        });
+    }
+
+    @DisplayName("승리요정 전체 순위와 팀 내 순위가 모두 있을 때 요약 정보를 정상적으로 조회한다")
+    @Test
+    void findVictoryFairySummary_success() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        int year = 2025;
+
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member rivalMember = memberFactory.save(b -> b.team(HT).nickname("두리"));
+        Member otherTeamMember = memberFactory.save(b -> b.team(LT).nickname("밍트"));
+
+        // 1등: otherTeamMember (200.0)
+        // 2등: rivalMember (100.0)
+        // 3등: targetMember (50.0)
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(otherTeamMember, 200.0, 20, 30, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(rivalMember, 100.0, 10, 20, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 10, year, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(3);
+            softAssertions.assertThat(actual.score()).isEqualTo(50.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(2);
+        });
+    }
+
+    @DisplayName("승리요정 랭킹 정보가 전혀 없을 때, 모든 필드가 null로 반환된다")
+    @Test
+    void findVictoryFairySummary_noRankingData() {
+        // given
+        Member member = memberFactory.save(b -> b.team(teamRepository.findByTeamCode("HT").orElseThrow()));
+        int year = 2025;
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isNull();
+            softAssertions.assertThat(actual.score()).isNull();
+            softAssertions.assertThat(actual.rankWithinTeam()).isNull();
+        });
+    }
+
+    @DisplayName("팀 내 동점자가 있을 경우 다음 순위가 올바르게 계산된다")
+    @Test
+    void findVictoryFairySummary_handlesTies() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        int year = 2025;
+
+        // 공동 1위 멤버 2명과, 그 다음 순위인 대상 멤버 1명 생성
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member jointFirst1 = memberFactory.save(b -> b.team(HT).nickname("메다"));
+        Member jointFirst2 = memberFactory.save(b -> b.team(HT).nickname("포라"));
+
+        // 랭킹 데이터 저장: 2명이 100점으로 공동 1위, 대상 멤버는 50점
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(jointFirst1, 100.0, 10, 10, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(jointFirst2, 100.0, 10, 10, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 5, year, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(3);
+            softAssertions.assertThat(actual.score()).isEqualTo(50.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(3);
+        });
+    }
+
+    @DisplayName("다른 연도의 랭킹 데이터는 현재 연도 조회 시 영향을 주지 않는다")
+    @Test
+    void findVictoryFairySummary_isolatesByYear() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        int targetYear = 2025;
+        int otherYear = 2024;
+
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member otherYearWinner = memberFactory.save(b -> b.team(HT).nickname("포르"));
+
+        // 2025년: targetMember가 100점으로 1위
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 100.0, 10, 10, targetYear, null));
+
+        // 2024년: 다른 멤버가 훨씬 높은 점수를 가짐 (이 데이터는 무시되어야 함)
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(otherYearWinner, 999.0, 100, 100, otherYear, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 5, otherYear, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), targetYear);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(1);
+            softAssertions.assertThat(actual.score()).isEqualTo(100.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(1);
         });
     }
 }
