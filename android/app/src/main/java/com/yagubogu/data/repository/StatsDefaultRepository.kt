@@ -7,8 +7,11 @@ import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.domain.model.StatsCounts
+import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.presentation.stats.my.AverageStats
 
@@ -56,5 +59,15 @@ class StatsDefaultRepository(
                 opponentWinRateResponse.opponents.mapIndexed { index: Int, opponentDto: OpponentWinRateTeamDto ->
                     opponentDto.toPresentation(index + 1)
                 }
+            }
+
+    override suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRanking> =
+        statsDataSource
+            .getVictoryFairyRankings(year, team)
+            .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
+                victoryFairyRankingResponse.toPresentation()
             }
 }

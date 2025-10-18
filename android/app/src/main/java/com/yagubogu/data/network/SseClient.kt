@@ -76,7 +76,7 @@ class SseClient(
     }
 
     companion object {
-        private const val EVENT_STREAM_ENDPOINT = "/api/event-stream"
+        private const val EVENT_STREAM_ENDPOINT = "/api/v1/event-stream"
         private const val HEADER_ACCEPT = "Accept"
         private const val HEADER_ACCEPT_EVENT_STREAM = "text/event-stream"
     }

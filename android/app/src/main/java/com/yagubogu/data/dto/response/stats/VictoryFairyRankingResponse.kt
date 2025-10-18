@@ -1,4 +1,4 @@
-package com.yagubogu.data.dto.response.checkin
+package com.yagubogu.data.dto.response.stats
 
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import kotlinx.serialization.SerialName

@@ -1,6 +1,8 @@
 package com.yagubogu.domain.repository
 
 import com.yagubogu.domain.model.StatsCounts
+import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.presentation.stats.my.AverageStats
 
@@ -14,4 +16,9 @@ interface StatsRepository {
     suspend fun getAverageStats(): Result<AverageStats>
 
     suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>>
+
+    suspend fun getVictoryFairyRankings(
+        year: Int,
+        team: Team?,
+    ): Result<VictoryFairyRanking>
 }
