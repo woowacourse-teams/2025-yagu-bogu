@@ -70,7 +70,7 @@ jobs:
           .
 
   cd:
-    needs: ci
+    needs: build
     runs-on: [ self-hosted, develop ]
     env:
       IMAGE: yagubogu/yagubogu-backend
