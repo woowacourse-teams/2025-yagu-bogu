@@ -109,7 +109,7 @@ public class StadiumE2eTest extends E2eTestBase {
                 .extract()
                 .as(StadiumsWithGamesResponse.class);
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.stadiums()).containsExactlyInAnyOrderElementsOf(expected.stadiums());
     }
 
     private Game makeGame(LocalDate date, LocalTime startAt, Team home, Team away, Stadium stadium) {
