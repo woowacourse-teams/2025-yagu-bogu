@@ -16,6 +16,8 @@ import java.util.List;
 
 public interface CustomCheckInRepository {
 
+    LocalDate findRecentCheckInGameDate(Member member);
+
     StatCountsParam findStatCounts(Member member, int year);
 
     int findWinCounts(Member member, int year);

@@ -11,8 +11,8 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stat.dto.CheckInSummary;
 import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.CheckInSummary;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
 import com.yagubogu.stat.dto.StadiumStatsParam;
@@ -190,12 +190,11 @@ public class StatService {
         validateUser(member);
 
         StatCountsParam statCounts = checkInRepository.findStatCounts(member, year);
-        int totalCount = statCounts.winCounts() + statCounts.drawCounts() + statCounts.loseCounts();
-
+        LocalDate recentCheckInDate = checkInRepository.findRecentCheckInGameDate(member);
         int totalGamesForWinRate = statCounts.winCounts() + statCounts.loseCounts();
         double winRate = calculateWinRate(statCounts.winCounts(), totalGamesForWinRate);
 
-        return new CheckInSummary(totalCount, winRate);
+        return CheckInSummary.from(statCounts, winRate, recentCheckInDate);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
