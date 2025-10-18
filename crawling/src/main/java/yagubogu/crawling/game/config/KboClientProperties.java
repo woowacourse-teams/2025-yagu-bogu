@@ -1,4 +1,4 @@
-package com.yagubogu.global.config;
+package yagubogu.crawling.game.config;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

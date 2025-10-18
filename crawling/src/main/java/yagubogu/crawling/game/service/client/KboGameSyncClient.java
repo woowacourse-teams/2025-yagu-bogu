@@ -1,11 +1,11 @@
-package com.yagubogu.game.service.client;
+package yagubogu.crawling.game.service.client;
 
 import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yagubogu.game.dto.KboGamesParam;
+import yagubogu.crawling.game.dto.KboGamesParam;
 import com.yagubogu.game.exception.GameSyncException;
-import com.yagubogu.game.exception.KboClientExceptionHandler;
+import yagubogu.crawling.game.exception.KboClientExceptionHandler;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -37,13 +37,13 @@ public class KboGameSyncClient {
                     .retrieve()
                     .onStatus(kboClientExceptionHandler)
                     .body(String.class);
-            KboGamesParam kboGamesParam = objectMapper.readValue(
+            KboGamesParam KboGamesParam = objectMapper.readValue(
                     responseBody,
                     KboGamesParam.class
             );
-            validateGameScheduleResponse(kboGamesParam);
+            validateGameScheduleResponse(KboGamesParam);
 
-            return kboGamesParam;
+            return KboGamesParam;
         } catch (Exception e) {
             throw new GameSyncException("Failed to fetch game data from Kbo api", e);
         }

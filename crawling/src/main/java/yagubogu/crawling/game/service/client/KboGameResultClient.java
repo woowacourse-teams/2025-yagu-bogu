@@ -1,4 +1,4 @@
-package com.yagubogu.game.service.client;
+package yagubogu.crawling.game.service.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,7 +7,7 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.KboGameResultParam;
 import com.yagubogu.game.exception.GameSyncException;
-import com.yagubogu.game.exception.KboClientExceptionHandler;
+import yagubogu.crawling.game.exception.KboClientExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

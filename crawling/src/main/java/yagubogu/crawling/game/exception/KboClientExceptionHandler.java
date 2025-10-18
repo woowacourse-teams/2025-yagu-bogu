@@ -1,5 +1,6 @@
-package com.yagubogu.game.exception;
+package yagubogu.crawling.game.exception;
 
+import com.yagubogu.game.exception.GameSyncException;
 import java.io.IOException;
 import java.net.URI;
 import org.springframework.http.HttpMethod;

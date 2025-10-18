@@ -1,4 +1,4 @@
-package com.yagubogu.game.dto;
+package yagubogu.crawling.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

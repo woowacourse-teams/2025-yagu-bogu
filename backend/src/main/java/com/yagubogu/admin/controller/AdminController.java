@@ -1,18 +1,14 @@
 package com.yagubogu.admin.controller;
 
 import com.yagubogu.auth.annotation.RequireRole;
-import com.yagubogu.game.service.GameResultSyncService;
-import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stat.service.StatSyncService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -22,28 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AdminController {
 
-    private final GameResultSyncService gameResultSyncService;
-    private final GameScheduleSyncService gameScheduleSyncService;
     private final StatSyncService statSyncService;
-
-
-    @PatchMapping("/game-results")
-    public ResponseEntity<Void> fetchForceDailyGameResult(
-            @RequestParam("date") LocalDate date
-    ) {
-        gameResultSyncService.syncGameResult(date);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/game-schedules")
-    public ResponseEntity<Void> fetchForceDailyGameSchedule(
-            @RequestParam("date") LocalDate date
-    ) {
-        gameScheduleSyncService.syncGameSchedule(date);
-
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/victory-fairy-rankings/sync")
     public ResponseEntity<Void> syncVictoryRankings() {

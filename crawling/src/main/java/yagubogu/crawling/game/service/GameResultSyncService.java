@@ -1,13 +1,11 @@
-package com.yagubogu.game.service;
+package yagubogu.crawling.game.service;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
-import com.yagubogu.game.dto.KboGameParam;
-import com.yagubogu.game.dto.KboGameResultParam;
 import com.yagubogu.game.dto.GameCompletedEvent;
+import yagubogu.crawling.game.dto.KboGameParam;
+import com.yagubogu.game.dto.KboGameResultParam;
 import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.game.service.client.KboGameResultClient;
-import com.yagubogu.game.service.client.KboGameSyncClient;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import yagubogu.crawling.game.service.client.KboGameResultClient;
+import yagubogu.crawling.game.service.client.KboGameSyncClient;
 
 @Slf4j
 @RequiredArgsConstructor

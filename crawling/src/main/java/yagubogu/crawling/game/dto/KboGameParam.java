@@ -1,4 +1,4 @@
-package com.yagubogu.game.dto;
+package yagubogu.crawling.game.dto;
 
 import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 

@@ -1,4 +1,4 @@
-package com.yagubogu.global.config;
+package yagubogu.crawling.game.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
