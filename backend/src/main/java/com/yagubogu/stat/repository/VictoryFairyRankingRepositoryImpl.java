@@ -41,8 +41,8 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
         QMember M2 = new QMember("m2");
         QTeam T2 = new QTeam("t2");
 
-        JPQLQuery<Integer> myRankingQuery = JPAExpressions
-                .select(V2.count().add(1).intValue())
+        JPQLQuery<Long> myRankingQuery = JPAExpressions
+                .select(V2.count().add(1))
                 .from(V2)
                 .join(V2.member, M2)
                 .join(M2.team, T2)
