@@ -1,5 +1,8 @@
 package com.yagubogu.talk;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -7,8 +10,8 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
@@ -27,9 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class TalkE2eTest extends E2eTestBase {
@@ -139,8 +139,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/v1/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("cursorResultParam.content[0].id", is(2))
-                .body("cursorResultParam.nextCursorId", is(2));
+                .body("cursorResult.content[0].id", is(2))
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("톡의 마지막 페이지를 조회한다")
@@ -179,8 +179,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/v1/talks/{gameId}")
                 .then()
                 .statusCode(200)
-                .body("cursorResultParam.content[0].id", is(1))
-                .body("cursorResultParam.nextCursorId", is(nullValue()));
+                .body("cursorResult.content[0].id", is(1))
+                .body("cursorResult.nextCursorId", is(nullValue()));
     }
 
     @DisplayName("새 톡을 가져온다")
@@ -215,9 +215,9 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/v1/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("cursorResultParam.content[-1].id", is(2))
-                .body("cursorResultParam.content.size()", is(1))
-                .body("cursorResultParam.nextCursorId", is(2));
+                .body("cursorResult.content[-1].id", is(2))
+                .body("cursorResult.content.size()", is(1))
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("새 톡이 없다면 가져오지 않는다")
@@ -252,8 +252,8 @@ public class TalkE2eTest extends E2eTestBase {
                 .get("/api/v1/talks/{gameId}/latest")
                 .then()
                 .statusCode(200)
-                .body("cursorResultParam.content.size()", is(0))
-                .body("cursorResultParam.nextCursorId", is(2));
+                .body("cursorResult.content.size()", is(0))
+                .body("cursorResult.nextCursorId", is(2));
     }
 
     @DisplayName("정상적으로 톡을 저장하고 응답을 반환한다")

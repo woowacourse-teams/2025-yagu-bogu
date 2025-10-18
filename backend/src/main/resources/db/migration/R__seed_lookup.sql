@@ -15,7 +15,9 @@ VALUES ('KIA 타이거즈', 'KIA', 'HT', 'ACTIVE'),
        ('나눔 올스타', '나눔', 'NN', 'INACTIVE'),
        ('드림 올스타', '드림', 'DR', 'INACTIVE')
 ON DUPLICATE KEY UPDATE name=VALUES(name),
-                        short_name=VALUES(short_name);
+                        short_name=VALUES(short_name),
+                        team_code=VALUES(team_code),
+                        status=VALUES(status);
 
 -- 2. 구장 데이터
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude, level)
@@ -42,8 +44,8 @@ ON DUPLICATE KEY UPDATE full_name=VALUES(full_name),
                         short_name=VALUES(short_name),
                         location=VALUES(location),
                         latitude=VALUES(latitude),
-                        longitude=VALUES(longitude);
-
+                        longitude=VALUES(longitude),
+                        level=VALUES(level);
 -- badges
 INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
     VALUES ('리드오프',

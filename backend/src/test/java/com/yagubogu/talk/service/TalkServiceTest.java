@@ -120,15 +120,15 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
                     .isEqualTo(expectedTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().size()).isOne();
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResult().content().size()).isOne();
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
                     .isEqualTo(expectedTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
                     .isEqualTo(expectedTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isNull();
-            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 
@@ -167,15 +167,15 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
                     .isEqualTo(expectedSecondPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
                     .isEqualTo(expectedFirstPageTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
                     .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResultParam().nextCursorId())
+            softAssertions.assertThat(actual.cursorResult().nextCursorId())
                     .isEqualTo(expectedSecondPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isTrue();
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isTrue();
         });
     }
 
@@ -215,21 +215,21 @@ class TalkServiceTest {
         // when
         TalkCursorResultResponse actual = talkService.findTalksExcludingReported(
                 game.getId(),
-                result.cursorResultParam().nextCursorId(),
+                result.cursorResult().nextCursorId(),
                 limit,
                 firstEnterMember.getId()
         );
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().id())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().id())
                     .isEqualTo(expectedFirstPageTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().memberId())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().memberId())
                     .isEqualTo(expectedFirstPageTalk.getMember().getId());
-            softAssertions.assertThat(actual.cursorResultParam().content().getFirst().imageUrl())
+            softAssertions.assertThat(actual.cursorResult().content().getFirst().imageUrl())
                     .isEqualTo(expectedFirstPageTalk.getMember().getImageUrl());
-            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isNull();
-            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isNull();
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 
@@ -322,7 +322,7 @@ class TalkServiceTest {
                 limit,
                 me.getId()
         );
-        long actualMyTalkCount = actual.cursorResultParam()
+        long actualMyTalkCount = actual.cursorResult()
                 .content()
                 .stream()
                 .filter(TalkResponse::isMine)
@@ -384,11 +384,11 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResultParam().content()).hasSize(expectedCursorResult.size());
-            softAssertions.assertThat(actual.cursorResultParam().content())
+            softAssertions.assertThat(actual.cursorResult().content()).hasSize(expectedCursorResult.size());
+            softAssertions.assertThat(actual.cursorResult().content())
                     .containsExactlyElementsOf(expectedCursorResult);
-            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isEqualTo(thirdTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(thirdTalk.getId());
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 
@@ -419,9 +419,9 @@ class TalkServiceTest {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual.cursorResultParam().content()).isEmpty();
-            softAssertions.assertThat(actual.cursorResultParam().nextCursorId()).isEqualTo(fristTalk.getId());
-            softAssertions.assertThat(actual.cursorResultParam().hasNext()).isFalse();
+            softAssertions.assertThat(actual.cursorResult().content()).isEmpty();
+            softAssertions.assertThat(actual.cursorResult().nextCursorId()).isEqualTo(fristTalk.getId());
+            softAssertions.assertThat(actual.cursorResult().hasNext()).isFalse();
         });
     }
 
