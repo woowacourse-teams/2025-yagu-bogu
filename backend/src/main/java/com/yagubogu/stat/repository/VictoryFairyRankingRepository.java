@@ -81,7 +81,7 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
                     vfr.game_year = :gameYear
                     AND m.deleted_at IS NULL
                     AND m.team_id IS NOT NULL
-                    AND (:teamFilter = 'ALL' OR t.team_code = :teamFilter)
+                    AND (:#{#teamFilter.name()} = 'ALL' OR t.team_code = :#{#teamFilter.name()})
                 ORDER BY
                     vfr.score DESC
                 LIMIT :limit
