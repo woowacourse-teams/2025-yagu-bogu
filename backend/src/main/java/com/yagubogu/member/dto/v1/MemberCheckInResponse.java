@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public record MemberCheckInResponse(
         Integer counts,
-        String winRate,
+        Double winRate,
         Integer winCounts,
         Integer drawCounts,
         Integer loseCounts,
@@ -16,11 +16,10 @@ public record MemberCheckInResponse(
         if (summary == null || summary.totalCount() == 0) {
             return empty();
         }
-        String formattedWinRate = String.format("%.1f%%", summary.winRate());
 
         return new MemberCheckInResponse(
                 summary.totalCount(),
-                formattedWinRate,
+                summary.winRate(),
                 summary.winCounts(),
                 summary.drawCounts(),
                 summary.loseCounts(),
