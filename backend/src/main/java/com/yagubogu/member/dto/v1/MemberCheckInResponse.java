@@ -13,7 +13,7 @@ public record MemberCheckInResponse(
 ) {
 
     public static MemberCheckInResponse from(final CheckInSummaryParam summary) {
-        if (summary == null || summary.totalCount() == null) {
+        if (summary == null || summary.totalCount() == 0) {
             return empty();
         }
         String formattedWinRate = String.format("%.1f%%", summary.winRate());
