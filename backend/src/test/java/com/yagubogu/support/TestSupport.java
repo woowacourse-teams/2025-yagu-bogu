@@ -1,7 +1,7 @@
 package com.yagubogu.support;
 
-import com.yagubogu.auth.dto.LoginRequest;
-import com.yagubogu.auth.dto.LoginResponse;
+import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.auth.dto.v1.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
@@ -12,8 +12,8 @@ public class TestSupport {
     public static LoginResponse loginResponse(String idToken) {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginRequest(idToken))
-                .when().post("/api/auth/login")
+                .body(new LoginParam(idToken))
+                .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

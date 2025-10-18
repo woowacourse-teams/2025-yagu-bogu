@@ -1,7 +1,6 @@
 package com.yagubogu.support.checkin;
 
 import com.yagubogu.checkin.domain.CheckIn;
-import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.team.domain.Team;
@@ -11,7 +10,6 @@ public class CheckInBuilder {
     private Game game;
     private Member member;
     private Team team;
-    private CheckInType checkInType = CheckInType.LOCATION_CHECK_IN;
 
     public CheckInBuilder game(final Game game) {
         this.game = game;
@@ -31,13 +29,7 @@ public class CheckInBuilder {
         return this;
     }
 
-    public CheckInBuilder checkInType(final CheckInType checkInType) {
-        this.checkInType = checkInType;
-
-        return this;
-    }
-
     public CheckIn build() {
-        return new CheckIn(game, member, team, checkInType);
+        return new CheckIn(game, member, team);
     }
 }

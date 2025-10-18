@@ -1,21 +1,23 @@
 -- 1. 팀 데이터
-INSERT INTO teams (name, short_name, team_code)
-VALUES ('KIA 타이거즈', 'KIA', 'HT'),
-       ('LG 트윈스', 'LG', 'LG'),
-       ('키움 히어로즈', '키움', 'WO'),
-       ('KT 위즈', 'KT', 'KT'),
-       ('삼성 라이온즈', '삼성', 'SS'),
-       ('롯데 자이언츠', '롯데', 'LT'),
-       ('SSG 랜더스', 'SSG', 'SK'),
-       ('NC 다이노스', 'NC', 'NC'),
-       ('한화 이글스', '한화', 'HH'),
-       ('두산 베어스', '두산', 'OB'),
-       ('SK 와이번스', 'SK', 'SK2'),
-       ('현대 유니콘스', '현대', 'HD'),
-       ('나눔 올스타', '나눔', 'NN'),
-       ('드림 올스타', '드림', 'DR')
+INSERT INTO teams (name, short_name, team_code, status)
+VALUES ('KIA 타이거즈', 'KIA', 'HT', 'ACTIVE'),
+       ('LG 트윈스', 'LG', 'LG', 'ACTIVE'),
+       ('키움 히어로즈', '키움', 'WO', 'ACTIVE'),
+       ('KT 위즈', 'KT', 'KT', 'ACTIVE'),
+       ('삼성 라이온즈', '삼성', 'SS', 'ACTIVE'),
+       ('롯데 자이언츠', '롯데', 'LT', 'ACTIVE'),
+       ('SSG 랜더스', 'SSG', 'SK', 'ACTIVE'),
+       ('NC 다이노스', 'NC', 'NC', 'ACTIVE'),
+       ('한화 이글스', '한화', 'HH', 'ACTIVE'),
+       ('두산 베어스', '두산', 'OB', 'ACTIVE'),
+       ('SK 와이번스', 'SK', 'SK2', 'INACTIVE'),
+       ('현대 유니콘스', '현대', 'HD', 'INACTIVE'),
+       ('나눔 올스타', '나눔', 'NN', 'INACTIVE'),
+       ('드림 올스타', '드림', 'DR', 'INACTIVE')
 ON DUPLICATE KEY UPDATE name=VALUES(name),
-                        short_name=VALUES(short_name);
+                        short_name=VALUES(short_name),
+                        team_code=VALUES(team_code),
+                        status=VALUES(status);
 
 -- 2. 구장 데이터
 INSERT INTO stadiums (stadium_id, full_name, short_name, location, latitude, longitude, level)
@@ -42,8 +44,8 @@ ON DUPLICATE KEY UPDATE full_name=VALUES(full_name),
                         short_name=VALUES(short_name),
                         location=VALUES(location),
                         latitude=VALUES(latitude),
-                        longitude=VALUES(longitude);
-
+                        longitude=VALUES(longitude),
+                        level=VALUES(level);
 -- badges
 INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
     VALUES ('리드오프',
@@ -72,21 +74,3 @@ ON DUPLICATE KEY UPDATE badge_name        = new_data.badge_name,
                         badge_policy      = new_data.badge_policy,
                         badge_threshold   = new_data.badge_threshold,
                         badge_image_url   = new_data.badge_image_url;
-
-INSERT INTO games (game_code, date, start_at, stadium_id, home_team_id, away_team_id,
-                   home_score, away_score, home_score_board_id, away_score_board_id,
-                   home_pitcher, away_pitcher, game_state)
-    VALUES ('G001', '2025-09-15', '18:30:00', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'SCHEDULED')
-        AS new_data
-ON DUPLICATE KEY UPDATE date                = new_data.date,
-                        start_at            = new_data.start_at,
-                        stadium_id          = new_data.stadium_id,
-                        home_team_id        = new_data.home_team_id,
-                        away_team_id        = new_data.away_team_id,
-                        home_score          = new_data.home_score,
-                        away_score          = new_data.away_score,
-                        home_score_board_id = new_data.home_score_board_id,
-                        away_score_board_id = new_data.away_score_board_id,
-                        home_pitcher        = new_data.home_pitcher,
-                        away_pitcher        = new_data.away_pitcher,
-                        game_state          = new_data.game_state;
