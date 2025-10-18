@@ -1,6 +1,5 @@
 package com.yagubogu.member.service;
 
-import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.event.SignUpEvent;
 import com.yagubogu.badge.domain.Badge;
@@ -8,17 +7,19 @@ import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.badge.dto.BadgeResponseWithRates;
 import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.badge.repository.MemberBadgeRepository;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
-import com.yagubogu.member.dto.MemberCheckInResponse;
-import com.yagubogu.member.dto.MemberProfileResponse;
 import com.yagubogu.member.dto.MemberFindResultParam;
+import com.yagubogu.member.dto.v1.MemberCheckInResponse;
 import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
 import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileBadgeResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.service.StatService;
@@ -155,13 +156,19 @@ public class MemberService {
         existMember(loginMemberId);
 
         Member profileOwnerMember = getMember(profileOwnerId);
-        //Badge
+        MemberProfileBadgeResponse memberProfileBadgeResponse = MemberProfileBadgeResponse.from(
+                profileOwnerMember.getRepresentativeBadge()
+        );
         //VictoryFairy
         MemberCheckInResponse memberCheckInResponse = MemberCheckInResponse.from(
                 statService.findCheckInSummary(profileOwnerId, LocalDate.now().getYear())
         );
 
-        return MemberProfileResponse.from(profileOwnerMember, null, null, memberCheckInResponse);
+        return MemberProfileResponse.from(profileOwnerMember,
+                memberProfileBadgeResponse,
+                null,
+                memberCheckInResponse
+        );
     }
 
     private void existMember(final long memberId) {

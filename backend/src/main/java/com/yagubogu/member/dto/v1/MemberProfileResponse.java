@@ -1,4 +1,4 @@
-package com.yagubogu.member.dto;
+package com.yagubogu.member.dto.v1;
 
 import com.yagubogu.member.domain.Member;
 import java.time.LocalDate;
@@ -8,13 +8,13 @@ public record MemberProfileResponse(
         LocalDate enterDate,
         String profileImageUrl,
         String favoriteTeam,
-        MemberRepresentativeBadgeResponse representativeBadge,
+        MemberProfileBadgeResponse representativeBadge,
         MemberVictoryFairyResponse victoryFairy,
         MemberCheckInResponse checkIn
 ) {
     public static MemberProfileResponse from(
             final Member member,
-            final MemberRepresentativeBadgeResponse badge,
+            final MemberProfileBadgeResponse badge,
             final MemberVictoryFairyResponse victoryFairy,
             final MemberCheckInResponse checkIn) {
         return new MemberProfileResponse(

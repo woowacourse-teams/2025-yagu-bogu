@@ -1,13 +1,13 @@
 package com.yagubogu.member.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.member.dto.MemberProfileResponse;
 import com.yagubogu.badge.dto.BadgeListResponse;
 import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
 import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteResponse;
