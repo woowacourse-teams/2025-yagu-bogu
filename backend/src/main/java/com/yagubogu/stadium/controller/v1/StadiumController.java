@@ -1,7 +1,7 @@
 package com.yagubogu.stadium.controller.v1;
 
 import com.yagubogu.stadium.dto.v1.StadiumsResponse;
-import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsWithGamesResponse;
 import com.yagubogu.stadium.service.StadiumService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

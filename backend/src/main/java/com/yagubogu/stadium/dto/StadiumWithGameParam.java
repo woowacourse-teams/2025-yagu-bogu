@@ -2,13 +2,13 @@ package com.yagubogu.stadium.dto;
 
 import java.util.List;
 
-public record StadiumWithGameResponse(
-        Long id,
-        String fullName,
+public record StadiumWithGameParam(
         String shortName,
         String location,
         Double latitude,
         Double longitude,
-        List<GameResponse> games
+        TeamParam awayTeam,
+        TeamParam homeTeam,
+        List<GameParam> games
 ) {
 }

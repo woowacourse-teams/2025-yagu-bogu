@@ -1,7 +1,7 @@
 package com.yagubogu.stadium.controller.v1;
 
-import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
 import com.yagubogu.stadium.dto.v1.StadiumsResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsWithGamesResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

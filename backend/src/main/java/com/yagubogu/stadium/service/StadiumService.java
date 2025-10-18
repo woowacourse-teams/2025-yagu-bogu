@@ -5,7 +5,7 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.domain.StadiumLevel;
 import com.yagubogu.stadium.dto.v1.StadiumsResponse;
-import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsWithGamesResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import java.time.LocalDate;
 import java.util.List;
