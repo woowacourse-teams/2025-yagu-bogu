@@ -39,7 +39,8 @@ public class StatService {
 
     private static final int RECENT_LIMIT = 10;
     private static final int VICTORY_RANKING_LIMIT = 5;
-    private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator.comparingDouble(
+    private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator
+            .comparingDouble(
                     OpponentWinRateTeamParam::winRate)
             .reversed()
             .thenComparing(OpponentWinRateTeamParam::name);
@@ -90,23 +91,12 @@ public class StatService {
         Member member = getMember(memberId);
         validateUser(member);
 
-        List<StadiumStatsParam> hello = checkInRepository.findWinAndNonDrawCountByStadium(
+        List<StadiumStatsParam> stadiumStats = checkInRepository.findWinAndNonDrawCountByStadium(
                 memberId,
                 LocalDate.of(year, 1, 1),
                 LocalDate.of(year, 12, 31)
         );
-        double lowestWinRate = 0;
-        String luckyStadiumName = null;
-        for (StadiumStatsParam stadiumStatsParam : hello) {
-            long winCounts = stadiumStatsParam.winCounts();
-            long totalCountsWithoutDraw = stadiumStatsParam.totalCountsWithoutDraw();
-
-            double currentWinRate = calculateWinRate(winCounts, totalCountsWithoutDraw);
-            if (currentWinRate > lowestWinRate) {
-                lowestWinRate = currentWinRate;
-                luckyStadiumName = stadiumStatsParam.stadiumName();
-            }
-        }
+        String luckyStadiumName = getLuckyStadiumName(stadiumStats);
 
         return new LuckyStadiumResponse(luckyStadiumName);
     }
@@ -126,6 +116,22 @@ public class StatService {
         List<OpponentWinRateTeamParam> responses = getOpponentWinRateTeamResponse(winRates);
 
         return new OpponentWinRateResponse(responses);
+    }
+
+    private String getLuckyStadiumName(final List<StadiumStatsParam> stadiumStats) {
+        double lowestWinRate = 0;
+        String luckyStadiumName = null;
+        for (StadiumStatsParam stadiumStatsParam : stadiumStats) {
+            long winCounts = stadiumStatsParam.winCounts();
+            long totalCountsWithoutDraw = stadiumStatsParam.totalCountsWithoutDraw();
+
+            double currentWinRate = calculateWinRate(winCounts, totalCountsWithoutDraw);
+            if (currentWinRate > lowestWinRate) {
+                lowestWinRate = currentWinRate;
+                luckyStadiumName = stadiumStatsParam.stadiumName();
+            }
+        }
+        return luckyStadiumName;
     }
 
     @Transactional

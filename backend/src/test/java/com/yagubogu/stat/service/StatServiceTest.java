@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -18,13 +19,13 @@ import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.v1.StatCountsResponse;
 import com.yagubogu.stat.dto.v1.WinRateResponse;
+import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -775,6 +776,277 @@ class StatServiceTest {
             s.assertThat(actual.opponents().stream()
                             .allMatch(it -> it.winRate() == 0.0))
                     .isTrue();
+        });
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 승패무 통계를 계산한다")
+    @Test
+    void findStatCounts_withPastCheckIn() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // CheckIn: 2승 1무
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 2))
+                .homeScore(4).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 3))
+                .homeScore(2).awayScore(6)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+
+        // PastCheckIn: 1승 1패
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 4))
+                .homeScore(7).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 6, 5))
+                .homeScore(8).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        int year = 2025;
+
+        // when
+        StatCountsResponse actual = statService.findStatCounts(member.getId(), year);
+
+        // then: CheckIn(2승 0패 1무) + PastCheckIn(1승 1패 0무) = 3승 1패 1무, 총 5경기
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isEqualTo(3);
+            softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.loseCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.favoriteCheckInCounts()).isEqualTo(5);
+        });
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 승률을 계산한다")
+    @Test
+    void findWinRate_withPastCheckIn() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // CheckIn: 2승 1패
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 2))
+                .homeScore(6).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 3))
+                .homeScore(7).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+
+        // PastCheckIn: 1승 1패
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 4))
+                .homeScore(8).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game g5 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 6, 5))
+                .homeScore(9).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g5).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        int year = 2025;
+
+        // when
+        WinRateResponse actual = statService.findWinRate(member.getId(), year);
+
+        // then: 총 3승 2패 = 60.0%
+        assertThat(actual.winRate()).isEqualTo(60.0);
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_withPastCheckIn() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        Stadium lot = stadiumRepository.findByShortName("사직구장").orElseThrow();
+
+        // CheckIn: 챔피언스필드 1승
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+
+        // PastCheckIn: 챔피언스필드 1승, 사직구장 1승 1패
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 2))
+                .homeScore(6).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game g3 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 6, 3))
+                .homeScore(2).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 4))
+                .homeScore(3).awayScore(7)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g4).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        int year = 2025;
+
+        // when
+        LuckyStadiumResponse actual = statService.findLuckyStadium(member.getId(), year);
+
+        // then: 챔피언스필드(2승 0패 = 100%) > 사직구장(1승 1패 = 50%)
+        assertThat(actual.shortName()).isEqualTo("챔피언스필드");
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 평균 통계를 조회한다")
+    @Test
+    void findAverageStatistic_withPastCheckIn() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // CheckIn: 1경기
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(6).awayScore(4)
+                .homeScoreBoard(new ScoreBoard(6, 10, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(4, 8, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+
+        // PastCheckIn: 1경기
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 6, 2))
+                .homeScore(5).awayScore(8)
+                .homeScoreBoard(new ScoreBoard(5, 9, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(8, 12, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        // when
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
+
+        // then: 평균 득점 = (6+8)/2 = 7.0, 평균 실점 = (4+5)/2 = 4.5, 평균 실책 = (1+1)/2 = 1.0, 평균 안타 = (10+12)/2 = 11.0, 평균 피안타 = (8+9)/2 = 8.5
+        assertSoftly(softly -> {
+            softly.assertThat(actual.averageRun()).isEqualTo(7.0);
+            softly.assertThat(actual.concededRuns()).isEqualTo(4.5);
+            softly.assertThat(actual.averageErrors()).isEqualTo(1.0);
+            softly.assertThat(actual.averageHits()).isEqualTo(11.0);
+            softly.assertThat(actual.concededHits()).isEqualTo(8.5);
+        });
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 상대팀별 승률을 조회한다")
+    @Test
+    void findOpponentWinRate_withPastCheckIn() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team SS = teamRepository.findByTeamCode("SS").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        // CheckIn: LT와 1승
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+
+        // PastCheckIn: LT와 1패, SS와 1승
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 6, 2))
+                .homeScore(6).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(SS)
+                .date(LocalDate.of(2025, 6, 3))
+                .homeScore(7).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        int year = 2025;
+
+        // when
+        OpponentWinRateResponse actual = statService.findOpponentWinRate(member.getId(), year);
+
+        // then
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
+
+            // SS: 1승 0패 = 100%
+            OpponentWinRateTeamParam ss = actual.opponents().stream()
+                    .filter(it -> it.teamCode().equals("SS"))
+                    .findFirst().orElseThrow();
+            s.assertThat(ss.wins()).isEqualTo(1);
+            s.assertThat(ss.losses()).isEqualTo(0);
+            s.assertThat(ss.winRate()).isEqualTo(100.0);
+
+            // LT: 1승 1패 = 50%
+            OpponentWinRateTeamParam lt = actual.opponents().stream()
+                    .filter(it -> it.teamCode().equals("LT"))
+                    .findFirst().orElseThrow();
+            s.assertThat(lt.wins()).isEqualTo(1);
+            s.assertThat(lt.losses()).isEqualTo(1);
+            s.assertThat(lt.winRate()).isEqualTo(50.0);
         });
     }
 }
