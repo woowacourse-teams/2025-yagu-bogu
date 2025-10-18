@@ -146,28 +146,46 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
 
     @Override
     public Optional<Integer> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
-        QVictoryFairyRanking V2 = new QVictoryFairyRanking("v2");
-        QMember M2 = new QMember("m2");
+        // 1. 멤버에게 응원팀이 없으면 랭킹 계산 불가
+        if (member.getTeam() == null) {
+            return Optional.empty();
+        }
 
-        // 나보다 점수가 높은 '같은 팀' 멤버의 수를 세서 랭킹을 계산
-        JPQLQuery<Integer> myTeamRankingQuery = JPAExpressions
-                .select(V2.count().add(1).intValue())
-                .from(V2)
-                .join(V2.member, M2)
+        // 2. 해당 연도에 멤버의 랭킹 기록(점수) 조회
+        Double memberScore = jpaQueryFactory
+                .select(VICTORY_FAIRY_RANKING.score)
+                .from(VICTORY_FAIRY_RANKING)
                 .where(
-                        V2.gameYear.eq(year),
-                        M2.team.eq(member.getTeam()),
-                        M2.deletedAt.isNull(),
-                        // 현재 멤버의 점수를 서브쿼리에서 참조하기 위한 조건
-                        V2.score.gt(
-                                JPAExpressions.select(VICTORY_FAIRY_RANKING.score)
-                                        .from(VICTORY_FAIRY_RANKING)
-                                        .where(VICTORY_FAIRY_RANKING.member.eq(member)
-                                                .and(VICTORY_FAIRY_RANKING.gameYear.eq(year)))
-                        )
-                );
+                        VICTORY_FAIRY_RANKING.member.eq(member),
+                        VICTORY_FAIRY_RANKING.gameYear.eq(year)
+                )
+                .fetchOne();
 
-        return Optional.ofNullable(myTeamRankingQuery.fetchOne());
+        // 3. 랭킹 기록이 없으면 팀 내 순위도 없음
+        if (memberScore == null) {
+            return Optional.empty();
+        }
+
+        // 4. 나보다 점수가 높은 '같은 팀' 멤버의 수 조회
+        QVictoryFairyRanking ranking = QVictoryFairyRanking.victoryFairyRanking;
+        QMember qMember = QMember.member;
+
+        // Long으로 받아서 Optional로 감싼 후, null일 경우 0L을 기본값으로 사용
+        long higherRankedCount = Optional.ofNullable(jpaQueryFactory
+                .select(ranking.count())
+                .from(ranking)
+                .join(ranking.member, qMember)
+                .where(
+                        qMember.team.eq(member.getTeam()),
+                        ranking.gameYear.eq(year),
+                        ranking.score.gt(memberScore),
+                        qMember.deletedAt.isNull()
+                )
+                .fetchOne()).orElse(0L);
+
+        int rank = (int) higherRankedCount + 1;
+
+        return Optional.of(rank);
     }
 
     private BooleanExpression filterByTeam(final TeamFilter teamFilter, final QTeam team) {
