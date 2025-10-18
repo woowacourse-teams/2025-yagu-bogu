@@ -2,16 +2,16 @@ package com.yagubogu.stadium;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.yagubogu.stadium.dto.StadiumParam;
-import com.yagubogu.stadium.dto.v1.StadiumsResponse;
-import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.dto.StadiumParam;
 import com.yagubogu.stadium.dto.StadiumsWithGamesResponse;
+import com.yagubogu.stadium.dto.v1.StadiumsResponse;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
@@ -103,7 +103,7 @@ public class StadiumE2eTest extends E2eTestBase {
         StadiumsWithGamesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .queryParam("date", date.toString())
-                .when().get("/api/stadiums/games")
+                .when().get("/api/v1/stadiums/games")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

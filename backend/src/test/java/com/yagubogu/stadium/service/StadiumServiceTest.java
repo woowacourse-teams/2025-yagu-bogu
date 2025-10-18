@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.dto.StadiumParam;
@@ -38,6 +39,9 @@ class StadiumServiceTest {
     private TeamRepository teamRepository;
 
     @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
     private GameFactory gameFactory;
 
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
@@ -45,7 +49,7 @@ class StadiumServiceTest {
 
     @BeforeEach
     void setUp() {
-        stadiumService = new StadiumService(stadiumRepository);
+        stadiumService = new StadiumService(stadiumRepository, gameRepository);
 
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
         stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
@@ -104,7 +108,7 @@ class StadiumServiceTest {
         StadiumsWithGamesResponse actual = stadiumService.findWithGameByDate(date);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.stadiums()).containsExactlyInAnyOrderElementsOf(expected.stadiums());
     }
 
     private Game makeGame(LocalDate date, LocalTime startAt, Team home, Team away, Stadium stadium) {
