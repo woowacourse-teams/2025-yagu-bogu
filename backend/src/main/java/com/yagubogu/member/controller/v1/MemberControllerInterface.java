@@ -129,7 +129,7 @@ public interface MemberControllerInterface {
             @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
     })
     @GetMapping("/{memberId}")
-    ResponseEntity<MemberProfileResponse> findProfileInformation(
+    ResponseEntity<MemberProfileResponse> findMemberProfile(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable Long memberId
     );

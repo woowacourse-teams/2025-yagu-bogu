@@ -118,11 +118,11 @@ public class MemberController implements MemberControllerInterface {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<MemberProfileResponse> findProfileInformation(
+    public ResponseEntity<MemberProfileResponse> findMemberProfile(
             final MemberClaims memberClaims,
             @PathVariable final Long memberId
     ) {
-        MemberProfileResponse response = memberService.findProfileInformation(memberClaims.id(), memberId);
+        MemberProfileResponse response = memberService.findMemberProfile(memberClaims.id(), memberId);
 
         return ResponseEntity.ok(response);
     }

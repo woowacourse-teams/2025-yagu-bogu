@@ -153,7 +153,7 @@ public class MemberService {
                 .orElseThrow(() -> new NotFoundException("Badge is not found"));
     }
 
-    public MemberProfileResponse findProfileInformation(final Long loginMemberId, final Long profileOwnerId) {
+    public MemberProfileResponse findMemberProfile(final Long loginMemberId, final Long profileOwnerId) {
         existMember(loginMemberId);
 
         Member profileOwnerMember = getMember(profileOwnerId);
