@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/mysql
+    validate-on-migrate: true
+
+  datasource:
+    hikari:
+      maximumPoolSize: 10
+      minimumIdle: 5
+      connectionTimeout: 5000
+      idleTimeout: 0
+      maxLifetime: 1500000
+      validationTimeout: 1000
+      poolName: crawling-hikari-pool
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod

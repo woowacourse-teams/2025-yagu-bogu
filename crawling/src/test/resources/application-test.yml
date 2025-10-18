@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      maximumPoolSize: 5
+      minimumIdle: 1
+      connectionTimeout: 30000
+      maxLifetime: 1800000
+      poolName: crawling-hikari-test
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  sql:
+    init:
+      mode: never
+      data-locations: false
+
+  flyway:
+    enabled: false
