@@ -12,10 +12,11 @@ import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.dto.AverageStatisticParam;
-import com.yagubogu.stat.dto.CheckInSummary;
+import com.yagubogu.stat.dto.CheckInSummaryParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
 import com.yagubogu.stat.dto.StadiumStatsParam;
+import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
@@ -149,6 +150,7 @@ public class StatService {
         }
     }
 
+
     public VictoryFairyRankingResponse findVictoryFairyRankings(
             final long memberId,
             final TeamFilter teamFilter,
@@ -185,7 +187,7 @@ public class StatService {
         return VictoryFairyRankingParam.from(victoryFairyRankings);
     }
 
-    public CheckInSummary findCheckInSummary(final long memberId, final int year) {
+    public CheckInSummaryParam findCheckInSummary(final long memberId, final int year) {
         Member member = getMember(memberId);
         validateUser(member);
 
@@ -194,7 +196,20 @@ public class StatService {
         int totalGamesForWinRate = statCounts.winCounts() + statCounts.loseCounts();
         double winRate = calculateWinRate(statCounts.winCounts(), totalGamesForWinRate);
 
-        return CheckInSummary.from(statCounts, winRate, recentCheckInDate);
+        return CheckInSummaryParam.from(statCounts, winRate, recentCheckInDate);
+    }
+
+    public VictoryFairySummaryParam findVictoryFairySummary(final long memberId, final int year) {
+        Member member = getMember(memberId);
+        validateUser(member);
+
+        return victoryFairyRankingRepository.findByMemberAndTeamFilterAndYear(member, TeamFilter.ALL, year)
+                .map(overallRankInfo -> {
+                    int rankWithinTeam = victoryFairyRankingRepository.findRankWithinTeamByMemberAndYear(member, year)
+                            .orElse(0);
+                    return VictoryFairySummaryParam.from(overallRankInfo, rankWithinTeam);
+                })
+                .orElseGet(VictoryFairySummaryParam::empty);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {

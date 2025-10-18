@@ -144,6 +144,32 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
         );
     }
 
+    @Override
+    public Optional<Integer> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
+        QVictoryFairyRanking V2 = new QVictoryFairyRanking("v2");
+        QMember M2 = new QMember("m2");
+
+        // 나보다 점수가 높은 '같은 팀' 멤버의 수를 세서 랭킹을 계산
+        JPQLQuery<Integer> myTeamRankingQuery = JPAExpressions
+                .select(V2.count().add(1).intValue())
+                .from(V2)
+                .join(V2.member, M2)
+                .where(
+                        V2.gameYear.eq(year),
+                        M2.team.eq(member.getTeam()),
+                        M2.deletedAt.isNull(),
+                        // 현재 멤버의 점수를 서브쿼리에서 참조하기 위한 조건
+                        V2.score.gt(
+                                JPAExpressions.select(VICTORY_FAIRY_RANKING.score)
+                                        .from(VICTORY_FAIRY_RANKING)
+                                        .where(VICTORY_FAIRY_RANKING.member.eq(member)
+                                                .and(VICTORY_FAIRY_RANKING.gameYear.eq(year)))
+                        )
+                );
+
+        return Optional.ofNullable(myTeamRankingQuery.fetchOne());
+    }
+
     private BooleanExpression filterByTeam(final TeamFilter teamFilter, final QTeam team) {
         if (teamFilter == TeamFilter.ALL) {
             return null;

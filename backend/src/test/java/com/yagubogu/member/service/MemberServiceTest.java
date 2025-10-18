@@ -20,7 +20,7 @@ import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
 import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.repository.MemberRepository;
-import com.yagubogu.stat.dto.CheckInSummary;
+import com.yagubogu.stat.dto.CheckInSummaryParam;
 import com.yagubogu.stat.service.StatService;
 import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
@@ -427,7 +427,7 @@ public class MemberServiceTest {
                 .build()
         );
 
-        CheckInSummary fakeSummary = new CheckInSummary(25, 75.0);
+        CheckInSummaryParam fakeSummary = new CheckInSummaryParam(25, 75.0);
         when(statService.findCheckInSummary(anyLong(), anyInt())).thenReturn(fakeSummary);
         MemberCheckInResponse expectedCheckInResponse = MemberCheckInResponse.from(fakeSummary);
 

@@ -21,6 +21,7 @@ import com.yagubogu.member.dto.v1.MemberNicknameResponse;
 import com.yagubogu.member.dto.v1.MemberProfileBadgeResponse;
 import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
+import com.yagubogu.member.dto.v1.VictoryFairyProfileResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.service.StatService;
 import com.yagubogu.team.domain.Team;
@@ -159,14 +160,16 @@ public class MemberService {
         MemberProfileBadgeResponse memberProfileBadgeResponse = MemberProfileBadgeResponse.from(
                 profileOwnerMember.getRepresentativeBadge()
         );
-        //VictoryFairy
+        VictoryFairyProfileResponse victoryFairyProfileResponse = VictoryFairyProfileResponse.from(
+                statService.findVictoryFairySummary(profileOwnerId, LocalDate.now().getYear())
+        );
         MemberCheckInResponse memberCheckInResponse = MemberCheckInResponse.from(
                 statService.findCheckInSummary(profileOwnerId, LocalDate.now().getYear())
         );
 
         return MemberProfileResponse.from(profileOwnerMember,
                 memberProfileBadgeResponse,
-                null,
+                victoryFairyProfileResponse,
                 memberCheckInResponse
         );
     }

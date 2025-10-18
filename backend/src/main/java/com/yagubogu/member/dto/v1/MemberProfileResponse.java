@@ -9,13 +9,13 @@ public record MemberProfileResponse(
         String profileImageUrl,
         String favoriteTeam,
         MemberProfileBadgeResponse representativeBadge,
-        MemberVictoryFairyResponse victoryFairy,
+        VictoryFairyProfileResponse victoryFairy,
         MemberCheckInResponse checkIn
 ) {
     public static MemberProfileResponse from(
             final Member member,
             final MemberProfileBadgeResponse badge,
-            final MemberVictoryFairyResponse victoryFairy,
+            final VictoryFairyProfileResponse victoryFairy,
             final MemberCheckInResponse checkIn) {
         return new MemberProfileResponse(
                 member.getNickname().getValue(),

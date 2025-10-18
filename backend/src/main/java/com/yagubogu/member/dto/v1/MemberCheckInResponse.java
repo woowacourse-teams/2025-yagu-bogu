@@ -1,6 +1,6 @@
 package com.yagubogu.member.dto.v1;
 
-import com.yagubogu.stat.dto.CheckInSummary;
+import com.yagubogu.stat.dto.CheckInSummaryParam;
 import java.time.LocalDate;
 
 public record MemberCheckInResponse(
@@ -12,7 +12,7 @@ public record MemberCheckInResponse(
         LocalDate recentCheckInDate
 ) {
 
-    public static MemberCheckInResponse from(final CheckInSummary summary) {
+    public static MemberCheckInResponse from(final CheckInSummaryParam summary) {
         if (summary == null) {
             return new MemberCheckInResponse(
                     0,
