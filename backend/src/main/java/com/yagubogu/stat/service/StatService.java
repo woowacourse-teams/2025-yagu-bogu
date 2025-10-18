@@ -205,9 +205,9 @@ public class StatService {
 
         return victoryFairyRankingRepository.findByMemberAndTeamFilterAndYear(member, TeamFilter.ALL, year)
                 .map(overallRankInfo -> {
-                    int rankWithinTeam = victoryFairyRankingRepository.findRankWithinTeamByMemberAndYear(member, year)
-                            .orElse(0);
-                    return VictoryFairySummaryParam.from(overallRankInfo, rankWithinTeam);
+                    Integer teamRank = victoryFairyRankingRepository.findRankWithinTeamByMemberAndYear(member, year)
+                            .orElse(null);
+                    return VictoryFairySummaryParam.from(overallRankInfo, teamRank);
                 })
                 .orElseGet(VictoryFairySummaryParam::empty);
     }

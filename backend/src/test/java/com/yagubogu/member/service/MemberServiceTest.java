@@ -18,15 +18,19 @@ import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileBadgeResponse;
 import com.yagubogu.member.dto.v1.MemberProfileResponse;
+import com.yagubogu.member.dto.v1.VictoryFairyProfileResponse;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.dto.CheckInSummaryParam;
+import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.service.StatService;
 import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -418,17 +422,24 @@ public class MemberServiceTest {
     void findProfileInformation() {
         // given
         Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member me = memberFactory.save(builder -> builder.nickname("진짜우가")
                 .team(favoriteTeam)
                 .build()
         );
         Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("우가")
                 .team(favoriteTeam)
+                .representativeBadge(badge)
                 .build()
         );
-
-        CheckInSummaryParam fakeSummary = new CheckInSummaryParam(25, 75.0);
+        CheckInSummaryParam fakeSummary = new CheckInSummaryParam(14, 75.0, 9, 0, 4, LocalDate.of(2025, 7, 24));
         when(statService.findCheckInSummary(anyLong(), anyInt())).thenReturn(fakeSummary);
+        VictoryFairySummaryParam fakeVictorySummary = new VictoryFairySummaryParam(5, 1, 90.0);
+        when(statService.findVictoryFairySummary(anyLong(), anyInt())).thenReturn(fakeVictorySummary);
+        MemberProfileBadgeResponse expectedBadgeResponse = MemberProfileBadgeResponse.from(
+                profileOwneredMember.getRepresentativeBadge());
+        VictoryFairyProfileResponse expectedVictoryFairyProfileResponse = VictoryFairyProfileResponse.from(
+                fakeVictorySummary);
         MemberCheckInResponse expectedCheckInResponse = MemberCheckInResponse.from(fakeSummary);
 
         // when
@@ -440,10 +451,21 @@ public class MemberServiceTest {
             softAssertions.assertThat(actual.favoriteTeam()).isEqualTo(profileOwneredMember.getTeam().getShortName());
             softAssertions.assertThat(actual.profileImageUrl()).isEqualTo(profileOwneredMember.getImageUrl());
             softAssertions.assertThat(actual.enterDate()).isEqualTo(profileOwneredMember.getCreatedAt().toLocalDate());
-            softAssertions.assertThat(actual.representativeBadge()).isNull();
-            softAssertions.assertThat(actual.victoryFairy()).isNull();
+            softAssertions.assertThat(actual.representativeBadge().imageUrl())
+                    .isEqualTo(expectedBadgeResponse.imageUrl());
+            softAssertions.assertThat(actual.victoryFairy().ranking())
+                    .isEqualTo(expectedVictoryFairyProfileResponse.ranking());
+            softAssertions.assertThat(actual.victoryFairy().rankWithinTeam())
+                    .isEqualTo(expectedVictoryFairyProfileResponse.rankWithinTeam());
+            softAssertions.assertThat(actual.victoryFairy().score())
+                    .isEqualTo(expectedVictoryFairyProfileResponse.score());
             softAssertions.assertThat(actual.checkIn().counts()).isEqualTo(expectedCheckInResponse.counts());
             softAssertions.assertThat(actual.checkIn().winRate()).isEqualTo(expectedCheckInResponse.winRate());
+            softAssertions.assertThat(actual.checkIn().winCounts()).isEqualTo(expectedCheckInResponse.winCounts());
+            softAssertions.assertThat(actual.checkIn().drawCounts()).isEqualTo(expectedCheckInResponse.drawCounts());
+            softAssertions.assertThat(actual.checkIn().loseCounts()).isEqualTo(expectedCheckInResponse.loseCounts());
+            softAssertions.assertThat(actual.checkIn().recentCheckInDate())
+                    .isEqualTo(expectedCheckInResponse.recentCheckInDate());
         });
     }
 

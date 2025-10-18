@@ -4,24 +4,17 @@ import com.yagubogu.stat.dto.CheckInSummaryParam;
 import java.time.LocalDate;
 
 public record MemberCheckInResponse(
-        int counts,
+        Integer counts,
         String winRate,
-        int winCounts,
-        int drawCounts,
-        int loseCounts,
+        Integer winCounts,
+        Integer drawCounts,
+        Integer loseCounts,
         LocalDate recentCheckInDate
 ) {
 
     public static MemberCheckInResponse from(final CheckInSummaryParam summary) {
-        if (summary == null) {
-            return new MemberCheckInResponse(
-                    0,
-                    "0.0%",
-                    0,
-                    0,
-                    0,
-                    null
-            );
+        if (summary == null || summary.totalCount() == null) {
+            return empty();
         }
         String formattedWinRate = String.format("%.1f%%", summary.winRate());
 
@@ -33,5 +26,9 @@ public record MemberCheckInResponse(
                 summary.loseCounts(),
                 summary.recentCheckInDate()
         );
+    }
+
+    private static MemberCheckInResponse empty() {
+        return new MemberCheckInResponse(null, null, null, null, null, null);
     }
 }

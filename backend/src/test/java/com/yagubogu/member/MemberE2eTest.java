@@ -302,12 +302,14 @@ public class MemberE2eTest extends E2eTestBase {
     void findProfileInformation() {
         // given
         Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
         Member me = memberFactory.save(builder ->
                 builder.nickname("우가")
                         .team(team)
         );
         Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("가짜우가")
                 .team(team)
+                .representativeBadge(badge)
                 .build()
         );
         String accessToken = authFactory.getAccessTokenByMemberId(me.getId(), Role.USER);
