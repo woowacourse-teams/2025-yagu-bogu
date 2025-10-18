@@ -12,16 +12,19 @@ public record MemberProfileResponse(
         VictoryFairyProfileResponse victoryFairy,
         MemberCheckInResponse checkIn
 ) {
+
     public static MemberProfileResponse from(
             final Member member,
             final MemberProfileBadgeResponse badge,
             final VictoryFairyProfileResponse victoryFairy,
             final MemberCheckInResponse checkIn) {
+        String favoriteTeamName = (member.getTeam() != null) ? member.getTeam().getShortName() : null;
+
         return new MemberProfileResponse(
                 member.getNickname().getValue(),
                 member.getCreatedAt().toLocalDate(),
                 member.getImageUrl(),
-                member.getTeam().getShortName(),
+                favoriteTeamName,
                 badge,
                 victoryFairy,
                 checkIn
