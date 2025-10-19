@@ -17,6 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.theme.Gray700
+import com.yagubogu.ui.theme.PretendardBold20
+import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.YaguBoguTheme
 
 /**
@@ -64,12 +67,7 @@ fun InfoPanel(
 
                 Text(
                     text = title,
-                    style =
-                        if (showLoading) {
-                            MaterialTheme.typography.bodyLarge
-                        } else {
-                            MaterialTheme.typography.titleMedium
-                        },
+                    style = PretendardBold20,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -77,8 +75,8 @@ fun InfoPanel(
                 subtitle?.let {
                     Text(
                         text = it,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = PretendardMedium16,
+                        color = Gray700,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )

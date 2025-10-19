@@ -44,10 +44,6 @@ fun GameListItem(
             } else {
                 CardDefaults.cardColors(containerColor = White)
             },
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = 2.dp,
-            ),
     ) {
         Column(
             modifier =

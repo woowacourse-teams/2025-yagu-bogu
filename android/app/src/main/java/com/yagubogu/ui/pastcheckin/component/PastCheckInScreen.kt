@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -123,7 +125,7 @@ private fun PastCheckInScreen(
             // 콘텐츠 영역 (나머지 공간 전체 사용)
             Box(
                 modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center, // ✅ 정중앙 배치
+                contentAlignment = Alignment.Center, // 정중앙 배치
             ) {
                 when {
                     // 로딩 중 (중앙 배치)
@@ -132,6 +134,7 @@ private fun PastCheckInScreen(
                             emoji = "",
                             title = uiState.isLoading,
                             showLoading = true,
+                            modifier = Modifier.offset(y = (-50).dp),
                         )
                     }
 
@@ -149,6 +152,11 @@ private fun PastCheckInScreen(
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
+                                contentPadding =
+                                    PaddingValues(
+                                        top = 8.dp,
+                                        bottom = 32.dp,
+                                    ),
                             ) {
                                 items(uiState.gameList) { game ->
                                     GameListItem(
@@ -166,6 +174,7 @@ private fun PastCheckInScreen(
                             emoji = "📅",
                             title = "해당 날짜에 경기가 없습니다",
                             subtitle = "다른 날짜를 선택해주세요",
+                            modifier = Modifier.offset(y = (-50).dp),
                         )
                     }
 
@@ -175,6 +184,7 @@ private fun PastCheckInScreen(
                             emoji = "⚾",
                             title = "날짜를 선택해주세요",
                             subtitle = "과거에 직관한 경기 날짜를 선택하면\n해당 날짜의 경기 목록을 확인할 수 있습니다",
+                            modifier = Modifier.offset(y = (-50).dp),
                         )
                     }
                 }
