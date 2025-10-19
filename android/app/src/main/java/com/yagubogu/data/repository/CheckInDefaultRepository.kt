@@ -16,10 +16,7 @@ import java.time.LocalDate
 class CheckInDefaultRepository(
     private val checkInDataSource: CheckInDataSource,
 ) : CheckInRepository {
-    override suspend fun addCheckIn(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<Unit> = checkInDataSource.addCheckIn(stadiumId, date)
+    override suspend fun addCheckIn(gameId: Long): Result<Unit> = checkInDataSource.addCheckIn(gameId)
 
     override suspend fun getCheckInCounts(year: Int): Result<Int> =
         checkInDataSource

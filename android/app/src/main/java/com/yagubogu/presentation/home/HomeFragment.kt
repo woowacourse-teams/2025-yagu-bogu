@@ -151,7 +151,7 @@ class HomeFragment :
             val message: String =
                 when (value) {
                     is CheckInUiEvent.Success ->
-                        getString(R.string.home_check_in_success_message, value.stadium.fullName)
+                        getString(R.string.home_check_in_success_message, value.stadium.shortName)
 
                     CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)

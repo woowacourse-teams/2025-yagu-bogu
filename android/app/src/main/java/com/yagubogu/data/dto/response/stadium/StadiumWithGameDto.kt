@@ -3,16 +3,12 @@ package com.yagubogu.data.dto.response.stadium
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
-import com.yagubogu.domain.model.Stadium
+import com.yagubogu.presentation.home.model.Stadium
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class StadiumDto(
-    @SerialName("id")
-    val id: Long, // 구장 id
-    @SerialName("fullName")
-    val fullName: String, // 구장 이름
+data class StadiumWithGameDto(
     @SerialName("shortName")
     val shortName: String, // 구장 별명
     @SerialName("location")
@@ -21,11 +17,15 @@ data class StadiumDto(
     val latitude: Double, // 위도
     @SerialName("longitude")
     val longitude: Double, // 경도
+    @SerialName("homeTeam")
+    val homeTeam: TeamDto, // 홈 팀
+    @SerialName("awayTeam")
+    val awayTeam: TeamDto, // 어웨이 팀
+    @SerialName("games")
+    val games: List<GameDto>, // 게임 목록 (1차전, 2차전 순서)
 ) {
-    fun toDomain(): Stadium =
+    fun toPresentation(): Stadium =
         Stadium(
-            id = id,
-            fullName = fullName,
             shortName = shortName,
             location = location,
             coordinate =
@@ -33,5 +33,6 @@ data class StadiumDto(
                     latitude = Latitude(latitude),
                     longitude = Longitude(longitude),
                 ),
+            games = games.map { it.gameId },
         )
 }

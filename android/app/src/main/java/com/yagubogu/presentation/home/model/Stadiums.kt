@@ -1,4 +1,7 @@
-package com.yagubogu.domain.model
+package com.yagubogu.presentation.home.model
+
+import com.yagubogu.domain.model.Coordinate
+import com.yagubogu.domain.model.Distance
 
 data class Stadiums(
     val values: List<Stadium>,

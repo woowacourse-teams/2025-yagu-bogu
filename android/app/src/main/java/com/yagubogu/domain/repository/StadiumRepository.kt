@@ -1,7 +1,10 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.domain.model.Stadiums
+import com.yagubogu.presentation.home.model.Stadiums
+import java.time.LocalDate
 
 interface StadiumRepository {
-    suspend fun getStadiums(): Result<Stadiums>
+    suspend fun getStadiumsForCheckIn(date: LocalDate): Result<Stadiums>
+
+    // TODO: 과거 직관 인증 getStadiumsForPastCheckIn
 }

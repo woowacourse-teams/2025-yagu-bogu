@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
-import com.yagubogu.domain.model.Stadium
-import com.yagubogu.domain.model.Stadiums
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.LocationRepository
 import com.yagubogu.domain.repository.MemberRepository
@@ -18,7 +16,9 @@ import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
+import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.model.Stadiums
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -110,11 +110,11 @@ class HomeViewModel(
         fetchVictoryFairyRanking()
     }
 
-    fun checkIn() {
+    fun checkIn(date: LocalDate = LocalDate.now()) {
         _isCheckInLoading.value = true
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
-                handleCheckIn(currentCoordinate)
+                handleCheckIn(currentCoordinate, date)
             },
             onFailure = { exception: Exception ->
                 Timber.w(exception, "위치 불러오기 실패")
@@ -218,9 +218,12 @@ class HomeViewModel(
         }
     }
 
-    private fun handleCheckIn(currentCoordinate: Coordinate) {
+    private fun handleCheckIn(
+        currentCoordinate: Coordinate,
+        date: LocalDate,
+    ) {
         viewModelScope.launch {
-            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiums()
+            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiumsForCheckIn(date)
             stadiumsResult
                 .onSuccess { stadiums: Stadiums ->
                     checkInIfWithinThreshold(currentCoordinate, stadiums)
@@ -245,9 +248,8 @@ class HomeViewModel(
             return
         }
 
-        val today = LocalDate.now()
         checkInRepository
-            .addCheckIn(nearestStadium.id, today)
+            .addCheckIn(nearestStadium.games.first())
             .onSuccess {
                 _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
                 _memberStatsUiModel.value =
