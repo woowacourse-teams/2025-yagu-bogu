@@ -16,7 +16,6 @@ val PretendardMedium =
         fontFamily = PretendardFontFamily,
         fontWeight = FontWeight.Medium,
     )
-val PretendardMedium16 = PretendardMedium.copy(fontSize = 16.sp)
 
 val PretendardSemiBold =
     TextStyle(
@@ -40,3 +39,4 @@ val EsamanruMedium =
     )
 
 val EsamanruMedium12 = EsamanruMedium.copy(fontSize = 12.sp)
+val EsamanruMedium20 = EsamanruMedium.copy(fontSize = 20.sp)

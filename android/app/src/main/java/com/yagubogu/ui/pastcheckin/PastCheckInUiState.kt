@@ -9,4 +9,5 @@ data class PastCheckInUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val selectedGame: LivetalkStadiumItem? = null,
+    val showConfirmDialog: Boolean = false,
 )

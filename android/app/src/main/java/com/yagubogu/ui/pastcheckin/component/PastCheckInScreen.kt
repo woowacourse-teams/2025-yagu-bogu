@@ -1,36 +1,40 @@
 package com.yagubogu.ui.pastcheckin.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import com.yagubogu.ui.component.DefaultDialog
 import com.yagubogu.ui.component.Toolbar
+import com.yagubogu.ui.pastcheckin.PastCheckInUiEvent
 import com.yagubogu.ui.pastcheckin.PastCheckInUiState
 import com.yagubogu.ui.pastcheckin.PastCheckInViewModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.YaguBoguTheme
+import com.yagubogu.ui.util.formatLocalDate
 import java.time.LocalDate
 
 @Composable
@@ -40,6 +44,8 @@ fun PastCheckInScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     PastCheckInScreen(
         uiState = uiState,
@@ -48,6 +54,33 @@ fun PastCheckInScreen(
         onGameSelected = viewModel::onGameSelected,
         modifier = modifier,
     )
+
+    if (uiState.showConfirmDialog) {
+        DefaultDialog(
+            DefaultDialogUiModel(
+                title = "${uiState.selectedGame?.homeTeam?.shortname} vs ${uiState.selectedGame?.awayTeam?.shortname}",
+                emoji = "⚾",
+                message = "${uiState.selectedDate?.let { formatLocalDate(it) }} ${uiState.selectedGame?.stadiumName}\n과거 직관을 등록하시겠습니까?",
+                positiveText = "등록",
+                negativeText = "취소",
+            ),
+            onConfirm = viewModel::confirmRegistration,
+            onDismiss = viewModel::dismissDialog,
+        )
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is PastCheckInUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
+                is PastCheckInUiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,39 +151,6 @@ private fun PastCheckInScreen(
             }
         }
     }
-
-    // 7️⃣ 에러 처리
-    uiState.errorMessage?.let { message ->
-        LaunchedEffect(message) {
-            // TODO: 스낵바나 토스트로 에러 메시지 표시
-            // 또는 에러 다이얼로그 표시
-        }
-
-        // 임시로 에러 카드 표시
-        Card(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                ),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "⚠️ 오류 발생",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                )
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                )
-            }
-        }
-    }
 }
 
 @Preview(showBackground = true)
@@ -170,7 +170,6 @@ private fun PastCheckInScreenPreview_Initial() {
 @Composable
 private fun PastCheckInScreenPreview_Loading() {
     YaguBoguTheme {
-        // 샘플 데이터로 Preview
         val sampleGames = emptyList<LivetalkStadiumItem>()
 
         PastCheckInScreen(

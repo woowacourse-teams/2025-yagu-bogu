@@ -124,7 +124,7 @@ private fun TeamInfo(
 
         // 팀명
         Text(
-            text = team.name,
+            text = team.shortname,
             style = EsamanruMedium12,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
