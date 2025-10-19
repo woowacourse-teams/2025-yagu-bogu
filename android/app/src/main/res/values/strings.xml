@@ -101,6 +101,7 @@
     <string name="attendance_history_balls">사사구</string>
 
     <string name="past_check_in_title">과거 직관 기록</string>
+    <string name="past_check_in_top_bar_add_btn">직관 인증 추가 아이콘</string>
 
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 

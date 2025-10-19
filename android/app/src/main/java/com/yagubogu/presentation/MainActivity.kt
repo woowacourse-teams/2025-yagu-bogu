@@ -29,6 +29,7 @@ import com.yagubogu.presentation.stats.StatsFragment
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.badge.BadgeActivity
+import com.yagubogu.ui.pastcheckin.PastCheckInActivity
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -88,6 +89,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.ivSettings.setOnClickListener {
             val intent = SettingActivity.newIntent(this)
+            startActivity(intent)
+        }
+
+        binding.ivAddPastCheckIn.setOnClickListener {
+            val intent = PastCheckInActivity.newIntent(this)
             startActivity(intent)
         }
     }
