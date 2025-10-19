@@ -65,7 +65,12 @@ private fun VictoryFairyStatsRow(
     ) {
         StatItem(
             title = "승리 요정 랭킹",
-            value = stringResource(R.string.all_ranking, memberProfile.victoryFairyRanking),
+            value =
+                if (memberProfile.victoryFairyRanking != null) {
+                    stringResource(R.string.all_ranking, memberProfile.victoryFairyRanking)
+                } else {
+                    null
+                },
             emoji = "\uD83C\uDF96\uFE0F",
             modifier = Modifier.weight(1f, true),
         )
@@ -76,7 +81,12 @@ private fun VictoryFairyStatsRow(
         )
         StatItem(
             title = "승리 요정 점수",
-            value = stringResource(R.string.all_score_first_float, memberProfile.victoryFairyScore),
+            value =
+                if (memberProfile.victoryFairyScore != null) {
+                    stringResource(R.string.all_score_first_float, memberProfile.victoryFairyScore)
+                } else {
+                    null
+                },
             emoji = "\uD83E\uDDDA",
             modifier = Modifier.weight(1f, true),
         )
@@ -98,7 +108,7 @@ private fun CheckInStatsRow(
     ) {
         StatItem(
             title = "응원팀 직관 횟수",
-            value = memberProfile.checkInCounts.toString(),
+            value = memberProfile.checkInCounts?.toString(),
             modifier = Modifier.weight(1f, true),
         )
         VerticalDivider(
@@ -151,8 +161,8 @@ private fun DatesRow(
             title = "최근 직관일",
             value =
                 memberProfile.recentCheckInDate
-                    .toJavaLocalDate()
-                    .format(DateFormatter.yyyyMMdd),
+                    ?.toJavaLocalDate()
+                    ?.format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f, true),
         )
     }
@@ -161,7 +171,7 @@ private fun DatesRow(
 @Composable
 private fun StatItem(
     title: String,
-    value: String,
+    value: String?,
     modifier: Modifier = Modifier,
     emoji: String? = null,
 ) {
@@ -173,7 +183,7 @@ private fun StatItem(
             Text(text = emoji, fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        Text(text = value, style = PretendardSemiBold20)
+        Text(text = value ?: "-", style = PretendardSemiBold20)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = title, style = PretendardRegular12, color = Gray500)
     }

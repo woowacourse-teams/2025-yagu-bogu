@@ -90,14 +90,16 @@ fun ProfileHeader(
                         Spacer(modifier = Modifier.height(4.dp))
                         RankingText(memberProfile)
                     }
-                    AsyncImage(
-                        model = memberProfile.representativeBadgeImageUrl,
-                        contentDescription = "대표 배지 이미지",
-                        modifier =
-                            Modifier
-                                .size(40.dp)
-                                .padding(start = 8.dp),
-                    )
+                    memberProfile.representativeBadgeImageUrl?.let { badgeImageUrl: String ->
+                        AsyncImage(
+                            model = badgeImageUrl,
+                            contentDescription = "대표 배지 이미지",
+                            modifier =
+                                Modifier
+                                    .size(40.dp)
+                                    .padding(start = 8.dp),
+                        )
+                    }
                 }
             }
             Box(
@@ -126,7 +128,7 @@ private fun RankingText(
     Row {
         Text(text = "전체 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
-            text = memberProfile.victoryFairyRanking.toString(),
+            text = memberProfile.victoryFairyRanking?.toString() ?: "-",
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
@@ -147,7 +149,7 @@ private fun RankingText(
         )
         Text(text = " 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
-            text = memberProfile.victoryFairyRankingWithinTeam.toString(),
+            text = memberProfile.victoryFairyRankingWithinTeam?.toString() ?: "-",
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,

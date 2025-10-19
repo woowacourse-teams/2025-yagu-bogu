@@ -16,7 +16,7 @@ data class MemberProfileResponse(
     @SerialName("favoriteTeam")
     val favoriteTeam: String, // 응원하는 팀
     @SerialName("representativeBadge")
-    val representativeBadge: RepresentativeBadgeDto, // 대표 배지 정보
+    val representativeBadge: RepresentativeBadgeDto?, // 대표 배지 정보
     @SerialName("victoryFairy")
     val victoryFairy: VictoryFairyDto, // 승리 요정 정보
     @SerialName("checkIn")
@@ -28,13 +28,13 @@ data class MemberProfileResponse(
             enterDate = enterDate,
             profileImageUrl = profileImageUrl,
             favoriteTeam = favoriteTeam,
-            representativeBadgeName = representativeBadge.name,
-            representativeBadgeImageUrl = representativeBadge.badgeImageUrl,
+            representativeBadgeName = representativeBadge?.name,
+            representativeBadgeImageUrl = representativeBadge?.badgeImageUrl,
             victoryFairyRanking = victoryFairy.ranking,
             victoryFairyScore = victoryFairy.score,
             victoryFairyRankingWithinTeam = victoryFairy.rankWithinTeam,
             checkInCounts = checkIn.counts,
-            checkInWinRate = checkIn.winRate,
+            checkInWinRate = checkIn.winRate ?: "-",
             winCounts = checkIn.winCounts,
             drawCounts = checkIn.drawCounts,
             loseCounts = checkIn.loseCounts,
