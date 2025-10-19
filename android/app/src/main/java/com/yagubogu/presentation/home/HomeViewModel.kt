@@ -69,8 +69,8 @@ class HomeViewModel(
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
 
-    private val _hasAlreadyCheckedIn = MutableLiveData<Boolean>()
-    val hasAlreadyCheckedIn: LiveData<Boolean> get() = _hasAlreadyCheckedIn
+    private val _checkInStatus = MutableLiveData<Boolean>()
+    val checkInStatus: LiveData<Boolean> get() = _checkInStatus
 
     init {
         fetchAll()
@@ -105,7 +105,6 @@ class HomeViewModel(
     }
 
     fun fetchAll() {
-        fetchCheckInStatus()
         fetchMemberStats()
         fetchStadiumStats()
         fetchVictoryFairyRanking()
@@ -159,12 +158,12 @@ class HomeViewModel(
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
     }
 
-    private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+    fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
-            val checkInStatusResult: Result<Boolean> = checkInRepository.getCheckInStatus(date)
-            checkInStatusResult
+            checkInRepository
+                .getCheckInStatus(date)
                 .onSuccess { checkInStatus: Boolean ->
-                    _hasAlreadyCheckedIn.value = checkInStatus
+                    _checkInStatus.value = checkInStatus
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -251,7 +250,6 @@ class HomeViewModel(
             .addCheckIn(nearestStadium.id, today)
             .onSuccess {
                 _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
-                _hasAlreadyCheckedIn.value = true
                 _memberStatsUiModel.value =
                     memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
                         currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)

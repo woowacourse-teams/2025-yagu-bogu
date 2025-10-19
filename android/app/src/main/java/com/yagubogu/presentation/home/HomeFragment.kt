@@ -139,6 +139,14 @@ class HomeFragment :
     }
 
     private fun setupObservers() {
+        viewModel.checkInStatus.observe(viewLifecycleOwner) { value: Boolean ->
+            if (value) {
+                showAdditionalCheckInConfirmDialog()
+            } else {
+                viewModel.checkIn()
+            }
+        }
+
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             val message: String =
                 when (value) {
@@ -176,6 +184,17 @@ class HomeFragment :
     private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(
             KEY_CHECK_IN_REQUEST_DIALOG,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+                viewModel.checkIn()
+                firebaseAnalytics.logEvent("check_in", null)
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            KEY_ADDITIONAL_CHECK_IN_DIALOG,
             viewLifecycleOwner,
         ) { _, bundle ->
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
@@ -245,6 +264,23 @@ class HomeFragment :
         startActivity(intent)
     }
 
+    private fun showAdditionalCheckInConfirmDialog() {
+        if (parentFragmentManager.findFragmentByTag(KEY_ADDITIONAL_CHECK_IN_DIALOG) == null) {
+            val dialogUiModel =
+                DefaultDialogUiModel(
+                    title = getString(R.string.home_already_checked_in),
+                    emoji = getString(R.string.home_already_checked_in_emoji),
+                    message = getString(R.string.home_additional_check_in_message),
+                )
+            val dialog =
+                DefaultDialogFragment.newInstance(
+                    KEY_ADDITIONAL_CHECK_IN_DIALOG,
+                    dialogUiModel,
+                )
+            dialog.show(parentFragmentManager, KEY_ADDITIONAL_CHECK_IN_DIALOG)
+        }
+    }
+
     private fun showCheckInConfirmDialog() {
         if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_REQUEST_DIALOG) == null) {
             val dialogUiModel =
@@ -276,8 +312,8 @@ class HomeFragment :
     private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse>) {
         task
             .addOnSuccessListener {
-                // 위치 설정이 활성화된 경우 직관 인증 확인 다이얼로그 표시
-                showCheckInConfirmDialog()
+                // 위치 설정이 활성화된 경우 직관 인증 여부 확인
+                viewModel.fetchCheckInStatus()
             }.addOnFailureListener { exception ->
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
@@ -316,6 +352,7 @@ class HomeFragment :
     companion object {
         private const val PACKAGE_SCHEME = "package"
         private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
+        private const val KEY_ADDITIONAL_CHECK_IN_DIALOG = "additionalCheckIn"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
         private const val RC_LOCATION_SETTINGS = 1001
