@@ -27,7 +27,7 @@ import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboar
 public class KboCrawlerController implements KboCrawlerControllerInterface {
 
     private final GameScheduleSyncService gameScheduleSyncService;
-        private final KboScoreboardService kboScoreboardService;
+    private final KboScoreboardService kboScoreboardService;
     private final GameCenterSyncService gameCenterSyncService;
 
     @Override
@@ -69,9 +69,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     public ResponseEntity<DailyGameData> getTodayData() {
         DailyGameData data = gameCenterSyncService.getTodayGameDetails();
 
-        // CSV 저장
-        data.saveToCsv("crawl_csv");
-
         return ResponseEntity.ok(data);
     }
 
@@ -81,9 +78,7 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
     @GetMapping("/{date}")
     public ResponseEntity<DailyGameData> getDateData(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-
         DailyGameData data = gameCenterSyncService.getGameDetails(date);
-        data.saveToCsv("crawl_csv");
 
         return ResponseEntity.ok(data);
     }

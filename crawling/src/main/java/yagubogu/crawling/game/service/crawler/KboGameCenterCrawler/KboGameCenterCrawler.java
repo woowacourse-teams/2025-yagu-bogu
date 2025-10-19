@@ -13,12 +13,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.PlaywrightManager;
+import yagubogu.crawling.game.dto.GameDetailInfo;
 import yagubogu.crawling.game.dto.GameInfo;
-import yagubogu.crawling.game.dto.PitcherDetailInfo;
-import yagubogu.crawling.game.dto.TeamDetailInfo;
 
 @Slf4j
 public class KboGameCenterCrawler {
@@ -58,7 +56,7 @@ public class KboGameCenterCrawler {
                 // 날짜 순서대로 정렬
                 List<LocalDate> sortedDates = dates.stream()
                         .sorted()
-                        .collect(Collectors.toList());
+                        .toList();
 
                 log.info("총 {}개 날짜 크롤링 시작", sortedDates.size());
 
@@ -94,6 +92,9 @@ public class KboGameCenterCrawler {
     /**
      * 일일 경기 상세 정보 크롤링
      */
+    /**
+     * 일일 경기 상세 정보 크롤링 (클릭 없이 목록에서 수집)
+     */
     public DailyGameData getDailyData(LocalDate date) {
         return playwrightManager.withPage(page -> {
             DailyGameData dailyData = new DailyGameData();
@@ -101,15 +102,15 @@ public class KboGameCenterCrawler {
             try {
                 navigateToUrl(page);
                 navigateToDate(page, date);
-
                 page.waitForTimeout(3000);
 
+                // 날짜 정보
                 String dateText = page.locator("#lblGameDate").textContent();
                 String dateFormatted = dateText.substring(0, 10).replace(".", "-");
                 dailyData.setDate(dateFormatted);
 
-                // Locator 사용 (더 현대적)
-                Locator gameLocator = page.locator(".game-cont");
+                // 경기 목록 수집
+                Locator gameLocator = page.locator(".game-list-n > li.game-cont");
                 int gameCount = gameLocator.count();
 
                 if (gameCount == 0) {
@@ -117,32 +118,27 @@ public class KboGameCenterCrawler {
                     return dailyData;
                 }
 
-                log.info("총 {}경기 크롤링 시작", gameCount);
+                log.info("총 {}경기 정보 수집 시작", gameCount);
 
                 for (int i = 0; i < gameCount; i++) {
                     try {
+                        Locator currentGame = gameLocator.nth(i);
+
                         log.info("경기 {}/{} 처리 중...", i + 1, gameCount);
 
-                        // Locator로 클릭 (자동으로 재시도)
-                        gameLocator.nth(i).click(new Locator.ClickOptions()
-                                .setForce(true)
-                                .setTimeout(10000)
-                        );
+                        // game-cont에서 직접 정보 수집
+                        GameDetailInfo gameDetail = extractGameDetailFromElement(currentGame, dateFormatted);
 
-                        page.waitForTimeout(2000);
-
-                        List<PitcherDetailInfo> pitchers = collectPitcherInfo(page, dateFormatted);
-                        dailyData.addPitchers(pitchers);
-
-                        List<TeamDetailInfo> teams = collectTeamInfo(page, dateFormatted);
-                        dailyData.addTeams(teams);
+                        if (gameDetail != null) {
+                            dailyData.addGameDetail(gameDetail);
+                        }
 
                     } catch (Exception e) {
                         log.error("경기 {} 처리 실패: {}", i + 1, e.getMessage());
                     }
                 }
 
-                log.info("일일 경기 정보 크롤링 성공");
+                log.info("일일 경기 정보 수집 완료");
 
             } catch (Exception e) {
                 log.error("일일 데이터 크롤링 실패", e);
@@ -153,23 +149,153 @@ public class KboGameCenterCrawler {
     }
 
     /**
+     * game-cont 요소에서 경기 상세 정보 추출
+     */
+    private GameDetailInfo extractGameDetailFromElement(Locator gameElement, String date) {
+        try {
+            GameDetailInfo detail = new GameDetailInfo();
+            detail.setDate(date);
+
+            // li 태그의 속성들
+            detail.setGameId(gameElement.getAttribute("g_id"));
+            detail.setGameDate(gameElement.getAttribute("g_dt"));
+            detail.setGameSc(gameElement.getAttribute("game_sc"));
+            detail.setAwayTeamId(gameElement.getAttribute("away_id"));
+            detail.setHomeTeamId(gameElement.getAttribute("home_id"));
+            detail.setAwayTeamName(gameElement.getAttribute("away_nm"));
+            detail.setHomeTeamName(gameElement.getAttribute("home_nm"));
+            detail.setStadium(gameElement.getAttribute("s_nm"));
+
+            // 경기 상태
+            String classAttr = gameElement.getAttribute("class");
+            if (classAttr != null) {
+                if (classAttr.contains("end")) {
+                    detail.setGameStatus("경기종료");
+                } else if (classAttr.contains("cancel")) {
+                    detail.setGameStatus("경기취소");
+                } else {
+                    detail.setGameStatus("경기예정");
+                }
+            }
+
+            // top 영역: 경기장, 날씨, 시간
+            Locator topItems = gameElement.locator(".top > ul > li");
+            int topCount = topItems.count();
+
+            if (topCount >= 1) {
+                detail.setStadiumName(topItems.nth(0).textContent().trim());
+            }
+
+            // 날씨 이미지 (있을 경우)
+            if (topCount >= 2) {
+                Locator weatherImg = topItems.nth(1).locator("img");
+                if (weatherImg.count() > 0) {
+                    detail.setWeatherIcon(weatherImg.getAttribute("src"));
+                }
+            }
+
+            // 경기 시간
+            if (topCount >= 3) {
+                detail.setStartTime(topItems.nth(topCount - 1).textContent().trim());
+            } else if (topCount == 2) {
+                // 날씨 없는 경우
+                detail.setStartTime(topItems.nth(1).textContent().trim());
+            }
+
+            // middle 영역: 중계, 상태, 점수, 투수
+            Locator broadcastingElem = gameElement.locator(".middle .broadcasting");
+            if (broadcastingElem.count() > 0) {
+                detail.setBroadcasting(broadcastingElem.textContent().trim());
+            }
+
+            Locator statusElem = gameElement.locator(".middle .staus");
+            if (statusElem.count() > 0) {
+                detail.setStatus(statusElem.textContent().trim());
+            }
+
+            // 어웨이 팀 정보
+            Locator awayTeam = gameElement.locator(".team.away");
+            if (awayTeam.count() > 0) {
+                // 점수
+                Locator awayScore = awayTeam.locator(".score");
+                if (awayScore.count() > 0) {
+                    String scoreText = awayScore.textContent().trim();
+                    detail.setAwayScore(scoreText);
+
+                    // 승리 여부
+                    String scoreClass = awayScore.getAttribute("class");
+                    if (scoreClass != null && scoreClass.contains("win")) {
+                        detail.setWinner("away");
+                    }
+                }
+
+                // 투수 정보
+                Locator awayPitchers = awayTeam.locator(".today-pitcher p");
+                List<String> awayPitcherList = new ArrayList<>();
+                for (int i = 0; i < awayPitchers.count(); i++) {
+                    String pitcherInfo = awayPitchers.nth(i).textContent().trim();
+                    awayPitcherList.add(pitcherInfo);
+                }
+                detail.setAwayPitchers(awayPitcherList);
+            }
+
+            // 홈 팀 정보
+            Locator homeTeam = gameElement.locator(".team.home");
+            if (homeTeam.count() > 0) {
+                // 점수
+                Locator homeScore = homeTeam.locator(".score");
+                if (homeScore.count() > 0) {
+                    String scoreText = homeScore.textContent().trim();
+                    detail.setHomeScore(scoreText);
+
+                    // 승리 여부
+                    String scoreClass = homeScore.getAttribute("class");
+                    if (scoreClass != null && scoreClass.contains("win")) {
+                        detail.setWinner("home");
+                    }
+                }
+
+                // 투수 정보
+                Locator homePitchers = homeTeam.locator(".today-pitcher p");
+                List<String> homePitcherList = new ArrayList<>();
+                for (int i = 0; i < homePitchers.count(); i++) {
+                    String pitcherInfo = homePitchers.nth(i).textContent().trim();
+                    homePitcherList.add(pitcherInfo);
+                }
+                detail.setHomePitchers(homePitcherList);
+            }
+
+            log.info("경기 정보 수집 완료: {} vs {} ({})",
+                    detail.getAwayTeamName(), detail.getHomeTeamName(), detail.getStatus());
+
+            return detail;
+
+        } catch (Exception e) {
+            log.error("경기 정보 추출 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * bx-loading이 사라질 때까지 대기
      */
     private void waitForBxLoading(Page page) {
         try {
             // bx-loading이 숨겨질 때까지 대기
-            page.waitForFunction(
-                    "document.querySelector('.bx-loading') === null || " +
-                            "getComputedStyle(document.querySelector('.bx-loading')).display === 'none'"
+            Locator loadingLocator = page.locator(".bx-loading");
+
+            // 요소가 숨겨지길 대기
+            loadingLocator.waitFor(new Locator.WaitForOptions()
+                    .setState(WaitForSelectorState.HIDDEN)
+                    .setTimeout(10000)
             );
 
             log.debug("bx-loading 사라짐");
 
         } catch (TimeoutError e) {
-            log.warn("bx-loading 대기 시간 초과 (무시)");
+            log.warn("bx-loading 대기 시간 초과");
         }
 
-        // 추가 안정화 대기
         page.waitForTimeout(500);
     }
 
@@ -259,10 +385,8 @@ public class KboGameCenterCrawler {
         try {
             log.info("날짜 {}로 이동 중...", date);
 
-            // 달력 버튼 클릭
-            page.click(".ui-datepicker-trigger", new Page.ClickOptions()
-                    .setTimeout(5000)
-            );
+            page.click(".ui-datepicker-trigger",
+                    new Page.ClickOptions().setTimeout(5000));
 
             page.waitForSelector(".ui-datepicker",
                     new Page.WaitForSelectorOptions()
@@ -275,21 +399,24 @@ public class KboGameCenterCrawler {
             selectYearMonth(page, date);
             clickDay(page, date);
 
-            // 데이터 로딩 및 bx-loading 대기
+            // 날짜 변경 후 데이터 로딩 대기
             page.waitForTimeout(2000);
 
-            // bx-loading 사라질 때까지 대기
+            // bx-loading 대기
+            waitForBxLoading(page);
+
+            // 경기 목록이 로드될 때까지 대기
             try {
-                page.waitForFunction(
-                        "document.querySelector('.bx-loading') === null || " +
-                                "window.getComputedStyle(document.querySelector('.bx-loading')).display === 'none'"
+                page.waitForSelector(".game-list-n > li",
+                        new Page.WaitForSelectorOptions()
+                                .setTimeout(5000)
+                                .setState(WaitForSelectorState.ATTACHED)
                 );
             } catch (TimeoutError e) {
-                log.warn("bx-loading 대기 시간 초과");
+                log.info("경기 목록 없음 (경기 없는 날)");
             }
 
             page.waitForTimeout(1000);
-
             log.info("날짜 이동 완료");
 
         } catch (Exception e) {
@@ -297,6 +424,7 @@ public class KboGameCenterCrawler {
             throw new RuntimeException("날짜 이동 실패", e);
         }
     }
+
     /**
      * 단일 날짜 크롤링
      */
@@ -407,178 +535,6 @@ public class KboGameCenterCrawler {
             log.error("경기 정보 파싱 에러: {}", e.getMessage());
             return null;
         }
-    }
-
-    /**
-     * 선발투수 정보 수집
-     */
-    private List<PitcherDetailInfo> collectPitcherInfo(Page page, String date) {
-        List<PitcherDetailInfo> pitchers = new ArrayList<>();
-
-        try {
-            // 1. 시즌 기록
-            List<ElementHandle> seasonRows = page.querySelectorAll("#tblStartPitcher > tbody > tr");
-
-            if (seasonRows.isEmpty()) {
-                return pitchers;
-            }
-
-            PitcherDetailInfo awayPitcher = parsePitcherRow(seasonRows.get(0), date, "어웨이");
-            PitcherDetailInfo homePitcher = parsePitcherRow(seasonRows.get(1), date, "홈");
-
-            // 2. 홈/어웨이 기록
-            page.click("xpath=//*[@id='gameCenterContents']/div[2]/ul/li[2]/a");
-            page.waitForTimeout(500);
-
-            List<ElementHandle> haRows = page.querySelectorAll("#tblStartPitcher > tbody > tr");
-            parseHARecord(haRows.get(0), awayPitcher);
-            parseHARecord(haRows.get(1), homePitcher);
-
-            // 3. 맞대결 기록
-            page.click("xpath=//*[@id='gameCenterContents']/div[2]/ul/li[3]/a");
-            page.waitForTimeout(500);
-
-            List<ElementHandle> vsRows = page.querySelectorAll("#tblStartPitcher > tbody > tr");
-            parseVSRecord(vsRows.get(0), awayPitcher);
-            parseVSRecord(vsRows.get(1), homePitcher);
-
-            pitchers.add(awayPitcher);
-            pitchers.add(homePitcher);
-
-        } catch (Exception e) {
-            log.error("선발투수 정보 수집 실패: {}", e.getMessage());
-        }
-
-        return pitchers;
-    }
-
-    /**
-     * 팀 정보 수집
-     */
-    private List<TeamDetailInfo> collectTeamInfo(Page page, String date) {
-        List<TeamDetailInfo> teams = new ArrayList<>();
-
-        try {
-            // 팀 전력비교 메뉴로 이동
-            page.evaluate("setGameDetailSection('TEAM')");
-            page.waitForTimeout(1000);
-
-            // 1. 시즌 기록
-            List<ElementHandle> seasonRows = page.querySelectorAll("#tblRecord > tbody > tr");
-
-            TeamDetailInfo awayTeam = parseTeamRow(seasonRows.get(0), date, "어웨이");
-            TeamDetailInfo homeTeam = parseTeamRow(seasonRows.get(1), date, "홈");
-
-            // 2. 홈/어웨이 기록
-            page.click("xpath=//*[@id='gameCenterContents']/div[2]/ul/li[2]/a");
-            page.waitForTimeout(500);
-
-            List<ElementHandle> haRows = page.querySelectorAll("#tblRecord > tbody > tr");
-            parseTeamHARecord(haRows.get(0), awayTeam);
-            parseTeamHARecord(haRows.get(1), homeTeam);
-
-            // 3. 맞대결 기록
-            page.click("xpath=//*[@id='gameCenterContents']/div[2]/ul/li[3]/a");
-            page.waitForTimeout(500);
-
-            List<ElementHandle> vsRows = page.querySelectorAll("#tblRecord > tbody > tr");
-            parseTeamVSRecord(vsRows.get(0), awayTeam);
-            parseTeamVSRecord(vsRows.get(1), homeTeam);
-
-            teams.add(awayTeam);
-            teams.add(homeTeam);
-
-        } catch (Exception e) {
-            log.error("팀 정보 수집 실패: {}", e.getMessage());
-        }
-
-        return teams;
-    }
-
-    /**
-     * 투수 행 파싱 (시즌 기록)
-     */
-    private PitcherDetailInfo parsePitcherRow(ElementHandle row, String date, String homeAway) {
-        PitcherDetailInfo pitcher = new PitcherDetailInfo();
-        pitcher.setDate(date);
-        pitcher.setHomeAway(homeAway);
-
-        pitcher.setPitcherName(row.querySelector(".name").textContent().trim());
-
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        pitcher.setSeasonEra(cells.get(1).textContent().trim());
-        pitcher.setSeasonWar(cells.get(2).textContent().trim());
-        pitcher.setSeasonGames(cells.get(3).textContent().trim());
-        pitcher.setSeasonAvgInning(cells.get(4).textContent().trim());
-        pitcher.setSeasonQs(cells.get(5).textContent().trim());
-        pitcher.setSeasonWhip(cells.get(6).textContent().trim());
-
-        return pitcher;
-    }
-
-    /**
-     * 홈/어웨이 기록 파싱 (투수)
-     */
-    private void parseHARecord(ElementHandle row, PitcherDetailInfo pitcher) {
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        pitcher.setHaEra(cells.get(1).textContent().trim());
-        pitcher.setHaGames(cells.get(2).textContent().trim());
-        pitcher.setHaAvgInning(cells.get(3).textContent().trim());
-        pitcher.setHaQs(cells.get(4).textContent().trim());
-        pitcher.setHaWhip(cells.get(5).textContent().trim());
-    }
-
-    /**
-     * 맞대결 기록 파싱 (투수)
-     */
-    private void parseVSRecord(ElementHandle row, PitcherDetailInfo pitcher) {
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        pitcher.setVsEra(cells.get(1).textContent().trim());
-        pitcher.setVsGames(cells.get(2).textContent().trim());
-        pitcher.setVsAvgInning(cells.get(3).textContent().trim());
-        pitcher.setVsQs(cells.get(4).textContent().trim());
-        pitcher.setVsWhip(cells.get(5).textContent().trim());
-    }
-
-    /**
-     * 팀 행 파싱 (시즌 기록)
-     */
-    private TeamDetailInfo parseTeamRow(ElementHandle row, String date, String homeAway) {
-        TeamDetailInfo team = new TeamDetailInfo();
-        team.setDate(date);
-        team.setHomeAway(homeAway);
-
-        team.setTeamName(row.querySelector("th > span").textContent().trim());
-
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        team.setSeasonEra(cells.get(2).textContent().trim());
-        team.setSeasonAvg(cells.get(3).textContent().trim());
-        team.setSeasonAvgScore(cells.get(4).textContent().trim());
-        team.setSeasonAvgLost(cells.get(5).textContent().trim());
-
-        return team;
-    }
-
-    /**
-     * 홈/어웨이 기록 파싱 (팀)
-     */
-    private void parseTeamHARecord(ElementHandle row, TeamDetailInfo team) {
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        team.setHaEra(cells.get(2).textContent().trim());
-        team.setHaAvg(cells.get(3).textContent().trim());
-        team.setHaAvgScore(cells.get(4).textContent().trim());
-        team.setHaAvgLost(cells.get(5).textContent().trim());
-    }
-
-    /**
-     * 맞대결 기록 파싱 (팀)
-     */
-    private void parseTeamVSRecord(ElementHandle row, TeamDetailInfo team) {
-        List<ElementHandle> cells = row.querySelectorAll("td");
-        team.setVsEra(cells.get(2).textContent().trim());
-        team.setVsAvg(cells.get(3).textContent().trim());
-        team.setVsAvgScore(cells.get(4).textContent().trim());
-        team.setVsAvgLost(cells.get(5).textContent().trim());
     }
 
     /**
