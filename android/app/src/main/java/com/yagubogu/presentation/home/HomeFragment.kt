@@ -144,6 +144,8 @@ class HomeFragment :
                 .start()
             firebaseAnalytics.logEvent("fan_rate_refresh", null)
         }
+
+        binding.layoutMyVictoryFairy.handler = this
     }
 
     private fun setupObservers() {
