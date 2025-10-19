@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.YaguBoguTheme
 
 /**
@@ -35,7 +35,7 @@ fun InfoPanel(
         modifier = modifier.fillMaxWidth(),
         colors =
             CardDefaults.cardColors(
-                containerColor = White,
+                containerColor = Gray050,
             ),
     ) {
         Box(
