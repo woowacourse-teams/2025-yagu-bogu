@@ -17,6 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{() -> handler.onProfileImageClick(victoryFairyItem.memberId)}"
         android:paddingVertical="10dp">
 
         <TextView
@@ -47,7 +48,6 @@
             app:strokeColor="@color/gray300"
             app:strokeWidth="1dp"
             app:userProfileImage="@{victoryFairyItem.profileImageUrl}"
-            android:onClick="@{() -> handler.onProfileImageClick(victoryFairyItem.memberId)}"
             tools:src="@drawable/ic_user" />
 
         <TextView
