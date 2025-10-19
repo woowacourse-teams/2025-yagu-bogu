@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class PastCheckInUiState(
     val selectedDate: LocalDate? = null,
     val gameList: List<LivetalkStadiumItem> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: String? = null,
     val errorMessage: String? = null,
     val selectedGame: LivetalkStadiumItem? = null,
     val showConfirmDialog: Boolean = false,

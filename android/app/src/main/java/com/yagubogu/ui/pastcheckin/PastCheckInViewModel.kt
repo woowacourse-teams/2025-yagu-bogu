@@ -56,7 +56,7 @@ class PastCheckInViewModel(
 
     private fun fetchGameList(date: LocalDate) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.value = _uiState.value.copy(isLoading = "경기 목록을 불러오는 중...")
 
             runCatching {
                 gameRepository.getGames(date)
@@ -64,14 +64,14 @@ class PastCheckInViewModel(
                 _uiState.value =
                     _uiState.value.copy(
                         gameList = games.getOrDefault(emptyList()),
-                        isLoading = false,
+                        isLoading = null,
                         errorMessage = null,
                     )
             }.onFailure { exception ->
                 _uiState.value =
                     _uiState.value.copy(
                         gameList = emptyList(),
-                        isLoading = false,
+                        isLoading = null,
                         errorMessage = exception.message ?: "알 수 없는 오류가 발생했습니다",
                     )
             }
@@ -83,20 +83,20 @@ class PastCheckInViewModel(
         date: LocalDate,
     ) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.value = _uiState.value.copy(isLoading = "과거 직관을 등록하는 중...")
 
             runCatching {
                 // TODO: 실제 과거 직관 등록 API 호출
                 kotlinx.coroutines.delay(1000)
                 // TODO: 테스트용 딜레이. 실제 API 호출 시 삭제할 것.
             }.onSuccess {
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                _uiState.value = _uiState.value.copy(isLoading = null)
                 fetchGameList(uiState.value.selectedDate ?: LocalDate.now())
                 _uiEvent.trySend(
                     PastCheckInUiEvent.ShowToast("${game.homeTeam.name} vs ${game.awayTeam.name} 직관 기록이 등록되었습니다!"),
                 )
             }.onFailure { exception ->
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                _uiState.value = _uiState.value.copy(isLoading = null)
                 _uiEvent.trySend(
                     PastCheckInUiEvent.ShowToast(
                         exception.message ?: "등록에 실패했습니다. 다시 시도해주세요.",

@@ -75,6 +75,7 @@ fun PastCheckInScreen(
                 is PastCheckInUiEvent.ShowToast -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
+
                 is PastCheckInUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
@@ -117,11 +118,11 @@ private fun PastCheckInScreen(
                 placeholder = "직관한 경기 날짜를 선택하세요",
             )
 
-            if (uiState.isLoading) {
-                InfoPanel(emoji = "", title = "경기 목록을 불러오는 중", showLoading = true)
+            if (uiState.isLoading != null) {
+                InfoPanel(emoji = "", title = uiState.isLoading, showLoading = true)
             }
 
-            if (!uiState.isLoading && uiState.gameList.isNotEmpty()) {
+            if (uiState.isLoading == null && uiState.gameList.isNotEmpty()) {
                 Text(
                     text = "경기 목록 (${uiState.gameList.size}개)",
                     style = PretendardBold20,
@@ -141,7 +142,7 @@ private fun PastCheckInScreen(
             }
 
             // 빈 상태 (날짜는 선택했지만 경기가 없는 경우)
-            if (!uiState.isLoading &&
+            if (uiState.isLoading == null &&
                 uiState.selectedDate != null &&
                 uiState.gameList.isEmpty() &&
                 uiState.errorMessage == null
@@ -177,7 +178,7 @@ private fun PastCheckInScreenPreview_Loading() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = true,
+                    isLoading = "과거 직관 로딩중...",
                 ),
             onBackClick = { },
             onDateSelected = { },
@@ -197,7 +198,7 @@ private fun PastCheckInScreenPreview_WithOutGames() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = false,
+                    isLoading = null,
                 ),
             onBackClick = { },
             onDateSelected = { },
@@ -235,7 +236,7 @@ private fun PastCheckInScreenPreview_WithGames() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = false,
+                    isLoading = null,
                 ),
             onBackClick = { },
             onDateSelected = { },
