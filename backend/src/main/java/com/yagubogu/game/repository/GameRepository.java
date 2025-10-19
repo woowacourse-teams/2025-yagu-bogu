@@ -45,4 +45,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             GROUP BY g.id
             """)
     List<GameWithCheckInParam> findGamesWithCheckInsByDate(LocalDate date, Member member);
+
+    List<Game> findByDate(LocalDate date);
 }

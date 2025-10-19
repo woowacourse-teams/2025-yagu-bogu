@@ -33,17 +33,19 @@ public class PlaywrightManager {
         }
 
         this.pw = Playwright.create();
-        this.browser = pw.chromium().launch(new BrowserType.LaunchOptions()
-                .setHeadless(true)
+
+        // ✅ Chromium → Firefox로 변경
+        this.browser = pw.firefox().launch(new BrowserType.LaunchOptions()
+                .setHeadless(false)  // 디버깅용
+                .setSlowMo(100)      // 안정성 증가
                 .setArgs(List.of(
                         "--disable-gpu",
-                        "--disable-extensions",
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox"
+                        "--no-sandbox"
                 )));
+
+        log.info("Firefox 브라우저 초기화 완료");
     }
 
-    // ✅ Browser 연결 확인 및 재연결
     private synchronized void ensureBrowserConnected() {
         if (browser == null || !browser.isConnected()) {
             log.warn("Browser 연결 끊김 감지, 재연결 시도...");
@@ -62,12 +64,13 @@ public class PlaywrightManager {
             Browser.NewContextOptions opts = new Browser.NewContextOptions()
                     .setViewportSize(1280, 800)
                     .setUserAgent(
-                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36")
+                            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                     .setBypassCSP(true);
 
             ctx = browser.newContext(opts);
             page = ctx.newPage();
 
+            // 리소스 차단
             page.route("**/*", route -> {
                 String type = route.request().resourceType();
                 if ("image".equals(type) || "media".equals(type) || "font".equals(type)) {
@@ -77,10 +80,15 @@ public class PlaywrightManager {
                 route.resume();
             });
 
-            page.setDefaultTimeout(properties.getWaitTimeout().toMillis());
-            page.setDefaultNavigationTimeout(properties.getNavigationTimeout().toMillis());
+            // 타임아웃 증가
+            page.setDefaultTimeout(30000);
+            page.setDefaultNavigationTimeout(60000);
 
             return action.apply(page);
+
+        } catch (Exception e) {
+            log.error("withPage 실행 중 에러", e);
+            throw new RuntimeException("크롤링 실패", e);
 
         } finally {
             if (page != null) {

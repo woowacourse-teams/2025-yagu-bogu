@@ -64,7 +64,8 @@ public class KboScoreboardCrawler {
                     if (attempt < maxRetries) {
                         try {
                             Thread.sleep(2000);  // Browser 재연결 대기
-                        } catch (InterruptedException ignored) {}
+                        } catch (InterruptedException ignored) {
+                        }
                     }
                 }
             }

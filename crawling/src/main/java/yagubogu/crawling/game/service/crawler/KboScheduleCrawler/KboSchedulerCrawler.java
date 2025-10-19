@@ -3,7 +3,6 @@ package yagubogu.crawling.game.service.crawler.KboScheduleCrawler;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,7 +35,6 @@ public class KboSchedulerCrawler {
     private final Duration waitTimeout;
     private final int maxRetries;
     private final Duration retryDelay;
-
 
     public KboSchedulerCrawler(final Duration navigationTimeout,
                                final Duration tableTimeout,
@@ -393,7 +390,8 @@ public class KboSchedulerCrawler {
                             // ✅ 매번 새로운 Context/Page 생성
                             ctx = browser.newContext(new Browser.NewContextOptions()
                                     .setViewportSize(1280, 800)
-                                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36")
+                                    .setUserAgent(
+                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36")
                                     .setBypassCSP(true));
 
                             page = ctx.newPage();
@@ -423,7 +421,8 @@ public class KboSchedulerCrawler {
                             break; // 성공하면 재시도 루프 탈출
 
                         } catch (PlaywrightException pe) {
-                            log.warn("[AUTO] 크롤링 실패 (월={}, 타입={}, 시도 {}/{}): {}", m, type.name(), attempt, maxRetries, pe.getMessage());
+                            log.warn("[AUTO] 크롤링 실패 (월={}, 타입={}, 시도 {}/{}): {}", m, type.name(), attempt, maxRetries,
+                                    pe.getMessage());
                             if (attempt == maxRetries) {
                                 log.error("[AUTO] 크롤링 포기 (월={}, 타입={})", m, type.name());
                             } else {
@@ -432,10 +431,16 @@ public class KboSchedulerCrawler {
                         } finally {
                             // ✅ 반드시 정리
                             if (page != null) {
-                                try { page.close(); } catch (Exception ignored) {}
+                                try {
+                                    page.close();
+                                } catch (Exception ignored) {
+                                }
                             }
                             if (ctx != null) {
-                                try { ctx.close(); } catch (Exception ignored) {}
+                                try {
+                                    ctx.close();
+                                } catch (Exception ignored) {
+                                }
                             }
                         }
                     }
