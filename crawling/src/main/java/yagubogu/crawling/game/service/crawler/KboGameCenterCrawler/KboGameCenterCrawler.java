@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -37,61 +36,6 @@ public class KboGameCenterCrawler {
         this.waitTimeout = waitTimeout;
     }
 
-    /**
-     * 여러 날짜의 경기 정보를 한 번에 크롤링
-     */
-    public Map<LocalDate, List<GameInfo>> crawlGamesByDate(List<LocalDate> dates) {
-        return playwrightManager.withPage(page -> {
-            Map<LocalDate, List<GameInfo>> gamesByDate = new LinkedHashMap<>();
-
-            if (dates == null || dates.isEmpty()) {
-                log.info("조회할 날짜가 없습니다.");
-                return gamesByDate;
-            }
-
-            try {
-                // 페이지로 이동
-                navigateToUrl(page);
-
-                // 날짜 순서대로 정렬
-                List<LocalDate> sortedDates = dates.stream()
-                        .sorted()
-                        .toList();
-
-                log.info("총 {}개 날짜 크롤링 시작", sortedDates.size());
-
-                for (int i = 0; i < sortedDates.size(); i++) {
-                    LocalDate date = sortedDates.get(i);
-                    log.info("조회 날짜: {} ({}/{})", date, i + 1, sortedDates.size());
-
-                    try {
-                        List<GameInfo> games = crawlSingleDate(page, date);
-                        gamesByDate.put(date, games);
-
-                        if (i < sortedDates.size() - 1) {
-                            Thread.sleep(1000);
-                        }
-
-                    } catch (Exception e) {
-                        log.error("날짜 {} 크롤링 실패: {}", date, e.getMessage());
-                        gamesByDate.put(date, new ArrayList<>());
-                    }
-                }
-
-                log.info("크롤링 완료!");
-                printSummary(gamesByDate);
-
-            } catch (Exception e) {
-                log.error("크롤링 전체 실패", e);
-            }
-
-            return gamesByDate;
-        });
-    }
-
-    /**
-     * 일일 경기 상세 정보 크롤링
-     */
     /**
      * 일일 경기 상세 정보 크롤링 (클릭 없이 목록에서 수집)
      */
@@ -160,8 +104,8 @@ public class KboGameCenterCrawler {
             detail.setGameId(gameElement.getAttribute("g_id"));
             detail.setGameDate(gameElement.getAttribute("g_dt"));
             detail.setGameSc(gameElement.getAttribute("game_sc"));
-            detail.setAwayTeamId(gameElement.getAttribute("away_id"));
-            detail.setHomeTeamId(gameElement.getAttribute("home_id"));
+            detail.setAwayTeamCode(gameElement.getAttribute("away_id"));
+            detail.setHomeTeamCode(gameElement.getAttribute("home_id"));
             detail.setAwayTeamName(gameElement.getAttribute("away_nm"));
             detail.setHomeTeamName(gameElement.getAttribute("home_nm"));
             detail.setStadium(gameElement.getAttribute("s_nm"));

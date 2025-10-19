@@ -51,17 +51,6 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/game-center")
-    public ResponseEntity<Void> fetchGameCenter(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        gameCenterSyncService.updateGameStatuses(startDate, endDate);
-
-        return ResponseEntity.ok().build();
-    }
-
-
     /**
      * 오늘 경기 상세 정보
      */

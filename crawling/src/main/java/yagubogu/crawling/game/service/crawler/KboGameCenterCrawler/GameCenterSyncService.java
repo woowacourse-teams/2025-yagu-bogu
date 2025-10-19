@@ -2,16 +2,20 @@ package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import yagubogu.crawling.game.dto.GameInfo;
+import yagubogu.crawling.game.dto.GameDetailInfo;
 
 @Slf4j
 @Service
@@ -19,102 +23,150 @@ import yagubogu.crawling.game.dto.GameInfo;
 public class GameCenterSyncService {
 
     private final KboGameCenterCrawler crawler;
-    private final KboGameCenterMapper mapper;
     private final GameRepository gameRepository;
+    private final StadiumRepository stadiumRepository;
+    private final TeamRepository teamRepository;
 
     /**
      * 오늘 경기 상세 정보 수집
      */
     public DailyGameData getTodayGameDetails() {
         LocalDate today = LocalDate.now();
-        return crawler.getDailyData(today);
+        DailyGameData dailyData = crawler.getDailyData(today);
+        updateGameStates(dailyData.getGames());
+        return dailyData;
     }
 
     /**
      * 특정 날짜 경기 상세 정보 수집
      */
     public DailyGameData getGameDetails(LocalDate date) {
-        return crawler.getDailyData(date);
+        DailyGameData dailyData = crawler.getDailyData(date);
+        updateGameStates(dailyData.getGames());
+        return dailyData;
     }
 
-    public void updateGameStatuses(LocalDate startDate, LocalDate endDate) {
-        // 1) 크롤링
-        List<LocalDate> dates = getDatesBetweenInclusive(startDate, endDate);
-        Map<LocalDate, List<GameInfo>> gamesByDate = crawler.crawlGamesByDate(dates);
-
-        // 2) 날짜+시간으로 기존 경기와 매칭하여 상태 업데이트
-        for (Map.Entry<LocalDate, List<GameInfo>> entry : gamesByDate.entrySet()) {
-            LocalDate date = entry.getKey();
-            List<GameInfo> crawledGames = entry.getValue();
-
-            // 해당 날짜의 기존 경기 조회
-            List<Game> existingGames = gameRepository.findByDate(date);
-
-            for (GameInfo crawled : crawledGames) {
-                // 시간 파싱
-                LocalTime startTime = parseStartTime(crawled.getStartTime());
-
-                // 날짜 + 시간으로 매칭
-                existingGames.stream()
-                        .filter(game -> matchByDateTime(game, date, startTime))
-                        .findFirst()
-                        .ifPresent(game -> {
-                            GameState newState = mapper.toState(crawled.getStatus());
-                            game.updateGameState(newState);
-                            log.info("경기 상태 업데이트: {} {} -> {}",
-                                    date, startTime, newState);
-                        });
+    /**
+     * GameDetailInfo 리스트를 받아서 Game 상태 업데이트
+     */
+    public void updateGameStates(List<GameDetailInfo> gameDetails) {
+        for (GameDetailInfo detail : gameDetails) {
+            try {
+                updateOrCreateGame(detail);
+            } catch (Exception e) {
+                log.error("경기 업데이트 실패: gameCode={}", detail.getGameId(), e);
             }
         }
-
-        // 3) 일괄 저장
-        gameRepository.flush();
     }
 
-    private boolean matchByDateTime(Game game, LocalDate date, LocalTime startTime) {
-        if (!game.getDate().equals(date)) {
-            return false;
-        }
+    /**
+     * 개별 경기 업데이트 또는 생성
+     */
+    private void updateOrCreateGame(GameDetailInfo detail) {
+        // GameState 변환
+        GameState gameState = fromGameSc(detail.getGameSc());
 
-        if (startTime == null || game.getStartAt() == null) {
-            return false;
-        }
+        // gameCode로 조회 또는 생성
+        Game game = gameRepository.findByGameCode(detail.getGameId())
+                .orElseGet(() -> createNewGame(detail));
 
-        return game.getStartAt().equals(startTime);
+        // 상태 업데이트
+        if (game.getGameState() != gameState) {
+            game.updateGameState(gameState);
+            log.info("경기 상태 업데이트: gameCode={}, {} vs {} - {} → {}",
+                    detail.getGameId(),
+                    detail.getAwayTeamName(),
+                    detail.getHomeTeamName(),
+                    game.getGameState(),
+                    gameState);
+        }
     }
 
-    private LocalTime parseStartTime(String timeText) {
-        if (timeText == null || timeText.isBlank()) {
-            return null;
+    private GameState fromGameSc(final String gameSc) {
+        if (gameSc == null || gameSc.isBlank()) {
+            return GameState.SCHEDULED;  // 기본값
         }
 
         try {
-            // "18:30" 형태
-            return LocalTime.parse(timeText.trim());
-        } catch (Exception e) {
-            try {
-                // "1830" 형태
-                String digits = timeText.replaceAll("[^0-9]", "");
-                if (digits.length() >= 4) {
-                    int hour = Integer.parseInt(digits.substring(0, 2));
-                    int minute = Integer.parseInt(digits.substring(2, 4));
-                    return LocalTime.of(hour, minute);
-                }
-            } catch (Exception ignored) {
-            }
-
-            log.warn("시간 파싱 실패: {}", timeText);
-            return null;
+            Integer scNumber = Integer.parseInt(gameSc);
+            return GameState.from(scNumber);
+        } catch (NumberFormatException e) {
+            throw new GameSyncException("Invalid gameSc format: " + gameSc);
         }
     }
 
-    private List<LocalDate> getDatesBetweenInclusive(LocalDate start, LocalDate end) {
-        List<LocalDate> dates = new ArrayList<>();
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-            dates.add(current);
-            current = current.plusDays(1);
+    /**
+     * 새 경기 생성
+     */
+    private Game createNewGame(GameDetailInfo detail) {
+        Stadium stadium = findStadium(detail.getStadiumName());
+        Team homeTeam = findTeam(detail.getHomeTeamCode());
+        Team awayTeam = findTeam(detail.getAwayTeamCode());
+
+        LocalDate date = parseDate(detail.getGameDate());
+        LocalTime startAt = parseTime(detail.getStartTime());
+        GameState gameState = fromGameSc(detail.getGameSc());
+
+        Game newGame = new Game(
+                stadium,
+                homeTeam,
+                awayTeam,
+                date,
+                startAt,
+                detail.getGameId(),  // gameCode
+                null,  // homeScore
+                null,  // awayScore
+                null,  // homeScoreBoard
+                null,  // awayScoreBoard
+                null,  // homePitcher
+                null,  // awayPitcher
+                gameState
+        );
+
+        log.info("새 경기 생성: gameCode={}, {} vs {}",
+                detail.getGameId(),
+                detail.getAwayTeamName(),
+                detail.getHomeTeamName());
+
+        return gameRepository.save(newGame);
+    }
+
+    /**
+     * Stadium 조회
+     */
+    private Stadium findStadium(String stadiumName) {
+        return stadiumRepository.findByLocation(stadiumName)
+                .orElseThrow(() -> new GameSyncException("Stadium not found: " + stadiumName));
+    }
+
+    /**
+     * Team 조회
+     */
+    private Team findTeam(String teamId) {
+        return teamRepository.findByTeamCode(teamId)
+                .orElseThrow(() -> new GameSyncException("Team not found: " + teamId));
+    }
+
+    /**
+     * 날짜 파싱: "20251021" → LocalDate
+     */
+    private LocalDate parseDate(String gameDate) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            return LocalDate.parse(gameDate, formatter);
+        } catch (Exception e) {
+            throw new GameSyncException("Invalid date format: " + gameDate);
         }
-        return dates;
+    }
+
+    /**
+     * 시간 파싱: "18:30" → LocalTime
+     */
+    private LocalTime parseTime(String startTime) {
+        try {
+            return LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (Exception e) {
+            throw new GameSyncException("Invalid time format: " + startTime);
+        }
     }
 }

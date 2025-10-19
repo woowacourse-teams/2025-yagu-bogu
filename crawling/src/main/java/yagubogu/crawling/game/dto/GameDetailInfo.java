@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class GameDetailInfo {
+
     // 기본 정보
     private String date;
     private String gameId;
@@ -12,8 +13,8 @@ public class GameDetailInfo {
     private String gameSc;
 
     // 팀 정보
-    private String awayTeamId;
-    private String homeTeamId;
+    private String awayTeamCode;
+    private String homeTeamCode;
     private String awayTeamName;
     private String homeTeamName;
 
