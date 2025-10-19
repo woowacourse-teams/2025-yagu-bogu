@@ -40,6 +40,10 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'software.amazon.awssdk:s3:2.34.8'
 
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+
     compileOnly 'org.projectlombok:lombok'
 
     runtimeOnly 'com.h2database:h2'

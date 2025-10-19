@@ -31,6 +31,12 @@ management:
     web:
       exposure:
         include: prometheus,health,metrics
+  tracing:
+    sampling:
+      probability: 0.2
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_SERVER_IP}:4317
 
 springdoc:
   api-docs:
