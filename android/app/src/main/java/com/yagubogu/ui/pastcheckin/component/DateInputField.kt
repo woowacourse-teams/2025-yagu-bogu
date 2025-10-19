@@ -30,8 +30,8 @@ import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.YaguBoguTheme
 import com.yagubogu.ui.util.formatLocalDate
-import com.yagubogu.ui.util.toEpochMillis
-import com.yagubogu.ui.util.toLocalDate
+import com.yagubogu.ui.util.toEpochMillisForDatePicker
+import com.yagubogu.ui.util.toLocalDateFromDatePicker
 import java.time.LocalDate
 
 @Composable
@@ -80,9 +80,9 @@ fun DateInputField(
     }
     if (showPicker) {
         DatePickerModal(
-            selectedDate = selectedDate?.toEpochMillis(),
+            selectedDate = selectedDate?.toEpochMillisForDatePicker(),
             onDateSelected = { millis ->
-                onDateSelected(millis?.toLocalDate())
+                onDateSelected(millis?.toLocalDateFromDatePicker())
             },
             onDismiss = { showPicker = false },
         )
