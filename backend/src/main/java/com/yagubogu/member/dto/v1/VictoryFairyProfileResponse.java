@@ -4,7 +4,7 @@ import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 
 public record VictoryFairyProfileResponse(
         Long ranking,
-        Integer rankWithinTeam,
+        Long rankWithinTeam,
         Double score
 ) {
 
