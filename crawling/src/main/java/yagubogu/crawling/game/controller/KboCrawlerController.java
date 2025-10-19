@@ -10,8 +10,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
@@ -48,26 +46,17 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate
     ) {
         List<ScoreboardResponse> responses = kboScoreboardService.fetchScoreboardRange(startDate, endDate);
+
         return ResponseEntity.ok(responses);
-    }
-
-    /**
-     * 오늘 경기 상세 정보
-     */
-    @GetMapping("/today")
-    public ResponseEntity<GameCenter> getTodayData() {
-        GameCenter data = gameCenterSyncService.getTodayGameDetails();
-
-        return ResponseEntity.ok(data);
     }
 
     /**
      * 특정 날짜 경기 상세 정보
      */
-    @GetMapping("/{date}")
-    public ResponseEntity<GameCenter> getDateData(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        GameCenter data = gameCenterSyncService.getGameDetails(date);
+    public ResponseEntity<GameCenter> fetchGameCenter(
+            @RequestParam @DateTimeFormat(iso = DATE) LocalDate date
+    ) {
+        GameCenter data = gameCenterSyncService.fetchGameCenter(date);
 
         return ResponseEntity.ok(data);
     }

@@ -40,7 +40,7 @@ public class GameCenterSyncService {
     /**
      * 특정 날짜 경기 상세 정보 수집
      */
-    public GameCenter getGameDetails(LocalDate date) {
+    public GameCenter fetchGameCenter(LocalDate date) {
         GameCenter dailyData = crawler.fetchDailyGameCenter(date);
         updateGameStates(dailyData.getGames());
         return dailyData;
