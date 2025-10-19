@@ -26,4 +26,4 @@ fun Long.toLocalDate(): LocalDate =
 /**
  * LocalDate 포맷팅
  */
-fun formatLocalDate(date: LocalDate): String = date.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+fun formatLocalDate(date: LocalDate): String = date.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
