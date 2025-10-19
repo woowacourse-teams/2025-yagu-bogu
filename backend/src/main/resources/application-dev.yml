@@ -27,7 +27,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus,health,metrics
+        include: prometheus, health
   tracing:
     sampling:
       probability: 0.2
