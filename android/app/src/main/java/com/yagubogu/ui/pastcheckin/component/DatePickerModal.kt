@@ -17,11 +17,12 @@ fun DatePickerModal(
     selectedDate: Long?,
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate
-    )
+    val datePickerState =
+        rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate,
+        )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -30,7 +31,7 @@ fun DatePickerModal(
                 onClick = {
                     onDateSelected(datePickerState.selectedDateMillis)
                     onDismiss()
-                }
+                },
             ) {
                 Text("확인")
             }
@@ -40,15 +41,16 @@ fun DatePickerModal(
                 Text("취소")
             }
         },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        ),
-        modifier = modifier
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+            ),
+        modifier = modifier,
     ) {
         DatePicker(
             state = datePickerState,
             modifier = Modifier.fillMaxWidth(),
-            showModeToggle = true
+            showModeToggle = true,
         )
     }
 }

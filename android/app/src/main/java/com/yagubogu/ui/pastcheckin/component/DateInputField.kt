@@ -21,13 +21,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.ui.theme.YaguBoguTheme
-import java.util.Calendar
+import com.yagubogu.ui.util.formatLocalDate
+import com.yagubogu.ui.util.toEpochMillis
+import com.yagubogu.ui.util.toLocalDate
+import java.time.LocalDate
 
 @Composable
 fun DateInputField(
     modifier: Modifier = Modifier,
-    selectedDate: Long?,
-    onDateSelected: (Long?) -> Unit,
+    selectedDate: LocalDate?,
+    onDateSelected: (LocalDate?) -> Unit,
     label: String = "날짜 선택",
     placeholder: String = "YYYY/MM/DD",
 ) {
@@ -35,7 +38,7 @@ fun DateInputField(
     val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
-        value = "",
+        value = selectedDate?.let { formatLocalDate(it) } ?: "",
         onValueChange = { },
         label = { Text(label) },
         placeholder = { Text(placeholder) },
@@ -65,8 +68,10 @@ fun DateInputField(
 
     if (showPicker) {
         DatePickerModal(
-            selectedDate = selectedDate,
-            onDateSelected = onDateSelected,
+            selectedDate = selectedDate?.toEpochMillis(),
+            onDateSelected = { millis ->
+                onDateSelected(millis?.toLocalDate())
+            },
             onDismiss = { showPicker = false },
         )
     }
@@ -83,10 +88,10 @@ private fun DateInputFieldPreview() {
                     .fillMaxWidth()
                     .padding(16.dp),
         ) {
-            var selectedDate by remember { mutableStateOf<Long?>(null) }
+            var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
             DateInputField(
-                selectedDate = selectedDate,
+                selectedDate = LocalDate.now(),
                 onDateSelected = { selectedDate = it },
                 label = "직관 날짜",
                 placeholder = "날짜를 선택하세요",
@@ -105,15 +110,8 @@ private fun DateInputFieldWithDatePreview() {
                     .fillMaxWidth()
                     .padding(16.dp),
         ) {
-            val selectedMillis =
-                Calendar
-                    .getInstance()
-                    .apply {
-                        set(2022, Calendar.OCTOBER, 10)
-                    }.timeInMillis
-
             DateInputField(
-                selectedDate = selectedMillis,
+                selectedDate = LocalDate.now(),
                 onDateSelected = { },
                 label = "직관 날짜",
             )
