@@ -43,7 +43,7 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.dialog.ProfileDialog
+import com.yagubogu.ui.dialog.profile.ProfileDialog
 import com.yagubogu.ui.dialog.model.MemberProfile
 
 @Suppress("ktlint:standard:backing-property-naming")
