@@ -4,13 +4,13 @@ import com.yagubogu.checkin.dto.VictoryFairyRankParam;
 
 public record VictoryFairySummaryParam(
         Long ranking,
-        Integer rankWithinTeam,
+        Long rankWithinTeam,
         Double score
 ) {
 
     public static VictoryFairySummaryParam from(
             final VictoryFairyRankParam overallRankInfo,
-            final Integer rankWithinTeam) {
+            final Long rankWithinTeam) {
         if (overallRankInfo == null) {
             return empty();
         }

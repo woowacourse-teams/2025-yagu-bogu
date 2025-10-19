@@ -211,7 +211,7 @@ public class StatService {
 
         return victoryFairyRankingRepository.findByMemberAndTeamFilterAndYear(member, TeamFilter.ALL, year)
                 .map(overallRankInfo -> {
-                    Integer teamRank = victoryFairyRankingRepository.findRankWithinTeamByMemberAndYear(member, year)
+                    Long teamRank = victoryFairyRankingRepository.findRankWithinTeamByMemberAndYear(member, year)
                             .orElse(null);
                     return VictoryFairySummaryParam.from(overallRankInfo, teamRank);
                 })

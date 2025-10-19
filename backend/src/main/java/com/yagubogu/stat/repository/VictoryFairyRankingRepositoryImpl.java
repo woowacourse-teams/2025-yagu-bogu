@@ -119,7 +119,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     }
 
     @Override
-    public Optional<Integer> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
+    public Optional<Long> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
         // 1. 멤버에게 응원팀이 없으면 랭킹 계산 불가
         if (member.getTeam() == null) {
             return Optional.empty();
@@ -157,7 +157,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 )
                 .fetchOne()).orElse(0L);
 
-        int rank = (int) higherRankedCount + 1;
+        long rank = higherRankedCount + 1;
 
         return Optional.of(rank);
     }
