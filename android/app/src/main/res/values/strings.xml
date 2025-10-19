@@ -12,6 +12,7 @@
     <string name="all_back_button_content_description">뒤로가기</string>
     <string name="all_ranking">%d등</string>
     <string name="all_score">%d점</string>
+    <string name="all_score_first_float">%.1f점</string>
 
     <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
@@ -74,20 +75,6 @@ private fun CancelButton(
 private fun ProfileDialogPreview() {
     ProfileDialog(
         onDismissRequest = {},
-        memberProfile =
-            MemberProfile(
-                nickname = "귀여운보욱이",
-                enterDate = "2025-08-22",
-                profileImageUrl = "",
-                favoriteTeam = "KIA",
-                representativeBadgeName = "말문이 트이다",
-                representativeBadgeImageUrl = "",
-                victoryFairyRanking = 275,
-                victoryFairyScore = 33,
-                checkInCounts = 11,
-                checkInWinRate = "60%",
-                rankInAll = 12,
-                rankInTeam = 1,
-            ),
+        memberProfile = MEMBER_PROFILE_FIXTURE,
     )
 }

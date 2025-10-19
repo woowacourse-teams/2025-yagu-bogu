@@ -17,14 +17,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yagubogu.R
+import com.yagubogu.presentation.util.DateFormatter
+import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold20
+import kotlinx.datetime.toJavaLocalDate
 
 @Composable
 fun ProfileContent(
@@ -41,7 +46,7 @@ fun ProfileContent(
         Spacer(modifier = Modifier.height(24.dp))
         CheckInStatsRow(memberProfile = memberProfile, modifier = modifier)
         Spacer(modifier = Modifier.height(30.dp))
-        DatesRow(modifier = modifier)
+        DatesRow(memberProfile = memberProfile, modifier = modifier)
     }
 }
 
@@ -60,7 +65,7 @@ private fun VictoryFairyStatsRow(
     ) {
         StatItem(
             title = "승리 요정 랭킹",
-            value = "1424",
+            value = stringResource(R.string.all_ranking, memberProfile.victoryFairyRanking),
             emoji = "\uD83C\uDF96\uFE0F",
             modifier = Modifier.weight(1f, true),
         )
@@ -71,7 +76,7 @@ private fun VictoryFairyStatsRow(
         )
         StatItem(
             title = "승리 요정 점수",
-            value = "100",
+            value = stringResource(R.string.all_score_first_float, memberProfile.victoryFairyScore),
             emoji = "\uD83E\uDDDA",
             modifier = Modifier.weight(1f, true),
         )
@@ -113,14 +118,17 @@ private fun CheckInStatsRow(
         )
         StatItem(
             title = "승 무 패",
-            value = "9/0/5",
+            value = memberProfile.winDrawLose,
             modifier = Modifier.weight(1f, true),
         )
     }
 }
 
 @Composable
-private fun DatesRow(modifier: Modifier = Modifier) {
+private fun DatesRow(
+    memberProfile: MemberProfile,
+    modifier: Modifier = Modifier,
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -131,7 +139,7 @@ private fun DatesRow(modifier: Modifier = Modifier) {
     ) {
         StatItem(
             title = "가입일",
-            value = "2025.07.04",
+            value = memberProfile.enterDate.toJavaLocalDate().format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f, true),
         )
         VerticalDivider(
@@ -141,7 +149,10 @@ private fun DatesRow(modifier: Modifier = Modifier) {
         )
         StatItem(
             title = "최근 직관일",
-            value = "2025.10.14",
+            value =
+                memberProfile.recentCheckInDate
+                    .toJavaLocalDate()
+                    .format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f, true),
         )
     }
@@ -183,20 +194,7 @@ private fun StatItemPreview(modifier: Modifier = Modifier) {
 @Composable
 private fun ProfileContentPreview(modifier: Modifier = Modifier) {
     ProfileContent(
-        MemberProfile(
-            nickname = "Jake Wharton",
-            enterDate = "2025.10.19",
-            profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
-            favoriteTeam = "Square",
-            representativeBadgeName = "말문이 트이다",
-            representativeBadgeImageUrl = "https://search.yahoo.com/search?p=ut",
-            victoryFairyRanking = 1424,
-            victoryFairyScore = 100,
-            checkInCounts = 17,
-            checkInWinRate = "99%",
-            rankInAll = 7306,
-            rankInTeam = 5178,
-        ),
+        memberProfile = MEMBER_PROFILE_FIXTURE,
         modifier = modifier,
     )
 }

@@ -23,6 +23,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -175,20 +176,7 @@ class HomeViewModel(
 //                }
 //        }
         // TODO API 배포되면 주석 제거
-        _profileImageClickEvent.setValue(
-            MemberProfile(
-                nickname = "우가우가귀여운보욱이우가",
-                enterDate = "2025-08-22",
-                profileImageUrl = "",
-                favoriteTeam = "KIA",
-                representativeBadgeName = "말문이 트이다",
-                representativeBadgeImageUrl = "",
-                victoryFairyRanking = 275,
-                victoryFairyScore = 33,
-                checkInCounts = 11,
-                checkInWinRate = "60%",
-            ),
-        )
+        _profileImageClickEvent.setValue(MEMBER_PROFILE_FIXTURE)
     }
 
     fun clearMemberProfileEvent() {

@@ -1,6 +1,5 @@
 package com.yagubogu.ui.dialog.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,12 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.yagubogu.R
+import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
@@ -90,10 +90,9 @@ fun ProfileHeader(
                         Spacer(modifier = Modifier.height(4.dp))
                         RankingText(memberProfile)
                     }
-
-                    Image(
-                        painter = painterResource(R.drawable.img_badge_lock),
-                        contentDescription = "대표 배지 없음",
+                    AsyncImage(
+                        model = memberProfile.representativeBadgeImageUrl,
+                        contentDescription = "대표 배지 이미지",
                         modifier =
                             Modifier
                                 .size(40.dp)
@@ -109,8 +108,8 @@ fun ProfileHeader(
                         .padding(10.dp)
                         .clip(CircleShape),
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher_background),
+                AsyncImage(
+                    model = memberProfile.profileImageUrl,
                     contentDescription = "프로필 이미지",
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -125,35 +124,35 @@ private fun RankingText(
     modifier: Modifier = Modifier,
 ) {
     Row {
-        Text("전체 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = "전체 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
-            memberProfile.rankInAll.toString(),
+            text = memberProfile.victoryFairyRanking.toString(),
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text("위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = "위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
-            "|",
+            text = "|",
             style = PretendardRegular,
             fontSize = 10.sp,
             color = Gray500,
             modifier = modifier.padding(horizontal = 6.dp),
         )
         Text(
-            stringResource(R.string.all_fan, memberProfile.favoriteTeam),
+            text = stringResource(R.string.all_fan, memberProfile.favoriteTeam),
             style = PretendardRegular,
             fontSize = 10.sp,
             color = Gray500,
         )
-        Text(" 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = " 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
-            memberProfile.rankInTeam.toString(),
+            text = memberProfile.victoryFairyRankingWithinTeam.toString(),
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text("위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = "위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
     }
 }
 
@@ -161,21 +160,7 @@ private fun RankingText(
 @Composable
 private fun ProfileHeaderPreview(modifier: Modifier = Modifier) {
     ProfileHeader(
-        memberProfile =
-            MemberProfile(
-                nickname = "Jake Wharton",
-                enterDate = "2025.10.19",
-                profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
-                favoriteTeam = "Square",
-                representativeBadgeName = "말문이 트이다",
-                representativeBadgeImageUrl = "https://search.yahoo.com/search?p=ut",
-                victoryFairyRanking = 1424,
-                victoryFairyScore = 100,
-                checkInCounts = 17,
-                checkInWinRate = "99%",
-                rankInAll = 7306,
-                rankInTeam = 5178,
-            ),
+        memberProfile = MEMBER_PROFILE_FIXTURE,
         modifier = modifier,
     )
 }
