@@ -1,6 +1,7 @@
 package com.yagubogu.data.dto.response.member
 
 import com.yagubogu.ui.dialog.model.MemberProfile
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,7 +10,7 @@ data class MemberProfileResponse(
     @SerialName("nickname")
     val nickname: String, // 회원 닉네임
     @SerialName("enterDate")
-    val enterDate: String, // 회원 가입일 (YYYY-MM-DD)
+    val enterDate: LocalDate, // 회원 가입일 (YYYY-MM-DD)
     @SerialName("profileImageUrl")
     val profileImageUrl: String, // 프로필 이미지 주소
     @SerialName("favoriteTeam")
@@ -31,7 +32,12 @@ data class MemberProfileResponse(
             representativeBadgeImageUrl = representativeBadge.badgeImageUrl,
             victoryFairyRanking = victoryFairy.ranking,
             victoryFairyScore = victoryFairy.score,
+            victoryFairyRankingWithinTeam = victoryFairy.rankWithinTeam,
             checkInCounts = checkIn.counts,
             checkInWinRate = checkIn.winRate,
+            winCounts = checkIn.winCounts,
+            drawCounts = checkIn.drawCounts,
+            loseCounts = checkIn.loseCounts,
+            recentCheckInDate = checkIn.recentCheckInDate,
         )
 }

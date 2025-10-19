@@ -1,14 +1,42 @@
 package com.yagubogu.ui.dialog.model
 
+import kotlinx.datetime.LocalDate
+
 data class MemberProfile(
     val nickname: String, // 회원 닉네임
-    val enterDate: String, // 회원 가입일 (YYYY-MM-DD)
+    val enterDate: LocalDate, // 회원 가입일 (YYYY-MM-DD)
     val profileImageUrl: String, // 프로필 이미지 주소
-    val favoriteTeam: String, // 응원하는 팀
+    val favoriteTeam: String, // 응원팀
     val representativeBadgeName: String, // 대표 배지 이름
     val representativeBadgeImageUrl: String, // 대표 배지 이미지 주소
-    val victoryFairyRanking: Int, // 승리 요정 랭킹
-    val victoryFairyScore: Int, // 승리 요정 점수
+    val victoryFairyRanking: Long, // 승리 요정 랭킹
+    val victoryFairyScore: Double, // 승리 요정 점수
+    val victoryFairyRankingWithinTeam: Long, // 팀 별 승리 요정 랭킹
     val checkInCounts: Int, // 누적 직관 횟수
-    val checkInWinRate: String, // 직관 승률
-)
+    val checkInWinRate: String, // 직관 승률 (예: "75%")
+    val winCounts: Int, // 직관 승리 횟수
+    val drawCounts: Int, // 직관 무승부 횟수
+    val loseCounts: Int, // 직관 패배 횟수
+    val recentCheckInDate: LocalDate, // 최근 직관 날짜
+) {
+    val winDrawLose: String = "$winCounts/$drawCounts/$loseCounts"
+}
+
+val MEMBER_PROFILE_FIXTURE =
+    MemberProfile(
+        nickname = "Jake Wharton",
+        enterDate = LocalDate(2025, 10, 1),
+        profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
+        favoriteTeam = "KIA",
+        representativeBadgeName = "말문이 트이다",
+        representativeBadgeImageUrl = "",
+        victoryFairyRanking = 275,
+        victoryFairyScore = 33.1,
+        victoryFairyRankingWithinTeam = 154,
+        checkInCounts = 11,
+        checkInWinRate = "60%",
+        winCounts = 10,
+        drawCounts = 3,
+        loseCounts = 5,
+        recentCheckInDate = LocalDate(2025, 10, 19),
+    )
