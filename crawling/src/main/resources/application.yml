@@ -35,7 +35,10 @@ api:
 
 kbo:
   crawler:
-    base-url: https://www.koreabaseball.com/Schedule/ScoreBoard.aspx
+    base-url: https://www.koreabaseball.com
+    schedule-url: /Schedule/ScoreBoard.aspx
+    game-center-url: /Schedule/GameCenter/Main.aspx
+
     navigation-timeout: 7s
     table-timeout: 3s
     wait-timeout: 3s

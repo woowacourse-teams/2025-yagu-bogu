@@ -16,6 +16,12 @@ public class KboCrawlerProperties {
     @NotBlank
     private String baseUrl;
 
+    @NotBlank
+    private String scheduleUrl;
+
+    @NotBlank
+    private String gameCenterUrl;
+
     @NotNull
     private Duration navigationTimeout;
 

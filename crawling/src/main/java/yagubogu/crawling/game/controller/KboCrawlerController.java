@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
-import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.DailyGameData;
+import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenter;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
 import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
 import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.ScheduleType;
@@ -55,8 +55,8 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
      * 오늘 경기 상세 정보
      */
     @GetMapping("/today")
-    public ResponseEntity<DailyGameData> getTodayData() {
-        DailyGameData data = gameCenterSyncService.getTodayGameDetails();
+    public ResponseEntity<GameCenter> getTodayData() {
+        GameCenter data = gameCenterSyncService.getTodayGameDetails();
 
         return ResponseEntity.ok(data);
     }
@@ -65,9 +65,9 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
      * 특정 날짜 경기 상세 정보
      */
     @GetMapping("/{date}")
-    public ResponseEntity<DailyGameData> getDateData(
+    public ResponseEntity<GameCenter> getDateData(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        DailyGameData data = gameCenterSyncService.getGameDetails(date);
+        GameCenter data = gameCenterSyncService.getGameDetails(date);
 
         return ResponseEntity.ok(data);
     }

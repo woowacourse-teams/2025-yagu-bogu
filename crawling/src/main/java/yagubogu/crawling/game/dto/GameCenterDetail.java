@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class GameDetailInfo {
+public class GameCenterDetail {
 
     // 기본 정보
     private String date;

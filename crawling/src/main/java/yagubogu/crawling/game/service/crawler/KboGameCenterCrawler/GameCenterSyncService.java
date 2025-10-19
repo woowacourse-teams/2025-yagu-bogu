@@ -15,7 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import yagubogu.crawling.game.dto.GameDetailInfo;
+import yagubogu.crawling.game.dto.GameCenterDetail;
 
 @Slf4j
 @Service
@@ -30,9 +30,9 @@ public class GameCenterSyncService {
     /**
      * 오늘 경기 상세 정보 수집
      */
-    public DailyGameData getTodayGameDetails() {
+    public GameCenter getTodayGameDetails() {
         LocalDate today = LocalDate.now();
-        DailyGameData dailyData = crawler.getDailyData(today);
+        GameCenter dailyData = crawler.fetchDailyGameCenter(today);
         updateGameStates(dailyData.getGames());
         return dailyData;
     }
@@ -40,8 +40,8 @@ public class GameCenterSyncService {
     /**
      * 특정 날짜 경기 상세 정보 수집
      */
-    public DailyGameData getGameDetails(LocalDate date) {
-        DailyGameData dailyData = crawler.getDailyData(date);
+    public GameCenter getGameDetails(LocalDate date) {
+        GameCenter dailyData = crawler.fetchDailyGameCenter(date);
         updateGameStates(dailyData.getGames());
         return dailyData;
     }
@@ -49,8 +49,8 @@ public class GameCenterSyncService {
     /**
      * GameDetailInfo 리스트를 받아서 Game 상태 업데이트
      */
-    public void updateGameStates(List<GameDetailInfo> gameDetails) {
-        for (GameDetailInfo detail : gameDetails) {
+    public void updateGameStates(List<GameCenterDetail> gameDetails) {
+        for (GameCenterDetail detail : gameDetails) {
             try {
                 updateOrCreateGame(detail);
             } catch (Exception e) {
@@ -62,7 +62,7 @@ public class GameCenterSyncService {
     /**
      * 개별 경기 업데이트 또는 생성
      */
-    private void updateOrCreateGame(GameDetailInfo detail) {
+    private void updateOrCreateGame(GameCenterDetail detail) {
         // GameState 변환
         GameState gameState = fromGameSc(detail.getGameSc());
 
@@ -98,7 +98,7 @@ public class GameCenterSyncService {
     /**
      * 새 경기 생성
      */
-    private Game createNewGame(GameDetailInfo detail) {
+    private Game createNewGame(GameCenterDetail detail) {
         Stadium stadium = findStadium(detail.getStadiumName());
         Team homeTeam = findTeam(detail.getHomeTeamCode());
         Team awayTeam = findTeam(detail.getAwayTeamCode());

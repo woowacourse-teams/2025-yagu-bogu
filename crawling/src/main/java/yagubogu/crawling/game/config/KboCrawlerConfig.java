@@ -31,7 +31,7 @@ public class KboCrawlerConfig {
             final KboCrawlerProperties p,
             final PlaywrightManager playwrightManager) {
         return new KboScoreboardCrawler(
-                p.getBaseUrl(),
+                p.getBaseUrl() + p.getScheduleUrl(),
                 p.getNavigationTimeout(),
                 p.getWaitTimeout(),
                 playwrightManager
@@ -43,9 +43,9 @@ public class KboCrawlerConfig {
             final KboCrawlerProperties p,
             final PlaywrightManager playwrightManager) {
         return new KboGameCenterCrawler(
-                playwrightManager,
+                p.getBaseUrl() + p.getGameCenterUrl(),
                 p.getNavigationTimeout(),
-                p.getWaitTimeout()
+                playwrightManager
         );
     }
 }

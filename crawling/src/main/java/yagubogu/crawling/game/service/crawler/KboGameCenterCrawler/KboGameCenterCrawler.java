@@ -1,6 +1,5 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
-import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
@@ -8,40 +7,34 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import com.microsoft.playwright.options.WaitUntilState;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.PlaywrightManager;
-import yagubogu.crawling.game.dto.GameDetailInfo;
-import yagubogu.crawling.game.dto.GameInfo;
+import yagubogu.crawling.game.dto.GameCenterDetail;
 
 @Slf4j
 public class KboGameCenterCrawler {
 
-    private static final String KBO_URL = "https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
-
+    private final String baseUrl;
     private final PlaywrightManager playwrightManager;
     private final Duration navigationTimeout;
-    private final Duration waitTimeout;
 
     public KboGameCenterCrawler(
-            PlaywrightManager playwrightManager,
+            String baseUrl,
             Duration navigationTimeout,
-            Duration waitTimeout) {
-        this.playwrightManager = playwrightManager;
+            PlaywrightManager playwrightManager) {
+        this.baseUrl = baseUrl;
         this.navigationTimeout = navigationTimeout;
-        this.waitTimeout = waitTimeout;
+        this.playwrightManager = playwrightManager;
     }
 
     /**
      * 일일 경기 상세 정보 크롤링 (클릭 없이 목록에서 수집)
      */
-    public DailyGameData getDailyData(LocalDate date) {
+    public GameCenter fetchDailyGameCenter(LocalDate date) {
         return playwrightManager.withPage(page -> {
-            DailyGameData dailyData = new DailyGameData();
+            GameCenter dailyData = new GameCenter();
 
             try {
                 navigateToUrl(page);
@@ -71,7 +64,7 @@ public class KboGameCenterCrawler {
                         log.info("경기 {}/{} 처리 중...", i + 1, gameCount);
 
                         // game-cont에서 직접 정보 수집
-                        GameDetailInfo gameDetail = extractGameDetailFromElement(currentGame, dateFormatted);
+                        GameCenterDetail gameDetail = extractGameDetailFromElement(currentGame, dateFormatted);
 
                         if (gameDetail != null) {
                             dailyData.addGameDetail(gameDetail);
@@ -95,30 +88,30 @@ public class KboGameCenterCrawler {
     /**
      * game-cont 요소에서 경기 상세 정보 추출
      */
-    private GameDetailInfo extractGameDetailFromElement(Locator gameElement, String date) {
+    private GameCenterDetail extractGameDetailFromElement(Locator gameElement, String date) {
         try {
-            GameDetailInfo detail = new GameDetailInfo();
-            detail.setDate(date);
+            GameCenterDetail gameCenter = new GameCenterDetail();
+            gameCenter.setDate(date);
 
             // li 태그의 속성들
-            detail.setGameId(gameElement.getAttribute("g_id"));
-            detail.setGameDate(gameElement.getAttribute("g_dt"));
-            detail.setGameSc(gameElement.getAttribute("game_sc"));
-            detail.setAwayTeamCode(gameElement.getAttribute("away_id"));
-            detail.setHomeTeamCode(gameElement.getAttribute("home_id"));
-            detail.setAwayTeamName(gameElement.getAttribute("away_nm"));
-            detail.setHomeTeamName(gameElement.getAttribute("home_nm"));
-            detail.setStadium(gameElement.getAttribute("s_nm"));
+            gameCenter.setGameId(gameElement.getAttribute("g_id"));
+            gameCenter.setGameDate(gameElement.getAttribute("g_dt"));
+            gameCenter.setGameSc(gameElement.getAttribute("game_sc"));
+            gameCenter.setAwayTeamCode(gameElement.getAttribute("away_id"));
+            gameCenter.setHomeTeamCode(gameElement.getAttribute("home_id"));
+            gameCenter.setAwayTeamName(gameElement.getAttribute("away_nm"));
+            gameCenter.setHomeTeamName(gameElement.getAttribute("home_nm"));
+            gameCenter.setStadium(gameElement.getAttribute("s_nm"));
 
             // 경기 상태
             String classAttr = gameElement.getAttribute("class");
             if (classAttr != null) {
                 if (classAttr.contains("end")) {
-                    detail.setGameStatus("경기종료");
+                    gameCenter.setGameStatus("경기종료");
                 } else if (classAttr.contains("cancel")) {
-                    detail.setGameStatus("경기취소");
+                    gameCenter.setGameStatus("경기취소");
                 } else {
-                    detail.setGameStatus("경기예정");
+                    gameCenter.setGameStatus("경기예정");
                 }
             }
 
@@ -127,34 +120,34 @@ public class KboGameCenterCrawler {
             int topCount = topItems.count();
 
             if (topCount >= 1) {
-                detail.setStadiumName(topItems.nth(0).textContent().trim());
+                gameCenter.setStadiumName(topItems.nth(0).textContent().trim());
             }
 
             // 날씨 이미지 (있을 경우)
             if (topCount >= 2) {
                 Locator weatherImg = topItems.nth(1).locator("img");
                 if (weatherImg.count() > 0) {
-                    detail.setWeatherIcon(weatherImg.getAttribute("src"));
+                    gameCenter.setWeatherIcon(weatherImg.getAttribute("src"));
                 }
             }
 
             // 경기 시간
             if (topCount >= 3) {
-                detail.setStartTime(topItems.nth(topCount - 1).textContent().trim());
+                gameCenter.setStartTime(topItems.nth(topCount - 1).textContent().trim());
             } else if (topCount == 2) {
                 // 날씨 없는 경우
-                detail.setStartTime(topItems.nth(1).textContent().trim());
+                gameCenter.setStartTime(topItems.nth(1).textContent().trim());
             }
 
             // middle 영역: 중계, 상태, 점수, 투수
             Locator broadcastingElem = gameElement.locator(".middle .broadcasting");
             if (broadcastingElem.count() > 0) {
-                detail.setBroadcasting(broadcastingElem.textContent().trim());
+                gameCenter.setBroadcasting(broadcastingElem.textContent().trim());
             }
 
             Locator statusElem = gameElement.locator(".middle .staus");
             if (statusElem.count() > 0) {
-                detail.setStatus(statusElem.textContent().trim());
+                gameCenter.setStatus(statusElem.textContent().trim());
             }
 
             // 어웨이 팀 정보
@@ -164,12 +157,12 @@ public class KboGameCenterCrawler {
                 Locator awayScore = awayTeam.locator(".score");
                 if (awayScore.count() > 0) {
                     String scoreText = awayScore.textContent().trim();
-                    detail.setAwayScore(scoreText);
+                    gameCenter.setAwayScore(scoreText);
 
                     // 승리 여부
                     String scoreClass = awayScore.getAttribute("class");
                     if (scoreClass != null && scoreClass.contains("win")) {
-                        detail.setWinner("away");
+                        gameCenter.setWinner("away");
                     }
                 }
 
@@ -180,7 +173,7 @@ public class KboGameCenterCrawler {
                     String pitcherInfo = awayPitchers.nth(i).textContent().trim();
                     awayPitcherList.add(pitcherInfo);
                 }
-                detail.setAwayPitchers(awayPitcherList);
+                gameCenter.setAwayPitchers(awayPitcherList);
             }
 
             // 홈 팀 정보
@@ -190,12 +183,12 @@ public class KboGameCenterCrawler {
                 Locator homeScore = homeTeam.locator(".score");
                 if (homeScore.count() > 0) {
                     String scoreText = homeScore.textContent().trim();
-                    detail.setHomeScore(scoreText);
+                    gameCenter.setHomeScore(scoreText);
 
                     // 승리 여부
                     String scoreClass = homeScore.getAttribute("class");
                     if (scoreClass != null && scoreClass.contains("win")) {
-                        detail.setWinner("home");
+                        gameCenter.setWinner("home");
                     }
                 }
 
@@ -206,13 +199,13 @@ public class KboGameCenterCrawler {
                     String pitcherInfo = homePitchers.nth(i).textContent().trim();
                     homePitcherList.add(pitcherInfo);
                 }
-                detail.setHomePitchers(homePitcherList);
+                gameCenter.setHomePitchers(homePitcherList);
             }
 
             log.info("경기 정보 수집 완료: {} vs {} ({})",
-                    detail.getAwayTeamName(), detail.getHomeTeamName(), detail.getStatus());
+                    gameCenter.getAwayTeamName(), gameCenter.getHomeTeamName(), gameCenter.getStatus());
 
-            return detail;
+            return gameCenter;
 
         } catch (Exception e) {
             log.error("경기 정보 추출 실패: {}", e.getMessage());
@@ -221,41 +214,15 @@ public class KboGameCenterCrawler {
     }
 
     /**
-     * bx-loading이 사라질 때까지 대기
-     */
-    private void waitForBxLoading(Page page) {
-        try {
-            // bx-loading이 숨겨질 때까지 대기
-            Locator loadingLocator = page.locator(".bx-loading");
-
-            // 요소가 숨겨지길 대기
-            loadingLocator.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.HIDDEN)
-                    .setTimeout(10000)
-            );
-
-            log.debug("bx-loading 사라짐");
-
-        } catch (TimeoutError e) {
-            log.warn("bx-loading 대기 시간 초과");
-        }
-
-        page.waitForTimeout(500);
-    }
-
-    /**
      * URL로 이동
      */
     private void navigateToUrl(Page page) {
         log.info("KBO 게임센터로 이동 중...");
 
-        page.navigate(KBO_URL, new Page.NavigateOptions()
+        page.navigate(baseUrl, new Page.NavigateOptions()
                 .setTimeout(navigationTimeout.toMillis())
                 .setWaitUntil(WaitUntilState.NETWORKIDLE)
         );
-
-        // 충분한 대기 시간 (JavaScript 실행 완료)
-        page.waitForTimeout(4000);
 
         log.info("페이지 로딩 완료");
     }
@@ -265,7 +232,6 @@ public class KboGameCenterCrawler {
         try {
             int day = date.getDayOfMonth();
 
-            // 방법 1: Locator 사용 (더 안전)
             String selector = String.format(
                     ".ui-datepicker-calendar tbody td:not(.ui-datepicker-other-month) a:has-text('%d')",
                     day
@@ -275,16 +241,9 @@ public class KboGameCenterCrawler {
 
             // 요소가 있는지 확인
             if (dayLocator.count() > 0) {
-                // 클릭 전 대기
-                dayLocator.first().waitFor(new Locator.WaitForOptions()
-                        .setState(WaitForSelectorState.VISIBLE)
-                        .setTimeout(3000)
-                );
-
-                // 클릭
                 dayLocator.first().click(new Locator.ClickOptions()
-                        .setTimeout(5000)
-                        .setForce(false)  // 자연스러운 클릭
+                        .setTimeout(2000)
+                        .setForce(false)
                 );
 
                 log.info("날짜 {} 클릭 완료", day);
@@ -307,15 +266,12 @@ public class KboGameCenterCrawler {
             // 년도 선택
             page.selectOption(".ui-datepicker-year",
                     String.valueOf(date.getYear()));
-            page.waitForTimeout(500);
 
             // 월 선택
             page.selectOption(".ui-datepicker-month",
                     String.valueOf(date.getMonthValue() - 1));
-            page.waitForTimeout(800);  // 대기 시간 증가
 
             log.info("년/월 선택 완료: {}-{}", date.getYear(), date.getMonthValue());
-
         } catch (Exception e) {
             log.error("년/월 선택 실패", e);
             throw new RuntimeException("년/월 선택 실패", e);
@@ -330,190 +286,33 @@ public class KboGameCenterCrawler {
             log.info("날짜 {}로 이동 중...", date);
 
             page.click(".ui-datepicker-trigger",
-                    new Page.ClickOptions().setTimeout(5000));
+                    new Page.ClickOptions().setTimeout(3000));
 
             page.waitForSelector(".ui-datepicker",
                     new Page.WaitForSelectorOptions()
-                            .setTimeout(3000)
+                            .setTimeout(1500)
                             .setState(WaitForSelectorState.VISIBLE)
             );
 
-            page.waitForTimeout(500);
-
             selectYearMonth(page, date);
             clickDay(page, date);
-
-            // 날짜 변경 후 데이터 로딩 대기
-            page.waitForTimeout(2000);
-
-            // bx-loading 대기
-            waitForBxLoading(page);
 
             // 경기 목록이 로드될 때까지 대기
             try {
                 page.waitForSelector(".game-list-n > li",
                         new Page.WaitForSelectorOptions()
-                                .setTimeout(5000)
+                                .setTimeout(1500)
                                 .setState(WaitForSelectorState.ATTACHED)
                 );
             } catch (TimeoutError e) {
                 log.info("경기 목록 없음 (경기 없는 날)");
             }
 
-            page.waitForTimeout(1000);
             log.info("날짜 이동 완료");
 
         } catch (Exception e) {
             log.error("날짜 이동 실패", e);
             throw new RuntimeException("날짜 이동 실패", e);
         }
-    }
-
-    /**
-     * 단일 날짜 크롤링
-     */
-    private List<GameInfo> crawlSingleDate(Page page, LocalDate date) {
-        List<GameInfo> games = new ArrayList<>();
-
-        try {
-            page.click(".ui-datepicker-trigger", new Page.ClickOptions().setTimeout(5000));
-
-            page.waitForSelector(".ui-datepicker",
-                    new Page.WaitForSelectorOptions().setTimeout(2000));
-
-            selectYearMonth(page, date);
-            clickDay(page, date);
-
-            page.waitForTimeout(1500);
-
-            try {
-                page.waitForFunction(
-                        "document.querySelectorAll('.game-list-n > li').length >= 0",
-                        new Page.WaitForFunctionOptions().setTimeout(3000)
-                );
-            } catch (TimeoutError e) {
-                log.info("  → 경기 없음");
-                return games;
-            }
-
-            List<ElementHandle> gameElements = page.querySelectorAll(".game-list-n > li");
-
-            if (gameElements.isEmpty()) {
-                log.info("  → 경기 없음");
-                return games;
-            }
-
-            for (ElementHandle gameElement : gameElements) {
-                GameInfo game = parseGameInfo(gameElement);
-                if (game != null) {
-                    games.add(game);
-                }
-            }
-
-            log.info("  → {}경기 수집 완료", games.size());
-
-        } catch (Exception e) {
-            log.error("  → 에러: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return games;
-    }
-
-
-    /**
-     * 경기 요소에서 정보 추출
-     */
-    private GameInfo parseGameInfo(ElementHandle gameElement) {
-        try {
-            GameInfo game = new GameInfo();
-
-            game.setGameId(gameElement.getAttribute("g_id"));
-            game.setGameDate(gameElement.getAttribute("g_dt"));
-            game.setGameSc(gameElement.getAttribute("game_sc"));
-            game.setAwayTeam(gameElement.getAttribute("away_id"));
-            game.setHomeTeam(gameElement.getAttribute("home_id"));
-
-            String classAttr = gameElement.getAttribute("class");
-            if (classAttr != null) {
-                if (classAttr.contains("end")) {
-                    game.setGameStatus("END");
-                } else if (classAttr.contains("cancel")) {
-                    game.setGameStatus("CANCEL");
-                } else {
-                    game.setGameStatus("SCHEDULED");
-                }
-            }
-
-            ElementHandle stadiumElement = gameElement.querySelector(".top > ul > li:nth-child(1)");
-            if (stadiumElement != null) {
-                game.setStadium(stadiumElement.textContent().trim());
-            }
-
-            ElementHandle timeElement = gameElement.querySelector(".top > ul > li:nth-child(2)");
-            if (timeElement != null) {
-                game.setStartTime(timeElement.textContent().trim());
-            }
-
-            ElementHandle statusElement = gameElement.querySelector(".staus");
-            if (statusElement != null) {
-                game.setStatus(statusElement.textContent().trim());
-            }
-
-            List<ElementHandle> scoreElements = gameElement.querySelectorAll(".score");
-            if (scoreElements.size() >= 2) {
-                String awayScore = scoreElements.get(0).textContent().trim();
-                String homeScore = scoreElements.get(1).textContent().trim();
-
-                if (awayScore.matches("\\d+")) {
-                    game.setAwayScore(awayScore);
-                }
-                if (homeScore.matches("\\d+")) {
-                    game.setHomeScore(homeScore);
-                }
-            }
-
-            return game;
-
-        } catch (Exception e) {
-            log.error("경기 정보 파싱 에러: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 크롤링 결과 요약 출력
-     */
-    private void printSummary(Map<LocalDate, List<GameInfo>> gamesByDate) {
-        int totalGames = gamesByDate.values().stream()
-                .mapToInt(List::size)
-                .sum();
-
-        long datesWithGames = gamesByDate.values().stream()
-                .filter(list -> !list.isEmpty())
-                .count();
-
-        long endedGames = gamesByDate.values().stream()
-                .flatMap(List::stream)
-                .filter(game -> "END".equals(game.getGameStatus()))
-                .count();
-
-        long canceledGames = gamesByDate.values().stream()
-                .flatMap(List::stream)
-                .filter(game -> "CANCEL".equals(game.getGameStatus()))
-                .count();
-
-        long scheduledGames = gamesByDate.values().stream()
-                .flatMap(List::stream)
-                .filter(game -> "SCHEDULED".equals(game.getGameStatus()))
-                .count();
-
-        log.info("\n=== 크롤링 요약 ===");
-        log.info("조회 날짜 수: {}", gamesByDate.size());
-        log.info("경기 있는 날짜: {}", datesWithGames);
-        log.info("총 경기 수: {}", totalGames);
-        log.info("  - 종료: {}", endedGames);
-        log.info("  - 취소: {}", canceledGames);
-        log.info("  - 예정: {}", scheduledGames);
     }
 }
