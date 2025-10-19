@@ -43,8 +43,8 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.dialog.profile.ProfileDialog
 import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.dialog.profile.ProfileDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -180,8 +180,8 @@ class HomeFragment :
             (requireActivity() as MainActivity).setLoadingScreen(value)
         }
 
-        viewModel.profileImageClickEvent.observe(viewLifecycleOwner) { value: MemberProfile? ->
-            showMemberProfileDialog(value)
+        viewModel.profileImageClickEvent.observe(viewLifecycleOwner) {
+            showMemberProfileDialog()
         }
     }
 
@@ -329,7 +329,7 @@ class HomeFragment :
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
-    private fun showMemberProfileDialog(memberProfile: MemberProfile?) {
+    private fun showMemberProfileDialog() {
         binding.composeView.setContent {
             val profile: State<MemberProfile?> = viewModel.profileImageClickEvent.observeAsState()
 

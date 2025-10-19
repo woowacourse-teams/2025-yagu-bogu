@@ -14,6 +14,8 @@ import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE_NULL
+import com.yagubogu.ui.dialog.model.MemberProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -79,6 +81,9 @@ class LivetalkChatViewModel(
     private val fetchLikesLock = Mutex()
     private var pendingLikeCount = 0
     private var likeBatchingJob: Job? = null
+
+    private val _profileInfoClickEvent = MutableLiveData<MemberProfile?>()
+    val profileInfoClickEvent: LiveData<MemberProfile?> = _profileInfoClickEvent
 
     init {
         fetchAll()
@@ -376,6 +381,25 @@ class LivetalkChatViewModel(
                     Timber.w(exception, "최신 메시지 API 호출 실패")
                 }
         }
+    }
+
+    fun fetchMemberProfile(memberId: Long) {
+//        viewModelScope.launch {
+//            val memberProfileResult: Result<MemberProfile> =
+//                memberRepository.getMemberProfile(memberId)
+//            memberProfileResult
+//                .onSuccess { memberProfile: MemberProfile ->
+//                    _profileImageClickEvent.setValue(memberProfile)
+//                }.onFailure { exception: Throwable ->
+//                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+//                }
+//        }
+        // TODO API 배포되면 주석 제거
+        _profileInfoClickEvent.value = MEMBER_PROFILE_FIXTURE_NULL
+    }
+
+    fun clearMemberProfileEvent() {
+        _profileInfoClickEvent.value = null
     }
 
     override fun onCleared() {

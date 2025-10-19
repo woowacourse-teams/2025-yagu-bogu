@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 @Serializable
 data class TalkResponse(
     @SerialName("id")
-    val id: Int, // 톡 메시지 ID
+    val id: Long, // 톡 메시지 ID
     @SerialName("memberId")
-    val memberId: Int, // 메시지를 작성한 멤버의 ID
+    val memberId: Long, // 메시지를 작성한 멤버의 ID
     @SerialName("nickname")
     val nickname: String, // 작성자의 닉네임
     @SerialName("favorite")
@@ -26,7 +26,8 @@ data class TalkResponse(
 ) {
     fun toPresentation(): LivetalkChatItem =
         LivetalkChatItem(
-            chatId = id.toLong(),
+            chatId = id,
+            memberId = memberId,
             isMine = isMine,
             message = content,
             profileImageUrl = imageUrl,
