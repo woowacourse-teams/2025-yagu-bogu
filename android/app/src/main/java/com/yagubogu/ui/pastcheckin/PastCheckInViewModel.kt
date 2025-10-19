@@ -51,7 +51,19 @@ class PastCheckInViewModel(
     }
 
     fun onGameSelected(game: LivetalkStadiumItem) {
-        _uiState.value = _uiState.value.copy(selectedGame = game, showConfirmDialog = true)
+        when (game.isVerified) {
+            true -> {
+                _uiEvent.trySend(
+                    PastCheckInUiEvent.ShowToast(
+                        "이미 직관 등록된 경기입니다!",
+                    ),
+                )
+            }
+
+            false ->
+                _uiState.value =
+                    _uiState.value.copy(selectedGame = game, showConfirmDialog = true)
+        }
     }
 
     private fun fetchGameList(date: LocalDate) {
