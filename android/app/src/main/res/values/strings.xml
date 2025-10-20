@@ -35,6 +35,8 @@
     <string name="home_check_in_stadium_emoji">🏟️</string>
     <string name="home_check_in_confirm">%s\n직관 인증할까요?</string>
     <string name="home_check_in_caution">직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.</string>
+    <string name="home_double_header_title">%s\n더블헤더가 있는 날이에요!</string>
+    <string name="home_double_header_message">어떤 경기를 인증할까요?</string>
     <string name="home_my_team">우리 팀</string>
     <string name="home_attendance_count">인증 횟수</string>
     <string name="home_winning_percentage">직관 승률</string>
