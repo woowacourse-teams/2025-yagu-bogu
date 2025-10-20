@@ -30,7 +30,7 @@ management:
         include: prometheus, health
   tracing:
     sampling:
-      probability: 0.2
+      probability: 0.1
   otlp:
     tracing:
       endpoint: http://${MONITORING_SERVER_IP}:4317
