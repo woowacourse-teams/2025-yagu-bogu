@@ -93,7 +93,7 @@ class PastCheckInServiceTest {
                 .gameState(GameState.COMPLETED)
         );
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId());
 
         // when
         pastCheckInService.createPastCheckIn(member.getId(), request);
@@ -120,7 +120,7 @@ class PastCheckInServiceTest {
 
         checkInFactory.save(b -> b.team(lotte).member(member).game(game));
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId());
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -145,7 +145,7 @@ class PastCheckInServiceTest {
 
         checkInFactory.save(b -> b.game(game).member(member).team(lotte));
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId());
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -161,7 +161,7 @@ class PastCheckInServiceTest {
         LocalDate date = LocalDate.of(2025, 4, 4);
 
         long nonExistingGameId = 9999L;
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(nonExistingGameId, date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(nonExistingGameId);
 
         // when / then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -177,7 +177,7 @@ class PastCheckInServiceTest {
         LocalDate date = LocalDate.of(2025, 5, 5);
 
         // 같은 구장 but 해당 날짜에 게임이 없음
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(999L, date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(999L);
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(member.getId(), request))
@@ -201,7 +201,7 @@ class PastCheckInServiceTest {
                 .gameState(GameState.COMPLETED)
         );
 
-        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId(), date);
+        CreatePastCheckInRequest request = new CreatePastCheckInRequest(game.getId());
 
         // when & then
         assertThatThrownBy(() -> pastCheckInService.createPastCheckIn(nonExistingMemberId, request))

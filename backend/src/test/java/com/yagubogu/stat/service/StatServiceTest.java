@@ -1,9 +1,5 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -19,7 +15,10 @@ import com.yagubogu.member.domain.Role;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.stat.domain.VictoryFairyRanking;
+import com.yagubogu.stat.dto.CheckInSummaryParam;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
@@ -43,6 +42,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -1047,6 +1050,348 @@ class StatServiceTest {
             s.assertThat(lt.wins()).isEqualTo(1);
             s.assertThat(lt.losses()).isEqualTo(1);
             s.assertThat(lt.winRate()).isEqualTo(50.0);
+        });
+    }
+
+    @DisplayName("사용자의 체크인 요약 정보(승/무/패, 승률, 최근 체크인 날짜)를 정상적으로 조회한다")
+    @Test
+    void findCheckInSummary_success() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT).nickname("우가").build());
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        int year = 2025;
+
+        // 2승 1무 1패 데이터 생성
+        Game winGame1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 1))
+                .homeScore(5).awayScore(1)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(winGame1));
+
+        Game loseGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 2))
+                .homeScore(2).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(loseGame));
+
+        Game drawGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 3))
+                .homeScore(4).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(drawGame));
+
+        // 이 경기가 가장 최신 체크인이 됨
+        Game winGame2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 5))
+                .homeScore(7).awayScore(0)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(winGame2));
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isEqualTo(2);
+            softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.loseCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.totalCount()).isEqualTo(4);
+            softAssertions.assertThat(actual.winRate()).isEqualTo(66.7);
+            softAssertions.assertThat(actual.recentCheckInDate()).isEqualTo(LocalDate.of(year, 8, 5));
+        });
+    }
+
+    @DisplayName("체크인 기록이 없는 사용자의 요약 정보를 조회하면 모든 값이 0또는 null로 반환된다")
+    @Test
+    void findCheckInSummary_noCheckIns() {
+        // given
+        Member member = memberFactory.save(b -> b.team(teamRepository.findByTeamCode("HT").orElseThrow())
+                .nickname("우가").build());
+        int year = 2025;
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isZero();
+            softAssertions.assertThat(actual.drawCounts()).isZero();
+            softAssertions.assertThat(actual.loseCounts()).isZero();
+            softAssertions.assertThat(actual.totalCount()).isZero();
+            softAssertions.assertThat(actual.winRate()).isEqualTo(0.0);
+            softAssertions.assertThat(actual.recentCheckInDate()).isNull();
+        });
+    }
+
+    @DisplayName("승/패 기록 없이 무승부만 있는 경우 승률은 0.0%가 된다")
+    @Test
+    void findCheckInSummary_onlyDraws() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT).nickname("우가").build());
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        int year = 2025;
+
+        Game drawGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 3))
+                .homeScore(4).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(drawGame));
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isZero();
+            softAssertions.assertThat(actual.drawCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.loseCounts()).isZero();
+            softAssertions.assertThat(actual.totalCount()).isEqualTo(1);
+            softAssertions.assertThat(actual.winRate()).isEqualTo(0.0);
+            softAssertions.assertThat(actual.recentCheckInDate()).isEqualTo(LocalDate.of(year, 8, 3));
+        });
+    }
+
+    @DisplayName("다른 연도의 체크인 기록은 요약 정보 집계에서 제외된다")
+    @Test
+    void findCheckInSummary_filtersByYear() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT).nickname("우가").build());
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        int targetYear = 2025;
+        int nonTargetYear = 2024;
+
+        // 2024년 기록 (제외 대상)
+        Game game2024 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(nonTargetYear, 10, 1))
+                .homeScore(10).awayScore(1) // 승
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(game2024));
+
+        // 2025년 기록 (포함 대상)
+        Game game2025 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(targetYear, 8, 2))
+                .homeScore(2).awayScore(3) // 패
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(game2025));
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), targetYear);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isZero(); // 2025년 승은 없음
+            softAssertions.assertThat(actual.drawCounts()).isZero();
+            softAssertions.assertThat(actual.loseCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.totalCount()).isEqualTo(1);
+            softAssertions.assertThat(actual.winRate()).isEqualTo(0.0);
+            softAssertions.assertThat(actual.recentCheckInDate()).isEqualTo(LocalDate.of(targetYear, 8, 2));
+        });
+    }
+
+    @DisplayName("당일 경기(SCHEDULED)는 집계에서 제외하고, 과거 경기(COMPLETED)만 집계한다")
+    @Test
+    void findCheckInSummary_excludesScheduledFutureGames() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        int year = 2025;
+        LocalDate today = LocalDate.now();
+
+        // 1. 과거 경기 (COMPLETED, 승) - 집계 포함 대상
+        Game pastCompletedGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(today.minusDays(1)) // 어제 경기
+                .homeScore(5).awayScore(1)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(pastCompletedGame));
+
+        // 2. 당일 경기 (SCHEDULED) - 집계 제외 대상
+        Game todayScheduledGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(today) // 오늘 경기
+                .homeScore(null).awayScore(null)
+                .gameState(GameState.SCHEDULED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(todayScheduledGame));
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+
+        // then
+        assertSoftly(s -> {
+            s.assertThat(actual.winCounts()).isEqualTo(1);
+            s.assertThat(actual.drawCounts()).isZero();
+            s.assertThat(actual.loseCounts()).isZero();
+            s.assertThat(actual.totalCount()).isEqualTo(1);
+            s.assertThat(actual.winRate()).isEqualTo(100.0);
+            s.assertThat(actual.recentCheckInDate()).isEqualTo(today.minusDays(1));
+        });
+    }
+
+    @DisplayName("COMPLETED 경기만 통계에 집계하고, CANCELED, SCHEDULED 경기는 제외한다")
+    @Test
+    void findCheckInSummary_filtersByGameState() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+        int year = 2025;
+
+        // 1. COMPLETED (승)
+        Game completedGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 1))
+                .homeScore(5).awayScore(1)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(completedGame));
+
+        // 2. CANCELED
+        Game canceledGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 2))
+                .homeScore(null).awayScore(null)
+                .gameState(GameState.CANCELED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(canceledGame));
+
+        // 3. SCHEDULED
+        Game scheduledGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(year, 8, 3))
+                .homeScore(null).awayScore(null)
+                .gameState(GameState.SCHEDULED));
+        checkInFactory.save(b -> b.member(member).team(HT).game(scheduledGame));
+
+        // when
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.winCounts()).isEqualTo(1);
+            softAssertions.assertThat(actual.drawCounts()).isZero();
+            softAssertions.assertThat(actual.loseCounts()).isZero();
+            softAssertions.assertThat(actual.totalCount()).isEqualTo(1);
+            softAssertions.assertThat(actual.winRate()).isEqualTo(100.0);
+            softAssertions.assertThat(actual.recentCheckInDate()).isEqualTo(LocalDate.of(year, 8, 2));
+        });
+    }
+
+    @DisplayName("승리요정 전체 순위와 팀 내 순위가 모두 있을 때 요약 정보를 정상적으로 조회한다")
+    @Test
+    void findVictoryFairySummary_success() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+        int year = 2025;
+
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member rivalMember = memberFactory.save(b -> b.team(HT).nickname("두리"));
+        Member otherTeamMember = memberFactory.save(b -> b.team(LT).nickname("밍트"));
+
+        // 1등: otherTeamMember (200.0)
+        // 2등: rivalMember (100.0)
+        // 3등: targetMember (50.0)
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(otherTeamMember, 200.0, 20, 30, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(rivalMember, 100.0, 10, 20, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 10, year, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(3);
+            softAssertions.assertThat(actual.score()).isEqualTo(50.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(2);
+        });
+    }
+
+    @DisplayName("승리요정 랭킹 정보가 전혀 없을 때, 모든 필드가 null로 반환된다")
+    @Test
+    void findVictoryFairySummary_noRankingData() {
+        // given
+        Member member = memberFactory.save(b -> b.team(teamRepository.findByTeamCode("HT").orElseThrow()));
+        int year = 2025;
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(member.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isNull();
+            softAssertions.assertThat(actual.score()).isNull();
+            softAssertions.assertThat(actual.rankWithinTeam()).isNull();
+        });
+    }
+
+    @DisplayName("팀 내 동점자가 있을 경우 다음 순위가 올바르게 계산된다")
+    @Test
+    void findVictoryFairySummary_handlesTies() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        int year = 2025;
+
+        // 공동 1위 멤버 2명과, 그 다음 순위인 대상 멤버 1명 생성
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member jointFirst1 = memberFactory.save(b -> b.team(HT).nickname("메다"));
+        Member jointFirst2 = memberFactory.save(b -> b.team(HT).nickname("포라"));
+
+        // 랭킹 데이터 저장: 2명이 100점으로 공동 1위, 대상 멤버는 50점
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(jointFirst1, 100.0, 10, 10, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(jointFirst2, 100.0, 10, 10, year, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 5, year, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), year);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(3);
+            softAssertions.assertThat(actual.score()).isEqualTo(50.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(3);
+        });
+    }
+
+    @DisplayName("다른 연도의 랭킹 데이터는 현재 연도 조회 시 영향을 주지 않는다")
+    @Test
+    void findVictoryFairySummary_isolatesByYear() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        int targetYear = 2025;
+        int otherYear = 2024;
+
+        Member targetMember = memberFactory.save(b -> b.team(HT).nickname("우가"));
+        Member otherYearWinner = memberFactory.save(b -> b.team(HT).nickname("포르"));
+
+        // 2025년: targetMember가 100점으로 1위
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 100.0, 10, 10, targetYear, null));
+
+        // 2024년: 다른 멤버가 훨씬 높은 점수를 가짐 (이 데이터는 무시되어야 함)
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(otherYearWinner, 999.0, 100, 100, otherYear, null));
+        victoryFairyRankingRepository.save(new VictoryFairyRanking(targetMember, 50.0, 5, 5, otherYear, null));
+
+        // when
+        VictoryFairySummaryParam actual = statService.findVictoryFairySummary(targetMember.getId(), targetYear);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual.ranking()).isEqualTo(1);
+            softAssertions.assertThat(actual.score()).isEqualTo(100.0);
+            softAssertions.assertThat(actual.rankWithinTeam()).isEqualTo(1);
         });
     }
 }

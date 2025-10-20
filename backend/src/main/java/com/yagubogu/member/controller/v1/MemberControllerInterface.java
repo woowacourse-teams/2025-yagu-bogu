@@ -7,6 +7,7 @@ import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteResponse;
@@ -120,5 +121,15 @@ public interface MemberControllerInterface {
     ResponseEntity<MemberRepresentativeBadgeResponse> patchRepresentativeBadge(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable final long badgeId
+    );
+
+    @Operation(summary = "프로필 조회", description = "memberId에 해당하는 멤버 프로필 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
+    })
+    @GetMapping("/{memberId}")
+    ResponseEntity<MemberProfileResponse> findMemberProfile(
+            @PathVariable Long memberId
     );
 }

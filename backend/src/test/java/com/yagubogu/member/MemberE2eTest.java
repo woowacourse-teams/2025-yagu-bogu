@@ -7,7 +7,6 @@ import com.yagubogu.badge.repository.BadgeRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
-import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
 import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
@@ -15,6 +14,7 @@ import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.badge.MemberBadgeFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
@@ -293,6 +293,55 @@ public class MemberE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("badgeId", badge.getId())
                 .when().patch("/api/v1/members/me/badges/{badgeId}/representative")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("사용자의 프로필 정보를 조회한다")
+    @Test
+    void findProfileInformation() {
+        // given
+        Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+        Member me = memberFactory.save(builder ->
+                builder.nickname("우가")
+                        .team(team)
+        );
+        Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("가짜우가")
+                .team(team)
+                .representativeBadge(badge)
+                .build()
+        );
+        String accessToken = authFactory.getAccessTokenByMemberId(me.getId(), Role.USER);
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("memberId", profileOwneredMember.getId())
+                .when().get("/api/v1/members/{memberId}")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @DisplayName("예외: 프로필 소유자의 회원을 찾을 수 없으면 예외가 발생한다")
+    @Test
+    void findProfileInformation_notFoundProfileOwnerMember() {
+        // given
+        Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+        Member me = memberFactory.save(builder ->
+                builder.nickname("우가")
+                        .team(team)
+        );
+        long invalidProfileOwnerMemberId = 9999999L;
+        String accessToken = authFactory.getAccessTokenByMemberId(me.getId(), Role.USER);
+
+        // when
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("memberId", invalidProfileOwnerMemberId)
+                .when().get("/api/v1/members/{memberId}")
                 .then().log().all()
                 .statusCode(404);
     }
