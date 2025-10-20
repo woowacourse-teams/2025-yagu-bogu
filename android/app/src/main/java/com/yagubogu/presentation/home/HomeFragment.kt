@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
+import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
@@ -118,7 +120,7 @@ class HomeFragment :
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                checkLocationSettingsThenShowDialog(requestLocationServices())
+                checkLocationSettingsThenCheckIn(requestLocationServices())
             } else {
                 requestLocationPermissions()
             }
@@ -143,7 +145,15 @@ class HomeFragment :
             if (value) {
                 showAdditionalCheckInConfirmDialog()
             } else {
-                viewModel.checkIn()
+                viewModel.fetchCurrentLocationThenCheckIn()
+            }
+        }
+
+        viewModel.nearestStadium.observe(viewLifecycleOwner) { value: Stadium ->
+            if (value.isDoubleHeader()) {
+                showCheckInConfirmDialog(value)
+            } else {
+                showCheckInConfirmDialog(value)
             }
         }
 
@@ -151,8 +161,9 @@ class HomeFragment :
             val message: String =
                 when (value) {
                     is CheckInUiEvent.Success ->
-                        getString(R.string.home_check_in_success_message, value.stadium.shortName)
+                        getString(R.string.home_check_in_success_message, value.stadium.name)
 
+                    CheckInUiEvent.NoGame -> getString(R.string.home_check_in_no_game_message)
                     CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
                     CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
@@ -183,23 +194,22 @@ class HomeFragment :
 
     private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(
-            KEY_CHECK_IN_REQUEST_DIALOG,
-            viewLifecycleOwner,
-        ) { _, bundle ->
-            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
-            if (isConfirmed) {
-                viewModel.checkIn()
-                firebaseAnalytics.logEvent("check_in", null)
-            }
-        }
-
-        parentFragmentManager.setFragmentResultListener(
             KEY_ADDITIONAL_CHECK_IN_DIALOG,
             viewLifecycleOwner,
         ) { _, bundle ->
             val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
             if (isConfirmed) {
-                viewModel.checkIn()
+                viewModel.fetchCurrentLocationThenCheckIn()
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            KEY_CHECK_IN_DIALOG,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
+            if (isConfirmed) {
+//                viewModel.checkIn()
                 firebaseAnalytics.logEvent("check_in", null)
             }
         }
@@ -213,7 +223,7 @@ class HomeFragment :
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> checkLocationSettingsThenShowDialog(requestLocationServices())
+                isPermissionGranted -> checkLocationSettingsThenCheckIn(requestLocationServices())
                 shouldShowRationale ->
                     binding.root.showSnackbar(
                         R.string.home_location_permission_denied_message,
@@ -281,18 +291,17 @@ class HomeFragment :
         }
     }
 
-    private fun showCheckInConfirmDialog() {
-        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_REQUEST_DIALOG) == null) {
+    private fun showCheckInConfirmDialog(stadium: Stadium) {
+        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_DIALOG) == null) {
             val dialogUiModel =
                 DefaultDialogUiModel(
-                    title = getString(R.string.home_check_in_confirm),
+                    title = getString(R.string.home_check_in_confirm, stadium.name),
                     emoji = getString(R.string.home_check_in_stadium_emoji),
                     message = getString(R.string.home_check_in_caution),
                 )
             val dialog =
-                DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
-
-            dialog.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
+                DefaultDialogFragment.newInstance(KEY_CHECK_IN_DIALOG, dialogUiModel)
+            dialog.show(parentFragmentManager, KEY_CHECK_IN_DIALOG)
         }
     }
 
@@ -309,12 +318,12 @@ class HomeFragment :
         return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
     }
 
-    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse>) {
+    private fun checkLocationSettingsThenCheckIn(task: Task<LocationSettingsResponse>) {
         task
             .addOnSuccessListener {
-                // 위치 설정이 활성화된 경우 직관 인증 여부 확인
-                viewModel.fetchCheckInStatus()
-            }.addOnFailureListener { exception ->
+                // 위치 설정이 활성화된 경우 구장 불러오기
+                viewModel.fetchStadiums()
+            }.addOnFailureListener { exception: Exception ->
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
                     exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
@@ -351,7 +360,7 @@ class HomeFragment :
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
+        private const val KEY_CHECK_IN_DIALOG = "checkIn"
         private const val KEY_ADDITIONAL_CHECK_IN_DIALOG = "additionalCheckIn"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L

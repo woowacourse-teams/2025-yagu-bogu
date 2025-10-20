@@ -9,7 +9,5 @@ data class StadiumsWithGamesResponse(
     @SerialName("stadiums")
     val stadiums: List<StadiumWithGameDto>,
 ) {
-    fun toCheckInPresentation(): Stadiums = Stadiums(values = stadiums.map { it.toPresentation() })
-
-    // TODO: 과거 직관 인증 toPastCheckInPresentation
+    fun toPresentation(): Stadiums = Stadiums(values = stadiums.map { it.toPresentation() })
 }

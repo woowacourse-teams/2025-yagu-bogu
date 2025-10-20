@@ -72,6 +72,11 @@ class HomeViewModel(
     private val _checkInStatus = MutableLiveData<Boolean>()
     val checkInStatus: LiveData<Boolean> get() = _checkInStatus
 
+    private val _nearestStadium = MutableLiveData<Stadium>()
+    val nearestStadium: LiveData<Stadium> get() = _nearestStadium
+
+    private var stadiumsWithGames: Stadiums? = null
+
     init {
         fetchAll()
     }
@@ -110,11 +115,11 @@ class HomeViewModel(
         fetchVictoryFairyRanking()
     }
 
-    fun checkIn(date: LocalDate = LocalDate.now()) {
+    fun fetchCurrentLocationThenCheckIn() {
         _isCheckInLoading.value = true
         locationRepository.getCurrentCoordinate(
             onSuccess = { currentCoordinate: Coordinate ->
-                handleCheckIn(currentCoordinate, date)
+                checkInIfWithinThreshold(currentCoordinate)
             },
             onFailure = { exception: Exception ->
                 Timber.w(exception, "위치 불러오기 실패")
@@ -156,18 +161,6 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
-    }
-
-    fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
-        viewModelScope.launch {
-            checkInRepository
-                .getCheckInStatus(date)
-                .onSuccess { checkInStatus: Boolean ->
-                    _checkInStatus.value = checkInStatus
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
-        }
     }
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {
@@ -218,29 +211,12 @@ class HomeViewModel(
         }
     }
 
-    private fun handleCheckIn(
-        currentCoordinate: Coordinate,
-        date: LocalDate,
-    ) {
-        viewModelScope.launch {
-            val stadiumsResult: Result<Stadiums> = stadiumRepository.getStadiumsForCheckIn(date)
-            stadiumsResult
-                .onSuccess { stadiums: Stadiums ->
-                    checkInIfWithinThreshold(currentCoordinate, stadiums)
-                }.onFailure {
-                    Timber.w(stadiumsResult.exceptionOrNull(), "API 호출 실패")
-                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
-                    _isCheckInLoading.value = false
-                }
-        }
-    }
-
-    private suspend fun checkInIfWithinThreshold(
-        currentCoordinate: Coordinate,
-        stadiums: Stadiums,
-    ) {
+    private fun checkInIfWithinThreshold(currentCoordinate: Coordinate) {
         val (nearestStadium: Stadium, nearestDistance: Distance) =
-            stadiums.findNearestTo(currentCoordinate, locationRepository::getDistanceInMeters)
+            stadiumsWithGames?.findNearestTo(
+                currentCoordinate,
+                locationRepository::getDistanceInMeters,
+            ) ?: return
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
             _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
@@ -248,20 +224,59 @@ class HomeViewModel(
             return
         }
 
-        checkInRepository
-            .addCheckIn(nearestStadium.games.first())
-            .onSuccess {
-                _checkInUiEvent.setValue(CheckInUiEvent.Success(nearestStadium))
-                _memberStatsUiModel.value =
-                    memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
-                        currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
+        _nearestStadium.value = nearestStadium
+    }
+
+    fun checkIn(
+        stadium: Stadium,
+        gameId: Long,
+    ) {
+        viewModelScope.launch {
+            checkInRepository
+                .addCheckIn(gameId)
+                .onSuccess {
+                    _checkInUiEvent.setValue(CheckInUiEvent.Success(stadium))
+                    _memberStatsUiModel.value =
+                        memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
+                            currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
+                        }
+                    _isCheckInLoading.value = false
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    _isCheckInLoading.value = false
+                }
+        }
+    }
+
+    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+        viewModelScope.launch {
+            stadiumRepository
+                .getStadiums(date)
+                .onSuccess { stadiums: Stadiums ->
+                    if (stadiums.isEmpty()) {
+                        _checkInUiEvent.setValue(CheckInUiEvent.NoGame)
+                    } else {
+                        stadiumsWithGames = stadiums
+                        fetchCheckInStatus(date)
                     }
-                _isCheckInLoading.value = false
-            }.onFailure { exception: Throwable ->
-                Timber.w(exception, "API 호출 실패")
-                _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
-                _isCheckInLoading.value = false
-            }
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                }
+        }
+    }
+
+    fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+        viewModelScope.launch {
+            checkInRepository
+                .getCheckInStatus(date)
+                .onSuccess { checkInStatus: Boolean ->
+                    _checkInStatus.value = checkInStatus
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
     companion object {

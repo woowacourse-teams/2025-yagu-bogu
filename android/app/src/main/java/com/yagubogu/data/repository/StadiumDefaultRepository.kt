@@ -9,8 +9,8 @@ import java.time.LocalDate
 class StadiumDefaultRepository(
     private val stadiumDataSource: StadiumDataSource,
 ) : StadiumRepository {
-    override suspend fun getStadiumsForCheckIn(date: LocalDate): Result<Stadiums> =
+    override suspend fun getStadiums(date: LocalDate): Result<Stadiums> =
         stadiumDataSource.getStadiums(date).map { stadiumsResponse: StadiumsWithGamesResponse ->
-            stadiumsResponse.toCheckInPresentation()
+            stadiumsResponse.toPresentation()
         }
 }

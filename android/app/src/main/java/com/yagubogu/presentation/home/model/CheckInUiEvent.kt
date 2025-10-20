@@ -5,6 +5,8 @@ sealed class CheckInUiEvent {
         val stadium: Stadium,
     ) : CheckInUiEvent()
 
+    data object NoGame : CheckInUiEvent()
+
     data object OutOfRange : CheckInUiEvent()
 
     data object LocationFetchFailed : CheckInUiEvent()

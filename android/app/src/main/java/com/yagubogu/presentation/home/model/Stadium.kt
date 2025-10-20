@@ -3,8 +3,9 @@ package com.yagubogu.presentation.home.model
 import com.yagubogu.domain.model.Coordinate
 
 data class Stadium(
-    val shortName: String,
-    val location: String,
+    val name: String,
     val coordinate: Coordinate,
-    val games: List<Long>,
-)
+    val gameIds: List<Long>,
+) {
+    fun isDoubleHeader(): Boolean = gameIds.size > 1
+}
