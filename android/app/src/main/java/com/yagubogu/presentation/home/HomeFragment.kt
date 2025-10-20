@@ -31,10 +31,8 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
-import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeDialogEvent
-import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
@@ -43,7 +41,7 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.common.component.DefaultDialog
+import com.yagubogu.ui.home.component.AdditionalCheckInDialog
 import com.yagubogu.ui.home.component.CheckInDialog
 import com.yagubogu.ui.home.component.DoubleHeaderDialog
 
@@ -197,21 +195,8 @@ class HomeFragment :
                     }
 
                     HomeDialogEvent.AdditionalCheckInDialog -> {
-                        val dialogUiModel =
-                            DefaultDialogUiModel(
-                                title = getString(R.string.home_already_checked_in),
-                                emoji = getString(R.string.home_already_checked_in_emoji),
-                                message = getString(R.string.home_additional_check_in_message),
-                                negativeText = getString(R.string.all_cancel),
-                            )
-
-                        DefaultDialog(
-                            dialogUiModel = dialogUiModel,
-                            onConfirm = {
-                                viewModel.fetchCurrentLocationThenCheckIn()
-                                viewModel.hideCheckInDialog()
-                            },
-                            onCancel = viewModel::hideCheckInDialog,
+                        AdditionalCheckInDialog(
+                            viewModel = viewModel,
                         )
                     }
 
