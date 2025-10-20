@@ -4,7 +4,6 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.dto.GameParam;
 import com.yagubogu.stadium.dto.StadiumWithGameParam;
-import com.yagubogu.stadium.dto.TeamParam;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +23,8 @@ public record StadiumsWithGamesResponse(
 
                     return new StadiumWithGameParam(
                             stadium.getShortName(),
-                            stadium.getLocation(),
                             stadium.getLatitude(),
                             stadium.getLongitude(),
-                            TeamParam.from(games.getFirst().getAwayTeam()),
-                            TeamParam.from(games.getFirst().getHomeTeam()),
                             GameParam.from(games.stream()
                                     .sorted(Comparator.comparing(Game::getStartAt))
                                     .collect(Collectors.toList()))
