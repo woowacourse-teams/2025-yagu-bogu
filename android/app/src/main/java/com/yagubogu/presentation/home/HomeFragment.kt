@@ -37,6 +37,7 @@ import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
+import com.yagubogu.presentation.home.model.HomeDialogEvent
 import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -207,25 +208,32 @@ class HomeFragment :
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.composeView.setContent {
-            val stadium by viewModel.checkInDialogEvent.collectAsStateWithLifecycle(initialValue = null)
-            stadium?.let { stadium: Stadium ->
-                val dialogUiModel =
-                    DefaultDialogUiModel(
-                        title = getString(R.string.home_check_in_confirm, stadium.name),
-                        emoji = getString(R.string.home_check_in_stadium_emoji),
-                        message = getString(R.string.home_check_in_caution),
-                        negativeText = getString(R.string.all_cancel),
-                    )
+            val dialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(initialValue = null)
+            dialogEvent?.let { dialogEvent: HomeDialogEvent ->
+                when (dialogEvent) {
+                    is HomeDialogEvent.CheckInDialog -> {
+                        val stadium: Stadium = dialogEvent.stadium
+                        val dialogUiModel =
+                            DefaultDialogUiModel(
+                                title = getString(R.string.home_check_in_confirm, stadium.name),
+                                emoji = getString(R.string.home_check_in_stadium_emoji),
+                                message = getString(R.string.home_check_in_caution),
+                                negativeText = getString(R.string.all_cancel),
+                            )
 
-                DefaultDialog(
-                    dialogUiModel = dialogUiModel,
-                    onConfirm = {
-                        viewModel.checkIn(stadium, stadium.gameIds.first())
-                        viewModel.hideCheckInDialog()
-                        firebaseAnalytics.logEvent("check_in", null)
-                    },
-                    onCancel = viewModel::hideCheckInDialog,
-                )
+                        DefaultDialog(
+                            dialogUiModel = dialogUiModel,
+                            onConfirm = {
+                                viewModel.checkIn(stadium, stadium.gameIds.first())
+                                viewModel.hideCheckInDialog()
+                                firebaseAnalytics.logEvent("check_in", null)
+                            },
+                            onCancel = viewModel::hideCheckInDialog,
+                        )
+                    }
+
+                    HomeDialogEvent.HideDialog -> {}
+                }
             }
         }
     }

@@ -15,6 +15,7 @@ import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.model.CheckInUiEvent
+import com.yagubogu.presentation.home.model.HomeDialogEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
@@ -75,8 +76,8 @@ class HomeViewModel(
     private val _checkInStatus = MutableLiveData<Boolean>()
     val checkInStatus: LiveData<Boolean> get() = _checkInStatus
 
-    private val _checkInDialogEvent = MutableSharedFlow<Stadium?>()
-    val checkInDialogEvent: SharedFlow<Stadium?> get() = _checkInDialogEvent.asSharedFlow()
+    private val _dialogEvent = MutableSharedFlow<HomeDialogEvent>()
+    val dialogEvent: SharedFlow<HomeDialogEvent> = _dialogEvent.asSharedFlow()
 
     private var stadiumsWithGames: Stadiums? = null
 
@@ -86,13 +87,13 @@ class HomeViewModel(
 
     fun showCheckInDialog(stadium: Stadium) {
         viewModelScope.launch {
-            _checkInDialogEvent.emit(stadium)
+            _dialogEvent.emit(HomeDialogEvent.CheckInDialog(stadium))
         }
     }
 
     fun hideCheckInDialog() {
         viewModelScope.launch {
-            _checkInDialogEvent.emit(null)
+            _dialogEvent.emit(HomeDialogEvent.HideDialog)
         }
     }
 
