@@ -85,10 +85,10 @@ class HomeFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setupComposeView()
         setupBindings()
         setupObservers()
         setupBalloons()
-        setupComposeView()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -115,6 +115,39 @@ class HomeFragment :
 
     override fun scrollToTop() {
         binding.nsvRoot.smoothScrollTo(0, 0)
+    }
+
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.composeView.setContent {
+            val dialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(initialValue = null)
+            dialogEvent?.let { dialogEvent: HomeDialogEvent ->
+                when (dialogEvent) {
+                    is HomeDialogEvent.CheckInDialog -> {
+                        CheckInDialog(
+                            viewModel = viewModel,
+                            stadium = dialogEvent.stadium,
+                        )
+                    }
+
+                    HomeDialogEvent.AdditionalCheckInDialog -> {
+                        AdditionalCheckInDialog(
+                            viewModel = viewModel,
+                        )
+                    }
+
+                    is HomeDialogEvent.DoubleHeaderDialog -> {
+                        DoubleHeaderDialog(
+                            viewModel = viewModel,
+                            stadium = dialogEvent.stadium,
+                        )
+                    }
+
+                    HomeDialogEvent.HideDialog -> {}
+                }
+            }
+        }
     }
 
     private fun setupBindings() {
@@ -177,44 +210,6 @@ class HomeFragment :
 
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)
-        }
-    }
-
-    private fun setupComposeView() {
-        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
-        binding.composeView.setContent {
-            val dialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(initialValue = null)
-            dialogEvent?.let { dialogEvent: HomeDialogEvent ->
-                when (dialogEvent) {
-                    is HomeDialogEvent.CheckInDialog -> {
-                        CheckInDialog(
-                            viewModel = viewModel,
-                            stadium = dialogEvent.stadium,
-                        )
-                    }
-
-                    HomeDialogEvent.AdditionalCheckInDialog -> {
-                        AdditionalCheckInDialog(
-                            viewModel = viewModel,
-                        )
-                    }
-
-                    is HomeDialogEvent.DoubleHeaderDialog -> {
-                        DoubleHeaderDialog(
-                            stadium = dialogEvent.stadium,
-                            onConfirm = {
-                                viewModel.checkIn(dialogEvent.stadium, it)
-                                viewModel.hideCheckInDialog()
-                                firebaseAnalytics.logEvent("check_in", null)
-                            },
-                            onCancel = viewModel::hideCheckInDialog,
-                        )
-                    }
-
-                    HomeDialogEvent.HideDialog -> {}
-                }
-            }
         }
     }
 

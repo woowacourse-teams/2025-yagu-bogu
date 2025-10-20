@@ -29,6 +29,7 @@ import com.yagubogu.R
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
+import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.Stadium
 import com.yagubogu.ui.theme.EsamanruMedium20
 import com.yagubogu.ui.theme.Gray200
@@ -40,6 +41,23 @@ import com.yagubogu.ui.theme.Primary500
 
 @Composable
 fun DoubleHeaderDialog(
+    viewModel: HomeViewModel,
+    stadium: Stadium,
+    modifier: Modifier = Modifier,
+) {
+    DoubleHeaderDialog(
+        stadium = stadium,
+        onConfirm = { gameId: Long ->
+            viewModel.checkIn(stadium, gameId)
+            viewModel.hideCheckInDialog()
+        },
+        onCancel = viewModel::hideCheckInDialog,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun DoubleHeaderDialog(
     stadium: Stadium,
     onConfirm: (Long) -> Unit,
     onCancel: () -> Unit,
@@ -96,7 +114,7 @@ fun DoubleHeaderDialog(
                             shape = RoundedCornerShape(12.dp),
                         ) {
                             Text(
-                                text = "${index + 1}차전",
+                                text = stringResource(R.string.home_double_header_game, index + 1),
                                 style = PretendardSemiBold.copy(fontSize = 14.sp),
                             )
                         }
