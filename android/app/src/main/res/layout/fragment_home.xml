@@ -24,6 +24,11 @@
             android:paddingBottom="20dp"
             tools:context=".presentation.home.HomeFragment">
 
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/compose_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_check_in"
                 android:layout_width="match_parent"

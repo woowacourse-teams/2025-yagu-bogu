@@ -25,6 +25,8 @@ import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -72,13 +74,17 @@ class HomeViewModel(
     private val _checkInStatus = MutableLiveData<Boolean>()
     val checkInStatus: LiveData<Boolean> get() = _checkInStatus
 
-    private val _nearestStadium = MutableLiveData<Stadium>()
-    val nearestStadium: LiveData<Stadium> get() = _nearestStadium
+    private val _nearestStadium = MutableLiveData<Stadium?>()
+    val nearestStadium: LiveData<Stadium?> get() = _nearestStadium
 
     private var stadiumsWithGames: Stadiums? = null
 
     init {
         fetchAll()
+    }
+
+    fun hideCheckInDialog() {
+        _nearestStadium.value = null
     }
 
     fun startStreaming() {
@@ -129,7 +135,7 @@ class HomeViewModel(
         )
     }
 
-    fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiumStats(date: LocalDate = LocalDate.of(2025, 10, 19)) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date)
@@ -218,13 +224,14 @@ class HomeViewModel(
                 locationRepository::getDistanceInMeters,
             ) ?: return
 
-        if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
-            _isCheckInLoading.value = false
-            return
-        }
+//        if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+//            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
+//            _isCheckInLoading.value = false
+//            return
+//        }
 
         _nearestStadium.value = nearestStadium
+        _isCheckInLoading.value = false
     }
 
     fun checkIn(
@@ -249,7 +256,7 @@ class HomeViewModel(
         }
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiums(date: LocalDate = LocalDate.of(2025, 10, 19)) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiums(date)

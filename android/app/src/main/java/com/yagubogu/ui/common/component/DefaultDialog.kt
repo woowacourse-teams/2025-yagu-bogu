@@ -44,11 +44,7 @@ fun DefaultDialog(
 ) {
     Dialog(
         onDismissRequest = onCancel,
-        properties =
-            DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = false,
-            ),
+        properties = DialogProperties(dismissOnClickOutside = false),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -57,7 +53,7 @@ fun DefaultDialog(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column(
-                modifier = Modifier.padding(30.dp),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 dialogUiModel.emoji?.let { emoji: String ->
@@ -72,6 +68,7 @@ fun DefaultDialog(
                 Text(
                     text = dialogUiModel.title,
                     style = EsamanruMedium20,
+                    textAlign = TextAlign.Center,
                 )
 
                 dialogUiModel.message?.let { message: String ->
@@ -87,7 +84,7 @@ fun DefaultDialog(
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     dialogUiModel.negativeText?.let { negativeText: String ->
                         Button(
@@ -136,7 +133,7 @@ private fun DefaultDialogPreview() {
     DefaultDialog(
         dialogUiModel =
             DefaultDialogUiModel(
-                title = "야구장에서 인증할까요?",
+                title = "잠실야구장\n직관 인증할까요?",
                 emoji = "🏟️",
                 message = "직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.",
                 negativeText = "취소",

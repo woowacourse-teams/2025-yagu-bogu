@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.gms.common.api.ResolvableApiException
@@ -41,6 +43,7 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.common.component.DefaultDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -86,6 +89,7 @@ class HomeFragment :
         setupObservers()
         setupFragmentResultListener()
         setupBalloons()
+        setupComposeView()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -149,14 +153,6 @@ class HomeFragment :
             }
         }
 
-        viewModel.nearestStadium.observe(viewLifecycleOwner) { value: Stadium ->
-            if (value.isDoubleHeader()) {
-                showCheckInConfirmDialog(value)
-            } else {
-                showCheckInConfirmDialog(value)
-            }
-        }
-
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             val message: String =
                 when (value) {
@@ -202,15 +198,30 @@ class HomeFragment :
                 viewModel.fetchCurrentLocationThenCheckIn()
             }
         }
+    }
 
-        parentFragmentManager.setFragmentResultListener(
-            KEY_CHECK_IN_DIALOG,
-            viewLifecycleOwner,
-        ) { _, bundle ->
-            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
-            if (isConfirmed) {
-//                viewModel.checkIn()
-                firebaseAnalytics.logEvent("check_in", null)
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.composeView.setContent {
+            val stadium: Stadium? = viewModel.nearestStadium.observeAsState().value
+            stadium?.let { stadium: Stadium ->
+                val dialogUiModel =
+                    DefaultDialogUiModel(
+                        title = getString(R.string.home_check_in_confirm, stadium.name),
+                        emoji = getString(R.string.home_check_in_stadium_emoji),
+                        message = getString(R.string.home_check_in_caution),
+                        negativeText = getString(R.string.all_cancel),
+                    )
+
+                DefaultDialog(
+                    dialogUiModel = dialogUiModel,
+                    onConfirm = {
+                        viewModel.checkIn(stadium, stadium.gameIds.first())
+                        viewModel.hideCheckInDialog()
+                        firebaseAnalytics.logEvent("check_in", null)
+                    },
+                    onCancel = viewModel::hideCheckInDialog,
+                )
             }
         }
     }
@@ -291,20 +302,6 @@ class HomeFragment :
         }
     }
 
-    private fun showCheckInConfirmDialog(stadium: Stadium) {
-        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_DIALOG) == null) {
-            val dialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.home_check_in_confirm, stadium.name),
-                    emoji = getString(R.string.home_check_in_stadium_emoji),
-                    message = getString(R.string.home_check_in_caution),
-                )
-            val dialog =
-                DefaultDialogFragment.newInstance(KEY_CHECK_IN_DIALOG, dialogUiModel)
-            dialog.show(parentFragmentManager, KEY_CHECK_IN_DIALOG)
-        }
-    }
-
     private fun requestLocationServices(): Task<LocationSettingsResponse> {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
 
@@ -360,7 +357,6 @@ class HomeFragment :
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val KEY_CHECK_IN_DIALOG = "checkIn"
         private const val KEY_ADDITIONAL_CHECK_IN_DIALOG = "additionalCheckIn"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
