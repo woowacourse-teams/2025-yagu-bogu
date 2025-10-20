@@ -7,5 +7,9 @@ sealed interface HomeDialogEvent {
 
     data object AdditionalCheckInDialog : HomeDialogEvent
 
+    data class DoubleHeaderDialog(
+        val stadium: Stadium,
+    ) : HomeDialogEvent
+
     data object HideDialog : HomeDialogEvent
 }

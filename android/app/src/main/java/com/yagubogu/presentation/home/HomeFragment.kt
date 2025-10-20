@@ -31,7 +31,6 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
-import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeDialogEvent
@@ -45,6 +44,7 @@ import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.common.component.DefaultDialog
+import com.yagubogu.ui.home.component.DoubleHeaderDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -222,6 +222,18 @@ class HomeFragment :
                             onConfirm = {
                                 viewModel.fetchCurrentLocationThenCheckIn()
                                 viewModel.hideCheckInDialog()
+                            },
+                            onCancel = viewModel::hideCheckInDialog,
+                        )
+                    }
+
+                    is HomeDialogEvent.DoubleHeaderDialog -> {
+                        DoubleHeaderDialog(
+                            stadium = dialogEvent.stadium,
+                            onConfirm = {
+                                viewModel.checkIn(dialogEvent.stadium, it)
+                                viewModel.hideCheckInDialog()
+                                firebaseAnalytics.logEvent("check_in", null)
                             },
                             onCancel = viewModel::hideCheckInDialog,
                         )

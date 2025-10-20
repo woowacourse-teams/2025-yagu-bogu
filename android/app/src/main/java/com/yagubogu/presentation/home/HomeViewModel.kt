@@ -231,6 +231,14 @@ class HomeViewModel(
             return
         }
 
+        if (nearestStadium.isDoubleHeader()) {
+            viewModelScope.launch {
+                _dialogEvent.emit(HomeDialogEvent.DoubleHeaderDialog(nearestStadium))
+                _isCheckInLoading.value = false
+            }
+            return
+        }
+
         viewModelScope.launch {
             _dialogEvent.emit(HomeDialogEvent.CheckInDialog(nearestStadium))
             _isCheckInLoading.value = false
