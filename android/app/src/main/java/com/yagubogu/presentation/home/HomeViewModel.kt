@@ -25,8 +25,9 @@ import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -74,8 +75,8 @@ class HomeViewModel(
     private val _checkInStatus = MutableLiveData<Boolean>()
     val checkInStatus: LiveData<Boolean> get() = _checkInStatus
 
-    private val _nearestStadium = MutableLiveData<Stadium?>()
-    val nearestStadium: LiveData<Stadium?> get() = _nearestStadium
+    private val _checkInDialogEvent = MutableSharedFlow<Stadium?>()
+    val checkInDialogEvent: SharedFlow<Stadium?> get() = _checkInDialogEvent.asSharedFlow()
 
     private var stadiumsWithGames: Stadiums? = null
 
@@ -83,8 +84,16 @@ class HomeViewModel(
         fetchAll()
     }
 
+    fun showCheckInDialog(stadium: Stadium) {
+        viewModelScope.launch {
+            _checkInDialogEvent.emit(stadium)
+        }
+    }
+
     fun hideCheckInDialog() {
-        _nearestStadium.value = null
+        viewModelScope.launch {
+            _checkInDialogEvent.emit(null)
+        }
     }
 
     fun startStreaming() {
@@ -224,13 +233,13 @@ class HomeViewModel(
                 locationRepository::getDistanceInMeters,
             ) ?: return
 
-//        if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-//            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
-//            _isCheckInLoading.value = false
-//            return
-//        }
+        if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
+            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
+            _isCheckInLoading.value = false
+            return
+        }
 
-        _nearestStadium.value = nearestStadium
+        showCheckInDialog(nearestStadium)
         _isCheckInLoading.value = false
     }
 

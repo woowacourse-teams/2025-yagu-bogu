@@ -12,10 +12,13 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -202,8 +205,9 @@ class HomeFragment :
 
     private fun setupComposeView() {
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
         binding.composeView.setContent {
-            val stadium: Stadium? = viewModel.nearestStadium.observeAsState().value
+            val stadium by viewModel.checkInDialogEvent.collectAsStateWithLifecycle(initialValue = null)
             stadium?.let { stadium: Stadium ->
                 val dialogUiModel =
                     DefaultDialogUiModel(
