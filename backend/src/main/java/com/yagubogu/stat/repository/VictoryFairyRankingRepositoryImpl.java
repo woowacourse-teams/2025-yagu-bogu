@@ -2,9 +2,6 @@ package com.yagubogu.stat.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -118,17 +115,54 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
         );
     }
 
+    @Override
+    public Optional<Long> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
+        // 1. 멤버에게 응원팀이 없으면 랭킹 계산 불가
+        if (member.getTeam() == null) {
+            return Optional.empty();
+        }
+
+        // 2. 해당 연도에 멤버의 랭킹 기록(점수) 조회
+        Double memberScore = jpaQueryFactory
+                .select(VICTORY_FAIRY_RANKING.score)
+                .from(VICTORY_FAIRY_RANKING)
+                .where(
+                        VICTORY_FAIRY_RANKING.member.eq(member),
+                        VICTORY_FAIRY_RANKING.gameYear.eq(year)
+                )
+                .fetchOne();
+
+        // 3. 랭킹 기록이 없으면 팀 내 순위도 없음
+        if (memberScore == null) {
+            return Optional.empty();
+        }
+
+        // 4. 나보다 점수가 높은 '같은 팀' 멤버의 수 조회
+        QVictoryFairyRanking ranking = QVictoryFairyRanking.victoryFairyRanking;
+        QMember qMember = QMember.member;
+
+        // Long으로 받아서 Optional로 감싼 후, null일 경우 0L을 기본값으로 사용
+        long higherRankedCount = Optional.ofNullable(jpaQueryFactory
+                .select(ranking.count())
+                .from(ranking)
+                .join(ranking.member, qMember)
+                .where(
+                        qMember.team.eq(member.getTeam()),
+                        ranking.gameYear.eq(year),
+                        ranking.score.gt(memberScore)
+                )
+                .fetchOne()).orElse(0L);
+
+        long rank = higherRankedCount + 1;
+
+        return Optional.of(rank);
+    }
+
     private BooleanExpression filterByTeam(final TeamFilter teamFilter, final QTeam team) {
         if (teamFilter == TeamFilter.ALL) {
             return null;
         }
 
         return team.teamCode.eq(teamFilter.name());
-    }
-
-    private NumberExpression<Integer> calculateRanking(NumberPath<Double> score) {
-        return Expressions.numberTemplate(Integer.class,
-                "RANK() OVER (ORDER BY {0} DESC)",  // DENSE_RANK() 대신 RANK()
-                score);
     }
 }
