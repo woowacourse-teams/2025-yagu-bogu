@@ -2,9 +2,6 @@ package com.yagubogu.stat.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -152,8 +149,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 .where(
                         qMember.team.eq(member.getTeam()),
                         ranking.gameYear.eq(year),
-                        ranking.score.gt(memberScore),
-                        qMember.deletedAt.isNull()
+                        ranking.score.gt(memberScore)
                 )
                 .fetchOne()).orElse(0L);
 
@@ -168,11 +164,5 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
         }
 
         return team.teamCode.eq(teamFilter.name());
-    }
-
-    private NumberExpression<Integer> calculateRanking(NumberPath<Double> score) {
-        return Expressions.numberTemplate(Integer.class,
-                "RANK() OVER (ORDER BY {0} DESC)",  // DENSE_RANK() 대신 RANK()
-                score);
     }
 }
