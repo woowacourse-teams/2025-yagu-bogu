@@ -90,7 +90,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(game.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId()))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
                 .statusCode(201);
@@ -123,7 +123,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(game.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId()))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
                 .statusCode(409);
@@ -152,7 +152,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreatePastCheckInRequest(game.getId(), date))
+                .body(new CreatePastCheckInRequest(game.getId()))
                 .when().post("/api/past-check-ins")
                 .then().log().all()
                 .statusCode(409);
