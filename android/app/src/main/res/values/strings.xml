@@ -31,7 +31,7 @@
     <string name="home_check_in">직관 인증하기</string>
     <string name="home_already_checked_in">오늘 이미 인증했어요!</string>
     <string name="home_already_checked_in_emoji">🚨</string>
-    <string name="home_additional_check_in_message">추가로 직관 인증 할까요?</string>
+    <string name="home_additional_check_in_message">추가로 직관 인증을 할까요?</string>
     <string name="home_check_in_stadium_emoji">🏟️</string>
     <string name="home_check_in_confirm">%s\n직관 인증할까요?</string>
     <string name="home_check_in_caution">직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.</string>

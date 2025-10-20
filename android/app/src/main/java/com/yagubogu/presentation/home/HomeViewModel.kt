@@ -73,9 +73,6 @@ class HomeViewModel(
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
 
-    private val _checkInStatus = MutableLiveData<Boolean>()
-    val checkInStatus: LiveData<Boolean> get() = _checkInStatus
-
     private val _dialogEvent = MutableSharedFlow<HomeDialogEvent>()
     val dialogEvent: SharedFlow<HomeDialogEvent> = _dialogEvent.asSharedFlow()
 
@@ -83,12 +80,6 @@ class HomeViewModel(
 
     init {
         fetchAll()
-    }
-
-    fun showCheckInDialog(stadium: Stadium) {
-        viewModelScope.launch {
-            _dialogEvent.emit(HomeDialogEvent.CheckInDialog(stadium))
-        }
     }
 
     fun hideCheckInDialog() {
@@ -240,8 +231,10 @@ class HomeViewModel(
             return
         }
 
-        showCheckInDialog(nearestStadium)
-        _isCheckInLoading.value = false
+        viewModelScope.launch {
+            _dialogEvent.emit(HomeDialogEvent.CheckInDialog(nearestStadium))
+            _isCheckInLoading.value = false
+        }
     }
 
     fun checkIn(
@@ -284,12 +277,16 @@ class HomeViewModel(
         }
     }
 
-    fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {
+    private fun fetchCheckInStatus(date: LocalDate) {
         viewModelScope.launch {
             checkInRepository
                 .getCheckInStatus(date)
                 .onSuccess { checkInStatus: Boolean ->
-                    _checkInStatus.value = checkInStatus
+                    if (checkInStatus) {
+                        _dialogEvent.emit(HomeDialogEvent.AdditionalCheckInDialog)
+                    } else {
+                        fetchCurrentLocationThenCheckIn()
+                    }
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

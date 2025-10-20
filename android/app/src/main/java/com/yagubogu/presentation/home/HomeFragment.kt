@@ -5,16 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -91,7 +88,6 @@ class HomeFragment :
         super.onViewCreated(view, savedInstanceState)
         setupBindings()
         setupObservers()
-        setupFragmentResultListener()
         setupBalloons()
         setupComposeView()
     }
@@ -149,14 +145,6 @@ class HomeFragment :
     }
 
     private fun setupObservers() {
-        viewModel.checkInStatus.observe(viewLifecycleOwner) { value: Boolean ->
-            if (value) {
-                showAdditionalCheckInConfirmDialog()
-            } else {
-                viewModel.fetchCurrentLocationThenCheckIn()
-            }
-        }
-
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             val message: String =
                 when (value) {
@@ -192,18 +180,6 @@ class HomeFragment :
         }
     }
 
-    private fun setupFragmentResultListener() {
-        parentFragmentManager.setFragmentResultListener(
-            KEY_ADDITIONAL_CHECK_IN_DIALOG,
-            viewLifecycleOwner,
-        ) { _, bundle ->
-            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
-            if (isConfirmed) {
-                viewModel.fetchCurrentLocationThenCheckIn()
-            }
-        }
-    }
-
     private fun setupComposeView() {
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
@@ -227,6 +203,25 @@ class HomeFragment :
                                 viewModel.checkIn(stadium, stadium.gameIds.first())
                                 viewModel.hideCheckInDialog()
                                 firebaseAnalytics.logEvent("check_in", null)
+                            },
+                            onCancel = viewModel::hideCheckInDialog,
+                        )
+                    }
+
+                    HomeDialogEvent.AdditionalCheckInDialog -> {
+                        val dialogUiModel =
+                            DefaultDialogUiModel(
+                                title = getString(R.string.home_already_checked_in),
+                                emoji = getString(R.string.home_already_checked_in_emoji),
+                                message = getString(R.string.home_additional_check_in_message),
+                                negativeText = getString(R.string.all_cancel),
+                            )
+
+                        DefaultDialog(
+                            dialogUiModel = dialogUiModel,
+                            onConfirm = {
+                                viewModel.fetchCurrentLocationThenCheckIn()
+                                viewModel.hideCheckInDialog()
                             },
                             onCancel = viewModel::hideCheckInDialog,
                         )
@@ -297,23 +292,6 @@ class HomeFragment :
         startActivity(intent)
     }
 
-    private fun showAdditionalCheckInConfirmDialog() {
-        if (parentFragmentManager.findFragmentByTag(KEY_ADDITIONAL_CHECK_IN_DIALOG) == null) {
-            val dialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.home_already_checked_in),
-                    emoji = getString(R.string.home_already_checked_in_emoji),
-                    message = getString(R.string.home_additional_check_in_message),
-                )
-            val dialog =
-                DefaultDialogFragment.newInstance(
-                    KEY_ADDITIONAL_CHECK_IN_DIALOG,
-                    dialogUiModel,
-                )
-            dialog.show(parentFragmentManager, KEY_ADDITIONAL_CHECK_IN_DIALOG)
-        }
-    }
-
     private fun requestLocationServices(): Task<LocationSettingsResponse> {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
 
@@ -369,7 +347,6 @@ class HomeFragment :
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val KEY_ADDITIONAL_CHECK_IN_DIALOG = "additionalCheckIn"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
         private const val RC_LOCATION_SETTINGS = 1001
