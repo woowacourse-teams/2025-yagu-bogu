@@ -28,16 +28,6 @@ public class GameCenterSyncService {
     private final TeamRepository teamRepository;
 
     /**
-     * 오늘 경기 상세 정보 수집
-     */
-    public GameCenter getTodayGameDetails() {
-        LocalDate today = LocalDate.now();
-        GameCenter dailyData = crawler.fetchDailyGameCenter(today);
-        updateGameStates(dailyData.getGames());
-        return dailyData;
-    }
-
-    /**
      * 특정 날짜 경기 상세 정보 수집
      */
     public GameCenter fetchGameCenter(LocalDate date) {
@@ -49,7 +39,7 @@ public class GameCenterSyncService {
     /**
      * GameDetailInfo 리스트를 받아서 Game 상태 업데이트
      */
-    public void updateGameStates(List<GameCenterDetail> gameDetails) {
+    private void updateGameStates(List<GameCenterDetail> gameDetails) {
         for (GameCenterDetail detail : gameDetails) {
             try {
                 updateOrCreateGame(detail);
