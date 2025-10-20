@@ -88,7 +88,7 @@ public class CheckInE2eTest extends E2eTestBase {
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
         LocalDate date = LocalDate.of(2025, 7, 25);
-        gameFactory.save(builder ->
+        Game game = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
@@ -98,7 +98,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreateCheckInRequest(stadiumJamsil.getId(), date))
+                .body(new CreateCheckInRequest(game.getId()))
                 .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(201);
@@ -147,26 +147,6 @@ public class CheckInE2eTest extends E2eTestBase {
         assertThat(actual.checkInCounts()).isEqualTo(3);
     }
 
-    @DisplayName("예외: 인증할 때 구장이 없으면 예외가 발생한다")
-    @Test
-    void createCheckIn_notFoundStadium() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        long invalidStadiumId = 999L;
-        LocalDate date = LocalDate.of(2025, 7, 25);
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreateCheckInRequest(invalidStadiumId, date))
-                .when().post("/api/v1/check-ins")
-                .then().log().all()
-                .statusCode(404);
-    }
-
     @DisplayName("예외: 인증할 때 게임이 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundGame() {
@@ -174,14 +154,13 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        long stadiumId = kia.getId();
-        LocalDate invalidDate = LocalDate.of(1000, 7, 21);
+        long invalidGameId = 999999L;
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreateCheckInRequest(stadiumId, invalidDate))
+                .body(new CreateCheckInRequest(invalidGameId))
                 .when().post("/api/v1/check-ins")
                 .then().log().all()
                 .statusCode(404);

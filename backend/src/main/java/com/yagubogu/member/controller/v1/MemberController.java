@@ -9,6 +9,7 @@ import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
 import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteRequest;
 import com.yagubogu.member.dto.v1.PreSignedUrlCompleteResponse;
@@ -113,6 +114,14 @@ public class MemberController implements MemberControllerInterface {
             @PathVariable final long badgeId
     ) {
         MemberRepresentativeBadgeResponse response = memberService.patchRepresentativeBadge(memberClaims.id(), badgeId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<MemberProfileResponse> findMemberProfile(
+            @PathVariable final Long memberId
+    ) {
+        MemberProfileResponse response = memberService.findMemberProfile(memberId);
 
         return ResponseEntity.ok(response);
     }

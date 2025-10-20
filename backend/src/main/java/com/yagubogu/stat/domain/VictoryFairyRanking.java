@@ -51,4 +51,14 @@ public class VictoryFairyRanking {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public VictoryFairyRanking(final Member member, final double score, final int winCount, final int checkInCount,
+                               final int gameYear, final LocalDateTime updatedAt) {
+        this.member = member;
+        this.score = score;
+        this.winCount = winCount;
+        this.checkInCount = checkInCount;
+        this.gameYear = gameYear;
+        this.updatedAt = updatedAt;
+    }
 }

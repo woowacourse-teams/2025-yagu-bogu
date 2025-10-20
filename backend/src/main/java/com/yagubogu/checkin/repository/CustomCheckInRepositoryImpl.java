@@ -36,12 +36,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
-
     private static final QCheckIn CHECK_IN = QCheckIn.checkIn;
     private static final QGame GAME = QGame.game;
     private static final QMember MEMBER = QMember.member;
     private static final QStadium STADIUM = QStadium.stadium;
+    private final JPAQueryFactory jpaQueryFactory;
+
+    @Override
+    public LocalDate findRecentCheckInGameDate(final Member member) {
+        return jpaQueryFactory
+                .select(GAME.date.max())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.eq(member),
+                        isMyCurrentFavorite(member, CHECK_IN),
+                        isCompleteOrCanceled()
+                )
+                .fetchOne();
+    }
 
     @Override
     public StatCountsParam findStatCounts(final Member member, final int year) {

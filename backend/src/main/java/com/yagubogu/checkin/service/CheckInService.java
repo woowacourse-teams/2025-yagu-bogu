@@ -51,20 +51,16 @@ public class CheckInService {
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
-        long stadiumId = request.stadiumId();
-        Stadium stadium = getStadiumById(stadiumId);
-        LocalDate date = request.date();
-        Game game = getGame(stadium, date);
-
+        Game game = getGameById(request.gameId());
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
         CheckIn checkIn = new CheckIn(game, member, team, CheckInType.LOCATION_CHECK_IN);
         checkInRepository.save(checkIn);
 
-        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(date));
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
-        applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, stadiumId));
+        applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(game.getDate()));
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
@@ -157,6 +153,11 @@ public class CheckInService {
     private Stadium getStadiumById(final long stadiumId) {
         return stadiumRepository.findById(stadiumId)
                 .orElseThrow(() -> new NotFoundException("Stadium is not found"));
+    }
+
+    private Game getGameById(final long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
     private Game getGame(final Stadium stadium, final LocalDate date) {

@@ -12,6 +12,8 @@ public interface VictoryFairyRankingRepositoryCustom {
 
     Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(Member member, TeamFilter teamFilter, int year);
 
+    Optional<Long> findRankWithinTeamByMemberAndYear(Member member, int year);
+
     void batchUpdate(List<UpdateDto> updates, int batchSize);
 
     void batchInsert(List<InsertDto> toInsert, int batchSize);
