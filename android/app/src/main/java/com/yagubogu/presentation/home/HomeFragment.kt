@@ -44,6 +44,7 @@ import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.common.component.DefaultDialog
+import com.yagubogu.ui.home.component.CheckInDialog
 import com.yagubogu.ui.home.component.DoubleHeaderDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -128,6 +129,7 @@ class HomeFragment :
             } else {
                 requestLocationPermissions()
             }
+            firebaseAnalytics.logEvent("check_in", null)
         }
 
         binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
@@ -188,23 +190,9 @@ class HomeFragment :
             dialogEvent?.let { dialogEvent: HomeDialogEvent ->
                 when (dialogEvent) {
                     is HomeDialogEvent.CheckInDialog -> {
-                        val stadium: Stadium = dialogEvent.stadium
-                        val dialogUiModel =
-                            DefaultDialogUiModel(
-                                title = getString(R.string.home_check_in_confirm, stadium.name),
-                                emoji = getString(R.string.home_check_in_stadium_emoji),
-                                message = getString(R.string.home_check_in_caution),
-                                negativeText = getString(R.string.all_cancel),
-                            )
-
-                        DefaultDialog(
-                            dialogUiModel = dialogUiModel,
-                            onConfirm = {
-                                viewModel.checkIn(stadium, stadium.gameIds.first())
-                                viewModel.hideCheckInDialog()
-                                firebaseAnalytics.logEvent("check_in", null)
-                            },
-                            onCancel = viewModel::hideCheckInDialog,
+                        CheckInDialog(
+                            viewModel = viewModel,
+                            stadium = dialogEvent.stadium,
                         )
                     }
 
