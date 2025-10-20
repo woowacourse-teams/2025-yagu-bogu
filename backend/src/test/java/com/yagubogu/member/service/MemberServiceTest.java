@@ -423,10 +423,7 @@ public class MemberServiceTest {
         // given
         Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
         Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
-        Member me = memberFactory.save(builder -> builder.nickname("진짜우가")
-                .team(favoriteTeam)
-                .build()
-        );
+
         Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("우가")
                 .team(favoriteTeam)
                 .representativeBadge(badge)
@@ -443,7 +440,7 @@ public class MemberServiceTest {
         MemberCheckInResponse expectedCheckInResponse = MemberCheckInResponse.from(fakeSummary);
 
         // when
-        MemberProfileResponse actual = memberService.findMemberProfile(me.getId(), profileOwneredMember.getId());
+        MemberProfileResponse actual = memberService.findMemberProfile(profileOwneredMember.getId());
 
         // then
         assertSoftly(softAssertions -> {
@@ -469,38 +466,16 @@ public class MemberServiceTest {
         });
     }
 
-    @DisplayName("예외: 로그인한 회원을 찾을 수 없으면 예외가 발생한다")
-    @Test
-    void findMemberProfile_notFoundLoginMember() {
-        // given
-        Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
-        long invalidLoginMemberId = 999999L;
-        Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("우가")
-                .team(favoriteTeam)
-                .build()
-        );
-
-        // when & then
-        assertThatThrownBy(
-                () -> memberService.findMemberProfile(invalidLoginMemberId, profileOwneredMember.getId()))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Member is not found");
-    }
-
     @DisplayName("예외: 프로필 소유자의 회원을 찾을 수 없으면 예외가 발생한다")
     @Test
     void findProfileInformation_notFoundMemberProfileOwnerMember() {
         // given
         Team favoriteTeam = teamRepository.findByTeamCode("HT").orElseThrow();
         long invalidProfileOwnerMemberId = 999999L;
-        Member me = memberFactory.save(builder -> builder.nickname("우가")
-                .team(favoriteTeam)
-                .build()
-        );
 
         // when & then
         assertThatThrownBy(
-                () -> memberService.findMemberProfile(me.getId(), invalidProfileOwnerMemberId))
+                () -> memberService.findMemberProfile(invalidProfileOwnerMemberId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
     }

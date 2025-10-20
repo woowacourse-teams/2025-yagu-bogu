@@ -153,9 +153,7 @@ public class MemberService {
                 .orElseThrow(() -> new NotFoundException("Badge is not found"));
     }
 
-    public MemberProfileResponse findMemberProfile(final Long loginMemberId, final Long profileOwnerId) {
-        existMember(loginMemberId);
-
+    public MemberProfileResponse findMemberProfile(final Long profileOwnerId) {
         Member profileOwnerMember = getMember(profileOwnerId);
         int currentYear = LocalDate.now().getYear();
 
@@ -181,13 +179,6 @@ public class MemberService {
 
     private MemberCheckInResponse createCheckInResponse(final Long memberId, final int year) {
         return MemberCheckInResponse.from(statService.findCheckInSummary(memberId, year));
-    }
-
-    private void existMember(final long memberId) {
-        boolean isExist = memberRepository.existsById(memberId);
-        if (!isExist) {
-            throw new NotFoundException("Member is not found");
-        }
     }
 
     private Member getMember(final long memberId) {

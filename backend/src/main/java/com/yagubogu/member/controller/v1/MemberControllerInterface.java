@@ -130,7 +130,6 @@ public interface MemberControllerInterface {
     })
     @GetMapping("/{memberId}")
     ResponseEntity<MemberProfileResponse> findMemberProfile(
-            @Parameter(hidden = true) MemberClaims memberClaims,
             @PathVariable Long memberId
     );
 }
