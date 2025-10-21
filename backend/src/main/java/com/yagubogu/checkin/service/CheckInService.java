@@ -25,8 +25,6 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.sse.dto.GameWithFanRateParam;
 import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
-import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,7 +43,6 @@ public class CheckInService {
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -60,7 +57,7 @@ public class CheckInService {
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
         applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
-        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(game.getDate()));
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent());
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
@@ -149,19 +146,8 @@ public class CheckInService {
         return result;
     }
 
-
-    private Stadium getStadiumById(final long stadiumId) {
-        return stadiumRepository.findById(stadiumId)
-                .orElseThrow(() -> new NotFoundException("Stadium is not found"));
-    }
-
     private Game getGameById(final long gameId) {
         return gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game is not found"));
-    }
-
-    private Game getGame(final Stadium stadium, final LocalDate date) {
-        return gameRepository.findByStadiumAndDate(stadium, date)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
