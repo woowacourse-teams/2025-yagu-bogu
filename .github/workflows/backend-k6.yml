@@ -3,9 +3,6 @@ name: YaguBogu Backend Dev K6
 on:
   push:
     branches: [ "dev-k6" ]
-    paths:
-      - "backend/**"
-      - ".github/workflows"
   workflow_dispatch:
 
 env:
