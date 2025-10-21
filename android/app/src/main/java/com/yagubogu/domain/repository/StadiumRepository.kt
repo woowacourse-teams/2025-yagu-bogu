@@ -1,7 +1,8 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.domain.model.Stadiums
+import com.yagubogu.presentation.home.model.StadiumsWithGames
+import java.time.LocalDate
 
 interface StadiumRepository {
-    suspend fun getStadiums(): Result<Stadiums>
+    suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGames>
 }

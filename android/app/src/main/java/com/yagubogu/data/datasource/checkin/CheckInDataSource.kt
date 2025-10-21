@@ -8,10 +8,7 @@ import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import java.time.LocalDate
 
 interface CheckInDataSource {
-    suspend fun addCheckIn(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<Unit>
+    suspend fun addCheckIn(gameId: Long): Result<Unit>
 
     suspend fun getCheckInCounts(year: Int): Result<CheckInCountsResponse>
 

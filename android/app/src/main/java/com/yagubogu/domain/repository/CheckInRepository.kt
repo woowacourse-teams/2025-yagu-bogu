@@ -6,10 +6,7 @@ import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import java.time.LocalDate
 
 interface CheckInRepository {
-    suspend fun addCheckIn(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<Unit>
+    suspend fun addCheckIn(gameId: Long): Result<Unit>
 
     suspend fun getCheckInCounts(year: Int): Result<Int>
 
