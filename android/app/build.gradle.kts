@@ -23,8 +23,8 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1_01_01
-        versionName = "1.1.1"
+        versionCode = 2_00_00
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
