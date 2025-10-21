@@ -7,10 +7,8 @@ import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
-import com.yagubogu.data.dto.response.checkin.VictoryFairyRankingResponse
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import java.time.LocalDate
@@ -18,10 +16,7 @@ import java.time.LocalDate
 class CheckInDefaultRepository(
     private val checkInDataSource: CheckInDataSource,
 ) : CheckInRepository {
-    override suspend fun addCheckIn(
-        stadiumId: Long,
-        date: LocalDate,
-    ): Result<Unit> = checkInDataSource.addCheckIn(stadiumId, date)
+    override suspend fun addCheckIn(gameId: Long): Result<Unit> = checkInDataSource.addCheckIn(gameId)
 
     override suspend fun getCheckInCounts(year: Int): Result<Int> =
         checkInDataSource
@@ -39,18 +34,11 @@ class CheckInDefaultRepository(
                 }
             }
 
-    override suspend fun getVictoryFairyRankings(): Result<VictoryFairyRanking> =
-        checkInDataSource
-            .getVictoryFairyRankings()
-            .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
-                victoryFairyRankingResponse.toPresentation()
-            }
-
     override suspend fun getCheckInHistories(
         year: Int,
         filter: String,
         order: String,
-    ): Result<List<AttendanceHistoryItem.Detail>> =
+    ): Result<List<AttendanceHistoryItem>> =
         checkInDataSource
             .getCheckInHistories(year, filter, order)
             .map { checkInHistoryResponse: CheckInHistoryResponse ->

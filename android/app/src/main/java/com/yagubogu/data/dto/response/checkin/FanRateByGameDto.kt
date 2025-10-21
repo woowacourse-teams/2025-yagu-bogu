@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FanRateByGameDto(
+    @SerialName("gameId")
+    val gameId: Long, // 경기 ID
     @SerialName("homeTeam")
     val homeTeam: TeamFanRateDto, // 홈 팀
     @SerialName("awayTeam")
@@ -13,6 +15,7 @@ data class FanRateByGameDto(
 ) {
     fun toPresentation(): StadiumFanRateItem =
         StadiumFanRateItem(
+            gameId = gameId,
             awayTeamFanRate = awayTeam.toPresentation(),
             homeTeamFanRate = homeTeam.toPresentation(),
         )

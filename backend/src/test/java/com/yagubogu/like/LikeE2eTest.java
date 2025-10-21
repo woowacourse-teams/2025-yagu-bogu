@@ -1,17 +1,15 @@
 package com.yagubogu.like;
 
-import static org.hamcrest.CoreMatchers.is;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
-import com.yagubogu.like.dto.LikeBatchRequest;
-import com.yagubogu.like.dto.LikeBatchRequest.LikeDelta;
+import com.yagubogu.like.dto.v1.LikeBatchRequest;
+import com.yagubogu.like.dto.v1.LikeBatchRequest.LikeDelta;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.E2eTestBase;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -26,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+
+import static org.hamcrest.CoreMatchers.is;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class LikeE2eTest extends E2eTestBase {
@@ -55,7 +55,7 @@ public class LikeE2eTest extends E2eTestBase {
         RestAssured.port = port;
     }
 
-    @DisplayName("좋아요 카운트: 초기값은 비어있다")
+    @DisplayName("좋아요 카운트: 초기값은 0으로 응답한다")
     @Test
     void findLikeCounts_initiallyEmpty() {
         // given
@@ -75,11 +75,13 @@ public class LikeE2eTest extends E2eTestBase {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .pathParam("gameId", game.getId())
                 .when()
-                .get("/api/games/{gameId}/likes/counts")
+                .get("/api/v1/games/{gameId}/likes/counts")
                 .then().log().all()
                 .statusCode(200)
                 .body("gameId", is(game.getId().intValue()))
-                .body("counts.size()", is(0));
+                .body("counts.size()", is(2))
+                .body("counts.find { it.teamCode == 'LT' }.totalCount", is(0))
+                .body("counts.find { it.teamCode == 'HH' }.totalCount", is(0));
     }
 
     @DisplayName("좋아요 배치를 적용하고 카운트를 반환한다")
@@ -98,8 +100,7 @@ public class LikeE2eTest extends E2eTestBase {
 
         LikeBatchRequest request = new LikeBatchRequest(
                 1L,
-                1L,
-                new LikeDelta(homeTeam.getId(), 3L)
+                new LikeDelta(homeTeam.getTeamCode(), 3L)
         );
 
         // when & then
@@ -109,9 +110,8 @@ public class LikeE2eTest extends E2eTestBase {
                 .pathParam("gameId", game.getId())
                 .body(request)
                 .when()
-                .post("/api/games/{gameId}/like-batches")
+                .post("/api/v1/games/{gameId}/like-batches")
                 .then().log().all()
                 .statusCode(204);
     }
 }
-

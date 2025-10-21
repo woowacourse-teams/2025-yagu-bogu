@@ -2,13 +2,14 @@ package com.yagubogu.like.service;
 
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
-import com.yagubogu.like.dto.LikeBatchRequest;
-import com.yagubogu.like.dto.LikeBatchRequest.LikeDelta;
-import com.yagubogu.like.dto.LikeCountsResponse;
-import com.yagubogu.like.dto.TeamLikeCountResponse;
+import com.yagubogu.like.dto.TeamLikeCountParam;
+import com.yagubogu.like.dto.v1.LikeBatchRequest;
+import com.yagubogu.like.dto.v1.LikeBatchRequest.LikeDelta;
+import com.yagubogu.like.dto.v1.LikeCountsResponse;
 import com.yagubogu.like.repository.LikeRepository;
 import com.yagubogu.like.repository.LikeWindowRepository;
-import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,12 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final LikeWindowRepository likeWindowRepository;
     private final GameRepository gameRepository;
-    private final MemberRepository memberRepository;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public void applyBatch(
             final long gameId,
+            final long memberId,
             final LikeBatchRequest request
     ) {
         existsGame(gameId);
@@ -34,7 +36,7 @@ public class LikeService {
         // 멱등성 키 insert (INSERT IGNORE -> 이미 처리된 배치면 재적용 금지)
         boolean inserted = likeWindowRepository.tryInsertWindow(
                 gameId,
-                request.memberId(),
+                memberId,
                 request.windowStartEpochSec()
         );
         if (!inserted) {
@@ -42,27 +44,26 @@ public class LikeService {
         }
 
         LikeDelta likeDelta = request.likeDelta();
-        likeRepository.upsertDelta(gameId, likeDelta.teamId(), likeDelta.delta());
+        Team team = getTeamByCode(likeDelta);
+        likeRepository.upsertDelta(gameId, team.getId(), likeDelta.delta());
     }
 
-    public LikeCountsResponse findCounts(final long gameId, final long memberId) {
+    public LikeCountsResponse findCounts(final long gameId) {
         existsGame(gameId);
-        existsMember(memberId);
 
-        List<TeamLikeCountResponse> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
+        List<TeamLikeCountParam> teamLikeCounts = likeRepository.findTeamCountsByGameId(gameId);
 
         return new LikeCountsResponse(gameId, teamLikeCounts);
+    }
+
+    private Team getTeamByCode(final LikeDelta likeDelta) {
+        return teamRepository.findByTeamCode(likeDelta.teamCode())
+                .orElseThrow(() -> new NotFoundException("Team not found"));
     }
 
     private void existsGame(final long gameId) {
         if (!gameRepository.existsById(gameId)) {
             throw new NotFoundException("Game not found");
-        }
-    }
-
-    private void existsMember(final long memberId) {
-        if (!memberRepository.existsById(memberId)) {
-            throw new NotFoundException("Member not found");
         }
     }
 }

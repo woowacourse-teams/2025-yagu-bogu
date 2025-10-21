@@ -1,7 +1,7 @@
 package com.yagubogu.game.repository;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.GameWithCheckIn;
+import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stadium.domain.Stadium;
 import java.time.LocalDate;
@@ -18,27 +18,22 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findByGameCode(String gameCode);
 
-    List<Game> findByDate(LocalDate date);
-
-    List<Game> findGameByDate(LocalDate date);
-
-
     @Query("""
-            SELECT new com.yagubogu.game.dto.GameWithCheckIn(
+            SELECT new com.yagubogu.game.dto.GameWithCheckInParam(
                 g.id,
                 COUNT(c),
                 CASE WHEN MAX(CASE WHEN c.member = :member THEN 1 ELSE 0 END) = 1
                              THEN true ELSE false END,
-                new com.yagubogu.game.dto.StadiumByGame(
+                new com.yagubogu.game.dto.StadiumByGameParam(
                     g.stadium.id,
                     g.stadium.fullName
                 ),
-                new com.yagubogu.game.dto.TeamByGame(
+                new com.yagubogu.game.dto.TeamByGameParam(
                     g.homeTeam.id,
                     g.homeTeam.shortName,
                     g.homeTeam.teamCode
                 ),
-                new com.yagubogu.game.dto.TeamByGame(
+                new com.yagubogu.game.dto.TeamByGameParam(
                     g.awayTeam.id,
                     g.awayTeam.shortName,
                     g.awayTeam.teamCode
@@ -49,5 +44,13 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             WHERE g.date = :date
             GROUP BY g.id
             """)
-    List<GameWithCheckIn> findGamesWithCheckInsByDate(LocalDate date, Member member);
+    List<GameWithCheckInParam> findGamesWithCheckInsByDate(LocalDate date, Member member);
+
+    @Query("""
+                select g
+                from Game g
+                join fetch g.stadium s
+                where g.date = :date
+            """)
+    List<Game> findByDateWithStadium(LocalDate date);
 }

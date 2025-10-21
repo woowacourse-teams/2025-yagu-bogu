@@ -1,20 +1,35 @@
 package com.yagubogu.member.service;
 
+import com.yagubogu.auth.dto.AuthParam;
+import com.yagubogu.auth.event.SignUpEvent;
+import com.yagubogu.badge.domain.Badge;
+import com.yagubogu.badge.dto.BadgeListResponse;
+import com.yagubogu.badge.dto.BadgeResponseWithRates;
+import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.badge.repository.MemberBadgeRepository;
 import com.yagubogu.global.exception.ConflictException;
-import com.yagubogu.auth.dto.AuthResponse;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Nickname;
-import com.yagubogu.member.dto.MemberFavoriteRequest;
-import com.yagubogu.member.dto.MemberFavoriteResponse;
-import com.yagubogu.member.dto.MemberFindResult;
-import com.yagubogu.member.dto.MemberInfoResponse;
-import com.yagubogu.member.dto.MemberNicknameRequest;
-import com.yagubogu.member.dto.MemberNicknameResponse;
+import com.yagubogu.member.dto.MemberFindResultParam;
+import com.yagubogu.member.dto.v1.MemberCheckInResponse;
+import com.yagubogu.member.dto.v1.MemberFavoriteRequest;
+import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
+import com.yagubogu.member.dto.v1.MemberInfoResponse;
+import com.yagubogu.member.dto.v1.MemberNicknameRequest;
+import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileBadgeResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
+import com.yagubogu.member.dto.v1.MemberRepresentativeBadgeResponse;
+import com.yagubogu.member.dto.v1.VictoryFairyProfileResponse;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stat.service.StatService;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +40,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
+    private final BadgeRepository badgeRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
+    private final ApplicationEventPublisher publisher;
+    private final StatService statService;
 
     @Transactional
     public MemberNicknameResponse patchNickname(final long memberId, final MemberNicknameRequest request) {
@@ -75,6 +94,30 @@ public class MemberService {
         return MemberFavoriteResponse.from(member.getTeam());
     }
 
+    @Transactional
+    public MemberRepresentativeBadgeResponse patchRepresentativeBadge(final Long memberId, final long badgeId) {
+        Member member = getMember(memberId);
+        Badge badge = getBadge(badgeId);
+        validateMemberHasBadge(member, badge);
+
+        member.updateBadge(badge);
+
+        return MemberRepresentativeBadgeResponse.from(badge);
+    }
+
+    public BadgeListResponse findBadges(final Long memberId) {
+        Member member = getMember(memberId);
+        Badge representativeBadge = member.getRepresentativeBadge();
+
+        long totalMembers = memberRepository.countByDeletedAtIsNull();
+        List<BadgeResponseWithRates> badgeResponses = badgeRepository.findAllBadgesWithAchievedCount(memberId)
+                .stream()
+                .map(raw -> BadgeResponseWithRates.from(raw, totalMembers))
+                .toList();
+
+        return BadgeListResponse.from(representativeBadge, badgeResponses);
+    }
+
     public MemberInfoResponse findMember(final Long memberId) {
         Member member = getMember(memberId);
 
@@ -82,13 +125,60 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberFindResult findMember(final AuthResponse response) {
+    public MemberFindResultParam findMember(final AuthParam response) {
         return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
-                .map(m -> new MemberFindResult(m, false))
+                .map(m -> new MemberFindResultParam(m, false))
                 .orElseGet(() -> {
                     Member savedMember = memberRepository.save(response.toMember());
-                    return new MemberFindResult(savedMember, true);
+                    publisher.publishEvent(new SignUpEvent(savedMember));
+                    return new MemberFindResultParam(savedMember, true);
                 });
+    }
+
+    @Transactional
+    public void updateProfileImageUrl(final Long memberId, final String imageUrl) {
+        Member member = getMember(memberId);
+        member.updateImageUrl(imageUrl);
+    }
+
+    private void validateMemberHasBadge(final Member member, final Badge badge) {
+        boolean hasBadge = memberBadgeRepository.existsByMemberAndBadgeAndIsAchievedTrue(member, badge);
+        if (!hasBadge) {
+            throw new NotFoundException("Member does not own this badge");
+        }
+    }
+
+    private Badge getBadge(final long badgeId) {
+        return badgeRepository.findById(badgeId)
+                .orElseThrow(() -> new NotFoundException("Badge is not found"));
+    }
+
+    public MemberProfileResponse findMemberProfile(final Long profileOwnerId) {
+        Member profileOwnerMember = getMember(profileOwnerId);
+        int currentYear = LocalDate.now().getYear();
+
+        MemberProfileBadgeResponse badgeResponse = createBadgeResponse(profileOwnerMember);
+        VictoryFairyProfileResponse victoryFairyResponse = createVictoryFairyResponse(profileOwnerId, currentYear);
+        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, currentYear);
+
+        return MemberProfileResponse.from(
+                profileOwnerMember,
+                badgeResponse,
+                victoryFairyResponse,
+                checkInResponse
+        );
+    }
+
+    private MemberProfileBadgeResponse createBadgeResponse(final Member member) {
+        return MemberProfileBadgeResponse.from(member.getRepresentativeBadge());
+    }
+
+    private VictoryFairyProfileResponse createVictoryFairyResponse(final Long memberId, final int year) {
+        return VictoryFairyProfileResponse.from(statService.findVictoryFairySummary(memberId, year));
+    }
+
+    private MemberCheckInResponse createCheckInResponse(final Long memberId, final int year) {
+        return MemberCheckInResponse.from(statService.findCheckInSummary(memberId, year));
     }
 
     private Member getMember(final long memberId) {

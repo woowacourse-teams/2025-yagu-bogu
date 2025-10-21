@@ -1,15 +1,17 @@
 package com.yagubogu.presentation.home.model
 
-import com.yagubogu.domain.model.Stadium
-
-sealed class CheckInUiEvent {
+sealed interface CheckInUiEvent {
     data class Success(
-        val stadium: Stadium,
-    ) : CheckInUiEvent()
+        val stadium: StadiumWithGame,
+    ) : CheckInUiEvent
 
-    data object OutOfRange : CheckInUiEvent()
+    data object NoGame : CheckInUiEvent
 
-    data object LocationFetchFailed : CheckInUiEvent()
+    data object OutOfRange : CheckInUiEvent
 
-    data object NetworkFailed : CheckInUiEvent()
+    data object AlreadyCheckedIn : CheckInUiEvent
+
+    data object LocationFetchFailed : CheckInUiEvent
+
+    data object NetworkFailed : CheckInUiEvent
 }

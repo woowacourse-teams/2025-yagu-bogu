@@ -2,35 +2,33 @@ package com.yagubogu.checkin.repository;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.domain.QCheckIn;
-import com.yagubogu.checkin.dto.CheckInGameResponse;
-import com.yagubogu.checkin.dto.CheckInGameTeamResponse;
-import com.yagubogu.checkin.dto.GameWithFanCountsResponse;
-import com.yagubogu.checkin.dto.StadiumCheckInCountResponse;
-import com.yagubogu.checkin.dto.TeamFilter;
-import com.yagubogu.checkin.dto.VictoryFairyRank;
+import com.yagubogu.checkin.dto.CheckInGameParam;
+import com.yagubogu.checkin.dto.CheckInGameTeamParam;
+import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
+import com.yagubogu.checkin.dto.StatCountsParam;
+import com.yagubogu.checkin.dto.VictoryFairyCountResult;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
 import com.yagubogu.game.domain.QScoreBoard;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.QMember;
-import com.yagubogu.member.domain.QNickname;
 import com.yagubogu.stadium.domain.QStadium;
-import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stat.dto.AverageStatistic;
-import com.yagubogu.stat.dto.OpponentWinRateRow;
+import com.yagubogu.stadium.domain.StadiumLevel;
+import com.yagubogu.stat.dto.AverageStatisticParam;
+import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.QTeam;
 import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.domain.TeamStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,15 +36,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
-
     private static final QCheckIn CHECK_IN = QCheckIn.checkIn;
     private static final QGame GAME = QGame.game;
     private static final QMember MEMBER = QMember.member;
-    private static final QTeam TEAM = QTeam.team;
-    private static final QNickname NICKNAME = QNickname.nickname;
     private static final QStadium STADIUM = QStadium.stadium;
+    private final JPAQueryFactory jpaQueryFactory;
 
+    @Override
+    public LocalDate findRecentCheckInGameDate(final Member member) {
+        return jpaQueryFactory
+                .select(GAME.date.max())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.eq(member),
+                        isMyCurrentFavorite(member, CHECK_IN),
+                        isCompleteOrCanceled()
+                )
+                .fetchOne();
+    }
+
+    @Override
+    public StatCountsParam findStatCounts(final Member member, final int year) {
+        LocalDate start = LocalDate.of(year, 1, 1);
+        LocalDate end = LocalDate.of(year, 12, 31);
+
+        NumberExpression<Integer> winExpr = new CaseBuilder().when(winCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> drawExpr = new CaseBuilder().when(drawCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> loseExpr = new CaseBuilder().when(loseCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+
+        return jpaQueryFactory.select(
+                        Projections.constructor(
+                                StatCountsParam.class,
+                                winExpr.sum(),
+                                drawExpr.sum(),
+                                loseExpr.sum()
+                        )).from(CHECK_IN)
+                .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
+                .where(
+                        CHECK_IN.member.eq(member),
+                        GAME.date.between(start, end),
+                        isMyCurrentFavorite(member, CHECK_IN)
+                ).fetchOne();
+    }
 
     @Override
     public int findWinCounts(final Member member, final int year) {
@@ -64,8 +96,67 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
+    public List<VictoryFairyCountResult> findCheckInAndWinCountBatch(final List<Long> memberIds, final int year) {
+        return jpaQueryFactory
+                .select(
+                        Projections.constructor(
+                                VictoryFairyCountResult.class,
+                                CHECK_IN.member.id,
+                                new CaseBuilder()
+                                        .when(drawCondition(CHECK_IN, GAME).not())
+                                        .then(1)
+                                        .otherwise(0)
+                                        .sum()
+                                        .intValue(),
+                                new CaseBuilder()
+                                        .when(winCondition(CHECK_IN, GAME))
+                                        .then(1)
+                                        .otherwise(0)
+                                        .sum()
+                                        .intValue()
+                        )
+                )
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.id.in(memberIds),
+                        isBetweenYear(year),
+                        isComplete()
+                )
+                .groupBy(CHECK_IN.member.id)
+                .fetch();
+    }
+
+    @Override
     public int findRecentGamesWinCounts(final Member member, final int year, final int limit) {
         return conditionCountOnRecentGames(member, year, winCondition(QCheckIn.checkIn, QGame.game), limit);
+    }
+
+    @Override
+    public List<Long> findWinMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(winCondition(CHECK_IN, GAME))
+                .fetch();
+    }
+
+    @Override
+    public List<Long> findLoseMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(loseCondition(CHECK_IN, GAME))
+                .fetch();
+    }
+
+    @Override
+    public List<Long> findDrawMemberIdByGameId(final long gameId) {
+        return jpaQueryFactory.select(CHECK_IN.member.id)
+                .from(CHECK_IN)
+                .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
+                .where(drawCondition(CHECK_IN, GAME))
+                .fetch();
     }
 
     @Override
@@ -94,7 +185,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         Tuple tuple = jpaQueryFactory.select(w, n)
                 .from(MEMBER)
                 .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year))
                 .where(isMemberNotDeleted()).fetchOne();
 
         long winCounts =
@@ -122,156 +213,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return (perCheckInCount == 0) ? 0.0 : (double) totalCheckInCount / perCheckInCount;
     }
 
-    /**
-     * 전체 유저 중 "승리 요정 랭킹" 상위 N명을 조회
-     * <p>
-     * - 베이즈 평균 공식을 기반으로 점수(score)를 계산 score = (W + C * m) / (N + C) W: 개인 승리 횟수 N: 개인 직관 수 m: 전체 평균 승률 C: 전체 평균 직관 횟수
-     *
-     * @param m          전체 유저 평균 승률
-     * @param c          전체 유저 평균 직관 횟수
-     * @param year       기준 연도
-     * @param teamFilter 팀 필터(ALL 또는 특정 팀만 조회)
-     * @param limit      상위 N명 제한
-     * @return VictoryFairyRank DTO 리스트 (상위 랭킹)
-     */
-    @Override
-    public List<VictoryFairyRank> findTopVictoryRanking(
-            final double m,
-            final double c,
-            final int year,
-            final TeamFilter teamFilter,
-            final int limit
-    ) {
-        NumberExpression<Long> w = calculateWinCounts(year);
-        NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
-
-        NumberExpression<Double> calculatePercent = w.multiply(100.0).divide(n).doubleValue();
-        NumberExpression<Double> safeWinPercent = getSafeWinPercent(n, calculatePercent);
-
-        return jpaQueryFactory.select(
-                        Projections.constructor(
-                                VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
-                                MEMBER.team.shortName, safeWinPercent))
-                .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
-                .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
-                .where(isMemberNotDeleted(), filterByTeam(teamFilter))
-                .groupBy(MEMBER.id, MEMBER.nickname, MEMBER.imageUrl, MEMBER.team.shortName)
-                .orderBy(score.desc()).limit(limit).fetch();
-    }
-
-    /**
-     * 특정 유저의 승리 요정 랭킹 점수 및 정보 조회
-     *
-     * @param m            전체 유저 평균 승률
-     * @param c            전체 유저 평균 직관 횟수
-     * @param targetMember 조회 대상 유저
-     * @param year         기준 연도
-     * @param teamFilter   팀 필터
-     * @return VictoryFairyRank DTO (단일 유저의 랭킹 정보)
-     */
-    public VictoryFairyRank findMyRanking(
-            final double m,
-            final double c,
-            final Member targetMember,
-            final int year,
-            final TeamFilter teamFilter
-    ) {
-        NumberExpression<Long> w = calculateWinCounts(year);
-        NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
-
-        NumberExpression<Double> calculatePercent = w.multiply(100.0).divide(n).doubleValue();
-
-        NumberExpression<Double> safeWinPercent = getSafeWinPercent(n, calculatePercent);
-
-        return jpaQueryFactory.select(
-                        Projections.constructor(VictoryFairyRank.class, score, NICKNAME.value, MEMBER.imageUrl,
-                                MEMBER.team.shortName, safeWinPercent))
-                .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year), isMyTeamInGame())
-                .leftJoin(TEAM).on(MEMBER.team.eq(TEAM))
-                .where(
-                        MEMBER.eq(targetMember),
-                        filterByTeam(teamFilter),
-                        isMemberNotDeleted()
-                )
-                .groupBy(MEMBER.id, MEMBER.nickname, MEMBER.imageUrl, MEMBER.team.shortName)
-                .fetchOne();
-    }
-
-    /**
-     * 특정 유저의 점수를 기준으로 "내 위에 몇 명이 있는지" 순위를 계산
-     * <p>
-     * - targetScore보다 점수가 높은 유저 수를 계산하여, "내 순위 = (해당 수 + 1)"로 환산 가능
-     *
-     * @param targetScore 조회 대상 유저의 베이즈 평균 점수
-     * @param m           전체 유저 평균 승률
-     * @param c           전체 유저 평균 직관 횟수
-     * @param year        기준 연도
-     * @param teamFilter  팀 필터
-     * @return 나보다 점수가 높은 유저 수 (즉, 내 순위 - 1)
-     */
-    public int calculateMyRankingOrder(
-            final double targetScore,
-            final double m,
-            final double c,
-            final int year,
-            final TeamFilter teamFilter
-    ) {
-        NumberExpression<Long> w = calculateWinCounts(year);
-        NumberExpression<Long> n = calculateTotalCountsWithoutDraws(year);
-        NumberExpression<Double> score = calculateWinRankingScore(m, c, w, n);
-
-        Expression<Double> myScore = Expressions.constant(targetScore);
-        return jpaQueryFactory.selectOne()
-                .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER))
-                .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
-                .leftJoin(TEAM).on(CHECK_IN.team.eq(TEAM))
-                .where(filterByTeam(teamFilter), isMemberNotDeleted())
-                .groupBy(MEMBER)
-                .having(score.gt(myScore))
-                .fetch().size();
-    }
-
-    // 구장 방문 총 횟수
-    // 행운의 구장 계산시 사용
-    // 구장별 승률 => 해당 구장에서 승리한 횟수 / (해당 구장에서 승리한 횟수 + 해당 구장에서 패배한 횟수)
-    // 경기 완료 여부 o, 무승부 x, 내 응원팀 여부 o
-    public int countTotalFavoriteTeamGamesByStadiumAndMember(Stadium stadium, Member member, int year) {
-        return jpaQueryFactory.select(CHECK_IN.count())
-                .from(CHECK_IN)
-                .join(CHECK_IN.game, GAME)
-                .where(
-                        CHECK_IN.member.eq(member),
-                        isBetweenYear(GAME, year),
-                        GAME.stadium.eq(stadium),
-                        isMyCurrentFavorite(member, CHECK_IN),
-                        drawCondition(CHECK_IN, GAME).not(),
-                        GAME.gameState.eq(GameState.COMPLETED)
-                )
-                .fetchOne()
-                .intValue();
-    }
-
-    public int countWinsFavoriteTeamByStadiumAndMember(Stadium stadium, Member member, int year) {
-        return jpaQueryFactory.select(CHECK_IN.count())
-                .from(CHECK_IN)
-                .join(CHECK_IN.game, GAME)
-                .where(
-                        CHECK_IN.member.eq(member),
-                        isBetweenYear(CHECK_IN.game, year),
-                        isMyCurrentFavorite(member, CHECK_IN),
-                        winCondition(CHECK_IN, CHECK_IN.game),
-                        GAME.stadium.eq(stadium)
-                ).fetchOne()
-                .intValue();
-    }
-
     // 경기 완료 여부 관계 x, 내 응원 팀 여부 관계 x
     // 내 인증 횟수 반환
     public int countByMemberAndYear(Member member, int year) {
@@ -293,7 +234,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 내 직관 내역 조회
     // 내 응원 팀 여부 관계 o, 게임 완료 여부 관계 x(취소된 경기도 보여줌)
-    public List<CheckInGameResponse> findCheckInHistory(
+    public List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
             int year,
@@ -308,7 +249,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         BooleanExpression myTeamWinFilter = getMyTeamWinFilter(resultFilter, CHECK_IN);
         OrderSpecifier<LocalDate> order = getOrderByFilter(orderFilter, GAME);
         return jpaQueryFactory.select(Projections.constructor(
-                        CheckInGameResponse.class,
+                        CheckInGameParam.class,
                         CHECK_IN.id,
                         STADIUM.fullName,
                         homeTeamResp(GAME, home, team),
@@ -326,13 +267,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.eq(member),
                         isBetweenYear(GAME, year),
-                        isFinished(), // 버저닝 후 삭제 예정(취소된 경기도 보여주도록)
+                        isCompleteOrCanceled(),
                         myTeamWinFilter
                 ).orderBy(order)
                 .fetch();
     }
 
-    public List<GameWithFanCountsResponse> findGamesWithFanCountsByDate(LocalDate date) {
+    public List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date) {
         QCheckIn CHECK_IN = QCheckIn.checkIn;
         QTeam home = new QTeam("home");
         QTeam away = new QTeam("away");
@@ -347,7 +288,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory.select(
                         Projections.constructor(
-                                GameWithFanCountsResponse.class,
+                                GameWithFanCountsParam.class,
                                 GAME,
                                 CHECK_IN.id.count(),
                                 homeFans,
@@ -364,7 +305,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 현재 내가 응원하는 팀만 통계에 집계한다
     // 내가 응원하는 팀 o, 경기 완료된 것 o(경기 완료된 것만 통계에 집계)
-    public AverageStatistic findAverageStatistic(Member member) {
+    public AverageStatisticParam findAverageStatistic(Member member) {
         NumberExpression<Integer> myRuns = new CaseBuilder()
                 .when(GAME.homeTeam.eq(CHECK_IN.team)).then(GAME.homeScoreBoard.runs)
                 .when(GAME.awayTeam.eq(CHECK_IN.team)).then(GAME.awayScoreBoard.runs)
@@ -392,7 +333,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory
                 .select(Projections.constructor(
-                        AverageStatistic.class,
+                        AverageStatisticParam.class,
                         myRuns.avg(),
                         opponentRuns.avg(),
                         myErrors.avg(),
@@ -402,7 +343,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(CHECK_IN.game, GAME)
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.homeTeam.eq(CHECK_IN.team).or(GAME.awayTeam.eq(CHECK_IN.team)),
+                        isCompleteOrCanceled(),
                         isMyCurrentFavorite(member, CHECK_IN),
                         GAME.gameState.eq(GameState.COMPLETED)
                 ).fetchOne();
@@ -410,14 +351,14 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 구장별 인증 횟수
     // 내가 응원하는 팀 o, 완료된 경기만 x
-    public List<StadiumCheckInCountResponse> findStadiumCheckInCounts(
+    public List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
             int year
     ) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(
-                                StadiumCheckInCountResponse.class,
+                                StadiumCheckInCountParam.class,
                                 STADIUM.id,
                                 STADIUM.location,
                                 CHECK_IN.id.count()
@@ -426,11 +367,13 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         CHECK_IN.game.stadium.eq(STADIUM)
                                 .and(CHECK_IN.member.eq(member))
                                 .and(isBetweenYear(CHECK_IN.game, year))
-                ).groupBy(STADIUM.id, STADIUM.location)
+                )
+                .where(STADIUM.level.eq(StadiumLevel.MAIN))
+                .groupBy(STADIUM.id, STADIUM.location)
                 .fetch();
     }
 
-    public List<OpponentWinRateRow> findOpponentWinRates(
+    public List<OpponentWinRateRowParam> findOpponentWinRates(
             Member member,
             Team team,
             int year
@@ -472,7 +415,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         return jpaQueryFactory
                 .select(Projections.constructor(
-                        OpponentWinRateRow.class,
+                        OpponentWinRateRowParam.class,
                         opponentTeam.id,
                         opponentTeam.name,
                         opponentTeam.shortName,
@@ -484,7 +427,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .from(opponentTeam)
                 .leftJoin(GAME).on(gameOnOpponent)
                 .leftJoin(CHECK_IN).on(CHECK_IN.game.eq(GAME).and(checkInFilter))
-                .where(opponentTeam.ne(team))
+                .where(opponentTeam.ne(team).and(opponentTeam.status.eq(TeamStatus.ACTIVE)))
                 .groupBy(opponentTeam.id, opponentTeam.name, opponentTeam.shortName, opponentTeam.teamCode)
                 .fetch();
     }
@@ -504,6 +447,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         qCheckIn.member.eq(member),
                         qGame.date.between(start, end),
                         qGame.gameState.eq(GameState.COMPLETED),
+                        isMyCurrentFavorite(member, CHECK_IN),
                         condition
                 )
                 .fetchOne();
@@ -511,33 +455,16 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return result.intValue();
     }
 
-    private NumberExpression<Double> getSafeWinPercent(
-            final NumberExpression<Long> total,
-            final NumberExpression<Double> calculatePercent
-    ) {
-        return new CaseBuilder().when(total.gt(0)).then(calculatePercent).otherwise(0.0);
-    }
-
     private BooleanExpression isMemberNotDeleted() {
         return MEMBER.deletedAt.isNull();
     }
 
-    private NumberExpression<Double> calculateWinRankingScore(
-            final double m,
-            final double c,
-            final NumberExpression<Long> wins,
-            final NumberExpression<Long> total
-    ) {
-        NumberExpression<Double> denominator = total.doubleValue().add(Expressions.constant(c));
-        NumberExpression<Double> numerator = wins.doubleValue().add(Expressions.constant(c * m));
-
-        return new CaseBuilder().when(denominator.ne(0.0))
-                .then(numerator.divide(denominator))
-                .otherwise(0.0);
+    private BooleanExpression isComplete() {
+        return GAME.gameState.eq(GameState.COMPLETED);
     }
 
-    private BooleanExpression isFinished() {
-        return GAME.gameState.eq(GameState.COMPLETED);
+    private BooleanExpression isCompleteOrCanceled() {
+        return GAME.gameState.eq(GameState.COMPLETED).or(GAME.gameState.eq(GameState.CANCELED));
     }
 
     private BooleanExpression isBetweenYear(final int year) {
@@ -547,18 +474,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return GAME.date.between(start, end);
     }
 
-    private BooleanExpression filterByTeam(final TeamFilter teamFilter) {
-        if (teamFilter == TeamFilter.ALL) {
-            return Expressions.TRUE.isTrue();
-        }
-
-        return TEAM.teamCode.eq(teamFilter.name());
-    }
-
     private Long calculateTotalCheckInCount(final int year) {
         return jpaQueryFactory.select(CHECK_IN.count())
                 .from(CHECK_IN)
-                .join(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .join(GAME)
+                .on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }
@@ -575,20 +495,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .sum();
     }
 
-    private NumberExpression<Long> calculateTotalCountsWithoutDraws(final int year) {
-        return new CaseBuilder()
-                .when(GAME.gameState.eq(GameState.COMPLETED)
-                        .and(GAME.homeScore.ne(GAME.awayScore))
-                        .and(isBetweenYear(year)))
-                .then(1L)
-                .otherwise(0L)
-                .sum();
-    }
-
     private Long calculatePerCheckInCount(final int year) {
         return jpaQueryFactory.select(MEMBER.countDistinct())
                 .from(CHECK_IN)
-                .join(GAME).on(CHECK_IN.game.eq(GAME), isFinished(), isBetweenYear(year))
+                .join(GAME)
+                .on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
                 .fetchOne();
     }
@@ -682,9 +593,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
 
-    private ConstructorExpression<CheckInGameTeamResponse> homeTeamResp(QGame g, final QTeam home, Team team) {
+    private ConstructorExpression<CheckInGameTeamParam> homeTeamResp(QGame g, final QTeam home, Team team) {
         return Projections.constructor(
-                CheckInGameTeamResponse.class,
+                CheckInGameTeamParam.class,
                 home.teamCode,
                 home.shortName,
                 g.homeScore,
@@ -693,9 +604,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         );
     }
 
-    private ConstructorExpression<CheckInGameTeamResponse> awayTeamResp(QGame g, final QTeam away, Team team) {
+    private ConstructorExpression<CheckInGameTeamParam> awayTeamResp(QGame g, final QTeam away, Team team) {
         return Projections.constructor(
-                CheckInGameTeamResponse.class,
+                CheckInGameTeamParam.class,
                 away.teamCode,
                 away.shortName,
                 g.awayScore,
@@ -713,10 +624,5 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         LocalDate end = LocalDate.of(year, 12, 31);
 
         return game.date.between(start, end);
-    }
-
-    private BooleanExpression isMyTeamInGame() {
-        return MEMBER.team.eq(GAME.homeTeam)
-                .or(MEMBER.team.eq(GAME.awayTeam));
     }
 }

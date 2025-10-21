@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: yagubogu-backend
-
   profiles:
     active: local
 
@@ -68,16 +65,38 @@ api:
     read-timeout: 30s
     content-type: application/x-www-form-urlencoded; charset=UTF-8
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics
+kbo:
+  crawler:
+    base-url: https://www.koreabaseball.com/Schedule/ScoreBoard.aspx
+    navigation-timeout: 7s
+    table-timeout: 3s
+    wait-timeout: 3s
+    max-retries: 1
+    retry-delay: 500ms
+    context-pool-size: 2
+
+    # 셀렉터
+    date-field-selector: "#cphContents_cphContents_cphContents_hfSearchDate"
+    date-label-selector: "#cphContents_cphContents_cphContents_lblGameDate"
+    update-panel-selector: "#cphContents_cphContents_cphContents_udpRecord"
+    score-selector: ".smsScore"
+
+    # WebForms 포스트백 타겟
+    event-target: "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$btnCalendarSelect"
+
+    runner:
+      enabled: false
+      schedule-type: "regular"
 
 sse:
   heartbeat:
     enabled: true
     interval-ms: 25000
+
+app:
+  s3:
+    bucket: techcourse-project-2025
+    presign-expiration: 5m
 
 ---
 spring:

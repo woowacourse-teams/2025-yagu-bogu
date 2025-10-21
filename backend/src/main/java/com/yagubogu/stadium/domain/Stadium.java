@@ -2,6 +2,8 @@ package com.yagubogu.stadium.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,12 +38,17 @@ public class Stadium {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false)
+    private StadiumLevel level;
+
     public Stadium(final String fullName, final String shortName, final String location, final Double latitude,
-                   final Double longitude) {
+                   final Double longitude, final StadiumLevel level) {
         this.fullName = fullName;
         this.shortName = shortName;
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.level = level;
     }
 }

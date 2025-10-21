@@ -19,6 +19,25 @@ spring:
   flyway:
     enabled: true
 
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      app: yagubogu
+      env: prod
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  tracing:
+    sampling:
+      probability: 0.2
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_SERVER_IP}:4317
+
 springdoc:
   api-docs:
     path: /api-docs
@@ -30,28 +49,3 @@ springdoc:
 server:
   shutdown: graceful
   forward-headers-strategy: native
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
-
-  tracing:
-    sampling:
-      probability: 0.2
-
-  otlp:
-    tracing:
-      endpoint: ${MONITORING_SERVER_URL}
-
-  metrics:
-    tags:
-      app: yagubogu
-      env: prod
-
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-

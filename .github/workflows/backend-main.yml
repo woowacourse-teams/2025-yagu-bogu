@@ -9,34 +9,21 @@ env:
   IMAGE: yagubogu/yagubogu-backend
 
 jobs:
-  ci:
+  release:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
-      next_version: ${{ steps.semver.outputs.next_version }}
-      next_version_with_v: ${{ steps.ver.outputs.next_version_with_v }}
-      digest: ${{ steps.capture_and_alias.outputs.digest }}
-      img_tag: ${{ steps.capture_and_alias.outputs.image_tag }}
+      next_version: ${{ steps.semver.outputs.next_version }}     # 1.0.1
+      next_version_with_v: ${{ steps.ver.outputs.next_version_with_v }}             # v1.0.1
+      digest: ${{ steps.capture.outputs.digest }}          # sha256:...
+      img_tag: ${{ steps.alias.outputs.image_tag }}         # v1.0.1-abcdef12
     steps:
       - name: Checkout (with tags)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'corretto'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Run Tests
-        working-directory: ./backend
-        run: ./gradlew test
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
@@ -46,6 +33,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
           password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
+
+      - name: Ensure dev-latest exists
+        run: docker buildx imagetools inspect $IMAGE:dev-latest > /dev/null
 
       - id: semver
         name: Decide bump from PR labels -> compute next version
@@ -95,63 +85,46 @@ jobs:
             git push origin "$VER"
           fi
 
-      - name: Docker Image Build & Push (main branch)
-        working-directory: ./backend
-        run: |
-          TAG_PROD="${{ steps.ver.outputs.next_version_with_v }}"
-          docker buildx build \
-            --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max \
-            --cache-from=type=registry,ref=$IMAGE:build-cache \
-            -f Dockerfile \
-            --platform linux/arm64 \
-            -t $IMAGE:$TAG_PROD \
-            --push \
-            .
-
-      - id: capture_and_alias
-        name: Capture digest and create final tag
+      - id: capture
+        name: Capture image digest of dev-latest
         shell: bash
         run: |
           set -euo pipefail
-          TAG_TEMP="${{ steps.ver.outputs.next_version_with_v }}"
-
-          # Digest 추출 (retry 로직 포함)
           DIGEST=""
+          # 레지스트리 전파 지연 대비(최대 10회, 3초 간격)
           for i in {1..10}; do
-            DIGEST="$(docker buildx imagetools inspect "$IMAGE:$TAG_TEMP" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
+            DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1 || true)"
             [ -n "$DIGEST" ] && break
             echo "waiting manifest... ($i/10)"; sleep 3
           done
-          [ -n "$DIGEST" ] || { echo "Digest not found for $IMAGE:$TAG_TEMP" >&2; exit 1; }
+          [ -n "$DIGEST" ] || { echo "Digest not found for $IMAGE:dev-latest" >&2; exit 1; }
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "Captured digest: $DIGEST"
 
-          # Short digest 생성
+      - id: alias
+        name: Create readable alias tag <VER>-<short>
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIGEST="$(docker buildx imagetools inspect "$IMAGE:dev-latest" | sed -n 's/^Digest:[[:space:]]*//p' | head -n1)"
           SHORT="${DIGEST#sha256:}"
           SHORT="${SHORT:0:8}"
-
-          # 최종 태그 생성 (v1.0.1-abcdef12)
-          TAG_FINAL="${{ steps.ver.outputs.next_version_with_v }}-${SHORT}"
-
-          # 최종 태그로 alias 생성
+          READABLE="${{ steps.ver.outputs.next_version_with_v }}-${SHORT}"
           docker buildx imagetools create \
-            -t "$IMAGE:$TAG_FINAL" \
-            "$IMAGE:$TAG_TEMP"
-
+            -t "$IMAGE:$READABLE" \
+            "$IMAGE:dev-latest"
+          echo "image_tag=$READABLE" >> "$GITHUB_OUTPUT"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-          echo "image_tag=$TAG_FINAL" >> "$GITHUB_OUTPUT"
-          
-          echo "✅ Built: $TAG_TEMP"
-          echo "✅ Final: $TAG_FINAL"
-          echo "✅ Digest: $DIGEST"
 
   cd:
-    needs: ci
+    needs: release
     runs-on: [ self-hosted, production ]
     env:
       IMAGE: yagubogu/yagubogu-backend
-      NEXT_VERSION: ${{ needs.ci.outputs.next_version }}              # ✅ 수정
-      NEXT_VERSION_WITH_V: ${{ needs.ci.outputs.next_version_with_v }} # ✅ 수정
-      DIGEST: ${{ needs.ci.outputs.digest }}                          # ✅ 수정
-      IMG_TAG: ${{ needs.ci.outputs.img_tag }}                        # ✅ 수정
+      NEXT_VERSION: ${{ needs.release.outputs.next_version }}   # 1.0.1
+      NEXT_VERSION_WITH_V: ${{ needs.release.outputs.next_version_with_v }}   # v1.0.1
+      DIGEST: ${{ needs.release.outputs.digest }}    # sha256:
+      IMG_TAG: ${{ needs.release.outputs.img_tag }}   # v1.0.1-abcdef12
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3.3.0
@@ -194,10 +167,10 @@ jobs:
             -e DB_URL="${{ secrets.DB_PROD_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e MONITORING_SERVER_IP="${{ secrets.MONITORING_SERVER_IP }}" \
             -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
             -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
             -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-            -e MONITORING_SERVER_URL="${{ secrets.MONITORING_SERVER_URL }}" \
             -l app=yagubogu-backend \
             -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \

@@ -5,5 +5,5 @@ data class VictoryFairyItem(
     val nickname: String,
     val profileImageUrl: String,
     val teamName: String,
-    val winRate: Double,
+    val score: Double,
 )

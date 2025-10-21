@@ -20,6 +20,14 @@ class AttendanceHistoryAdapter(
 
             AttendanceHistoryItem.ViewType.DETAIL ->
                 AttendanceHistoryDetailViewHolder.from(parent, attendanceHistoryDetailHandler)
+
+            AttendanceHistoryItem.ViewType.CANCELED ->
+                AttendanceHistorySummaryViewHolder.from(
+                    parent,
+                    object : AttendanceHistorySummaryViewHolder.Handler {
+                        override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) = Unit
+                    },
+                )
         }
 
     override fun onBindViewHolder(
@@ -32,6 +40,9 @@ class AttendanceHistoryAdapter(
 
             is AttendanceHistoryItem.Detail ->
                 (holder as AttendanceHistoryDetailViewHolder).bind(item)
+
+            is AttendanceHistoryItem.Canceled ->
+                (holder as AttendanceHistorySummaryViewHolder).bind(item.summary)
         }
     }
 
@@ -51,6 +62,10 @@ class AttendanceHistoryAdapter(
 
                         oldItem is AttendanceHistoryItem.Detail &&
                             newItem is AttendanceHistoryItem.Detail ->
+                            oldItem.summary.id == newItem.summary.id
+
+                        oldItem is AttendanceHistoryItem.Canceled &&
+                            newItem is AttendanceHistoryItem.Canceled ->
                             oldItem.summary.id == newItem.summary.id
 
                         else -> false

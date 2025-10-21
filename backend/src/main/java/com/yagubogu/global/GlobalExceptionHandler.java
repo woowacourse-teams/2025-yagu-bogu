@@ -1,16 +1,25 @@
 package com.yagubogu.global;
 
+import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
+import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,14 +40,55 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 400 JSON 파싱 실패, 바인딩/검증 실패, 타입/형변환 문제
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleNotReadable(HttpMessageNotReadableException e) {
+        log.info("[HttpMessageNotReadableException] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Invalid JSON request body");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleValidation(MethodArgumentNotValidException e) {
+        log.info("[MethodArgumentNotValid] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Validation failed");
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleConversion(HttpMessageConversionException e) {
+        log.info("[HttpMessageConversion] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Type conversion failed");
+    }
+
+    /**
      * 401 UnAuthorized
      */
-    @ExceptionHandler(value = UnAuthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ExceptionResponse handleUnAuthorizedException(final UnAuthorizedException e) {
-        log.warn("[UnAuthorizedException]- {}", e.getMessage());
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<?> handleUnAuthorizedException(
+            final UnAuthorizedException e,
+            final HttpServletRequest request
+    ) {
+        final String accept = request.getHeader(org.springframework.http.HttpHeaders.ACCEPT);
+        final boolean isSse = accept != null && accept.contains(MediaType.TEXT_EVENT_STREAM_VALUE);
 
-        return new ExceptionResponse(e.getMessage());
+        log.warn("[UnAuthorizedException] {}", e.getMessage());
+
+        if (isSse) {
+            // ⚠️ SSE는 JSON 바디를 쓰면 협상 충돌(406/500) 위험 → 상태코드만
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 일반 요청: JSON 바디 반환
+        ExceptionResponse body = new ExceptionResponse(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body);
     }
 
     /**
@@ -75,6 +125,28 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 413 Payload Too Large
+     */
+    @ExceptionHandler(value = PayloadTooLargeException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ExceptionResponse handlePayloadTooLarge(final PayloadTooLargeException e) {
+        log.info("[PayloadTooLargeException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 415 Unsupported Media Type
+     */
+    @ExceptionHandler(value = UnsupportedMediaTypeException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public ExceptionResponse handleUnsupportedMediaType(final PayloadTooLargeException e) {
+        log.info("[UnsupportedMediaTypeException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
      * 422 UnprocessableEntity
      */
     @ExceptionHandler(value = UnprocessableEntityException.class)
@@ -86,23 +158,34 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 500 GameSyncException
+     */
+    @ExceptionHandler(GameSyncException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleGameSyncException(final GameSyncException e) {
+        log.warn("[GameSyncException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
      * 500 Internal Server Error
      */
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        log.error("[YaguBoguException]- {}", e.getMessage());
+        log.error("[{}]- {} AT {}", e.getClass().getSimpleName(), safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
-        String message = "Unexpected server error is occurred";
-        log.error("[RuntimeException] Unhandled runtime exception", runtimeException);
-        log.error("[RuntimeException] Message", runtimeException.getMessage());
+    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
+        String simpleName = e.getClass().getSimpleName();
+        log.error("[{}] - {} AT {}", simpleName, safeMsg(e.getMessage()), firstLine(e));
 
+        String message = "Unexpected server error is occurred";
         return new ExceptionResponse(message);
     }
 
@@ -112,8 +195,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadGatewayException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
-        log.warn("[BadGatewayException]- {}", e.getMessage());
+        log.warn("[BadGatewayException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    private String firstLine(Throwable t) {
+        if (t.getStackTrace().length > 0) {
+            return t.getStackTrace()[0].toString();
+        }
+
+        return "no stack trace";
+    }
+
+    private String safeMsg(String msg) {
+        if (msg == null) {
+            return "";
+        }
+        String trimmed = msg.length() > 300 ? msg.substring(0, 300) + "..." : msg;
+
+        return trimmed.replaceAll("(?i)(token|authorization|password)=\\S+", "$1=***");
     }
 }

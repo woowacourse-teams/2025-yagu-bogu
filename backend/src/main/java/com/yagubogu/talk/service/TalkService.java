@@ -8,10 +8,12 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.talk.domain.Talk;
-import com.yagubogu.talk.dto.CursorResult;
-import com.yagubogu.talk.dto.TalkCursorResult;
-import com.yagubogu.talk.dto.TalkRequest;
-import com.yagubogu.talk.dto.TalkResponse;
+import com.yagubogu.talk.dto.CursorResultParam;
+import com.yagubogu.talk.dto.event.TalkEvent;
+import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
+import com.yagubogu.talk.dto.v1.TalkEntranceResponse;
+import com.yagubogu.talk.dto.v1.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -36,8 +39,19 @@ public class TalkService {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
+    private final ApplicationEventPublisher publisher;
 
-    public TalkCursorResult findTalksExcludingReported(
+    public TalkEntranceResponse findInitialTalksExcludingReported(
+            final long gameId,
+            final long memberId
+    ) {
+        Game game = getGame(gameId);
+        Member member = getMember(memberId);
+
+        return TalkEntranceResponse.from(game, member);
+    }
+
+    public TalkCursorResultResponse findTalksExcludingReported(
             final long gameId,
             final Long cursorId,
             final int limit,
@@ -49,14 +63,13 @@ public class TalkService {
         Long nextCursorId = getNextCursorIdOrNull(talkResponses.hasNext(), talkResponses);
         List<TalkResponse> hiddenReportedTalks = hideReportedTalks(talkResponses.getContent(), memberId);
 
-        Game game = getGame(gameId);
-        CursorResult<TalkResponse> cursorResult = new CursorResult<>(hiddenReportedTalks, nextCursorId,
+        CursorResultParam<TalkResponse> cursorResultParam = new CursorResultParam<>(hiddenReportedTalks, nextCursorId,
                 talkResponses.hasNext());
 
-        return TalkCursorResult.from(game, cursorResult);
+        return new TalkCursorResultResponse(cursorResultParam);
     }
 
-    public TalkCursorResult findNewTalks(
+    public TalkCursorResultResponse findNewTalks(
             final long gameId,
             final long cursorId,
             final long memberId,
@@ -67,11 +80,10 @@ public class TalkService {
         Slice<TalkResponse> talkResponses = talks.map(talk -> TalkResponse.from(talk, memberId));
 
         long nextCursorId = getNextCursorIdOrStay(cursorId, talkResponses);
-        Game game = getGame(gameId);
-        CursorResult<TalkResponse> cursorResult = new CursorResult<>(talkResponses.getContent(),
+        CursorResultParam<TalkResponse> cursorResultParam = new CursorResultParam<>(talkResponses.getContent(),
                 nextCursorId, talkResponses.hasNext());
 
-        return TalkCursorResult.from(game, cursorResult);
+        return new TalkCursorResultResponse(cursorResultParam);
     }
 
     @Transactional
@@ -87,6 +99,7 @@ public class TalkService {
         validateBlockedFromGame(gameId, memberId);
 
         Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
+        publisher.publishEvent(new TalkEvent(member));
 
         return TalkResponse.from(talk, memberId);
     }
@@ -104,7 +117,7 @@ public class TalkService {
         }
 
         if (isValidMemberId(memberId, talk)) {
-            throw new ForbiddenException("Invalid memberId for the talk");
+            throw new ForbiddenException("Invalid member for the talk");
         }
 
         talkRepository.delete(talk);
@@ -133,6 +146,15 @@ public class TalkService {
                 .toList();
     }
 
+    private Slice<TalkResponse> getInitialTalkResponses(
+            final long gameId,
+            final long memberId,
+            final Pageable pageable
+    ) {
+        Slice<Talk> talks = talkRepository.fetchRecentTalks(gameId, pageable);
+        return talks.map(talk -> TalkResponse.from(talk, memberId));
+    }
+
     private Slice<TalkResponse> getTalkResponses(
             final long gameId,
             final Long cursorId,
@@ -144,6 +166,7 @@ public class TalkService {
             return talks.map(talk -> TalkResponse.from(talk, memberId));
         }
         Slice<Talk> talks = talkRepository.fetchTalksBeforeCursor(gameId, cursorId, pageable);
+
         return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 
