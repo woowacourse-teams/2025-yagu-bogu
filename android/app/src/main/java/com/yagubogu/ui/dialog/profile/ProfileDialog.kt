@@ -1,7 +1,6 @@
 package com.yagubogu.ui.dialog.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
+import com.yagubogu.ui.util.noRippleClickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +65,7 @@ private fun CancelButton(
             imageVector = Icons.Default.Close,
             contentDescription = "닫기",
             tint = Gray500,
-            modifier = Modifier.clickable(onClick = onClick),
+            modifier = Modifier.noRippleClickable(onClick = onClick),
         )
     }
 }
