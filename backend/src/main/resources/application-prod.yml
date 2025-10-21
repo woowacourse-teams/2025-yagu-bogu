@@ -20,11 +20,23 @@ spring:
     enabled: true
 
 management:
-  endpoints.web.exposure.include: health, metrics, prometheus
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
     tags:
       app: yagubogu
       env: prod
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  tracing:
+    sampling:
+      probability: 0.2
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_SERVER_IP}:4317
 
 springdoc:
   api-docs:
