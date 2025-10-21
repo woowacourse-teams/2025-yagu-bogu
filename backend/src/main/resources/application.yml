@@ -114,4 +114,10 @@ spring:
 spring:
   config:
     activate:
+      on-profile: k6
+
+---
+spring:
+  config:
+    activate:
       on-profile: prod
