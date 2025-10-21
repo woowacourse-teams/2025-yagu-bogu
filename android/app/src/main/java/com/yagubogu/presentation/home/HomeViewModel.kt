@@ -267,8 +267,8 @@ class HomeViewModel(
         viewModelScope.launch {
             checkInRepository
                 .getCheckInStatus(date)
-                .onSuccess { checkInStatus: Boolean ->
-                    if (checkInStatus) {
+                .onSuccess { hasCheckedIn: Boolean ->
+                    if (hasCheckedIn) {
                         _dialogEvent.emit(HomeDialogEvent.AdditionalCheckInDialog)
                     } else {
                         fetchCurrentLocationThenCheckIn()
