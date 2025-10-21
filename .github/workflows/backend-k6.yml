@@ -5,6 +5,7 @@ on:
     branches: [ "dev-k6" ]
     paths:
       - "backend/**"
+      - ".github/workflows"
   workflow_dispatch:
 
 env:
