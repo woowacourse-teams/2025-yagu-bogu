@@ -71,7 +71,7 @@ jobs:
 
   cd:
     needs: build
-    runs-on: [ self-hosted, develop ]
+    runs-on: [ self-hosted, dev-k6 ]
     env:
       IMAGE: yagubogu/yagubogu-backend
       TAG: "dev-latest"
