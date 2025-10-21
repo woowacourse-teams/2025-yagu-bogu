@@ -51,3 +51,4 @@ oauth:
     client-id: ${GOOGLE_CLIENT_ID}
     connect-timeout: 180s
     read-timeout: 180s
+
