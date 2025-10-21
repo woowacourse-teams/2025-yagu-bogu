@@ -23,7 +23,7 @@ management:
         http.server.requests: true
     tags:
       app: yagubogu
-      env: dev
+      env: dev-k6
   endpoints:
     web:
       exposure:
