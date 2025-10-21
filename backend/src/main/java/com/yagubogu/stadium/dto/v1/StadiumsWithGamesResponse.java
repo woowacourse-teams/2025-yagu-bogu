@@ -22,7 +22,7 @@ public record StadiumsWithGamesResponse(
                     List<Game> games = entry.getValue();
 
                     return new StadiumWithGameParam(
-                            stadium.getShortName(),
+                            stadium.getFullName(),
                             stadium.getLatitude(),
                             stadium.getLongitude(),
                             GameParam.from(games.stream()

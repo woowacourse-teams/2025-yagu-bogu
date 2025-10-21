@@ -104,6 +104,57 @@ public class CheckInE2eTest extends E2eTestBase {
                 .statusCode(201);
     }
 
+    @DisplayName("예외: 인증할 때 게임이 없으면 예외가 발생한다")
+    @Test
+    void createCheckIn_notFoundGame() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        long invalidGameId = 999999L;
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new CreateCheckInRequest(invalidGameId))
+                .when().post("/api/v1/check-ins")
+                .then().log().all()
+                .statusCode(404);
+    }
+
+    @DisplayName("예외: 이미 회원이 경기에 인증할 경우 예외가 발생한다")
+    @Test
+    void createCheckIn_alreadyExists() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        LocalDate date = LocalDate.of(2025, 7, 25);
+        Game game = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new CreateCheckInRequest(game.getId()))
+                .when().post("/api/v1/check-ins")
+                .then().log().all()
+                .statusCode(201);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .body(new CreateCheckInRequest(game.getId()))
+                .when().post("/api/v1/check-ins")
+                .then().log().all()
+                .statusCode(409);
+    }
+
     @DisplayName("회원의 총 인증 횟수를 조회한다")
     @Test
     void findCheckInCounts() {
@@ -145,25 +196,6 @@ public class CheckInE2eTest extends E2eTestBase {
 
         // then
         assertThat(actual.checkInCounts()).isEqualTo(3);
-    }
-
-    @DisplayName("예외: 인증할 때 게임이 없으면 예외가 발생한다")
-    @Test
-    void createCheckIn_notFoundGame() {
-        // given
-        Member fora = memberFactory.save(b -> b.team(kia));
-        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
-
-        long invalidGameId = 999999L;
-
-        // when & then
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new CreateCheckInRequest(invalidGameId))
-                .when().post("/api/v1/check-ins")
-                .then().log().all()
-                .statusCode(404);
     }
 
     @DisplayName("직관 내역을 최신순으로 조회한다")
