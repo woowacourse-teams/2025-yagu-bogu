@@ -22,7 +22,9 @@ fun CheckInDialog(
     CheckInDialog(
         stadium = stadium,
         onConfirm = {
-            viewModel.checkIn(stadium, stadium.gameIds.first())
+            stadium.gameIds.firstOrNull()?.let { gameId: Long ->
+                viewModel.checkIn(stadium, gameId)
+            }
             viewModel.hideCheckInDialog()
         },
         onCancel = viewModel::hideCheckInDialog,
