@@ -11,11 +11,9 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -32,7 +30,6 @@ import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeDialogEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
@@ -41,9 +38,7 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.home.component.AdditionalCheckInDialog
-import com.yagubogu.ui.home.component.CheckInDialog
-import com.yagubogu.ui.home.component.DoubleHeaderDialog
+import com.yagubogu.ui.home.component.HomeDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -119,34 +114,8 @@ class HomeFragment :
 
     private fun setupComposeView() {
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
         binding.composeView.setContent {
-            val dialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(initialValue = null)
-            dialogEvent?.let { dialogEvent: HomeDialogEvent ->
-                when (dialogEvent) {
-                    is HomeDialogEvent.CheckInDialog -> {
-                        CheckInDialog(
-                            viewModel = viewModel,
-                            stadium = dialogEvent.stadium,
-                        )
-                    }
-
-                    HomeDialogEvent.AdditionalCheckInDialog -> {
-                        AdditionalCheckInDialog(
-                            viewModel = viewModel,
-                        )
-                    }
-
-                    is HomeDialogEvent.DoubleHeaderDialog -> {
-                        DoubleHeaderDialog(
-                            viewModel = viewModel,
-                            stadium = dialogEvent.stadium,
-                        )
-                    }
-
-                    HomeDialogEvent.HideDialog -> {}
-                }
-            }
+            HomeDialog(viewModel = viewModel)
         }
     }
 
