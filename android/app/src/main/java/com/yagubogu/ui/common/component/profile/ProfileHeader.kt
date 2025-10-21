@@ -154,7 +154,7 @@ private fun RankingText(
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text(text = "위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = stringResource(R.string.profile_ranking_rank), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
     }
 }
 
