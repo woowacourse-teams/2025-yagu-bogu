@@ -31,8 +31,6 @@ import com.yagubogu.R
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
-import com.yagubogu.presentation.dialog.DefaultDialogFragment
-import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
@@ -45,6 +43,7 @@ import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.dialog.profile.ProfileDialog
+import com.yagubogu.ui.home.component.HomeDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
 class HomeFragment :
@@ -87,11 +86,10 @@ class HomeFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setupComposeView()
         setupBindings()
         setupObservers()
-        setupFragmentResultListener()
         setupBalloons()
-        setupComposeView()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -120,16 +118,24 @@ class HomeFragment :
         binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.composeView.setContent {
+            HomeDialog(viewModel = viewModel)
+        }
+    }
+
     private fun setupBindings() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
         binding.btnCheckIn.setOnClickListener {
             if (isLocationPermissionGranted()) {
-                checkLocationSettingsThenShowDialog(requestLocationServices())
+                checkLocationSettingsThenCheckIn(requestLocationServices())
             } else {
                 requestLocationPermissions()
             }
+            firebaseAnalytics.logEvent("check_in", null)
         }
 
         binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
@@ -153,9 +159,11 @@ class HomeFragment :
             val message: String =
                 when (value) {
                     is CheckInUiEvent.Success ->
-                        getString(R.string.home_check_in_success_message, value.stadium.fullName)
+                        getString(R.string.home_check_in_success_message, value.stadium.name)
 
+                    CheckInUiEvent.NoGame -> getString(R.string.home_check_in_no_game_message)
                     CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
+                    CheckInUiEvent.AlreadyCheckedIn -> getString(R.string.home_already_checked_in_message)
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
                     CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
                 }
@@ -187,28 +195,37 @@ class HomeFragment :
         }
     }
 
-    private fun setupFragmentResultListener() {
-        parentFragmentManager.setFragmentResultListener(
-            KEY_CHECK_IN_REQUEST_DIALOG,
-            viewLifecycleOwner,
-        ) { _, bundle ->
-            val isConfirmed = bundle.getBoolean(DefaultDialogFragment.KEY_CONFIRM)
-            if (isConfirmed) {
-                viewModel.checkIn()
-                firebaseAnalytics.logEvent("check_in", null)
-            }
+    private fun setupBalloons() {
+        val stadiumStatsInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_stadium_stats_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameStadiumStatsTooltip.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
+            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
+        }
+
+        val victoryFairyInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_victory_fairy_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
         }
     }
 
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val isPermissionGranted = permissions.any { it.value }
-            val shouldShowRationale =
+            val isPermissionGranted: Boolean = permissions.any { it.value }
+            val shouldShowRationale: Boolean =
                 permissions.keys.any { permission: String ->
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
             when {
-                isPermissionGranted -> checkLocationSettingsThenShowDialog(requestLocationServices())
+                isPermissionGranted -> checkLocationSettingsThenCheckIn(requestLocationServices())
                 shouldShowRationale ->
                     binding.root.showSnackbar(
                         R.string.home_location_permission_denied_message,
@@ -259,21 +276,6 @@ class HomeFragment :
         startActivity(intent)
     }
 
-    private fun showCheckInConfirmDialog() {
-        if (parentFragmentManager.findFragmentByTag(KEY_CHECK_IN_REQUEST_DIALOG) == null) {
-            val dialogUiModel =
-                DefaultDialogUiModel(
-                    title = getString(R.string.home_check_in_confirm),
-                    emoji = getString(R.string.home_check_in_stadium_emoji),
-                    message = getString(R.string.home_check_in_caution),
-                )
-            val dialog =
-                DefaultDialogFragment.newInstance(KEY_CHECK_IN_REQUEST_DIALOG, dialogUiModel)
-
-            dialog.show(parentFragmentManager, KEY_CHECK_IN_REQUEST_DIALOG)
-        }
-    }
-
     private fun requestLocationServices(): Task<LocationSettingsResponse> {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
 
@@ -287,12 +289,12 @@ class HomeFragment :
         return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
     }
 
-    private fun checkLocationSettingsThenShowDialog(task: Task<LocationSettingsResponse>) {
+    private fun checkLocationSettingsThenCheckIn(task: Task<LocationSettingsResponse>) {
         task
             .addOnSuccessListener {
-                // 위치 설정이 활성화된 경우 직관 인증 확인 다이얼로그 표시
-                showCheckInConfirmDialog()
-            }.addOnFailureListener { exception ->
+                // 위치 설정이 활성화된 경우 구장 불러오기
+                viewModel.fetchStadiums()
+            }.addOnFailureListener { exception: Exception ->
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
                     exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
@@ -303,32 +305,6 @@ class HomeFragment :
                     )
                 }
             }
-    }
-
-    private fun setupBalloons() {
-        val stadiumStatsInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_stadium_stats_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameStadiumStatsTooltip.setOnClickListener {
-            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
-            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
-        }
-
-        val victoryFairyInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_victory_fairy_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
-            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
-            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
-        }
-    }
-
-    private fun setupComposeView() {
-        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
     private fun showMemberProfileDialog() {
@@ -350,7 +326,6 @@ class HomeFragment :
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val KEY_CHECK_IN_REQUEST_DIALOG = "checkInRequest"
         private const val REFRESH_ANIMATION_ROTATION = 360f
         private const val REFRESH_ANIMATION_DURATION = 1000L
         private const val RC_LOCATION_SETTINGS = 1001

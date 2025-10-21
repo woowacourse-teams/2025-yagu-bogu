@@ -32,10 +32,15 @@
     <string name="login_complete_update_message">업데이트 중이에요! ⚾</string>
 
     <string name="home_check_in">직관 인증하기</string>
-    <string name="home_already_checked_in">오늘 인증했어요!</string>
+    <string name="home_already_checked_in_message">오늘 이미 인증했어요!</string>
+    <string name="home_already_checked_in_emoji">🚨</string>
+    <string name="home_additional_check_in_message">추가로 직관 인증을 할까요?</string>
     <string name="home_check_in_stadium_emoji">🏟️</string>
-    <string name="home_check_in_confirm">직관 인증 할까요?</string>
+    <string name="home_check_in_confirm">%s\n직관 인증할까요?</string>
     <string name="home_check_in_caution">직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.</string>
+    <string name="home_double_header_title">%s\n더블헤더가 있는 날이에요!</string>
+    <string name="home_double_header_message">어떤 경기를 인증할까요?</string>
+    <string name="home_double_header_game">%d차전</string>
     <string name="home_my_team">우리 팀</string>
     <string name="home_attendance_count">인증 횟수</string>
     <string name="home_winning_percentage">직관 승률</string>
@@ -43,6 +48,7 @@
     <string name="home_location_settings_disabled">디바이스 위치 설정이 비활성화 상태입니다.</string>
     <string name="home_check_in_location_fetch_failed_message">위치를 불러오는 데 실패했습니다.</string>
     <string name="home_check_in_success_message">%s 인증이 완료되었습니다!</string>
+    <string name="home_check_in_no_game_message">오늘은 경기가 없는 날이에요.</string>
     <string name="home_check_in_out_of_range_message">구장 근처에서만 인증할 수 있어요.</string>
     <string name="home_check_in_network_failed_message">네트워크 오류로 인증에 실패했습니다.\n잠시 후 다시 시도해주세요.</string>
 

@@ -18,6 +18,7 @@ inline fun <T> safeApiCall(apiCall: () -> Response<T>): Result<T> =
                 401 -> throw ApiException.Unauthorized(errorBody)
                 403 -> throw ApiException.Forbidden(errorBody)
                 404 -> throw ApiException.NotFound(errorBody)
+                409 -> throw ApiException.Conflict(errorBody)
                 else -> throw HttpException(response)
             }
         }
