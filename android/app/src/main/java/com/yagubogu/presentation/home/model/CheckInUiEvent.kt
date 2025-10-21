@@ -1,15 +1,17 @@
 package com.yagubogu.presentation.home.model
 
-sealed class CheckInUiEvent {
+sealed interface CheckInUiEvent {
     data class Success(
         val stadium: StadiumWithGame,
-    ) : CheckInUiEvent()
+    ) : CheckInUiEvent
 
-    data object NoGame : CheckInUiEvent()
+    data object NoGame : CheckInUiEvent
 
-    data object OutOfRange : CheckInUiEvent()
+    data object OutOfRange : CheckInUiEvent
 
-    data object LocationFetchFailed : CheckInUiEvent()
+    data object AlreadyCheckedIn : CheckInUiEvent
 
-    data object NetworkFailed : CheckInUiEvent()
+    data object LocationFetchFailed : CheckInUiEvent
+
+    data object NetworkFailed : CheckInUiEvent
 }

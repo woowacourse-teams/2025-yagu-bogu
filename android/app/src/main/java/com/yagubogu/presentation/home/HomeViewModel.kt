@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.repository.CheckInRepository
@@ -116,7 +117,7 @@ class HomeViewModel(
         streamRepository.disconnect()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.of(2025, 10, 19)) {
+    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
@@ -164,9 +165,12 @@ class HomeViewModel(
                         }
                     _isCheckInLoading.value = false
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    when (exception) {
+                        is ApiException.Conflict -> _checkInUiEvent.setValue(CheckInUiEvent.AlreadyCheckedIn)
+                        else -> _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    }
                     _isCheckInLoading.value = false
+                    Timber.w(exception, "API 호출 실패")
                 }
         }
     }
@@ -229,7 +233,7 @@ class HomeViewModel(
         }
     }
 
-    private fun fetchStadiumStats(date: LocalDate = LocalDate.of(2025, 10, 19)) {
+    private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date)

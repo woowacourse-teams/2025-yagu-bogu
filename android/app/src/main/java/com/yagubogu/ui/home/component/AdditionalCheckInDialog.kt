@@ -32,7 +32,7 @@ private fun AdditionalCheckInDialog(
 ) {
     val dialogUiModel =
         DefaultDialogUiModel(
-            title = stringResource(R.string.home_already_checked_in),
+            title = stringResource(R.string.home_already_checked_in_message),
             emoji = stringResource(R.string.home_already_checked_in_emoji),
             message = stringResource(R.string.home_additional_check_in_message),
             negativeText = stringResource(R.string.all_cancel),

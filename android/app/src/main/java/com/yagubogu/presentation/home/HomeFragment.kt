@@ -186,6 +186,7 @@ class HomeFragment :
 
                     CheckInUiEvent.NoGame -> getString(R.string.home_check_in_no_game_message)
                     CheckInUiEvent.OutOfRange -> getString(R.string.home_check_in_out_of_range_message)
+                    CheckInUiEvent.AlreadyCheckedIn -> getString(R.string.home_already_checked_in_message)
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
                     CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
                 }
