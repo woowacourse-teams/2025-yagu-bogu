@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "k6"})
 @RequiredArgsConstructor
 @RestController
 public class InternalAuthController implements InternalAuthControllerInterface {
