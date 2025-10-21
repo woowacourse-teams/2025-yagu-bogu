@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemAttendanceHistorySummaryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 
-class AttendanceHistorySummaryViewHolder(
+class AttendanceHistorySummaryViewHolder private constructor(
     private val binding: ItemAttendanceHistorySummaryBinding,
     handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {

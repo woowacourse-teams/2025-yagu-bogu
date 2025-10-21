@@ -1,5 +1,7 @@
 package com.yagubogu.presentation
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +12,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.google.firebase.Firebase
@@ -25,6 +28,7 @@ import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.stats.StatsFragment
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.badge.BadgeActivity
 
 class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
@@ -37,8 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupBindings()
         setupView()
+        setupBindings()
         setupBottomNavigationView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -46,7 +50,11 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             binding.bnvNavigation.selectedItemId = R.id.item_home
-            switchFragment(HomeFragment::class.java, R.id.item_home)
+            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
+            switchFragment(
+                HomeFragment::class.java,
+                homeMenuItem,
+            )
         }
     }
 
@@ -61,15 +69,9 @@ class MainActivity : AppCompatActivity() {
         binding.cpiCheckInLoading.visibility = visibility
     }
 
-    private fun setupBindings() {
-        binding.ivSettings.setOnClickListener {
-            val intent = SettingActivity.newIntent(this)
-            startActivity(intent)
-        }
-    }
-
     private fun setupView() {
         enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -78,31 +80,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBindings() {
+        binding.ivBadge.setOnClickListener {
+            val intent = BadgeActivity.newIntent(this)
+            startActivity(intent)
+        }
+
+        binding.ivSettings.setOnClickListener {
+            val intent = SettingActivity.newIntent(this)
+            startActivity(intent)
+        }
+    }
+
     private fun setupBottomNavigationView() {
         binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
         binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
-            when (val itemId: Int = item.itemId) {
-                R.id.item_home -> {
-                    switchFragment(HomeFragment::class.java, itemId)
-                    true
+            val fragmentClass =
+                when (item.itemId) {
+                    R.id.item_home -> HomeFragment::class.java
+                    R.id.item_stats -> StatsFragment::class.java
+                    R.id.item_livetalk -> LivetalkFragment::class.java
+                    R.id.item_attendance_history -> AttendanceHistoryFragment::class.java
+                    else -> null
                 }
 
-                R.id.item_stats -> {
-                    switchFragment(StatsFragment::class.java, itemId)
-                    true
-                }
-
-                R.id.item_livetalk -> {
-                    switchFragment(LivetalkFragment::class.java, itemId)
-                    true
-                }
-
-                R.id.item_attendance_history -> {
-                    switchFragment(AttendanceHistoryFragment::class.java, itemId)
-                    true
-                }
-
-                else -> false
+            if (fragmentClass != null) {
+                switchFragment(fragmentClass, item)
+                true
+            } else {
+                false
             }
         }
 
@@ -118,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchFragment(
         fragmentClass: Class<out Fragment>,
-        selectedItemId: Int,
+        item: MenuItem,
     ) {
         val tag: String = fragmentClass.name
         val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
@@ -134,10 +140,10 @@ class MainActivity : AppCompatActivity() {
                 show(targetFragment)
             }
         }
-        setToolbarTitle(selectedItemId)
+        setToolbarTitle(item.itemId)
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            param(FirebaseAnalytics.Param.SCREEN_NAME, tag)
+            param(FirebaseAnalytics.Param.SCREEN_NAME, "${item.title} Fragment")
         }
     }
 
@@ -177,5 +183,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val BACK_PRESS_INTERVAL = 1500L
+
+        fun newIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
     }
 }

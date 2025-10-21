@@ -23,8 +23,8 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1_01_01
-        versionName = "1.1.1"
+        versionCode = 2_00_00
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -121,10 +121,7 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.ucrop)
 
     // firebase
     implementation(platform(libs.firebase.bom))
@@ -140,7 +137,39 @@ dependencies {
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
 
+    // compose
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+
+    // coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    // sse
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.eventsource)
+
+    // kotest
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }

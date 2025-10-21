@@ -16,7 +16,7 @@ import java.time.LocalDate
 class AttendanceHistoryViewModel(
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
-    private var items: List<AttendanceHistoryItem.Detail> = emptyList()
+    private var items: List<AttendanceHistoryItem> = emptyList()
 
     private val attendanceHistoryFilter = MutableLiveData(AttendanceHistoryFilter.ALL)
     private val _attendanceHistoryOrder = MutableLiveData(AttendanceHistoryOrder.LATEST)
@@ -41,7 +41,7 @@ class AttendanceHistoryViewModel(
 
             checkInRepository
                 .getCheckInHistories(year, filter.name, order.name)
-                .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem.Detail> ->
+                .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
                     items = attendanceHistoryItems
                     _detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
@@ -77,8 +77,12 @@ class AttendanceHistoryViewModel(
     }
 
     private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> =
-        items.mapIndexed { index: Int, item: AttendanceHistoryItem.Detail ->
-            if (index == detailItemPosition.value) item else item.summary
+        items.mapIndexed { index: Int, item: AttendanceHistoryItem ->
+            when (item) {
+                is AttendanceHistoryItem.Summary -> item
+                is AttendanceHistoryItem.Detail -> if (index == detailItemPosition.value) item else item.summary
+                is AttendanceHistoryItem.Canceled -> item
+            }
         }
 
     companion object {
