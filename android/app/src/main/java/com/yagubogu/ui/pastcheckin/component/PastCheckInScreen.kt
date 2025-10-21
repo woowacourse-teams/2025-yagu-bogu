@@ -1,5 +1,6 @@
 package com.yagubogu.ui.pastcheckin.component
 
+import DefaultDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
-import com.yagubogu.ui.component.DefaultDialog
 import com.yagubogu.ui.component.Toolbar
 import com.yagubogu.ui.pastcheckin.PastCheckInUiEvent
 import com.yagubogu.ui.pastcheckin.PastCheckInUiState
@@ -68,7 +68,7 @@ fun PastCheckInScreen(
                 negativeText = "취소",
             ),
             onConfirm = viewModel::confirmRegistration,
-            onDismiss = viewModel::dismissDialog,
+            onCancel = viewModel::dismissDialog,
         )
     }
 
