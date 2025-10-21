@@ -9,6 +9,7 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.FanRateByGameParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
@@ -19,18 +20,17 @@ import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.v1.FanRateResponse;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
-import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
@@ -80,9 +80,6 @@ class CheckInServiceTest {
     private GameRepository gameRepository;
 
     @Autowired
-    private VictoryFairyRankingRepository victoryRankingRepository;
-
-    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     private Team kia, kt, lg, samsung, doosan, lotte;
@@ -93,7 +90,6 @@ class CheckInServiceTest {
         checkInService = new CheckInService(
                 checkInRepository,
                 memberRepository,
-                stadiumRepository,
                 gameRepository,
                 applicationEventPublisher
         );
@@ -255,7 +251,7 @@ class CheckInServiceTest {
                 .hasMessage("Game is not found");
     }
 
-    @DisplayName("회원을 찾을 수 없으면 예외가 발생한다")
+    @DisplayName("예외: 회원을 찾을 수 없으면 예외가 발생한다")
     @Test
     void createCheckIn_notFoundMember() {
         // given
@@ -268,6 +264,25 @@ class CheckInServiceTest {
         assertThatThrownBy(() -> checkInService.createCheckIn(invalidMemberId, request))
                 .isExactlyInstanceOf(NotFoundException.class)
                 .hasMessage("Member is not found");
+    }
+
+    @DisplayName("예외: 이미 회원이 경기에 인증할 경우 예외가 발생한다")
+    @Test
+    void createCheckIn_alreadyExists() {
+        // given
+        Member member = memberFactory.save(builder -> builder.team(lotte));
+        Long memberId = member.getId();
+        Game game = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1)));
+        CreateCheckInRequest request = new CreateCheckInRequest(game.getId());
+        checkInService.createCheckIn(memberId, request);
+
+        // when & then
+        assertThatThrownBy(() -> checkInService.createCheckIn(memberId, request))
+                .isExactlyInstanceOf(ConflictException.class)
+                .hasMessage("CheckIn is already exists");
     }
 
     @DisplayName("회원의 총 인증 횟수를 조회한다")

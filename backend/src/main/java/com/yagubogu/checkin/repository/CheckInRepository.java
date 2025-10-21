@@ -2,6 +2,7 @@ package com.yagubogu.checkin.repository;
 
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInType;
+import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
@@ -65,4 +66,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
             @Param("date") LocalDate date,
             Pageable pageable
     );
+
+    boolean existsByGameAndMember(Game game, Member member);
 }
