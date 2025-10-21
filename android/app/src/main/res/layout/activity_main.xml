@@ -31,35 +31,36 @@
 
                 <ImageView
                     android:id="@+id/iv_settings"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|end"
-                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="24dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/setting_icon_description"
-                    android:padding="4dp"
+                    android:padding="3dp"
                     android:src="@drawable/ic_settings" />
 
                 <ImageView
                     android:id="@+id/iv_badge"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|end"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="10dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/badge_icon_description"
-                    android:padding="4dp"
+                    android:padding="3dp"
                     android:src="@drawable/ic_trophy" />
 
                 <ImageView
                     android:id="@+id/iv_add_past_check_in"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|end"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="10dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/past_check_in_top_bar_add_btn"
-                    android:padding="4dp"
+                    android:padding="3dp"
                     android:src="@drawable/ic_add_check_in" />
             </androidx.appcompat.widget.Toolbar>
 

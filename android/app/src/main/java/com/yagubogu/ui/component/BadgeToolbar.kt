@@ -1,5 +1,6 @@
 package com.yagubogu.ui.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.yagubogu.R
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
@@ -26,7 +28,12 @@ fun Toolbar(
     CenterAlignedTopAppBar(
         title = { Text(text = title, style = PretendardBold20) },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
+            IconButton(
+                modifier =
+                    Modifier
+                        .padding(start = 4.dp),
+                onClick = onBackClick,
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_left),
                     contentDescription = stringResource(R.string.all_back_button_content_description),

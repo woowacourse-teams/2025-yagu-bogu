@@ -91,11 +91,12 @@
 
             <ImageView
                 android:id="@+id/iv_arrow_left"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/livetalk_return_stadiums_description"
+                android:padding="3dp"
                 android:src="@drawable/ic_arrow_left"
                 app:layout_constraintBottom_toBottomOf="@id/tv_away_vs_home_name"
                 app:layout_constraintStart_toStartOf="parent"
