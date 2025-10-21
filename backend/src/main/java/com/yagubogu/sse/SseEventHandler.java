@@ -26,7 +26,6 @@ public class SseEventHandler {
     @TransactionalEventListener
     public void onCheckInCreated(final CheckInCreatedEvent event) {
         List<GameWithFanRateParam> eventData = checkInService.buildCheckInEventData(LocalDate.now());
-
         sseEmitterRegistry.all().forEach(emitter -> {
             try {
                 emitter.send(SseEmitter.event()
