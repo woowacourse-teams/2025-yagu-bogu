@@ -7,13 +7,12 @@ data class MemberProfile(
     val enterDate: LocalDate, // 회원 가입일 (YYYY-MM-DD)
     val profileImageUrl: String, // 프로필 이미지 주소
     val favoriteTeam: String, // 응원팀
-    val representativeBadgeName: String?, // 대표 배지 이름
     val representativeBadgeImageUrl: String?, // 대표 배지 이미지 주소
     val victoryFairyRanking: Long?, // 승리 요정 랭킹
     val victoryFairyScore: Double?, // 승리 요정 점수
     val victoryFairyRankingWithinTeam: Long?, // 팀 별 승리 요정 랭킹
     val checkInCounts: Int?, // 누적 직관 횟수
-    val checkInWinRate: String, // 직관 승률 (예: "75%")
+    val checkInWinRate: Double?, // 직관 승률
     val winCounts: Int?, // 직관 승리 횟수
     val drawCounts: Int?, // 직관 무승부 횟수
     val loseCounts: Int?, // 직관 패배 횟수
@@ -28,13 +27,12 @@ val MEMBER_PROFILE_FIXTURE =
         enterDate = LocalDate(2025, 10, 1),
         profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
         favoriteTeam = "KIA",
-        representativeBadgeName = "말문이 트이다",
         representativeBadgeImageUrl = "",
         victoryFairyRanking = 275,
         victoryFairyScore = 33.1,
         victoryFairyRankingWithinTeam = 154,
         checkInCounts = 11,
-        checkInWinRate = "60%",
+        checkInWinRate = 60.0,
         winCounts = 10,
         drawCounts = 3,
         loseCounts = 5,
@@ -47,13 +45,12 @@ val MEMBER_PROFILE_FIXTURE_NULL =
         enterDate = LocalDate(2025, 10, 1),
         profileImageUrl = "https://www.google.com/#q=quod",
         favoriteTeam = "삼성",
-        representativeBadgeName = null,
         representativeBadgeImageUrl = null,
         victoryFairyRanking = null,
         victoryFairyScore = null,
         victoryFairyRankingWithinTeam = null,
         checkInCounts = null,
-        checkInWinRate = "",
+        checkInWinRate = 0.0,
         winCounts = null,
         drawCounts = null,
         loseCounts = null,

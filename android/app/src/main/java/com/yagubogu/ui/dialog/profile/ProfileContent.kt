@@ -118,8 +118,17 @@ private fun CheckInStatsRow(
         )
         StatItem(
             title = "직관 승률",
-            value = memberProfile.checkInWinRate,
-            modifier = Modifier.weight(1f, true),
+            value =
+                if (memberProfile.checkInWinRate != null) {
+                    stringResource(R.string.all_win_rate, memberProfile.checkInWinRate)
+                } else {
+                    null
+                },
+            modifier =
+                Modifier.weight(
+                    1f,
+                    true,
+                ),
         )
         VerticalDivider(
             thickness = 0.4.dp,

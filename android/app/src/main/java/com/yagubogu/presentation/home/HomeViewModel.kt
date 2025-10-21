@@ -23,7 +23,6 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
-import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE_NULL
 import com.yagubogu.ui.dialog.model.MemberProfile
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -165,22 +164,20 @@ class HomeViewModel(
     }
 
     fun fetchMemberProfile(memberId: Long) {
-//        viewModelScope.launch {
-//            val memberProfileResult: Result<MemberProfile> =
-//                memberRepository.getMemberProfile(memberId)
-//            memberProfileResult
-//                .onSuccess { memberProfile: MemberProfile ->
-//                    _profileImageClickEvent.setValue(memberProfile)
-//                }.onFailure { exception: Throwable ->
-//                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
-//                }
-//        }
-        // TODO API 배포되면 주석 제거
-        _profileImageClickEvent.setValue(MEMBER_PROFILE_FIXTURE_NULL)
+        viewModelScope.launch {
+            val memberProfileResult: Result<MemberProfile> =
+                memberRepository.getMemberProfile(memberId)
+            memberProfileResult
+                .onSuccess { memberProfile: MemberProfile ->
+                    _profileImageClickEvent.value = memberProfile
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+                }
+        }
     }
 
     fun clearMemberProfileEvent() {
-        _profileImageClickEvent.setValue(null)
+        _profileImageClickEvent.value = null
     }
 
     private fun fetchCheckInStatus(date: LocalDate = LocalDate.now()) {

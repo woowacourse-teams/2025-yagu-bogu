@@ -9,7 +9,7 @@ data class CheckInDto(
     @SerialName("counts")
     val counts: Int?, // 누적 직관 인증 횟수
     @SerialName("winRate")
-    val winRate: String?, // 직관 승률 (예: "75%")
+    val winRate: Double?, // 직관 승률
     @SerialName("winCounts")
     val winCounts: Int?, // 직관 승리 횟수
     @SerialName("drawCounts")

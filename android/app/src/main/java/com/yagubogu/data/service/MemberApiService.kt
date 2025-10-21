@@ -60,7 +60,7 @@ interface MemberApiService {
         @Body request: PresignedUrlCompleteRequest,
     ): Response<PresignedUrlCompleteResponse>
 
-    @GET("/api/members/{memberId}")
+    @GET("/api/v1/members/{memberId}")
     suspend fun getMemberProfile(
         @Path("memberId") memberId: Long,
     ): Response<MemberProfileResponse>
