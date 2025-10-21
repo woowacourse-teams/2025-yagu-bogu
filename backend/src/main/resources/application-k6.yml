@@ -35,7 +35,6 @@ management:
     tracing:
       endpoint: http://${MONITORING_SERVER_IP}:4317
 
-
 security:
   token:
     access-token:
