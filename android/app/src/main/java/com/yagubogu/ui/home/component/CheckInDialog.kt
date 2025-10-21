@@ -10,13 +10,13 @@ import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.home.HomeViewModel
-import com.yagubogu.presentation.home.model.Stadium
+import com.yagubogu.presentation.home.model.StadiumWithGame
 import com.yagubogu.ui.common.component.DefaultDialog
 
 @Composable
 fun CheckInDialog(
     viewModel: HomeViewModel,
-    stadium: Stadium,
+    stadium: StadiumWithGame,
     modifier: Modifier = Modifier,
 ) {
     CheckInDialog(
@@ -32,7 +32,7 @@ fun CheckInDialog(
 
 @Composable
 private fun CheckInDialog(
-    stadium: Stadium,
+    stadium: StadiumWithGame,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -58,7 +58,7 @@ private fun CheckInDialog(
 private fun CheckInDialogPreview() {
     CheckInDialog(
         stadium =
-            Stadium(
+            StadiumWithGame(
                 name = "잠실야구장",
                 coordinate = Coordinate(Latitude(0.0), Longitude(0.0)),
                 gameIds = listOf(0),

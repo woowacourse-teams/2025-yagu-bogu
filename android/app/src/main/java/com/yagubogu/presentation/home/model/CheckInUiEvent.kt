@@ -2,7 +2,7 @@ package com.yagubogu.presentation.home.model
 
 sealed class CheckInUiEvent {
     data class Success(
-        val stadium: Stadium,
+        val stadium: StadiumWithGame,
     ) : CheckInUiEvent()
 
     data object NoGame : CheckInUiEvent()

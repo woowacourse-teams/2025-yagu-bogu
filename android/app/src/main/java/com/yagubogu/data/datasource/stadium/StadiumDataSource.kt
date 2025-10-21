@@ -4,5 +4,5 @@ import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import java.time.LocalDate
 
 interface StadiumDataSource {
-    suspend fun getStadiums(date: LocalDate): Result<StadiumsWithGamesResponse>
+    suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGamesResponse>
 }

@@ -8,8 +8,8 @@ import java.time.LocalDate
 class StadiumRemoteDataSource(
     private val stadiumApiService: StadiumApiService,
 ) : StadiumDataSource {
-    override suspend fun getStadiums(date: LocalDate): Result<StadiumsWithGamesResponse> =
+    override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGamesResponse> =
         safeApiCall {
-            stadiumApiService.getStadiums(date.toString())
+            stadiumApiService.getStadiumsWithGames(date.toString())
         }
 }

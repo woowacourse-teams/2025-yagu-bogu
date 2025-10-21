@@ -30,7 +30,7 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 import com.yagubogu.presentation.home.HomeViewModel
-import com.yagubogu.presentation.home.model.Stadium
+import com.yagubogu.presentation.home.model.StadiumWithGame
 import com.yagubogu.ui.theme.EsamanruMedium20
 import com.yagubogu.ui.theme.Gray200
 import com.yagubogu.ui.theme.Gray500
@@ -42,7 +42,7 @@ import com.yagubogu.ui.theme.Primary500
 @Composable
 fun DoubleHeaderDialog(
     viewModel: HomeViewModel,
-    stadium: Stadium,
+    stadium: StadiumWithGame,
     modifier: Modifier = Modifier,
 ) {
     DoubleHeaderDialog(
@@ -58,7 +58,7 @@ fun DoubleHeaderDialog(
 
 @Composable
 private fun DoubleHeaderDialog(
-    stadium: Stadium,
+    stadium: StadiumWithGame,
     onConfirm: (Long) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -147,7 +147,7 @@ private fun DoubleHeaderDialog(
 private fun DoubleHeaderDialogPreview() {
     DoubleHeaderDialog(
         stadium =
-            Stadium(
+            StadiumWithGame(
                 name = "잠실야구장",
                 coordinate = Coordinate(Latitude(0.0), Longitude(0.0)),
                 gameIds = listOf(0, 1),

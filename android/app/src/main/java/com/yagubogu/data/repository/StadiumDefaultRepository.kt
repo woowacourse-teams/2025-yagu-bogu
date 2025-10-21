@@ -3,14 +3,14 @@ package com.yagubogu.data.repository
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import com.yagubogu.domain.repository.StadiumRepository
-import com.yagubogu.presentation.home.model.Stadiums
+import com.yagubogu.presentation.home.model.StadiumsWithGames
 import java.time.LocalDate
 
 class StadiumDefaultRepository(
     private val stadiumDataSource: StadiumDataSource,
 ) : StadiumRepository {
-    override suspend fun getStadiums(date: LocalDate): Result<Stadiums> =
-        stadiumDataSource.getStadiums(date).map { stadiumsResponse: StadiumsWithGamesResponse ->
-            stadiumsResponse.toPresentation()
+    override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGames> =
+        stadiumDataSource.getStadiumsWithGames(date).map { stadiumsWithGamesResponse: StadiumsWithGamesResponse ->
+            stadiumsWithGamesResponse.toPresentation()
         }
 }

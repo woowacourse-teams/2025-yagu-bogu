@@ -2,7 +2,7 @@ package com.yagubogu.presentation.home.model
 
 import com.yagubogu.domain.model.Coordinate
 
-data class Stadium(
+data class StadiumWithGame(
     val name: String,
     val coordinate: Coordinate,
     val gameIds: List<Long>,

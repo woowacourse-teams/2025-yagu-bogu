@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface StadiumApiService {
     @GET("/api/v1/stadiums/games")
-    suspend fun getStadiums(
+    suspend fun getStadiumsWithGames(
         @Query("date") date: String,
     ): Response<StadiumsWithGamesResponse>
 }

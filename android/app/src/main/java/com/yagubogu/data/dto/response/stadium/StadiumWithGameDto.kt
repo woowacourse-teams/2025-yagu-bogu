@@ -3,7 +3,7 @@ package com.yagubogu.data.dto.response.stadium
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
-import com.yagubogu.presentation.home.model.Stadium
+import com.yagubogu.presentation.home.model.StadiumWithGame
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,8 +18,8 @@ data class StadiumWithGameDto(
     @SerialName("games")
     val games: List<GameDto>, // 게임 목록 (1차전, 2차전 순서)
 ) {
-    fun toPresentation(): Stadium =
-        Stadium(
+    fun toPresentation(): StadiumWithGame =
+        StadiumWithGame(
             name = name,
             coordinate =
                 Coordinate(

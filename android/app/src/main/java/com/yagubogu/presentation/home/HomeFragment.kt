@@ -213,10 +213,32 @@ class HomeFragment :
         }
     }
 
+    private fun setupBalloons() {
+        val stadiumStatsInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_stadium_stats_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameStadiumStatsTooltip.setOnClickListener {
+            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
+            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
+        }
+
+        val victoryFairyInfoBalloon =
+            requireContext().buildBalloon(
+                getString(R.string.home_victory_fairy_tooltip),
+                viewLifecycleOwner,
+            )
+        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
+            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
+            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
+        }
+    }
+
     private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val isPermissionGranted = permissions.any { it.value }
-            val shouldShowRationale =
+            val isPermissionGranted: Boolean = permissions.any { it.value }
+            val shouldShowRationale: Boolean =
                 permissions.keys.any { permission: String ->
                     PermissionUtil.shouldShowRationale(requireActivity(), permission)
                 }
@@ -301,28 +323,6 @@ class HomeFragment :
                     )
                 }
             }
-    }
-
-    private fun setupBalloons() {
-        val stadiumStatsInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_stadium_stats_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameStadiumStatsTooltip.setOnClickListener {
-            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
-            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
-        }
-
-        val victoryFairyInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_victory_fairy_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
-            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
-            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
-        }
     }
 
     companion object {
