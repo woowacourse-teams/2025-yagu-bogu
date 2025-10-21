@@ -1,10 +1,5 @@
 package com.yagubogu.checkin.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -48,6 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest

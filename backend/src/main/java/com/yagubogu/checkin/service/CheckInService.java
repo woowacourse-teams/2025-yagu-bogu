@@ -59,7 +59,7 @@ public class CheckInService {
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
         applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
-        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(game.getDate()));
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent());
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
