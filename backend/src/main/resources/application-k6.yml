@@ -28,12 +28,6 @@ management:
     web:
       exposure:
         include: prometheus, health
-  tracing:
-    sampling:
-      probability: 0.1
-  otlp:
-    tracing:
-      endpoint: http://${MONITORING_SERVER_IP}:4317
 
 security:
   token:
