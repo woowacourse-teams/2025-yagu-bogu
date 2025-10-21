@@ -1,4 +1,4 @@
-package com.yagubogu.ui.dialog.profile
+package com.yagubogu.ui.common.component.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.yagubogu.R
-import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
-import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.common.model.MEMBER_PROFILE_FIXTURE
+import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
@@ -57,8 +57,7 @@ fun ProfileHeader(
                         .background(
                             color = Color.White,
                             shape = RoundedCornerShape(12.dp),
-                        )
-                        .padding(
+                        ).padding(
                             top = profileImageOverlap - 20.dp,
                             bottom = 20.dp,
                             start = 20.dp,

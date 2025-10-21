@@ -25,8 +25,8 @@ import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
-import com.yagubogu.ui.dialog.model.MemberProfile
-import com.yagubogu.ui.dialog.profile.ProfileDialog
+import com.yagubogu.ui.common.component.profile.ProfileDialog
+import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package com.yagubogu.ui.dialog.model
+package com.yagubogu.ui.common.model
 
 import kotlinx.datetime.LocalDate
 

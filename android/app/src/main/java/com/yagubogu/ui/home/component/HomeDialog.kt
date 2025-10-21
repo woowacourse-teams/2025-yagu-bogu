@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.HomeDialogEvent
-import com.yagubogu.ui.dialog.profile.ProfileDialog
+import com.yagubogu.ui.common.component.profile.ProfileDialog
 
 @Composable
 fun HomeDialog(

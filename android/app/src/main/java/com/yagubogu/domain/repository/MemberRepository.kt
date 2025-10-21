@@ -5,7 +5,7 @@ import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.common.model.MemberProfile
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>

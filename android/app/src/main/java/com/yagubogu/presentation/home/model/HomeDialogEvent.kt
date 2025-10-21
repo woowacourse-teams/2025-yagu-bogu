@@ -1,6 +1,6 @@
 package com.yagubogu.presentation.home.model
 
-import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.common.model.MemberProfile
 
 sealed interface HomeDialogEvent {
     data class CheckInDialog(

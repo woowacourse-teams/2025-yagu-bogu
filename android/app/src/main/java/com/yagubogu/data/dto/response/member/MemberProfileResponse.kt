@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.member
 
-import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

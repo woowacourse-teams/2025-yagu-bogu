@@ -1,4 +1,4 @@
-package com.yagubogu.ui.dialog.profile
+package com.yagubogu.ui.common.component.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
-import com.yagubogu.ui.dialog.model.MemberProfile
+import com.yagubogu.ui.common.model.MEMBER_PROFILE_FIXTURE
+import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.util.noRippleClickable
