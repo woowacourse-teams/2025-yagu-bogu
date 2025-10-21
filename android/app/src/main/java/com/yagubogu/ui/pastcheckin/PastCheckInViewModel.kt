@@ -2,6 +2,7 @@ package com.yagubogu.ui.pastcheckin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.R
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import kotlinx.coroutines.channels.Channel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 
 class PastCheckInViewModel(
@@ -32,7 +34,7 @@ class PastCheckInViewModel(
         } else {
             _uiEvent.trySend(
                 PastCheckInUiEvent.ShowToast(
-                    "선택된 게임 정보가 없어\n직관 정보를 등록할 수 없습니다.",
+                    R.string.past_check_in_not_selected_game,
                 ),
             )
         }
@@ -55,7 +57,7 @@ class PastCheckInViewModel(
             true -> {
                 _uiEvent.trySend(
                     PastCheckInUiEvent.ShowToast(
-                        "이미 직관 등록된 경기입니다!",
+                        R.string.past_check_in_existing_game,
                     ),
                 )
             }
@@ -68,7 +70,8 @@ class PastCheckInViewModel(
 
     private fun fetchGameList(date: LocalDate) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = "경기 목록을 불러오는 중...")
+            _uiState.value =
+                _uiState.value.copy(loadingMessageRes = R.string.past_check_in_loading_games)
 
             runCatching {
                 gameRepository.getGames(date)
@@ -76,16 +79,20 @@ class PastCheckInViewModel(
                 _uiState.value =
                     _uiState.value.copy(
                         gameList = games.getOrDefault(emptyList()),
-                        isLoading = null,
-                        errorMessage = null,
+                        loadingMessageRes = null,
                     )
             }.onFailure { exception ->
                 _uiState.value =
                     _uiState.value.copy(
                         gameList = emptyList(),
-                        isLoading = null,
-                        errorMessage = exception.message ?: "알 수 없는 오류가 발생했습니다",
+                        loadingMessageRes = null,
                     )
+                _uiEvent.trySend(
+                    PastCheckInUiEvent.ShowToast(
+                        R.string.past_check_in_failed_load_game_list,
+                    ),
+                )
+                Timber.w("과거 직관 등록 중 게임 목록 fetch 실패: $exception")
             }
         }
     }
@@ -95,25 +102,33 @@ class PastCheckInViewModel(
         date: LocalDate,
     ) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = "과거 직관을 등록하는 중...")
+            _uiState.value =
+                _uiState.value.copy(loadingMessageRes = R.string.past_check_in_adding_message)
 
             runCatching {
                 // TODO: 실제 과거 직관 등록 API 호출
                 kotlinx.coroutines.delay(1000)
                 // TODO: 테스트용 딜레이. 실제 API 호출 시 삭제할 것.
             }.onSuccess {
-                _uiState.value = _uiState.value.copy(isLoading = null)
+                _uiState.value = _uiState.value.copy(loadingMessageRes = null)
                 fetchGameList(uiState.value.selectedDate ?: LocalDate.now())
                 _uiEvent.trySend(
-                    PastCheckInUiEvent.ShowToast("${game.homeTeam.name} vs ${game.awayTeam.name} 직관 기록이 등록되었습니다!"),
-                )
-            }.onFailure { exception ->
-                _uiState.value = _uiState.value.copy(isLoading = null)
-                _uiEvent.trySend(
-                    PastCheckInUiEvent.ShowToast(
-                        exception.message ?: "등록에 실패했습니다. 다시 시도해주세요.",
+                    PastCheckInUiEvent.ShowToastWithArgs(
+                        R.string.past_check_in_saved_alert,
+                        listOf(
+                            game.homeTeam.shortname,
+                            game.awayTeam.shortname,
+                        ),
                     ),
                 )
+            }.onFailure { exception ->
+                _uiState.value = _uiState.value.copy(loadingMessageRes = null)
+                _uiEvent.trySend(
+                    PastCheckInUiEvent.ShowToast(
+                        R.string.past_check_in_failed_adding_game,
+                    ),
+                )
+                Timber.w("과거 직관 등록 실패: $exception")
             }
         }
     }

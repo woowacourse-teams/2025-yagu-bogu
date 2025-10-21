@@ -23,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.R
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
@@ -73,14 +75,23 @@ fun PastCheckInScreen(
     }
 
     LaunchedEffect(viewModel) {
-        viewModel.uiEvent.collect { event ->
+        viewModel.uiEvent.collect { event: PastCheckInUiEvent ->
             when (event) {
                 is PastCheckInUiEvent.ShowToast -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, event.messageRes, Toast.LENGTH_LONG).show()
                 }
 
                 is PastCheckInUiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.messageRes))
+                }
+
+                is PastCheckInUiEvent.ShowToastWithArgs -> {
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(event.messageRes, *event.args.toTypedArray()),
+                            Toast.LENGTH_LONG,
+                        ).show()
                 }
             }
         }
@@ -129,10 +140,10 @@ private fun PastCheckInScreen(
             ) {
                 when {
                     // 로딩 중 (중앙 배치)
-                    uiState.isLoading != null -> {
+                    uiState.loadingMessageRes != null -> {
                         InfoPanel(
                             emoji = "",
-                            title = uiState.isLoading,
+                            title = stringResource(uiState.loadingMessageRes),
                             showLoading = true,
                             modifier = Modifier.offset(y = (-50).dp),
                         )
@@ -169,7 +180,7 @@ private fun PastCheckInScreen(
                     }
 
                     // 빈 상태 (중앙 배치)
-                    uiState.selectedDate != null && uiState.gameList.isEmpty() && uiState.errorMessage == null -> {
+                    uiState.selectedDate != null -> {
                         InfoPanel(
                             emoji = "📅",
                             title = "해당 날짜에 경기가 없습니다",
@@ -179,7 +190,7 @@ private fun PastCheckInScreen(
                     }
 
                     // 초기 상태 (중앙 배치)
-                    uiState.selectedDate == null -> {
+                    true -> {
                         InfoPanel(
                             emoji = "⚾",
                             title = "날짜를 선택해주세요",
@@ -217,7 +228,7 @@ private fun PastCheckInScreenPreview_Loading() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = "과거 직관 로딩중...",
+                    loadingMessageRes = R.string.past_check_in_load_check_in_list,
                 ),
             onBackClick = { },
             onDateSelected = { },
@@ -237,7 +248,7 @@ private fun PastCheckInScreenPreview_WithOutGames() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = null,
+                    loadingMessageRes = null,
                 ),
             onBackClick = { },
             onDateSelected = { },
@@ -275,7 +286,7 @@ private fun PastCheckInScreenPreview_WithGames() {
                 PastCheckInUiState(
                     selectedDate = LocalDate.of(2025, 10, 19),
                     gameList = sampleGames,
-                    isLoading = null,
+                    loadingMessageRes = null,
                 ),
             onBackClick = { },
             onDateSelected = { },

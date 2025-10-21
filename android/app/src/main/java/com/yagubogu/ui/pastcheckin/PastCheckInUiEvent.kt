@@ -1,11 +1,20 @@
 package com.yagubogu.ui.pastcheckin
 
+import androidx.annotation.StringRes
+
 sealed class PastCheckInUiEvent {
     data class ShowToast(
-        val message: String,
+        @StringRes
+        val messageRes: Int,
     ) : PastCheckInUiEvent()
 
     data class ShowSnackbar(
-        val message: String,
+        @StringRes
+        val messageRes: Int,
+    ) : PastCheckInUiEvent()
+
+    data class ShowToastWithArgs(
+        @StringRes val messageRes: Int,
+        val args: List<Any>,
     ) : PastCheckInUiEvent()
 }

@@ -102,6 +102,14 @@
 
     <string name="past_check_in_title">과거 직관 기록</string>
     <string name="past_check_in_top_bar_add_btn">직관 인증 추가 아이콘</string>
+    <string name="past_check_in_not_selected_game">선택된 게임 정보가 없어\n직관 정보를 등록할 수 없습니다.</string>
+    <string name="past_check_in_existing_game">이미 직관 등록된 경기입니다!</string>
+    <string name="past_check_in_loading_games">경기 목록을 불러오는 중...</string>
+    <string name="past_check_in_failed_load_game_list">경기 목록 조회에 실패했습니다.</string>
+    <string name="past_check_in_adding_message">과거 직관을 등록하는 중...</string>
+    <string name="past_check_in_failed_adding_game">등록에 실패했습니다. 다시 시도해주세요.</string>
+    <string name="past_check_in_saved_alert">%1$s vs %2$s 직관 기록이 등록되었습니다!</string>
+    <string name="past_check_in_load_check_in_list">과거 직관 내역 로딩중...</string>
 
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 
@@ -175,5 +183,4 @@
     <string name="setting_contact_us">문의하기</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
     <string name="setting_app_version">앱 버전: %s</string>
-
 </resources>
