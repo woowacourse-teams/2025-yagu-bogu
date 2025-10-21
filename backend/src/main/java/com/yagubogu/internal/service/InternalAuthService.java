@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "k6"})
 @RequiredArgsConstructor
 @Service
 public class InternalAuthService {
