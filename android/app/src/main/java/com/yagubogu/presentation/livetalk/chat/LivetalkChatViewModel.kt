@@ -10,11 +10,11 @@ import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.GameRepository
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
-import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE_NULL
 import com.yagubogu.ui.dialog.model.MemberProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -29,6 +29,7 @@ class LivetalkChatViewModel(
     private val gameId: Long,
     private val talkRepository: TalkRepository,
     private val gameRepository: GameRepository,
+    private val memberRepository: MemberRepository,
     private val isVerified: Boolean,
 ) : ViewModel() {
     private val _livetalkUiState =
@@ -384,18 +385,16 @@ class LivetalkChatViewModel(
     }
 
     fun fetchMemberProfile(memberId: Long) {
-//        viewModelScope.launch {
-//            val memberProfileResult: Result<MemberProfile> =
-//                memberRepository.getMemberProfile(memberId)
-//            memberProfileResult
-//                .onSuccess { memberProfile: MemberProfile ->
-//                    _profileImageClickEvent.setValue(memberProfile)
-//                }.onFailure { exception: Throwable ->
-//                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
-//                }
-//        }
-        // TODO API 배포되면 주석 제거
-        _profileInfoClickEvent.value = MEMBER_PROFILE_FIXTURE_NULL
+        viewModelScope.launch {
+            val memberProfileResult: Result<MemberProfile> =
+                memberRepository.getMemberProfile(memberId)
+            memberProfileResult
+                .onSuccess { memberProfile: MemberProfile ->
+                    _profileInfoClickEvent.value = memberProfile
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+                }
+        }
     }
 
     fun clearMemberProfileEvent() {

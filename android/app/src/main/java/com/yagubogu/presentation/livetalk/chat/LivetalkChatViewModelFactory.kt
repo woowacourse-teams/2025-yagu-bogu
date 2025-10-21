@@ -3,12 +3,14 @@ package com.yagubogu.presentation.livetalk.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.yagubogu.domain.repository.GameRepository
+import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 
 class LivetalkChatViewModelFactory(
     private val gameId: Long,
     private val talkRepository: TalkRepository,
     private val gameRepository: GameRepository,
+    private val memberRepository: MemberRepository,
     private val isVerified: Boolean,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -18,6 +20,7 @@ class LivetalkChatViewModelFactory(
                 gameId,
                 talkRepository,
                 gameRepository,
+                memberRepository,
                 isVerified,
             ) as T
         }

@@ -42,6 +42,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             gameId,
             app.talksRepository,
             app.gamesRepository,
+            app.memberRepository,
             intent.getBooleanExtra(KEY_IS_VERIFIED, false),
         )
     }
