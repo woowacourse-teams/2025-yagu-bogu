@@ -64,7 +64,7 @@ private fun VictoryFairyStatsRow(
                 .height(IntrinsicSize.Min),
     ) {
         StatItem(
-            title = "승리 요정 랭킹",
+            title = stringResource(R.string.profile_victory_fairy_ranking),
             value =
                 if (memberProfile.victoryFairyRanking != null) {
                     stringResource(R.string.all_ranking, memberProfile.victoryFairyRanking)
@@ -80,7 +80,7 @@ private fun VictoryFairyStatsRow(
             modifier = Modifier.fillMaxHeight(0.8f),
         )
         StatItem(
-            title = "승리 요정 점수",
+            title = stringResource(R.string.profile_victory_fairy_score),
             value =
                 if (memberProfile.victoryFairyScore != null) {
                     stringResource(R.string.all_score_first_float, memberProfile.victoryFairyScore)
@@ -107,7 +107,7 @@ private fun CheckInStatsRow(
                 .height(IntrinsicSize.Min),
     ) {
         StatItem(
-            title = "응원팀 직관 횟수",
+            title = stringResource(R.string.profile_check_in_counts),
             value = memberProfile.checkInCounts?.toString(),
             modifier = Modifier.weight(1f, true),
         )
@@ -117,7 +117,7 @@ private fun CheckInStatsRow(
             modifier = Modifier.fillMaxHeight(0.8f),
         )
         StatItem(
-            title = "직관 승률",
+            title = stringResource(R.string.profile_winning_percentage),
             value =
                 if (memberProfile.checkInWinRate != null) {
                     stringResource(R.string.all_win_rate, memberProfile.checkInWinRate)
@@ -136,7 +136,7 @@ private fun CheckInStatsRow(
             modifier = Modifier.fillMaxHeight(0.8f),
         )
         StatItem(
-            title = "승 무 패",
+            title = stringResource(R.string.profile_win_draw_lose),
             value = memberProfile.winDrawLose,
             modifier = Modifier.weight(1f, true),
         )
@@ -157,7 +157,7 @@ private fun DatesRow(
                 .height(IntrinsicSize.Min),
     ) {
         StatItem(
-            title = "가입일",
+            title = stringResource(R.string.profile_register_date),
             value = memberProfile.enterDate.toJavaLocalDate().format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f, true),
         )
@@ -167,7 +167,7 @@ private fun DatesRow(
             modifier = Modifier.fillMaxHeight(0.8f),
         )
         StatItem(
-            title = "최근 직관일",
+            title = stringResource(R.string.profile_latest_check_in_date),
             value =
                 memberProfile.recentCheckInDate
                     ?.toJavaLocalDate()

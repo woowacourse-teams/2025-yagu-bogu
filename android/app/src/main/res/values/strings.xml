@@ -182,4 +182,15 @@
     <string name="setting_open_source_license">오픈소스 라이선스</string>
     <string name="setting_app_version">앱 버전: %s</string>
 
+    <string name="profile_ranking_all">"전체 랭킹 : "</string>
+    <string name="profile_ranking_within_team">" 랭킹 : "</string>
+    <string name="profile_ranking_rank">위</string>
+    <string name="profile_victory_fairy_ranking">승리 요정 랭킹</string>
+    <string name="profile_victory_fairy_score">승리 요정 점수</string>
+    <string name="profile_check_in_counts">응원팀 직관 횟수</string>
+    <string name="profile_winning_percentage">직관 승률</string>
+    <string name="profile_win_draw_lose">승 무 패</string>
+    <string name="profile_register_date">가입일</string>
+    <string name="profile_latest_check_in_date">최근 직관일</string>
+
 </resources>

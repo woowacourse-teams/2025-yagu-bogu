@@ -57,7 +57,8 @@ fun ProfileHeader(
                         .background(
                             color = Color.White,
                             shape = RoundedCornerShape(12.dp),
-                        ).padding(
+                        )
+                        .padding(
                             top = profileImageOverlap - 20.dp,
                             bottom = 20.dp,
                             start = 20.dp,
@@ -126,14 +127,14 @@ private fun RankingText(
     modifier: Modifier = Modifier,
 ) {
     Row {
-        Text(text = "전체 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = stringResource(R.string.profile_ranking_all), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
             text = memberProfile.victoryFairyRanking?.toString() ?: "-",
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text(text = "위", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = stringResource(R.string.profile_ranking_rank), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
             text = "|",
             style = PretendardRegular,
@@ -147,7 +148,7 @@ private fun RankingText(
             fontSize = 10.sp,
             color = Gray500,
         )
-        Text(text = " 랭킹 : ", style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(text = stringResource(R.string.profile_ranking_within_team), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
         Text(
             text = memberProfile.victoryFairyRankingWithinTeam?.toString() ?: "-",
             style = PretendardSemiBold,
