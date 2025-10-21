@@ -80,9 +80,6 @@ class HomeViewModel(
 
     private var stadiums: StadiumsWithGames? = null
 
-    private val _profileImageClickEvent = MutableLiveData<MemberProfile?>()
-    val profileImageClickEvent: LiveData<MemberProfile?> = _profileImageClickEvent
-
     init {
         fetchAll()
     }
@@ -208,15 +205,11 @@ class HomeViewModel(
                 memberRepository.getMemberProfile(memberId)
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
-                    _profileImageClickEvent.value = memberProfile
+                    _dialogEvent.emit(HomeDialogEvent.ProfileDialog(memberProfile))
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
                 }
         }
-    }
-
-    fun clearMemberProfileEvent() {
-        _profileImageClickEvent.value = null
     }
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {

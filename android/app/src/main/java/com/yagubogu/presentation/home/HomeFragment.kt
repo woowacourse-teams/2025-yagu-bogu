@@ -11,8 +11,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -41,8 +39,6 @@ import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.dialog.model.MemberProfile
-import com.yagubogu.ui.dialog.profile.ProfileDialog
 import com.yagubogu.ui.home.component.HomeDialog
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -189,10 +185,6 @@ class HomeFragment :
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)
         }
-
-        viewModel.profileImageClickEvent.observe(viewLifecycleOwner) {
-            showMemberProfileDialog()
-        }
     }
 
     private fun setupBalloons() {
@@ -305,19 +297,6 @@ class HomeFragment :
                     )
                 }
             }
-    }
-
-    private fun showMemberProfileDialog() {
-        binding.composeView.setContent {
-            val profile: State<MemberProfile?> = viewModel.profileImageClickEvent.observeAsState()
-
-            profile.value?.let { memberProfile: MemberProfile ->
-                ProfileDialog(
-                    onDismissRequest = { viewModel.clearMemberProfileEvent() },
-                    memberProfile = memberProfile,
-                )
-            }
-        }
     }
 
     override fun onProfileImageClick(memberId: Long) {
