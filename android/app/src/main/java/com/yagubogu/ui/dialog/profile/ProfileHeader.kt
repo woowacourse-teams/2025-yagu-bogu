@@ -96,7 +96,7 @@ fun ProfileHeader(
                             contentDescription = "대표 배지 이미지",
                             modifier =
                                 Modifier
-                                    .size(40.dp)
+                                    .size(60.dp)
                                     .padding(start = 8.dp),
                         )
                     }

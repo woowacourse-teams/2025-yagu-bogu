@@ -27,8 +27,8 @@ import com.yagubogu.ui.dialog.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.dialog.model.MemberProfile
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.PretendardRegular12
-import com.yagubogu.ui.theme.PretendardSemiBold20
+import com.yagubogu.ui.theme.PretendardRegular
+import com.yagubogu.ui.theme.PretendardSemiBold
 import kotlinx.datetime.toJavaLocalDate
 
 @Composable
@@ -192,9 +192,9 @@ private fun StatItem(
             Text(text = emoji, fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        Text(text = value ?: "-", style = PretendardSemiBold20)
+        Text(text = value ?: "-", style = PretendardSemiBold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = title, style = PretendardRegular12, color = Gray500)
+        Text(text = title, style = PretendardRegular, color = Gray500, fontSize = 10.sp)
     }
 }
 
