@@ -8,6 +8,7 @@ import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
+import com.yagubogu.ui.common.model.MemberProfile
 
 /**
  * @param isFailureMode `true`면 Result.failure를 반환
@@ -79,6 +80,10 @@ class MemberFakeRepository(
     }
 
     override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfile> {
         TODO("Not yet implemented")
     }
 }
