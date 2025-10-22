@@ -114,6 +114,11 @@ class HomeFragment :
         binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
+    override fun onProfileImageClick(memberId: Long) {
+        viewModel.fetchMemberProfile(memberId)
+        firebaseAnalytics.logEvent("member_profile", null)
+    }
+
     private fun setupComposeView() {
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         binding.composeView.setContent {
@@ -297,10 +302,6 @@ class HomeFragment :
                     )
                 }
             }
-    }
-
-    override fun onProfileImageClick(memberId: Long) {
-        viewModel.fetchMemberProfile(memberId)
     }
 
     companion object {

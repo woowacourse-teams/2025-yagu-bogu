@@ -67,6 +67,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
                 is LivetalkChatEvent.ViewProfile -> {
                     viewModel.fetchMemberProfile(event.livetalkChatItem.memberId)
+                    firebaseAnalytics.logEvent("member_profile", null)
                 }
             }
         }
