@@ -18,9 +18,9 @@ data class MemberProfileResponse(
     @SerialName("representativeBadge")
     val representativeBadge: ProfileRepresentativeBadgeDto?, // 대표 배지 정보
     @SerialName("victoryFairy")
-    val victoryFairy: VictoryFairyDto, // 승리 요정 정보
+    val victoryFairyProfile: VictoryFairyProfileDto, // 승리 요정 정보
     @SerialName("checkIn")
-    val checkIn: CheckInDto, // 직관 인증 정보
+    val checkIn: MemberCheckInDto, // 직관 인증 정보
 ) {
     fun toPresentation(): MemberProfile =
         MemberProfile(
@@ -29,9 +29,9 @@ data class MemberProfileResponse(
             profileImageUrl = profileImageUrl,
             favoriteTeam = favoriteTeam,
             representativeBadgeImageUrl = representativeBadge?.imageUrl,
-            victoryFairyRanking = victoryFairy.ranking,
-            victoryFairyScore = victoryFairy.score,
-            victoryFairyRankingWithinTeam = victoryFairy.rankWithinTeam,
+            victoryFairyRanking = victoryFairyProfile.ranking,
+            victoryFairyScore = victoryFairyProfile.score,
+            victoryFairyRankingWithinTeam = victoryFairyProfile.rankWithinTeam,
             checkInCounts = checkIn.counts,
             checkInWinRate = checkIn.winRate,
             winCounts = checkIn.winCounts,
@@ -40,9 +40,3 @@ data class MemberProfileResponse(
             recentCheckInDate = checkIn.recentCheckInDate,
         )
 }
-
-@Serializable
-data class ProfileRepresentativeBadgeDto(
-    @SerialName("imageUrl")
-    val imageUrl: String,
-)

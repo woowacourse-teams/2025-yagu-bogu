@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CheckInDto(
+data class MemberCheckInDto(
     @SerialName("counts")
     val counts: Int?, // 누적 직관 인증 횟수
     @SerialName("winRate")

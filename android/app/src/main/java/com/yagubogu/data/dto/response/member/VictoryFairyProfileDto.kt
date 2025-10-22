@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VictoryFairyDto(
+data class VictoryFairyProfileDto(
     @SerialName("ranking")
     val ranking: Long?, // 승리 요정 랭킹
     @SerialName("rankWithinTeam")
