@@ -40,7 +40,7 @@ security:
 
 oauth:
   google:
-    base-uri: 'https://oauth2.googleapis.com'
+    base-uri: 'http://wiremock:8080'
     token-info-uri: '/tokeninfo'
     client-id: ${GOOGLE_CLIENT_ID}
     connect-timeout: 180s
