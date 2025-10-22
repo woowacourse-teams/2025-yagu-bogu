@@ -42,7 +42,7 @@ oauth:
   google:
     base-uri: 'http://wiremock:8080'
     token-info-uri: '/tokeninfo'
-    client-id: ${GOOGLE_CLIENT_ID}
+    client-id: mock-client-id
     connect-timeout: 180s
     read-timeout: 180s
 
