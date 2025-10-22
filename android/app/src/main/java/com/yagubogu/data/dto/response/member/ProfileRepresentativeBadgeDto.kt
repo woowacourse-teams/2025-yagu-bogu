@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProfileRepresentativeBadgeDto(
     @SerialName("imageUrl")
-    val imageUrl: String,
+    val imageUrl: String, // 프로필 이미지 주소
 )
