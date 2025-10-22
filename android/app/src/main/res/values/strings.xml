@@ -185,8 +185,8 @@
     <string name="profile_ranking_all">"전체 랭킹 : "</string>
     <string name="profile_ranking_within_team">" 랭킹 : "</string>
     <string name="profile_ranking_rank">위</string>
-    <string name="profile_victory_fairy_ranking">승리 요정 랭킹</string>
-    <string name="profile_victory_fairy_score">승리 요정 점수</string>
+    <string name="profile_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="profile_victory_fairy_score">승리요정 점수</string>
     <string name="profile_check_in_counts">직관 횟수</string>
     <string name="profile_winning_percentage">직관 승률</string>
     <string name="profile_win_draw_lose">승 무 패</string>
