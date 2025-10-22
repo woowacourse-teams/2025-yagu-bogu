@@ -1,9 +1,7 @@
 package com.yagubogu.ui.common.component.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,7 +41,10 @@ fun ProfileDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CancelButton(onClick = onDismissRequest)
+                CancelButton(
+                    onClick = onDismissRequest,
+                    modifier = Modifier.align(Alignment.End),
+                )
                 ProfileHeader(memberProfile = memberProfile)
                 Spacer(modifier = Modifier.height(20.dp))
                 ProfileContent(memberProfile = memberProfile)
@@ -57,17 +58,12 @@ private fun CancelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.End,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "닫기",
-            tint = Gray500,
-            modifier = Modifier.noRippleClickable(onClick = onClick),
-        )
-    }
+    Icon(
+        imageVector = Icons.Default.Close,
+        contentDescription = "닫기",
+        tint = Gray500,
+        modifier = modifier.noRippleClickable(onClick = onClick),
+    )
 }
 
 @Preview(showBackground = true)
