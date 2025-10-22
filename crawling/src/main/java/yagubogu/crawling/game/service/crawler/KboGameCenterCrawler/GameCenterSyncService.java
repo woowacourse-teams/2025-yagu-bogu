@@ -11,6 +11,7 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,46 +31,53 @@ public class GameCenterSyncService {
     /**
      * 특정 날짜 경기 상세 정보 수집
      */
-    public GameCenter fetchGameCenter(LocalDate date) {
-        GameCenter dailyData = crawler.fetchDailyGameCenter(date);
-        updateGameStates(dailyData.getGames());
-        return dailyData;
+    public List<Game> fetchGameCenter(LocalDate date) {
+        GameCenter dailyData = fetchGameCenterOnly(date);
+
+        return updateGameStates(dailyData.getGames());
+    }
+
+    public GameCenter fetchGameCenterOnly(LocalDate date) {
+        return crawler.fetchDailyGameCenter(date);
     }
 
     /**
      * GameDetailInfo 리스트를 받아서 Game 상태 업데이트
      */
-    private void updateGameStates(List<GameCenterDetail> gameDetails) {
+    private List<Game> updateGameStates(List<GameCenterDetail> gameDetails) {
+        List<Game> games = new ArrayList<>();
         for (GameCenterDetail detail : gameDetails) {
             try {
-                updateOrCreateGame(detail);
+                games.add(updateOrCreateGame(detail));
             } catch (Exception e) {
-                log.error("경기 업데이트 실패: gameCode={}", detail.getGameId(), e);
+                log.error("경기 업데이트 실패: gameCode={}", detail.getGameCode(), e);
             }
         }
+        return games;
     }
 
     /**
      * 개별 경기 업데이트 또는 생성
      */
-    private void updateOrCreateGame(GameCenterDetail detail) {
+    private Game updateOrCreateGame(GameCenterDetail detail) {
         // GameState 변환
         GameState gameState = fromGameSc(detail.getGameSc());
 
         // gameCode로 조회 또는 생성
-        Game game = gameRepository.findByGameCode(detail.getGameId())
+        Game game = gameRepository.findByGameCode(detail.getGameCode())
                 .orElseGet(() -> createNewGame(detail));
 
         // 상태 업데이트
         if (game.getGameState() != gameState) {
             game.updateGameState(gameState);
             log.info("경기 상태 업데이트: gameCode={}, {} vs {} - {} → {}",
-                    detail.getGameId(),
+                    detail.getGameCode(),
                     detail.getAwayTeamName(),
                     detail.getHomeTeamName(),
                     game.getGameState(),
                     gameState);
         }
+        return game;
     }
 
     private GameState fromGameSc(final String gameSc) {
@@ -103,7 +111,7 @@ public class GameCenterSyncService {
                 awayTeam,
                 date,
                 startAt,
-                detail.getGameId(),  // gameCode
+                detail.getGameCode(),  // gameCode
                 null,  // homeScore
                 null,  // awayScore
                 null,  // homeScoreBoard
@@ -114,7 +122,7 @@ public class GameCenterSyncService {
         );
 
         log.info("새 경기 생성: gameCode={}, {} vs {}",
-                detail.getGameId(),
+                detail.getGameCode(),
                 detail.getAwayTeamName(),
                 detail.getHomeTeamName());
 

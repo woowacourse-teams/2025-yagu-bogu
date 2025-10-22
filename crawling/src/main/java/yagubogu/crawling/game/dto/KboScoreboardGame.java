@@ -1,6 +1,7 @@
 package yagubogu.crawling.game.dto;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,13 @@ import lombok.Setter;
 public final class KboScoreboardGame {
 
     private final LocalDate date;
-    private final String gameId;
+    private final String gameCode;
     private final String status;
     private final String stadium;
-    private final String startTime;
+    private final LocalTime startTime;
     private final String boxScoreUrl;
-    private final KboScoreboardTeam awayTeam;
-    private final KboScoreboardTeam homeTeam;
+    private final KboScoreboardTeam awayTeamScoreboard;
+    private final KboScoreboardTeam homeTeamScoreboard;
     private final Integer awayScore;
     private final Integer homeScore;
     private final String winningPitcher;
@@ -25,13 +26,13 @@ public final class KboScoreboardGame {
 
     public KboScoreboardGame(
             LocalDate date,
-            String gameId,
+            String gameCode,
             String status,
             String stadium,
-            String startTime,
+            LocalTime startTime,
             String boxScoreUrl,
-            KboScoreboardTeam awayTeam,
-            KboScoreboardTeam homeTeam,
+            KboScoreboardTeam awayTeamScoreboard,
+            KboScoreboardTeam homeTeamScoreboard,
             Integer awayScore,
             Integer homeScore,
             String winningPitcher,
@@ -39,13 +40,13 @@ public final class KboScoreboardGame {
             String losingPitcher
     ) {
         this.date = date;
-        this.gameId = gameId;
+        this.gameCode = gameCode;
         this.status = status;
         this.stadium = stadium;
         this.startTime = startTime;
         this.boxScoreUrl = boxScoreUrl;
-        this.awayTeam = awayTeam;
-        this.homeTeam = homeTeam;
+        this.awayTeamScoreboard = awayTeamScoreboard;
+        this.homeTeamScoreboard = homeTeamScoreboard;
         this.awayScore = awayScore;
         this.homeScore = homeScore;
         this.winningPitcher = winningPitcher;

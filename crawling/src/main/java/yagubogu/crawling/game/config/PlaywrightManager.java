@@ -5,6 +5,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.PlaywrightException;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.function.Function;
@@ -15,12 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaywrightManager {
 
-    private final KboCrawlerProperties properties;
     private Playwright pw;
     private Browser browser;
 
-    public PlaywrightManager(final KboCrawlerProperties properties) {
-        this.properties = properties;
+    public PlaywrightManager() {
         initializeBrowser();
     }
 
@@ -54,11 +53,13 @@ public class PlaywrightManager {
         }
     }
 
-    public <T> T withPage(Function<Page, T> action) {
+    public synchronized <T> T withPage(Function<Page, T> action) {
         ensureBrowserConnected();
+        log.info("withPage 시작 - Browser 연결 상태: {}", browser.isConnected());
 
         Page page = null;
         BrowserContext ctx = null;
+        boolean resetBrowser = false;
 
         try {
             Browser.NewContextOptions opts = new Browser.NewContextOptions()
@@ -68,7 +69,9 @@ public class PlaywrightManager {
                     .setBypassCSP(true);
 
             ctx = browser.newContext(opts);
+            log.info("Context 생성 완료: {}", ctx != null);
             page = ctx.newPage();
+            log.info("Page 생성 완료");
 
             // 리소스 차단
             page.route("**/*", route -> {
@@ -86,6 +89,16 @@ public class PlaywrightManager {
 
             return action.apply(page);
 
+        } catch (PlaywrightException e) {
+            log.error("withPage 실행 중 Playwright 에러", e);
+            if (shouldResetBrowser(e)) {
+                log.warn("Playwright 세션이 종료되어 브라우저를 재초기화합니다.");
+                resetBrowser = true;
+            }
+            throw e;
+        } catch (RuntimeException e) {
+            log.error("withPage 실행 중 런타임 에러", e);
+            throw e;
         } catch (Exception e) {
             log.error("withPage 실행 중 에러", e);
             throw new RuntimeException("크롤링 실패", e);
@@ -105,7 +118,29 @@ public class PlaywrightManager {
                     log.debug("Context close 예외 (무시): {}", e.getMessage());
                 }
             }
+            if (resetBrowser) {
+                initializeBrowser();
+                log.info("재초기화 완료 - 새 Browser 연결: {}", browser.isConnected());
+            }
         }
+    }
+
+    private boolean shouldResetBrowser(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null) {
+                if (message.contains("Target page, context or browser has been closed")
+                        || message.contains("Target closed")
+                        || message.contains("Object doesn't exist")
+                        || message.contains("PipeTransport")
+                        || message.contains("Stream closed")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     @PreDestroy

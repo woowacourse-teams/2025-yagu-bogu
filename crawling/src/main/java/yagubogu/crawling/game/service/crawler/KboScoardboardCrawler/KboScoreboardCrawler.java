@@ -5,8 +5,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.yagubogu.game.exception.GameSyncException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,7 +37,7 @@ public class KboScoreboardCrawler {
     private final Duration waitTimeout;
     private final PlaywrightManager pwManager;
 
-    public synchronized Map<LocalDate, List<KboScoreboardGame>> crawlManyScoreboard(final List<LocalDate> dates) {
+    public synchronized Map<LocalDate, List<KboScoreboardGame>> crawl(final List<LocalDate> dates) {
         Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
         if (dates == null || dates.isEmpty()) {
             return result;
@@ -210,7 +212,7 @@ public class KboScoreboardCrawler {
                 gameId,
                 emptyToNull(status),
                 emptyToNull(stadium),
-                emptyToNull(startTime),
+                parseLocalTimeEmptyToNull(startTime),
                 emptyToNull(boxScoreUrl),
                 awayTeam,
                 homeTeam,
@@ -389,6 +391,14 @@ public class KboScoreboardCrawler {
         return t.isEmpty() ? null : t;
     }
 
+    private LocalTime parseLocalTimeEmptyToNull(final String v) {
+        if (v == null) {
+            return null;
+        }
+        String t = v.trim();
+        return t.isEmpty() ? null : parseTime(t);
+    }
+
     private Pitcher parsePitcher(ElementHandle scoreboard) {
         String win = null, save = null, lose = null;
         try {
@@ -421,5 +431,13 @@ public class KboScoreboardCrawler {
         } catch (PlaywrightException ignored) {
         }
         return new Pitcher(win, save, lose);
+    }
+
+    private LocalTime parseTime(String startTime) {
+        try {
+            return LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (Exception e) {
+            throw new GameSyncException("Invalid time format: " + startTime);
+        }
     }
 }

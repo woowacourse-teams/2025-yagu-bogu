@@ -20,7 +20,9 @@ import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "games")
@@ -81,7 +83,7 @@ public class Game {
                 final LocalTime startAt, final String gameCode,
                 final Integer homeScore, final Integer awayScore, final ScoreBoard homeScoreBoard,
                 final ScoreBoard awayScoreBoard,
-                final String homePitcher, final String awayPitcher, final GameState gameState) {
+                final String homePitcher, final String awayPitcher, final GameState newState) {
         this.stadium = stadium;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
@@ -94,11 +96,23 @@ public class Game {
         this.awayScoreBoard = awayScoreBoard;
         this.homePitcher = homePitcher;
         this.awayPitcher = awayPitcher;
-        this.gameState = gameState;
+        updateGameState(newState);
     }
 
-    public void updateGameState(final GameState gameState) {
-        this.gameState = gameState;
+    public void updateGameState(final GameState newState) {
+        if (newState == GameState.CANCELED) {
+            this.gameState = GameState.CANCELED;
+            log.info("Game canceled: gameCode={}", this.gameCode);
+            return;
+        }
+
+        if (this.gameState != null && !this.gameState.canTransitionTo(newState)) {
+            log.warn("Invalid state transition blocked in game center update: " +
+                            "gameCode={}, current={}, attempted={}",
+                    this.gameCode, this.gameState, newState);
+            return;
+        }
+        this.gameState = newState;
     }
 
     public void updateScoreBoard(
@@ -116,20 +130,43 @@ public class Game {
         this.awayPitcher = awayPitcher;
     }
 
-    public void updateSchedule(
-            final Stadium stadium,
-            final Team homeTeam,
-            final Team awayTeam,
-            final LocalDate date,
-            final LocalTime startAt,
-            final GameState gameState
+    public void update(
+            final Stadium stadium, final Team homeTeam, final Team awayTeam,
+            final LocalDate date, final LocalTime startAt, final String gameCode,
+            final Integer homeScore, final Integer awayScore, final ScoreBoard homeScoreBoard,
+            final ScoreBoard awayScoreBoard, final String homePitcher, final String awayPitcher,
+            final GameState newState
     ) {
         this.stadium = stadium;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.date = date;
         this.startAt = startAt;
-        this.gameState = gameState;
+        this.gameCode = gameCode;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+        this.homeScoreBoard = homeScoreBoard;
+        this.awayScoreBoard = awayScoreBoard;
+        this.homePitcher = homePitcher;
+        this.awayPitcher = awayPitcher;
+        updateGameState(newState);
+    }
+
+    public void updateSchedule(
+            final Stadium stadium,
+            final Team homeTeam,
+            final Team awayTeam,
+            final LocalDate date,
+            final LocalTime startAt,
+            final GameState newState
+    ) {
+
+        this.stadium = stadium;
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.date = date;
+        this.startAt = startAt;
+        updateGameState(newState);
     }
 
     public boolean hasTeam(final Team team) {

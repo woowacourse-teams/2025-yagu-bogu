@@ -1,6 +1,7 @@
 package yagubogu.crawling;
 
 import com.yagubogu.global.config.QueryDslConfig;
+import com.yagubogu.global.config.ScheduleConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -10,7 +11,8 @@ import yagubogu.crawling.game.config.KboClientConfig;
 
 @Import({
         KboClientConfig.class,
-        QueryDslConfig.class
+        QueryDslConfig.class,
+        ScheduleConfig.class
 })
 @EntityScan(basePackages = "com.yagubogu")
 @EnableJpaRepositories(basePackages = "com.yagubogu")

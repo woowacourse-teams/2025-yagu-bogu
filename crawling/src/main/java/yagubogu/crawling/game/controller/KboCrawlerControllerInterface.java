@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import yagubogu.crawling.game.dto.GamesFromGameCenter;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
-import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenter;
 import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.ScheduleType;
 
 @Tag(name = "KboCrawler", description = "KBO 크롤링 관련 API")
@@ -48,6 +48,6 @@ public interface KboCrawlerControllerInterface {
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")
     })
     @PostMapping("/game-center")
-    ResponseEntity<GameCenter> fetchGameCenter(
+    ResponseEntity<GamesFromGameCenter> fetchGameCenter(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
 }

@@ -94,7 +94,7 @@ public class KboGameCenterCrawler {
             gameCenter.setDate(date);
 
             // li 태그의 속성들
-            gameCenter.setGameId(gameElement.getAttribute("g_id"));
+            gameCenter.setGameCode(gameElement.getAttribute("g_id"));
             gameCenter.setGameDate(gameElement.getAttribute("g_dt"));
             gameCenter.setGameSc(gameElement.getAttribute("game_sc"));
             gameCenter.setAwayTeamCode(gameElement.getAttribute("away_id"));

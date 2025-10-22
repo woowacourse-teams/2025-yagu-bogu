@@ -8,7 +8,7 @@ public class GameCenterDetail {
 
     // 기본 정보
     private String date;
-    private String gameId;
+    private String gameCode;
     private String gameDate;
     private String gameSc;
 

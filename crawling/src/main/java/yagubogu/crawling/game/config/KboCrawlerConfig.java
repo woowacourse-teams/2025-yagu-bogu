@@ -22,8 +22,8 @@ public class KboCrawlerConfig {
     }
 
     @Bean
-    public PlaywrightManager playwrightManager(final KboCrawlerProperties properties) {
-        return new PlaywrightManager(properties);
+    public PlaywrightManager playwrightManager() {
+        return new PlaywrightManager();
     }
 
     @Bean
