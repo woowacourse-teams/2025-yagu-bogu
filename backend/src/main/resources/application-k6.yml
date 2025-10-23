@@ -16,6 +16,14 @@ spring:
       idle-timeout: 300000
       leak-detection-threshold: 30000
 
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 4
+        queue-capacity: 200
+      thread-name-prefix: app-async-
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -30,7 +38,7 @@ spring:
 server:
   tomcat:
     threads:
-      max: 5
+      max: 200
       min-spare: 16
     accept-count: 100
 
