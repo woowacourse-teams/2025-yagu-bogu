@@ -266,7 +266,7 @@ private fun VictoryFairyStatsRow(
                 } else {
                     null
                 },
-            emoji = "\uD83C\uDF96\uFE0F",
+            emoji = stringResource(R.string.profile_victory_fairy_ranking_emoji),
             modifier = Modifier.weight(1f),
         )
         VerticalDivider(
@@ -282,7 +282,7 @@ private fun VictoryFairyStatsRow(
                 } else {
                     null
                 },
-            emoji = "\uD83E\uDDDA",
+            emoji = stringResource(R.string.profile_victory_fairy_score_emoji),
             modifier = Modifier.weight(1f),
         )
     }
