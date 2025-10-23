@@ -192,5 +192,7 @@
     <string name="profile_win_draw_lose">승 무 패</string>
     <string name="profile_register_date">가입일</string>
     <string name="profile_latest_check_in_date">최근 직관일</string>
+    <string name="profile_image_url_content_description">프로필 이미지</string>
+    <string name="profile_representative_badge_content_description">대표 배지 이미지</string>
 
 </resources>

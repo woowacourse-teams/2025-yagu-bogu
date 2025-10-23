@@ -86,7 +86,7 @@ private fun CancelButton(
 ) {
     Icon(
         imageVector = Icons.Rounded.Close,
-        contentDescription = "닫기",
+        contentDescription = stringResource(R.string.all_back_button_content_description),
         tint = Gray500,
         modifier = modifier.noRippleClickable(onClick = onClick),
     )
@@ -111,8 +111,7 @@ fun ProfileHeader(
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(12.dp),
-                    )
-                    .padding(
+                    ).padding(
                         top = profileImageOverlap - 20.dp,
                         bottom = 20.dp,
                         start = 20.dp,
@@ -144,7 +143,7 @@ fun ProfileHeader(
                 memberProfile.representativeBadgeImageUrl?.let { badgeImageUrl: String ->
                     AsyncImage(
                         model = badgeImageUrl,
-                        contentDescription = "대표 배지 이미지",
+                        contentDescription = stringResource(R.string.profile_representative_badge_content_description),
                         modifier = Modifier.size(50.dp),
                     )
                 }
@@ -160,7 +159,7 @@ fun ProfileHeader(
         ) {
             AsyncImage(
                 model = memberProfile.profileImageUrl,
-                contentDescription = "프로필 이미지",
+                contentDescription = stringResource(R.string.profile_image_url_content_description),
                 modifier =
                     Modifier
                         .fillMaxSize()
