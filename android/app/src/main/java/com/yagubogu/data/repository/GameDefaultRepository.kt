@@ -7,19 +7,22 @@ import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import java.time.LocalDate
+import javax.inject.Inject
 
-class GameDefaultRepository(
-    private val gameDataSource: GameDataSource,
-) : GameRepository {
-    override suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>> =
-        gameDataSource.getGames(date).map { gameResponse: GameResponse ->
-            gameResponse.games.map { it.toPresentation() }
-        }
+class GameDefaultRepository
+    @Inject
+    constructor(
+        private val gameDataSource: GameDataSource,
+    ) : GameRepository {
+        override suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>> =
+            gameDataSource.getGames(date).map { gameResponse: GameResponse ->
+                gameResponse.games.map { it.toPresentation() }
+            }
 
-    override suspend fun addLikeBatches(
-        gameId: Long,
-        likeBatchRequest: LikeBatchRequest,
-    ): Result<Unit> = gameDataSource.addLikeBatches(gameId, likeBatchRequest)
+        override suspend fun addLikeBatches(
+            gameId: Long,
+            likeBatchRequest: LikeBatchRequest,
+        ): Result<Unit> = gameDataSource.addLikeBatches(gameId, likeBatchRequest)
 
-    override suspend fun getLikeCounts(gameId: Long): Result<LikeCountsResponse> = gameDataSource.getLikeCounts(gameId)
-}
+        override suspend fun getLikeCounts(gameId: Long): Result<LikeCountsResponse> = gameDataSource.getLikeCounts(gameId)
+    }

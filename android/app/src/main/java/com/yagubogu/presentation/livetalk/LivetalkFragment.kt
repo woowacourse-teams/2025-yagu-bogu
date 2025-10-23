@@ -14,18 +14,17 @@ import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 import com.yagubogu.presentation.util.ScrollToTop
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class LivetalkFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentLivetalkBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: LivetalkViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        LivetalkViewModelFactory(app.gamesRepository)
-    }
+    private val viewModel: LivetalkViewModel by viewModels()
 
     private val livetalkStadiumAdapter by lazy {
         LivetalkStadiumAdapter(

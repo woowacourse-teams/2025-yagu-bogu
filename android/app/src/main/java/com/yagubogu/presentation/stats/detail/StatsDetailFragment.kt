@@ -9,21 +9,17 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsDetailBinding
 import com.yagubogu.presentation.util.ScrollToTop
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class StatsDetailFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentStatsDetailBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: StatsDetailViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        StatsDetailViewModelFactory(
-            app.statsRepository,
-            app.checkInsRepository,
-        )
-    }
+    private val viewModel: StatsDetailViewModel by viewModels()
 
     private val vsTeamStatAdapter: VsTeamStatAdapter by lazy { VsTeamStatAdapter() }
     private val barChartManager: BarChartManager by lazy {

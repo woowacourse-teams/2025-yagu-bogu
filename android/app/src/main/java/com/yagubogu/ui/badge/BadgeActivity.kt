@@ -15,9 +15,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.YaguBoguApplication
 import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.theme.YaguBoguTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BadgeActivity : ComponentActivity() {
-    private val viewModel: BadgeViewModel by viewModels { BadgeViewModelFactory((application as YaguBoguApplication).memberRepository) }
+    private val viewModel: BadgeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

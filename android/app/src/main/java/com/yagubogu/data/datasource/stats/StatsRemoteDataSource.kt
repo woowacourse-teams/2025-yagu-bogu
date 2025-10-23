@@ -9,40 +9,43 @@ import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.util.safeApiCall
 import com.yagubogu.domain.model.Team
+import javax.inject.Inject
 
-class StatsRemoteDataSource(
-    private val statsApiService: StatsApiService,
-) : StatsDataSource {
-    override suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse> =
-        safeApiCall {
-            statsApiService.getStatsWinRate(year)
-        }
+class StatsRemoteDataSource
+    @Inject
+    constructor(
+        private val statsApiService: StatsApiService,
+    ) : StatsDataSource {
+        override suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse> =
+            safeApiCall {
+                statsApiService.getStatsWinRate(year)
+            }
 
-    override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> =
-        safeApiCall {
-            statsApiService.getStatsCounts(year)
-        }
+        override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> =
+            safeApiCall {
+                statsApiService.getStatsCounts(year)
+            }
 
-    override suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse> =
-        safeApiCall {
-            statsApiService.getLuckyStadiums(year)
-        }
+        override suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse> =
+            safeApiCall {
+                statsApiService.getLuckyStadiums(year)
+            }
 
-    override suspend fun getAverageStats(): Result<AverageStatisticResponse> =
-        safeApiCall {
-            statsApiService.getAverageStats()
-        }
+        override suspend fun getAverageStats(): Result<AverageStatisticResponse> =
+            safeApiCall {
+                statsApiService.getAverageStats()
+            }
 
-    override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =
-        safeApiCall {
-            statsApiService.getVsTeamStats(year)
-        }
+        override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =
+            safeApiCall {
+                statsApiService.getVsTeamStats(year)
+            }
 
-    override suspend fun getVictoryFairyRankings(
-        year: Int,
-        team: Team?,
-    ): Result<VictoryFairyRankingResponse> =
-        safeApiCall {
-            statsApiService.getVictoryFairyRankings(year, team?.name)
-        }
-}
+        override suspend fun getVictoryFairyRankings(
+            year: Int,
+            team: Team?,
+        ): Result<VictoryFairyRankingResponse> =
+            safeApiCall {
+                statsApiService.getVictoryFairyRankings(year, team?.name)
+            }
+    }

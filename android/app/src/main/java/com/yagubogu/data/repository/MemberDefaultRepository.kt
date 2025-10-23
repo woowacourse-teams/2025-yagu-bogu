@@ -17,105 +17,108 @@ import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
+import javax.inject.Inject
 
-class MemberDefaultRepository(
-    private val memberDataSource: MemberDataSource,
-    private val tokenManager: TokenManager,
-) : MemberRepository {
-    private var cachedNickname: String? = null
-    private var cachedFavoriteTeam: String? = null
+class MemberDefaultRepository
+    @Inject
+    constructor(
+        private val memberDataSource: MemberDataSource,
+        private val tokenManager: TokenManager,
+    ) : MemberRepository {
+        private var cachedNickname: String? = null
+        private var cachedFavoriteTeam: String? = null
 
-    override suspend fun getMemberInfo(): Result<MemberInfoItem> =
-        memberDataSource.getMemberInfo().map { memberInfoResponse: MemberInfoResponse ->
-            cachedNickname = memberInfoResponse.nickname
-            cachedFavoriteTeam = memberInfoResponse.favoriteTeam
-            memberInfoResponse.toPresentation()
-        }
-
-    override suspend fun getNickname(): Result<String> {
-        cachedNickname?.let { nickname: String ->
-            return Result.success(nickname)
-        }
-
-        return memberDataSource
-            .getNickname()
-            .map { memberNicknameResponse: MemberNicknameResponse ->
-                val nickname: String = memberNicknameResponse.nickname
-                cachedNickname = nickname
-                nickname
+        override suspend fun getMemberInfo(): Result<MemberInfoItem> =
+            memberDataSource.getMemberInfo().map { memberInfoResponse: MemberInfoResponse ->
+                cachedNickname = memberInfoResponse.nickname
+                cachedFavoriteTeam = memberInfoResponse.favoriteTeam
+                memberInfoResponse.toPresentation()
             }
+
+        override suspend fun getNickname(): Result<String> {
+            cachedNickname?.let { nickname: String ->
+                return Result.success(nickname)
+            }
+
+            return memberDataSource
+                .getNickname()
+                .map { memberNicknameResponse: MemberNicknameResponse ->
+                    val nickname: String = memberNicknameResponse.nickname
+                    cachedNickname = nickname
+                    nickname
+                }
+        }
+
+        override suspend fun updateNickname(nickname: String): Result<Unit> =
+            memberDataSource
+                .updateNickname(nickname)
+                .map { memberNicknameResponse: MemberNicknameResponse ->
+                    val newNickname: String = memberNicknameResponse.nickname
+                    cachedNickname = newNickname
+                }
+
+        override suspend fun getFavoriteTeam(): Result<String?> {
+            cachedFavoriteTeam?.let { favoriteTeam: String ->
+                return Result.success(favoriteTeam)
+            }
+
+            return memberDataSource
+                .getFavoriteTeam()
+                .map { memberFavoriteResponse: MemberFavoriteResponse ->
+                    val favoriteTeam: String? = memberFavoriteResponse.favorite
+                    cachedFavoriteTeam = favoriteTeam
+                    favoriteTeam
+                }
+        }
+
+        override suspend fun updateFavoriteTeam(team: Team): Result<Unit> =
+            memberDataSource
+                .updateFavoriteTeam(team)
+                .map { memberFavoriteResponse: MemberFavoriteResponse ->
+                    val newFavoriteTeam: String? = memberFavoriteResponse.favorite
+                    cachedFavoriteTeam = newFavoriteTeam
+                }
+
+        override suspend fun deleteMember(): Result<Unit> =
+            memberDataSource.deleteMember().map {
+                tokenManager.clearTokens()
+            }
+
+        override suspend fun getBadges(): Result<BadgeUiState> =
+            memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
+                val representativeBadge: BadgeUiModel? =
+                    badgeResponse.representativeBadge?.toPresentation()
+                val badges: List<BadgeInfoUiModel> =
+                    badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
+                BadgeUiState.Success(representativeBadge, badges)
+            }
+
+        override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.updateRepresentativeBadge(badgeId)
+
+        override fun invalidateCache() {
+            cachedNickname = null
+            cachedFavoriteTeam = null
+        }
+
+        override suspend fun getPresignedUrl(
+            contentType: String,
+            contentLength: Long,
+        ): Result<PresignedUrlItem> =
+            memberDataSource
+                .getPresignedUrl(
+                    contentType,
+                    contentLength,
+                ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
+                    PresignedUrlItem(
+                        presignedUrlStartResponse.key,
+                        presignedUrlStartResponse.url,
+                    )
+                }
+
+        override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> =
+            memberDataSource
+                .completeUploadProfileImage(key)
+                .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
+                    PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
+                }
     }
-
-    override suspend fun updateNickname(nickname: String): Result<Unit> =
-        memberDataSource
-            .updateNickname(nickname)
-            .map { memberNicknameResponse: MemberNicknameResponse ->
-                val newNickname: String = memberNicknameResponse.nickname
-                cachedNickname = newNickname
-            }
-
-    override suspend fun getFavoriteTeam(): Result<String?> {
-        cachedFavoriteTeam?.let { favoriteTeam: String ->
-            return Result.success(favoriteTeam)
-        }
-
-        return memberDataSource
-            .getFavoriteTeam()
-            .map { memberFavoriteResponse: MemberFavoriteResponse ->
-                val favoriteTeam: String? = memberFavoriteResponse.favorite
-                cachedFavoriteTeam = favoriteTeam
-                favoriteTeam
-            }
-    }
-
-    override suspend fun updateFavoriteTeam(team: Team): Result<Unit> =
-        memberDataSource
-            .updateFavoriteTeam(team)
-            .map { memberFavoriteResponse: MemberFavoriteResponse ->
-                val newFavoriteTeam: String? = memberFavoriteResponse.favorite
-                cachedFavoriteTeam = newFavoriteTeam
-            }
-
-    override suspend fun deleteMember(): Result<Unit> =
-        memberDataSource.deleteMember().map {
-            tokenManager.clearTokens()
-        }
-
-    override suspend fun getBadges(): Result<BadgeUiState> =
-        memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
-            val representativeBadge: BadgeUiModel? =
-                badgeResponse.representativeBadge?.toPresentation()
-            val badges: List<BadgeInfoUiModel> =
-                badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
-            BadgeUiState.Success(representativeBadge, badges)
-        }
-
-    override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.updateRepresentativeBadge(badgeId)
-
-    override fun invalidateCache() {
-        cachedNickname = null
-        cachedFavoriteTeam = null
-    }
-
-    override suspend fun getPresignedUrl(
-        contentType: String,
-        contentLength: Long,
-    ): Result<PresignedUrlItem> =
-        memberDataSource
-            .getPresignedUrl(
-                contentType,
-                contentLength,
-            ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
-                PresignedUrlItem(
-                    presignedUrlStartResponse.key,
-                    presignedUrlStartResponse.url,
-                )
-            }
-
-    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> =
-        memberDataSource
-            .completeUploadProfileImage(key)
-            .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
-                PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
-            }
-}

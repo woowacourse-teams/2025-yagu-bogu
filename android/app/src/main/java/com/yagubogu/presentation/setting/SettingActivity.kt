@@ -16,16 +16,15 @@ import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingActivity : AppCompatActivity() {
     private val binding: ActivitySettingBinding by lazy {
         ActivitySettingBinding.inflate(layoutInflater)
     }
 
-    private val viewModel: SettingViewModel by viewModels {
-        val app = application as YaguBoguApplication
-        SettingViewModelFactory(app.memberRepository, app.authRepository, app.thirdPartyRepository)
-    }
+    private val viewModel: SettingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

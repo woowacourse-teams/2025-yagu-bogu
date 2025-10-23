@@ -26,7 +26,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
@@ -39,25 +38,17 @@ import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.home.component.HomeDialog
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class HomeFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: HomeViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        HomeViewModelFactory(
-            app.memberRepository,
-            app.checkInsRepository,
-            app.statsRepository,
-            app.locationRepository,
-            app.stadiumRepository,
-            app.streamRepository,
-        )
-    }
+    private val viewModel: HomeViewModel by viewModels()
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 

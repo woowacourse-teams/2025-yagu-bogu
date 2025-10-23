@@ -6,32 +6,37 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoriteTeamViewModel(
-    private val memberRepository: MemberRepository,
-) : ViewModel() {
-    private var selectedTeam: Team? = null
+@HiltViewModel
+class FavoriteTeamViewModel
+    @Inject
+    constructor(
+        private val memberRepository: MemberRepository,
+    ) : ViewModel() {
+        private var selectedTeam: Team? = null
 
-    private val _favoriteTeamUpdateEvent = MutableSingleLiveData<Unit>()
-    val favoriteTeamUpdateEvent: SingleLiveData<Unit> get() = _favoriteTeamUpdateEvent
+        private val _favoriteTeamUpdateEvent = MutableSingleLiveData<Unit>()
+        val favoriteTeamUpdateEvent: SingleLiveData<Unit> get() = _favoriteTeamUpdateEvent
 
-    fun saveFavoriteTeam() {
-        viewModelScope.launch {
-            selectedTeam?.let { team: Team ->
-                memberRepository
-                    .updateFavoriteTeam(team)
-                    .onSuccess {
-                        _favoriteTeamUpdateEvent.setValue(Unit)
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "API 호출 실패")
-                    }
+        fun saveFavoriteTeam() {
+            viewModelScope.launch {
+                selectedTeam?.let { team: Team ->
+                    memberRepository
+                        .updateFavoriteTeam(team)
+                        .onSuccess {
+                            _favoriteTeamUpdateEvent.setValue(Unit)
+                        }.onFailure { exception: Throwable ->
+                            Timber.w(exception, "API 호출 실패")
+                        }
+                }
             }
         }
-    }
 
-    fun selectTeam(team: Team) {
-        selectedTeam = team
+        fun selectTeam(team: Team) {
+            selectedTeam = team
+        }
     }
-}
