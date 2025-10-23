@@ -2,6 +2,7 @@ package com.yagubogu.data.dto.response.member
 
 import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,7 +26,7 @@ data class MemberProfileResponse(
     fun toPresentation(): MemberProfile =
         MemberProfile(
             nickname = nickname,
-            enterDate = enterDate,
+            enterDate = enterDate.toJavaLocalDate(),
             profileImageUrl = profileImageUrl,
             favoriteTeam = favoriteTeam,
             representativeBadgeImageUrl = representativeBadge?.imageUrl,
@@ -37,6 +38,6 @@ data class MemberProfileResponse(
             winCounts = checkIn.winCounts,
             drawCounts = checkIn.drawCounts,
             loseCounts = checkIn.loseCounts,
-            recentCheckInDate = checkIn.recentCheckInDate,
+            recentCheckInDate = checkIn.recentCheckInDate?.toJavaLocalDate(),
         )
 }

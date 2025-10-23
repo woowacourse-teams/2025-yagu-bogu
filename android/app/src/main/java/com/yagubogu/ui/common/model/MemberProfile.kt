@@ -1,6 +1,6 @@
 package com.yagubogu.ui.common.model
 
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 
 data class MemberProfile(
     val nickname: String, // 회원 닉네임
@@ -24,7 +24,7 @@ data class MemberProfile(
 val MEMBER_PROFILE_FIXTURE =
     MemberProfile(
         nickname = "Jake Wharton",
-        enterDate = LocalDate(2025, 10, 1),
+        enterDate = LocalDate.of(2025, 10, 1),
         profileImageUrl = "https://avatars.githubusercontent.com/u/66577?v=4",
         favoriteTeam = "KIA",
         representativeBadgeImageUrl = "",
@@ -36,13 +36,13 @@ val MEMBER_PROFILE_FIXTURE =
         winCounts = 10,
         drawCounts = 3,
         loseCounts = 5,
-        recentCheckInDate = LocalDate(2025, 10, 19),
+        recentCheckInDate = LocalDate.of(2025, 10, 19),
     )
 
 val MEMBER_PROFILE_FIXTURE_NULL =
     MemberProfile(
         nickname = "Alvaro Bruce",
-        enterDate = LocalDate(2025, 10, 1),
+        enterDate = LocalDate.of(2025, 10, 1),
         profileImageUrl = "https://www.google.com/#q=quod",
         favoriteTeam = "삼성",
         representativeBadgeImageUrl = null,

@@ -48,7 +48,6 @@ import com.yagubogu.ui.theme.PretendardSemiBold20
 import com.yagubogu.ui.theme.Primary600
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.util.noRippleClickable
-import kotlinx.datetime.toJavaLocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -350,7 +349,7 @@ private fun DatesRow(
     ) {
         StatItem(
             title = stringResource(R.string.profile_register_date),
-            value = memberProfile.enterDate.toJavaLocalDate().format(DateFormatter.yyyyMMdd),
+            value = memberProfile.enterDate.format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f),
         )
         VerticalDivider(
@@ -362,7 +361,6 @@ private fun DatesRow(
             title = stringResource(R.string.profile_latest_check_in_date),
             value =
                 memberProfile.recentCheckInDate
-                    ?.toJavaLocalDate()
                     ?.format(DateFormatter.yyyyMMdd),
             modifier = Modifier.weight(1f),
         )
