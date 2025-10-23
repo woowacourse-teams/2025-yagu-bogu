@@ -41,7 +41,6 @@ import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardSemiBold
@@ -112,7 +111,8 @@ fun ProfileHeader(
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(12.dp),
-                    ).padding(
+                    )
+                    .padding(
                         top = profileImageOverlap - 20.dp,
                         bottom = 20.dp,
                         start = 20.dp,
@@ -145,7 +145,7 @@ fun ProfileHeader(
                     AsyncImage(
                         model = badgeImageUrl,
                         contentDescription = "대표 배지 이미지",
-                        modifier = Modifier.size(50.dp)
+                        modifier = Modifier.size(50.dp),
                     )
                 }
             }
@@ -239,7 +239,7 @@ fun ProfileContent(
                 .background(Color.White, RoundedCornerShape(12.dp))
                 .padding(vertical = 20.dp),
     ) {
-        VictoryFairyStatsRow(memberProfile = memberProfile, modifier = modifier)
+        VictoryFairyStatsRow(memberProfile = memberProfile)
         Spacer(modifier = Modifier.height(24.dp))
         CheckInStatsRow(memberProfile = memberProfile, modifier = modifier)
         Spacer(modifier = Modifier.height(30.dp))
@@ -269,7 +269,7 @@ private fun VictoryFairyStatsRow(
                     null
                 },
             emoji = "\uD83C\uDF96\uFE0F",
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
         VerticalDivider(
             thickness = 0.4.dp,
@@ -285,7 +285,7 @@ private fun VictoryFairyStatsRow(
                     null
                 },
             emoji = "\uD83E\uDDDA",
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -306,7 +306,7 @@ private fun CheckInStatsRow(
         StatItem(
             title = stringResource(R.string.profile_check_in_counts),
             value = memberProfile.checkInCounts?.toString(),
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
         VerticalDivider(
             thickness = 0.4.dp,
@@ -321,11 +321,7 @@ private fun CheckInStatsRow(
                 } else {
                     null
                 },
-            modifier =
-                Modifier.weight(
-                    1f,
-                    true,
-                ),
+            modifier = Modifier.weight(1f),
         )
         VerticalDivider(
             thickness = 0.4.dp,
@@ -335,7 +331,7 @@ private fun CheckInStatsRow(
         StatItem(
             title = stringResource(R.string.profile_win_draw_lose),
             value = memberProfile.winDrawLose,
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -356,7 +352,7 @@ private fun DatesRow(
         StatItem(
             title = stringResource(R.string.profile_register_date),
             value = memberProfile.enterDate.toJavaLocalDate().format(DateFormatter.yyyyMMdd),
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
         VerticalDivider(
             thickness = 0.4.dp,
@@ -369,7 +365,7 @@ private fun DatesRow(
                 memberProfile.recentCheckInDate
                     ?.toJavaLocalDate()
                     ?.format(DateFormatter.yyyyMMdd),
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
         )
     }
 }
