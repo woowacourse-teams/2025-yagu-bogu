@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.MainActivity

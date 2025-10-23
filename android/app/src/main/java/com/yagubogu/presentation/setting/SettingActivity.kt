@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivitySettingBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.login.LoginActivity
