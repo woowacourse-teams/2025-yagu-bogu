@@ -27,6 +27,13 @@ spring:
   flyway:
     enabled: true
 
+server:
+  tomcat:
+    threads:
+      max: 5
+      min-spare: 16
+    accept-count: 100
+
 management:
   metrics:
     enable:
