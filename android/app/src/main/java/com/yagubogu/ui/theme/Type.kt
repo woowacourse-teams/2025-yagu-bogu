@@ -16,6 +16,7 @@ val PretendardMedium =
         fontFamily = PretendardFontFamily,
         fontWeight = FontWeight.Medium,
     )
+val PretendardMedium12 = PretendardMedium.copy(fontSize = 12.sp)
 val PretendardMedium16 = PretendardMedium.copy(fontSize = 16.sp)
 val PretendardSemiBold =
     TextStyle(

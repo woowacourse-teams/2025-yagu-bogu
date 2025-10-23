@@ -42,6 +42,7 @@ import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
+import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold20
@@ -100,81 +101,71 @@ fun ProfileHeader(
     val profileImageSize = 100.dp
     val profileImageOverlap = (0.6 * profileImageSize.value).dp // 카드 위로 겹치는 영역
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = modifier,
     ) {
         Box(
-            contentAlignment = Alignment.TopCenter,
+            modifier =
+                Modifier
+                    .padding(top = profileImageOverlap)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(12.dp),
+                    ).padding(
+                        top = profileImageOverlap - 20.dp,
+                        bottom = 20.dp,
+                        start = 20.dp,
+                        end = 20.dp,
+                    ),
         ) {
-            Box(
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier =
-                    modifier
-                        .padding(top = profileImageOverlap)
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(12.dp),
-                        ).padding(
-                            top = profileImageOverlap - 20.dp,
-                            bottom = 20.dp,
-                            start = 20.dp,
-                            end = 20.dp,
-                        ),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier =
-                        modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 9.dp),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.all_fan, memberProfile.favoriteTeam),
-                            style = PretendardMedium,
-                            fontSize = 12.sp,
-                            color = Primary600,
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = memberProfile.nickname,
-                            style = PretendardSemiBold20,
-                            maxLines = 1,
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        RankingText(memberProfile)
-                    }
-                    memberProfile.representativeBadgeImageUrl?.let { badgeImageUrl: String ->
-                        AsyncImage(
-                            model = badgeImageUrl,
-                            contentDescription = "대표 배지 이미지",
-                            modifier =
-                                Modifier
-                                    .size(60.dp)
-                                    .padding(start = 8.dp),
-                        )
-                    }
+                Column {
+                    Text(
+                        text = stringResource(R.string.all_fan, memberProfile.favoriteTeam),
+                        style = PretendardMedium12,
+                        color = Primary600,
+                    )
+                    Text(
+                        text = memberProfile.nickname,
+                        style = PretendardSemiBold20,
+                        maxLines = 1,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    RankingText(memberProfile)
+                }
+                memberProfile.representativeBadgeImageUrl?.let { badgeImageUrl: String ->
+                    AsyncImage(
+                        model = badgeImageUrl,
+                        contentDescription = "대표 배지 이미지",
+                        modifier = Modifier.size(50.dp)
+                    )
                 }
             }
-            Box(
+        }
+        Box(
+            modifier =
+                Modifier
+                    .size(100.dp)
+                    .background(Gray050, CircleShape)
+                    .padding(10.dp)
+                    .clip(CircleShape),
+        ) {
+            AsyncImage(
+                model = memberProfile.profileImageUrl,
+                contentDescription = "프로필 이미지",
                 modifier =
-                    modifier
-                        .size(100.dp)
-                        .background(Gray050, CircleShape)
-                        .padding(10.dp)
-                        .clip(CircleShape),
-            ) {
-                AsyncImage(
-                    model = memberProfile.profileImageUrl,
-                    contentDescription = "프로필 이미지",
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .border(1.dp, Gray300, CircleShape), // 검은색 테두리 추가
-                )
-            }
+                    Modifier
+                        .fillMaxSize()
+                        .border(1.dp, Gray300, CircleShape), // 검은색 테두리 추가
+            )
         }
     }
 }
