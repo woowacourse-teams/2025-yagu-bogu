@@ -3,24 +3,18 @@ spring:
   transaction:
     default-timeout: 30s
 
-# ------
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     hikari:
-      maximumPoolSize: 36
-      minimumIdle: 18
-      connectionTimeout: 15000
-      idleTimeout: 300000
-      maxLifetime: 540000
-      validationTimeout: 1000
-      leak-detection-threshold: 15000
-
-  task:
-    execution:
-      pool:
-        core-size: 2
-        max-size: 4
-        queue-capacity: 200
-# ------
+      maximum-pool-size: 5
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 600000
+      idle-timeout: 300000
+      leak-detection-threshold: 30000
 
   jpa:
     hibernate:
@@ -32,15 +26,6 @@ spring:
 
   flyway:
     enabled: true
-
-# ------
-server:
-  tomcat:
-    threads:
-      max: 104
-      min-spare: 16
-    accept-count: 100
-# ------
 
 management:
   metrics:
@@ -73,4 +58,3 @@ oauth:
     client-id: mock-client-id
     connect-timeout: 180s
     read-timeout: 180s
-
