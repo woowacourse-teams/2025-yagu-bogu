@@ -9,7 +9,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 100
       minimum-idle: 5
       connection-timeout: 30000
       max-lifetime: 600000
@@ -61,5 +61,8 @@ oauth:
 
 server:
   tomcat:
+    threads:
+      max: 200
+      min-spare: 10
     mbeanregistry:
       enabled: true   # Tomcat MBean 등록(필수) → Micrometer가 Tomcat 지표를 수집
