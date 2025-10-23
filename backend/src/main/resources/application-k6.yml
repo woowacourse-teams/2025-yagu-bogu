@@ -1,4 +1,8 @@
 spring:
+
+  transaction:
+    default-timeout: 30
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
@@ -8,6 +12,9 @@ spring:
       maximum-pool-size: 50
       minimum-idle: 50
       connection-timeout: 30000
+      max-lifetime: 600000
+      idle-timeout: 300000
+      leak-detection-threshold: 30000
 
   jpa:
     hibernate:
