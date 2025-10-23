@@ -40,7 +40,8 @@ server:
     threads:
       max: 10
       min-spare: 10
-    accept-count: 50
+    accept-count: 100
+    max-connections: 200
 
 management:
   metrics:
