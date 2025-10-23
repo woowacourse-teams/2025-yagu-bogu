@@ -58,3 +58,8 @@ oauth:
     client-id: mock-client-id
     connect-timeout: 180s
     read-timeout: 180s
+
+server:
+  tomcat:
+    threads:
+      max: 20
