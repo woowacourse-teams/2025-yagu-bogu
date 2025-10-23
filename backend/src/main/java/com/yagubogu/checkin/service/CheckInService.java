@@ -54,7 +54,6 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        validateNotExistGameAndMember(game, member);
         saveCheckInSafely(game, member, team);
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
