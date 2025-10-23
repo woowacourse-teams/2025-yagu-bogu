@@ -1,6 +1,7 @@
 package com.yagubogu.ui.common.component.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import com.yagubogu.R
 import com.yagubogu.ui.common.model.MEMBER_PROFILE_FIXTURE
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
@@ -113,7 +115,10 @@ fun ProfileHeader(
                 AsyncImage(
                     model = memberProfile.profileImageUrl,
                     contentDescription = "프로필 이미지",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .border(1.dp, Gray300, CircleShape), // 검은색 테두리 추가
                 )
             }
         }
@@ -126,14 +131,24 @@ private fun RankingText(
     modifier: Modifier = Modifier,
 ) {
     Row {
-        Text(text = stringResource(R.string.profile_ranking_all), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(
+            text = stringResource(R.string.profile_ranking_all),
+            style = PretendardRegular,
+            fontSize = 10.sp,
+            color = Gray500,
+        )
         Text(
             text = memberProfile.victoryFairyRanking?.toString() ?: "-",
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text(text = stringResource(R.string.profile_ranking_rank), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(
+            text = stringResource(R.string.profile_ranking_rank),
+            style = PretendardRegular,
+            fontSize = 10.sp,
+            color = Gray500,
+        )
         Text(
             text = "|",
             style = PretendardRegular,
@@ -147,14 +162,24 @@ private fun RankingText(
             fontSize = 10.sp,
             color = Gray500,
         )
-        Text(text = stringResource(R.string.profile_ranking_within_team), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(
+            text = stringResource(R.string.profile_ranking_within_team),
+            style = PretendardRegular,
+            fontSize = 10.sp,
+            color = Gray500,
+        )
         Text(
             text = memberProfile.victoryFairyRankingWithinTeam?.toString() ?: "-",
             style = PretendardSemiBold,
             fontSize = 10.sp,
             color = Primary700,
         )
-        Text(text = stringResource(R.string.profile_ranking_rank), style = PretendardRegular, fontSize = 10.sp, color = Gray500)
+        Text(
+            text = stringResource(R.string.profile_ranking_rank),
+            style = PretendardRegular,
+            fontSize = 10.sp,
+            color = Gray500,
+        )
     }
 }
 
