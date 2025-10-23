@@ -18,6 +18,8 @@ spring:
 
 management:
   metrics:
+    enable:
+      tomcat: true
     distribution:
       percentiles-histogram:
         http.server.requests: true
@@ -46,3 +48,7 @@ oauth:
     connect-timeout: 180s
     read-timeout: 180s
 
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true   # Tomcat MBean 등록(필수) → Micrometer가 Tomcat 지표를 수집
