@@ -1,7 +1,7 @@
 spring:
 
   transaction:
-    default-timeout: 30
+    default-timeout: 30s
 
 # ------
   datasource:
