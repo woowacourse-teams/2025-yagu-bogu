@@ -38,7 +38,7 @@ spring:
 server:
   tomcat:
     threads:
-      max: 100
+      max: 25
       min-spare: 16
     accept-count: 100
 
