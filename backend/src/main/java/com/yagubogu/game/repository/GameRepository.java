@@ -49,13 +49,12 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             """)
     List<GameWithCheckInParam> findGamesWithCheckInsByDate(LocalDate date, Member member);
 
-    @Query("""
-                select g
-                from Game g
-                join fetch g.stadium s
-                where g.date = :date
-            """)
-    List<Game> findByDateWithStadium(LocalDate date);
+    @Query("SELECT g FROM Game g " +
+            "JOIN FETCH g.stadium " +
+            "JOIN FETCH g.homeTeam " +
+            "JOIN FETCH g.awayTeam " +
+            "WHERE g.date = :date")
+    List<Game> findAllByDateWithStadium(@Param("date") LocalDate date);
 
     /**
      * Bulk 상태 조회 (Batch Guard용)
