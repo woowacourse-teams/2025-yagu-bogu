@@ -6,6 +6,7 @@ import com.yagubogu.game.repository.GameRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,22 +54,25 @@ public class AdaptivePoller {
         Instant now = Instant.now(clock);
 
         if (globalBackoff.isActive(now)) {
+            log.debug("[POLLER] Skip: global backoff active");
             return;
         }
 
         if (!scheduleManager.shouldWake(now)) {
+            log.debug("[POLLER] Skip: not wake time yet");
             return;
         }
 
         LocalDate today = LocalDate.now(clock);
-
         if (!hasRemainingGames(today)) {
+            log.info("[POLLER] No remaining games for today");
             cleanupAndSleepUntilTomorrow(today);
             return;
         }
 
         Map<String, KboScoreboardGame> scoreboardGames = fetchScoreboard(today);
         if (scoreboardGames.isEmpty()) {
+            log.debug("[POLLER] Skip: scoreboard empty");
             return;
         }
 
@@ -79,7 +83,7 @@ public class AdaptivePoller {
     private void processGames(LocalDate today,
                               Map<String, KboScoreboardGame> scoreboardGames,
                               Instant now) {
-        List<Game> games = gameRepository.findAllByDate(today);
+        List<Game> games = gameRepository.findAllByDateWithStadium(today);
 
         for (Game game : games) {
             if (game.getGameState().isFinalized()) {
@@ -106,7 +110,8 @@ public class AdaptivePoller {
      */
     private void processGame(Game game, Map<String, KboScoreboardGame> scoreboardGames) {
         try {
-            KboScoreboardGame scoreboardGame = scoreboardGames.get(game.getGameCode());
+            KboScoreboardGame scoreboardGame = scoreboardGames.get(
+                    makeGameKey(game.getDate(), game.getStartAt(), game.getStadium().getLocation()));
 
             if (scoreboardGame == null) {
                 handleMissingGame(game);
@@ -141,7 +146,7 @@ public class AdaptivePoller {
 
         if (gameCenterData.getGameState().isCanceled()) {
             removeGameFromSchedule(game.getId());
-            log.info("[POLLER] Game canceled: {}", game.getGameCode());
+            log.debug("[POLLER] Game canceled: {}", game.getGameCode());
         } else {
             handleGameFailure(game);
         }
@@ -151,7 +156,6 @@ public class AdaptivePoller {
         Instant nextRetryTime = backoffStrategy.applyGameBackoff(game.getId());
 
         if (nextRetryTime == null) {
-            // 6회 실패: 게임센터 재확인 필요
             handleMissingGame(game);
         } else {
             scheduleManager.scheduleNextPollAt(game.getId(), nextRetryTime);
@@ -165,11 +169,11 @@ public class AdaptivePoller {
      */
     private Map<String, KboScoreboardGame> fetchScoreboard(LocalDate date) {
         try {
-            List<KboScoreboardGame> games = kboScoreboardService.fetchScoreboardOnly(date);
+            List<KboScoreboardGame> scoreboardResponses = kboScoreboardService.fetchScoreboardOnly(date);
 
-            return games.stream()
+            return scoreboardResponses.stream()
                     .collect(Collectors.toMap(
-                            KboScoreboardGame::getGameCode,
+                            game -> makeGameKey(game.getDate(), game.getStartTime(), game.getStadium()),
                             game -> game
                     ));
         } catch (Exception e) {
@@ -177,6 +181,10 @@ public class AdaptivePoller {
             log.warn("[POLLER] Scoreboard fetch failed: {}", e.getMessage());
             return Map.of();
         }
+    }
+
+    private String makeGameKey(LocalDate date, LocalTime startAt, String stadium) {
+        return String.format("%s_%s_%s", date, startAt, stadium);
     }
 
     private Game fetchFromGameCenter(Game game) {
@@ -199,21 +207,26 @@ public class AdaptivePoller {
      * - SCHEDULED 상태 유지 (변경 사항 없음)
      */
     private void updateGameIfNeeded(Game game, KboScoreboardGame scoreboardGame) {
-        GameState fetchedState = GameState.fromStatus(scoreboardGame.getStatus());
+        GameState fetchedState = GameState.fromName(scoreboardGame.getStatus());
 
         boolean stateChanged = game.getGameState() != fetchedState;
-        boolean isLive = game.getGameState() == GameState.LIVE;
+        boolean isLive = fetchedState == GameState.LIVE;
 
         if (stateChanged || isLive) {
+            log.debug("[UPDATE] Calling updateFromScoreboard for gameCode={}, stadium={}, home={}, away={}",
+                    game.getGameCode(), scoreboardGame.getStadium(),
+                    scoreboardGame.getHomeTeamScoreboard().name(),
+                    scoreboardGame.getAwayTeamScoreboard().name());
             kboScoreboardService.updateFromScoreboard(
                     game.getGameCode(),
                     scoreboardGame
             );
+            game.updateGameState(fetchedState);
         }
     }
 
     private boolean isGameFinalized(KboScoreboardGame scoreboardGame) {
-        return GameState.fromStatus(scoreboardGame.getStatus()).isFinalized();
+        return GameState.fromName(scoreboardGame.getStatus()).isFinalized();
     }
 
     private boolean hasRemainingGames(LocalDate today) {
@@ -232,6 +245,5 @@ public class AdaptivePoller {
         scheduleManager.clearAll();
         backoffStrategy.clearAll();
         scheduleManager.sleepUntilTomorrow(today);
-        log.info("[POLLER] No remaining games. Sleep until tomorrow.");
     }
 }

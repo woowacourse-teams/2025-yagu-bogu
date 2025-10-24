@@ -38,7 +38,7 @@ public record KboGameParam(
                 stadiumName,
                 awayTeamCode,
                 homeTeamCode,
-                GameState.from(Integer.valueOf(gameState))
+                GameState.fromNumber(Integer.valueOf(gameState))
         );
     }
 }

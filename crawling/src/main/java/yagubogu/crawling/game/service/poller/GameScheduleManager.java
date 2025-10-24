@@ -61,20 +61,30 @@ public class GameScheduleManager {
             earliestPollTime = earliestOf(earliestPollTime, pollTime);
         }
 
+        // 변경: 가장 빠른 폴링 시각이 현재보다 미래면 그대로, 아니면 즉시
         globalWakeTime = Optional.ofNullable(earliestPollTime)
-                .filter(t -> t.isAfter(now))
+                .map(t -> t.isAfter(now) ? t : now)
                 .orElseGet(() -> {
                     log.info("[SCHEDULE] All games finalized. Sleep until tomorrow.");
                     return calculateTomorrow(today);
                 });
 
         log.info("[SCHEDULE] Initialized {} games. Next wake: {}",
-                nextPollTime.size(),
-                globalWakeTime.atZone(clock.getZone()));
+                nextPollTime.size(), globalWakeTime.atZone(clock.getZone()));
     }
 
     public boolean shouldWake(Instant now) {
-        return !now.isBefore(globalWakeTime);
+        if (globalWakeTime == Instant.MAX) {
+            log.debug("[SCHEDULE] Not initialized yet, skipping poll");
+            return false;
+        }
+        boolean shouldWake = !now.isBefore(globalWakeTime);
+        log.debug("[SCHEDULE] shouldWake={}, now={}, globalWakeTime={}, diff={}m[in",
+                shouldWake,
+                now.atZone(clock.getZone()),
+                globalWakeTime.atZone(clock.getZone()),
+                Duration.between(now, globalWakeTime).toMinutes());
+        return shouldWake;
     }
 
     public boolean shouldPollGame(Long gameId, Instant now) {

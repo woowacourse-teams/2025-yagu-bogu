@@ -87,7 +87,7 @@ public class GameCenterSyncService {
 
         try {
             Integer scNumber = Integer.parseInt(gameSc);
-            return GameState.from(scNumber);
+            return GameState.fromNumber(scNumber);
         } catch (NumberFormatException e) {
             throw new GameSyncException("Invalid gameSc format: " + gameSc);
         }
@@ -111,20 +111,15 @@ public class GameCenterSyncService {
                 awayTeam,
                 date,
                 startAt,
-                detail.getGameCode(),  // gameCode
-                null,  // homeScore
-                null,  // awayScore
-                null,  // homeScoreBoard
-                null,  // awayScoreBoard
-                null,  // homePitcher
-                null,  // awayPitcher
+                detail.getGameCode(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 gameState
         );
-
-        log.info("새 경기 생성: gameCode={}, {} vs {}",
-                detail.getGameCode(),
-                detail.getAwayTeamName(),
-                detail.getHomeTeamName());
 
         return gameRepository.save(newGame);
     }
