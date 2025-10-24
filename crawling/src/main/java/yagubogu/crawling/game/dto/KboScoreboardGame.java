@@ -10,7 +10,6 @@ import lombok.Setter;
 public final class KboScoreboardGame {
 
     private final LocalDate date;
-    private final String gameCode;
     private final String status;
     private final String stadium;
     private final LocalTime startTime;
@@ -26,7 +25,6 @@ public final class KboScoreboardGame {
 
     public KboScoreboardGame(
             LocalDate date,
-            String gameCode,
             String status,
             String stadium,
             LocalTime startTime,
@@ -40,7 +38,6 @@ public final class KboScoreboardGame {
             String losingPitcher
     ) {
         this.date = date;
-        this.gameCode = gameCode;
         this.status = status;
         this.stadium = stadium;
         this.startTime = startTime;

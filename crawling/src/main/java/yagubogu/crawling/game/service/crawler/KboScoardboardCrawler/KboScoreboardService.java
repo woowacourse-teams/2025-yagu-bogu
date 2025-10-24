@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -65,19 +64,6 @@ public class KboScoreboardService {
     @PostConstruct
     public void initCache() {
         reloadCache();
-    }
-
-    /**
-     * 캐시 갱신 (팀/구장 변경 시 호출)
-     */
-    public void reloadCache() {
-        this.stadiumCache = stadiumRepository.findAll().stream()
-                .collect(Collectors.toConcurrentMap(Stadium::getLocation, s -> s));
-
-        this.teamCache = teamRepository.findAll().stream()
-                .collect(Collectors.toConcurrentMap(Team::getShortName, t -> t));
-
-        log.info("[CACHE] Reloaded {} stadiums, {} teams", stadiumCache.size(), teamCache.size());
     }
 
     public List<ScoreboardResponse> fetchScoreboardRange(final LocalDate startDate, final LocalDate endDate) {
@@ -177,103 +163,57 @@ public class KboScoreboardService {
                 losingPitcher);
 
         KboScoreboardTeam kboHomeTeamScoreboard = data.getHomeTeamScoreboard();
-        ScoreBoard homeTeamScoreboard = new ScoreBoard(kboHomeTeamScoreboard.runs(), kboHomeTeamScoreboard.hits(),
-                kboHomeTeamScoreboard.errors(), kboHomeTeamScoreboard.basesOnBalls(),
-                kboHomeTeamScoreboard.inningScores());
         KboScoreboardTeam kboAwayTeamScoreboard = data.getAwayTeamScoreboard();
-        ScoreBoard awayTeamScoreboard = new ScoreBoard(kboAwayTeamScoreboard.runs(), kboAwayTeamScoreboard.hits(),
-                kboAwayTeamScoreboard.errors(), kboAwayTeamScoreboard.basesOnBalls(),
-                kboAwayTeamScoreboard.inningScores());
-        game.update(stadium, homeTeam, awayTeam, data.getDate(), data.getStartTime(), data.getGameCode(),
-                homeScore, awayScore, homeTeamScoreboard, awayTeamScoreboard,
-                pitcherAssignment.homePitcher(), pitcherAssignment.awayPitcher(), GameState.fromStatus(data.getStatus())
+
+        ScoreBoard homeScoreBoard = updateOrCreateScoreBoard(
+                game.getHomeScoreBoard(),
+                kboHomeTeamScoreboard
+        );
+        ScoreBoard awayScoreBoard = updateOrCreateScoreBoard(
+                game.getAwayScoreBoard(),
+                kboAwayTeamScoreboard
+        );
+
+        LocalDate date = data.getDate();
+        game.update(stadium, homeTeam, awayTeam, date, data.getStartTime(), gameCode,
+                homeScore, awayScore, homeScoreBoard, awayScoreBoard,
+                pitcherAssignment.homePitcher(), pitcherAssignment.awayPitcher(), GameState.fromName(data.getStatus())
         );
     }
 
-    /**
-     * Chunk 단위 업서트 (Guard 포함)
-     */
-    private UpsertResult upsertInChunksExceptFinalized(List<GameUpsertRow> rows) {
-        final int CHUNK = 1000;
-        int totalSuccess = 0;
-        List<FailedGame> failedGames = new ArrayList<>();
-
-        for (int i = 0; i < rows.size(); i += CHUNK) {
-            int from = i;
-            int to = Math.min(i + CHUNK, rows.size());
-            List<GameUpsertRow> chunk = rows.subList(from, to);
-
-            BatchResult result = transactionTemplate.execute(status -> {
-                try {
-                    // Guard: 종료 상태 경기 필터링
-                    List<GameUpsertRow> safeRows = filterFinalizedGames(chunk);
-
-                    // Batch Upsert
-                    return batchUpsertRepository.batchUpsert(safeRows);
-
-                } catch (Exception e) {
-                    log.error("Batch upsert failed for chunk {}-{}", from, to, e);
-                    status.setRollbackOnly();
-                    return new BatchResult(0,
-                            IntStream.range(0, chunk.size()).boxed().toList(), 0);
-                }
-            });
-
-            totalSuccess += result.success();
-
-            if (result.hasFailures()) {
-                for (Integer failedIndex : result.failedIndices()) {
-                    int absoluteIndex = from + failedIndex;
-                    if (absoluteIndex < rows.size()) {
-                        GameUpsertRow failedRow = rows.get(absoluteIndex);
-                        failedGames.add(new FailedGame(
-                                failedRow.date(),
-                                failedRow.gameCode(),
-                                failedRow.awayTeamId(),
-                                failedRow.homeTeamId()
-                        ));
-                    }
-                }
-            }
+    private ScoreBoard updateOrCreateScoreBoard(ScoreBoard existing, KboScoreboardTeam data) {
+        if (existing == null) {
+            return new ScoreBoard(
+                    data.runs(),
+                    data.hits(),
+                    data.errors(),
+                    data.basesOnBalls(),
+                    data.inningScores()
+            );
         }
 
-        return new UpsertResult(totalSuccess, failedGames);
+        existing.update(
+                data.runs(),
+                data.hits(),
+                data.errors(),
+                data.basesOnBalls(),
+                data.inningScores()
+        );
+        return existing;
     }
 
     /**
-     * 종료 상태 경기 필터링 (Guard)
-     * COMPLETED/CANCELED 경기는 업데이트 제외
+     * 캐시 갱신 (팀/구장 변경 시 호출)
      */
-    private List<GameUpsertRow> filterFinalizedGames(List<GameUpsertRow> rows) {
-        if (rows.isEmpty()) {
-            return rows;
-        }
+    private void reloadCache() {
+        this.stadiumCache = stadiumRepository.findAll().stream()
+                .collect(Collectors.toConcurrentMap(Stadium::getLocation, s -> s));
 
-        // 1. gameCode 목록 추출
-        Set<String> gameCodes = rows.stream()
-                .map(GameUpsertRow::gameCode)
-                .collect(Collectors.toSet());
+        this.teamCache = teamRepository.findAll().stream()
+                .collect(Collectors.toConcurrentMap(Team::getShortName, t -> t));
 
-        // 2. 종료 상태 경기 조회 (Bulk SELECT)
-        Set<String> finalizedGameCodes = gameRepository
-                .findGameCodesByGameCodeInAndGameStateIn(
-                        gameCodes, List.of(GameState.COMPLETED, GameState.CANCELED)
-                );
-
-        // 3. 필터링
-        List<GameUpsertRow> safeRows = rows.stream()
-                .filter(row -> !finalizedGameCodes.contains(row.gameCode()))
-                .toList();
-
-        // 4. 로그
-        int filteredCount = rows.size() - safeRows.size();
-        if (filteredCount > 0) {
-            log.info("[GUARD] Filtered {} finalized games from batch upsert", filteredCount);
-        }
-
-        return safeRows;
+        log.info("[CACHE] Reloaded {} stadiums, {} teams", stadiumCache.size(), teamCache.size());
     }
-
 
     // 팀 로딩 (READ_ONLY 트랜잭션)
     private Map<String, Team> loadTeams() {
@@ -417,21 +357,6 @@ public class KboScoreboardService {
                     teamGames.get(index).setDoubleHeaderGameOrder(index);
                 }
             }
-        }
-    }
-
-    private LocalTime parseStartAt(String hhmm) {
-        if (hhmm == null || hhmm.isBlank()) {
-            return LocalTime.of(0, 0);
-        }
-        try {
-            return LocalTime.parse(hhmm.trim());
-        } catch (Exception ignore) {
-            String digits = hhmm.replaceAll("[^0-9]", " ").trim();
-            String[] sp = digits.split("\\s+");
-            int h = sp.length > 0 ? Integer.parseInt(sp[0]) : 0;
-            int m = sp.length > 1 ? Integer.parseInt(sp[1]) : 0;
-            return LocalTime.of(Math.min(23, h), Math.min(59, m));
         }
     }
 

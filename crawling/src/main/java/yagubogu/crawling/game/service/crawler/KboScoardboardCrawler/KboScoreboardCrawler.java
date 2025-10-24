@@ -126,7 +126,6 @@ public class KboScoreboardCrawler {
                             .setTimeout(waitTimeout.toMillis())
                             .setState(WaitForSelectorState.VISIBLE));
         } catch (PlaywrightException e) {
-            // fallback: waitForFunction 사용
             page.waitForFunction("(args) => {" +
                             "  const [exp, sel] = args;" +
                             "  const el = document.querySelector(sel);" +
@@ -192,7 +191,6 @@ public class KboScoreboardCrawler {
 
         ElementHandle boxScoreAnchor = scoreboard.querySelector(".btnSms a[href*='gameId=']");
         String boxScoreUrl = boxScoreAnchor != null ? resolveUrl(boxScoreAnchor.getAttribute("href")) : null;
-        String gameId = extractGameId(boxScoreUrl);
 
         ElementHandle table = scoreboard.querySelector("table.tScore");
         Map<String, KboScoreboardTeam> tableScores = parseTableScores(table);
@@ -209,7 +207,6 @@ public class KboScoreboardCrawler {
 
         return Optional.of(new KboScoreboardGame(
                 date,
-                gameId,
                 emptyToNull(status),
                 emptyToNull(stadium),
                 parseLocalTimeEmptyToNull(startTime),
@@ -365,22 +362,6 @@ public class KboScoreboardCrawler {
             return "https://www.koreabaseball.com" + rawUrl;
         }
         return "https://www.koreabaseball.com/" + rawUrl;
-    }
-
-    private String extractGameId(final String boxScoreUrl) {
-        if (boxScoreUrl == null) {
-            return null;
-        }
-        int index = boxScoreUrl.indexOf("gameId=");
-        if (index < 0) {
-            return null;
-        }
-        String substring = boxScoreUrl.substring(index + "gameId=".length());
-        int ampIndex = substring.indexOf('&');
-        if (ampIndex >= 0) {
-            substring = substring.substring(0, ampIndex);
-        }
-        return substring;
     }
 
     private String emptyToNull(final String v) {
