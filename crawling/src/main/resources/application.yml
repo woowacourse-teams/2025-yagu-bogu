@@ -37,9 +37,9 @@ kbo:
   crawler:
     score-board-url: https://www.koreabaseball.com/Schedule/ScoreBoard.aspx
     game-center-url: https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx
-    navigation-timeout: 60000
-    table-timeout: 30000
-    wait-timeout: 30000
+    navigation-timeout: 10000
+    table-timeout: 5000
+    wait-timeout: 8000
     max-retries: 1
     retry-delay: 500
 
