@@ -2,7 +2,6 @@ package yagubogu.crawling.game.service.poller;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.repository.GameRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
+import yagubogu.crawling.game.service.GameReadOnlyService;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 
@@ -23,7 +23,7 @@ import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboar
 @RequiredArgsConstructor
 public class AdaptivePoller {
 
-    private final GameRepository gameRepository;
+    private final GameReadOnlyService gameReadOnlyService;
     private final KboScoreboardService kboScoreboardService;
     private final GameCenterSyncService gameCenterSyncService;
     private final GameScheduleManager scheduleManager;
@@ -35,7 +35,7 @@ public class AdaptivePoller {
      * 00시 스케줄러에서 호출
      */
     public void initializeTodaySchedule(LocalDate today) {
-        List<Game> games = gameRepository.findAllByDate(today);
+        List<Game> games = gameReadOnlyService.findAllByDate(today);
         scheduleManager.initialize(games, today);
         backoffStrategy.clearAll();
     }
@@ -83,7 +83,7 @@ public class AdaptivePoller {
     private void processGames(LocalDate today,
                               Map<String, KboScoreboardGame> scoreboardGames,
                               Instant now) {
-        List<Game> games = gameRepository.findAllByDateWithStadium(today);
+        List<Game> games = gameReadOnlyService.findAllByDateWithStadium(today);
 
         for (Game game : games) {
             if (game.getGameState().isFinalized()) {
@@ -230,7 +230,7 @@ public class AdaptivePoller {
     }
 
     private boolean hasRemainingGames(LocalDate today) {
-        return gameRepository.existsByDateAndGameStateIn(
+        return gameReadOnlyService.existsByDateAndGameStateIn(
                 today,
                 List.of(GameState.SCHEDULED, GameState.LIVE)
         );
