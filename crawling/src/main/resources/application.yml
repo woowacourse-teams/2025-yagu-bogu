@@ -44,9 +44,22 @@ kbo:
     retry-delay: 500
 
     context-pool-size: 2
-    runner:
-      enabled: false
-      schedule-type: "regular"
+
+  scheduler:
+    default-game-start-time: "18:30"
+    polling-interval: 1m
+
+  retry:
+    per-game:
+      quick-threshold: 5
+      quick-interval: 2m
+      max-backoff: 8m
+      max-attempts: 12
+      warn-threshold: 15
+    global:
+      first: 1m
+      second: 2m
+      max: 5m
 
   selectors:
     # 달력 네비게이션

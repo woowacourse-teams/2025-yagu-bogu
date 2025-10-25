@@ -10,134 +10,99 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import yagubogu.crawling.game.config.CrawlerSchedulerProperties;
 
 @Slf4j
 @Component
 public class GameScheduleManager {
 
-    private static final LocalTime DEFAULT_GAME_START_TIME = LocalTime.of(18, 30);
-    private static final Duration POLLING_INTERVAL = Duration.ofMinutes(1);
-
     private final Clock clock;
-    private final Map<Long, Instant> nextPollTime = new ConcurrentHashMap<>();
-    private volatile Instant globalWakeTime = Instant.MAX;
+    private final CrawlerSchedulerProperties props;
+    private final Map<Long, Instant> nextPoll = new ConcurrentHashMap<>();
+    private volatile Instant globalWake = Instant.MAX;
 
-    public GameScheduleManager(Clock clock) {
+    public GameScheduleManager(Clock clock, final CrawlerSchedulerProperties props) {
         this.clock = clock;
+        this.props = props;
     }
 
-    /**
-     * 오늘 경기 스케줄 초기화
-     *
-     * 각 경기의 첫 폴링 시각 계산:
-     * - 경기 시작 전: 시작 시각에 확인
-     * - 경기 시작 후: 현재 시각 + 1분 후 확인
-     */
     public void initialize(List<Game> games, LocalDate today) {
-        nextPollTime.clear();
+        nextPoll.clear();
 
         if (games.isEmpty()) {
-            globalWakeTime = calculateTomorrow(today);
-            log.info("[SCHEDULE] No games today. Sleep until tomorrow.");
+            globalWake = getTomorrow(today);
+            log.info("[SCHEDULE] no games. sleep until {}", globalWake.atZone(clock.getZone()));
             return;
         }
 
         Instant now = Instant.now(clock);
-        Instant earliestPollTime = null;
-
+        Instant earliest = null;
         for (Game game : games) {
             if (game.getGameState().isFinalized()) {
                 continue;
             }
-
-            Instant gameStartTime = calculateGameStartTime(game);
-            Instant pollTime = calculateInitialPollTime(gameStartTime, now);
-
-            nextPollTime.put(game.getId(), pollTime);
-            earliestPollTime = earliestOf(earliestPollTime, pollTime);
+            Instant start = getStartTime(game);
+            Instant pollAt = calculateInitialPollTime(start, now);
+            nextPoll.put(game.getId(), pollAt);
+            earliest = calculateEarliestTime(earliest, pollAt);
         }
-
-        // 변경: 가장 빠른 폴링 시각이 현재보다 미래면 그대로, 아니면 즉시
-        globalWakeTime = Optional.ofNullable(earliestPollTime)
-                .map(t -> t.isAfter(now) ? t : now)
-                .orElseGet(() -> {
-                    log.info("[SCHEDULE] All games finalized. Sleep until tomorrow.");
-                    return calculateTomorrow(today);
-                });
-
-        log.info("[SCHEDULE] Initialized {} games. Next wake: {}",
-                nextPollTime.size(), globalWakeTime.atZone(clock.getZone()));
+        globalWake = calculateGlobalWake(earliest, now);
+        log.info("[SCHEDULE] Initialized {} games. Next wake: {}", nextPoll.size(), globalWake.atZone(clock.getZone()));
     }
 
     public boolean shouldWake(Instant now) {
-        if (globalWakeTime == Instant.MAX) {
+        if (globalWake == Instant.MAX) {
             log.debug("[SCHEDULE] Not initialized yet, skipping poll");
             return false;
         }
-        boolean shouldWake = !now.isBefore(globalWakeTime);
+        boolean shouldWake = !now.isBefore(globalWake);
         log.debug("[SCHEDULE] shouldWake={}, now={}, globalWakeTime={}, diff={}m[in",
                 shouldWake,
                 now.atZone(clock.getZone()),
-                globalWakeTime.atZone(clock.getZone()),
-                Duration.between(now, globalWakeTime).toMinutes());
+                globalWake.atZone(clock.getZone()),
+                Duration.between(now, globalWake).toMinutes());
         return shouldWake;
     }
 
     public boolean shouldPollGame(Long gameId, Instant now) {
-        Instant pollTime = nextPollTime.get(gameId);
+        Instant pollTime = nextPoll.get(gameId);
         return pollTime != null && !now.isBefore(pollTime);
     }
 
     public void scheduleNextPoll(Long gameId) {
-        Instant nextTime = Instant.now(clock).plus(POLLING_INTERVAL);
-        nextPollTime.put(gameId, nextTime);
+        Instant nextTime = Instant.now(clock).plus(props.getPollingInterval());
+        nextPoll.put(gameId, nextTime);
     }
 
     public void scheduleNextPollAt(Long gameId, Instant nextTime) {
         if (nextTime != null) {
-            nextPollTime.put(gameId, nextTime);
+            nextPoll.put(gameId, nextTime);
         }
     }
 
     public void removeGame(Long gameId) {
-        nextPollTime.remove(gameId);
+        nextPoll.remove(gameId);
     }
 
     public void clearAll() {
-        nextPollTime.clear();
+        nextPoll.clear();
     }
 
     public void sleepUntilTomorrow(LocalDate today) {
-        globalWakeTime = calculateTomorrow(today);
+        globalWake = getTomorrow(today);
     }
 
-    /**
-     * 초기 폴링 시각 계산
-     * - 경기 시작 전: 시작 시각
-     * - 경기 시작 후: 현재 + 1분
-     */
     private Instant calculateInitialPollTime(Instant gameStartTime, Instant now) {
         if (now.isBefore(gameStartTime)) {
             return gameStartTime;
         }
-        return now.plus(POLLING_INTERVAL);
+        return now.plus(props.getPollingInterval());
     }
 
-    private Instant calculateGameStartTime(Game game) {
-        LocalTime startTime = Objects.requireNonNullElse(
-                game.getStartAt(),
-                DEFAULT_GAME_START_TIME
-        );
-
-        return ZonedDateTime.of(game.getDate(), startTime, clock.getZone())
-                .toInstant();
-    }
-
-    private Instant calculateTomorrow(LocalDate today) {
+    private Instant getTomorrow(LocalDate today) {
         return ZonedDateTime.of(
                 today.plusDays(1),
                 LocalTime.MIDNIGHT,
@@ -145,7 +110,24 @@ public class GameScheduleManager {
         ).toInstant();
     }
 
-    private static Instant earliestOf(Instant a, Instant b) {
+    private Instant calculateGlobalWake(final Instant earliest, final Instant now) {
+        if (earliest != null && earliest.isAfter(now)) {
+            return earliest;
+        }
+        return now;
+    }
+
+    private Instant getStartTime(Game game) {
+        LocalTime startTime = Objects.requireNonNullElse(
+                game.getStartAt(),
+                props.getDefaultGameStartTime()
+        );
+
+        return ZonedDateTime.of(game.getDate(), startTime, clock.getZone())
+                .toInstant();
+    }
+
+    private static Instant calculateEarliestTime(Instant a, Instant b) {
         if (a == null) {
             return b;
         }

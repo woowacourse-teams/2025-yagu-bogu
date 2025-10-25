@@ -9,7 +9,12 @@ import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.KboSchedulerCra
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardCrawler;
 
 @Configuration
-@EnableConfigurationProperties(KboCrawlerProperties.class)
+@EnableConfigurationProperties({
+        KboCrawlerProperties.class,
+        CrawlerSchedulerProperties.class,
+        PerGameRetryProperties.class,
+        GlobalBackoffProperties.class
+})
 public class KboCrawlerConfig {
 
     @Bean

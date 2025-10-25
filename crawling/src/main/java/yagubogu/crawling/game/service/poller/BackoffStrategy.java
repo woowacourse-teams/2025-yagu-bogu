@@ -7,21 +7,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import yagubogu.crawling.game.config.PerGameRetryProperties;
 
 @Slf4j
 @Component
 public class BackoffStrategy {
 
-    private static final int QUICK_RETRY_THRESHOLD = 5;
-    private static final int QUICK_RETRY_INTERVAL_MINUTES = 2;
-    private static final int MAX_BACKOFF_MINUTES = 8;
-    private static final int MAX_RETRY_WARNING_COUNT = 15;
-
     private final Clock clock;
+    private final PerGameRetryProperties props;
     private final Map<Long, Integer> failureCount = new ConcurrentHashMap<>();
 
-    public BackoffStrategy(Clock clock) {
+    public BackoffStrategy(Clock clock, final PerGameRetryProperties props) {
         this.clock = clock;
+        this.props = props;
     }
 
     /**
@@ -38,24 +36,31 @@ public class BackoffStrategy {
         int failCount = failureCount.merge(gameId, 1, Integer::sum);
 
         // Phase 1: 빠른 복구 시도
-        if (failCount <= QUICK_RETRY_THRESHOLD) {
+        if (failCount <= props.getQuickThreshold()) {
             return Instant.now(clock)
-                    .plus(Duration.ofMinutes(QUICK_RETRY_INTERVAL_MINUTES));
+                    .plus(props.getQuickInterval());
         }
 
         // Phase 2: 게임센터 확인 필요 (null 반환으로 신호)
-        if (failCount == QUICK_RETRY_THRESHOLD + 1) {
+        if (failCount == props.getQuickThreshold() + 1) {
             return null;
         }
 
         // Phase 3: 지수 백오프
         int backoffMultiplier = Math.min(
-                failCount - QUICK_RETRY_THRESHOLD,
+                failCount - props.getQuickThreshold(),
                 3  // 최대 2^3 = 8분
         );
-        int minutes = Math.min(MAX_BACKOFF_MINUTES, 1 << backoffMultiplier);
+        long minutes = Math.min(props.getMaxBackoff().toMinutes(), 1L << backoffMultiplier);
 
-        warnIfExcessiveFailures(gameId, failCount);
+        if (failCount > props.getWarnThreshold()) {
+            log.warn("[BACKOFF] excessive failures: gameId={}, attempts={}", gameId, failCount);
+        }
+
+        if (failCount >= props.getMaxAttempts()) {
+            log.warn("[BACKOFF] give up: gameId={}, attempts={}", gameId, failCount);
+            return null;
+        }
 
         return Instant.now(clock).plus(Duration.ofMinutes(minutes));
     }
@@ -66,13 +71,6 @@ public class BackoffStrategy {
 
     public void clearAll() {
         failureCount.clear();
-    }
-
-    private void warnIfExcessiveFailures(Long gameId, int failCount) {
-        if (failCount > MAX_RETRY_WARNING_COUNT) {
-            log.warn("[BACKOFF] Excessive failures detected. Manual check recommended: " +
-                    "gameId={}, failCount={}", gameId, failCount);
-        }
     }
 }
 

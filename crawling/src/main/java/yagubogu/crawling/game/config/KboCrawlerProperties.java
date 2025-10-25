@@ -3,7 +3,6 @@ package yagubogu.crawling.game.config;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
-import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,19 +15,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class KboCrawlerProperties {
 
     private CrawlerConfig crawler;
-    private Runner runner;
+    private CrawlerSchedulerProperties scheduler;
+    private PerGameRetryProperties retry;
     private Selectors selectors;
     private Patterns patterns;
-
-    @Setter
-    @Getter
-    public static class Runner {
-
-        private boolean enabled;
-        private String scheduleType = "regular";
-        private LocalDate startDate;
-        private LocalDate endDate;
-    }
 
     @Getter
     @Setter
