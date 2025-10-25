@@ -5,11 +5,11 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.microsoft.playwright.options.WaitUntilState;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import yagubogu.crawling.game.config.KboCrawlerProperties;
 import yagubogu.crawling.game.config.PlaywrightManager;
 import yagubogu.crawling.game.dto.GameCenterDetail;
 
@@ -17,15 +17,14 @@ import yagubogu.crawling.game.dto.GameCenterDetail;
 public class KboGameCenterCrawler {
 
     private final String baseUrl;
+    private final KboCrawlerProperties properties;
     private final PlaywrightManager playwrightManager;
-    private final Duration navigationTimeout;
 
     public KboGameCenterCrawler(
-            String baseUrl,
-            Duration navigationTimeout,
+            final String baseUrl, KboCrawlerProperties properties,
             PlaywrightManager playwrightManager) {
         this.baseUrl = baseUrl;
-        this.navigationTimeout = navigationTimeout;
+        this.properties = properties;
         this.playwrightManager = playwrightManager;
     }
 
@@ -214,87 +213,44 @@ public class KboGameCenterCrawler {
     }
 
     /**
-     * URL로 이동
+     * URL로 이동 (YML 설정 사용)
      */
     private void navigateToUrl(Page page) {
         log.info("KBO 게임센터로 이동 중...");
 
+        long timeout = properties.getCrawler().getNavigationTimeout().toMillis();
+
         page.navigate(baseUrl, new Page.NavigateOptions()
-                .setTimeout(navigationTimeout.toMillis())
+                .setTimeout(timeout)
                 .setWaitUntil(WaitUntilState.NETWORKIDLE)
         );
 
         log.info("페이지 로딩 완료");
     }
 
-
-    private void clickDay(Page page, LocalDate date) {
-        try {
-            int day = date.getDayOfMonth();
-
-            String selector = String.format(
-                    ".ui-datepicker-calendar tbody td:not(.ui-datepicker-other-month) a:has-text('%d')",
-                    day
-            );
-
-            Locator dayLocator = page.locator(selector);
-
-            // 요소가 있는지 확인
-            if (dayLocator.count() > 0) {
-                dayLocator.first().click(new Locator.ClickOptions()
-                        .setTimeout(2000)
-                        .setForce(false)
-                );
-
-                log.info("날짜 {} 클릭 완료", day);
-                return;
-            }
-
-            throw new RuntimeException("날짜를 찾을 수 없습니다: " + day);
-
-        } catch (Exception e) {
-            log.error("날짜 클릭 실패", e);
-            throw new RuntimeException("날짜 클릭 실패: " + date, e);
-        }
-    }
-
     /**
-     * 달력에서 년/월 선택 (안전한 버전)
-     */
-    private void selectYearMonth(Page page, LocalDate date) {
-        try {
-            // 년도 선택
-            page.selectOption(".ui-datepicker-year",
-                    String.valueOf(date.getYear()));
-
-            // 월 선택
-            page.selectOption(".ui-datepicker-month",
-                    String.valueOf(date.getMonthValue() - 1));
-
-            log.info("년/월 선택 완료: {}-{}", date.getYear(), date.getMonthValue());
-        } catch (Exception e) {
-            log.error("년/월 선택 실패", e);
-            throw new RuntimeException("년/월 선택 실패", e);
-        }
-    }
-
-    /**
-     * 특정 날짜로 이동 (안전한 버전)
+     * 특정 날짜로 이동 (YML 설정 사용)
      */
     private void navigateToDate(Page page, LocalDate date) {
         try {
             log.info("날짜 {}로 이동 중...", date);
 
-            page.click(".ui-datepicker-trigger",
-                    new Page.ClickOptions().setTimeout(3000));
+            long timeout = properties.getCrawler().getWaitTimeout().toMillis();
+            var calendarSelectors = properties.getSelectors().getCalendar();
 
-            page.waitForSelector(".ui-datepicker",
-                    new Page.WaitForSelectorOptions()
-                            .setTimeout(1500)
-                            .setState(WaitForSelectorState.VISIBLE)
-            );
+            // ✅ 달력 열기 - XPath 사용
+            page.locator(calendarSelectors.getTrigger())
+                    .click(new Locator.ClickOptions().setTimeout(timeout));
 
+            page.locator(calendarSelectors.getContainer())
+                    .waitFor(new Locator.WaitForOptions()
+                            .setTimeout(timeout)
+                            .setState(WaitForSelectorState.VISIBLE));
+
+            // ✅ 년/월 선택 - XPath 사용
             selectYearMonth(page, date);
+
+            // ✅ 일자 클릭 - XPath 사용
             clickDay(page, date);
 
             // 경기 목록이 로드될 때까지 대기
@@ -313,6 +269,65 @@ public class KboGameCenterCrawler {
         } catch (Exception e) {
             log.error("날짜 이동 실패", e);
             throw new RuntimeException("날짜 이동 실패", e);
+        }
+    }
+
+    /**
+     * 달력에서 년/월 선택 (YML 설정 사용)
+     */
+    private void selectYearMonth(Page page, LocalDate date) {
+        try {
+            var calendarSelectors = properties.getSelectors().getCalendar();
+
+            // ✅ XPath 사용
+            page.locator(calendarSelectors.getYearSelect())
+                    .selectOption(String.valueOf(date.getYear()));
+
+            page.locator(calendarSelectors.getMonthSelect())
+                    .selectOption(String.valueOf(date.getMonthValue() - 1));
+
+            log.info("년/월 선택 완료: {}-{}", date.getYear(), date.getMonthValue());
+        } catch (Exception e) {
+            log.error("년/월 선택 실패", e);
+            throw new RuntimeException("년/월 선택 실패", e);
+        }
+    }
+
+    /**
+     * 일자 클릭 (YML 설정 사용)
+     */
+    private void clickDay(Page page, LocalDate date) {
+        try {
+            long timeout = properties.getCrawler().getWaitTimeout().toMillis();
+            var calendarSelectors = properties.getSelectors().getCalendar();
+
+            int day = date.getDayOfMonth();
+
+            // ✅ XPath 사용 (텍스트 기반)
+            String dayXpath = String.format(calendarSelectors.getDayLink(), day);
+
+            Locator dayLocator = page.locator(dayXpath);
+
+            // 요소가 있는지 확인
+            if (dayLocator.count() > 0) {
+                dayLocator.waitFor(new Locator.WaitForOptions()
+                        .setTimeout(timeout)
+                        .setState(WaitForSelectorState.VISIBLE));
+
+                dayLocator.first().click(new Locator.ClickOptions()
+                        .setTimeout(timeout)
+                        .setForce(false)
+                );
+
+                log.info("날짜 {} 클릭 완료", day);
+                return;
+            }
+
+            throw new RuntimeException("날짜를 찾을 수 없습니다: " + day);
+
+        } catch (Exception e) {
+            log.error("날짜 클릭 실패", e);
+            throw new RuntimeException("날짜 클릭 실패: " + date, e);
         }
     }
 }

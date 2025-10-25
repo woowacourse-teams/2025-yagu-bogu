@@ -3,6 +3,7 @@ package yagubogu.crawling.game.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import yagubogu.crawling.game.config.KboCrawlerProperties.CrawlerConfig;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.KboGameCenterCrawler;
 import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.KboSchedulerCrawler;
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardCrawler;
@@ -13,12 +14,13 @@ public class KboCrawlerConfig {
 
     @Bean
     public KboSchedulerCrawler kboScheduleCrawler(final KboCrawlerProperties properties) {
+        CrawlerConfig crawler = properties.getCrawler();
         return new KboSchedulerCrawler(
-                properties.getNavigationTimeout(),
-                properties.getTableTimeout(),
-                properties.getWaitTimeout(),
-                properties.getMaxRetries(),
-                properties.getRetryDelay());
+                crawler.getNavigationTimeout(),
+                crawler.getTableTimeout(),
+                crawler.getWaitTimeout(),
+                crawler.getMaxRetries(),
+                crawler.getRetryDelay());
     }
 
     @Bean
@@ -28,23 +30,22 @@ public class KboCrawlerConfig {
 
     @Bean
     public KboScoreboardCrawler kboScoreboardCrawler(
-            final KboCrawlerProperties p,
+            final KboCrawlerProperties properties,
             final PlaywrightManager playwrightManager) {
         return new KboScoreboardCrawler(
-                p.getBaseUrl() + p.getScheduleUrl(),
-                p.getNavigationTimeout(),
-                p.getWaitTimeout(),
+                properties,
                 playwrightManager
         );
     }
 
     @Bean
     public KboGameCenterCrawler kboGameCenterCrawler(
-            final KboCrawlerProperties p,
+            final KboCrawlerProperties properties,
             final PlaywrightManager playwrightManager) {
+        CrawlerConfig crawler = properties.getCrawler();
         return new KboGameCenterCrawler(
-                p.getBaseUrl() + p.getGameCenterUrl(),
-                p.getNavigationTimeout(),
+                crawler.getGameCenterUrl(),
+                properties,
                 playwrightManager
         );
     }

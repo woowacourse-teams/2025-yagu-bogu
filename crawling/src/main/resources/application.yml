@@ -35,29 +35,66 @@ api:
 
 kbo:
   crawler:
-    base-url: https://www.koreabaseball.com
-    schedule-url: /Schedule/ScoreBoard.aspx
-    game-center-url: /Schedule/GameCenter/Main.aspx
-
-    navigation-timeout: 7s
-    table-timeout: 3s
-    wait-timeout: 3s
+    score-board-url: https://www.koreabaseball.com/Schedule/ScoreBoard.aspx
+    game-center-url: https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx
+    navigation-timeout: 60000
+    table-timeout: 30000
+    wait-timeout: 30000
     max-retries: 1
-    retry-delay: 500ms
+    retry-delay: 500
+
     context-pool-size: 2
-
-    # 셀렉터
-    date-field-selector: "#cphContents_cphContents_cphContents_hfSearchDate"
-    date-label-selector: "#cphContents_cphContents_cphContents_lblGameDate"
-    update-panel-selector: "#cphContents_cphContents_cphContents_udpRecord"
-    score-selector: ".smsScore"
-
-    # WebForms 포스트백 타겟
-    event-target: "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$btnCalendarSelect"
-
     runner:
       enabled: false
       schedule-type: "regular"
+
+  selectors:
+    # 달력 네비게이션
+    calendar:
+      trigger: "//img[contains(@class, 'ui-datepicker-trigger')]"
+      container: "//div[@id='ui-datepicker-div']"
+      yearSelect: "//select[contains(@class, 'ui-datepicker-year')]"
+      monthSelect: "//select[contains(@class, 'ui-datepicker-month')]"
+      dayLink: "//div[@id='ui-datepicker-div']//td[not(contains(@class,'ui-datepicker-other-month'))]//a[normalize-space(text())='%s']"
+      dateLabel: "//span[@id='cphContents_cphContents_cphContents_lblGameDate']"
+      updatePanel: "//div[@id='cphContents_cphContents_cphContents_udpRecord']"
+
+    # 스코어보드 (CSS Selector - 안정적)
+    scoreboard:
+      container: ".smsScore"
+      status: ".flag span"
+      stadium: ".place"
+      startTime: ".place span"
+
+      # 팀 정보
+      awayTeam:
+        name: ".leftTeam .teamT"
+        score: ".leftTeam .score span"
+
+      homeTeam:
+        name: ".rightTeam .teamT"
+        score: ".rightTeam .score span"
+
+      # 박스스코어 링크
+      boxScoreLink: ".btnSms a[href*='gameId=']"
+
+      # 이닝별 점수 테이블
+      scoreTable:
+        table: "table.tScore"
+        rows: "tbody tr"
+        team-name: "th"
+        cells: "td"
+
+      # 투수 정보
+      pitcher:
+        container: ".score_wrap p.win"
+        spans: "span"
+
+  # 정규표현식 패턴
+  patterns:
+    pitcherLabel: "^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$"
+    dateFormat: "yyyy.MM.dd"
+    timeFormat: "HH:mm"
 
 ---
 spring:

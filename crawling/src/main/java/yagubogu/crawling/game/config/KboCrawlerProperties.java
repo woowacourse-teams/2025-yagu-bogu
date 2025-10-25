@@ -6,95 +6,120 @@ import java.time.Duration;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "kbo.crawler")
+@ConfigurationProperties(prefix = "kbo")
 @Getter
 @Setter
+@Slf4j
 public class KboCrawlerProperties {
 
-    @NotBlank
-    private String baseUrl;
+    private CrawlerConfig crawler;
+    private Runner runner;
+    private Selectors selectors;
+    private Patterns patterns;
 
-    @NotBlank
-    private String scheduleUrl;
-
-    @NotBlank
-    private String gameCenterUrl;
-
-    @NotNull
-    private Duration navigationTimeout;
-
-    @NotNull
-    private Duration tableTimeout;
-
-    private int maxRetries;
-
-    @NotNull
-    private Duration retryDelay;
-
-    @NotNull
-    private Duration waitTimeout;
-
-    @NotBlank
-    private String dateFieldSelector;
-
-    @NotBlank
-    private String dateLabelSelector;
-
-    @NotBlank
-    private String updatePanelSelector;
-
-    @NotBlank
-    private String scoreSelector;
-
-    @NotBlank
-    private String eventTarget;
-
-    private int contextPoolSize;
-
-    private final Runner runner = new Runner();
-
+    @Setter
+    @Getter
     public static class Runner {
 
         private boolean enabled;
-
         private String scheduleType = "regular";
-
         private LocalDate startDate;
-
         private LocalDate endDate;
+    }
 
-        public boolean isEnabled() {
-            return enabled;
-        }
+    @Getter
+    @Setter
+    public static class CrawlerConfig {
 
-        public void setEnabled(final boolean enabled) {
-            this.enabled = enabled;
-        }
+        @NotBlank
+        private String scoreBoardUrl;
+        @NotBlank
+        private String gameCenterUrl;
+        @NotNull
+        private Duration navigationTimeout;
+        @NotNull
+        private Duration tableTimeout;
 
-        public String getScheduleType() {
-            return scheduleType;
-        }
+        private int maxRetries;
+        @NotNull
+        private Duration retryDelay;
+        @NotNull
+        private Duration waitTimeout;
+        @NotBlank
+        private String dateFieldSelector;
+        @NotBlank
+        private String dateLabelSelector;
+        @NotBlank
+        private String updatePanelSelector;
+        @NotBlank
+        private String scoreSelector;
+        private int contextPoolSize;
+    }
 
-        public void setScheduleType(final String scheduleType) {
-            this.scheduleType = scheduleType;
-        }
+    @Getter
+    @Setter
+    public static class Selectors {
+        private CalendarSelectors calendar;
+        private ScoreboardSelectors scoreboard;
+    }
 
-        public LocalDate getStartDate() {
-            return startDate;
-        }
+    @Getter
+    @Setter
+    public static class CalendarSelectors {
+        private String trigger;
+        private String container;
+        private String yearSelect;
+        private String monthSelect;
+        private String dayLink;
+        private String dateLabel;
+        private String updatePanel;
+    }
 
-        public void setStartDate(final LocalDate startDate) {
-            this.startDate = startDate;
-        }
+    @Getter
+    @Setter
+    public static class ScoreboardSelectors {
+        private String container;
+        private String status;
+        private String stadium;
+        private String startTime;
+        private TeamSelectors awayTeam;
+        private TeamSelectors homeTeam;
+        private String boxScoreLink;
+        private ScoreTableSelectors scoreTable;
+        private PitcherSelectors pitcher;
+    }
 
-        public LocalDate getEndDate() {
-            return endDate;
-        }
+    @Getter
+    @Setter
+    public static class TeamSelectors {
+        private String name;
+        private String score;
+    }
 
-        public void setEndDate(final LocalDate endDate) {
-            this.endDate = endDate;
-        }
+    @Getter
+    @Setter
+    public static class ScoreTableSelectors {
+        private String table;
+        private String rows;
+        private String teamName;
+        private String cells;
+    }
+
+    @Getter
+    @Setter
+    public static class PitcherSelectors {
+        private String container;
+        private String spans;
+    }
+
+    @Getter
+    @Setter
+    public static class Patterns {
+        private String pitcherLabel;
+        private String dateFormat;
+        private String timeFormat;
     }
 }

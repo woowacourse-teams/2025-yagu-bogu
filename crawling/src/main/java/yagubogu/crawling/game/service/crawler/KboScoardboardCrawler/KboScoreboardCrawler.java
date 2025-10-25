@@ -6,7 +6,6 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.yagubogu.game.exception.GameSyncException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -15,11 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import yagubogu.crawling.game.config.KboCrawlerProperties;
 import yagubogu.crawling.game.config.PlaywrightManager;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
 import yagubogu.crawling.game.dto.KboScoreboardTeam;
@@ -29,13 +28,19 @@ import yagubogu.crawling.game.dto.Pitcher;
 @RequiredArgsConstructor
 public class KboScoreboardCrawler {
 
-    private static final DateTimeFormatter LABEL_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    private static final Pattern LABELED = Pattern.compile("^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$");
-
-    private final String baseUrl;
-    private final Duration navigationTimeout;
-    private final Duration waitTimeout;
+    private final KboCrawlerProperties properties;
     private final PlaywrightManager pwManager;
+    private final Pattern pitcherPattern;
+    private final DateTimeFormatter labelFormatter;
+    private final DateTimeFormatter timeFormatter;
+
+    public KboScoreboardCrawler(KboCrawlerProperties properties, PlaywrightManager pwManager) {
+        this.properties = properties;
+        this.pwManager = pwManager;
+        this.pitcherPattern = Pattern.compile(properties.getPatterns().getPitcherLabel());
+        this.labelFormatter = DateTimeFormatter.ofPattern(properties.getPatterns().getDateFormat());
+        this.timeFormatter = DateTimeFormatter.ofPattern(properties.getPatterns().getTimeFormat());
+    }
 
     public synchronized Map<LocalDate, List<KboScoreboardGame>> crawl(final List<LocalDate> dates) {
         Map<LocalDate, List<KboScoreboardGame>> result = new LinkedHashMap<>();
@@ -52,8 +57,11 @@ public class KboScoreboardCrawler {
             for (int attempt = 1; attempt <= maxRetries && !success; attempt++) {
                 try {
                     List<KboScoreboardGame> games = pwManager.withPage(page -> {
-                        page.navigate(baseUrl, new Page.NavigateOptions().setTimeout(navigationTimeout.toMillis()));
-                        navigateToDateUsingCalendar(page, date, waitTimeout);
+                        String baseUrl = properties.getCrawler().getScoreBoardUrl();
+                        long navTimeout = properties.getCrawler().getNavigationTimeout().toMillis();
+
+                        page.navigate(baseUrl, new Page.NavigateOptions().setTimeout(navTimeout));
+                        navigateToDateUsingCalendar(page, date);
                         return extractScoreboards(page, date);
                     });
 
@@ -65,7 +73,7 @@ public class KboScoreboardCrawler {
 
                     if (attempt < maxRetries) {
                         try {
-                            Thread.sleep(2000);  // Browser 재연결 대기
+                            Thread.sleep(2000);
                         } catch (InterruptedException ignored) {
                         }
                     }
@@ -80,73 +88,75 @@ public class KboScoreboardCrawler {
         return result;
     }
 
-    private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate,
-                                             final Duration waitTimeout) {
-        // 1) 달력 열기
-        page.locator(".ui-datepicker-trigger")
-                .click(new Locator.ClickOptions().setTimeout(waitTimeout.toMillis()));
+    private void navigateToDateUsingCalendar(final Page page, final LocalDate targetDate) {
+        long timeout = properties.getCrawler().getWaitTimeout().toMillis();
+        var calendarSelectors = properties.getSelectors().getCalendar();
 
-        page.locator("#ui-datepicker-div")
+        // 1) 달력 열기 - XPath
+        page.locator(calendarSelectors.getTrigger())
+                .click(new Locator.ClickOptions().setTimeout(timeout));
+
+        page.locator(calendarSelectors.getContainer())
                 .waitFor(new Locator.WaitForOptions()
-                        .setTimeout(waitTimeout.toMillis())
+                        .setTimeout(timeout)
                         .setState(WaitForSelectorState.VISIBLE));
 
-        // 2) 연/월 선택
+        // 2) 연/월 선택 - XPath
         String year = String.valueOf(targetDate.getYear());
         String monthZeroBased = String.valueOf(targetDate.getMonthValue() - 1);
 
-        page.locator(".ui-datepicker-year")
+        page.locator(calendarSelectors.getYearSelect())
                 .selectOption(year);
-        page.locator(".ui-datepicker-month")
+        page.locator(calendarSelectors.getMonthSelect())
                 .selectOption(monthZeroBased);
 
-        // ✅ 3) 일자 클릭 - Locator 사용 + 안전한 대기
+        // 3) 일자 클릭 - XPath (텍스트 기반)
         String day = String.valueOf(targetDate.getDayOfMonth());
-        String dayXpath = String.format(
-                "//div[@id='ui-datepicker-div']//td[not(contains(@class,'ui-datepicker-other-month'))]//a[normalize-space(text())='%s']",
-                day);
+        String dayXpath = String.format(calendarSelectors.getDayLink(), day);
 
         Locator dayLocator = page.locator(dayXpath);
-
-        // ✅ 클릭 가능 상태 확인
         dayLocator.waitFor(new Locator.WaitForOptions()
-                .setTimeout(waitTimeout.toMillis())
+                .setTimeout(timeout)
                 .setState(WaitForSelectorState.VISIBLE));
+        dayLocator.click(new Locator.ClickOptions().setTimeout(timeout));
 
-        // ✅ 클릭
-        dayLocator.click(new Locator.ClickOptions().setTimeout(waitTimeout.toMillis()));
-
-        // ✅ 4) 라벨 변경 대기 - 더 안정적인 방식
-        String expected = LABEL_FMT.format(targetDate);
+        // 4) 라벨 변경 대기 - XPath
+        String expected = labelFormatter.format(targetDate);
 
         try {
-            page.locator("#cphContents_cphContents_cphContents_lblGameDate")
+            page.locator(calendarSelectors.getDateLabel())
                     .filter(new Locator.FilterOptions().setHasText(expected))
                     .waitFor(new Locator.WaitForOptions()
-                            .setTimeout(waitTimeout.toMillis())
+                            .setTimeout(timeout)
                             .setState(WaitForSelectorState.VISIBLE));
         } catch (PlaywrightException e) {
+            // Fallback: JavaScript 대기
             page.waitForFunction("(args) => {" +
                             "  const [exp, sel] = args;" +
-                            "  const el = document.querySelector(sel);" +
+                            "  const xpath = document.evaluate(sel, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);"
+                            +
+                            "  const el = xpath.singleNodeValue;" +
                             "  return el && el.textContent && el.textContent.includes(exp);" +
                             "}",
-                    new Object[]{expected, "#cphContents_cphContents_cphContents_lblGameDate"},
-                    new Page.WaitForFunctionOptions().setTimeout(waitTimeout.toMillis()));
+                    new Object[]{expected, calendarSelectors.getDateLabel()},
+                    new Page.WaitForFunctionOptions().setTimeout(timeout));
         }
 
-        // ✅ 5) 스코어 요소 등장 대기
-        page.locator("#cphContents_cphContents_cphContents_udpRecord")
+        // 5) 스코어 요소 등장 대기 - XPath
+        page.locator(calendarSelectors.getUpdatePanel())
                 .waitFor(new Locator.WaitForOptions()
-                        .setTimeout(waitTimeout.toMillis())
+                        .setTimeout(timeout)
                         .setState(WaitForSelectorState.ATTACHED));
     }
 
-    private boolean waitForScoreboardsOrSkip(final Page page,
-                                             final Duration timeout) {
+    private boolean waitForScoreboardsOrSkip(final Page page) {
+        long timeout = properties.getCrawler().getWaitTimeout().toMillis();
+        String containerSelector = properties.getSelectors().getScoreboard().getContainer();
+
         try {
-            page.waitForSelector(".smsScore",
-                    new Page.WaitForSelectorOptions().setTimeout(timeout.toMillis())
+            page.waitForSelector(containerSelector,
+                    new Page.WaitForSelectorOptions()
+                            .setTimeout(timeout)
                             .setState(WaitForSelectorState.ATTACHED));
             return true;
         } catch (PlaywrightException ignore) {
@@ -155,11 +165,13 @@ public class KboScoreboardCrawler {
     }
 
     private List<KboScoreboardGame> extractScoreboards(final Page page, final LocalDate date) {
-        if (!waitForScoreboardsOrSkip(page, waitTimeout)) {
+        if (!waitForScoreboardsOrSkip(page)) {
             return List.of();
         }
 
-        List<ElementHandle> scoreboards = page.querySelectorAll(".smsScore");
+        String containerSelector = properties.getSelectors().getScoreboard().getContainer();
+        List<ElementHandle> scoreboards = page.querySelectorAll(containerSelector);
+
         if (scoreboards.isEmpty()) {
             log.info("스코어보드가 존재하지 않습니다.");
             return List.of();
@@ -175,24 +187,39 @@ public class KboScoreboardCrawler {
     }
 
     private Optional<KboScoreboardGame> parseScoreboard(final ElementHandle scoreboard, final LocalDate date) {
-        String status = safeText(scoreboard, ".flag span");
-        String stadium = safeText(scoreboard, ".place");
-        String startTime = safeText(scoreboard, ".place span");
+        var selectors = properties.getSelectors().getScoreboard();
+
+        // ✅ 디버깅: 선택자 값 확인
+        log.debug("[DEBUG] status selector: {}", selectors.getStatus());
+        log.debug("[DEBUG] stadium selector: {}", selectors.getStadium());
+        log.debug("[DEBUG] awayTeam name selector: {}",
+                selectors.getAwayTeam() != null ? selectors.getAwayTeam().getName() : "NULL");
+
+        // ✅ YML 설정의 CSS Selector 사용
+        String status = safeTextCSS(scoreboard, selectors.getStatus());
+        String stadium = safeTextCSS(scoreboard, selectors.getStadium());
+        String startTime = safeTextCSS(scoreboard, selectors.getStartTime());
+
+        log.debug("[DEBUG] Parsed - status: {}, stadium: {}, startTime: {}", status, stadium, startTime);
+
         if (stadium != null && startTime != null) {
             stadium = stadium.replace(startTime, "").trim();
         } else if (stadium != null) {
             stadium = stadium.trim();
         }
 
-        String awayName = safeText(scoreboard, ".leftTeam .teamT");
-        String homeName = safeText(scoreboard, ".rightTeam .teamT");
-        Integer awayScore = parseNullableInt(safeText(scoreboard, ".leftTeam .score span"));
-        Integer homeScore = parseNullableInt(safeText(scoreboard, ".rightTeam .score span"));
+        String awayName = safeTextCSS(scoreboard, selectors.getAwayTeam().getName());
+        String homeName = safeTextCSS(scoreboard, selectors.getHomeTeam().getName());
+        Integer awayScore = parseNullableInt(safeTextCSS(scoreboard, selectors.getAwayTeam().getScore()));
+        Integer homeScore = parseNullableInt(safeTextCSS(scoreboard, selectors.getHomeTeam().getScore()));
 
-        ElementHandle boxScoreAnchor = scoreboard.querySelector(".btnSms a[href*='gameId=']");
+        log.debug("[DEBUG] Parsed - awayName: {}, homeName: {}, awayScore: {}, homeScore: {}",
+                awayName, homeName, awayScore, homeScore);
+
+        ElementHandle boxScoreAnchor = queryCSS(scoreboard, selectors.getBoxScoreLink());
         String boxScoreUrl = boxScoreAnchor != null ? resolveUrl(boxScoreAnchor.getAttribute("href")) : null;
 
-        ElementHandle table = scoreboard.querySelector("table.tScore");
+        ElementHandle table = queryCSS(scoreboard, selectors.getScoreTable().getTable());
         Map<String, KboScoreboardTeam> tableScores = parseTableScores(table);
 
         KboScoreboardTeam awayTeam = mergeTeamData(awayName, awayScore, tableScores);
@@ -227,14 +254,17 @@ public class KboScoreboardCrawler {
             return scores;
         }
 
-        List<ElementHandle> rows = table.querySelectorAll("tbody tr");
+        // ✅ YML 설정 사용
+        var tableSelectors = properties.getSelectors().getScoreboard().getScoreTable();
+        List<ElementHandle> rows = table.querySelectorAll(tableSelectors.getRows());
+
         for (ElementHandle row : rows) {
-            String teamName = safeText(row, "th");
+            String teamName = safeTextCSS(row, tableSelectors.getTeamName());
             if (teamName == null || teamName.isBlank()) {
                 continue;
             }
 
-            List<ElementHandle> cells = row.querySelectorAll("td");
+            List<ElementHandle> cells = row.querySelectorAll(tableSelectors.getCells());
             if (cells.isEmpty()) {
                 continue;
             }
@@ -305,8 +335,8 @@ public class KboScoreboardCrawler {
         );
     }
 
-    private String safeText(final ElementHandle parent, final String selector) {
-        if (parent == null) {
+    private String safeTextCSS(final ElementHandle parent, final String selector) {
+        if (parent == null || selector == null) {
             return null;
         }
         try {
@@ -317,6 +347,18 @@ public class KboScoreboardCrawler {
             String text = element.innerText();
             return text != null ? text.trim() : null;
         } catch (PlaywrightException exception) {
+            return null;
+        }
+    }
+
+    // ✅ CSS Selector 단일 요소 조회
+    private ElementHandle queryCSS(final ElementHandle parent, final String selector) {
+        if (parent == null || selector == null) {
+            return null;
+        }
+        try {
+            return parent.querySelector(selector);
+        } catch (PlaywrightException e) {
             return null;
         }
     }
@@ -338,14 +380,6 @@ public class KboScoreboardCrawler {
 
     private String normalizeScore(final String text) {
         return text == null ? "" : text.trim();
-    }
-
-    private void sleep(final Duration delay) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(delay.toMillis());
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     private String resolveUrl(final String rawUrl) {
@@ -381,22 +415,26 @@ public class KboScoreboardCrawler {
     }
 
     private Pitcher parsePitcher(ElementHandle scoreboard) {
+        var pitcherSelectors = properties.getSelectors().getScoreboard().getPitcher();
+
         String win = null, save = null, lose = null;
         try {
-            ElementHandle container = scoreboard.querySelector(".score_wrap p.win");
+            // ✅ YML 설정 사용
+            ElementHandle container = scoreboard.querySelector(pitcherSelectors.getContainer());
             if (container != null) {
-                for (ElementHandle s : container.querySelectorAll("span")) {
+                List<ElementHandle> spans = container.querySelectorAll(pitcherSelectors.getSpans());
+                for (ElementHandle s : spans) {
                     String raw = s.innerText();
                     if (raw == null || raw.isBlank()) {
                         continue;
                     }
                     raw = raw.replace('\u00A0', ' ').trim();
-                    Matcher m = LABELED.matcher(raw);
+                    Matcher m = pitcherPattern.matcher(raw);
                     if (!m.find()) {
                         continue;
                     }
 
-                    String label = m.group(1); // 승|세|패
+                    String label = m.group(1);
                     String name = m.group(2).trim();
                     if (name.isEmpty() || "-".equals(name)) {
                         continue;
@@ -416,7 +454,7 @@ public class KboScoreboardCrawler {
 
     private LocalTime parseTime(String startTime) {
         try {
-            return LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
+            return LocalTime.parse(startTime, timeFormatter);
         } catch (Exception e) {
             throw new GameSyncException("Invalid time format: " + startTime);
         }
