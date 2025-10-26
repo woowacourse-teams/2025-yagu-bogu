@@ -4,7 +4,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     open-in-view: false
     properties:
       hibernate:
@@ -26,13 +26,6 @@ spring:
     init:
       mode: never
       data-locations: false
-
-api:
-  kbo:
-    base-url: https://www.koreabaseball.com/ws
-    connect-timeout: 5s
-    read-timeout: 30s
-    content-type: application/x-www-form-urlencoded; charset=UTF-8
 
 kbo:
   crawler:
