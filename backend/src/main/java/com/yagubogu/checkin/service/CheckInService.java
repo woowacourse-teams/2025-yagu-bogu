@@ -20,19 +20,19 @@ import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.sse.dto.GameWithFanRateParam;
 import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
-import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +45,6 @@ public class CheckInService {
 
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
-    private final StadiumRepository stadiumRepository;
     private final GameRepository gameRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -55,12 +54,12 @@ public class CheckInService {
         Member member = getMember(memberId);
         Team team = member.getTeam();
 
-        CheckIn checkIn = new CheckIn(game, member, team, CheckInType.LOCATION_CHECK_IN);
-        checkInRepository.save(checkIn);
+        validateNotExistGameAndMember(game, member);
+        saveCheckInSafely(game, member, team);
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
         applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
-        applicationEventPublisher.publishEvent(new CheckInCreatedEvent(game.getDate()));
+        applicationEventPublisher.publishEvent(new CheckInCreatedEvent());
     }
 
     public FanRateResponse findFanRatesByGames(final long memberId, final LocalDate date) {
@@ -149,19 +148,23 @@ public class CheckInService {
         return result;
     }
 
+    private void saveCheckInSafely(final Game game, final Member member, final Team team) {
+        CheckIn checkIn = new CheckIn(game, member, team, CheckInType.LOCATION_CHECK_IN);
+        try {
+            checkInRepository.save(checkIn);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("CheckIn is already exists");
+        }
+    }
 
-    private Stadium getStadiumById(final long stadiumId) {
-        return stadiumRepository.findById(stadiumId)
-                .orElseThrow(() -> new NotFoundException("Stadium is not found"));
+    private void validateNotExistGameAndMember(final Game game, final Member member) {
+        if (checkInRepository.existsByGameAndMember(game, member)) {
+            throw new ConflictException("CheckIn is already exists");
+        }
     }
 
     private Game getGameById(final long gameId) {
         return gameRepository.findById(gameId)
-                .orElseThrow(() -> new NotFoundException("Game is not found"));
-    }
-
-    private Game getGame(final Stadium stadium, final LocalDate date) {
-        return gameRepository.findByStadiumAndDate(stadium, date)
                 .orElseThrow(() -> new NotFoundException("Game is not found"));
     }
 
