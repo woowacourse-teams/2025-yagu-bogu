@@ -1,9 +1,8 @@
-package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
+package yagubogu.crawling.game.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import yagubogu.crawling.game.dto.GameCenterDetail;
 
 @Data
 public class GameCenter {

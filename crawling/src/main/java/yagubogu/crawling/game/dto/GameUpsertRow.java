@@ -14,6 +14,8 @@ public record GameUpsertRow(
         Integer awayScore,
         String homePitcher,
         String awayPitcher,
-        String gameState
+        String gameState,
+        ScoreBoardData homeScoreBoard,
+        ScoreBoardData awayScoreBoard
 ) {
 }

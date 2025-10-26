@@ -25,6 +25,8 @@ public class KboCrawlerProperties {
     public static class CrawlerConfig {
 
         @NotBlank
+        private String baseUrl;
+        @NotBlank
         private String scoreBoardUrl;
         @NotBlank
         private String gameCenterUrl;

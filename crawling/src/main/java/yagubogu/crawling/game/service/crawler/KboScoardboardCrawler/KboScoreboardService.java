@@ -37,6 +37,7 @@ import yagubogu.crawling.game.dto.GameUpsertRow;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
 import yagubogu.crawling.game.dto.KboScoreboardTeam;
 import yagubogu.crawling.game.dto.PitcherAssignment;
+import yagubogu.crawling.game.dto.ScoreBoardData;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
 import yagubogu.crawling.game.dto.UpsertResult;
 import yagubogu.crawling.game.repository.GameJdbcBatchUpsertRepository;
@@ -85,7 +86,7 @@ public class KboScoreboardService {
             allGames.addAll(e.getValue());
         }
 
-        // 4) 전체를 한 번에 "행"으로 변환
+        // 4) 전체를 한 번에 "행"으로 변환 (ScoreBoard 포함)
         List<GameUpsertRow> rows = convertToRows(allGames, teamByShort, stadiumByLocation);
 
         // 5) CHUNK별로 트랜잭션 분리하여 업서트
@@ -274,12 +275,14 @@ public class KboScoreboardService {
         return new UpsertResult(totalSuccess, failedGames);
     }
 
+    /**
+     * KboScoreboardGame → GameUpsertRow 변환 (ScoreBoard 포함)
+     */
     private List<GameUpsertRow> convertToRows(
             List<KboScoreboardGame> allGames,
             Map<String, Team> teamByShort,
             Map<String, Stadium> stadiumByLocation
     ) {
-
         List<GameUpsertRow> rows = new ArrayList<>(allGames.size());
 
         for (KboScoreboardGame dto : allGames) {
@@ -289,9 +292,11 @@ public class KboScoreboardService {
             LocalDate date = dto.getDate();
             LocalTime startAt = dto.getStartTime();
 
-            ScoreBoard h = mapper.toScoreBoard(dto.getHomeTeamScoreboard());
-            ScoreBoard a = mapper.toScoreBoard(dto.getAwayTeamScoreboard());
-            GameState state = mapper.toState(dto.getStatus(), h.getRuns(), a.getRuns());
+            // ScoreBoard 변환
+            KboScoreboardTeam homeTeamData = dto.getHomeTeamScoreboard();
+            KboScoreboardTeam awayTeamData = dto.getAwayTeamScoreboard();
+
+            GameState state = mapper.toState(dto.getStatus(), homeTeamData.runs(), awayTeamData.runs());
 
             String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
 
@@ -302,14 +307,45 @@ public class KboScoreboardService {
             PitcherAssignment pitcherAssignment = assignPitchersByScore(homeScore, awayScore, winningPitcher,
                     losingPitcher);
 
+            // ScoreBoard 데이터 변환
+            ScoreBoardData homeScoreBoardData = convertToScoreBoardData(homeTeamData);
+            ScoreBoardData awayScoreBoardData = convertToScoreBoardData(awayTeamData);
+
             rows.add(new GameUpsertRow(
-                    gameCode, stadium.getId(), home.getId(), away.getId(),
-                    date, startAt, h.getRuns(), a.getRuns(),
-                    pitcherAssignment.homePitcher(), pitcherAssignment.awayPitcher(), state.name()
+                    gameCode,
+                    stadium.getId(),
+                    home.getId(),
+                    away.getId(),
+                    date,
+                    startAt,
+                    homeScore,
+                    awayScore,
+                    pitcherAssignment.homePitcher(),
+                    pitcherAssignment.awayPitcher(),
+                    state.name(),
+                    homeScoreBoardData,  // Home ScoreBoard 추가
+                    awayScoreBoardData   // Away ScoreBoard 추가
             ));
         }
 
         return rows;
+    }
+
+    /**
+     * KboScoreboardTeam → ScoreBoardData 변환
+     */
+    private ScoreBoardData convertToScoreBoardData(KboScoreboardTeam teamData) {
+        if (teamData == null) {
+            return null;
+        }
+
+        return ScoreBoardData.from(
+                teamData.runs(),
+                teamData.hits(),
+                teamData.errors(),
+                teamData.basesOnBalls(),
+                teamData.inningScores()
+        );
     }
 
     private PitcherAssignment assignPitchersByScore(
