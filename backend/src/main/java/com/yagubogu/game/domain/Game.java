@@ -115,21 +115,6 @@ public class Game {
         this.gameState = newState;
     }
 
-    public void updateScoreBoard(
-            final ScoreBoard homeScoreBoard,
-            final ScoreBoard awayScoreBoard,
-            final String homePitcher,
-            final String awayPitcher
-    ) {
-        // TODO: homeScore과 homeScoreBoard의 runs가 중복되므로 homeScore 제거
-        this.homeScore = homeScoreBoard.getRuns();
-        this.awayScore = awayScoreBoard.getRuns();
-        this.homeScoreBoard = homeScoreBoard;
-        this.awayScoreBoard = awayScoreBoard;
-        this.homePitcher = homePitcher;
-        this.awayPitcher = awayPitcher;
-    }
-
     public void update(
             final Stadium stadium, final Team homeTeam, final Team awayTeam,
             final LocalDate date, final LocalTime startAt, final String gameCode,
@@ -149,23 +134,6 @@ public class Game {
         this.awayScoreBoard = awayScoreBoard;
         this.homePitcher = homePitcher;
         this.awayPitcher = awayPitcher;
-        updateGameState(newState);
-    }
-
-    public void updateSchedule(
-            final Stadium stadium,
-            final Team homeTeam,
-            final Team awayTeam,
-            final LocalDate date,
-            final LocalTime startAt,
-            final GameState newState
-    ) {
-
-        this.stadium = stadium;
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
-        this.date = date;
-        this.startAt = startAt;
         updateGameState(newState);
     }
 

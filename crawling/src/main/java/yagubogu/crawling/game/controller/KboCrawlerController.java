@@ -6,7 +6,6 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Role;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import yagubogu.crawling.game.dto.GamesFromGameCenter;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
-import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
-import yagubogu.crawling.game.service.crawler.KboScheduleCrawler.ScheduleType;
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 
 @RequiredArgsConstructor
@@ -25,21 +22,8 @@ import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboar
 @RestController
 public class KboCrawlerController implements KboCrawlerControllerInterface {
 
-    private final GameScheduleSyncService gameScheduleSyncService;
     private final KboScoreboardService kboScoreboardService;
     private final GameCenterSyncService gameCenterSyncService;
-
-    @Override
-    public ResponseEntity<Void> fetchScheduleRange(
-            @RequestParam @DateTimeFormat(iso = DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "ALL") ScheduleType scheduleType
-    ) {
-        LocalDateTime now = LocalDateTime.now();
-        gameScheduleSyncService.syncByCrawler(now, startDate, endDate, scheduleType);
-
-        return ResponseEntity.ok().build();
-    }
 
     @Override
     public ResponseEntity<List<ScoreboardResponse>> fetchScoreboardRange(
