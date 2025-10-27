@@ -3,6 +3,7 @@ package com.yagubogu.talk.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.BadRequestException;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.member.domain.Member;
@@ -19,9 +20,12 @@ import com.yagubogu.talk.repository.TalkRepository;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -31,9 +35,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
+@Slf4j
 public class TalkService {
 
     private static final Integer REPORTER_THRESHOLD_FOR_BLOCK = 10;
+    private static final int DUPLICATE_CHECK_WINDOW_SECONDS = 3;
 
     private final TalkRepository talkRepository;
     private final GameRepository gameRepository;
@@ -92,16 +98,66 @@ public class TalkService {
             final TalkRequest request,
             final long memberId
     ) {
+        log.info("채팅 생성 시작 - gameId: {}, memberId: {}, clientMessageId: {}, content: {}",
+                gameId, memberId, request.clientMessageId(), request.content());
+
+        // 1. Client Message ID 중복 체크 (멱등성)
+        Optional<Talk> existingTalk = talkRepository.findByClientMessageId(request.clientMessageId());
+        if (existingTalk.isPresent()) {
+            log.info("중복 요청 감지 (Client Message ID) - clientMessageId: {}, talkId: {}",
+                    request.clientMessageId(), existingTalk.get().getId());
+            return TalkResponse.from(existingTalk.get(), memberId);
+        }
+
+        // 2. 엔티티 조회
         Game game = getGame(gameId);
         Member member = getMember(memberId);
-        LocalDateTime now = LocalDateTime.now();
 
+        // 3. 차단 검증
         validateBlockedFromGame(gameId, memberId);
 
-        Talk talk = talkRepository.save(new Talk(game, member, request.content(), now));
-        publisher.publishEvent(new TalkEvent(member));
+        // 4. 중복 내용 검증 (3초 윈도우)
+        validateRecentDuplicate(gameId, memberId, request.content());
 
-        return TalkResponse.from(talk, memberId);
+        // 5. 저장
+        LocalDateTime now = LocalDateTime.now();
+
+        try {
+            Talk talk = talkRepository.save(new Talk(
+                    request.clientMessageId(),
+                    game,
+                    member,
+                    request.content(),
+                    now
+            ));
+
+            log.info("채팅 생성 완료 - talkId: {}, gameId: {}, memberId: {}",
+                    talk.getId(), gameId, memberId);
+
+            // 6. 이벤트 발행
+            publisher.publishEvent(new TalkEvent(member));
+
+            return TalkResponse.from(talk, memberId);
+
+        } catch (DataIntegrityViolationException e) {
+            // DB Unique 제약 위반 (동시 요청으로 이미 저장됨)
+            log.warn("DB Unique 제약 위반 - clientMessageId: {}", request.clientMessageId());
+            Talk saved = talkRepository.findByClientMessageId(request.clientMessageId())
+                    .orElseThrow(() -> new IllegalStateException("저장된 채팅을 찾을 수 없습니다"));
+            return TalkResponse.from(saved, memberId);
+        }
+    }
+
+    private void validateRecentDuplicate(long gameId, long memberId, String content) {
+        LocalDateTime threshold = LocalDateTime.now().minusSeconds(DUPLICATE_CHECK_WINDOW_SECONDS);
+
+        boolean exists = talkRepository.existsRecentDuplicate(gameId, memberId, content, threshold);
+
+        if (exists) {
+            log.warn("중복 내용 감지 - gameId: {}, memberId: {}, content: {}",
+                    gameId, memberId, content);
+            throw new ConflictException("같은 메시지를 너무 빠르게 보내고 있습니다");
+        }
     }
 
     @Transactional
@@ -144,15 +200,6 @@ public class TalkService {
                         ? TalkResponse.hiddenFrom(talk)
                         : talk)
                 .toList();
-    }
-
-    private Slice<TalkResponse> getInitialTalkResponses(
-            final long gameId,
-            final long memberId,
-            final Pageable pageable
-    ) {
-        Slice<Talk> talks = talkRepository.fetchRecentTalks(gameId, pageable);
-        return talks.map(talk -> TalkResponse.from(talk, memberId));
     }
 
     private Slice<TalkResponse> getTalkResponses(

@@ -1,6 +1,8 @@
 package com.yagubogu.talk.repository;
 
 import com.yagubogu.talk.domain.Talk;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,5 +49,22 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             @Param("gameId") long gameId,
             @Param("cursorId") Long cursorId,
             Pageable pageable
+    );
+
+    Optional<Talk> findByClientMessageId(String clientMessageId);
+
+    @Query("""
+            SELECT COUNT(t) > 0
+            FROM Talk t
+            WHERE t.game.id = :gameId
+              AND t.member.id = :memberId
+              AND t.content = :content
+              AND t.createdAt > :threshold
+            """)
+    boolean existsRecentDuplicate(
+            @Param("gameId") long gameId,
+            @Param("memberId") long memberId,
+            @Param("content") String content,
+            @Param("threshold") LocalDateTime threshold
     );
 }

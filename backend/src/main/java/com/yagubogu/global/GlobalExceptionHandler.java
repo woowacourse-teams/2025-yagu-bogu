@@ -7,6 +7,7 @@ import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.PayloadTooLargeException;
+import com.yagubogu.global.exception.RateLimitExceededException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.global.exception.UnsupportedMediaTypeException;
@@ -153,6 +154,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ExceptionResponse handleUnprocessableException(final UnprocessableEntityException e) {
         log.info("[UnprocessableEntityException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 429 Too Many Requests
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ExceptionResponse handleRateLimitExceeded(RateLimitExceededException e) {
+        log.info("[RateLimitExceededException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
