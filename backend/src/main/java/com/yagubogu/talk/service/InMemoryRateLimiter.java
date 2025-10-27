@@ -1,5 +1,6 @@
 package com.yagubogu.talk.service;
 
+import com.yagubogu.global.exception.RateLimitExceededException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;

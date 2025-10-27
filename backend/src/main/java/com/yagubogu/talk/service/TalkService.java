@@ -1,5 +1,6 @@
 package com.yagubogu.talk.service;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.BadRequestException;
@@ -17,6 +18,7 @@ import com.yagubogu.talk.dto.v1.TalkRequest;
 import com.yagubogu.talk.dto.v1.TalkResponse;
 import com.yagubogu.talk.repository.TalkReportRepository;
 import com.yagubogu.talk.repository.TalkRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +32,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,6 +51,7 @@ public class TalkService {
     private final MemberRepository memberRepository;
     private final TalkReportRepository talkReportRepository;
     private final ApplicationEventPublisher publisher;
+    private final EntityManager entityManager;
 
     public TalkEntranceResponse findInitialTalksExcludingReported(
             final long gameId,
@@ -98,10 +104,7 @@ public class TalkService {
             final TalkRequest request,
             final long memberId
     ) {
-        log.info("채팅 생성 시작 - gameId: {}, memberId: {}, clientMessageId: {}, content: {}",
-                gameId, memberId, request.clientMessageId(), request.content());
-
-        // 1. Client Message ID 중복 체크 (멱등성)
+        // 1. 중복 체크
         Optional<Talk> existingTalk = talkRepository.findByClientMessageId(request.clientMessageId());
         if (existingTalk.isPresent()) {
             log.info("중복 요청 감지 (Client Message ID) - clientMessageId: {}, talkId: {}",
@@ -109,17 +112,12 @@ public class TalkService {
             return TalkResponse.from(existingTalk.get(), memberId);
         }
 
-        // 2. 엔티티 조회
+        // 2~4. 검증
         Game game = getGame(gameId);
         Member member = getMember(memberId);
-
-        // 3. 차단 검증
         validateBlockedFromGame(gameId, memberId);
-
-        // 4. 중복 내용 검증 (3초 윈도우)
         validateRecentDuplicate(gameId, memberId, request.content());
 
-        // 5. 저장
         LocalDateTime now = LocalDateTime.now();
 
         try {
@@ -130,21 +128,24 @@ public class TalkService {
                     request.content(),
                     now
             ));
+            TalkResponse response = TalkResponse.from(talk, memberId);
 
-            log.info("채팅 생성 완료 - talkId: {}, gameId: {}, memberId: {}",
-                    talk.getId(), gameId, memberId);
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            log.info("트랜잭션 커밋 완료 - 이벤트 발행 시작, thread: {}",
+                                    Thread.currentThread().getName());
+                            publisher.publishEvent(new TalkEvent(member));
+                        }
+                    }
+            );
 
-            // 6. 이벤트 발행
-            publisher.publishEvent(new TalkEvent(member));
-
-            return TalkResponse.from(talk, memberId);
+            return response;
 
         } catch (DataIntegrityViolationException e) {
-            // DB Unique 제약 위반 (동시 요청으로 이미 저장됨)
-            log.warn("DB Unique 제약 위반 - clientMessageId: {}", request.clientMessageId());
-            Talk saved = talkRepository.findByClientMessageId(request.clientMessageId())
-                    .orElseThrow(() -> new IllegalStateException("저장된 채팅을 찾을 수 없습니다"));
-            return TalkResponse.from(saved, memberId);
+            entityManager.clear();
+            throw new DuplicateRequestException("이미 처리된 요청입니다");
         }
     }
 

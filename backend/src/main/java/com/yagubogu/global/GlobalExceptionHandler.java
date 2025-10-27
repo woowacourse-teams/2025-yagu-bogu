@@ -1,5 +1,6 @@
 package com.yagubogu.global;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -121,6 +123,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionResponse handleConflictException(final ConflictException e) {
         log.info("[ConflictException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateRequestException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleDuplicateRequest(DuplicateRequestException e) {
+        log.info("[DuplicateRequestException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
