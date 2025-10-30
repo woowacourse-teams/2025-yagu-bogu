@@ -1,11 +1,14 @@
 package com.yagubogu.global;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
+import com.yagubogu.global.exception.PayloadTooLargeException;
+import com.yagubogu.global.exception.RateLimitExceededException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.global.exception.YaguBoguException;
@@ -15,6 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,6 +39,33 @@ public class GlobalExceptionHandler {
         log.info("[BadRequestException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 400 JSON 파싱 실패, 바인딩/검증 실패, 타입/형변환 문제
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleNotReadable(HttpMessageNotReadableException e) {
+        log.info("[HttpMessageNotReadableException] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Invalid JSON request body");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleValidation(MethodArgumentNotValidException e) {
+        log.info("[MethodArgumentNotValid] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Validation failed");
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleConversion(HttpMessageConversionException e) {
+        log.info("[HttpMessageConversion] {}", safeMsg(e.getMessage()));
+
+        return new ExceptionResponse("Type conversion failed");
     }
 
     /**
@@ -92,6 +126,14 @@ public class GlobalExceptionHandler {
         return new ExceptionResponse(e.getMessage());
     }
 
+    @ExceptionHandler(DuplicateRequestException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleDuplicateRequest(DuplicateRequestException e) {
+        log.info("[DuplicateRequestException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
     /**
      * 422 UnprocessableEntity
      */
@@ -99,6 +141,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ExceptionResponse handleUnprocessableException(final UnprocessableEntityException e) {
         log.info("[UnprocessableEntityException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 429 Too Many Requests
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ExceptionResponse handleRateLimitExceeded(RateLimitExceededException e) {
+        log.info("[RateLimitExceededException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
@@ -129,8 +182,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
         String message = "Unexpected server error is occurred";
-        log.error("[RuntimeException] Unhandled runtime exception", runtimeException);
-        log.error("[RuntimeException] Message", runtimeException.getMessage());
+        log.error("[RuntimeException]- {}", runtimeException.getMessage());
 
         return new ExceptionResponse(message);
     }
@@ -141,8 +193,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadGatewayException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ExceptionResponse handleBadGatewayException(final BadGatewayException e) {
-        log.warn("[BadGatewayException]- {}", e.getMessage());
+        log.warn("[BadGatewayException] {} AT {}", safeMsg(e.getMessage()), firstLine(e));
 
         return new ExceptionResponse(e.getMessage());
+    }
+
+    private String firstLine(Throwable t) {
+        if (t.getStackTrace().length > 0) {
+            return t.getStackTrace()[0].toString();
+        }
+
+        return "no stack trace";
+    }
+
+    private String safeMsg(String msg) {
+        if (msg == null) {
+            return "";
+        }
+        String trimmed = msg.length() > 300 ? msg.substring(0, 300) + "..." : msg;
+
+        return trimmed.replaceAll("(?i)(token|authorization|password)=\\S+", "$1=***");
     }
 }
