@@ -11,7 +11,6 @@ import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.global.exception.RateLimitExceededException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
-import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -136,28 +135,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 413 Payload Too Large
-     */
-    @ExceptionHandler(value = PayloadTooLargeException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
-    public ExceptionResponse handlePayloadTooLarge(final PayloadTooLargeException e) {
-        log.info("[PayloadTooLargeException]- {}", e.getMessage());
-
-        return new ExceptionResponse(e.getMessage());
-    }
-
-    /**
-     * 415 Unsupported Media Type
-     */
-    @ExceptionHandler(value = UnsupportedMediaTypeException.class)
-    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    public ExceptionResponse handleUnsupportedMediaType(final PayloadTooLargeException e) {
-        log.info("[UnsupportedMediaTypeException]- {}", e.getMessage());
-
-        return new ExceptionResponse(e.getMessage());
-    }
-
-    /**
      * 422 UnprocessableEntity
      */
     @ExceptionHandler(value = UnprocessableEntityException.class)
@@ -196,18 +173,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        log.error("[{}]- {} AT {}", e.getClass().getSimpleName(), safeMsg(e.getMessage()), firstLine(e));
+        log.error("[YaguBoguException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
-        String simpleName = e.getClass().getSimpleName();
-        log.error("[{}] - {} AT {}", simpleName, safeMsg(e.getMessage()), firstLine(e));
-
+    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
         String message = "Unexpected server error is occurred";
+        log.error("[RuntimeException]- {}", runtimeException.getMessage());
+
         return new ExceptionResponse(message);
     }
 

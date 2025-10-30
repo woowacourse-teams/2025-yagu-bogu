@@ -47,7 +47,7 @@ class StadiumServiceTest {
 
     @BeforeEach
     void setUp() {
-        stadiumService = new StadiumService(stadiumRepository, gameRepository);
+        stadiumService = new StadiumService(gameRepository);
 
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
         stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
