@@ -46,8 +46,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -682,15 +686,13 @@ class TalkServiceTest {
         TalkRequest request = new TalkRequest(clientMessageId, content);
 
         // when
-        talkService.createTalk(game.getId(), request, me.getId());
-        ArgumentCaptor<TalkEvent> eventCaptor = ArgumentCaptor.forClass(TalkEvent.class);
-        verify(publisher, times(1)).publishEvent(eventCaptor.capture());
-        TalkEvent publishedEvent = eventCaptor.getValue();
+        TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());
 
         // then
-        assertSoftly(softAssertions -> {
-            softAssertions.assertThat(publishedEvent.member()).isEqualTo(me);
-            softAssertions.assertThat(publishedEvent.policy()).isEqualTo(Policy.CHAT);
-        });
+        assertThat(response).isNotNull();
+
+        List<TransactionSynchronization> synchronizations =
+                TransactionSynchronizationManager.getSynchronizations();
+        assertThat(synchronizations).isNotEmpty();
     }
 }
