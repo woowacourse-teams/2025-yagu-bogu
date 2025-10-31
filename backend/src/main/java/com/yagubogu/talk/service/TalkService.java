@@ -149,18 +149,6 @@ public class TalkService {
         }
     }
 
-    private void validateRecentDuplicate(long gameId, long memberId, String content) {
-        LocalDateTime threshold = LocalDateTime.now().minusSeconds(DUPLICATE_CHECK_WINDOW_SECONDS);
-
-        boolean exists = talkRepository.existsRecentDuplicate(gameId, memberId, content, threshold);
-
-        if (exists) {
-            log.warn("중복 내용 감지 - gameId: {}, memberId: {}, content: {}",
-                    gameId, memberId, content);
-            throw new ConflictException("같은 메시지를 너무 빠르게 보내고 있습니다");
-        }
-    }
-
     @Transactional
     public void removeTalk(
             final long gameId,
@@ -263,6 +251,18 @@ public class TalkService {
                 memberId);
         if (distinctReporterCount >= REPORTER_THRESHOLD_FOR_BLOCK) {
             throw new ForbiddenException("Cannot chat due to multiple user reports");
+        }
+    }
+
+    private void validateRecentDuplicate(long gameId, long memberId, String content) {
+        LocalDateTime threshold = LocalDateTime.now().minusSeconds(DUPLICATE_CHECK_WINDOW_SECONDS);
+
+        boolean exists = talkRepository.existsRecentDuplicate(gameId, memberId, content, threshold);
+
+        if (exists) {
+            log.warn("중복 내용 감지 - gameId: {}, memberId: {}, content: {}",
+                    gameId, memberId, content);
+            throw new ConflictException("같은 메시지를 너무 빠르게 보내고 있습니다");
         }
     }
 
