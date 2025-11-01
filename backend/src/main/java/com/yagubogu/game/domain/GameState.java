@@ -29,9 +29,13 @@ public enum GameState {
                 .orElseThrow(() -> new GameSyncException("Unknown game status: " + gameState));
     }
 
-    public static GameState fromName(final String statusName) {
+    public static GameState fromName(final String state) {
+        if (state == null || state.isEmpty()) {
+            return GameState.SCHEDULED;
+        }
+
         return Arrays.stream(values())
-                .filter(status -> status.statusName.equals(statusName))
+                .filter(status -> status.statusName.equals(state))
                 .findFirst()
                 .orElse(LIVE);
     }

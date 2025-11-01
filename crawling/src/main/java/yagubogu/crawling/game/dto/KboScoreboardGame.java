@@ -21,7 +21,6 @@ public final class KboScoreboardGame {
     private final String winningPitcher;
     private final String savingPitcher;
     private final String losingPitcher;
-    private int doubleHeaderGameOrder = -1;
 
     public KboScoreboardGame(
             LocalDate date,

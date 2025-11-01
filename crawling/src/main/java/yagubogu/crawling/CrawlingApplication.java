@@ -1,5 +1,6 @@
 package yagubogu.crawling;
 
+import com.yagubogu.global.config.PipelineConfig;
 import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.global.config.ScheduleConfig;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Import({
         QueryDslConfig.class,
-        ScheduleConfig.class
+        ScheduleConfig.class,
+        PipelineConfig.class
 })
 @EntityScan(basePackages = "com.yagubogu")
 @EnableJpaRepositories(basePackages = "com.yagubogu")
