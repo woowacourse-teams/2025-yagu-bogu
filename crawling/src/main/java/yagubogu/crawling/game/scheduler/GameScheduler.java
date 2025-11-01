@@ -1,6 +1,7 @@
 package yagubogu.crawling.game.scheduler;
 
 import com.yagubogu.game.exception.GameSyncException;
+import java.time.Clock;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,14 @@ public class GameScheduler {
     private final KboScoreboardService kboScoreboardService;
     private final GameCenterSyncService gameCenterSyncService;
     private final AdaptivePoller adaptivePoller;
+    private final Clock clock;
 
     @EventListener(ApplicationReadyEvent.class)
     @Scheduled(cron = "0 0 0 * * *")
     public void fetchDailyGameSchedule() {
         log.info("FETCH DAILY GAME SCHEDULE");
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
+        LocalDate yesterday = today.minusDays(1);
         try {
             kboScoreboardService.fetchScoreboardRange(yesterday, today);
             gameCenterSyncService.fetchGameCenter(today);
