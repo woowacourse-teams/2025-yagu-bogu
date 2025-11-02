@@ -1,4 +1,4 @@
-package yagubogu.crawling.game.config;
+package com.yagubogu.global.config;
 
 import java.time.Clock;
 import java.time.LocalDate;

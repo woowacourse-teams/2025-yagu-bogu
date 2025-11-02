@@ -24,6 +24,7 @@ public class GameCompletedEventHandler {
     @EventListener
     public void handleGameFinalized(final GameFinalizedEvent event) {
         try {
+            // 단일 게임 ETL
             gameEtlService.transformSpecificGame(
                     event.date(),
                     event.stadium(),
@@ -31,6 +32,7 @@ public class GameCompletedEventHandler {
                     event.awayTeam(),
                     event.startTime()
             );
+
             log.info("[EVENT] Immediate ETL finalized: date={}, home={}, away={}",
                     event.date(), event.homeTeam(), event.awayTeam());
         } catch (Exception e) {

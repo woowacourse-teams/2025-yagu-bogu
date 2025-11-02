@@ -1,5 +1,6 @@
 package yagubogu.crawling;
 
+import com.yagubogu.global.config.ClockConfig;
 import com.yagubogu.global.config.PipelineConfig;
 import com.yagubogu.global.config.QueryDslConfig;
 import com.yagubogu.global.config.ScheduleConfig;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Import({
+        ClockConfig.class,
         QueryDslConfig.class,
         ScheduleConfig.class,
         PipelineConfig.class

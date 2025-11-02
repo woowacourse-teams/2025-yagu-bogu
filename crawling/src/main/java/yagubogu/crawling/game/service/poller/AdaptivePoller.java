@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import yagubogu.crawling.game.dto.GameCenter;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
 import yagubogu.crawling.game.service.GameReadOnlyService;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
@@ -188,12 +189,32 @@ public class AdaptivePoller {
     }
 
     private Game fetchFromGameCenter(Game game) {
-        List<Game> games = gameCenterSyncService.fetchGameCenter(game.getDate());
+        // GameCenter 원본 데이터 크롤링
+        GameCenter gameCenter = gameCenterSyncService.fetchGameCenterOnly(game.getDate());
 
-        return games.stream()
-                .filter(g -> g.getGameCode().equals(game.getGameCode()))
+        // Bronze Layer에 저장 (ETL이 Silver로 변환)
+        gameCenterSyncService.saveToBronzeLayer(gameCenter.getGames());
+
+        // 메모리상 취소 여부 확인 (스케줄 관리용)
+        return gameCenter.getGames().stream()
+                .filter(detail -> detail.getGameCode().equals(game.getGameCode()))
                 .findFirst()
+                .map(detail -> {
+                    game.updateGameState(parseGameState(detail.getGameSc()));
+                    return game;
+                })
                 .orElse(game);
+    }
+
+    private GameState parseGameState(String gameSc) {
+        if (gameSc == null || gameSc.isBlank()) {
+            return GameState.SCHEDULED;
+        }
+        try {
+            return GameState.fromNumber(Integer.parseInt(gameSc));
+        } catch (NumberFormatException e) {
+            return GameState.SCHEDULED;
+        }
     }
 
     /**

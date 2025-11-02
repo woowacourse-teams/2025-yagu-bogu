@@ -56,6 +56,9 @@ public class BronzeGame {
     @Column(name = "content_hash", nullable = false, length = 64)
     private String contentHash;
 
+    @Column(name = "etl_processed_at")
+    private LocalDateTime etlProcessedAt;
+
     public BronzeGame(final LocalDate date,
                       final String stadium,
                       final String homeTeam,
@@ -72,11 +75,21 @@ public class BronzeGame {
         this.collectedAt = collectedAt;
         this.payload = payload;
         this.contentHash = contentHash;
+        this.etlProcessedAt = null;
     }
 
     public void update(final LocalDateTime collectedAt, final String payload, final String contentHash) {
         this.collectedAt = collectedAt;
         this.payload = payload;
         this.contentHash = contentHash;
+        this.etlProcessedAt = null;
+    }
+
+    public void markEtlProcessed(final LocalDateTime processedAt) {
+        this.etlProcessedAt = processedAt;
+    }
+
+    public boolean isEtlProcessed() {
+        return this.etlProcessedAt != null;
     }
 }
