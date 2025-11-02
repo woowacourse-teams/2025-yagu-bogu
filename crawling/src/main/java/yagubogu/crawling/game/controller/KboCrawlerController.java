@@ -3,7 +3,6 @@ package yagubogu.crawling.game.controller;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 
 import com.yagubogu.auth.annotation.RequireRole;
-import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Role;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,8 +11,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import yagubogu.crawling.game.dto.GamesFromGameCenter;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
+import yagubogu.crawling.game.service.GameReadOnlyService;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardService;
 
@@ -37,12 +36,13 @@ public class KboCrawlerController implements KboCrawlerControllerInterface {
 
     /**
      * 특정 날짜 경기 상세 정보
+     * GameCenter 데이터를 Bronze Layer에 저장
      */
-    public ResponseEntity<GamesFromGameCenter> fetchGameCenter(
+    public ResponseEntity<Integer> fetchGameCenter(
             @RequestParam @DateTimeFormat(iso = DATE) LocalDate date
     ) {
-        List<Game> games = gameCenterSyncService.fetchGameCenter(date);
+        int savedCount = gameCenterSyncService.fetchGameCenter(date);
 
-        return ResponseEntity.ok(new GamesFromGameCenter(games));
+        return ResponseEntity.ok(savedCount);
     }
 }
