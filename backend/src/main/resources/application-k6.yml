@@ -70,7 +70,7 @@ security:
 
 oauth:
   google:
-    base-uri: 'http://wiremock:8080'
+    base-uri: 'http://10.0.0.238:1080'
     token-info-uri: '/tokeninfo'
     client-id: mock-client-id
     connect-timeout: 180s
