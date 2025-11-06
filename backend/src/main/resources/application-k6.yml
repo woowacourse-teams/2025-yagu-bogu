@@ -9,19 +9,19 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 3
-      minimum-idle: 0
-      connection-timeout: 1000
+      maximum-pool-size: 18
+      minimum-idle: 5
+      connection-timeout: 2000
       max-lifetime: 600000
       idle-timeout: 300000
-      leak-detection-threshold: 4000
+      leak-detection-threshold: 2000
 
   task:
     execution:
       pool:
-        core-size: 10
-        max-size: 10
-        queue-capacity: 0
+        core-size: 2
+        max-size: 4
+        queue-capacity: 100
       thread-name-prefix: app-async-
 
   jpa:
@@ -38,10 +38,10 @@ spring:
 server:
   tomcat:
     threads:
-      max: 30
-      min-spare: 10
-    accept-count: 100
-    max-connections: 200
+      max: 100
+      min-spare: 20
+    accept-count: 200
+    max-connections: 500
 
 management:
   metrics:
