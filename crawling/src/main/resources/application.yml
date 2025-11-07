@@ -11,10 +11,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
   flyway:
-    locations:
-      - classpath:db/migration
-      - classpath:db/migration/mysql
-    validate-on-migrate: true
+    enabled: false
 
   datasource:
     hikari:
@@ -102,6 +99,10 @@ kbo:
     pitcherLabel: "^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$"
     dateFormat: "yyyy.MM.dd"
     timeFormat: "HH:mm"
+
+app:
+  clock:
+    fixed-date: 2024-08-15
 
 ---
 spring:

@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -18,4 +18,8 @@ spring:
       mode: never
 
   flyway:
+    enabled: false
     clean-disabled: false
+
+server:
+  port: 9000

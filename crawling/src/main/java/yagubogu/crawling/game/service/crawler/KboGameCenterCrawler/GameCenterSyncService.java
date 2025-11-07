@@ -1,18 +1,12 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
-import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.GameState;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.exception.GameSyncException;
-import com.yagubogu.game.repository.GameRepository;
-import com.yagubogu.stadium.domain.Stadium;
-import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.team.domain.Team;
-import com.yagubogu.team.repository.TeamRepository;
+import com.yagubogu.game.service.BronzeGameService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,17 +19,16 @@ import yagubogu.crawling.game.dto.GameCenterDetail;
 public class GameCenterSyncService {
 
     private final KboGameCenterCrawler crawler;
-    private final GameRepository gameRepository;
-    private final StadiumRepository stadiumRepository;
-    private final TeamRepository teamRepository;
+    private final BronzeGameService bronzeGameService;
+    private final ObjectMapper objectMapper;
 
     /**
-     * 특정 날짜 경기 상세 정보 수집
+     * 특정 날짜 경기 상세 정보 수집 및 Bronze Layer 저장
      */
-    public List<Game> fetchGameCenter(LocalDate date) {
+    public int fetchGameCenter(LocalDate date) {
         GameCenter dailyData = fetchGameCenterOnly(date);
 
-        return updateGameStates(dailyData.getGames());
+        return saveToBronzeLayer(dailyData.getGames());
     }
 
     public GameCenter fetchGameCenterOnly(LocalDate date) {
@@ -43,102 +36,51 @@ public class GameCenterSyncService {
     }
 
     /**
-     * GameDetailInfo 리스트를 받아서 Game 상태 업데이트
+     * GameCenterDetail 리스트를 받아서 Bronze Layer에 저장
      */
-    private List<Game> updateGameStates(List<GameCenterDetail> gameDetails) {
-        List<Game> games = new ArrayList<>();
+     public int saveToBronzeLayer(java.util.List<GameCenterDetail> gameDetails) {
+        int savedCount = 0;
+
         for (GameCenterDetail detail : gameDetails) {
             try {
-                games.add(updateOrCreateGame(detail));
+                boolean changed = saveToBronze(detail);
+                if (changed) {
+                    savedCount++;
+                }
             } catch (Exception e) {
-                log.error("경기 업데이트 실패: gameCode={}", detail.getGameCode(), e);
+                log.error("[BRONZE] 경기 저장 실패: gameCode={}", detail.getGameCode(), e);
             }
         }
-        return games;
+
+        log.info("[BRONZE] Processed {} games, {} saved (changed)", gameDetails.size(), savedCount);
+        return savedCount;
     }
 
     /**
-     * 개별 경기 업데이트 또는 생성
+     * 개별 경기를 Bronze Layer에 저장
      */
-    private Game updateOrCreateGame(GameCenterDetail detail) {
-        // GameState 변환
-        GameState gameState = fromGameSc(detail.getGameSc());
+    private boolean saveToBronze(GameCenterDetail detail) throws JsonProcessingException {
+        // GameCenterDetail을 JSON으로 직렬화
+        String payload = objectMapper.writeValueAsString(detail);
 
-        // gameCode로 조회 또는 생성
-        Game game = gameRepository.findByGameCode(detail.getGameCode())
-                .orElseGet(() -> createNewGame(detail));
-
-        // 상태 업데이트
-        if (game.getGameState() != gameState) {
-            game.updateGameState(gameState);
-            log.info("경기 상태 업데이트: gameCode={}, {} vs {} - {} → {}",
-                    detail.getGameCode(),
-                    detail.getAwayTeamName(),
-                    detail.getHomeTeamName(),
-                    game.getGameState(),
-                    gameState);
-        }
-        return game;
-    }
-
-    private GameState fromGameSc(final String gameSc) {
-        if (gameSc == null || gameSc.isBlank()) {
-            return GameState.SCHEDULED;  // 기본값
-        }
-
-        try {
-            Integer scNumber = Integer.parseInt(gameSc);
-            return GameState.fromNumber(scNumber);
-        } catch (NumberFormatException e) {
-            throw new GameSyncException("Invalid gameSc format: " + gameSc);
-        }
-    }
-
-    /**
-     * 새 경기 생성
-     */
-    private Game createNewGame(GameCenterDetail detail) {
-        Stadium stadium = findStadium(detail.getStadiumName());
-        Team homeTeam = findTeam(detail.getHomeTeamCode());
-        Team awayTeam = findTeam(detail.getAwayTeamCode());
-
+        // Natural Key 추출
         LocalDate date = parseDate(detail.getGameDate());
-        LocalTime startAt = parseTime(detail.getStartTime());
-        GameState gameState = fromGameSc(detail.getGameSc());
+        String stadium = detail.getStadiumName();
+        String homeTeam = detail.getHomeTeamName();
+        String awayTeam = detail.getAwayTeamName();
+        LocalTime startTime = parseTime(detail.getStartTime());
 
-        Game newGame = new Game(
-                stadium,
-                homeTeam,
-                awayTeam,
-                date,
-                startAt,
-                detail.getGameCode(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                gameState
+        // BronzeGameService를 활용하여 upsert
+        boolean changed = bronzeGameService.upsertByNaturalKey(
+                date, stadium, homeTeam, awayTeam, startTime, payload
         );
 
-        return gameRepository.save(newGame);
-    }
+        if (changed) {
+            log.debug("[BRONZE] Saved gameCode={}, {} vs {}",
+                    detail.getGameCode(), awayTeam, homeTeam);
+        }
 
-    /**
-     * Stadium 조회
-     */
-    private Stadium findStadium(String stadiumName) {
-        return stadiumRepository.findByLocation(stadiumName)
-                .orElseThrow(() -> new GameSyncException("Stadium not found: " + stadiumName));
-    }
-
-    /**
-     * Team 조회
-     */
-    private Team findTeam(String teamId) {
-        return teamRepository.findByTeamCode(teamId)
-                .orElseThrow(() -> new GameSyncException("Team not found: " + teamId));
+        return changed;
     }
 
     /**

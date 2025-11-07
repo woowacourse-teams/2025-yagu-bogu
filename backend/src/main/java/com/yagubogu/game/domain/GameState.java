@@ -7,7 +7,7 @@ import java.util.List;
 public enum GameState {
 
     SCHEDULED(1, "경기전"),
-    LIVE(2, ""),
+    LIVE(2, "중"),
     COMPLETED(3, "경기종료"),
     CANCELED(4, "경기취소"),
     ;
@@ -29,9 +29,13 @@ public enum GameState {
                 .orElseThrow(() -> new GameSyncException("Unknown game status: " + gameState));
     }
 
-    public static GameState fromName(final String statusName) {
+    public static GameState fromName(final String state) {
+        if (state == null || state.isEmpty()) {
+            return GameState.SCHEDULED;
+        }
+
         return Arrays.stream(values())
-                .filter(status -> status.statusName.equals(statusName))
+                .filter(status -> state.contains(status.statusName))
                 .findFirst()
                 .orElse(LIVE);
     }

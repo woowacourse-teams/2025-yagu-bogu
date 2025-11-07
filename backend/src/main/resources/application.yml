@@ -74,6 +74,8 @@ app:
   s3:
     bucket: techcourse-project-2025
     presign-expiration: 5m
+  clock:
+    fixed-date: 2024-08-15
 
 ---
 spring:

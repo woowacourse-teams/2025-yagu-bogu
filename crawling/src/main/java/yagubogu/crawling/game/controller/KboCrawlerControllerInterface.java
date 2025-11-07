@@ -36,6 +36,6 @@ public interface KboCrawlerControllerInterface {
             @ApiResponse(responseCode = "200", description = "경기 조회 성공")
     })
     @PostMapping("/game-center")
-    ResponseEntity<GamesFromGameCenter> fetchGameCenter(
+    ResponseEntity<Integer> fetchGameCenter(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
 }
