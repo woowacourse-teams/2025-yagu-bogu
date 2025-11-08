@@ -6,6 +6,7 @@ import com.yagubogu.sse.dto.GameWithFanRateParam;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,5 +26,11 @@ public class FanRateCache {
 
     public List<GameWithFanRateParam> get(LocalDate date) {
         return cache.getIfPresent(date);
+    }
+
+    public List<GameWithFanRateParam> getOrCompute(
+            LocalDate date,
+            Function<LocalDate, List<GameWithFanRateParam>> loader) {
+        return cache.get(date, loader);
     }
 }
