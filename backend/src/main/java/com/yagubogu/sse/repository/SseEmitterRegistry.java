@@ -53,6 +53,10 @@ public class SseEmitterRegistry {
         return sseEmitter;
     }
 
+    public int size() {
+        return sseEmitterMap.size();
+    }
+
     public Collection<SseEmitter> all() {
         return sseEmitterMap.values();
     }
