@@ -1,6 +1,6 @@
 package com.yagubogu.checkin;
 
-import static org.springframework.web.servlet.mvc.method.annotation.SseEmitter.*;
+import static org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event;
 
 import com.yagubogu.checkin.cache.FanRateCache;
 import com.yagubogu.checkin.service.CheckInService;
@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.concurrent.Executor;
 
 @Slf4j
 @Service
@@ -25,6 +27,9 @@ public class CheckInEventListener {
     private final CheckInService checkInService;
     private final SseEmitterRegistry sseEmitterRegistry;
     private final FanRateCache fanRateCache;
+
+    @Qualifier("sseExecutor")
+    private final Executor sseExecutor;
 
     @Async
     @TransactionalEventListener
@@ -43,7 +48,7 @@ public class CheckInEventListener {
                     } catch (IOException e) {
                         sseEmitterRegistry.removeWithError(emitter, e);
                     }
-                }))
+                }, sseExecutor))
                 .toList();
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
