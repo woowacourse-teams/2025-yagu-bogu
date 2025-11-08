@@ -16,7 +16,7 @@ public class FanRateCache {
 
     public FanRateCache() {
         this.cache = Caffeine.newBuilder()
-                .expireAfterWrite(5, TimeUnit.SECONDS)
+                .expireAfterWrite(15, TimeUnit.SECONDS)
                 .build();
     }
 
