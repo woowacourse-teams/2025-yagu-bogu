@@ -1,6 +1,7 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.v1.GameResponse;
@@ -40,6 +41,12 @@ public class GameService {
         validateScoreBoard(game);
 
         return GameResultParam.from(game);
+    }
+
+    public boolean isLiveToday() {
+        LocalDate today = LocalDate.now();
+
+        return gameRepository.existsByDateAndGameState(today, GameState.LIVE);
     }
 
     private static void validateScoreBoard(final Game game) {
