@@ -15,6 +15,9 @@ class LivetalkOtherBubbleViewHolder private constructor(
         binding.constraintReportContainer.setOnClickListener {
             livetalkChatEventHandler.onEvent(LivetalkChatEvent.Report(item))
         }
+        binding.constraintMemberProfile.setOnClickListener {
+            livetalkChatEventHandler.onEvent(LivetalkChatEvent.ViewProfile(item))
+        }
         binding.executePendingBindings()
     }
 

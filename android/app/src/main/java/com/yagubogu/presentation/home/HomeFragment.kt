@@ -32,6 +32,7 @@ import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
+import com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
@@ -44,7 +45,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment :
     Fragment(),
-    ScrollToTop {
+    ScrollToTop,
+    VictoryFairyViewHolder.Handler {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -53,7 +55,7 @@ class HomeFragment :
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
-    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter() }
+    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter(this) }
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
@@ -103,6 +105,11 @@ class HomeFragment :
         binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
+    override fun onProfileImageClick(memberId: Long) {
+        viewModel.fetchMemberProfile(memberId)
+        firebaseAnalytics.logEvent("member_profile", null)
+    }
+
     private fun setupComposeView() {
         binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         binding.composeView.setContent {
@@ -135,6 +142,8 @@ class HomeFragment :
                 .start()
             firebaseAnalytics.logEvent("fan_rate_refresh", null)
         }
+
+        binding.layoutMyVictoryFairy.handler = this
     }
 
     private fun setupObservers() {

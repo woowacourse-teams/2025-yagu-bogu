@@ -5,6 +5,7 @@ import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
 import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
+import com.yagubogu.ui.common.model.MemberProfile
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoItem>
@@ -31,4 +32,6 @@ interface MemberRepository {
     ): Result<PresignedUrlItem>
 
     suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem>
+
+    suspend fun getMemberProfile(memberId: Long): Result<MemberProfile>
 }
