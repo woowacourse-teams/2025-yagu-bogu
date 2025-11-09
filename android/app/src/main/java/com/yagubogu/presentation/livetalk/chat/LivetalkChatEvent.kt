@@ -1,6 +1,10 @@
 package com.yagubogu.presentation.livetalk.chat
 
 sealed interface LivetalkChatEvent {
+    data class ViewProfile(
+        val livetalkChatItem: LivetalkChatItem,
+    ) : LivetalkChatEvent
+
     data class Report(
         val livetalkChatItem: LivetalkChatItem,
     ) : LivetalkChatEvent

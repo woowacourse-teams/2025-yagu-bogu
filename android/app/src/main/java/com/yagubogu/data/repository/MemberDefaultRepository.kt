@@ -6,6 +6,7 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
@@ -17,6 +18,7 @@ import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
+import com.yagubogu.ui.common.model.MemberProfile
 import javax.inject.Inject
 
 class MemberDefaultRepository
@@ -120,5 +122,12 @@ class MemberDefaultRepository
                 .completeUploadProfileImage(key)
                 .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
                     PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
+                }
+
+        override suspend fun getMemberProfile(memberId: Long): Result<MemberProfile> =
+            memberDataSource
+                .getMemberProfile(memberId)
+                .map { memberProfileResponse: MemberProfileResponse ->
+                    memberProfileResponse.toPresentation()
                 }
     }

@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +24,8 @@ import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import com.yagubogu.ui.common.component.profile.ProfileDialog
+import com.yagubogu.ui.common.model.MemberProfile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,6 +63,11 @@ class LivetalkChatActivity : AppCompatActivity() {
                         event.livetalkChatItem.nickname ?: getString(R.string.all_null_nick_name),
                     )
                 }
+
+                is LivetalkChatEvent.ViewProfile -> {
+                    viewModel.fetchMemberProfile(event.livetalkChatItem.memberId)
+                    firebaseAnalytics.logEvent("member_profile", null)
+                }
             }
         }
     }
@@ -76,6 +86,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         setupListener()
         setupRecyclerView()
         setupObservers()
+        setupComposeView()
     }
 
     private fun setupBinding() {
@@ -157,6 +168,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
+        viewModel.profileInfoClickEvent.observe(this) { showMemberProfileDialog() }
         observePollingLikeAnimation()
     }
 
@@ -315,6 +327,23 @@ class LivetalkChatActivity : AppCompatActivity() {
         val talkReportDialog =
             DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
         talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
+    }
+
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    }
+
+    private fun showMemberProfileDialog() {
+        binding.composeView.setContent {
+            val profile: State<MemberProfile?> = viewModel.profileInfoClickEvent.observeAsState()
+
+            profile.value?.let { memberProfile: MemberProfile ->
+                ProfileDialog(
+                    onDismissRequest = { viewModel.clearMemberProfileEvent() },
+                    memberProfile = memberProfile,
+                )
+            }
+        }
     }
 
     companion object {
