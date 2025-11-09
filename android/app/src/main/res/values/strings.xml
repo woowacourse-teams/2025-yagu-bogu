@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">야구보구</string>
 
     <string name="all_settings">설정</string>
@@ -161,6 +161,10 @@
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
     <string name="setting_edit_my_team">응원팀 수정</string>
+
+    <!--    uCrop의 문자열 리소스 오버라이딩-->
+    <string name="ucrop_rotate" tools:ignore="PrivateResource">회전</string>
+    <string name="ucrop_scale" tools:ignore="PrivateResource">배율</string>
 
     <string name="setting_manage_account">계정 관리</string>
     <string name="setting_logout">로그아웃</string>
