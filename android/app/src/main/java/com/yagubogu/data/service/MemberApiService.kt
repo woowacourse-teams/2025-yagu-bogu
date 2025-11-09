@@ -8,6 +8,7 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import retrofit2.Response
@@ -58,4 +59,9 @@ interface MemberApiService {
     suspend fun postCompleteUpload(
         @Body request: PresignedUrlCompleteRequest,
     ): Response<PresignedUrlCompleteResponse>
+
+    @GET("/api/v1/members/{memberId}")
+    suspend fun getMemberProfile(
+        @Path("memberId") memberId: Long,
+    ): Response<MemberProfileResponse>
 }

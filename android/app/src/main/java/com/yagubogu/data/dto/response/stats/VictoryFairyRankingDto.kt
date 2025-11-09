@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 data class VictoryFairyRankingDto(
     @SerialName("ranking")
     val ranking: Int, // 승리요정 랭킹
+    @SerialName("memberId")
+    val memberId: Long, // 멤버 ID
     @SerialName("nickname")
     val nickname: String, // 회원 닉네임
     @SerialName("profileImageUrl")
@@ -24,5 +26,6 @@ data class VictoryFairyRankingDto(
             profileImageUrl = profileImageUrl,
             teamName = teamShortName,
             score = victoryFairyScore,
+            memberId = memberId,
         )
 }

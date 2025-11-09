@@ -25,6 +25,7 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -196,6 +197,19 @@ class HomeViewModel(
 
     fun toggleStadiumStats() {
         _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+    }
+
+    fun fetchMemberProfile(memberId: Long) {
+        viewModelScope.launch {
+            val memberProfileResult: Result<MemberProfile> =
+                memberRepository.getMemberProfile(memberId)
+            memberProfileResult
+                .onSuccess { memberProfile: MemberProfile ->
+                    _dialogEvent.emit(HomeDialogEvent.ProfileDialog(memberProfile))
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+                }
+        }
     }
 
     private fun fetchMemberStats(year: Int = LocalDate.now().year) {

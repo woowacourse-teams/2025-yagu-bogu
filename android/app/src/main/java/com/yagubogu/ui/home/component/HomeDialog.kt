@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.HomeDialogEvent
+import com.yagubogu.ui.common.component.profile.ProfileDialog
 
 @Composable
 fun HomeDialog(
@@ -38,6 +39,13 @@ fun HomeDialog(
                 )
             }
 
+            is HomeDialogEvent.ProfileDialog -> {
+                ProfileDialog(
+                    onDismissRequest = viewModel::hideCheckInDialog,
+                    memberProfile = dialogEvent.memberProfile,
+                    modifier = modifier,
+                )
+            }
             HomeDialogEvent.HideDialog -> {}
         }
     }

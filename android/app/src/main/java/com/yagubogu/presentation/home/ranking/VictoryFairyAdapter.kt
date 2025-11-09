@@ -4,11 +4,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class VictoryFairyAdapter : ListAdapter<VictoryFairyItem, VictoryFairyViewHolder>(diffCallback) {
+class VictoryFairyAdapter(
+    private val profileImageHandler: VictoryFairyViewHolder.Handler,
+) : ListAdapter<VictoryFairyItem, VictoryFairyViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): VictoryFairyViewHolder = VictoryFairyViewHolder.from(parent)
+    ): VictoryFairyViewHolder = VictoryFairyViewHolder.from(parent, profileImageHandler)
 
     override fun onBindViewHolder(
         holder: VictoryFairyViewHolder,

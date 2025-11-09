@@ -8,11 +8,16 @@
         <variable
             name="victoryFairyItem"
             type="com.yagubogu.presentation.home.ranking.VictoryFairyItem" />
+
+        <variable
+            name="handler"
+            type="com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder.Handler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{() -> handler.onProfileImageClick(victoryFairyItem.memberId)}"
         android:paddingVertical="10dp">
 
         <TextView

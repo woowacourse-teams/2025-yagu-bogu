@@ -8,6 +8,7 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
@@ -76,5 +77,10 @@ class MemberRemoteDataSource(
         safeApiCall {
             val request = PresignedUrlCompleteRequest(key)
             memberApiService.postCompleteUpload(request)
+        }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> =
+        safeApiCall {
+            memberApiService.getMemberProfile(memberId)
         }
 }
