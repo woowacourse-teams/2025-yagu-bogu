@@ -1,8 +1,5 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
@@ -25,6 +22,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
@@ -94,7 +94,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
             softAssertions.assertThat(results).extracting(VictoryFairyRanking::getCheckInCount)
                     .containsExactlyInAnyOrder(1, 1);
             softAssertions.assertThat(results).extracting(VictoryFairyRanking::getScore)
-                    .containsExactlyInAnyOrder(100.0, 100.0);
+                    .containsExactlyInAnyOrder(75.0, 75.0);
         });
     }
 
@@ -142,10 +142,10 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(r1.getWinCount()).isEqualTo(1);
             softAssertions.assertThat(r1.getCheckInCount()).isEqualTo(2);
-            softAssertions.assertThat(r1.getScore()).isEqualTo(57.14);
+            softAssertions.assertThat(r1.getScore()).isEqualTo(50.0);
             softAssertions.assertThat(r2.getWinCount()).isEqualTo(1);
             softAssertions.assertThat(r2.getCheckInCount()).isEqualTo(1);
-            softAssertions.assertThat(r2.getScore()).isEqualTo(100.0);
+            softAssertions.assertThat(r2.getScore()).isEqualTo(75.0);
         });
     }
 

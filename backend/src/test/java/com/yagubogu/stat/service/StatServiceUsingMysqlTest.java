@@ -1,8 +1,5 @@
 package com.yagubogu.stat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse;
@@ -33,6 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
 
@@ -60,6 +60,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
     @Autowired
     private VictoryFairyRankingRepository victoryFairyRankingRepository;
 
+    private long gameCount = 0;
     private Team kia, kt, lg, samsung, doosan, lotte;
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
@@ -348,7 +349,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                             .containsExactly("밍트", "포르", "포라", "두리", "우가");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo(duri.getNickname().getValue());
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo(duri.getTeam().getShortName());
-                    softAssertions.assertThat(actual.myRanking().victoryFairyScore()).isEqualTo(43.75);
+                    softAssertions.assertThat(actual.myRanking().victoryFairyScore()).isEqualTo(34.38);
                     softAssertions.assertThat(actual.myRanking().ranking()).isEqualTo(4);
                 }
         );
@@ -407,7 +408,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                             .containsExactly("포르", "밍트");
                     softAssertions.assertThat(actual.myRanking().nickname()).isEqualTo("포르");
                     softAssertions.assertThat(actual.myRanking().teamShortName()).isEqualTo("KIA");
-                    softAssertions.assertThat(actual.myRanking().victoryFairyScore()).isEqualTo(90.0);
+                    softAssertions.assertThat(actual.myRanking().victoryFairyScore()).isEqualTo(80.0);
                 }
         );
     }
@@ -447,7 +448,7 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 startDate.getYear()).myRanking();
 
         // then
-        assertThat(myRanking.victoryFairyScore()).isEqualTo(66.67);
+        assertThat(myRanking.victoryFairyScore()).isEqualTo(50.0);
     }
 
     @DisplayName("승리 요정 랭킹 조회 - 인증을 한 번도 하지않은 회원의 순위는 0위이다")
@@ -493,6 +494,78 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         });
     }
 
+    @DisplayName("시즌 초반, 9승 1패 유저가 1승 0패 유저보다 랭킹 점수가 높은지 검증한다 (N=100 적용 확인)")
+    @Test
+    void findVictoryFairyRankings_scenario_9_1_vs_1_0() {
+        int year = 2025;
+
+        // given: 유저 A (KIA 팬, 1승 0패가 될 유저)
+        Member userA = memberFactory.save(b -> b.team(kia).nickname("우가"));
+        // given: 유저 B (KIA 팬, 9승 1패가 될 유저)
+        Member userB = memberFactory.save(b -> b.team(kia).nickname("두리"));
+
+        // when: 11일간 11경기가 진행되며, 매일 랭킹이 계산되는 것을 시뮬레이션
+        simulateGameAndCheckIn(userA, kia, kt, 1, 0, year, stadiumJamsil);
+        for (int i = 0; i < 9; i++) {
+            simulateGameAndCheckIn(userB, kia, kt, 1, 0, year, stadiumJamsil);
+        }
+        simulateGameAndCheckIn(userB, kia, kt, 0, 1, year, stadiumJamsil);
+
+        // (이 시점: totalCounts=11 < N=100 이므로, m=0.5로 강제 보정되어 계산됨)
+
+        // when: 최종 랭킹을 조회 (조회 기준 유저는 userA로 설정)
+        VictoryFairyRankingResponse actual = statService.findVictoryFairyRankings(userA.getId(), TeamFilter.ALL, year);
+
+        // then: 랭킹 순서를 검증
+        List<VictoryFairyRankingParam> topRankings = actual.topRankings();
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(topRankings.get(0).nickname()).isEqualTo("두리");
+            softAssertions.assertThat(topRankings.get(1).nickname()).isEqualTo("우가");
+            softAssertions.assertThat(topRankings.get(0).victoryFairyScore())
+                    .isGreaterThan(topRankings.get(1).victoryFairyScore());
+        });
+    }
+
+    // --- (3) 헬퍼 메서드 3개를 클래스 내부로 이동 ---
+
+    /**
+     * 1. 게임 생성 (GameFactory) 2. 직관 인증 (CheckInFactory) 3. 랭킹 계산 서비스 호출 (statService) 세 가지를 한 번에 처리하는 헬퍼 메서드
+     */
+    private void simulateGameAndCheckIn(Member member, Team homeTeam, Team awayTeam, int homeScore, int awayScore,
+                                        int year, Stadium stadium) {
+        Game game = simulateGame(homeTeam, awayTeam, homeScore, awayScore, year, stadium);
+        simulateCheckIn(member, game);
+
+        statService.calculateVictoryFairyScore(year, game.getId());
+    }
+
+    /**
+     * Game 엔티티를 생성하고 저장 (STADIUM_ID NOT NULL 에러 방지 포함)
+     */
+    private Game simulateGame(Team homeTeam, Team awayTeam, int homeScore, int awayScore, int year, Stadium stadium) {
+        return gameFactory.save(b -> b
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .homeScore(homeScore)
+                .awayScore(awayScore)
+                .gameState(GameState.COMPLETED)
+                .date(LocalDate.of(year, 4, 1).plusDays(gameCount++))
+                .stadium(stadium)
+        );
+    }
+
+    /**
+     * CheckIn 엔티티를 생성하고 저장 (TEAM_ID NOT NULL 에러 방지 포함)
+     */
+    private void simulateCheckIn(Member member, Game game) {
+        checkInFactory.save(b -> b
+                .member(member)
+                .game(game)
+                .team(member.getTeam())
+        );
+    }
+
     private void checkInFavorite(Member member, Game... games) {
         for (Game g : games) {
             boolean participates =
@@ -510,4 +583,5 @@ class StatServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .setScale(2, RoundingMode.HALF_UP) // ROUND(..., 2)
                 .doubleValue();
     }
+
 }
