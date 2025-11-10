@@ -4,11 +4,11 @@ import {sleep} from 'k6';
 import {textSummary} from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
 
 export const options = {
-    vus: 3,
-    duration: '20s',
+    vus: 3,               // 가벼운 부하 수준 (3명 동시 사용자)
+    duration: '20s',      // 약 20초 실행
     thresholds: {
-        http_req_failed: ['rate<0.05'],
-        'http_req_duration{api:smoke}': ['p(95)<2000'],
+        http_req_failed: ['rate<0.05'],            // 실패율 5% 미만
+        'http_req_duration{api:smoke}': ['p(95)<2000'], // p95 2초 미만
     },
 };
 
@@ -52,9 +52,9 @@ export function handleSummary(data) {
         ? data.metrics.http_req_duration.values['p(95)']
         : 0;
 
-    // === 임계값 (테스트용으로 낮춤) ===
-    const ERROR_RATE_THRESHOLD = 0.01;  // 1%
-    const P95_THRESHOLD_MS = 200;       // 0.5초
+    // === 임계값 (운영용 2초 기준) ===
+    const ERROR_RATE_THRESHOLD = 0.05;  // 5%
+    const P95_THRESHOLD_MS = 2000;      // 2초
 
     const isErrorRateBad = failedRate > ERROR_RATE_THRESHOLD;
     const isP95Bad = p95 > P95_THRESHOLD_MS;
