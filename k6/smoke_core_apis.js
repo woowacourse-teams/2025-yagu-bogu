@@ -64,3 +64,43 @@ export default function () {
 
     sleep(1);
 }
+
+export function handleSummary(data) {
+    const webhookUrl = __ENV.DISCORD_WEBHOOK_BE; // GitHub Actions에서 주입
+
+    // 기본 메트릭
+    const failedRate = data.metrics.http_req_failed
+        ? data.metrics.http_req_failed.values.rate
+        : 0;
+
+    const p95 = data.metrics.http_req_duration
+        ? data.metrics.http_req_duration.values['p(95)']
+        : 0;
+
+    // ✅ 임계값 설정 (밑에서 설명)
+    const ERROR_RATE_THRESHOLD = 0.05; // 5%
+    const P95_THRESHOLD_MS = 2000;     // 2초
+
+    const isErrorRateBad = failedRate > ERROR_RATE_THRESHOLD;
+    const isP95Bad = p95 > P95_THRESHOLD_MS;
+
+    // 디스코드로 보낼 메시지 내용
+    if (webhookUrl && (isErrorRateBad || isP95Bad)) {
+        const content =
+            `⚠️ k6 Smoke Alert (dev)\n` +
+            `• http_req_failed: ${(failedRate * 100).toFixed(2)}% (임계값 ${ERROR_RATE_THRESHOLD * 100}% )\n` +
+            `• http_req_duration p95: ${p95.toFixed(2)} ms (임계값 ${P95_THRESHOLD_MS} ms)\n` +
+            `• 기준 초과 항목: ` +
+            `${isErrorRateBad ? 'ErrorRate ' : ''}` +
+            `${isP95Bad ? 'p95 ' : ''}`;
+
+        const payload = JSON.stringify({content});
+
+        http.post(webhookUrl, payload, {
+            headers: {'Content-Type': 'application/json'},
+        });
+    }
+
+    // CI에서 summary.json 필요 없다면 빈 객체 리턴
+    return {};
+}

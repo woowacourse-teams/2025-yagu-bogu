@@ -1,4 +1,4 @@
-name: YaguBogu Backend Dev
+name: YaguBogu Backend Dev (smoke-ci)
 
 on:
   push:
@@ -36,127 +36,34 @@ jobs:
       - name: Run Tests
         run: ./gradlew test
 
-  build:
-    needs: ci
-    runs-on: ubuntu-22.04-arm
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./backend
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4  # ✅ 이게 있어야 ./backend 가 생김
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3.3.0
-        with:
-          username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
-
-      - name: Docker Image Build & Push (arm64-arch)
-        run: |
-          TAG_LATEST="dev-latest"
-          # Dockerfile 경로: backend/Dockerfile
-          docker buildx build \
-          --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max \
-          --cache-from=type=registry,ref=$IMAGE:build-cache \
-          -f Dockerfile \
-          --platform linux/arm64 \
-          -t $IMAGE:$TAG_LATEST \
-          --push \
-          .
-
-  cd:
-    needs: build
-    runs-on: [ self-hosted, develop ]
-    env:
-      IMAGE: yagubogu/yagubogu-backend
-      TAG: "dev-latest"
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3.3.0
-        with:
-          username: ${{ secrets.DOCKERHUB_DEPLOY_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_DEPLOY_TOKEN }}
-
-      - name: Pull Docker image
-        run: |
-          echo "Docker 이미지 pull 시작"
-          docker pull $IMAGE:$TAG
-          echo "Docker 이미지 pull 완료"
-
-      - name: Stop & Remove existing container (by name)
-        run: |
-          set -e
-          NAME="yagubogu-backend"
-          if [ "$(docker ps -q -f name=^/${NAME}$)" ]; then
-            echo "실행중 컨테이너 중지: $NAME"
-            docker stop $NAME
-          fi
-          if [ "$(docker ps -aq -f name=^/${NAME}$)" ]; then
-            echo "기존 컨테이너 제거: $NAME"
-            docker rm $NAME
-          fi
-          echo "포트 80 점유 프로세스 확인 및 정리"
-          sudo fuser -k -n tcp 80 || true
-
-      - name: Run docker container
-        run: |
-          set -e
-          NAME="yagubogu-backend"
-          echo "새 Docker 컨테이너 실행..."
-          docker run -d \
-            --name $NAME \
-            --restart unless-stopped \
-            --network yagubogu-net \
-            -p 80:8080 \
-            -e SPRING_PROFILES_ACTIVE=dev \
-            -e DB_URL="${{ secrets.DB_URL }}" \
-            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -e MONITORING_SERVER_IP="${{ secrets.MONITORING_SERVER_IP }}" \
-            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
-            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY_DEV }}" \
-            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-            $IMAGE:$TAG
-          
-          echo "컨테이너 실행 완료."  
-
-      - name: Docker image Prune
-        run: |
-          echo "사용하지 않는 Docker 이미지 정리 중..."
-          docker image prune -af || true
-          echo "이미지 정리 완료"
-
   smoke:
-    needs: cd
-    runs-on: [ self-hosted, develop ]
-    continue-on-error: true
+    needs: ci
+    runs-on: ubuntu-latest
+    continue-on-error: true   # 🔸 스모크가 실패해도 워크플로우는 빨갛게 안 깨짐
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6 (if not installed)
-        run: |
-          if ! command -v k6 &> /dev/null; then
-            echo "k6 not found, installing..."
-            sudo apt-get update
-            sudo apt-get install -y k6
-          else
-            echo "k6 already installed"
-          fi
-
-      - name: Run k6 smoke test on core APIs
+      - name: Run k6 smoke test on core APIs (via Docker)
         working-directory: ./k6
         env:
-          BASE_URL: "http://localhost:80"
+          # 여기 BASE_URL을 실제로 호출해볼 서버로 바꿔줘도 됨
+          # 예: dev 서버: "http://43.203.246.80:80"
+          BASE_URL: "http://43.203.246.80:80"
           AUTH_TOKEN: ${{ secrets.SMOKE_AUTH_TOKEN }}
           GAME_ID: "2"
           MEMBER_ID: "2"
           YEAR: "2025"
           DATE: "2025-05-25"
+          DISCORD_WEBHOOK_BE: ${{ secrets.DISCORD_WEBHOOK_BE }}
         run: |
-          k6 run smoke_core_apis.js
+          docker run --rm \
+            -e BASE_URL="$BASE_URL" \
+            -e AUTH_TOKEN="$AUTH_TOKEN" \
+            -e GAME_ID="$GAME_ID" \
+            -e MEMBER_ID="$MEMBER_ID" \
+            -e YEAR="$YEAR" \
+            -e DATE="$DATE" \
+            -e DISCORD_WEBHOOK_BE="$DISCORD_WEBHOOK_BE" \
+            -v "$PWD":/scripts \
+            grafana/k6 \
+            run /scripts/smoke_core_apis.js
