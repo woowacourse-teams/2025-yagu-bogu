@@ -1,14 +1,14 @@
 // smoke_core_apis.js
 import http from 'k6/http';
 import {sleep} from 'k6';
-import {textSummary} from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
+import {textSummary} from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 
 export const options = {
     vus: 3,               // 가벼운 부하 수준 (3명 동시 사용자)
     duration: '20s',      // 약 20초 실행
     thresholds: {
-        http_req_failed: ['rate<0.05'],            // 실패율 5% 미만
-        'http_req_duration{api:smoke}': ['p(95)<2000'], // p95 2초 미만
+        http_req_failed: ['rate<0.05'],                 // 실패율 5% 미만
+        'http_req_duration{api:smoke}': ['p(95)<2000'] // p95 2초 미만
     },
 };
 
@@ -20,6 +20,11 @@ const MEMBER_ID = __ENV.MEMBER_ID || '2';
 const YEAR = __ENV.YEAR || '2025';
 const DATE = __ENV.DATE || '2025-05-25';
 
+// 톡 페이징용 (스모크라 대충 안전한 값으로)
+const TALK_BEFORE = __ENV.TALK_BEFORE || '999999999';
+const TALK_AFTER = __ENV.TALK_AFTER || '0';
+const TALK_LIMIT = __ENV.TALK_LIMIT || '10';
+
 export default function () {
     const params = {
         headers: AUTH_TOKEN
@@ -28,12 +33,20 @@ export default function () {
         tags: {api: 'smoke'},
     };
 
-    // === 5개 주요 API ===
+    // === 기존 5개 주요 API ===
+
     http.get(`${BASE_URL}/api/v1/members/${MEMBER_ID}?gameId=${GAME_ID}&after=10&limit=10`, params);
     http.get(`${BASE_URL}/api/v1/members/me/badges?gameId=${GAME_ID}&after=10&limit=10`, params);
     http.get(`${BASE_URL}/api/v1/check-ins/stadiums/fan-rates?date=${DATE}`, params);
     http.get(`${BASE_URL}/api/v1/check-ins/stadiums/counts?year=${YEAR}`, params);
     http.get(`${BASE_URL}/api/v1/check-ins/counts?year=${YEAR}`, params);
+
+    // === 새로 추가한 4개 핵심 API ===
+
+    http.get(`${BASE_URL}/api/v1/stats/victory-fairy/rankings`, params);
+    http.get(`${BASE_URL}/api/v1/stats/win-rate?year=${YEAR}`, params);
+    http.get(`${BASE_URL}/api/v1/talks/${GAME_ID}?before=${TALK_BEFORE}&limit=${TALK_LIMIT}`, params);
+    http.get(`${BASE_URL}/api/v1/talks/${GAME_ID}/latest?after=${TALK_AFTER}&limit=${TALK_LIMIT}`, params);
 
     sleep(1);
 }
@@ -54,7 +67,7 @@ export function handleSummary(data) {
 
     // === 임계값 (운영용 2초 기준) ===
     const ERROR_RATE_THRESHOLD = 0.05;  // 5%
-    const P95_THRESHOLD_MS = 2000;      // 2초
+    const P95_THRESHOLD_MS = 2000;  // 2초
 
     const isErrorRateBad = failedRate > ERROR_RATE_THRESHOLD;
     const isP95Bad = p95 > P95_THRESHOLD_MS;
@@ -78,6 +91,6 @@ export function handleSummary(data) {
 
     // === CI 콘솔 리포트 출력 ===
     return {
-        stdout: textSummary(data, {indent: " ", enableColors: true}),
+        stdout: textSummary(data, {indent: ' ', enableColors: true}),
     };
 }
