@@ -1,0 +1,66 @@
+// smoke_core_apis.js
+import http from 'k6/http';
+import {sleep} from 'k6';
+
+export const options = {
+    vus: 3,               // 가벼운 동시 사용자 수
+    duration: '20s',      // 20초 정도만
+    thresholds: {
+        http_req_failed: ['rate<0.05'],        // 전체 실패율 5% 미만
+        'http_req_duration{api:smoke}': ['p(95)<4000'], // p95 4초 이내 (dev 환경 고려해서 널널하게)
+    },
+};
+
+// 환경 변수로 받도록 (CI에서 세팅)
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:80';
+const AUTH_TOKEN = __ENV.AUTH_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAxNDciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2MjQxMjkzNiwiZXhwIjoxNzYzNjIyNTM2fQ.rLVBmoFMQUsGvS3E_W4dN2RAWIJ7o98GBVhSDGoqXO0'; // 필요 없으면 빈 문자열
+const GAME_ID = __ENV.GAME_ID || '2';
+const MEMBER_ID = __ENV.MEMBER_ID || '2';
+const YEAR = __ENV.YEAR || '2025';
+const DATE = __ENV.DATE || '2025-05-25';
+
+export default function () {
+    const params = {
+        headers: AUTH_TOKEN
+            ? {
+                Authorization: `Bearer ${AUTH_TOKEN}`,
+                'Content-Type': 'application/json',
+            }
+            : {'Content-Type': 'application/json'},
+        tags: {
+            api: 'smoke',
+        },
+    };
+
+    // 1) 프로필 조회
+    http.get(
+        `${BASE_URL}/api/v1/members/${MEMBER_ID}?gameId=${GAME_ID}&after=10&limit=10`,
+        params,
+    );
+
+    // 2) 내 뱃지 조회
+    http.get(
+        `${BASE_URL}/api/v1/members/me/badges?gameId=${GAME_ID}&after=10&limit=10`,
+        params,
+    );
+
+    // 3) 구장별 팬 점유율
+    http.get(
+        `${BASE_URL}/api/v1/check-ins/stadiums/fan-rates?date=${DATE}`,
+        params,
+    );
+
+    // 4) 구장별 방문 횟수
+    http.get(
+        `${BASE_URL}/api/v1/check-ins/stadiums/counts?year=${YEAR}`,
+        params,
+    );
+
+    // 5) 인증 횟수
+    http.get(
+        `${BASE_URL}/api/v1/check-ins/counts?year=${YEAR}`,
+        params,
+    );
+
+    sleep(1);
+}
