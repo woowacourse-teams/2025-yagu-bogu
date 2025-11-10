@@ -1,6 +1,7 @@
 // smoke_core_apis.js
 import http from 'k6/http';
 import {sleep} from 'k6';
+import {textSummary} from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
 
 export const options = {
     vus: 3,               // 가벼운 동시 사용자 수
@@ -102,5 +103,7 @@ export function handleSummary(data) {
     }
 
     // CI에서 summary.json 필요 없다면 빈 객체 리턴
-    return {};
+    return {
+        stdout: textSummary(data, {indent: " ", enableColors: true}), // 콘솔에 k6 기본 리포트 출력
+    };
 }
