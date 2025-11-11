@@ -33,6 +33,7 @@ val PretendardBold =
 val PretendardBold12 = PretendardBold.copy(fontSize = 12.sp)
 val PretendardBold16 = PretendardBold.copy(fontSize = 16.sp)
 val PretendardBold20 = PretendardBold.copy(fontSize = 20.sp)
+val PretendardBold32 = PretendardBold.copy(fontSize = 32.sp)
 
 val EsamanruMedium =
     TextStyle(
