@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -14,6 +16,7 @@ import com.yagubogu.databinding.ViewTabStatsBinding
 import com.yagubogu.presentation.stats.detail.StatsDetailFragment
 import com.yagubogu.presentation.stats.my.StatsMyFragment
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.ui.stats.StatsScreen
 
 @Suppress("ktlint:standard:backing-property-naming")
 class StatsFragment :
@@ -29,23 +32,37 @@ class StatsFragment :
         )
     }
 
+    // TODO Compose 마이그레이션 후 필요 없는 코드 삭제하기
+
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?,
+//    ): View {
+//        _binding = FragmentStatsBinding.inflate(inflater, container, false)
+//        return binding.root
+//    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentStatsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                StatsScreen()
+            }
+        }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.vpStatsFragment.adapter = statsStateAdapter
-        setupTabLayoutMediator()
-        setupTabLayoutListener()
+//        binding.vpStatsFragment.adapter = statsStateAdapter
+//        setupTabLayoutMediator()
+//        setupTabLayoutListener()
     }
 
     override fun onDestroyView() {

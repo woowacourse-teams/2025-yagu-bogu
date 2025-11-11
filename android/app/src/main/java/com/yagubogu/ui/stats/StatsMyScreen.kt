@@ -3,6 +3,7 @@ package com.yagubogu.ui.stats
 import android.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -30,6 +34,7 @@ import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
+import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardBold32
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.PretendardRegular12
@@ -45,11 +50,14 @@ fun StatsMyScreen(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .background(Black)
-                .padding(20.dp),
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState()),
     ) {
+        Spacer(modifier = modifier.height(20.dp))
         WinRateColumn()
         MyStatsRow()
         AttendanceStats()
+        Spacer(modifier = modifier.height(20.dp))
     }
 }
 
@@ -74,58 +82,65 @@ fun WinRateColumn(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
         )
 
-        AndroidView(
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = modifier.fillMaxWidth(),
-            factory = { context ->
-                val pieChart =
-                    PieChart(context).apply {
-                        setNoDataText("")
-                        legend.isEnabled = false
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "58%", style = PretendardBold, fontSize = 40.sp, color = Primary500)
+                Text(text = "24 경기", style = PretendardMedium16, color = Gray500)
+            }
+            AndroidView(
+                modifier = modifier.size(200.dp),
+                factory = { context ->
+                    val pieChart =
+                        PieChart(context).apply {
+                            setNoDataText("")
+                            legend.isEnabled = false
 
-                        isDrawHoleEnabled = true
-                        setHoleColor(Color.TRANSPARENT)
-                        holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
+                            isDrawHoleEnabled = true
+                            setHoleColor(Color.TRANSPARENT)
+                            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
 
-                        description.isEnabled = false
-                        setDrawEntryLabels(false)
-                        setDrawCenterText(false)
+                            description.isEnabled = false
+                            setDrawEntryLabels(false)
+                            setDrawCenterText(false)
 
-                        isRotationEnabled = false
-                        setTouchEnabled(false)
-                        animateY(PIE_CHART_ANIMATION_MILLISECOND)
+                            isRotationEnabled = false
+                            setTouchEnabled(false)
+                            animateY(PIE_CHART_ANIMATION_MILLISECOND)
 
-                        // TODO: loadChartData 로직 분리
-                        val pieEntries: List<PieEntry> =
-                            listOf(
-                                PieEntry(
-                                    50f,
-                                    PIE_ENTRY_LABEL_WIN,
-                                ),
-                                PieEntry(
-                                    30f,
-                                    PIE_ENTRY_LABEL_ETC,
-                                ),
-                            )
+                            // TODO: loadChartData 로직 분리
+                            val pieEntries: List<PieEntry> =
+                                listOf(
+                                    PieEntry(
+                                        50f,
+                                        PIE_ENTRY_LABEL_WIN,
+                                    ),
+                                    PieEntry(
+                                        30f,
+                                        PIE_ENTRY_LABEL_ETC,
+                                    ),
+                                )
 
-                        val myStatsChartDataSet: PieDataSet =
-                            PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
-                                colors =
-                                    listOf(
-                                        getColor(R.color.primary500),
-                                        getColor(R.color.gray300),
-                                    )
-                            }
+                            val myStatsChartDataSet: PieDataSet =
+                                PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
+                                    colors =
+                                        listOf(
+                                            context.getColor(R.color.primary500),
+                                            context.getColor(R.color.gray300),
+                                        )
+                                }
 
-                        val pieData = PieData(myStatsChartDataSet)
-                        pieData.setDrawValues(false)
-                        data = pieData
-                        animateY(PIE_CHART_ANIMATION_MILLISECOND)
-
-                        invalidate()
-                    }
-                pieChart
-            },
-        )
+                            val pieData = PieData(myStatsChartDataSet)
+                            pieData.setDrawValues(false)
+                            data = pieData
+                            animateY(PIE_CHART_ANIMATION_MILLISECOND)
+                        }
+                    pieChart
+                },
+            )
+        }
 
         Row {
             Column(
