@@ -30,11 +30,12 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
-import com.yagubogu.ui.theme.Black
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold
+import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardBold32
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.PretendardRegular12
@@ -49,15 +50,15 @@ fun StatsMyScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
-                .background(Black)
+                .background(Gray050)
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState()),
     ) {
-        Spacer(modifier = modifier.height(20.dp))
+        Spacer(modifier = modifier.height(10.dp))
         WinRateColumn()
         MyStatsRow()
         AttendanceStats()
-        Spacer(modifier = modifier.height(20.dp))
+        Spacer(modifier = modifier.height(10.dp))
     }
 }
 
@@ -78,7 +79,7 @@ fun WinRateColumn(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(R.string.stats_my_pie_chart_title),
-            style = PretendardSemiBold20,
+            style = PretendardBold20,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -142,7 +143,7 @@ fun WinRateColumn(modifier: Modifier = Modifier) {
             )
         }
 
-        Row {
+        Row(modifier = modifier.padding(top = 10.dp)) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier.weight(1f),
@@ -228,7 +229,7 @@ fun AttendanceStats(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(R.string.stats_attendance_stats_title),
-            style = PretendardSemiBold20,
+            style = PretendardBold20,
             modifier =
                 Modifier
                     .fillMaxWidth()

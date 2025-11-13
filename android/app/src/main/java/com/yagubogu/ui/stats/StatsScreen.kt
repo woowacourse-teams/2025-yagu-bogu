@@ -13,7 +13,10 @@ fun StatsScreen(modifier: Modifier = Modifier) {
     HorizontalPager(
         state = pagerState,
         modifier = modifier.fillMaxSize(),
-    ) {
-        StatsMyScreen()
+    ) { page ->
+        when (page) {
+            0 -> StatsMyScreen()
+            1 -> StatsDetailScreen()
+        }
     }
 }

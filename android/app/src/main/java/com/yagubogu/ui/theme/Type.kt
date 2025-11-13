@@ -10,6 +10,7 @@ val PretendardRegular =
         fontWeight = FontWeight.Normal,
     )
 val PretendardRegular12 = PretendardRegular.copy(fontSize = 12.sp)
+val PretendardRegular16 = PretendardRegular.copy(fontSize = 16.sp)
 
 val PretendardMedium =
     TextStyle(
