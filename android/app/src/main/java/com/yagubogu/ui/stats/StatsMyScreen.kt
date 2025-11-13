@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,24 +45,6 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
 
-@Composable
-fun StatsMyScreen(modifier: Modifier = Modifier) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier =
-            modifier
-                .background(Gray050)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
-    ) {
-        Spacer(modifier = modifier.height(10.dp))
-        WinRateColumn()
-        MyStatsRow()
-        AttendanceStats()
-        Spacer(modifier = modifier.height(10.dp))
-    }
-}
-
 private const val PIE_DATA_SET_LABEL = "내 직관 승률"
 private const val PIE_ENTRY_LABEL_WIN = "Win"
 private const val PIE_ENTRY_LABEL_ETC = "Etc"
@@ -69,7 +52,30 @@ private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
 private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
 
 @Composable
-fun WinRateColumn(modifier: Modifier = Modifier) {
+fun StatsMyScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier =
+            modifier
+                .background(Gray050)
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState()),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 20.dp),
+        ) {
+            WinRateColumn()
+            MyStatsRow()
+            AttendanceStats()
+        }
+    }
+}
+
+@Composable
+private fun WinRateColumn(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -219,7 +225,7 @@ private fun MyStatsRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AttendanceStats(modifier: Modifier = Modifier) {
+private fun AttendanceStats(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -307,7 +313,7 @@ fun AttendanceStats(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StatItem(
+private fun StatItem(
     title: String,
     value: String?,
     modifier: Modifier = Modifier,

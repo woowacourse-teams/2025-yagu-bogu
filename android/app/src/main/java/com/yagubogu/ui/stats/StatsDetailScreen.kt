@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,17 +47,22 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun StatsDetailScreen(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
                 .background(Gray050)
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState()),
     ) {
-        Spacer(modifier = modifier.height(10.dp))
-        VsTeamWinningPercentage()
-        StadiumVisitCounts()
-        Spacer(modifier = modifier.height(10.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 20.dp),
+        ) {
+            VsTeamWinningPercentage()
+            StadiumVisitCounts()
+        }
     }
 }
 
@@ -86,7 +92,7 @@ private fun VsTeamWinningPercentage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun VsTeamStatItem(modifier: Modifier = Modifier) {
+private fun VsTeamStatItem(modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
@@ -116,7 +122,7 @@ fun VsTeamStatItem(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ShowMoreButton(modifier: Modifier = Modifier) {
+private fun ShowMoreButton(modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -143,7 +149,7 @@ fun ShowMoreButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StadiumVisitCounts(modifier: Modifier = Modifier) {
+private fun StadiumVisitCounts(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier
