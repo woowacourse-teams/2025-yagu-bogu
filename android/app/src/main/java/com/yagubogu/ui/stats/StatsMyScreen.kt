@@ -1,6 +1,5 @@
 package com.yagubogu.ui.stats
 
-import android.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
 import com.yagubogu.R
+import com.yagubogu.presentation.stats.my.AverageStats
+import com.yagubogu.presentation.stats.my.StatsMyUiModel
+import com.yagubogu.presentation.stats.my.StatsMyViewModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -45,14 +50,14 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
 
-private const val PIE_DATA_SET_LABEL = "내 직관 승률"
-private const val PIE_ENTRY_LABEL_WIN = "Win"
-private const val PIE_ENTRY_LABEL_ETC = "Etc"
-private const val PIE_CHART_INSIDE_HOLE_RADIUS = 75f
-private const val PIE_CHART_ANIMATION_MILLISECOND = 1000
-
 @Composable
-fun StatsMyScreen(modifier: Modifier = Modifier) {
+fun StatsMyScreen(
+    statsMyViewModel: StatsMyViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val statsMyUiModel: State<StatsMyUiModel?> = statsMyViewModel.statsMyUiModel.observeAsState()
+    val averageStats: State<AverageStats?> = statsMyViewModel.averageStats.observeAsState()
+
     Column(
         modifier =
             modifier
@@ -67,15 +72,18 @@ fun StatsMyScreen(modifier: Modifier = Modifier) {
                     .fillMaxSize()
                     .padding(vertical = 20.dp),
         ) {
-            WinRateColumn()
-            MyStatsRow()
-            AttendanceStats()
+            statsMyUiModel.value?.let { WinRateColumn(it) }
+            statsMyUiModel.value?.let { MyStatsRow(it) }
+            averageStats.value?.let { AttendanceStats(it) }
         }
     }
 }
 
 @Composable
-private fun WinRateColumn(modifier: Modifier = Modifier) {
+private fun WinRateColumn(
+    statsMyUiModel: StatsMyUiModel,
+    modifier: Modifier = Modifier,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -88,107 +96,121 @@ private fun WinRateColumn(modifier: Modifier = Modifier) {
             style = PretendardBold20,
             modifier = Modifier.fillMaxWidth(),
         )
+        StatsMyPieChart(modifier, statsMyUiModel)
+        WinDrawLoseCountsRow(modifier, statsMyUiModel)
+    }
+}
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = modifier.fillMaxWidth(),
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "58%", style = PretendardBold, fontSize = 40.sp, color = Primary500)
-                Text(text = "24 경기", style = PretendardMedium16, color = Gray500)
-            }
-            AndroidView(
-                modifier = modifier.size(200.dp),
-                factory = { context ->
-                    val pieChart =
-                        PieChart(context).apply {
-                            setNoDataText("")
-                            legend.isEnabled = false
+@Composable
+private fun StatsMyPieChart(
+    modifier: Modifier,
+    statsMyUiModel: StatsMyUiModel,
+) {
+    var pieChartManager by remember { mutableStateOf<PieChartManager?>(null) }
 
-                            isDrawHoleEnabled = true
-                            setHoleColor(Color.TRANSPARENT)
-                            holeRadius = PIE_CHART_INSIDE_HOLE_RADIUS
-
-                            description.isEnabled = false
-                            setDrawEntryLabels(false)
-                            setDrawCenterText(false)
-
-                            isRotationEnabled = false
-                            setTouchEnabled(false)
-                            animateY(PIE_CHART_ANIMATION_MILLISECOND)
-
-                            // TODO: loadChartData 로직 분리
-                            val pieEntries: List<PieEntry> =
-                                listOf(
-                                    PieEntry(
-                                        50f,
-                                        PIE_ENTRY_LABEL_WIN,
-                                    ),
-                                    PieEntry(
-                                        30f,
-                                        PIE_ENTRY_LABEL_ETC,
-                                    ),
-                                )
-
-                            val myStatsChartDataSet: PieDataSet =
-                                PieDataSet(pieEntries, PIE_DATA_SET_LABEL).apply {
-                                    colors =
-                                        listOf(
-                                            context.getColor(R.color.primary500),
-                                            context.getColor(R.color.gray300),
-                                        )
-                                }
-
-                            val pieData = PieData(myStatsChartDataSet)
-                            pieData.setDrawValues(false)
-                            data = pieData
-                            animateY(PIE_CHART_ANIMATION_MILLISECOND)
-                        }
-                    pieChart
-                },
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text =
+                    stringResource(
+                        R.string.all_rounded_win_rate,
+                        statsMyUiModel.winningPercentage,
+                    ),
+                style = PretendardBold,
+                fontSize = 40.sp,
+                color = Primary500,
+            )
+            Text(
+                text =
+                    stringResource(
+                        R.string.stats_my_pie_chart_attendance_count,
+                        statsMyUiModel.winCount,
+                    ),
+                style = PretendardMedium16,
+                color = Gray500,
             )
         }
+        @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+        AndroidView(
+            modifier = modifier.size(200.dp),
+            factory = { context ->
+                val pieChart = PieChart(context)
+                pieChartManager = PieChartManager(context, pieChart)
+                pieChartManager?.setupChart()
+                pieChart
+            },
+            update = {
+                pieChartManager?.loadData(
+                    statsMyUiModel.winningPercentage,
+                    statsMyUiModel.etcPercentage,
+                )
+            },
+        )
+    }
+}
 
-        Row(modifier = modifier.padding(top = 10.dp)) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.weight(1f),
-            ) {
-                Text(
-                    text = stringResource(R.string.stats_my_pie_chart_win),
-                    style = PretendardMedium16,
-                )
-                Spacer(modifier = modifier.height(4.dp))
-                Text(text = "18", style = PretendardBold32, color = Primary500)
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.weight(1f),
-            ) {
-                Text(
-                    text = stringResource(R.string.stats_my_pie_chart_draw),
-                    style = PretendardMedium16,
-                )
-                Spacer(modifier = modifier.height(4.dp))
-                Text(text = "18", style = PretendardBold32, color = Gray400)
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.weight(1f),
-            ) {
-                Text(
-                    text = stringResource(R.string.stats_my_pie_chart_lose),
-                    style = PretendardMedium16,
-                )
-                Spacer(modifier = modifier.height(4.dp))
-                Text(text = "18", style = PretendardBold32, color = Red)
-            }
+@Composable
+private fun WinDrawLoseCountsRow(
+    modifier: Modifier,
+    statsMyUiModel: StatsMyUiModel,
+) {
+    Row(modifier = modifier.padding(top = 10.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.weight(1f),
+        ) {
+            Text(
+                text = stringResource(R.string.stats_my_pie_chart_win),
+                style = PretendardMedium16,
+            )
+            Spacer(modifier = modifier.height(4.dp))
+            Text(
+                text = statsMyUiModel.winCount.toString(),
+                style = PretendardBold32,
+                color = Primary500,
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.weight(1f),
+        ) {
+            Text(
+                text = stringResource(R.string.stats_my_pie_chart_draw),
+                style = PretendardMedium16,
+            )
+            Spacer(modifier = modifier.height(4.dp))
+            Text(
+                text = statsMyUiModel.drawCount.toString(),
+                style = PretendardBold32,
+                color = Gray400,
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.weight(1f),
+        ) {
+            Text(
+                text = stringResource(R.string.stats_my_pie_chart_lose),
+                style = PretendardMedium16,
+            )
+            Spacer(modifier = modifier.height(4.dp))
+            Text(
+                text = statsMyUiModel.loseCount.toString(),
+                style = PretendardBold32,
+                color = Red,
+            )
         }
     }
 }
 
 @Composable
-private fun MyStatsRow(modifier: Modifier = Modifier) {
+private fun MyStatsRow(
+    statsMyUiModel: StatsMyUiModel,
+    modifier: Modifier = Modifier,
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -200,7 +222,7 @@ private fun MyStatsRow(modifier: Modifier = Modifier) {
     ) {
         StatItem(
             title = stringResource(R.string.stats_my_team),
-            value = "KIA",
+            value = statsMyUiModel.myTeam,
             emoji = stringResource(R.string.stats_my_team_emoji),
             modifier =
                 Modifier
@@ -214,7 +236,7 @@ private fun MyStatsRow(modifier: Modifier = Modifier) {
         )
         StatItem(
             title = stringResource(R.string.stats_my_lucky_stadium),
-            value = "챔피언스필드",
+            value = statsMyUiModel.luckyStadium,
             emoji = stringResource(R.string.stats_my_lucky_stadium_emoji),
             modifier =
                 Modifier
@@ -225,7 +247,10 @@ private fun MyStatsRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AttendanceStats(modifier: Modifier = Modifier) {
+private fun AttendanceStats(
+    averageStats: AverageStats,
+    modifier: Modifier = Modifier,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -252,7 +277,7 @@ private fun AttendanceStats(modifier: Modifier = Modifier) {
         ) {
             StatItem(
                 title = stringResource(R.string.stats_gain_score),
-                value = "6.5점",
+                value = stringResource(R.string.stats_average_score, averageStats.averageRuns),
                 emoji = stringResource(R.string.stats_gain_score_emoji),
                 modifier =
                     Modifier
@@ -266,7 +291,7 @@ private fun AttendanceStats(modifier: Modifier = Modifier) {
             )
             StatItem(
                 title = stringResource(R.string.stats_loss_score),
-                value = "2.2점",
+                value = stringResource(R.string.stats_average_score, averageStats.concededRuns),
                 emoji = stringResource(R.string.stats_loss_score_emoji),
                 modifier =
                     Modifier
@@ -285,7 +310,7 @@ private fun AttendanceStats(modifier: Modifier = Modifier) {
         ) {
             StatItem(
                 title = stringResource(R.string.stats_hit),
-                value = "8.6점",
+                value = stringResource(R.string.stats_average_count, averageStats.averageHits),
                 modifier = Modifier.weight(1f),
             )
             VerticalDivider(
@@ -295,7 +320,7 @@ private fun AttendanceStats(modifier: Modifier = Modifier) {
             )
             StatItem(
                 title = stringResource(R.string.stats_hit_allowed),
-                value = "6.2점",
+                value = stringResource(R.string.stats_average_count, averageStats.concededHits),
                 modifier = Modifier.weight(1f),
             )
             VerticalDivider(
@@ -305,7 +330,7 @@ private fun AttendanceStats(modifier: Modifier = Modifier) {
             )
             StatItem(
                 title = stringResource(R.string.stats_error),
-                value = "1.4점",
+                value = stringResource(R.string.stats_average_count, averageStats.averageErrors),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -336,17 +361,17 @@ private fun StatItem(
 @Preview(showBackground = true)
 @Composable
 private fun WinRateColumnPreview() {
-    WinRateColumn()
+//    WinRateColumn()
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun AttendanceStatsPreview() {
-    AttendanceStats()
+//    AttendanceStats()
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun StatsMyScreenPreview() {
-    StatsMyScreen()
+//    StatsMyScreen()
 }

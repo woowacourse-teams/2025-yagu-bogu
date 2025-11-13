@@ -19,6 +19,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -33,6 +39,8 @@ import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.yagubogu.R
 import com.yagubogu.presentation.stats.detail.BarChartManager
 import com.yagubogu.presentation.stats.detail.StadiumVisitCount
+import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
+import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -45,7 +53,15 @@ import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
 
 @Composable
-fun StatsDetailScreen(modifier: Modifier = Modifier) {
+fun StatsDetailScreen(
+    statsDetailViewModel: StatsDetailViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val vsTeamStats: State<List<VsTeamStatItem>?> =
+        statsDetailViewModel.vsTeamStats.observeAsState()
+    val stadiumVisitCounts: State<List<StadiumVisitCount>?> =
+        statsDetailViewModel.stadiumVisitCounts.observeAsState()
+
     Column(
         modifier =
             modifier
@@ -60,14 +76,17 @@ fun StatsDetailScreen(modifier: Modifier = Modifier) {
                     .fillMaxSize()
                     .padding(vertical = 20.dp),
         ) {
-            VsTeamWinningPercentage()
-            StadiumVisitCounts()
+            vsTeamStats.value?.let { VsTeamWinningPercentage(it) }
+            stadiumVisitCounts.value?.let { StadiumVisitCounts(it) }
         }
     }
 }
 
 @Composable
-private fun VsTeamWinningPercentage(modifier: Modifier = Modifier) {
+private fun VsTeamWinningPercentage(
+    vsTeamStatItems: List<VsTeamStatItem>,
+    modifier: Modifier = Modifier,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -83,8 +102,8 @@ private fun VsTeamWinningPercentage(modifier: Modifier = Modifier) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            repeat(5) {
-                VsTeamStatItem()
+            vsTeamStatItems.take(5).forEach { vsTeamStatItem: VsTeamStatItem ->
+                VsTeamStatItem(vsTeamStatItem = vsTeamStatItem)
             }
         }
         ShowMoreButton()
@@ -92,7 +111,10 @@ private fun VsTeamWinningPercentage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun VsTeamStatItem(modifier: Modifier = Modifier) {
+private fun VsTeamStatItem(
+    vsTeamStatItem: VsTeamStatItem,
+    modifier: Modifier = Modifier,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
@@ -101,23 +123,29 @@ private fun VsTeamStatItem(modifier: Modifier = Modifier) {
                 .padding(vertical = 8.dp),
     ) {
         Text(
-            text = "1",
+            text = vsTeamStatItem.rank.toString(),
             style = PretendardRegular16,
             textAlign = TextAlign.Center,
             color = Gray500,
             modifier = Modifier.widthIn(min = 32.dp),
         )
-        Text(text = "🐻", fontSize = 24.sp)
+        Text(text = vsTeamStatItem.teamEmoji, fontSize = 24.sp)
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "두산", style = PretendardSemiBold, fontSize = 16.sp)
+            Text(text = vsTeamStatItem.teamName, style = PretendardSemiBold, fontSize = 16.sp)
             Text(
-                text = stringResource(R.string.stats_vs_team_stats, 1, 2, 3),
+                text =
+                    stringResource(
+                        R.string.stats_vs_team_stats,
+                        vsTeamStatItem.winCounts,
+                        vsTeamStatItem.drawCounts,
+                        vsTeamStatItem.loseCounts,
+                    ),
                 style = PretendardMedium12,
                 color = Gray400,
             )
         }
-        Text(text = stringResource(R.string.all_win_rate, 100.0))
+        Text(text = stringResource(R.string.all_win_rate, vsTeamStatItem.winningPercentage))
     }
 }
 
@@ -149,7 +177,12 @@ private fun ShowMoreButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StadiumVisitCounts(modifier: Modifier = Modifier) {
+private fun StadiumVisitCounts(
+    stadiumVisitCounts: List<StadiumVisitCount>,
+    modifier: Modifier = Modifier,
+) {
+    var barChartManager by remember { mutableStateOf<BarChartManager?>(null) }
+
     Column(
         modifier =
             modifier
@@ -161,29 +194,15 @@ private fun StadiumVisitCounts(modifier: Modifier = Modifier) {
             style = PretendardBold20,
             modifier = Modifier.fillMaxWidth(),
         )
+        @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
         AndroidView(
             factory = { context ->
                 val barChart = HorizontalBarChart(context)
-                val barChartManager = BarChartManager(context, barChart)
-                barChartManager.setupChart()
+                barChartManager = BarChartManager(context, barChart)
+                barChartManager?.setupChart()
                 barChart
             },
-            update = { barChart ->
-                val barChartManager = BarChartManager(barChart.context, barChart)
-                barChartManager.loadData(
-                    listOf(
-                        StadiumVisitCount("대구", 50),
-                        StadiumVisitCount("대전", 6),
-                        StadiumVisitCount("광주", 3),
-                        StadiumVisitCount("잠실", 2),
-                        StadiumVisitCount("고척", 2),
-                        StadiumVisitCount("수원", 2),
-                        StadiumVisitCount("사직", 0),
-                        StadiumVisitCount("문학", 0),
-                        StadiumVisitCount("창원", 0),
-                    ),
-                )
-            },
+            update = { barChartManager?.loadData(stadiumVisitCounts) },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -195,11 +214,11 @@ private fun StadiumVisitCounts(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun VsTeamStatItemPreview() {
-    VsTeamStatItem()
+//    VsTeamStatItem()
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun StatsDetailScreenPreview() {
-    StatsDetailScreen()
+//    StatsDetailScreen()
 }

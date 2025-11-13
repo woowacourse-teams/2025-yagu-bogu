@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.yagubogu.presentation.stats.StatsTab
+import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
+import com.yagubogu.presentation.stats.my.StatsMyViewModel
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.Primary100
@@ -41,7 +43,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen(modifier: Modifier = Modifier) {
+fun StatsScreen(
+    statsMyViewModel: StatsMyViewModel,
+    statsDetailViewModel: StatsDetailViewModel,
+    modifier: Modifier = Modifier,
+) {
     val pagerState: PagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
@@ -52,10 +58,12 @@ fun StatsScreen(modifier: Modifier = Modifier) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = 1,
+            key = { it },
         ) { page ->
             when (page) {
-                StatsTab.MY_STATS.ordinal -> StatsMyScreen()
-                StatsTab.DETAIL_STATS.ordinal -> StatsDetailScreen()
+                StatsTab.MY_STATS.ordinal -> StatsMyScreen(statsMyViewModel)
+                StatsTab.DETAIL_STATS.ordinal -> StatsDetailScreen(statsDetailViewModel)
             }
         }
     }
@@ -129,5 +137,5 @@ private fun StatsTabRow(
 @Preview(showBackground = true)
 @Composable
 private fun StatsScreenPreview() {
-    StatsScreen()
+//    StatsScreen()
 }

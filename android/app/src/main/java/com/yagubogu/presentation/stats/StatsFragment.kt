@@ -8,22 +8,30 @@ import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentStatsBinding
 import com.yagubogu.databinding.ViewTabStatsBinding
 import com.yagubogu.presentation.stats.detail.StatsDetailFragment
+import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
 import com.yagubogu.presentation.stats.my.StatsMyFragment
+import com.yagubogu.presentation.stats.my.StatsMyViewModel
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.stats.StatsScreen
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class StatsFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentStatsBinding? = null
     private val binding get() = _binding!!
+
+    private val statsMyViewModel: StatsMyViewModel by viewModels()
+    private val statsDetailViewModel: StatsDetailViewModel by viewModels()
 
     private val statsStateAdapter: StatsFragmentStateAdapter by lazy {
         StatsFragmentStateAdapter(
@@ -51,7 +59,10 @@ class StatsFragment :
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                StatsScreen()
+                StatsScreen(
+                    statsMyViewModel = statsMyViewModel,
+                    statsDetailViewModel = statsDetailViewModel,
+                )
             }
         }
 
