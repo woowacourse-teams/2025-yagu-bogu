@@ -1,5 +1,8 @@
 package com.yagubogu.ui.stats
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,9 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.yagubogu.R
 import com.yagubogu.presentation.stats.detail.BarChartManager
@@ -51,16 +53,16 @@ import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun StatsDetailScreen(
-    statsDetailViewModel: StatsDetailViewModel,
+    viewModel: StatsDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val vsTeamStats: State<List<VsTeamStatItem>?> =
-        statsDetailViewModel.vsTeamStats.observeAsState()
-    val stadiumVisitCounts: State<List<StadiumVisitCount>?> =
-        statsDetailViewModel.stadiumVisitCounts.observeAsState()
+    val vsTeamStatItems: List<VsTeamStatItem> by viewModel.vsTeamStatItems.collectAsStateWithLifecycle()
+    val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
+    val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
 
     Column(
         modifier =
@@ -74,10 +76,22 @@ fun StatsDetailScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(vertical = 20.dp),
+                    .padding(vertical = 20.dp)
+                    .noRippleClickable { viewModel.toggleVsTeamStats() },
         ) {
-            vsTeamStats.value?.let { VsTeamWinningPercentage(it) }
-            stadiumVisitCounts.value?.let { StadiumVisitCounts(it) }
+            VsTeamWinningPercentage(
+                vsTeamStatItems = vsTeamStatItems,
+                isVsTeamStatsExpanded = isVsTeamStatsExpanded,
+                modifier =
+                    Modifier.animateContentSize(
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                    ),
+            )
+            StadiumVisitCounts(stadiumVisitCounts = stadiumVisitCounts)
         }
     }
 }
@@ -85,6 +99,7 @@ fun StatsDetailScreen(
 @Composable
 private fun VsTeamWinningPercentage(
     vsTeamStatItems: List<VsTeamStatItem>,
+    isVsTeamStatsExpanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -102,11 +117,11 @@ private fun VsTeamWinningPercentage(
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            vsTeamStatItems.take(5).forEach { vsTeamStatItem: VsTeamStatItem ->
+            vsTeamStatItems.forEach { vsTeamStatItem: VsTeamStatItem ->
                 VsTeamStatItem(vsTeamStatItem = vsTeamStatItem)
             }
         }
-        ShowMoreButton()
+        ShowMoreButton(isVsTeamStatsExpanded)
     }
 }
 
@@ -150,7 +165,10 @@ private fun VsTeamStatItem(
 }
 
 @Composable
-private fun ShowMoreButton(modifier: Modifier = Modifier) {
+private fun ShowMoreButton(
+    isVsTeamStatsExpanded: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -161,14 +179,14 @@ private fun ShowMoreButton(modifier: Modifier = Modifier) {
                 .padding(vertical = 8.dp),
     ) {
         Text(
-            text = stringResource(R.string.home_show_more),
+            text = stringResource(if (isVsTeamStatsExpanded) R.string.home_show_less else R.string.home_show_more),
             color = Gray400,
             style = PretendardRegular,
             fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.width(4.dp))
         Image(
-            painter = painterResource(R.drawable.ic_arrow_down),
+            painter = painterResource(if (isVsTeamStatsExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down),
             contentDescription = "더보기",
             colorFilter = ColorFilter.tint(Gray400),
             modifier = Modifier.size(20.dp),
