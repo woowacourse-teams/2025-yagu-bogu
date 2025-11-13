@@ -1,5 +1,6 @@
 package com.yagubogu.ui.stats
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,16 +27,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.mikephil.charting.charts.PieChart
+import com.skydoves.balloon.compose.Balloon
+import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
 import com.yagubogu.presentation.stats.my.AverageStats
 import com.yagubogu.presentation.stats.my.StatsMyUiModel
 import com.yagubogu.presentation.stats.my.StatsMyViewModel
+import com.yagubogu.presentation.util.rememberBalloonBuilder
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -49,14 +55,15 @@ import com.yagubogu.ui.theme.PretendardSemiBold20
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun StatsMyScreen(
-    statsMyViewModel: StatsMyViewModel,
+    viewModel: StatsMyViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val statsMyUiModel: State<StatsMyUiModel?> = statsMyViewModel.statsMyUiModel.observeAsState()
-    val averageStats: State<AverageStats?> = statsMyViewModel.averageStats.observeAsState()
+    val statsMyUiModel: State<StatsMyUiModel?> = viewModel.statsMyUiModel.observeAsState()
+    val averageStats: State<AverageStats?> = viewModel.averageStats.observeAsState()
 
     Column(
         modifier =
@@ -84,6 +91,8 @@ private fun WinRateColumn(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
+    val balloonBuilder = rememberBalloonBuilder(R.string.stats_my_pie_chart_tooltip)
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -91,11 +100,26 @@ private fun WinRateColumn(
                 .background(White, RoundedCornerShape(12.dp))
                 .padding(20.dp),
     ) {
-        Text(
-            text = stringResource(R.string.stats_my_pie_chart_title),
-            style = PretendardBold20,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
-        )
+        ) {
+            Text(
+                text = stringResource(R.string.stats_my_pie_chart_title),
+                style = PretendardBold20,
+            )
+            Balloon(builder = balloonBuilder) { balloonWindow: BalloonWindow ->
+                Image(
+                    painter = painterResource(R.drawable.ic_info),
+                    contentDescription = stringResource(R.string.stats_my_pie_chart_tooltip),
+                    colorFilter = ColorFilter.tint(color = Gray300),
+                    modifier =
+                        Modifier
+                            .padding(8.dp)
+                            .noRippleClickable { balloonWindow.showAlignBottom(yOff = -30) },
+                )
+            }
+        }
         StatsMyPieChart(modifier, statsMyUiModel)
         WinDrawLoseCountsRow(modifier, statsMyUiModel)
     }
@@ -211,6 +235,8 @@ private fun MyStatsRow(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
+    val balloonBuilder = rememberBalloonBuilder(R.string.stats_my_lucky_stadium_tooltip)
+
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -234,15 +260,22 @@ private fun MyStatsRow(
             color = Gray300,
             modifier = Modifier.padding(vertical = 20.dp),
         )
-        StatItem(
-            title = stringResource(R.string.stats_my_lucky_stadium),
-            value = statsMyUiModel.luckyStadium,
-            emoji = stringResource(R.string.stats_my_lucky_stadium_emoji),
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(vertical = 20.dp),
-        )
+        Balloon(
+            builder = balloonBuilder,
+            modifier = Modifier.weight(1f),
+        ) { balloonWindow: BalloonWindow ->
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                StatItem(
+                    title = stringResource(R.string.stats_my_lucky_stadium),
+                    value = statsMyUiModel.luckyStadium,
+                    emoji = stringResource(R.string.stats_my_lucky_stadium_emoji),
+                    modifier =
+                        Modifier
+                            .padding(vertical = 20.dp)
+                            .noRippleClickable { balloonWindow.showAlignBottom(yOff = -60) },
+                )
+            }
+        }
     }
 }
 
