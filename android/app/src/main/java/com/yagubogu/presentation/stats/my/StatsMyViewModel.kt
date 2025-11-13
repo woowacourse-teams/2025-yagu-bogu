@@ -1,7 +1,5 @@
 package com.yagubogu.presentation.stats.my
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.StatsCounts
@@ -10,6 +8,9 @@ import com.yagubogu.domain.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -23,11 +24,11 @@ class StatsMyViewModel
         private val statsRepository: StatsRepository,
         private val memberRepository: MemberRepository,
     ) : ViewModel() {
-        private val _statsMyUiModel = MutableLiveData<StatsMyUiModel>()
-        val statsMyUiModel: LiveData<StatsMyUiModel> get() = _statsMyUiModel
+        private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
+        val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
 
-        private val _averageStats = MutableLiveData<AverageStats>()
-        val averageStats: LiveData<AverageStats> = _averageStats
+        private val _averageStats = MutableStateFlow(AverageStats())
+        val averageStats: StateFlow<AverageStats> = _averageStats.asStateFlow()
 
         init {
             fetchAll()

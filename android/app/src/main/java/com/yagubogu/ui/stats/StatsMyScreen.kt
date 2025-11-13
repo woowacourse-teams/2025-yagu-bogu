@@ -19,9 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.PieChart
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
@@ -62,8 +61,8 @@ fun StatsMyScreen(
     viewModel: StatsMyViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val statsMyUiModel: State<StatsMyUiModel?> = viewModel.statsMyUiModel.observeAsState()
-    val averageStats: State<AverageStats?> = viewModel.averageStats.observeAsState()
+    val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
+    val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
 
     Column(
         modifier =
@@ -79,9 +78,9 @@ fun StatsMyScreen(
                     .fillMaxSize()
                     .padding(vertical = 20.dp),
         ) {
-            statsMyUiModel.value?.let { WinRateColumn(it) }
-            statsMyUiModel.value?.let { MyStatsRow(it) }
-            averageStats.value?.let { AttendanceStats(it) }
+            WinRateColumn(statsMyUiModel)
+            MyStatsRow(statsMyUiModel)
+            AttendanceStats(averageStats)
         }
     }
 }
