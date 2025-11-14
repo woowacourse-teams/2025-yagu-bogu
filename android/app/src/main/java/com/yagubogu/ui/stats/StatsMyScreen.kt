@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.PieChart
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
@@ -139,7 +141,10 @@ private fun WinRateColumn(
                     modifier =
                         Modifier
                             .padding(8.dp)
-                            .noRippleClickable { balloonWindow.showAlignBottom(yOff = -30) },
+                            .noRippleClickable {
+                                balloonWindow.showAlignBottom(yOff = -30)
+                                Firebase.analytics.logEvent("attendance_history_item_click", null)
+                            },
                 )
             }
         }
@@ -295,7 +300,10 @@ private fun MyStatsRow(
                     modifier =
                         Modifier
                             .padding(vertical = 20.dp)
-                            .noRippleClickable { balloonWindow.showAlignBottom(yOff = -60) },
+                            .noRippleClickable {
+                                balloonWindow.showAlignBottom(yOff = -60)
+                                Firebase.analytics.logEvent("attendance_history_item_click", null)
+                            },
                 )
             }
         }
