@@ -39,6 +39,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.yagubogu.R
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.stats.detail.BarChartManager
 import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
@@ -64,6 +65,23 @@ fun StatsDetailScreen(
     val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
 
+    StatsDetailScreen(
+        vsTeamStatItems = vsTeamStatItems,
+        stadiumVisitCounts = stadiumVisitCounts,
+        isVsTeamStatsExpanded = isVsTeamStatsExpanded,
+        modifier = modifier,
+        onShowMoreClick = { viewModel.toggleVsTeamStats() },
+    )
+}
+
+@Composable
+private fun StatsDetailScreen(
+    vsTeamStatItems: List<VsTeamStatItem>,
+    stadiumVisitCounts: List<StadiumVisitCount>,
+    isVsTeamStatsExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onShowMoreClick: () -> Unit = {},
+) {
     Column(
         modifier =
             modifier
@@ -77,7 +95,7 @@ fun StatsDetailScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(vertical = 20.dp)
-                    .noRippleClickable { viewModel.toggleVsTeamStats() },
+                    .noRippleClickable { onShowMoreClick() },
         ) {
             VsTeamWinningPercentage(
                 vsTeamStatItems = vsTeamStatItems,
@@ -91,8 +109,8 @@ fun StatsDetailScreen(
                             ),
                     ),
             )
-            StadiumVisitCounts(stadiumVisitCounts = stadiumVisitCounts)
         }
+        StadiumVisitCounts(stadiumVisitCounts = stadiumVisitCounts)
     }
 }
 
@@ -187,7 +205,7 @@ private fun ShowMoreButton(
         Spacer(modifier = Modifier.width(4.dp))
         Image(
             painter = painterResource(if (isVsTeamStatsExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down),
-            contentDescription = "더보기",
+            contentDescription = stringResource(R.string.home_show_more),
             colorFilter = ColorFilter.tint(Gray400),
             modifier = Modifier.size(20.dp),
         )
@@ -231,12 +249,22 @@ private fun StadiumVisitCounts(
 
 @Preview(showBackground = true)
 @Composable
-private fun VsTeamStatItemPreview() {
-//    VsTeamStatItem()
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun StatsDetailScreenPreview() {
-//    StatsDetailScreen()
+    StatsDetailScreen(
+        vsTeamStatItems =
+            List(5) { i ->
+                VsTeamStatItem(
+                    rank = i + 1,
+                    team = Team.HT,
+                    teamName = "KIA",
+                    winCounts = 10,
+                    drawCounts = 9,
+                    loseCounts = 8,
+                    winningPercentage = 77.7,
+                )
+            },
+        stadiumVisitCounts =
+            List(9) { i -> StadiumVisitCount(location = "잠실", visitCounts = 10 - i) },
+        isVsTeamStatsExpanded = false,
+    )
 }

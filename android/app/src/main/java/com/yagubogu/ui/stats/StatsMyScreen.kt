@@ -64,6 +64,15 @@ fun StatsMyScreen(
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
     val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
 
+    StatsMyScreen(statsMyUiModel, averageStats, modifier)
+}
+
+@Composable
+private fun StatsMyScreen(
+    statsMyUiModel: StatsMyUiModel,
+    averageStats: AverageStats,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -392,18 +401,6 @@ private fun StatItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun WinRateColumnPreview() {
-//    WinRateColumn()
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AttendanceStatsPreview() {
-//    AttendanceStats()
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun StatsMyScreenPreview() {
-//    StatsMyScreen()
+    StatsMyScreen(statsMyUiModel = StatsMyUiModel(), averageStats = AverageStats())
 }
