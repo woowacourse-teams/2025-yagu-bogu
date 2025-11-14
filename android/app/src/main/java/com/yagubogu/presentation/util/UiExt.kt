@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
+import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.ArrowOrientationRules
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.compose.rememberBalloonBuilder
@@ -81,5 +82,6 @@ fun rememberBalloonBuilder(
         setTextColorResource(R.color.gray800)
         setBackgroundColorResource(R.color.gray200)
         setArrowTopPadding(4)
-        setArrowOrientationRules(ArrowOrientationRules.ALIGN_ANCHOR)
+        setArrowOrientation(ArrowOrientation.TOP)
+        setArrowOrientationRules(ArrowOrientationRules.ALIGN_FIXED)
     }
