@@ -1,6 +1,7 @@
 package com.yagubogu.ui.stats
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,14 +65,27 @@ fun StatsMyScreen(
 ) {
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
     val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
+    val scrollState: ScrollState = rememberScrollState()
 
-    StatsMyScreen(statsMyUiModel, averageStats, modifier)
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
+    StatsMyScreen(
+        statsMyUiModel = statsMyUiModel,
+        averageStats = averageStats,
+        scrollState = scrollState,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun StatsMyScreen(
     statsMyUiModel: StatsMyUiModel,
     averageStats: AverageStats,
+    scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -78,7 +93,7 @@ private fun StatsMyScreen(
             modifier
                 .background(Gray050)
                 .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),

@@ -5,9 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -23,6 +27,14 @@ class StatsDetailViewModel
         private val statsRepository: StatsRepository,
         private val checkInRepository: CheckInRepository,
     ) : ViewModel() {
+        private val _scrollToTopEvent =
+            MutableSharedFlow<Unit>(
+                replay = 0,
+                extraBufferCapacity = 1,
+                onBufferOverflow = BufferOverflow.DROP_OLDEST,
+            )
+        val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+
         private val _isVsTeamStatsExpanded = MutableStateFlow(false)
         val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
 
@@ -49,6 +61,12 @@ class StatsDetailViewModel
         fun fetchAll() {
             fetchVsTeamStats()
             fetchStadiumVisitCounts()
+        }
+
+        fun scrollToTop() {
+            viewModelScope.launch {
+                _scrollToTopEvent.emit(Unit)
+            }
         }
 
         fun toggleVsTeamStats() {

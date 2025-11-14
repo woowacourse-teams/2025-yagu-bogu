@@ -8,8 +8,12 @@ import com.yagubogu.domain.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,6 +28,14 @@ class StatsMyViewModel
         private val statsRepository: StatsRepository,
         private val memberRepository: MemberRepository,
     ) : ViewModel() {
+        private val _scrollToTopEvent =
+            MutableSharedFlow<Unit>(
+                replay = 0,
+                extraBufferCapacity = 1,
+                onBufferOverflow = BufferOverflow.DROP_OLDEST,
+            )
+        val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+
         private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
         val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
 
@@ -37,6 +49,12 @@ class StatsMyViewModel
         fun fetchAll() {
             fetchMyStats()
             fetchMyAverageStats()
+        }
+
+        fun scrollToTop() {
+            viewModelScope.launch {
+                _scrollToTopEvent.emit(Unit)
+            }
         }
 
         private fun fetchMyStats(year: Int = LocalDate.now().year) {

@@ -37,12 +37,8 @@ class StatsFragment :
             }
         }
 
-    // TODO scrollToTop 구현
     override fun scrollToTop() {
-//        val position: Int = binding.vpStatsFragment.currentItem
-//        val currentFragment: Fragment = statsStateAdapter.createFragment(position)
-//        if (currentFragment is ScrollToTop) {
-//            currentFragment.scrollToTop()
-//        }
+        statsMyViewModel.scrollToTop()
+        statsDetailViewModel.scrollToTop()
     }
 }

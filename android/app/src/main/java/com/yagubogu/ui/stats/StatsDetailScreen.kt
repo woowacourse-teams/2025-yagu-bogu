@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,11 +66,19 @@ fun StatsDetailScreen(
     val vsTeamStatItems: List<VsTeamStatItem> by viewModel.vsTeamStatItems.collectAsStateWithLifecycle()
     val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
+    val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
 
     StatsDetailScreen(
         vsTeamStatItems = vsTeamStatItems,
         stadiumVisitCounts = stadiumVisitCounts,
         isVsTeamStatsExpanded = isVsTeamStatsExpanded,
+        scrollState = scrollState,
         modifier = modifier,
         onShowMoreClick = { viewModel.toggleVsTeamStats() },
     )
@@ -80,6 +90,7 @@ private fun StatsDetailScreen(
     stadiumVisitCounts: List<StadiumVisitCount>,
     isVsTeamStatsExpanded: Boolean,
     modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
     onShowMoreClick: () -> Unit = {},
 ) {
     Column(
@@ -87,7 +98,7 @@ private fun StatsDetailScreen(
             modifier
                 .background(Gray050)
                 .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),
