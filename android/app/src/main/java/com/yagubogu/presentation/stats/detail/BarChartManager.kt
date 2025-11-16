@@ -38,6 +38,7 @@ class BarChartManager(
             }
             axisRight.isEnabled = false
 
+            setExtraOffsets(-20f, 0f, 20f, 0f)
             // X축 (실제로는 화면에서 Y축처럼 보임)
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM // 왼쪽에 라벨이 오도록

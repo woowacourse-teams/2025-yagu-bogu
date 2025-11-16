@@ -37,6 +37,14 @@ class StatsFragment :
             }
         }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            statsMyViewModel.fetchAll()
+            statsDetailViewModel.fetchAll()
+        }
+    }
+
     override fun scrollToTop() {
         statsMyViewModel.scrollToTop()
         statsDetailViewModel.scrollToTop()

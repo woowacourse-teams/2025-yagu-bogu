@@ -58,8 +58,6 @@ fun StatsScreen(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = 1,
-            key = { it },
         ) { page ->
             when (page) {
                 StatsTab.MY_STATS.ordinal -> StatsMyScreen(statsMyViewModel)

@@ -87,8 +87,8 @@ fun StatsMyScreen(
 private fun StatsMyScreen(
     statsMyUiModel: StatsMyUiModel,
     averageStats: AverageStats,
-    scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
 ) {
     Column(
         modifier =
