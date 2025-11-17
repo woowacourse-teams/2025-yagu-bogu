@@ -14,7 +14,7 @@ public class PerGameRetryProperties {
     private int quickThreshold = 5;
 
     /** 빠른 복구 간격 */
-    private Duration quickInterval = Duration.ofMinutes(2);
+    private Duration quickInterval = Duration.ofMinutes(1);
 
     /** 지수 백오프 최대(1→2→4→8분 cap) */
     private Duration maxBackoff = Duration.ofMinutes(8);

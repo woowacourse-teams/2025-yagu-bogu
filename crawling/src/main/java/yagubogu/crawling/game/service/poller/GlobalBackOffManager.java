@@ -26,7 +26,7 @@ public class GlobalBackOffManager {
     /**
      * 전역 백오프 적용 (외부 API 장애 시)
      *
-     * 지수 백오프: 1분 → 2분 → 5분 (최대)
+     * 지수 백오프: 1분 → 2분 → 4분 -> 8분 (최대)
      * 목적: API 차단 방지, 과도한 재시도 방지
      */
     public void applyBackoff() {
