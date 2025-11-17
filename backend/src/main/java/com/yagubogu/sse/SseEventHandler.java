@@ -25,7 +25,14 @@ public class SseEventHandler {
     @Async
     @TransactionalEventListener
     public void onCheckInCreated(final CheckInCreatedEvent event) {
+        long startTime = System.currentTimeMillis();
+
+        long buildStart = System.currentTimeMillis();
         List<GameWithFanRateParam> eventData = checkInService.buildCheckInEventData(LocalDate.now());
+        long buildTime = System.currentTimeMillis() - buildStart;
+
+        int targetCount = sseEmitterRegistry.all().size();
+
         sseEmitterRegistry.all().forEach(emitter -> {
             try {
                 emitter.send(SseEmitter.event()
@@ -35,5 +42,10 @@ public class SseEventHandler {
                 sseEmitterRegistry.removeWithError(emitter, e);
             }
         });
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        long sendTime = totalTime - buildTime;
+        log.info("[SSE] Fan-out 완료: 총 {}ms (빌드 {}ms, 전송 {}ms), 대상: {}명",
+                totalTime, buildTime, sendTime, targetCount);
     }
 }
