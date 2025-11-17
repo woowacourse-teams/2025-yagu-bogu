@@ -36,10 +36,10 @@ public class StatScheduler {
         triggerRankingUpdate(event.date(), "game-finalized event");
     }
 
-    private void triggerRankingUpdate(final LocalDate date, final String triggerSource) {
+    private void triggerRankingUpdate(final LocalDate targetDate, final String triggerSource) {
         try {
-            log.info("[STAT] Update victory ranking triggered by {} for date {}", triggerSource, date);
-            statSyncService.updateRankings(date);
+            log.info("[STAT] Update victory ranking triggered by {} for date {}", triggerSource, targetDate);
+            statSyncService.updateRankings(targetDate);
         } catch (RuntimeException e) {
             log.error("[{}]- {}", e.getClass().getSimpleName(), e.getMessage());
         }
