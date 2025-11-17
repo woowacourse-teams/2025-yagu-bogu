@@ -1,7 +1,6 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.service.BronzeGameService;
 import java.time.LocalDate;
@@ -20,7 +19,6 @@ public class GameCenterSyncService {
 
     private final KboGameCenterCrawler crawler;
     private final BronzeGameService bronzeGameService;
-    private final ObjectMapper objectMapper;
 
     /**
      * 특정 날짜 경기 상세 정보 수집 및 Bronze Layer 저장
@@ -38,49 +36,45 @@ public class GameCenterSyncService {
     /**
      * GameCenterDetail 리스트를 받아서 Bronze Layer에 저장
      */
-     public int saveToBronzeLayer(java.util.List<GameCenterDetail> gameDetails) {
-        int savedCount = 0;
+    public int saveToBronzeLayer(java.util.List<GameCenterDetail> gameDetails) {
+        int updatedCount = 0;
 
         for (GameCenterDetail detail : gameDetails) {
             try {
-                boolean changed = saveToBronze(detail);
-                if (changed) {
-                    savedCount++;
+                boolean updated = updateGameState(detail);
+                if (updated) {
+                    updatedCount++;
                 }
             } catch (Exception e) {
-                log.error("[BRONZE] 경기 저장 실패: gameCode={}", detail.getGameCode(), e);
+                log.error("[BRONZE] 경기 상태 저장 실패: gameCode={}", detail.getGameCode(), e);
             }
         }
 
-        log.info("[BRONZE] Processed {} games, {} saved (changed)", gameDetails.size(), savedCount);
-        return savedCount;
+        log.info("[BRONZE] Processed {} games, {} state updates", gameDetails.size(), updatedCount);
+        return updatedCount;
     }
 
     /**
-     * 개별 경기를 Bronze Layer에 저장
+     * 개별 경기 상태를 Bronze Layer에 반영
      */
-    private boolean saveToBronze(GameCenterDetail detail) throws JsonProcessingException {
-        // GameCenterDetail을 JSON으로 직렬화
-        String payload = objectMapper.writeValueAsString(detail);
-
-        // Natural Key 추출
+    private boolean updateGameState(GameCenterDetail detail) {
         LocalDate date = parseDate(detail.getGameDate());
         String stadium = detail.getStadiumName();
         String homeTeam = detail.getHomeTeamName();
         String awayTeam = detail.getAwayTeamName();
         LocalTime startTime = parseTime(detail.getStartTime());
+        GameState state = GameState.fromName(detail.getStatus());
 
-        // BronzeGameService를 활용하여 upsert
-        boolean changed = bronzeGameService.upsertByNaturalKey(
-                date, stadium, homeTeam, awayTeam, startTime, payload
+        boolean updated = bronzeGameService.updateGameState(
+                date, stadium, homeTeam, awayTeam, startTime, state
         );
 
-        if (changed) {
-            log.debug("[BRONZE] Saved gameCode={}, {} vs {}",
-                    detail.getGameCode(), awayTeam, homeTeam);
+        if (updated) {
+            log.debug("[BRONZE] Game state synced: gameCode={}, state={}",
+                    detail.getGameCode(), state);
         }
 
-        return changed;
+        return updated;
     }
 
     /**

@@ -10,6 +10,7 @@ CREATE TABLE bronze_games_raw
     home_team        VARCHAR(50) NOT NULL,
     away_team        VARCHAR(50) NOT NULL,
     start_time       TIME,
+    game_state          ENUM ('SCHEDULED','LIVE','COMPLETED','CANCELED'),
     collected_at     DATETIME(6) NOT NULL,
     payload          JSON        NOT NULL,
     content_hash     VARCHAR(64) NOT NULL,

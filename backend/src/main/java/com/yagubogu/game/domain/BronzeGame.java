@@ -2,6 +2,8 @@ package com.yagubogu.game.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -59,6 +61,10 @@ public class BronzeGame {
     @Column(name = "etl_processed_at")
     private LocalDateTime etlProcessedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", length = 30)
+    private GameState state;
+
     public BronzeGame(final LocalDate date,
                       final String stadium,
                       final String homeTeam,
@@ -76,6 +82,7 @@ public class BronzeGame {
         this.payload = payload;
         this.contentHash = contentHash;
         this.etlProcessedAt = null;
+        this.state = null;
     }
 
     public void update(final LocalDateTime collectedAt, final String payload, final String contentHash) {
@@ -89,7 +96,11 @@ public class BronzeGame {
         this.etlProcessedAt = processedAt;
     }
 
-    public boolean isEtlProcessed() {
-        return this.etlProcessedAt != null;
+    public boolean updateState(final GameState newState) {
+        if (newState == null || newState.equals(this.state)) {
+            return false;
+        }
+        this.state = newState;
+        return true;
     }
 }

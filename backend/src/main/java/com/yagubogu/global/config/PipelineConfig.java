@@ -7,6 +7,7 @@ import com.yagubogu.game.service.BronzeGameService;
 import com.yagubogu.game.service.GameEtlService;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.repository.TeamRepository;
+import java.time.Clock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,9 +26,10 @@ public class PipelineConfig {
     @Bean
     public GameEtlService gameEtlService(final BronzeGameRepository bronzeGameRepository,
                                          final GameRepository gameRepository, final TeamRepository teamRepository,
-                                         final StadiumRepository stadiumRepository, final ObjectMapper objectMapper
+                                         final StadiumRepository stadiumRepository, final ObjectMapper objectMapper,
+                                         final Clock clock
     ) {
         return new GameEtlService(bronzeGameRepository, gameRepository, teamRepository, stadiumRepository,
-                objectMapper);
+                objectMapper, clock);
     }
 }

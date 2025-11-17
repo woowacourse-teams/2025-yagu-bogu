@@ -16,6 +16,7 @@ import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -45,6 +46,7 @@ public class GameEtlService {
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
     private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     /**
      * 최근 수집된 Bronze 데이터를 Silver로 ETL
@@ -96,7 +98,7 @@ public class GameEtlService {
                 try {
                     final int order = doubleHeaderOrderMap.getOrDefault(bronzeGame, 0);
                     transformSingleGame(bronzeGame, order);
-                    bronzeGame.markEtlProcessed(LocalDateTime.now());
+                    bronzeGame.markEtlProcessed(LocalDateTime.now(clock));
 
                     transformedCount++;
                 } catch (Exception e) {
@@ -268,7 +270,8 @@ public class GameEtlService {
         // 올바른 더블헤더 순서로 게임 코드 생성
         final String gameCode = generateGameCode(date, homeTeam, awayTeam, doubleHeaderOrder);
 
-        final GameState gameState = GameState.fromName(status);
+        final GameState payloadState = GameState.fromName(status);
+        final GameState gameState = Optional.ofNullable(bronzeGame.getState()).orElse(payloadState);
 
         PitcherResult result = assignPitchers(homeScore, awayScore, winningPitcher, losingPitcher);
         final String homePitcher = result.home();

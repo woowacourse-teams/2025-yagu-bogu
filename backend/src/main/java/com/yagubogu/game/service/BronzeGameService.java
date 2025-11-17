@@ -1,6 +1,7 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.BronzeGame;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.repository.BronzeGameRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -42,6 +43,34 @@ public class BronzeGameService {
                         date, stadium, homeTeam, awayTeam, startTime,
                         payload, contentHash, now
                 ));
+    }
+
+    @Transactional
+    public boolean updateGameState(
+            final LocalDate date,
+            final String stadium,
+            final String homeTeam,
+            final String awayTeam,
+            final LocalTime startTime,
+            final GameState gameState
+    ) {
+        return bronzeGameRepository
+                .findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
+                        date, stadium, homeTeam, awayTeam, startTime
+                )
+                .map(existing -> {
+                    boolean updated = existing.updateState(gameState);
+                    if (updated) {
+                        log.info("Bronze gameCenterState updated: date={}, stadium={}, home={}, away={}, state={}",
+                                date, stadium, homeTeam, awayTeam, gameState);
+                    }
+                    return updated;
+                })
+                .orElseGet(() -> {
+                    log.warn("Bronze game not found for GameCenter state update: date={}, stadium={}, home={}, away={}",
+                            date, stadium, homeTeam, awayTeam);
+                    return false;
+                });
     }
 
     private boolean updateIfHashChanged(final BronzeGame existing, final String payload,
