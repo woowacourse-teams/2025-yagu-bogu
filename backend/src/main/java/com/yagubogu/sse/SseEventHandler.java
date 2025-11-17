@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,14 +48,12 @@ public class SseEventHandler {
     public void broadcastLatestDataIfDirty() {
         // 'isDirty'가 true일 때만 실행 (compareAndSet으로 동시성 처리)
         if (isDirty.compareAndSet(true, false)) {
-
-            log.info("[SSE-Scheduler] 최신 데이터 전송 시작");
-
+            log.info("[SSE-Scheduler] 전송 시작");
             Collection<SseEmitter> allEmitters = sseEmitterRegistry.all();
             int emitterCount = allEmitters.size();
 
             if (emitterCount == 0) {
-                log.info("[SSE-Scheduler] 연결된 클라이언트가 전송 취소");
+                log.info("[SSE-Scheduler] 연결된 클라이언트가 없어 전송 취소");
                 return;
             }
 
@@ -68,15 +68,21 @@ public class SseEventHandler {
                                     .name("check-in-created")
                                     .data(eventData));
                         } catch (IOException e) {
+                            log.info("[SSE-Client] I/O 예외 발생, 메시지: {}", e.getMessage());
                             sseEmitterRegistry.removeWithError(emitter, e);
                         }
                     }, sseBroadcastExecutor))
                     .toList();
 
-            // 모든 전송이 완료될 때까지 기다림
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-            log.info("[SSE-Scheduler] 전송 완료");
+            CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            try {
+                allFutures.get(5, TimeUnit.SECONDS);
+                log.info("[SSE-Scheduler] 전송 완료 ({}명)", emitterCount);
+            } catch (TimeoutException e) {
+                log.warn("[SSE-Scheduler] 5초 타임아웃 발생");
+            } catch (Exception e) {
+                log.error("[SSE-Scheduler] 전송 중 예외 발생", e);
+            }
         }
     }
 }
