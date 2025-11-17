@@ -24,4 +24,19 @@ public class AsyncConfig {
 
         return taskExecutor;
     }
+
+    @Bean(name = "sseBroadcastExecutor")
+    public Executor sseBroadcastExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+
+        taskExecutor.setCorePoolSize(50);
+        taskExecutor.setMaxPoolSize(100);
+        taskExecutor.setQueueCapacity(2000);
+        taskExecutor.setThreadNamePrefix("Sse-Broadcast-");
+
+        taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        taskExecutor.initialize();
+        return taskExecutor;
+    }
 }
