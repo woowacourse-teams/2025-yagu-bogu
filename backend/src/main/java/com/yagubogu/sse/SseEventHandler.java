@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +21,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class SseEventHandler {
 
@@ -27,17 +29,8 @@ public class SseEventHandler {
 
     private final SseEmitterRegistry sseEmitterRegistry;
     private final CheckInService checkInService;
+    @Qualifier("sseBroadcastExecutor")
     private final Executor sseBroadcastExecutor;
-
-    public SseEventHandler(
-            SseEmitterRegistry sseEmitterRegistry,
-            CheckInService checkInService,
-            @Qualifier("sseBroadcastExecutor") Executor sseBroadcastExecutor
-    ) {
-        this.sseEmitterRegistry = sseEmitterRegistry;
-        this.checkInService = checkInService;
-        this.sseBroadcastExecutor = sseBroadcastExecutor;
-    }
 
     /**
      * [이벤트 리스너] DB 조회를 하지 않고 "플래그"만 true로 설정하고 즉시 종료.
