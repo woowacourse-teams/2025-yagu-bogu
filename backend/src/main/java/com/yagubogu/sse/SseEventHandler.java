@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -35,7 +34,6 @@ public class SseEventHandler {
     /**
      * [이벤트 리스너] DB 조회를 하지 않고 "플래그"만 true로 설정하고 즉시 종료.
      */
-    @Async
     @TransactionalEventListener
     public void onCheckInCreated(final CheckInCreatedEvent event) {
         isDirty.set(true);
@@ -44,7 +42,7 @@ public class SseEventHandler {
     /**
      * [스케줄러] 0.25초(250ms)마다 "변경 플래그(isDirty)"를 확인. 플래그가 true일 경우에만 DB 조회 1번, 전체 방송 1번을 수행.
      */
-    @Scheduled(fixedDelay = 250) // 0.5초 간격으로 실행
+    @Scheduled(fixedDelay = 250) // 0.25초 간격으로 실행
     public void broadcastLatestDataIfDirty() {
         // 'isDirty'가 true일 때만 실행 (compareAndSet으로 동시성 처리)
         if (isDirty.compareAndSet(true, false)) {
