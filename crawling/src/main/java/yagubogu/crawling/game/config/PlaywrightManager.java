@@ -35,7 +35,7 @@ public class PlaywrightManager {
 
         // ✅ Chromium → Firefox로 변경
         this.browser = pw.firefox().launch(new BrowserType.LaunchOptions()
-                .setHeadless(false)  // 디버깅용
+//                .setHeadless(false)  // 디버깅용
                 .setSlowMo(100)      // 안정성 증가
                 .setArgs(List.of(
                         "--disable-gpu",
