@@ -261,7 +261,7 @@ class LivetalkChatViewModel
         }
 
         private suspend fun getLikeCount() {
-            if (cachedLivetalkTeams.myTeamType == null) {
+            if (!::cachedLivetalkTeams.isInitialized || cachedLivetalkTeams.myTeamType == null) {
                 return
             }
 
@@ -319,7 +319,7 @@ class LivetalkChatViewModel
                     count
                 }
 
-            if (countToSend > 0 && cachedLivetalkTeams.myTeamType != null) {
+            if (countToSend > 0 && ::cachedLivetalkTeams.isInitialized && cachedLivetalkTeams.myTeamType != null) {
                 Timber.d("보낸 수 countToSend: $countToSend")
                 val result =
                     gameRepository.addLikeBatches(
