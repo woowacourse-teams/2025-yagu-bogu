@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="com.yagubogu.presentation.login.LoginViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_activity_login_root"
         android:layout_width="match_parent"
@@ -76,7 +69,6 @@
             android:layout_marginHorizontal="60dp"
             android:layout_marginBottom="180dp"
             android:background="@drawable/bg_white_stroke_gray300_radius_4dp_ripple"
-            android:onClick="@{() -> viewModel.signInWithGoogle()}"
             android:paddingVertical="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -157,8 +157,7 @@ class GoogleCredentialManager(
     private suspend fun getCredentialResponseResult(request: GetCredentialRequest): Result<GetCredentialResponse> =
         withContext(Dispatchers.IO) {
             return@withContext try {
-                val response: GetCredentialResponse =
-                    credentialManager.getCredential(context, request)
+                val response: GetCredentialResponse = credentialManager.getCredential(context, request)
                 Result.success(response)
             } catch (e: GetCredentialException) {
                 Result.failure(e)
