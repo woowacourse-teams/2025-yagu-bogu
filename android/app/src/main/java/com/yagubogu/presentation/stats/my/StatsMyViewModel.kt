@@ -73,7 +73,7 @@ class StatsMyViewModel
                     _statsMyUiModel.value = statsMyUiModel
                 } else {
                     val errors: List<String> =
-                        listOf(statsCountsResult, winRateResult, luckyStadiumResult)
+                        listOf(statsCountsResult, winRateResult, myTeamResult, luckyStadiumResult)
                             .filter { it.isFailure }
                             .mapNotNull { it.exceptionOrNull()?.message }
                     Timber.w("API 호출 실패: ${errors.joinToString()}")
