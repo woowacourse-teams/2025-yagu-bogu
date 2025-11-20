@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.auth.GoogleCredentialResult
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TokenRepository
+import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.presentation.login.auth.GoogleCredentialResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
