@@ -164,7 +164,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
-        viewModel.liveTalkChatBubbleItem.observe(this, ::handleLiveTalkChatBubbleItem)
+        viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(this, ::handleLiveTalkChatBubbleItem)
         viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
         viewModel.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
@@ -175,7 +175,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun observePollingLikeAnimation() {
         val likeButton = binding.tvLikeButton
-        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+        viewModel.likeCountStateHolder.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
             val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
 
@@ -196,7 +196,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                         val randomDelay = (0L..10000L).random()
                         delay(randomDelay)
 
-                        viewModel.addMyTeamShowingCount(increment)
+                        viewModel.likeCountStateHolder.increaseMyTeamShowingCount(increment)
                         showLikeEmojiAnimation(
                             viewModel.cachedLivetalkTeams.myTeamEmoji,
                             likeButton,
@@ -205,7 +205,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             }
         }
-        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+        viewModel.likeCountStateHolder.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
             val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
 
@@ -228,7 +228,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         val likeButton = binding.tvLikeButton
 
         likeButton.setOnClickListener {
-            viewModel.addMyTeamShowingCount()
+            viewModel.likeCountStateHolder.increaseMyTeamShowingCount()
             viewModel.addLikeToBatch()
             showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
         }
