@@ -6,13 +6,11 @@ import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate
 import javax.inject.Inject
 
-class StadiumRemoteDataSource
-    @Inject
-    constructor(
-        private val stadiumApiService: StadiumApiService,
-    ) : StadiumDataSource {
-        override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGamesResponse> =
-            safeApiCall {
-                stadiumApiService.getStadiumsWithGames(date.toString())
-            }
-    }
+class StadiumRemoteDataSource @Inject constructor(
+    private val stadiumApiService: StadiumApiService,
+) : StadiumDataSource {
+    override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGamesResponse> =
+        safeApiCall {
+            stadiumApiService.getStadiumsWithGames(date.toString())
+        }
+}

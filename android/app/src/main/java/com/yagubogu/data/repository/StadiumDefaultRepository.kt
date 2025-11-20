@@ -7,15 +7,13 @@ import com.yagubogu.presentation.home.model.StadiumsWithGames
 import java.time.LocalDate
 import javax.inject.Inject
 
-class StadiumDefaultRepository
-    @Inject
-    constructor(
-        private val stadiumDataSource: StadiumDataSource,
-    ) : StadiumRepository {
-        override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGames> =
-            stadiumDataSource
-                .getStadiumsWithGames(date)
-                .map { stadiumsWithGamesResponse: StadiumsWithGamesResponse ->
-                    stadiumsWithGamesResponse.toPresentation()
-                }
-    }
+class StadiumDefaultRepository @Inject constructor(
+    private val stadiumDataSource: StadiumDataSource,
+) : StadiumRepository {
+    override suspend fun getStadiumsWithGames(date: LocalDate): Result<StadiumsWithGames> =
+        stadiumDataSource
+            .getStadiumsWithGames(date)
+            .map { stadiumsWithGamesResponse: StadiumsWithGamesResponse ->
+                stadiumsWithGamesResponse.toPresentation()
+            }
+}
