@@ -17,6 +17,9 @@ import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -51,8 +54,8 @@ class LivetalkChatViewModel(
 
     private var likeBatchingJob: Job? = null
 
-    private val _profileInfoClickEvent = MutableLiveData<MemberProfile?>()
-    val profileInfoClickEvent: LiveData<MemberProfile?> get() = _profileInfoClickEvent
+    private val _profileInfoClickEvent = MutableSharedFlow<MemberProfile>()
+    val profileInfoClickEvent: SharedFlow<MemberProfile> = _profileInfoClickEvent.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -218,15 +221,11 @@ class LivetalkChatViewModel(
             memberRepository
                 .getMemberProfile(memberId)
                 .onSuccess { memberProfile: MemberProfile ->
-                    _profileInfoClickEvent.value = memberProfile
+                    _profileInfoClickEvent.emit(memberProfile)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
                 }
         }
-    }
-
-    fun clearMemberProfileEvent() {
-        _profileInfoClickEvent.value = null
     }
 
     private fun startPolling() {

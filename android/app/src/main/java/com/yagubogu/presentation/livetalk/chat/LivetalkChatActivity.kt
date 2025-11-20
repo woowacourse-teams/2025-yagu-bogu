@@ -6,8 +6,11 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -88,6 +91,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         setupRecyclerView()
         setupObservers()
         setupComposeView()
+        showMemberProfileDialog()
     }
 
     private fun setupBinding() {
@@ -164,12 +168,15 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
-        viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(this, ::handleLiveTalkChatBubbleItem)
+        viewModel.messageStateHolder
+        viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(
+            this,
+            ::handleLiveTalkChatBubbleItem,
+        )
         viewModel.messageStateHolder.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
         viewModel.messageStateHolder.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
-        viewModel.profileInfoClickEvent.observe(this) { showMemberProfileDialog() }
         observePollingLikeAnimation()
     }
 
@@ -336,12 +343,18 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun showMemberProfileDialog() {
         binding.composeView.setContent {
-            val profile: State<MemberProfile?> = viewModel.profileInfoClickEvent.observeAsState()
+            var memberProfile by remember { mutableStateOf<MemberProfile?>(null) }
 
-            profile.value?.let { memberProfile: MemberProfile ->
+            LaunchedEffect(Unit) {
+                viewModel.profileInfoClickEvent.collect { profile: MemberProfile ->
+                    memberProfile = profile
+                }
+            }
+
+            memberProfile?.let { profile ->
                 ProfileDialog(
-                    onDismissRequest = { viewModel.clearMemberProfileEvent() },
-                    memberProfile = memberProfile,
+                    onDismissRequest = { memberProfile = null },
+                    memberProfile = profile,
                 )
             }
         }
