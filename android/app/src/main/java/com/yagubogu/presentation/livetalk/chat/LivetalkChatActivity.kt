@@ -165,8 +165,8 @@ class LivetalkChatActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
         viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(this, ::handleLiveTalkChatBubbleItem)
-        viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
-        viewModel.livetalkDeleteEvent.observe(this) {
+        viewModel.messageStateHolder.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
+        viewModel.messageStateHolder.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
         viewModel.profileInfoClickEvent.observe(this) { showMemberProfileDialog() }
@@ -295,7 +295,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 )
         }
 
-        viewModel.livetalkDeleteEvent.observe(this) {
+        viewModel.messageStateHolder.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
     }

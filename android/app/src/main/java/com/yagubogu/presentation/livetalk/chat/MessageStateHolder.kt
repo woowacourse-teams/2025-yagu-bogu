@@ -3,6 +3,9 @@ package com.yagubogu.presentation.livetalk.chat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
+import com.yagubogu.presentation.util.livedata.SingleLiveData
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -40,6 +43,12 @@ class MessageStateHolder(
 
     private val _liveTalkChatBubbleItems = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItems: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItems
+
+    private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
+    val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
+
+    private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
+    val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
     suspend fun addBeforeChats(response: LivetalkResponseItem) {
         lock.withLock {
@@ -80,6 +89,7 @@ class MessageStateHolder(
             newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
             oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
             _liveTalkChatBubbleItems.value = deletedChats
+            _livetalkDeleteEvent.setValue(Unit)
         }
     }
 
@@ -102,5 +112,9 @@ class MessageStateHolder(
                 }
             _liveTalkChatBubbleItems.value = updatedChats
         }
+    }
+
+    fun updateLivetalkReportEvent(event: LivetalkReportEvent) {
+        _livetalkReportEvent.setValue(event)
     }
 }

@@ -13,8 +13,6 @@ import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -47,12 +45,6 @@ class LivetalkChatViewModel(
 
     lateinit var cachedLivetalkTeams: LivetalkTeams
         private set
-
-    private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
-    val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
-
-    private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
-    val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
     private val pollingControlLock = Mutex()
     private var pollingJob: Job? = null
@@ -124,7 +116,6 @@ class LivetalkChatViewModel(
                 .deleteTalks(gameId, chatId)
                 .onSuccess {
                     messageStateHolder.deleteChat(chatId)
-                    _livetalkDeleteEvent.setValue(Unit)
                     Timber.d("현장톡 정상 삭제")
                 }.onFailure { exception: Throwable ->
                     when (exception) {
@@ -143,12 +134,12 @@ class LivetalkChatViewModel(
                 .reportTalks(chatId)
                 .onSuccess {
                     messageStateHolder.reportChat(chatId)
-                    _livetalkReportEvent.setValue(LivetalkReportEvent.Success)
+                    messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.Success)
                     Timber.d("현장톡 정상 신고")
                 }.onFailure { exception: Throwable ->
                     when (exception) {
                         is ApiException.BadRequest -> {
-                            _livetalkReportEvent.setValue(LivetalkReportEvent.DuplicatedReport)
+                            messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.DuplicatedReport)
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
