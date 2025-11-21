@@ -8,12 +8,8 @@ import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
-import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.stats.detail.VsTeamStatItem
-import com.yagubogu.presentation.stats.my.AverageStats
 import javax.inject.Inject
 
 class StatsDefaultRepository @Inject constructor(
@@ -26,12 +22,7 @@ class StatsDefaultRepository @Inject constructor(
                 statsWinRateResponse.winPercent
             }
 
-    override suspend fun getStatsCounts(year: Int): Result<StatsCounts> =
-        statsDataSource
-            .getStatsCounts(year)
-            .map { statsCountsResponse: StatsCountsResponse ->
-                statsCountsResponse.toDomain()
-            }
+    override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> = statsDataSource.getStatsCounts(year)
 
     override suspend fun getLuckyStadiums(year: Int): Result<String?> =
         statsDataSource
@@ -40,35 +31,17 @@ class StatsDefaultRepository @Inject constructor(
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getAverageStats(): Result<AverageStats> =
-        statsDataSource
-            .getAverageStats()
-            .map { averageStatisticResponse: AverageStatisticResponse ->
-                AverageStats(
-                    averageRuns = averageStatisticResponse.averageRun ?: 0.0,
-                    concededRuns = averageStatisticResponse.concededRuns ?: 0.0,
-                    averageErrors = averageStatisticResponse.averageErrors ?: 0.0,
-                    averageHits = averageStatisticResponse.averageHits ?: 0.0,
-                    concededHits = averageStatisticResponse.concededHits ?: 0.0,
-                )
-            }
+    override suspend fun getAverageStats(): Result<AverageStatisticResponse> = statsDataSource.getAverageStats()
 
-    override suspend fun getVsTeamStats(year: Int): Result<List<VsTeamStatItem>> =
+    override suspend fun getVsTeamStats(year: Int): Result<List<OpponentWinRateTeamDto>> =
         statsDataSource
             .getVsTeamStats(year)
             .map { opponentWinRateResponse: OpponentWinRateResponse ->
-                opponentWinRateResponse.opponents.mapIndexed { index: Int, opponentDto: OpponentWinRateTeamDto ->
-                    opponentDto.toPresentation(index + 1)
-                }
+                opponentWinRateResponse.opponents
             }
 
     override suspend fun getVictoryFairyRankings(
         year: Int,
         team: Team?,
-    ): Result<VictoryFairyRanking> =
-        statsDataSource
-            .getVictoryFairyRankings(year, team)
-            .map { victoryFairyRankingResponse: VictoryFairyRankingResponse ->
-                victoryFairyRankingResponse.toPresentation()
-            }
+    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, team)
 }

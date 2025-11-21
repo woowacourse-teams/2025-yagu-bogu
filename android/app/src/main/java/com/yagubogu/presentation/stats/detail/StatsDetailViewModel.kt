@@ -5,10 +5,12 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
+import com.yagubogu.presentation.util.mapListIndexed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -50,7 +52,11 @@ class StatsDetailViewModel @Inject constructor(
     private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
-                statsRepository.getVsTeamStats(year)
+                statsRepository
+                    .getVsTeamStats(year)
+                    .mapListIndexed { index: Int, item: OpponentWinRateTeamDto ->
+                        item.toUiModel(rank = index + 1)
+                    }
             vsTeamStatsResult
                 .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
                     vsTeamStatItems = updatedVsTeamStats

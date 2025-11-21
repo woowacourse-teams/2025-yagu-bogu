@@ -273,7 +273,7 @@ class HomeViewModel @Inject constructor(
     private fun fetchVictoryFairyRanking(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                statsRepository.getVictoryFairyRankings(year, null)
+                statsRepository.getVictoryFairyRankings(year, null).map { it.toUiModel() }
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking

@@ -1,4 +1,4 @@
-package com.yagubogu.domain.model
+package com.yagubogu.presentation.stats.my
 
 data class StatsCounts(
     val winCounts: Int,
