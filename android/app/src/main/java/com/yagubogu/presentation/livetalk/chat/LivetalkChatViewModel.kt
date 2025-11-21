@@ -113,7 +113,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
         viewModelScope.launch {
             fetchTalksLock.withLock {
                 val result =
-                    talkRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                    talkRepository
+                        .getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                        .map { it.toUiModel() }
                 result
                     .onSuccess { response ->
                         val pastChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
@@ -135,7 +137,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
-                talkRepository.postTalks(gameId, message.trim())
+                talkRepository.postTalks(gameId, message.trim()).map { it.toUiModel() }
             talksResult
                 .onSuccess {
                     stopPolling()
@@ -342,7 +344,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     private suspend fun fetchTeams(gameId: Long) {
-        val result = talkRepository.getInitial(gameId)
+        val result = talkRepository.getInitial(gameId).map { it.toUiModel() }
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
                 _livetalkTeams.value = livetalkTeams
@@ -355,7 +357,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private suspend fun fetchInitialTalks() {
         fetchTalksLock.withLock {
-            val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
+            val result =
+                talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT).map { it.toUiModel() }
             result
                 .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
                     _livetalkUiState.value = LivetalkUiState.Success
@@ -380,7 +383,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
     private suspend fun fetchAfterTalks() {
         fetchTalksLock.withLock {
             val result =
-                talkRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                talkRepository
+                    .getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                    .map { it.toUiModel() }
             result
                 .onSuccess { response ->
                     val newChats =

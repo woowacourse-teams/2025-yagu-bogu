@@ -2,11 +2,9 @@ package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.domain.repository.TalkRepository
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
 import javax.inject.Inject
 
 class TalkDefaultRepository @Inject constructor(
@@ -16,61 +14,43 @@ class TalkDefaultRepository @Inject constructor(
         gameId: Long,
         before: Long?,
         limit: Int,
-    ): Result<LivetalkResponseItem> =
-        talkDataSource
-            .getTalks(
-                gameId = gameId,
-                before = before,
-                limit = limit,
-            ).map { talksResponse: TalkCursorResponse ->
-                talksResponse.toPresentation()
-            }
+    ): Result<TalkCursorResponse> =
+        talkDataSource.getTalks(
+            gameId = gameId,
+            before = before,
+            limit = limit,
+        )
 
     override suspend fun getAfterTalks(
         gameId: Long,
         after: Long?,
         limit: Int,
-    ): Result<LivetalkResponseItem> =
-        talkDataSource
-            .getLatestTalks(
-                gameId = gameId,
-                after = after,
-                limit = limit,
-            ).map { talksResponse: TalkCursorResponse ->
-                talksResponse.toPresentation()
-            }
+    ): Result<TalkCursorResponse> =
+        talkDataSource.getLatestTalks(
+            gameId = gameId,
+            after = after,
+            limit = limit,
+        )
 
     override suspend fun postTalks(
         gameId: Long,
         content: String,
-    ): Result<LivetalkChatItem> =
-        talkDataSource
-            .postTalks(
-                gameId = gameId,
-                content = content,
-            ).map { talkResponse: TalkResponse ->
-                talkResponse.toPresentation()
-            }
+    ): Result<TalkResponse> =
+        talkDataSource.postTalks(
+            gameId = gameId,
+            content = content,
+        )
 
     override suspend fun deleteTalks(
         gameId: Long,
         talkId: Long,
     ): Result<Unit> =
-        talkDataSource
-            .deleteTalks(
-                gameId = gameId,
-                talkId = talkId,
-            )
+        talkDataSource.deleteTalks(
+            gameId = gameId,
+            talkId = talkId,
+        )
 
-    override suspend fun reportTalks(talkId: Long): Result<Unit> =
-        talkDataSource
-            .reportTalks(
-                talkId = talkId,
-            )
+    override suspend fun reportTalks(talkId: Long): Result<Unit> = talkDataSource.reportTalks(talkId = talkId)
 
-    override suspend fun getInitial(gameId: Long): Result<LivetalkTeams> =
-        talkDataSource
-            .getInitial(
-                gameId,
-            ).map { it.toPresentation() }
+    override suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse> = talkDataSource.getInitial(gameId)
 }

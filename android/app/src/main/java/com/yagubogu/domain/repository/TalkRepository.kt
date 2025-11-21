@@ -1,26 +1,26 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
+import com.yagubogu.data.dto.response.talk.TalkCursorResponse
+import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
+import com.yagubogu.data.dto.response.talk.TalkResponse
 
 interface TalkRepository {
     suspend fun getBeforeTalks(
         gameId: Long,
         before: Long?,
         limit: Int,
-    ): Result<LivetalkResponseItem>
+    ): Result<TalkCursorResponse>
 
     suspend fun getAfterTalks(
         gameId: Long,
         after: Long?,
         limit: Int,
-    ): Result<LivetalkResponseItem>
+    ): Result<TalkCursorResponse>
 
     suspend fun postTalks(
         gameId: Long,
         content: String,
-    ): Result<LivetalkChatItem>
+    ): Result<TalkResponse>
 
     suspend fun deleteTalks(
         gameId: Long,
@@ -29,5 +29,5 @@ interface TalkRepository {
 
     suspend fun reportTalks(talkId: Long): Result<Unit>
 
-    suspend fun getInitial(gameId: Long): Result<LivetalkTeams>
+    suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse>
 }
