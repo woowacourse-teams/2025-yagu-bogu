@@ -1,9 +1,6 @@
 package com.yagubogu.data.dto.response.member
 
-import com.yagubogu.ui.badge.model.BadgeInfoUiModel
-import com.yagubogu.ui.badge.model.BadgeUiModel
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,22 +22,4 @@ data class BadgeDto(
     val progressRate: Double, // 진행률(개인 사용자)
     @SerialName("achievedRate")
     val achievedRate: Double, // 획득률(모든 사용자 기반)
-) {
-    fun toPresentation(): BadgeInfoUiModel {
-        val badge =
-            BadgeUiModel(
-                id = id,
-                imageUrl = badgeImageUrl,
-                name = name,
-                isAcquired = acquired,
-            )
-
-        return BadgeInfoUiModel(
-            badge = badge,
-            description = description,
-            achievedRate = achievedRate.toInt(),
-            achievedAt = achievedAt?.date?.toJavaLocalDate(),
-            progressRate = progressRate,
-        )
-    }
-}
+)

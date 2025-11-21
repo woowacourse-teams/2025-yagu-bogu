@@ -1,7 +1,6 @@
 package com.yagubogu.data.repository
 
 import com.yagubogu.data.datasource.member.MemberDataSource
-import com.yagubogu.data.dto.response.member.BadgeDto
 import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
@@ -12,13 +11,6 @@ import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
-import com.yagubogu.presentation.setting.PresignedUrlItem
-import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.badge.model.BadgeInfoUiModel
-import com.yagubogu.ui.badge.model.BadgeUiModel
-import com.yagubogu.ui.common.model.MemberProfile
 import javax.inject.Inject
 
 class MemberDefaultRepository @Inject constructor(
@@ -28,11 +20,11 @@ class MemberDefaultRepository @Inject constructor(
     private var cachedNickname: String? = null
     private var cachedFavoriteTeam: String? = null
 
-    override suspend fun getMemberInfo(): Result<MemberInfoItem> =
+    override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
         memberDataSource.getMemberInfo().map { memberInfoResponse: MemberInfoResponse ->
             cachedNickname = memberInfoResponse.nickname
             cachedFavoriteTeam = memberInfoResponse.favoriteTeam
-            memberInfoResponse.toPresentation()
+            memberInfoResponse
         }
 
     override suspend fun getNickname(): Result<String> {
@@ -84,14 +76,7 @@ class MemberDefaultRepository @Inject constructor(
             tokenManager.clearTokens()
         }
 
-    override suspend fun getBadges(): Result<BadgeUiState> =
-        memberDataSource.getBadges().map { badgeResponse: BadgeResponse ->
-            val representativeBadge: BadgeUiModel? =
-                badgeResponse.representativeBadge?.toPresentation()
-            val badges: List<BadgeInfoUiModel> =
-                badgeResponse.badges.map { badge: BadgeDto -> badge.toPresentation() }
-            BadgeUiState.Success(representativeBadge, badges)
-        }
+    override suspend fun getBadges(): Result<BadgeResponse> = memberDataSource.getBadges()
 
     override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> = memberDataSource.updateRepresentativeBadge(badgeId)
 
@@ -103,29 +88,10 @@ class MemberDefaultRepository @Inject constructor(
     override suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
-    ): Result<PresignedUrlItem> =
-        memberDataSource
-            .getPresignedUrl(
-                contentType,
-                contentLength,
-            ).map { presignedUrlStartResponse: PresignedUrlStartResponse ->
-                PresignedUrlItem(
-                    presignedUrlStartResponse.key,
-                    presignedUrlStartResponse.url,
-                )
-            }
+    ): Result<PresignedUrlStartResponse> = memberDataSource.getPresignedUrl(contentType, contentLength)
 
-    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> =
-        memberDataSource
-            .completeUploadProfileImage(key)
-            .map { presignedUrlCompleteResponse: PresignedUrlCompleteResponse ->
-                PresignedUrlCompleteItem(presignedUrlCompleteResponse.url)
-            }
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse> =
+        memberDataSource.completeUploadProfileImage(key)
 
-    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfile> =
-        memberDataSource
-            .getMemberProfile(memberId)
-            .map { memberProfileResponse: MemberProfileResponse ->
-                memberProfileResponse.toPresentation()
-            }
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> = memberDataSource.getMemberProfile(memberId)
 }

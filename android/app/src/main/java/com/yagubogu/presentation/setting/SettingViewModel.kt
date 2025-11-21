@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.AuthRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.ThirdPartyRepository
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,7 +98,7 @@ class SettingViewModel @Inject constructor(
         runCatching {
             // 1. Presigned URL 요청
             val presignedUrlItem: PresignedUrlItem =
-                memberRepository.getPresignedUrl(mimeType, size).getOrThrow()
+                memberRepository.getPresignedUrl(mimeType, size).getOrThrow().toUiModel()
 
             // 2. S3 업로드
             thirdPartyRepository
@@ -106,7 +107,10 @@ class SettingViewModel @Inject constructor(
 
             // 3. Complete API 호출 및 프로필 업데이트
             val completeItem: PresignedUrlCompleteItem =
-                memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
+                memberRepository
+                    .completeUploadProfileImage(presignedUrlItem.key)
+                    .getOrThrow()
+                    .toUiModel()
             _myMemberInfoItem.value =
                 myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
@@ -117,6 +121,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
+                .map { it.toUiModel() }
                 .onSuccess { memberInfoItem: MemberInfoItem ->
                     _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->

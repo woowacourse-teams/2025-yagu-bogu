@@ -14,6 +14,7 @@ import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.common.model.MemberProfile
@@ -399,7 +400,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
             val memberProfileResult: Result<MemberProfile> =
-                memberRepository.getMemberProfile(memberId)
+                memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
                     _profileInfoClickEvent.value = memberProfile

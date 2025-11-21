@@ -207,7 +207,7 @@ class HomeViewModel @Inject constructor(
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
             val memberProfileResult: Result<MemberProfile> =
-                memberRepository.getMemberProfile(memberId)
+                memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
                     _dialogEvent.emit(HomeDialogEvent.ProfileDialog(memberProfile))

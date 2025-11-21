@@ -1,8 +1,6 @@
 package com.yagubogu.data.dto.response.member
 
-import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,22 +20,4 @@ data class MemberProfileResponse(
     val victoryFairyProfile: VictoryFairyProfileDto, // 승리 요정 정보
     @SerialName("checkIn")
     val checkIn: MemberCheckInDto, // 직관 인증 정보
-) {
-    fun toPresentation(): MemberProfile =
-        MemberProfile(
-            nickname = nickname,
-            enterDate = enterDate.toJavaLocalDate(),
-            profileImageUrl = profileImageUrl,
-            favoriteTeam = favoriteTeam,
-            representativeBadgeImageUrl = representativeBadge?.imageUrl,
-            victoryFairyRanking = victoryFairyProfile.ranking,
-            victoryFairyScore = victoryFairyProfile.score,
-            victoryFairyRankingWithinTeam = victoryFairyProfile.rankWithinTeam,
-            checkInCounts = checkIn.counts,
-            checkInWinRate = checkIn.winRate,
-            winCounts = checkIn.winCounts,
-            drawCounts = checkIn.drawCounts,
-            loseCounts = checkIn.loseCounts,
-            recentCheckInDate = checkIn.recentCheckInDate?.toJavaLocalDate(),
-        )
-}
+)
