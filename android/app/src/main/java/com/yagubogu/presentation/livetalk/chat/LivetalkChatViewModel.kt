@@ -18,7 +18,8 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.ui.common.model.MemberProfile
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -264,8 +265,7 @@ class LivetalkChatViewModel(
         likeBatchingJob?.cancel()
 
         if (likeCountStateHolder.pendingLikeCount > 0) {
-            // TODO 추후 리팩터링에서 GlobalScope 제거하기
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 sendLikeBatch()
             }
         }
