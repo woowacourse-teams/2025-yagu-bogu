@@ -1,16 +1,18 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.domain.model.Coordinate
-import com.yagubogu.domain.model.Distance
+import com.yagubogu.data.dto.response.location.CoordinateDto
+import com.yagubogu.data.dto.response.location.DistanceDto
 
 interface LocationRepository {
     fun getCurrentCoordinate(
-        onSuccess: (Coordinate) -> Unit,
+        onSuccess: (CoordinateDto) -> Unit,
         onFailure: (Exception) -> Unit,
     )
 
     fun getDistanceInMeters(
-        coordinate: Coordinate,
-        targetCoordinate: Coordinate,
-    ): Distance
+        startLatitude: Double,
+        startLongitude: Double,
+        endLatitude: Double,
+        endLongitude: Double,
+    ): DistanceDto
 }

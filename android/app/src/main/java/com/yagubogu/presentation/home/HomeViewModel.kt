@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.location.CoordinateDto
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
@@ -23,6 +24,7 @@ import com.yagubogu.presentation.home.model.StadiumWithGame
 import com.yagubogu.presentation.home.model.StadiumsWithGames
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.mapper.toDomain
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
@@ -149,7 +151,8 @@ class HomeViewModel @Inject constructor(
     fun fetchCurrentLocationThenCheckIn() {
         _isCheckInLoading.value = true
         locationRepository.getCurrentCoordinate(
-            onSuccess = { currentCoordinate: Coordinate ->
+            onSuccess = { coordinateDto: CoordinateDto ->
+                val currentCoordinate: Coordinate = coordinateDto.toDomain()
                 checkIfWithinThresholdThenCheckIn(currentCoordinate)
                 _isCheckInLoading.value = false
             },
@@ -307,8 +310,16 @@ class HomeViewModel @Inject constructor(
         val (nearestStadium: StadiumWithGame, nearestDistance: Distance) =
             stadiums?.findNearestTo(
                 currentCoordinate,
-                locationRepository::getDistanceInMeters,
-            ) ?: return
+            ) { coordinate: Coordinate, targetCoordinate: Coordinate ->
+                locationRepository
+                    .getDistanceInMeters(
+                        coordinate.latitude.value,
+                        coordinate.longitude.value,
+                        targetCoordinate.latitude.value,
+                        targetCoordinate.longitude.value,
+                    ).toDomain()
+            }
+                ?: return
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
             _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
