@@ -1,10 +1,10 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.home.model.CheckInSseEvent
+import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import kotlinx.coroutines.flow.Flow
 
 interface StreamRepository {
-    fun connect(): Flow<CheckInSseEvent>
+    fun connect(): Flow<SseCheckInResponse>
 
     fun disconnect()
 }

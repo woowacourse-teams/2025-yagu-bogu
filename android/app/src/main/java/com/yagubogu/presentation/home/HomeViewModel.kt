@@ -34,6 +34,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -97,25 +98,28 @@ class HomeViewModel @Inject constructor(
 
     fun startStreaming() {
         viewModelScope.launch {
-            streamRepository.connect().collect { event: CheckInSseEvent ->
-                when (event) {
-                    is CheckInSseEvent.CheckInCreated -> {
-                        val newItems: List<StadiumFanRateItem> = event.items
-                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
-                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
+            streamRepository
+                .connect()
+                .map { it.toUiModel() }
+                .collect { event: CheckInSseEvent ->
+                    when (event) {
+                        is CheckInSseEvent.CheckInCreated -> {
+                            val newItems: List<StadiumFanRateItem> = event.items
+                            val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
+                            cachedStadiumFanRateItems.keys.retainAll(validKeys)
 
-                        newItems.forEach { item: StadiumFanRateItem ->
-                            cachedStadiumFanRateItems[item.gameId] = item
+                            newItems.forEach { item: StadiumFanRateItem ->
+                                cachedStadiumFanRateItems[item.gameId] = item
+                            }
+                            stadiumFanRateItems.value = newItems
                         }
-                        stadiumFanRateItems.value = newItems
-                    }
 
-                    CheckInSseEvent.Connect,
-                    CheckInSseEvent.Timeout,
-                    CheckInSseEvent.Unknown,
-                    -> Unit
+                        CheckInSseEvent.Connect,
+                        CheckInSseEvent.Timeout,
+                        CheckInSseEvent.Unknown,
+                        -> Unit
+                    }
                 }
-            }
         }
     }
 
