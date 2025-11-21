@@ -39,6 +39,7 @@ import com.yagubogu.presentation.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -48,9 +49,8 @@ class LoginActivity : AppCompatActivity() {
 
     private val viewModel: LoginViewModel by viewModels()
 
-    private val googleCredentialManager: GoogleCredentialManager by lazy {
-        GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
-    }
+    @Inject
+    lateinit var googleCredentialManager: GoogleCredentialManager
 
     private var shouldImmediateUpdate: Boolean = true
     private var isAppInitialized: Boolean = false

@@ -13,7 +13,6 @@ import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -26,7 +25,7 @@ import kotlinx.coroutines.withContext
  * @param nonce nonce string to use when generating a Google ID token
  */
 class GoogleCredentialManager(
-    @ActivityContext private val context: Context,
+    private val context: Context,
     serverClientId: String,
     nonce: String,
 ) {
