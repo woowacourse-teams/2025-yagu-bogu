@@ -1,9 +1,9 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.domain.model.LoginResult
+import com.yagubogu.data.dto.response.auth.LoginResultResponse
 
 interface AuthRepository {
-    suspend fun login(idToken: String): Result<LoginResult>
+    suspend fun login(idToken: String): Result<LoginResultResponse>
 
     suspend fun logout(): Result<Unit>
 }
