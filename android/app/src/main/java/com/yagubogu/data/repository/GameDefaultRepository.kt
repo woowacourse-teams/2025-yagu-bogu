@@ -3,18 +3,18 @@ package com.yagubogu.data.repository
 import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameResponse
+import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.domain.repository.GameRepository
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import java.time.LocalDate
 import javax.inject.Inject
 
 class GameDefaultRepository @Inject constructor(
     private val gameDataSource: GameDataSource,
 ) : GameRepository {
-    override suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>> =
+    override suspend fun getGames(date: LocalDate): Result<List<GameWithCheckInDto>> =
         gameDataSource.getGames(date).map { gameResponse: GameResponse ->
-            gameResponse.games.map { it.toPresentation() }
+            gameResponse.games
         }
 
     override suspend fun addLikeBatches(
