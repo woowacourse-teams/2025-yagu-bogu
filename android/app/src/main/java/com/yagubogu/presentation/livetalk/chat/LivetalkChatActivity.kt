@@ -237,7 +237,9 @@ class LivetalkChatActivity : AppCompatActivity() {
         val likeButton = binding.tvLikeButton
 
         likeButton.setOnClickListener {
-            viewModel.likeCountStateHolder.increaseMyTeamShowingCount()
+            lifecycleScope.launch {
+                viewModel.likeCountStateHolder.increaseMyTeamShowingCount()
+            }
             viewModel.addLikeToBatch()
             showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
         }

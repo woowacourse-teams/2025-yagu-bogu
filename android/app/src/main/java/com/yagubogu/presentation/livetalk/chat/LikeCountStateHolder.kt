@@ -38,49 +38,53 @@ class LikeCountStateHolder {
     private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
     val otherTeamLikeAnimationEvent: SingleLiveData<Long> get() = _otherTeamLikeAnimationEvent
 
-    fun updateLikeCount(
+    suspend fun updateLikeCount(
         livetalkTeams: LivetalkTeams,
         likeCountsResponse: LikeCountsResponse,
     ) {
-        // 서버에서 받아온 좋아요 수
-        val remoteMyTeamLikeCount: Long =
-            if (likeCountsResponse.counts.isEmpty()) {
-                0L
-            } else {
-                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.myTeam.name }?.totalCount
-                    ?: 0L
+        lock.withLock {
+            // 서버에서 받아온 좋아요 수
+            val remoteMyTeamLikeCount: Long =
+                if (likeCountsResponse.counts.isEmpty()) {
+                    0L
+                } else {
+                    likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.myTeam.name }?.totalCount
+                        ?: 0L
+                }
+            val remoteOtherTeamLikeCount: Long =
+                if (likeCountsResponse.counts.isEmpty()) {
+                    0L
+                } else {
+                    likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
+                        ?: 0L
+                }
+
+            if (myTeamLikeRealCount == 0L) {
+                myTeamLikeRealCount = remoteMyTeamLikeCount
+                _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
             }
-        val remoteOtherTeamLikeCount: Long =
-            if (likeCountsResponse.counts.isEmpty()) {
-                0L
-            } else {
-                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
-                    ?: 0L
+            if (otherTeamLikeRealCount == 0L) {
+                otherTeamLikeRealCount = remoteOtherTeamLikeCount
             }
 
-        if (myTeamLikeRealCount == 0L) {
-            myTeamLikeRealCount = remoteMyTeamLikeCount
-            _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
-        }
-        if (otherTeamLikeRealCount == 0L) {
-            otherTeamLikeRealCount = remoteOtherTeamLikeCount
-        }
-
-        // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
-        if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
-            val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
-            myTeamLikeRealCount = remoteMyTeamLikeCount
-            _myTeamLikeAnimationEvent.setValue(diffCount)
-        }
-        if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
-            val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
-            otherTeamLikeRealCount = remoteOtherTeamLikeCount
-            _otherTeamLikeAnimationEvent.setValue(diffCount)
+            // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
+            if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
+                val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
+                myTeamLikeRealCount = remoteMyTeamLikeCount
+                _myTeamLikeAnimationEvent.setValue(diffCount)
+            }
+            if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
+                val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
+                otherTeamLikeRealCount = remoteOtherTeamLikeCount
+                _otherTeamLikeAnimationEvent.setValue(diffCount)
+            }
         }
     }
 
-    fun increaseMyTeamShowingCount(addValue: Long = 1L) {
-        _myTeamLikeShowingCount.value = _myTeamLikeShowingCount.value?.plus(addValue)
+    suspend fun increaseMyTeamShowingCount(addValue: Long = 1L) {
+        lock.withLock {
+            _myTeamLikeShowingCount.value = _myTeamLikeShowingCount.value?.plus(addValue)
+        }
     }
 
     suspend fun increaseLikeCount() {

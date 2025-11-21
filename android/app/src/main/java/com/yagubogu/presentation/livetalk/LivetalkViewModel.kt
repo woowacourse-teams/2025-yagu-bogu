@@ -23,7 +23,7 @@ class LivetalkViewModel @Inject constructor(
         fetchGames()
     }
 
-    fun fetchGames(date: LocalDate = LocalDate.now()) {
+    fun fetchGames(date: LocalDate = LocalDate.of(2025, 10, 24)) {
         viewModelScope.launch {
             val gamesResult: Result<List<LivetalkStadiumItem>> = gameRepository.getGames(date)
             gamesResult
