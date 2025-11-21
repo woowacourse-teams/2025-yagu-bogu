@@ -6,7 +6,6 @@ import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 
 /**
@@ -32,7 +31,7 @@ class MemberFakeRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<Unit> {
+    override suspend fun updateFavoriteTeam(teamCode: String): Result<Unit> {
         TODO("Not yet implemented")
     }
 

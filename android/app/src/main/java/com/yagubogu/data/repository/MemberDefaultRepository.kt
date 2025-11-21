@@ -9,7 +9,6 @@ import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.MemberRepository
 import javax.inject.Inject
 
@@ -63,9 +62,9 @@ class MemberDefaultRepository @Inject constructor(
             }
     }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<Unit> =
+    override suspend fun updateFavoriteTeam(teamCode: String): Result<Unit> =
         memberDataSource
-            .updateFavoriteTeam(team)
+            .updateFavoriteTeam(teamCode)
             .map { memberFavoriteResponse: MemberFavoriteResponse ->
                 val newFavoriteTeam: String? = memberFavoriteResponse.favorite
                 cachedFavoriteTeam = newFavoriteTeam

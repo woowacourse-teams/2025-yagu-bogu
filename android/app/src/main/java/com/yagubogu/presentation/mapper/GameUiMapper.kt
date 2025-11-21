@@ -1,6 +1,8 @@
 package com.yagubogu.presentation.mapper
 
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto
+import com.yagubogu.data.dto.response.game.TeamByGameDto
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 
 fun GameWithCheckInDto.toUiModel(): LivetalkStadiumItem =
@@ -12,3 +14,5 @@ fun GameWithCheckInDto.toUiModel(): LivetalkStadiumItem =
         homeTeam = homeTeam.toDomain(),
         isVerified = isMyCheckIn,
     )
+
+fun TeamByGameDto.toDomain(): Team = Team.getByCode(code)

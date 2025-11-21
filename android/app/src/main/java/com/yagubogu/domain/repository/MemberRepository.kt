@@ -5,7 +5,6 @@ import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import com.yagubogu.domain.model.Team
 
 interface MemberRepository {
     suspend fun getMemberInfo(): Result<MemberInfoResponse>
@@ -16,7 +15,7 @@ interface MemberRepository {
 
     suspend fun getFavoriteTeam(): Result<String?>
 
-    suspend fun updateFavoriteTeam(team: Team): Result<Unit>
+    suspend fun updateFavoriteTeam(teamCode: String): Result<Unit>
 
     suspend fun deleteMember(): Result<Unit>
 

@@ -24,7 +24,7 @@ class FavoriteTeamViewModel @Inject constructor(
         viewModelScope.launch {
             selectedTeam?.let { team: Team ->
                 memberRepository
-                    .updateFavoriteTeam(team)
+                    .updateFavoriteTeam(team.name)
                     .onSuccess {
                         _favoriteTeamUpdateEvent.setValue(Unit)
                     }.onFailure { exception: Throwable ->

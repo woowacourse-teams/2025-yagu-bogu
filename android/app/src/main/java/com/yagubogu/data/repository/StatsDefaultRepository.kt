@@ -8,7 +8,6 @@ import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
-import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.repository.StatsRepository
 import javax.inject.Inject
 
@@ -42,6 +41,6 @@ class StatsDefaultRepository @Inject constructor(
 
     override suspend fun getVictoryFairyRankings(
         year: Int,
-        team: Team?,
-    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, team)
+        teamCode: String?,
+    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, teamCode)
 }

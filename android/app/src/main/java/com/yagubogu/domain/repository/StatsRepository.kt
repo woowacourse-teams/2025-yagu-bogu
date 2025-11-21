@@ -4,7 +4,6 @@ import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
 import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
-import com.yagubogu.domain.model.Team
 
 interface StatsRepository {
     suspend fun getStatsWinRate(year: Int): Result<Double>
@@ -19,6 +18,6 @@ interface StatsRepository {
 
     suspend fun getVictoryFairyRankings(
         year: Int,
-        team: Team?,
+        teamCode: String?,
     ): Result<VictoryFairyRankingResponse>
 }
