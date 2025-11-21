@@ -127,6 +127,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
+                .map { it.toUiModel() }
                 .onSuccess { stadiumsWithGames: StadiumsWithGames ->
                     if (stadiumsWithGames.isEmpty()) {
                         _checkInUiEvent.setValue(CheckInUiEvent.NoGame)
