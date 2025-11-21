@@ -1,10 +1,11 @@
 package com.yagubogu.data.repository
 
 import android.net.Uri
-import com.yagubogu.data.datasource.ThirdPartyDataSource
+import com.yagubogu.data.datasource.thirdparty.ThirdPartyDataSource
 import com.yagubogu.domain.repository.ThirdPartyRepository
+import javax.inject.Inject
 
-class ThirdPartyDefaultRepository(
+class ThirdPartyDefaultRepository @Inject constructor(
     private val thirdPartyDataSource: ThirdPartyDataSource,
 ) : ThirdPartyRepository {
     override suspend fun uploadImageToS3(

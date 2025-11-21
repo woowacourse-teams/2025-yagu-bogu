@@ -7,11 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.StatsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import javax.inject.Inject
 
-class StatsDetailViewModel(
+@HiltViewModel
+class StatsDetailViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
@@ -62,7 +65,8 @@ class StatsDetailViewModel(
                 checkInRepository.getStadiumCheckInCounts(year)
             stadiumVisitCountsResult
                 .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
-                    _stadiumVisitCounts.value = stadiumVisitCounts.sortedByDescending { it.visitCounts }
+                    _stadiumVisitCounts.value =
+                        stadiumVisitCounts.sortedByDescending { it.visitCounts }
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

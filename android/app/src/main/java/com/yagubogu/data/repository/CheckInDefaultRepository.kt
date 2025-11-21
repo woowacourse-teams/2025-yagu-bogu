@@ -12,8 +12,9 @@ import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.stats.detail.StadiumVisitCount
 import java.time.LocalDate
+import javax.inject.Inject
 
-class CheckInDefaultRepository(
+class CheckInDefaultRepository @Inject constructor(
     private val checkInDataSource: CheckInDataSource,
 ) : CheckInRepository {
     override suspend fun addCheckIn(gameId: Long): Result<Unit> = checkInDataSource.addCheckIn(gameId)

@@ -1,4 +1,4 @@
-package com.yagubogu.data.datasource
+package com.yagubogu.data.datasource.thirdparty
 
 import android.content.ContentResolver
 import android.net.Uri
@@ -10,12 +10,13 @@ import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
 import java.io.InputStream
+import javax.inject.Inject
 
-class ThirdPartyDataSource(
+class ThirdPartyRemoteDataSource @Inject constructor(
     private val thirdPartyApiService: ThirdPartyApiService,
     private val contentResolver: ContentResolver,
-) {
-    suspend fun uploadImageToS3(
+) : ThirdPartyDataSource {
+    override suspend fun uploadImageToS3(
         url: String,
         imageFileUri: Uri,
         contentType: String,

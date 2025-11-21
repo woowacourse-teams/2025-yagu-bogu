@@ -14,8 +14,9 @@ import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
 import com.yagubogu.domain.model.Team
+import javax.inject.Inject
 
-class MemberRemoteDataSource(
+class MemberRemoteDataSource @Inject constructor(
     private val memberApiService: MemberApiService,
 ) : MemberDataSource {
     override suspend fun getMemberInfo(): Result<MemberInfoResponse> =

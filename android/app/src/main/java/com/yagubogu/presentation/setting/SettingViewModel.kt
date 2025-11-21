@@ -10,10 +10,13 @@ import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.ThirdPartyRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class SettingViewModel(
+@HiltViewModel
+class SettingViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
@@ -104,7 +107,8 @@ class SettingViewModel(
             // 3. Complete API 호출 및 프로필 업데이트
             val completeItem: PresignedUrlCompleteItem =
                 memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
-            _myMemberInfoItem.value = myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
+            _myMemberInfoItem.value =
+                myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
             Timber.e(exception, "프로필 이미지 업로드 실패")
         }

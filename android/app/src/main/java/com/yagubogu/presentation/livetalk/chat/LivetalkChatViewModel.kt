@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
@@ -16,6 +17,9 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.common.model.MemberProfile
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -25,13 +29,21 @@ import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
 
-class LivetalkChatViewModel(
-    private val gameId: Long,
+class LivetalkChatViewModel @AssistedInject constructor(
+    @Assisted private val gameId: Long,
+    @Assisted private val isVerified: Boolean,
     private val talkRepository: TalkRepository,
     private val gameRepository: GameRepository,
     private val memberRepository: MemberRepository,
-    private val isVerified: Boolean,
 ) : ViewModel() {
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            gameId: Long,
+            isVerified: Boolean,
+        ): LivetalkChatViewModel
+    }
+
     private val _livetalkUiState =
         MutableLiveData<LivetalkUiState>(LivetalkUiState.Loading)
     val livetalkUiState: LiveData<LivetalkUiState> get() = _livetalkUiState
@@ -247,7 +259,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        if (cachedLivetalkTeams.myTeamType == null) {
+        if (!::cachedLivetalkTeams.isInitialized || cachedLivetalkTeams.myTeamType == null) {
             return
         }
 
@@ -305,7 +317,7 @@ class LivetalkChatViewModel(
                 count
             }
 
-        if (countToSend > 0 && cachedLivetalkTeams.myTeamType != null) {
+        if (countToSend > 0 && ::cachedLivetalkTeams.isInitialized && cachedLivetalkTeams.myTeamType != null) {
             Timber.d("보낸 수 countToSend: $countToSend")
             val result =
                 gameRepository.addLikeBatches(
@@ -420,5 +432,15 @@ class LivetalkChatViewModel(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
+
+        fun provideFactory(
+            assistedFactory: Factory,
+            gameId: Long,
+            isVerified: Boolean,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T = assistedFactory.create(gameId, isVerified) as T
+            }
     }
 }

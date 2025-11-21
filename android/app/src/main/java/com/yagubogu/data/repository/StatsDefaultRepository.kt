@@ -14,8 +14,9 @@ import com.yagubogu.domain.repository.StatsRepository
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.stats.detail.VsTeamStatItem
 import com.yagubogu.presentation.stats.my.AverageStats
+import javax.inject.Inject
 
-class StatsDefaultRepository(
+class StatsDefaultRepository @Inject constructor(
     private val statsDataSource: StatsDataSource,
 ) : StatsRepository {
     override suspend fun getStatsWinRate(year: Int): Result<Double> =

@@ -8,8 +8,9 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
+import javax.inject.Inject
 
-class LocationLocalDataSource(
+class LocationLocalDataSource @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
 ) : LocationDataSource {
     @SuppressLint("MissingPermission")

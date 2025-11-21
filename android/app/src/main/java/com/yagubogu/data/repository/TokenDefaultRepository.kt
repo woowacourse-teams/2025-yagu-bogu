@@ -3,8 +3,9 @@ package com.yagubogu.data.repository
 import com.yagubogu.data.datasource.token.TokenDataSource
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.repository.TokenRepository
+import javax.inject.Inject
 
-class TokenDefaultRepository(
+class TokenDefaultRepository @Inject constructor(
     private val tokenDataSource: TokenDataSource,
     private val tokenManager: TokenManager,
 ) : TokenRepository {

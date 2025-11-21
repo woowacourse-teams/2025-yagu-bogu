@@ -7,14 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StatsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class StatsMyViewModel(
+@HiltViewModel
+class StatsMyViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
@@ -68,7 +71,7 @@ class StatsMyViewModel(
                 _statsMyUiModel.value = statsMyUiModel
             } else {
                 val errors: List<String> =
-                    listOf(statsCountsResult, winRateResult, luckyStadiumResult)
+                    listOf(statsCountsResult, winRateResult, myTeamResult, luckyStadiumResult)
                         .filter { it.isFailure }
                         .mapNotNull { it.exceptionOrNull()?.message }
                 Timber.w("API 호출 실패: ${errors.joinToString()}")

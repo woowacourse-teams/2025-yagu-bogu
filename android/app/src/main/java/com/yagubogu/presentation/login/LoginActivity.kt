@@ -29,35 +29,32 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
-import com.yagubogu.data.auth.GoogleCredentialManager
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
+import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private val binding: ActivityLoginBinding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
+
+    private val viewModel: LoginViewModel by viewModels()
+
+    @Inject
+    lateinit var googleCredentialManager: GoogleCredentialManager
+
     private var shouldImmediateUpdate: Boolean = true
     private var isAppInitialized: Boolean = false
 
-    private val viewModel: LoginViewModel by viewModels {
-        val googleCredentialManager =
-            GoogleCredentialManager(this, BuildConfig.WEB_CLIENT_ID, "")
-        val app = application as YaguBoguApplication
-        LoginViewModelFactory(
-            app.tokenRepository,
-            app.authRepository,
-            app.memberRepository,
-            googleCredentialManager,
-        )
-    }
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     // 인앱 업데이트 요청 후 결과를 처리하기 위한 ActivityResultLauncher
@@ -78,7 +75,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         handleInAppUpdate(onSuccess = { handleAutoLogin() })
         setupView()
-        setupBindings()
+        setupObservers()
+        setupListeners()
     }
 
     private fun setupSplash() {
@@ -114,9 +112,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupBindings() {
-        binding.viewModel = viewModel
-
+    private fun setupObservers() {
         viewModel.loginResult.observe(this) { value: LoginResult ->
             when (value) {
                 LoginResult.SignUp -> {
@@ -137,6 +133,12 @@ class LoginActivity : AppCompatActivity() {
 
                 LoginResult.Cancel -> Unit
             }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.constraintBtnGoogle.setOnClickListener {
+            viewModel.signInWithGoogle(googleCredentialManager)
         }
     }
 

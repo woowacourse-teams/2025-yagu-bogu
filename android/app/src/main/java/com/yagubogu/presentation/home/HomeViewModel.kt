@@ -26,6 +26,7 @@ import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.common.model.MemberProfile
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,9 +36,11 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val checkInRepository: CheckInRepository,
     private val statsRepository: StatsRepository,

@@ -7,8 +7,9 @@ import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
 import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
+import javax.inject.Inject
 
-class TalkDefaultRepository(
+class TalkDefaultRepository @Inject constructor(
     private val talkDataSource: TalkDataSource,
 ) : TalkRepository {
     override suspend fun getBeforeTalks(

@@ -9,6 +9,7 @@ credentials = "1.5.0"
 datastorePreferences = "1.1.7"
 firebaseBom = "34.0.0"
 fragmentKtx = "1.8.8"
+hiltAndroid = "2.57.2"
 kotestAssertionsCore = "6.0.3"
 kotestRunnerJunit5 = "6.0.3"
 kotlin = "2.1.0"
@@ -43,6 +44,7 @@ googleOssLicenses = "0.10.7"
 activityCompose = "1.10.1"
 composeBom = "2025.08.01"
 lifecycleRuntimeKtx = "2.9.3"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -62,6 +64,8 @@ converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-k
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -108,5 +112,6 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 google-oss-licenses-plugin = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "googleOssLicenses" }
-org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }

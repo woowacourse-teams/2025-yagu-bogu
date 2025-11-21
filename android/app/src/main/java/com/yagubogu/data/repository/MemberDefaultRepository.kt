@@ -19,8 +19,9 @@ import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.common.model.MemberProfile
+import javax.inject.Inject
 
-class MemberDefaultRepository(
+class MemberDefaultRepository @Inject constructor(
     private val memberDataSource: MemberDataSource,
     private val tokenManager: TokenManager,
 ) : MemberRepository {

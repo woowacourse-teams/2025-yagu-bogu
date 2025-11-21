@@ -17,7 +17,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
@@ -27,24 +26,24 @@ import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileDialog
 import com.yagubogu.ui.common.model.MemberProfile
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
         ActivityLivetalkChatBinding.inflate(layoutInflater)
     }
 
+    @Inject
+    lateinit var viewModelFactory: LivetalkChatViewModel.Factory
+
     private val viewModel: LivetalkChatViewModel by viewModels {
-        val app = application as YaguBoguApplication
         val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
-        LivetalkChatViewModelFactory(
-            gameId,
-            app.talksRepository,
-            app.gamesRepository,
-            app.memberRepository,
-            intent.getBooleanExtra(KEY_IS_VERIFIED, false),
-        )
+        val isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        LivetalkChatViewModel.provideFactory(viewModelFactory, gameId, isVerified)
     }
 
     private var pendingDeleteMessageId: Long? = null
