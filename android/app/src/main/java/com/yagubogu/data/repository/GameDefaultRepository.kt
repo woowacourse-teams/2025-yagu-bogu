@@ -7,8 +7,9 @@ import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import java.time.LocalDate
+import javax.inject.Inject
 
-class GameDefaultRepository(
+class GameDefaultRepository @Inject constructor(
     private val gameDataSource: GameDataSource,
 ) : GameRepository {
     override suspend fun getGames(date: LocalDate): Result<List<LivetalkStadiumItem>> =

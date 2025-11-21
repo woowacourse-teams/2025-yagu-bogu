@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.oss.licenses.plugin)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -158,6 +160,10 @@ dependencies {
     // kotest
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
+
+    // hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)

@@ -14,22 +14,20 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentStatsMyBinding
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class StatsMyFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentStatsMyBinding? = null
     private val binding: FragmentStatsMyBinding get() = _binding!!
 
-    private val viewModel: StatsMyViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        StatsMyViewModelFactory(app.statsRepository, app.memberRepository)
-    }
+    private val viewModel: StatsMyViewModel by viewModels()
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 

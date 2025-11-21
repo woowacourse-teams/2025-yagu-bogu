@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import javax.inject.Inject
 
-class LivetalkViewModel(
+@HiltViewModel
+class LivetalkViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
     private val _livetalkStadiumItems = MutableLiveData<List<LivetalkStadiumItem>>()

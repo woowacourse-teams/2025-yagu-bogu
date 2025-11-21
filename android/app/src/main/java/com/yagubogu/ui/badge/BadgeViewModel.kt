@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class BadgeViewModel(
+@HiltViewModel
+class BadgeViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
     var badgeUiState = mutableStateOf<BadgeUiState>(BadgeUiState.Loading)

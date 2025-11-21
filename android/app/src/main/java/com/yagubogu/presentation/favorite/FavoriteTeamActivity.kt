@@ -7,20 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoriteTeamActivity : AppCompatActivity() {
     private val binding: ActivityFavoriteTeamBinding by lazy {
         ActivityFavoriteTeamBinding.inflate(layoutInflater)
     }
 
-    private val viewModel: FavoriteTeamViewModel by viewModels {
-        val app = application as YaguBoguApplication
-        FavoriteTeamViewModelFactory(app.memberRepository)
-    }
+    private val viewModel: FavoriteTeamViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -9,11 +9,14 @@ import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import javax.inject.Inject
 
-class AttendanceHistoryViewModel(
+@HiltViewModel
+class AttendanceHistoryViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
     private var items: List<AttendanceHistoryItem> = emptyList()

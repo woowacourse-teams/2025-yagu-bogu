@@ -5,8 +5,9 @@ import com.yagubogu.data.dto.request.auth.LogoutRequest
 import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.util.safeApiCall
+import javax.inject.Inject
 
-class AuthRemoteDataSource(
+class AuthRemoteDataSource @Inject constructor(
     private val authApiService: AuthApiService,
 ) : AuthDataSource {
     override suspend fun login(idToken: String): Result<LoginResponse> =

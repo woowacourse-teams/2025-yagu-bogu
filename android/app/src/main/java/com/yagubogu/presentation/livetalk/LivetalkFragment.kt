@@ -7,25 +7,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentLivetalkBinding
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 import com.yagubogu.presentation.util.ScrollToTop
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class LivetalkFragment :
     Fragment(),
     ScrollToTop {
     private var _binding: FragmentLivetalkBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: LivetalkViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        LivetalkViewModelFactory(app.gamesRepository)
-    }
+    private val viewModel: LivetalkViewModel by viewModels()
 
     private val livetalkStadiumAdapter by lazy {
         LivetalkStadiumAdapter(

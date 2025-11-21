@@ -3,6 +3,7 @@ package com.yagubogu.presentation.livetalk.chat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
@@ -18,6 +19,9 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.ui.common.model.MemberProfile
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,13 +35,21 @@ import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
 
-class LivetalkChatViewModel(
-    private val gameId: Long,
+class LivetalkChatViewModel @AssistedInject constructor(
+    @Assisted private val gameId: Long,
+    @Assisted private val isVerified: Boolean,
     private val talkRepository: TalkRepository,
     private val gameRepository: GameRepository,
     private val memberRepository: MemberRepository,
-    isVerified: Boolean,
 ) : ViewModel() {
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            gameId: Long,
+            isVerified: Boolean,
+        ): LivetalkChatViewModel
+    }
+
     val messageStateHolder = MessageStateHolder(isVerified)
     val likeCountStateHolder = LikeCountStateHolder()
 
@@ -172,7 +184,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        if (cachedLivetalkTeams.myTeamType == null) {
+        if (!::cachedLivetalkTeams.isInitialized || cachedLivetalkTeams.myTeamType == null) {
             return
         }
 
@@ -197,7 +209,7 @@ class LivetalkChatViewModel(
                     ),
             )
 
-        if (countToSend > 0 && cachedLivetalkTeams.myTeamType != null) {
+        if (countToSend > 0 && ::cachedLivetalkTeams.isInitialized && cachedLivetalkTeams.myTeamType != null) {
             gameRepository
                 .addLikeBatches(gameId, request)
                 .onSuccess {
@@ -277,5 +289,15 @@ class LivetalkChatViewModel(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
+
+        fun provideFactory(
+            assistedFactory: Factory,
+            gameId: Long,
+            isVerified: Boolean,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T = assistedFactory.create(gameId, isVerified) as T
+            }
     }
 }

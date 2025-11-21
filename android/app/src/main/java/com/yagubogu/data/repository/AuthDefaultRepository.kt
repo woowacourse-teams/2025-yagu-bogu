@@ -5,8 +5,9 @@ import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.domain.repository.AuthRepository
+import javax.inject.Inject
 
-class AuthDefaultRepository(
+class AuthDefaultRepository @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val tokenManager: TokenManager,
 ) : AuthRepository {

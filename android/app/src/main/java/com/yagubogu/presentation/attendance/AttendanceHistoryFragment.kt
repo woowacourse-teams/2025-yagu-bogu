@@ -13,14 +13,15 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
 import com.yagubogu.presentation.util.ScrollToTop
+import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
+@AndroidEntryPoint
 class AttendanceHistoryFragment :
     Fragment(),
     AttendanceHistorySummaryViewHolder.Handler,
@@ -29,10 +30,7 @@ class AttendanceHistoryFragment :
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
 
-    private val viewModel: AttendanceHistoryViewModel by viewModels {
-        val app = requireActivity().application as YaguBoguApplication
-        AttendanceHistoryViewModelFactory(app.checkInsRepository)
-    }
+    private val viewModel: AttendanceHistoryViewModel by viewModels()
 
     private val attendanceHistoryAdapter by lazy {
         AttendanceHistoryAdapter(
