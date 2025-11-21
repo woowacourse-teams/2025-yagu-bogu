@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.talk
 
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse

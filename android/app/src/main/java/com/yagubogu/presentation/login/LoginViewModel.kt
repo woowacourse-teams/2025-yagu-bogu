@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
-import com.yagubogu.domain.repository.AuthRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.TokenRepository
+import com.yagubogu.data.repository.auth.AuthRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.token.TokenRepository
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.presentation.login.auth.GoogleCredentialResult
 import com.yagubogu.presentation.login.model.LoginResult

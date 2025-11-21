@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.stream
 
 import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import kotlinx.coroutines.flow.Flow

@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.member.BadgeResponse
-import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel

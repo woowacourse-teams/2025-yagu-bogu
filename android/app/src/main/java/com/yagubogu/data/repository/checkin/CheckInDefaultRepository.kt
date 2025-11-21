@@ -1,4 +1,4 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.checkin
 
 import com.yagubogu.data.datasource.checkin.CheckInDataSource
 import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
@@ -9,7 +9,6 @@ import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountDto
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
-import com.yagubogu.domain.repository.CheckInRepository
 import java.time.LocalDate
 import javax.inject.Inject
 

@@ -6,7 +6,7 @@ import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import com.yagubogu.domain.repository.MemberRepository
+import com.yagubogu.data.repository.member.MemberRepository
 
 /**
  * @param isFailureMode `true`면 Result.failure를 반환

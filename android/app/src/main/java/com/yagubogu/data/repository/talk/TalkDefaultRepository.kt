@@ -1,10 +1,9 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.talk
 
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
-import com.yagubogu.domain.repository.TalkRepository
 import javax.inject.Inject
 
 class TalkDefaultRepository @Inject constructor(

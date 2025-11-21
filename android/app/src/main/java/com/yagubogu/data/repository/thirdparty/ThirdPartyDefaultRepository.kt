@@ -1,8 +1,7 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.thirdparty
 
 import android.net.Uri
 import com.yagubogu.data.datasource.thirdparty.ThirdPartyDataSource
-import com.yagubogu.domain.repository.ThirdPartyRepository
 import javax.inject.Inject
 
 class ThirdPartyDefaultRepository @Inject constructor(

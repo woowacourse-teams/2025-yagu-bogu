@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.game
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto

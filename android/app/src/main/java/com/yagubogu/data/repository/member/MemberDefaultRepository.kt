@@ -1,4 +1,4 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.member
 
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.dto.response.member.BadgeResponse
@@ -9,7 +9,6 @@ import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.network.TokenManager
-import com.yagubogu.domain.repository.MemberRepository
 import javax.inject.Inject
 
 class MemberDefaultRepository @Inject constructor(

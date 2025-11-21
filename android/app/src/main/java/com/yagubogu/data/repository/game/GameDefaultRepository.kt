@@ -1,11 +1,10 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.game
 
 import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
-import com.yagubogu.domain.repository.GameRepository
 import java.time.LocalDate
 import javax.inject.Inject
 

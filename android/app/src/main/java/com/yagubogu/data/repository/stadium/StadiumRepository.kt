@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.stadium
 
 import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import java.time.LocalDate

@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.auth
 
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
 

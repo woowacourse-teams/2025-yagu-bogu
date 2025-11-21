@@ -1,4 +1,4 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.stats
 
 import com.yagubogu.data.datasource.stats.StatsDataSource
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
@@ -8,7 +8,6 @@ import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
-import com.yagubogu.domain.repository.StatsRepository
 import javax.inject.Inject
 
 class StatsDefaultRepository @Inject constructor(

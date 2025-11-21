@@ -1,9 +1,8 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.location
 
 import com.yagubogu.data.datasource.location.LocationDataSource
 import com.yagubogu.data.dto.response.location.CoordinateDto
 import com.yagubogu.data.dto.response.location.DistanceDto
-import com.yagubogu.domain.repository.LocationRepository
 import javax.inject.Inject
 
 class LocationDefaultRepository @Inject constructor(

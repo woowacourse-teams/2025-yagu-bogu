@@ -1,8 +1,7 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.stadium
 
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
-import com.yagubogu.domain.repository.StadiumRepository
 import java.time.LocalDate
 import javax.inject.Inject
 

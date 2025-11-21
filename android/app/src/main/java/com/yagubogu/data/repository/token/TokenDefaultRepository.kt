@@ -1,8 +1,7 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.token
 
 import com.yagubogu.data.datasource.token.TokenDataSource
 import com.yagubogu.data.network.TokenManager
-import com.yagubogu.domain.repository.TokenRepository
 import javax.inject.Inject
 
 class TokenDefaultRepository @Inject constructor(

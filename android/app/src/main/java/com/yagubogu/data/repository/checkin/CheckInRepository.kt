@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.checkin
 
 import com.yagubogu.data.dto.response.checkin.CheckInGameDto
 import com.yagubogu.data.dto.response.checkin.FanRateByGameDto

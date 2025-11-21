@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.location
 
 import com.yagubogu.data.dto.response.location.CoordinateDto
 import com.yagubogu.data.dto.response.location.DistanceDto

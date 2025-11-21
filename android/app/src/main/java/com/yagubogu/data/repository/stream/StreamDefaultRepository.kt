@@ -1,8 +1,7 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.stream
 
 import com.yagubogu.data.datasource.stream.StreamDataSource
 import com.yagubogu.data.dto.response.stream.SseCheckInResponse
-import com.yagubogu.domain.repository.StreamRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -9,10 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.repository.GameRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData

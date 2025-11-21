@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred

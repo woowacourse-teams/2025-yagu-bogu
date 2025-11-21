@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.repository.AuthRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.ThirdPartyRepository
+import com.yagubogu.data.repository.auth.AuthRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData

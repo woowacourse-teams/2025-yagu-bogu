@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.repository.GameRepository
+import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList

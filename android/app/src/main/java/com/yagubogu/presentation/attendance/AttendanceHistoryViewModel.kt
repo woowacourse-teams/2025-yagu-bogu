@@ -5,7 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.repository.CheckInRepository
+import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder

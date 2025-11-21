@@ -1,10 +1,9 @@
-package com.yagubogu.data.repository
+package com.yagubogu.data.repository.auth
 
 import com.yagubogu.data.datasource.auth.AuthDataSource
 import com.yagubogu.data.dto.response.auth.LoginResponse
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
 import com.yagubogu.data.network.TokenManager
-import com.yagubogu.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class AuthDefaultRepository @Inject constructor(

@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
-import com.yagubogu.domain.repository.CheckInRepository
-import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.data.repository.checkin.CheckInRepository
+import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
 import com.yagubogu.presentation.util.mapListIndexed

@@ -1,4 +1,4 @@
-package com.yagubogu.domain.repository
+package com.yagubogu.data.repository.member
 
 import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
