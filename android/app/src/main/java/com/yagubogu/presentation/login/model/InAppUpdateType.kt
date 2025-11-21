@@ -1,7 +1,5 @@
 package com.yagubogu.presentation.login.model
 
-import com.yagubogu.presentation.login.model.VersionInfo
-
 enum class InAppUpdateType {
     IMMEDIATE, // 업데이트 강제
     FLEXIBLE, // 업데이트 권장
