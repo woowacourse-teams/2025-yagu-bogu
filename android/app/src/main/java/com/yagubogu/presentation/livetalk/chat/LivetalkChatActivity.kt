@@ -170,7 +170,6 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
-        viewModel.messageStateHolder
         viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(
             this,
             ::handleLiveTalkChatBubbleItem,
@@ -304,10 +303,6 @@ class LivetalkChatActivity : AppCompatActivity() {
                     R.string.livetalk_report_succeed,
                     R.id.divider,
                 )
-        }
-
-        viewModel.messageStateHolder.livetalkDeleteEvent.observe(this) {
-            binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
     }
 
