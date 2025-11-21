@@ -4,9 +4,9 @@ import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.domain.repository.TalkRepository
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 
 class TalkDefaultRepository(
     private val talkDataSource: TalkDataSource,

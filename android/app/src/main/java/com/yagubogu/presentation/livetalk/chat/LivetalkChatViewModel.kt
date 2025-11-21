@@ -12,7 +12,11 @@ import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.repository.GameRepository
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.TalkRepository
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job

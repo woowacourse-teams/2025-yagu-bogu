@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.talk
 
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

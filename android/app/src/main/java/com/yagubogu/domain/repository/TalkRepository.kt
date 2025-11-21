@@ -1,8 +1,8 @@
 package com.yagubogu.domain.repository
 
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 
 interface TalkRepository {
     suspend fun getBeforeTalks(

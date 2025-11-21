@@ -25,7 +25,10 @@ import com.yagubogu.databinding.ActivityLivetalkChatBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileDialog

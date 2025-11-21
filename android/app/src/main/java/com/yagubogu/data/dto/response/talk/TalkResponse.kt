@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.talk
 
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime

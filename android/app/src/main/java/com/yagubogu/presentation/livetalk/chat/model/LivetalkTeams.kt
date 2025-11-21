@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.presentation.livetalk.chat.model
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.util.getEmoji
@@ -10,9 +10,9 @@ class LivetalkTeams(
     awayTeamCode: String,
     myTeamCode: String,
 ) {
-    val homeTeam: Team = Team.Companion.getByCode(homeTeamCode)
-    val awayTeam: Team = Team.Companion.getByCode(awayTeamCode)
-    val myTeam: Team = Team.Companion.getByCode(myTeamCode)
+    val homeTeam: Team = Team.getByCode(homeTeamCode)
+    val awayTeam: Team = Team.getByCode(awayTeamCode)
+    val myTeam: Team = Team.getByCode(myTeamCode)
     val myTeamEmoji: String = myTeam.getEmoji()
     val myTeamType: HomeAwayType? =
         when (myTeam) {
