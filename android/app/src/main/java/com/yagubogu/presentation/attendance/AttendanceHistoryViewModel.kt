@@ -9,6 +9,8 @@ import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.mapper.toUiModel
+import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,6 +46,7 @@ class AttendanceHistoryViewModel @Inject constructor(
 
             checkInRepository
                 .getCheckInHistories(year, filter.name, order.name)
+                .mapList { it.toUiModel() }
                 .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
                     items = attendanceHistoryItems
                     _detailItemPosition.value = FIRST_INDEX

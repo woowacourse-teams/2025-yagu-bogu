@@ -23,8 +23,10 @@ import com.yagubogu.presentation.home.model.StadiumWithGame
 import com.yagubogu.presentation.home.model.StadiumsWithGames
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.presentation.util.mapList
 import com.yagubogu.ui.common.model.MemberProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
@@ -253,7 +255,7 @@ class HomeViewModel @Inject constructor(
     private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
-                checkInRepository.getStadiumFanRates(date)
+                checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
                     cachedStadiumFanRateItems.clear()

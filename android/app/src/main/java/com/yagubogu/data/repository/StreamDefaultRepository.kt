@@ -5,6 +5,7 @@ import com.yagubogu.data.dto.response.stream.SseCheckInResponse
 import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.mapper.toUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class StreamDefaultRepository @Inject constructor(
             when (sseResponse) {
                 is SseCheckInResponse.CheckInCreated -> {
                     val items: List<StadiumFanRateItem> =
-                        sseResponse.items.map { it.toPresentation() }
+                        sseResponse.items.map { it.toUiModel() }
                     CheckInSseEvent.CheckInCreated(items)
                 }
 

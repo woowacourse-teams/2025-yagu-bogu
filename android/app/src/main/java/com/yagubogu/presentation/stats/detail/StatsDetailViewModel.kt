@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.presentation.mapper.toUiModel
+import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -62,7 +64,7 @@ class StatsDetailViewModel @Inject constructor(
     private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
-                checkInRepository.getStadiumCheckInCounts(year)
+                checkInRepository.getStadiumCheckInCounts(year).mapList { it.toUiModel() }
             stadiumVisitCountsResult
                 .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
                     _stadiumVisitCounts.value =
