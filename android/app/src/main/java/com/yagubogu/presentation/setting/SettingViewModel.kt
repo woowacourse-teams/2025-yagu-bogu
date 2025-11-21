@@ -16,114 +16,112 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingViewModel
-    @Inject
-    constructor(
-        private val memberRepository: MemberRepository,
-        private val authRepository: AuthRepository,
-        private val thirdPartyRepository: ThirdPartyRepository,
-    ) : ViewModel() {
-        private val _settingTitle = MutableLiveData<String>()
-        val settingTitle: LiveData<String> get() = _settingTitle
+class SettingViewModel @Inject constructor(
+    private val memberRepository: MemberRepository,
+    private val authRepository: AuthRepository,
+    private val thirdPartyRepository: ThirdPartyRepository,
+) : ViewModel() {
+    private val _settingTitle = MutableLiveData<String>()
+    val settingTitle: LiveData<String> get() = _settingTitle
 
-        private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
-        val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
+    private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
+    val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
 
-        private val _nicknameEditedEvent = MutableSingleLiveData<String>()
-        val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
+    private val _nicknameEditedEvent = MutableSingleLiveData<String>()
+    val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
 
-        private val _logoutEvent = MutableSingleLiveData<Unit>()
-        val logoutEvent: SingleLiveData<Unit> get() = _logoutEvent
+    private val _logoutEvent = MutableSingleLiveData<Unit>()
+    val logoutEvent: SingleLiveData<Unit> get() = _logoutEvent
 
-        private val _deleteAccountEvent = MutableSingleLiveData<Unit>()
-        val deleteAccountEvent: SingleLiveData<Unit> get() = _deleteAccountEvent
+    private val _deleteAccountEvent = MutableSingleLiveData<Unit>()
+    val deleteAccountEvent: SingleLiveData<Unit> get() = _deleteAccountEvent
 
-        private val _deleteAccountCancelEvent = MutableSingleLiveData<Unit>()
-        val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
+    private val _deleteAccountCancelEvent = MutableSingleLiveData<Unit>()
+    val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
 
-        init {
-            fetchMemberInfo()
-        }
+    init {
+        fetchMemberInfo()
+    }
 
-        fun setSettingTitle(title: String) {
-            _settingTitle.value = title
-        }
+    fun setSettingTitle(title: String) {
+        _settingTitle.value = title
+    }
 
-        fun updateNickname(newNickname: String) {
-            viewModelScope.launch {
-                memberRepository
-                    .updateNickname(newNickname)
-                    .onSuccess {
-                        _myMemberInfoItem.value = myMemberInfoItem.value?.copy(nickName = newNickname)
-                        _nicknameEditedEvent.setValue(newNickname)
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "닉네임 변경 API 호출 실패")
-                    }
-            }
-        }
-
-        fun logout() {
-            viewModelScope.launch {
-                authRepository
-                    .logout()
-                    .onSuccess {
-                        memberRepository.invalidateCache()
-                        _logoutEvent.setValue(Unit)
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "로그아웃 API 호출 실패")
-                    }
-            }
-        }
-
-        fun deleteAccount() {
-            viewModelScope.launch {
-                memberRepository
-                    .deleteMember()
-                    .onSuccess {
-                        _deleteAccountEvent.setValue(Unit)
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "계정 삭제 API 호출 실패")
-                    }
-            }
-        }
-
-        fun cancelDeleteAccount() {
-            _deleteAccountCancelEvent.setValue(Unit)
-        }
-
-        suspend fun uploadProfileImage(
-            imageUri: Uri,
-            mimeType: String,
-            size: Long,
-        ): Result<Unit> =
-            runCatching {
-                // 1. Presigned URL 요청
-                val presignedUrlItem: PresignedUrlItem =
-                    memberRepository.getPresignedUrl(mimeType, size).getOrThrow()
-
-                // 2. S3 업로드
-                thirdPartyRepository
-                    .uploadImageToS3(presignedUrlItem.url, imageUri, mimeType, size)
-                    .getOrThrow()
-
-                // 3. Complete API 호출 및 프로필 업데이트
-                val completeItem: PresignedUrlCompleteItem =
-                    memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
-                _myMemberInfoItem.value =
-                    myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
-            }.onFailure { exception: Throwable ->
-                Timber.e(exception, "프로필 이미지 업로드 실패")
-            }
-
-        private fun fetchMemberInfo() {
-            viewModelScope.launch {
-                memberRepository
-                    .getMemberInfo()
-                    .onSuccess { memberInfoItem: MemberInfoItem ->
-                        _myMemberInfoItem.value = memberInfoItem
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "회원 정보 조회 API 호출 실패")
-                    }
-            }
+    fun updateNickname(newNickname: String) {
+        viewModelScope.launch {
+            memberRepository
+                .updateNickname(newNickname)
+                .onSuccess {
+                    _myMemberInfoItem.value = myMemberInfoItem.value?.copy(nickName = newNickname)
+                    _nicknameEditedEvent.setValue(newNickname)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "닉네임 변경 API 호출 실패")
+                }
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository
+                .logout()
+                .onSuccess {
+                    memberRepository.invalidateCache()
+                    _logoutEvent.setValue(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "로그아웃 API 호출 실패")
+                }
+        }
+    }
+
+    fun deleteAccount() {
+        viewModelScope.launch {
+            memberRepository
+                .deleteMember()
+                .onSuccess {
+                    _deleteAccountEvent.setValue(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "계정 삭제 API 호출 실패")
+                }
+        }
+    }
+
+    fun cancelDeleteAccount() {
+        _deleteAccountCancelEvent.setValue(Unit)
+    }
+
+    suspend fun uploadProfileImage(
+        imageUri: Uri,
+        mimeType: String,
+        size: Long,
+    ): Result<Unit> =
+        runCatching {
+            // 1. Presigned URL 요청
+            val presignedUrlItem: PresignedUrlItem =
+                memberRepository.getPresignedUrl(mimeType, size).getOrThrow()
+
+            // 2. S3 업로드
+            thirdPartyRepository
+                .uploadImageToS3(presignedUrlItem.url, imageUri, mimeType, size)
+                .getOrThrow()
+
+            // 3. Complete API 호출 및 프로필 업데이트
+            val completeItem: PresignedUrlCompleteItem =
+                memberRepository.completeUploadProfileImage(presignedUrlItem.key).getOrThrow()
+            _myMemberInfoItem.value =
+                myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
+        }.onFailure { exception: Throwable ->
+            Timber.e(exception, "프로필 이미지 업로드 실패")
+        }
+
+    private fun fetchMemberInfo() {
+        viewModelScope.launch {
+            memberRepository
+                .getMemberInfo()
+                .onSuccess { memberInfoItem: MemberInfoItem ->
+                    _myMemberInfoItem.value = memberInfoItem
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "회원 정보 조회 API 호출 실패")
+                }
+        }
+    }
+}

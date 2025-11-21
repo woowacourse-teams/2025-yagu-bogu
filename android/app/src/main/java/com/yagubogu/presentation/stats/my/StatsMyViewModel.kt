@@ -22,93 +22,91 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @HiltViewModel
-class StatsMyViewModel
-    @Inject
-    constructor(
-        private val statsRepository: StatsRepository,
-        private val memberRepository: MemberRepository,
-    ) : ViewModel() {
-        private val _scrollToTopEvent =
-            MutableSharedFlow<Unit>(
-                replay = 0,
-                extraBufferCapacity = 1,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            )
-        val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+class StatsMyViewModel @Inject constructor(
+    private val statsRepository: StatsRepository,
+    private val memberRepository: MemberRepository,
+) : ViewModel() {
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
 
-        private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
-        val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
+    private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
+    val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
 
-        private val _averageStats = MutableStateFlow(AverageStats())
-        val averageStats: StateFlow<AverageStats> = _averageStats.asStateFlow()
+    private val _averageStats = MutableStateFlow(AverageStats())
+    val averageStats: StateFlow<AverageStats> = _averageStats.asStateFlow()
 
-        init {
-            fetchAll()
+    init {
+        fetchAll()
+    }
+
+    fun fetchAll() {
+        fetchMyStats()
+        fetchMyAverageStats()
+    }
+
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
         }
+    }
 
-        fun fetchAll() {
-            fetchMyStats()
-            fetchMyAverageStats()
-        }
+    private fun fetchMyStats(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val statsCountsDeferred: Deferred<Result<StatsCounts>> =
+                async { statsRepository.getStatsCounts(year) }
+            val winRateDeferred: Deferred<Result<Double>> =
+                async { statsRepository.getStatsWinRate(year) }
+            val myTeamDeferred: Deferred<Result<String?>> =
+                async { memberRepository.getFavoriteTeam() }
+            val luckyStadiumDeferred: Deferred<Result<String?>> =
+                async { statsRepository.getLuckyStadiums(year) }
 
-        fun scrollToTop() {
-            viewModelScope.launch {
-                _scrollToTopEvent.emit(Unit)
-            }
-        }
+            val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
+            val winRateResult: Result<Double> = winRateDeferred.await()
+            val myTeamResult: Result<String?> = myTeamDeferred.await()
+            val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
 
-        private fun fetchMyStats(year: Int = LocalDate.now().year) {
-            viewModelScope.launch {
-                val statsCountsDeferred: Deferred<Result<StatsCounts>> =
-                    async { statsRepository.getStatsCounts(year) }
-                val winRateDeferred: Deferred<Result<Double>> =
-                    async { statsRepository.getStatsWinRate(year) }
-                val myTeamDeferred: Deferred<Result<String?>> =
-                    async { memberRepository.getFavoriteTeam() }
-                val luckyStadiumDeferred: Deferred<Result<String?>> =
-                    async { statsRepository.getLuckyStadiums(year) }
+            if (statsCountsResult.isSuccess && winRateResult.isSuccess && myTeamResult.isSuccess && luckyStadiumResult.isSuccess) {
+                val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
+                val winRate: Double = winRateResult.getOrThrow()
+                val myTeam: String? = myTeamResult.getOrThrow()
+                val luckyStadium: String? = luckyStadiumResult.getOrThrow()
 
-                val statsCountsResult: Result<StatsCounts> = statsCountsDeferred.await()
-                val winRateResult: Result<Double> = winRateDeferred.await()
-                val myTeamResult: Result<String?> = myTeamDeferred.await()
-                val luckyStadiumResult: Result<String?> = luckyStadiumDeferred.await()
-
-                if (statsCountsResult.isSuccess && winRateResult.isSuccess && myTeamResult.isSuccess && luckyStadiumResult.isSuccess) {
-                    val statsCounts: StatsCounts = statsCountsResult.getOrThrow()
-                    val winRate: Double = winRateResult.getOrThrow()
-                    val myTeam: String? = myTeamResult.getOrThrow()
-                    val luckyStadium: String? = luckyStadiumResult.getOrThrow()
-
-                    val statsMyUiModel =
-                        StatsMyUiModel(
-                            winCount = statsCounts.winCounts,
-                            drawCount = statsCounts.drawCounts,
-                            loseCount = statsCounts.loseCounts,
-                            totalCount = statsCounts.favoriteCheckInCounts,
-                            winningPercentage = winRate.roundToInt(),
-                            myTeam = myTeam,
-                            luckyStadium = luckyStadium,
-                        )
-                    _statsMyUiModel.value = statsMyUiModel
-                } else {
-                    val errors: List<String> =
-                        listOf(statsCountsResult, winRateResult, luckyStadiumResult)
-                            .filter { it.isFailure }
-                            .mapNotNull { it.exceptionOrNull()?.message }
-                    Timber.w("API 호출 실패: ${errors.joinToString()}")
-                }
-            }
-        }
-
-        private fun fetchMyAverageStats() {
-            viewModelScope.launch {
-                val averageStatsResult: Result<AverageStats> = statsRepository.getAverageStats()
-                averageStatsResult
-                    .onSuccess { averageStats: AverageStats ->
-                        _averageStats.value = averageStats
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "API 호출 실패")
-                    }
+                val statsMyUiModel =
+                    StatsMyUiModel(
+                        winCount = statsCounts.winCounts,
+                        drawCount = statsCounts.drawCounts,
+                        loseCount = statsCounts.loseCounts,
+                        totalCount = statsCounts.favoriteCheckInCounts,
+                        winningPercentage = winRate.roundToInt(),
+                        myTeam = myTeam,
+                        luckyStadium = luckyStadium,
+                    )
+                _statsMyUiModel.value = statsMyUiModel
+            } else {
+                val errors: List<String> =
+                    listOf(statsCountsResult, winRateResult, myTeamResult, luckyStadiumResult)
+                        .filter { it.isFailure }
+                        .mapNotNull { it.exceptionOrNull()?.message }
+                Timber.w("API 호출 실패: ${errors.joinToString()}")
             }
         }
     }
+
+    private fun fetchMyAverageStats() {
+        viewModelScope.launch {
+            val averageStatsResult: Result<AverageStats> = statsRepository.getAverageStats()
+            averageStatsResult
+                .onSuccess { averageStats: AverageStats ->
+                    _averageStats.value = averageStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+}

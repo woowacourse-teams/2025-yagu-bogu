@@ -29,7 +29,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val MEDIA_TYPE = "application/json; charset=UTF8"
+    private const val MEDIA_TYPE = "application/json; charset=UTF-8"
 
     @Provides
     @Singleton

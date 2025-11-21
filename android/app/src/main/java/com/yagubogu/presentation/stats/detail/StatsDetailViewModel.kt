@@ -21,86 +21,84 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class StatsDetailViewModel
-    @Inject
-    constructor(
-        private val statsRepository: StatsRepository,
-        private val checkInRepository: CheckInRepository,
-    ) : ViewModel() {
-        private val _scrollToTopEvent =
-            MutableSharedFlow<Unit>(
-                replay = 0,
-                extraBufferCapacity = 1,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            )
-        val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+class StatsDetailViewModel @Inject constructor(
+    private val statsRepository: StatsRepository,
+    private val checkInRepository: CheckInRepository,
+) : ViewModel() {
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
 
-        private val _isVsTeamStatsExpanded = MutableStateFlow(false)
-        val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
+    private val _isVsTeamStatsExpanded = MutableStateFlow(false)
+    val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
 
-        private val _stadiumVisitCounts = MutableStateFlow<List<StadiumVisitCount>>(emptyList())
-        val stadiumVisitCounts: StateFlow<List<StadiumVisitCount>> = _stadiumVisitCounts.asStateFlow()
+    private val _stadiumVisitCounts = MutableStateFlow<List<StadiumVisitCount>>(emptyList())
+    val stadiumVisitCounts: StateFlow<List<StadiumVisitCount>> = _stadiumVisitCounts.asStateFlow()
 
-        private val _vsTeamStatItems = MutableStateFlow<List<VsTeamStatItem>>(emptyList())
-        val vsTeamStatItems: StateFlow<List<VsTeamStatItem>> =
-            combine(
-                isVsTeamStatsExpanded,
-                _vsTeamStatItems,
-            ) { isExpanded: Boolean, vsTeamStats: List<VsTeamStatItem> ->
-                if (!isExpanded) vsTeamStats.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStats
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList(),
-            )
+    private val _vsTeamStatItems = MutableStateFlow<List<VsTeamStatItem>>(emptyList())
+    val vsTeamStatItems: StateFlow<List<VsTeamStatItem>> =
+        combine(
+            isVsTeamStatsExpanded,
+            _vsTeamStatItems,
+        ) { isExpanded: Boolean, vsTeamStats: List<VsTeamStatItem> ->
+            if (!isExpanded) vsTeamStats.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStats
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
 
-        init {
-            fetchAll()
-        }
+    init {
+        fetchAll()
+    }
 
-        fun fetchAll() {
-            fetchVsTeamStats()
-            fetchStadiumVisitCounts()
-        }
+    fun fetchAll() {
+        fetchVsTeamStats()
+        fetchStadiumVisitCounts()
+    }
 
-        fun scrollToTop() {
-            viewModelScope.launch {
-                _scrollToTopEvent.emit(Unit)
-            }
-        }
-
-        fun toggleVsTeamStats() {
-            _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
-        }
-
-        private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
-            viewModelScope.launch {
-                val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
-                    statsRepository.getVsTeamStats(year)
-                vsTeamStatsResult
-                    .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
-                        _vsTeamStatItems.value = updatedVsTeamStats
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "API 호출 실패")
-                    }
-            }
-        }
-
-        private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
-            viewModelScope.launch {
-                val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
-                    checkInRepository.getStadiumCheckInCounts(year)
-                stadiumVisitCountsResult
-                    .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
-                        _stadiumVisitCounts.value =
-                            stadiumVisitCounts.sortedByDescending { it.visitCounts }
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "API 호출 실패")
-                    }
-            }
-        }
-
-        companion object {
-            private const val DEFAULT_TEAM_STATS_COUNT = 5
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
         }
     }
+
+    fun toggleVsTeamStats() {
+        _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
+    }
+
+    private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
+                statsRepository.getVsTeamStats(year)
+            vsTeamStatsResult
+                .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
+                    _vsTeamStatItems.value = updatedVsTeamStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
+                checkInRepository.getStadiumCheckInCounts(year)
+            stadiumVisitCountsResult
+                .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
+                    _stadiumVisitCounts.value =
+                        stadiumVisitCounts.sortedByDescending { it.visitCounts }
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_TEAM_STATS_COUNT = 5
+    }
+}

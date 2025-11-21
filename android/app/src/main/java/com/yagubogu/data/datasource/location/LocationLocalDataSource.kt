@@ -10,44 +10,42 @@ import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 import javax.inject.Inject
 
-class LocationLocalDataSource
-    @Inject
-    constructor(
-        private val locationClient: FusedLocationProviderClient,
-    ) : LocationDataSource {
-        @SuppressLint("MissingPermission")
-        override fun getCurrentCoordinate(
-            onSuccess: (Coordinate) -> Unit,
-            onFailure: (Exception) -> Unit,
-        ) {
-            locationClient
-                .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-                .addOnSuccessListener { location: Location ->
-                    val currentLatitude = Latitude(location.latitude)
-                    val currentLongitude = Longitude(location.longitude)
-                    val currentCoordinate = Coordinate(currentLatitude, currentLongitude)
-                    onSuccess(currentCoordinate)
-                }.addOnFailureListener { exception: Exception ->
-                    onFailure(exception)
-                }
-        }
-
-        override fun getDistanceInMeters(
-            coordinate: Coordinate,
-            targetCoordinate: Coordinate,
-        ): Distance {
-            val results = FloatArray(RESULTS_ARRAY_SIZE)
-            Location.distanceBetween(
-                coordinate.latitude.value,
-                coordinate.longitude.value,
-                targetCoordinate.latitude.value,
-                targetCoordinate.longitude.value,
-                results,
-            )
-            return Distance(results.first().toDouble())
-        }
-
-        companion object {
-            private const val RESULTS_ARRAY_SIZE = 1
-        }
+class LocationLocalDataSource @Inject constructor(
+    private val locationClient: FusedLocationProviderClient,
+) : LocationDataSource {
+    @SuppressLint("MissingPermission")
+    override fun getCurrentCoordinate(
+        onSuccess: (Coordinate) -> Unit,
+        onFailure: (Exception) -> Unit,
+    ) {
+        locationClient
+            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location: Location ->
+                val currentLatitude = Latitude(location.latitude)
+                val currentLongitude = Longitude(location.longitude)
+                val currentCoordinate = Coordinate(currentLatitude, currentLongitude)
+                onSuccess(currentCoordinate)
+            }.addOnFailureListener { exception: Exception ->
+                onFailure(exception)
+            }
     }
+
+    override fun getDistanceInMeters(
+        coordinate: Coordinate,
+        targetCoordinate: Coordinate,
+    ): Distance {
+        val results = FloatArray(RESULTS_ARRAY_SIZE)
+        Location.distanceBetween(
+            coordinate.latitude.value,
+            coordinate.longitude.value,
+            targetCoordinate.latitude.value,
+            targetCoordinate.longitude.value,
+            results,
+        )
+        return Distance(results.first().toDouble())
+    }
+
+    companion object {
+        private const val RESULTS_ARRAY_SIZE = 1
+    }
+}

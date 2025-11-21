@@ -12,38 +12,36 @@ import okio.source
 import java.io.InputStream
 import javax.inject.Inject
 
-class ThirdPartyRemoteDataSource
-    @Inject
-    constructor(
-        private val thirdPartyApiService: ThirdPartyApiService,
-        private val contentResolver: ContentResolver,
-    ) : ThirdPartyDataSource {
-        override suspend fun uploadImageToS3(
-            url: String,
-            imageFileUri: Uri,
-            contentType: String,
-            contentLength: Long,
-        ): Result<Unit> =
-            safeApiCall {
-                val requestBody: RequestBody =
-                    createRequestBody(imageFileUri, contentType, contentLength)
-                thirdPartyApiService.putImageToS3(url, requestBody)
-            }
+class ThirdPartyRemoteDataSource @Inject constructor(
+    private val thirdPartyApiService: ThirdPartyApiService,
+    private val contentResolver: ContentResolver,
+) : ThirdPartyDataSource {
+    override suspend fun uploadImageToS3(
+        url: String,
+        imageFileUri: Uri,
+        contentType: String,
+        contentLength: Long,
+    ): Result<Unit> =
+        safeApiCall {
+            val requestBody: RequestBody =
+                createRequestBody(imageFileUri, contentType, contentLength)
+            thirdPartyApiService.putImageToS3(url, requestBody)
+        }
 
-        private fun createRequestBody(
-            uri: Uri,
-            contentType: String,
-            contentLength: Long,
-        ): RequestBody =
-            object : RequestBody() {
-                override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
+    private fun createRequestBody(
+        uri: Uri,
+        contentType: String,
+        contentLength: Long,
+    ): RequestBody =
+        object : RequestBody() {
+            override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
 
-                override fun contentLength(): Long = contentLength
+            override fun contentLength(): Long = contentLength
 
-                override fun writeTo(sink: BufferedSink) {
-                    contentResolver.openInputStream(uri)?.use { inputStream: InputStream ->
-                        sink.writeAll(inputStream.source())
-                    }
+            override fun writeTo(sink: BufferedSink) {
+                contentResolver.openInputStream(uri)?.use { inputStream: InputStream ->
+                    sink.writeAll(inputStream.source())
                 }
             }
-    }
+        }
+}

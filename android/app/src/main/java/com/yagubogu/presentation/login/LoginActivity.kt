@@ -29,11 +29,11 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
-import com.yagubogu.data.auth.GoogleCredentialManager
 import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
+import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,15 +47,10 @@ class LoginActivity : AppCompatActivity() {
         ActivityLoginBinding.inflate(layoutInflater)
     }
 
-    @Inject
-    lateinit var viewModelFactory: LoginViewModel.Factory
+    private val viewModel: LoginViewModel by viewModels()
 
     @Inject
     lateinit var googleCredentialManager: GoogleCredentialManager
-
-    private val viewModel: LoginViewModel by viewModels {
-        LoginViewModel.provideFactory(viewModelFactory, googleCredentialManager)
-    }
 
     private var shouldImmediateUpdate: Boolean = true
     private var isAppInitialized: Boolean = false
@@ -80,7 +75,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         handleInAppUpdate(onSuccess = { handleAutoLogin() })
         setupView()
-        setupBindings()
+        setupObservers()
+        setupListeners()
     }
 
     private fun setupSplash() {
@@ -116,9 +112,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupBindings() {
-        binding.viewModel = viewModel
-
+    private fun setupObservers() {
         viewModel.loginResult.observe(this) { value: LoginResult ->
             when (value) {
                 LoginResult.SignUp -> {
@@ -139,6 +133,12 @@ class LoginActivity : AppCompatActivity() {
 
                 LoginResult.Cancel -> Unit
             }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.constraintBtnGoogle.setOnClickListener {
+            viewModel.signInWithGoogle(googleCredentialManager)
         }
     }
 
