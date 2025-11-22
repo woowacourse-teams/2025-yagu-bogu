@@ -415,10 +415,31 @@ private fun StatItem(
             Text(text = emoji, fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        Text(text = value ?: "-", style = PretendardSemiBold20)
+        Text(
+            text = value ?: stringResource(R.string.stats_my_no_lucky_stadium),
+            style = PretendardSemiBold20,
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = title, style = PretendardRegular12, color = Gray500)
     }
+}
+
+@Preview
+@Composable
+private fun WinRateColumnPreview() {
+    WinRateColumn(StatsMyUiModel())
+}
+
+@Preview
+@Composable
+private fun MyStatsRowPreview() {
+    MyStatsRow(StatsMyUiModel())
+}
+
+@Preview
+@Composable
+private fun AttendanceStatsPreview() {
+    AttendanceStats(AverageStats())
 }
 
 @Preview(showBackground = true)

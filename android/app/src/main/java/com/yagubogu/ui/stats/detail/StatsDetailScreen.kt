@@ -98,28 +98,42 @@ private fun StatsDetailScreen(
                 .padding(horizontal = 20.dp)
                 .verticalScroll(scrollState),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 20.dp)
-                    .noRippleClickable { onShowMoreClick() },
-        ) {
-            VsTeamWinningPercentage(
-                vsTeamStatItems = vsTeamStatItems,
-                isVsTeamStatsExpanded = isVsTeamStatsExpanded,
-                modifier =
-                    Modifier.animateContentSize(
-                        animationSpec =
-                            spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow,
-                            ),
-                    ),
-            )
-        }
+        VsTeamWinningPercentageColumn(
+            onShowMoreClick = onShowMoreClick,
+            vsTeamStatItems = vsTeamStatItems,
+            isVsTeamStatsExpanded = isVsTeamStatsExpanded,
+            modifier = modifier.fillMaxSize(),
+        )
         StadiumVisitCounts(stadiumVisitCounts = stadiumVisitCounts)
+    }
+}
+
+@Composable
+private fun VsTeamWinningPercentageColumn(
+    onShowMoreClick: () -> Unit,
+    vsTeamStatItems: List<VsTeamStatItem>,
+    isVsTeamStatsExpanded: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        modifier =
+            modifier
+                .padding(vertical = 20.dp)
+                .noRippleClickable { onShowMoreClick() },
+    ) {
+        VsTeamWinningPercentage(
+            vsTeamStatItems = vsTeamStatItems,
+            isVsTeamStatsExpanded = isVsTeamStatsExpanded,
+            modifier =
+                Modifier.animateContentSize(
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow,
+                        ),
+                ),
+        )
     }
 }
 
@@ -256,24 +270,44 @@ private fun StadiumVisitCounts(
     }
 }
 
+@Preview
+@Composable
+private fun VsTeamWinningPercentageColumnPreview() {
+    VsTeamWinningPercentageColumn(
+        onShowMoreClick = { },
+        vsTeamStatItems = DUMMY_VS_TEAM_STAT_ITEMS,
+        isVsTeamStatsExpanded = false,
+    )
+}
+
+@Preview
+@Composable
+private fun StadiumVisitCountsPreview() {
+    StadiumVisitCounts(DUMMY_STADIUM_VISIT_COUNTS)
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun StatsDetailScreenPreview() {
     StatsDetailScreen(
-        vsTeamStatItems =
-            List(5) { i ->
-                VsTeamStatItem(
-                    rank = i + 1,
-                    team = Team.HT,
-                    teamName = "KIA",
-                    winCounts = 10,
-                    drawCounts = 9,
-                    loseCounts = 8,
-                    winningPercentage = 77.7,
-                )
-            },
-        stadiumVisitCounts =
-            List(9) { i -> StadiumVisitCount(location = "잠실", visitCounts = 10 - i) },
+        vsTeamStatItems = DUMMY_VS_TEAM_STAT_ITEMS,
+        stadiumVisitCounts = DUMMY_STADIUM_VISIT_COUNTS,
         isVsTeamStatsExpanded = false,
     )
 }
+
+private val DUMMY_VS_TEAM_STAT_ITEMS =
+    List(5) { i ->
+        VsTeamStatItem(
+            rank = i + 1,
+            team = Team.HT,
+            teamName = "KIA",
+            winCounts = 10,
+            drawCounts = 9,
+            loseCounts = 8,
+            winningPercentage = 77.7,
+        )
+    }
+
+private val DUMMY_STADIUM_VISIT_COUNTS =
+    List(9) { i -> StadiumVisitCount(location = "잠실", visitCounts = 10 - i) }
