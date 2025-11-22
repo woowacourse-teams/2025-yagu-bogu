@@ -228,7 +228,7 @@ private fun ShowMoreButton(
         Spacer(modifier = Modifier.width(4.dp))
         Image(
             painter = painterResource(if (isVsTeamStatsExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down),
-            contentDescription = stringResource(R.string.home_show_more),
+            contentDescription = stringResource(if (isVsTeamStatsExpanded) R.string.home_show_less else R.string.home_show_more),
             colorFilter = ColorFilter.tint(Gray400),
             modifier = Modifier.size(20.dp),
         )
