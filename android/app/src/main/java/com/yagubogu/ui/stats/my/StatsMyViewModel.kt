@@ -1,10 +1,12 @@
-package com.yagubogu.presentation.stats.my
+package com.yagubogu.ui.stats.my
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.ui.stats.my.model.AverageStats
+import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async

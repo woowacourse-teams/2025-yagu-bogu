@@ -27,9 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.yagubogu.presentation.stats.StatsTab
-import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
-import com.yagubogu.presentation.stats.my.StatsMyViewModel
+import com.yagubogu.ui.stats.detail.StatsDetailScreen
+import com.yagubogu.ui.stats.detail.StatsDetailViewModel
+import com.yagubogu.ui.stats.my.StatsMyScreen
+import com.yagubogu.ui.stats.my.StatsMyViewModel
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.Primary100

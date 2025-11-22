@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail
 
 import android.graphics.Canvas
 import android.graphics.Path

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail
 
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.yagubogu.R
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 
 /**
  * HorizontalBarChart의 스타일과 데이터를 관리하는 클래스

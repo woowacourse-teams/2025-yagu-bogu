@@ -1,7 +1,7 @@
 package com.yagubogu.data.dto.response.stats
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.stats.detail.VsTeamStatItem
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

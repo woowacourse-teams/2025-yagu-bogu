@@ -3,8 +3,8 @@ package com.yagubogu.domain.repository
 import com.yagubogu.domain.model.StatsCounts
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.stats.detail.VsTeamStatItem
-import com.yagubogu.presentation.stats.my.AverageStats
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
+import com.yagubogu.ui.stats.my.model.AverageStats
 
 interface StatsRepository {
     suspend fun getStatsWinRate(year: Int): Result<Double>

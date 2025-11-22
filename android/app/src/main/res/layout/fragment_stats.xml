@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.stats.StatsFragment">
+        tools:context=".ui.stats.StatsFragment">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_stats"

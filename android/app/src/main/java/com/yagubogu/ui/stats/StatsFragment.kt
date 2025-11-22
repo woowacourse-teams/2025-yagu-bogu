@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats
+package com.yagubogu.ui.stats
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +8,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
-import com.yagubogu.presentation.stats.my.StatsMyViewModel
 import com.yagubogu.presentation.util.ScrollToTop
-import com.yagubogu.ui.stats.StatsScreen
+import com.yagubogu.ui.stats.detail.StatsDetailViewModel
+import com.yagubogu.ui.stats.my.StatsMyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")

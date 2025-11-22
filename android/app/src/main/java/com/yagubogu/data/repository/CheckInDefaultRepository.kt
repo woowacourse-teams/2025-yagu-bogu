@@ -10,7 +10,7 @@ import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
-import com.yagubogu.presentation.stats.detail.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import java.time.LocalDate
 import javax.inject.Inject
 

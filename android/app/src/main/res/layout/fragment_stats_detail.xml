@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.yagubogu.presentation.stats.detail.StatsDetailViewModel" />
+            type="com.yagubogu.ui.stats.detail.StatsDetailViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.my
+package com.yagubogu.ui.stats.my.model
 
 data class AverageStats(
     val averageRuns: Double = 0.0,

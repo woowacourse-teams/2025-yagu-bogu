@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats
+package com.yagubogu.ui.stats
 
 import com.yagubogu.R
 

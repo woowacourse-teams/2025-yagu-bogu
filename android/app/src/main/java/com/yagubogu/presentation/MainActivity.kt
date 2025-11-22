@@ -25,7 +25,7 @@ import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
 import com.yagubogu.presentation.home.HomeFragment
 import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.setting.SettingActivity
-import com.yagubogu.presentation.stats.StatsFragment
+import com.yagubogu.ui.stats.StatsFragment
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.badge.BadgeActivity

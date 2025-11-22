@@ -7,11 +7,11 @@
 
         <variable
             name="statsMyUiModel"
-            type="com.yagubogu.presentation.stats.my.StatsMyUiModel" />
+            type="com.yagubogu.ui.stats.my.model.StatsMyUiModel" />
 
         <variable
             name="averageStats"
-            type="com.yagubogu.presentation.stats.my.AverageStats" />
+            type="com.yagubogu.ui.stats.my.model.AverageStats" />
     </data>
 
     <ScrollView

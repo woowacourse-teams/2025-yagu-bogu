@@ -1,4 +1,4 @@
-package com.yagubogu.ui.stats
+package com.yagubogu.ui.stats.my
 
 import android.content.Context
 import android.graphics.Color

@@ -1,4 +1,4 @@
-package com.yagubogu.ui.stats
+package com.yagubogu.ui.stats.detail
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -42,10 +42,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.stats.detail.BarChartManager
-import com.yagubogu.presentation.stats.detail.StadiumVisitCount
-import com.yagubogu.presentation.stats.detail.StatsDetailViewModel
-import com.yagubogu.presentation.stats.detail.VsTeamStatItem
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400

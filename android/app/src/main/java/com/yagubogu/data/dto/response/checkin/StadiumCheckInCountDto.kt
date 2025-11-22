@@ -1,6 +1,6 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.presentation.stats.detail.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,9 +1,11 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.domain.repository.CheckInRepository
 import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

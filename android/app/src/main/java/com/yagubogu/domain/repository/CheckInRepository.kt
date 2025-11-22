@@ -2,7 +2,7 @@ package com.yagubogu.domain.repository
 
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
-import com.yagubogu.presentation.stats.detail.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import java.time.LocalDate
 
 interface CheckInRepository {
