@@ -2,7 +2,6 @@ package com.yagubogu.ui.stats.my
 
 import android.content.Context
 import android.graphics.Color
-import androidx.core.content.res.ResourcesCompat
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -13,9 +12,6 @@ class PieChartManager(
     private val context: Context,
     private val chart: PieChart,
 ) {
-    private val pretendardTypeface =
-        ResourcesCompat.getFont(context, R.font.pretendard_medium)
-
     /**
      * 차트 기본 스타일 설정
      */
