@@ -178,7 +178,7 @@ private fun StatsMyPieChart(
                 text =
                     stringResource(
                         R.string.stats_my_pie_chart_attendance_count,
-                        statsMyUiModel.winCount,
+                        statsMyUiModel.totalCount,
                     ),
                 style = PretendardMedium16,
                 color = Gray500,
