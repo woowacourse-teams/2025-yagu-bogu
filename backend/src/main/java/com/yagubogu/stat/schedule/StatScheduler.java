@@ -18,7 +18,7 @@ public class StatScheduler {
     public void updateVictoryRanking() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         try {
-            statSyncService.updateRankings(yesterday);
+            statSyncService.updateRankings(yesterday, 1000, 1000);
         } catch (RuntimeException e) {
             log.error("[{}]- {}", e.getClass().getSimpleName(), e.getMessage());
         }

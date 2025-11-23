@@ -80,7 +80,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         checkInFactory.save(b -> b.game(g1).member(m2).team(HT));
 
         // when
-        statSyncService.updateRankings(date);
+        statSyncService.updateRankings(date, 1000, 1000);
 
         // then
         List<VictoryFairyRanking> results = victoryFairyRankingRepository
@@ -116,7 +116,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.game(g1).member(m1).team(HT));
         checkInFactory.save(b -> b.game(g1).member(m2).team(HT));
-        statSyncService.updateRankings(date);
+        statSyncService.updateRankings(date, 1000, 1000);
 
         // 누적용 경기 (8/1 HT 패, m1만 체크인)
         LocalDate later = LocalDate.of(2025, 8, 1);
@@ -128,7 +128,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         checkInFactory.save(b -> b.game(g2).member(m1).team(HT));
 
         // when
-        statSyncService.updateRankings(later);
+        statSyncService.updateRankings(later, 1000, 1000);
 
         // then
         List<VictoryFairyRanking> results = victoryFairyRankingRepository
@@ -156,7 +156,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         LocalDate date = LocalDate.of(2025, 7, 22); // 아무도 체크인하지 않은 날짜
 
         // when
-        statSyncService.updateRankings(date);
+        statSyncService.updateRankings(date, 1000, 1000);
 
         // then
         assertThat(victoryFairyRankingRepository.findAll()).isEmpty();
