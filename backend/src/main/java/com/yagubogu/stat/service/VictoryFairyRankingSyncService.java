@@ -34,13 +34,11 @@ public class VictoryFairyRankingSyncService {
     private static final double SCORE_COMPARISON_THRESHOLD = 0.0001;
 
     @Transactional
-    public VictoryFairyChunkResult processChunk(final List<Long> memberIds, final int year) {
+    public VictoryFairyChunkResult processChunk(final List<Long> memberIds, final int year, final double averageWinRate,
+                                                final double averageCheckInCount) {
         Map<Long, VictoryFairyRanking> existingRankingMap = buildExistingRankingMap(memberIds, year);
         List<VictoryFairyCountResult> checkInAndWinCounts = checkInRepository.findCheckInAndWinCountBatch(
                 memberIds, year);
-
-        double averageWinRate = checkInRepository.calculateTotalAverageWinRate(year);
-        double averageCheckInCount = checkInRepository.calculateAverageCheckInCount(year);
 
         SyncBatchData batchData = prepareBatchData(
                 checkInAndWinCounts,

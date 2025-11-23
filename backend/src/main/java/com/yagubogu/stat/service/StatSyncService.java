@@ -32,17 +32,20 @@ public class StatSyncService {
         int totalUpdated = 0;
         int totalInserted = 0;
 
+        double averageWinRate = checkInRepository.calculateTotalAverageWinRate(date.getYear());
+        double averageCheckInCount = checkInRepository.calculateAverageCheckInCount(date.getYear());
+
         try {
             Slice<Long> slice;
             do {
                 Pageable pageable = PageRequest.of(page, CHUNK_SIZE);
-                slice = checkInRepository.findDistinctMemberIdsByDate(date, pageable);
+                slice = checkInRepository.findDistinctMemberIdsByDate(date, Pageable.unpaged());
 
                 if (slice.hasContent()) {
                     List<Long> memberIds = slice.getContent();
 
                     VictoryFairyChunkResult result = victoryFairyRankingSyncService.processChunk(memberIds,
-                            currentYear);
+                            currentYear, averageWinRate, averageCheckInCount);
 
                     totalProcessed += memberIds.size();
                     totalUpdated += result.updatedCount();

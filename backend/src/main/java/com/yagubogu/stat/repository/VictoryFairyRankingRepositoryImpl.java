@@ -116,6 +116,48 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     }
 
     @Override
+    public void nonBatchUpdate(final List<UpdateDto> updates) {
+        String sql = """
+                UPDATE victory_fairy_rankings 
+                SET score = ?, 
+                    win_count = ?, 
+                    check_in_count = ?, 
+                    updated_at = NOW()
+                WHERE victory_fairy_ranking_id = ?
+                """;
+
+        for (UpdateDto dto : updates) {
+            jdbcTemplate.update(
+                    sql,
+                    dto.score(),
+                    dto.winCount(),
+                    dto.checkInCount(),
+                    dto.id()
+            );
+        }
+    }
+
+    @Override
+    public void nonBatchInsert(final List<InsertDto> toInsert) {
+        String sql = """
+                INSERT INTO victory_fairy_rankings 
+                (member_id, game_year, score, win_count, check_in_count, updated_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
+                """;
+
+        for (InsertDto dto : toInsert) {
+            jdbcTemplate.update(
+                    sql,
+                    dto.memberId(),
+                    dto.year(),
+                    dto.score(),
+                    dto.winCount(),
+                    dto.checkInCount()
+            );
+        }
+    }
+
+    @Override
     public Optional<Long> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
         // 1. 멤버에게 응원팀이 없으면 랭킹 계산 불가
         if (member.getTeam() == null) {

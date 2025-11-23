@@ -17,4 +17,8 @@ public interface VictoryFairyRankingRepositoryCustom {
     void batchUpdate(List<UpdateDto> updates, int batchSize);
 
     void batchInsert(List<InsertDto> toInsert, int batchSize);
+
+    void nonBatchUpdate(List<UpdateDto> updates);
+
+    void nonBatchInsert(List<InsertDto> toInsert);
 }
