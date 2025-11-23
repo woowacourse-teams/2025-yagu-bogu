@@ -46,13 +46,8 @@ public class AdminController {
     }
 
     @PostMapping("/victory-fairy-rankings/sync")
-    public ResponseEntity<Void> syncVictoryRankings() {
-        int year = LocalDate.now().getYear();
-        LocalDate startDate = LocalDate.of(year, 1, 1);
-        LocalDate endDate = LocalDate.of(year, 12, 31);
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
-            statSyncService.updateRankings(date);
-        }
+    public ResponseEntity<Void> syncVictoryRankings(@RequestParam("date") LocalDate date) {
+        statSyncService.updateRankings(date);
 
         return ResponseEntity.ok().build();
     }
