@@ -28,7 +28,7 @@ public class VictoryFairyRankingSyncService {
     private final CheckInRepository checkInRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
 
-    private static final int BATCH_SIZE = 1000;
+    private static final int BATCH_SIZE = 100000;
     private static final int SCORE_SCALE = 2;
     private static final double SCORE_PERCENTAGE_MULTIPLIER = 100.0;
     private static final double SCORE_COMPARISON_THRESHOLD = 0.0001;
