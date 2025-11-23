@@ -14,7 +14,7 @@ spring:
       connection-timeout: 5000
       max-lifetime: 600000
       idle-timeout: 300000
-      leak-detection-threshold: 5000
+  #      leak-detection-threshold: 5000
 
   task:
     execution:
