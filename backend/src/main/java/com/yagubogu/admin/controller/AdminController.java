@@ -46,8 +46,11 @@ public class AdminController {
     }
 
     @PostMapping("/victory-fairy-rankings/sync")
-    public ResponseEntity<Void> syncVictoryRankings(@RequestParam("date") LocalDate date) {
-        statSyncService.updateRankings(date);
+    public ResponseEntity<Void> syncVictoryRankings(@RequestParam("date") LocalDate date,
+                                                    @RequestParam("chunk") int chunkSize,
+                                                    @RequestParam("batch") int batch
+    ) {
+        statSyncService.updateRankings(date, chunkSize, batch);
 
         return ResponseEntity.ok().build();
     }

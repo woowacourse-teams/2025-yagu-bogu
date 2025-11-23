@@ -28,14 +28,13 @@ public class VictoryFairyRankingSyncService {
     private final CheckInRepository checkInRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
 
-    private static final int BATCH_SIZE = 100000;
     private static final int SCORE_SCALE = 2;
     private static final double SCORE_PERCENTAGE_MULTIPLIER = 100.0;
     private static final double SCORE_COMPARISON_THRESHOLD = 0.0001;
 
     @Transactional
     public VictoryFairyChunkResult processChunk(final List<Long> memberIds, final int year, final double averageWinRate,
-                                                final double averageCheckInCount) {
+                                                final double averageCheckInCount, final int batch_size) {
         Map<Long, VictoryFairyRanking> existingRankingMap = buildExistingRankingMap(memberIds, year);
         List<VictoryFairyCountResult> checkInAndWinCounts = checkInRepository.findCheckInAndWinCountBatch(
                 memberIds, year);
@@ -48,7 +47,7 @@ public class VictoryFairyRankingSyncService {
                 year
         );
 
-        return executeBatchOperations(batchData);
+        return executeBatchOperations(batchData, batch_size);
     }
 
     private Map<Long, VictoryFairyRanking> buildExistingRankingMap(final List<Long> memberIds, final int year) {
@@ -117,15 +116,13 @@ public class VictoryFairyRankingSyncService {
             double calculatedScore,
             List<UpdateDto> toUpdate
     ) {
-        if (!isSameData(existingRanking, winCount, checkInCount, calculatedScore)) {
-            toUpdate.add(new UpdateDto(
-                    existingRanking.getId(),
-                    calculatedScore,
-                    winCount,
-                    checkInCount
-            ));
-            logDataInconsistency(existingRanking, winCount, checkInCount, calculatedScore);
-        }
+        toUpdate.add(new UpdateDto(
+                existingRanking.getId(),
+                calculatedScore,
+                winCount,
+                checkInCount
+        ));
+//            logDataInconsistency(existingRanking, winCount, checkInCount, calculatedScore);
     }
 
     private void processNewRanking(
@@ -146,17 +143,17 @@ public class VictoryFairyRankingSyncService {
         logMissingRanking(memberId);
     }
 
-    private VictoryFairyChunkResult executeBatchOperations(SyncBatchData batchData) {
+    private VictoryFairyChunkResult executeBatchOperations(SyncBatchData batchData, int batch_size) {
         int updatedCount = 0;
         int insertedCount = 0;
 
         if (!batchData.toUpdate().isEmpty()) {
-            victoryFairyRankingRepository.batchUpdate(batchData.toUpdate(), BATCH_SIZE);
+            victoryFairyRankingRepository.batchUpdate(batchData.toUpdate(), batch_size);
             updatedCount = batchData.toUpdate().size();
         }
 
         if (!batchData.toInsert().isEmpty()) {
-            victoryFairyRankingRepository.batchInsert(batchData.toInsert(), BATCH_SIZE);
+            victoryFairyRankingRepository.batchInsert(batchData.toInsert(), batch_size);
             insertedCount = batchData.toInsert().size();
         }
 

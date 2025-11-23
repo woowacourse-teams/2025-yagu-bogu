@@ -19,13 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StatSyncService {
 
-    private static final int CHUNK_SIZE = 100000;
 
     private final VictoryFairyRankingSyncService victoryFairyRankingSyncService;
     private final CheckInRepository checkInRepository;
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void updateRankings(final LocalDate date) {
+    public void updateRankings(final LocalDate date, final int chunk_size, final int batch_size) {
         int currentYear = date.getYear();
         int page = 0;
         int totalProcessed = 0;
@@ -38,14 +37,14 @@ public class StatSyncService {
         try {
             Slice<Long> slice;
             do {
-                Pageable pageable = PageRequest.of(page, CHUNK_SIZE);
+                Pageable pageable = PageRequest.of(page, chunk_size);
                 slice = checkInRepository.findDistinctMemberIdsByDate(date, pageable);
 
                 if (slice.hasContent()) {
                     List<Long> memberIds = slice.getContent();
 
                     VictoryFairyChunkResult result = victoryFairyRankingSyncService.processChunk(memberIds,
-                            currentYear, averageWinRate, averageCheckInCount);
+                            currentYear, averageWinRate, averageCheckInCount, batch_size);
 
                     totalProcessed += memberIds.size();
                     totalUpdated += result.updatedCount();
