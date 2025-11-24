@@ -1,7 +1,7 @@
 spring:
 
   transaction:
-    default-timeout: 30s
+    default-timeout: 300s
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
