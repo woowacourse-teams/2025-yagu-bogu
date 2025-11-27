@@ -95,7 +95,7 @@ sse:
 
 app:
   s3:
-    bucket: techcourse-project-2025
+    bucket: yagubogu
     presign-expiration: 5m
 
 ---
