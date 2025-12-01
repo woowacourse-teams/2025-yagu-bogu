@@ -22,6 +22,12 @@ spring:
       maxLifetime: 1800000
       poolName: crawling-hikari-test
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
   sql:
     init:
       mode: never
