@@ -2,6 +2,7 @@ package yagubogu.crawling.game.service.crawler;
 
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.event.GameFinalizedEvent;
+import com.yagubogu.global.config.RabbitMQConfig;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,8 @@ class QuickRabbitMQTest {
                 "LG", "KIA", LocalTime.of(6,30), GameState.CANCELED);
         // 발행
         rabbitTemplate.convertAndSend(
-                "game.finalized.queue",
+                RabbitMQConfig.GAME_FINALIZED_EXCHANGE,
+                RabbitMQConfig.GAME_FINALIZED_ROUTING_KEY,
                 event
         );
 

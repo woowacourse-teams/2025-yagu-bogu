@@ -29,7 +29,7 @@ public class StatScheduler {
      * 크롤링 서버에서 경기가 종료되면 RabbitMQ를 통해 메시지가 전달되고,
      * 해당 날짜의 랭킹을 즉시 업데이트
      */
-    @RabbitListener(queues = RabbitMQConfig.GAME_FINALIZED_QUEUE)
+    @RabbitListener(queues = RabbitMQConfig.GAME_FINALIZED_STATS_QUEUE)
     public void handleGameFinalizedFromRabbitMQ(final GameFinalizedEvent event) {
         if (!event.state().isCompleted()) {
             log.debug("[RABBITMQ] Skip ranking update (state={}): date={}, home={}, away={}",

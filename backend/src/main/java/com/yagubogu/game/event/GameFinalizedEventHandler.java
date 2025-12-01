@@ -28,7 +28,7 @@ public class GameFinalizedEventHandler {
      * 크롤링 서버에서 경기가 종료되면 RabbitMQ를 통해 메시지가 전달되고,
      * 해당 경기에 대한 ETL을 즉시 실행
      */
-    @RabbitListener(queues = RabbitMQConfig.GAME_FINALIZED_QUEUE)
+    @RabbitListener(queues = RabbitMQConfig.GAME_FINALIZED_ETL_QUEUE)
     public void handleGameFinalizedFromRabbitMQ(final GameFinalizedEvent event) {
         try {
             log.info("[RABBITMQ] Received GameFinalizedEvent: date={}, home={}, away={}, state={}",

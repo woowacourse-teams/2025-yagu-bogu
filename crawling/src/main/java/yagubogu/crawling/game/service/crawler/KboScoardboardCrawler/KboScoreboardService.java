@@ -130,7 +130,11 @@ public class KboScoreboardService {
                 GameFinalizedEvent event = new GameFinalizedEvent(
                         date, stadium, homeTeamName, awayTeamName, startTime, state
                 );
-                rabbitTemplate.convertAndSend(RabbitMQConfig.GAME_FINALIZED_QUEUE, event);
+                rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.GAME_FINALIZED_EXCHANGE,
+                        RabbitMQConfig.GAME_FINALIZED_ROUTING_KEY,
+                        event
+                );
                 log.info("[RABBITMQ] Sent GameFinalizedEvent: gameCode={}, state={}", gameCode, state);
             }
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package yagubogu.crawling.game.config;
 
 import com.yagubogu.global.config.RabbitMQConfig;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -19,8 +19,8 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitProducerConfig {
 
     @Bean
-    public Queue gameFinalizedQueue() {
-        return new Queue(RabbitMQConfig.GAME_FINALIZED_QUEUE, true);
+    public TopicExchange gameFinalizedExchange() {
+        return new TopicExchange(RabbitMQConfig.GAME_FINALIZED_EXCHANGE, true, false);
     }
 
     @Bean
