@@ -1,0 +1,24 @@
+# infrastructure.yml
+version: '3.9'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: yagubogu-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"    # AMQP 프로토콜 (앱 연결용)
+      - "15672:15672"  # 관리 UI
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  rabbitmq-data:

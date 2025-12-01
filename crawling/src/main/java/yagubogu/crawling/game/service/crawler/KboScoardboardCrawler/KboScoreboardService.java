@@ -1,15 +1,14 @@
 package yagubogu.crawling.game.service.crawler.KboScoardboardCrawler;
 
-import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.util.stream.Collectors.toMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.event.GameFinalizedEvent;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.BronzeGameService;
+import com.yagubogu.global.config.RabbitMQConfig;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -35,9 +34,6 @@ import yagubogu.crawling.game.dto.BatchResult;
 import yagubogu.crawling.game.dto.FailedGame;
 import yagubogu.crawling.game.dto.GameUpsertRow;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
-import yagubogu.crawling.game.dto.KboScoreboardTeam;
-import yagubogu.crawling.game.dto.PitcherAssignment;
-import yagubogu.crawling.game.dto.ScoreBoardData;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
 import yagubogu.crawling.game.dto.UpsertResult;
 import yagubogu.crawling.game.repository.GameJdbcBatchUpsertRepository;
@@ -48,7 +44,6 @@ import yagubogu.crawling.game.repository.GameJdbcBatchUpsertRepository;
 public class KboScoreboardService {
 
     private final KboScoreboardCrawler kboScoreboardCrawler;
-    private final KboScoreboardMapper mapper;
     private final GameJdbcBatchUpsertRepository batchUpsertRepository;
     private final TeamRepository teamRepository;
     private final StadiumRepository stadiumRepository;
@@ -57,7 +52,7 @@ public class KboScoreboardService {
     private final GameRepository gameRepository;
     private final BronzeGameService bronzeGameService;
     private final ObjectMapper objectMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final RabbitTemplate rabbitTemplate;
 
     private Map<String, Stadium> stadiumCache = new ConcurrentHashMap<>();
     private Map<String, Team> teamCache = new ConcurrentHashMap<>();
@@ -129,12 +124,14 @@ public class KboScoreboardService {
             bronzeGameService.upsertByNaturalKey(date, stadium, homeTeamName, awayTeamName, startTime, payload);
             log.debug("[BRONZE] Saved gameCode={}, state={}", gameCode, data.getStatus());
 
-            // 경기 종료 시 이벤트 발행 (ETL 트리거)
+            // 경기 종료 시 RabbitMQ로 메시지 발행 (ETL 트리거)
             GameState state = GameState.fromName(data.getStatus());
             if (state == GameState.COMPLETED || state == GameState.CANCELED) {
-                applicationEventPublisher.publishEvent(new GameFinalizedEvent(date, stadium, homeTeamName,
-                        awayTeamName, startTime, state));
-                log.info("[EVENT] Published GameFinalizedEvent: gameCode={}, state={}", gameCode, state);
+                GameFinalizedEvent event = new GameFinalizedEvent(
+                        date, stadium, homeTeamName, awayTeamName, startTime, state
+                );
+                rabbitTemplate.convertAndSend(RabbitMQConfig.GAME_FINALIZED_QUEUE, event);
+                log.info("[RABBITMQ] Sent GameFinalizedEvent: gameCode={}, state={}", gameCode, state);
             }
         } catch (Exception e) {
             log.error("[BRONZE] Failed to save gameCode={}", gameCode, e);
@@ -199,27 +196,6 @@ public class KboScoreboardService {
 
         log.info("[BRONZE_BATCH] Processed {} games, {} saved (changed)", allGames.size(), totalSaved);
         return totalSaved;
-    }
-
-    private ScoreBoard updateOrCreateScoreBoard(ScoreBoard existing, KboScoreboardTeam data) {
-        if (existing == null) {
-            return new ScoreBoard(
-                    data.runs(),
-                    data.hits(),
-                    data.errors(),
-                    data.basesOnBalls(),
-                    data.inningScores()
-            );
-        }
-
-        existing.update(
-                data.runs(),
-                data.hits(),
-                data.errors(),
-                data.basesOnBalls(),
-                data.inningScores()
-        );
-        return existing;
     }
 
     /**
@@ -297,127 +273,6 @@ public class KboScoreboardService {
 
         return new UpsertResult(totalSuccess, failedGames);
     }
-
-    /**
-     * KboScoreboardGame → GameUpsertRow 변환 (ScoreBoard 포함)
-     */
-//    private List<GameUpsertRow> convertToRows(
-//            List<KboScoreboardGame> allGames,
-//            Map<String, Team> teamByShort,
-//            Map<String, Stadium> stadiumByLocation
-//    ) {
-//        List<GameUpsertRow> rows = new ArrayList<>(allGames.size());
-//
-//        for (KboScoreboardGame dto : allGames) {
-//            Team away = teamByShort.get(dto.getAwayTeamScoreboard().name());
-//            Team home = teamByShort.get(dto.getHomeTeamScoreboard().name());
-//            Stadium stadium = stadiumByLocation.get(dto.getStadium());
-//            LocalDate date = dto.getDate();
-//            LocalTime startAt = dto.getStartTime();
-//
-//            // ScoreBoard 변환
-//            KboScoreboardTeam homeTeamData = dto.getHomeTeamScoreboard();
-//            KboScoreboardTeam awayTeamData = dto.getAwayTeamScoreboard();
-//
-//            GameState state = mapper.toState(dto.getStatus(), homeTeamData.runs(), awayTeamData.runs());
-//
-//            String gameCode = generateGameCode(date, home, away, dto.getDoubleHeaderGameOrder());
-//
-//            String winningPitcher = dto.getWinningPitcher();
-//            String losingPitcher = dto.getLosingPitcher();
-//            Integer homeScore = dto.getHomeScore();
-//            Integer awayScore = dto.getAwayScore();
-//            PitcherAssignment pitcherAssignment = assignPitchersByScore(homeScore, awayScore, winningPitcher,
-//                    losingPitcher);
-//
-//            // ScoreBoard 데이터 변환
-//            ScoreBoardData homeScoreBoardData = convertToScoreBoardData(homeTeamData);
-//            ScoreBoardData awayScoreBoardData = convertToScoreBoardData(awayTeamData);
-//
-//            rows.add(new GameUpsertRow(
-//                    gameCode,
-//                    stadium.getId(),
-//                    home.getId(),
-//                    away.getId(),
-//                    date,
-//                    startAt,
-//                    homeScore,
-//                    awayScore,
-//                    pitcherAssignment.homePitcher(),
-//                    pitcherAssignment.awayPitcher(),
-//                    state.name(),
-//                    homeScoreBoardData,  // Home ScoreBoard 추가
-//                    awayScoreBoardData   // Away ScoreBoard 추가
-//            ));
-//        }
-//
-//        return rows;
-//    }
-
-    /**
-     * KboScoreboardTeam → ScoreBoardData 변환
-     */
-    private ScoreBoardData convertToScoreBoardData(KboScoreboardTeam teamData) {
-        if (teamData == null) {
-            return null;
-        }
-
-        return ScoreBoardData.from(
-                teamData.runs(),
-                teamData.hits(),
-                teamData.errors(),
-                teamData.basesOnBalls(),
-                teamData.inningScores()
-        );
-    }
-
-    private PitcherAssignment assignPitchersByScore(
-            Integer homeScore,
-            Integer awayScore,
-            String winningPitcher,
-            String losingPitcher
-    ) {
-        if (homeScore == null || awayScore == null) {
-            return new PitcherAssignment(null, null);
-        }
-
-        if (homeScore > awayScore) {
-            return new PitcherAssignment(winningPitcher, losingPitcher);
-        } else {
-            return new PitcherAssignment(losingPitcher, winningPitcher);
-        }
-    }
-
-    private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,
-                                    final int headerOrder) {
-        return date.format(BASIC_ISO_DATE) + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
-    }
-
-//    private void applyDoubleHeaderOrder(final List<KboScoreboardGame> games) {
-//        Map<LocalDate, Map<String, List<KboScoreboardGame>>> grouped = new HashMap<>();
-//
-//        for (KboScoreboardGame game : games) {
-//            grouped.computeIfAbsent(game.getDate(), ignored -> new HashMap<>())
-//                    .computeIfAbsent(game.getHomeTeamScoreboard().name(), ignored -> new ArrayList<>())
-//                    .add(game);
-//        }
-//
-//        Comparator<LocalTime> timeComparator = Comparator.nullsLast(Comparator.naturalOrder());
-//
-//        for (Map<String, List<KboScoreboardGame>> byTeam : grouped.values()) {
-//            for (List<KboScoreboardGame> teamGames : byTeam.values()) {
-//                if (teamGames.size() <= 1) {
-//                    teamGames.forEach(g -> g.setDoubleHeaderGameOrder(0));
-//                    continue;
-//                }
-//
-//                teamGames.sort(Comparator.comparing(KboScoreboardGame::getStartTime, timeComparator));
-//                for (int index = 0; index < teamGames.size(); index++) {
-//                    teamGames.get(index).setDoubleHeaderGameOrder(index);
-//                }
-//            }
-//        }
-//    }
 
     private List<LocalDate> getDatesBetweenInclusive(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
