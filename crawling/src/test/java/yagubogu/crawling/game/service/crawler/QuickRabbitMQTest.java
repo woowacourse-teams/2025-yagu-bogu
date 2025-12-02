@@ -19,7 +19,7 @@ class QuickRabbitMQTest {
     @Test
     void quickTest() throws InterruptedException {
         GameFinalizedEvent event = new GameFinalizedEvent(LocalDate.now(), "잠실",
-                "LG", "KIA", LocalTime.of(6,30), GameState.CANCELED);
+                "LG", "KIA", LocalTime.of(6, 30), GameState.COMPLETED);
         // 발행
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.GAME_FINALIZED_EXCHANGE,
