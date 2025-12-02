@@ -25,9 +25,11 @@ class CheckInDefaultRepository @Inject constructor(
             }
 
     override suspend fun getStadiumFanRates(date: LocalDate): Result<List<FanRateByGameDto>> =
-        checkInDataSource.getStadiumFanRates(date).map { fanRateResponse: FanRateResponse ->
-            fanRateResponse.fanRateByGames
-        }
+        checkInDataSource
+            .getStadiumFanRates(date)
+            .map { fanRateResponse: FanRateResponse ->
+                fanRateResponse.fanRateByGames
+            }
 
     override suspend fun getCheckInHistories(
         year: Int,
