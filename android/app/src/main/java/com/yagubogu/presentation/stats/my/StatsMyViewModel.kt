@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.model.StatsCounts
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.StatsRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.stats.StatsRepository
+import com.yagubogu.presentation.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -39,7 +39,7 @@ class StatsMyViewModel @Inject constructor(
     private fun fetchMyStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
-                async { statsRepository.getStatsCounts(year) }
+                async { statsRepository.getStatsCounts(year).map { it.toUiModel() } }
             val winRateDeferred: Deferred<Result<Double>> =
                 async { statsRepository.getStatsWinRate(year) }
             val myTeamDeferred: Deferred<Result<String?>> =
@@ -81,8 +81,9 @@ class StatsMyViewModel @Inject constructor(
 
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
-            val averageStatsResult: Result<AverageStats> = statsRepository.getAverageStats()
-            averageStatsResult
+            statsRepository
+                .getAverageStats()
+                .map { it.toUiModel() }
                 .onSuccess { averageStats: AverageStats ->
                     _averageStats.value = averageStats
                 }.onFailure { exception: Throwable ->

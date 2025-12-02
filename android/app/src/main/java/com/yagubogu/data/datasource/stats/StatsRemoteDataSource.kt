@@ -8,7 +8,6 @@ import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.util.safeApiCall
-import com.yagubogu.domain.model.Team
 import javax.inject.Inject
 
 class StatsRemoteDataSource @Inject constructor(
@@ -41,9 +40,9 @@ class StatsRemoteDataSource @Inject constructor(
 
     override suspend fun getVictoryFairyRankings(
         year: Int,
-        team: Team?,
+        teamCode: String?,
     ): Result<VictoryFairyRankingResponse> =
         safeApiCall {
-            statsApiService.getVictoryFairyRankings(year, team?.name)
+            statsApiService.getVictoryFairyRankings(year, teamCode)
         }
 }

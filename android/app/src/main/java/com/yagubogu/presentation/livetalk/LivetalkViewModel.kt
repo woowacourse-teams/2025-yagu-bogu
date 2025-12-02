@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.domain.repository.GameRepository
+import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import com.yagubogu.presentation.mapper.toUiModel
+import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,7 +27,8 @@ class LivetalkViewModel @Inject constructor(
 
     fun fetchGames(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
-            val gamesResult: Result<List<LivetalkStadiumItem>> = gameRepository.getGames(date)
+            val gamesResult: Result<List<LivetalkStadiumItem>> =
+                gameRepository.getGames(date).mapList { it.toUiModel() }
             gamesResult
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
                     _livetalkStadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)

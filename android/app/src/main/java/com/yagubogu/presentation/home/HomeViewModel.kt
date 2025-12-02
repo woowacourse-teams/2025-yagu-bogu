@@ -5,15 +5,16 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.location.CoordinateDto
+import com.yagubogu.data.repository.checkin.CheckInRepository
+import com.yagubogu.data.repository.location.LocationRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.stadium.StadiumRepository
+import com.yagubogu.data.repository.stats.StatsRepository
+import com.yagubogu.data.repository.stream.StreamRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
-import com.yagubogu.domain.repository.CheckInRepository
-import com.yagubogu.domain.repository.LocationRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.StadiumRepository
-import com.yagubogu.domain.repository.StatsRepository
-import com.yagubogu.domain.repository.StreamRepository
 import com.yagubogu.presentation.home.model.CheckInSseEvent
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.HomeDialogEvent
@@ -23,8 +24,11 @@ import com.yagubogu.presentation.home.model.StadiumWithGame
 import com.yagubogu.presentation.home.model.StadiumsWithGames
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.presentation.mapper.toDomain
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.presentation.util.mapList
 import com.yagubogu.ui.common.model.MemberProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
@@ -32,6 +36,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -95,25 +100,28 @@ class HomeViewModel @Inject constructor(
 
     fun startStreaming() {
         viewModelScope.launch {
-            streamRepository.connect().collect { event: CheckInSseEvent ->
-                when (event) {
-                    is CheckInSseEvent.CheckInCreated -> {
-                        val newItems: List<StadiumFanRateItem> = event.items
-                        val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
-                        cachedStadiumFanRateItems.keys.retainAll(validKeys)
+            streamRepository
+                .connect()
+                .map { it.toUiModel() }
+                .collect { event: CheckInSseEvent ->
+                    when (event) {
+                        is CheckInSseEvent.CheckInCreated -> {
+                            val newItems: List<StadiumFanRateItem> = event.items
+                            val validKeys: Set<Long> = newItems.map { it.gameId }.toSet()
+                            cachedStadiumFanRateItems.keys.retainAll(validKeys)
 
-                        newItems.forEach { item: StadiumFanRateItem ->
-                            cachedStadiumFanRateItems[item.gameId] = item
+                            newItems.forEach { item: StadiumFanRateItem ->
+                                cachedStadiumFanRateItems[item.gameId] = item
+                            }
+                            stadiumFanRateItems.value = newItems
                         }
-                        stadiumFanRateItems.value = newItems
-                    }
 
-                    CheckInSseEvent.Connect,
-                    CheckInSseEvent.Timeout,
-                    CheckInSseEvent.Unknown,
-                    -> Unit
+                        CheckInSseEvent.Connect,
+                        CheckInSseEvent.Timeout,
+                        CheckInSseEvent.Unknown,
+                        -> Unit
+                    }
                 }
-            }
         }
     }
 
@@ -125,6 +133,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
+                .map { it.toUiModel() }
                 .onSuccess { stadiumsWithGames: StadiumsWithGames ->
                     if (stadiumsWithGames.isEmpty()) {
                         _checkInUiEvent.setValue(CheckInUiEvent.NoGame)
@@ -142,7 +151,8 @@ class HomeViewModel @Inject constructor(
     fun fetchCurrentLocationThenCheckIn() {
         _isCheckInLoading.value = true
         locationRepository.getCurrentCoordinate(
-            onSuccess = { currentCoordinate: Coordinate ->
+            onSuccess = { coordinateDto: CoordinateDto ->
+                val currentCoordinate: Coordinate = coordinateDto.toDomain()
                 checkIfWithinThresholdThenCheckIn(currentCoordinate)
                 _isCheckInLoading.value = false
             },
@@ -205,7 +215,7 @@ class HomeViewModel @Inject constructor(
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
             val memberProfileResult: Result<MemberProfile> =
-                memberRepository.getMemberProfile(memberId)
+                memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
                     _dialogEvent.emit(HomeDialogEvent.ProfileDialog(memberProfile))
@@ -253,7 +263,7 @@ class HomeViewModel @Inject constructor(
     private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
-                checkInRepository.getStadiumFanRates(date)
+                checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }
             stadiumFanRatesResult
                 .onSuccess { stadiumFanRates: List<StadiumFanRateItem> ->
                     cachedStadiumFanRateItems.clear()
@@ -270,7 +280,7 @@ class HomeViewModel @Inject constructor(
     private fun fetchVictoryFairyRanking(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                statsRepository.getVictoryFairyRankings(year, null)
+                statsRepository.getVictoryFairyRankings(year, null).map { it.toUiModel() }
             victoryFairyRankingResult
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
@@ -300,8 +310,16 @@ class HomeViewModel @Inject constructor(
         val (nearestStadium: StadiumWithGame, nearestDistance: Distance) =
             stadiums?.findNearestTo(
                 currentCoordinate,
-                locationRepository::getDistanceInMeters,
-            ) ?: return
+            ) { coordinate: Coordinate, targetCoordinate: Coordinate ->
+                locationRepository
+                    .getDistanceInMeters(
+                        coordinate.latitude.value,
+                        coordinate.longitude.value,
+                        targetCoordinate.latitude.value,
+                        targetCoordinate.longitude.value,
+                    ).toDomain()
+            }
+                ?: return
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
             _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)

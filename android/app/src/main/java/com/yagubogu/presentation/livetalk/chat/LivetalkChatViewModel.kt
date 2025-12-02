@@ -9,11 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.repository.GameRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.common.model.MemberProfile
@@ -112,7 +113,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
         viewModelScope.launch {
             fetchTalksLock.withLock {
                 val result =
-                    talkRepository.getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                    talkRepository
+                        .getBeforeTalks(gameId, oldestMessageCursor, CHAT_LOAD_LIMIT)
+                        .map { it.toUiModel() }
                 result
                     .onSuccess { response ->
                         val pastChats = response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
@@ -134,7 +137,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
-                talkRepository.postTalks(gameId, message.trim())
+                talkRepository.postTalks(gameId, message.trim()).map { it.toUiModel() }
             talksResult
                 .onSuccess {
                     stopPolling()
@@ -341,7 +344,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     private suspend fun fetchTeams(gameId: Long) {
-        val result = talkRepository.getInitial(gameId)
+        val result = talkRepository.getInitial(gameId).map { it.toUiModel() }
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
                 _livetalkTeams.value = livetalkTeams
@@ -354,7 +357,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private suspend fun fetchInitialTalks() {
         fetchTalksLock.withLock {
-            val result = talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT)
+            val result =
+                talkRepository.getBeforeTalks(gameId, null, CHAT_LOAD_LIMIT).map { it.toUiModel() }
             result
                 .onSuccess { livetalkResponseItem: LivetalkResponseItem ->
                     _livetalkUiState.value = LivetalkUiState.Success
@@ -379,7 +383,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
     private suspend fun fetchAfterTalks() {
         fetchTalksLock.withLock {
             val result =
-                talkRepository.getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                talkRepository
+                    .getAfterTalks(gameId, newestMessageCursor, CHAT_LOAD_LIMIT)
+                    .map { it.toUiModel() }
             result
                 .onSuccess { response ->
                     val newChats =
@@ -399,7 +405,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
             val memberProfileResult: Result<MemberProfile> =
-                memberRepository.getMemberProfile(memberId)
+                memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
                     _profileInfoClickEvent.value = memberProfile
