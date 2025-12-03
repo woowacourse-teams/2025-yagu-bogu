@@ -13,7 +13,6 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -35,6 +34,14 @@ public class RabbitMQConfig {
     public static final String GAME_FINALIZED_EXCHANGE = "game.finalized.exchange";
     public static final String GAME_FINALIZED_ROUTING_KEY = "game.finalized";
     public static final String GAME_FINALIZED_ETL_QUEUE = "game.finalized.etl.queue";
+    public static final String GAME_FINALIZED_ETL_DELAY_QUEUE = "game.finalized.etl.delay.queue";
+    public static final String GAME_FINALIZED_ETL_DELAY_ROUTING_KEY = "game.finalized.etl.delay";
+    public static final String GAME_FINALIZED_ETL_RETRY_ROUTING_KEY = "game.finalized.etl.retry";
+    public static final String GAME_FINALIZED_ETL_DLQ = "game.finalized.etl.dlq";
+    public static final String GAME_FINALIZED_ETL_DLX = "game.finalized.etl.dlx";
+    public static final String GAME_FINALIZED_ETL_DLQ_ROUTING_KEY = "game.finalized.etl.dlq";
+
+    public static final String GAME_FINALIZED_STATS_ROUTING_KEY = "etl.completed";
     public static final String GAME_FINALIZED_STATS_QUEUE = "game.finalized.stats.queue";
     public static final String GAME_FINALIZED_STATS_DELAY_QUEUE = "game.finalized.stats.delay.queue";
     public static final String GAME_FINALIZED_STATS_DELAY_ROUTING_KEY = "game.finalized.stats.delay";
@@ -43,6 +50,7 @@ public class RabbitMQConfig {
     public static final String GAME_FINALIZED_STATS_DLX = "game.finalized.stats.dlx";
     public static final String GAME_FINALIZED_STATS_DLQ_ROUTING_KEY = "game.finalized.stats.dlq";
 
+    private static final int ETL_RETRY_DELAY_MS = 5 * 1000; // 5초 대기 후 재시도
     private static final int STATS_RETRY_DELAY_MS = 5 * 1000; // 5초 대기 후 재시도
 
     @Bean
@@ -52,7 +60,29 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue gameFinalizedEtlQueue() {
-        return new Queue(GAME_FINALIZED_ETL_QUEUE, true);
+        return QueueBuilder.durable(GAME_FINALIZED_ETL_QUEUE)
+                .withArgument("x-dead-letter-exchange", GAME_FINALIZED_ETL_DLX)
+                .withArgument("x-dead-letter-routing-key", GAME_FINALIZED_ETL_DLQ_ROUTING_KEY)
+                .build();
+    }
+
+    @Bean
+    public Queue gameFinalizedEtlDelayQueue() {
+        return QueueBuilder.durable(GAME_FINALIZED_ETL_DELAY_QUEUE)
+                .withArgument("x-dead-letter-exchange", GAME_FINALIZED_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", GAME_FINALIZED_ETL_RETRY_ROUTING_KEY)
+                .withArgument("x-message-ttl", ETL_RETRY_DELAY_MS)
+                .build();
+    }
+
+    @Bean
+    public Queue gameFinalizedEtlDlq() {
+        return QueueBuilder.durable(GAME_FINALIZED_ETL_DLQ).build();
+    }
+
+    @Bean
+    public DirectExchange gameFinalizedEtlDlx() {
+        return new DirectExchange(GAME_FINALIZED_ETL_DLX, true, false);
     }
 
     @Bean
@@ -90,10 +120,31 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Binding gameFinalizedEtlRetryBinding() {
+        return BindingBuilder.bind(gameFinalizedEtlQueue())
+                .to(gameFinalizedExchange())
+                .with(GAME_FINALIZED_ETL_RETRY_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding gameFinalizedEtlDelayBinding() {
+        return BindingBuilder.bind(gameFinalizedEtlDelayQueue())
+                .to(gameFinalizedExchange())
+                .with(GAME_FINALIZED_ETL_DELAY_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding gameFinalizedEtlDlqBinding() {
+        return BindingBuilder.bind(gameFinalizedEtlDlq())
+                .to(gameFinalizedEtlDlx())
+                .with(GAME_FINALIZED_ETL_DLQ_ROUTING_KEY);
+    }
+
+    @Bean
     public Binding gameFinalizedStatsBinding() {
         return BindingBuilder.bind(gameFinalizedStatsQueue())
                 .to(gameFinalizedExchange())
-                .with(GAME_FINALIZED_ROUTING_KEY);
+                .with(GAME_FINALIZED_STATS_ROUTING_KEY);
     }
 
     @Bean
@@ -156,14 +207,20 @@ public class RabbitMQConfig {
         AmqpAdmin amqpAdmin = event.getApplicationContext().getBean(AmqpAdmin.class);
 
         amqpAdmin.declareExchange(gameFinalizedExchange());
+        amqpAdmin.declareExchange(gameFinalizedEtlDlx());
         amqpAdmin.declareExchange(gameFinalizedStatsDlx());
 
         amqpAdmin.declareQueue(gameFinalizedEtlQueue());
+        amqpAdmin.declareQueue(gameFinalizedEtlDelayQueue());
+        amqpAdmin.declareQueue(gameFinalizedEtlDlq());
         amqpAdmin.declareQueue(gameFinalizedStatsQueue());
         amqpAdmin.declareQueue(gameFinalizedStatsDelayQueue());
         amqpAdmin.declareQueue(gameFinalizedStatsDlq());
 
         amqpAdmin.declareBinding(gameFinalizedEtlBinding());
+        amqpAdmin.declareBinding(gameFinalizedEtlRetryBinding());
+        amqpAdmin.declareBinding(gameFinalizedEtlDelayBinding());
+        amqpAdmin.declareBinding(gameFinalizedEtlDlqBinding());
         amqpAdmin.declareBinding(gameFinalizedStatsBinding());
         amqpAdmin.declareBinding(gameFinalizedStatsRetryBinding());
         amqpAdmin.declareBinding(gameFinalizedStatsDelayBinding());
