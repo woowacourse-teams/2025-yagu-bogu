@@ -30,10 +30,12 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityLoginBinding
-import com.yagubogu.domain.model.LoginResult
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.presentation.login.model.InAppUpdateType
+import com.yagubogu.presentation.login.model.LoginResult
+import com.yagubogu.presentation.login.model.VersionInfo
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import dagger.hilt.android.AndroidEntryPoint

@@ -9,15 +9,16 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.domain.repository.GameRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.TalkRepository
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
+import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -86,12 +87,12 @@ class LivetalkChatViewModel @AssistedInject constructor(
         if (!messageStateHolder.hasNext) return
 
         viewModelScope.launch {
-            talkRepository
-                .getBeforeTalks(
-                    gameId,
-                    messageStateHolder.oldestMessageCursor,
-                    CHAT_LOAD_LIMIT,
-                ).onSuccess { response: LivetalkResponseItem ->
+            val result: Result<LivetalkResponseItem> =
+                talkRepository
+                    .getBeforeTalks(gameId, messageStateHolder.oldestMessageCursor, CHAT_LOAD_LIMIT)
+                    .map { it.toUiModel() }
+            result
+                .onSuccess { response: LivetalkResponseItem ->
                     messageStateHolder.addBeforeChats(response)
                 }.onFailure { exception ->
                     Timber.w(exception, "과거 메시지 API 호출 실패")
@@ -100,12 +101,15 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     private suspend fun fetchAfterTalks() {
-        talkRepository
-            .getAfterTalks(
-                gameId,
-                messageStateHolder.newestMessageCursor,
-                CHAT_LOAD_LIMIT,
-            ).onSuccess { response: LivetalkResponseItem ->
+        val result: Result<LivetalkResponseItem> =
+            talkRepository
+                .getAfterTalks(
+                    gameId,
+                    messageStateHolder.newestMessageCursor,
+                    CHAT_LOAD_LIMIT,
+                ).map { it.toUiModel() }
+        result
+            .onSuccess { response: LivetalkResponseItem ->
                 messageStateHolder.addAfterChats(response)
             }.onFailure { exception ->
                 Timber.w(exception, "최신 메시지 API 호출 실패")
@@ -118,7 +122,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
-                talkRepository.postTalks(gameId, message.trim())
+                talkRepository.postTalks(gameId, message.trim()).map { it.toUiModel() }
             talksResult
                 .onSuccess {
                     stopPolling()
@@ -163,8 +167,13 @@ class LivetalkChatViewModel @AssistedInject constructor(
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
-                        is ApiException.Forbidden -> Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
-                        else -> Timber.d(exception)
+                        is ApiException.Forbidden -> {
+                            Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                        }
+
+                        else -> {
+                            Timber.d(exception)
+                        }
                     }
                 }
         }
@@ -221,8 +230,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     private suspend fun fetchTeams(gameId: Long) {
-        talkRepository
-            .getInitial(gameId)
+        val result: Result<LivetalkTeams> = talkRepository.getInitial(gameId).map { it.toUiModel() }
+        result
             .onSuccess { livetalkTeams: LivetalkTeams ->
                 _livetalkTeams.value = livetalkTeams
                 cachedLivetalkTeams = livetalkTeams
@@ -235,8 +244,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
-            memberRepository
-                .getMemberProfile(memberId)
+            val memberProfileResult: Result<MemberProfile> =
+                memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
+            memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
                     _profileInfoClickEvent.emit(memberProfile)
                 }.onFailure { exception: Throwable ->

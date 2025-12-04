@@ -1,8 +1,8 @@
 package com.yagubogu.ui.badge
 
+import com.yagubogu.fixture.BADGE_ID_0_ACQUIRED_FIXTURE
+import com.yagubogu.fixture.BADGE_ID_1_ACQUIRED_FIXTURE
 import com.yagubogu.fixture.MemberFakeRepository
-import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
-import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
