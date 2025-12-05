@@ -1,5 +1,6 @@
 package com.yagubogu.ui.stats.my
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -90,23 +91,17 @@ private fun StatsMyScreen(
     scrollState: ScrollState = rememberScrollState(),
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
+                .fillMaxSize()
                 .background(Gray050)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .padding(20.dp),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 20.dp),
-        ) {
-            WinRateColumn(statsMyUiModel)
-            MyStatsRow(statsMyUiModel)
-            AttendanceStats(averageStats)
-        }
+        WinRateColumn(statsMyUiModel)
+        MyStatsRow(statsMyUiModel)
+        AttendanceStats(averageStats)
     }
 }
 
@@ -126,7 +121,6 @@ private fun WinRateColumn(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
                 text = stringResource(R.string.stats_my_pie_chart_title),
@@ -147,15 +141,15 @@ private fun WinRateColumn(
                 )
             }
         }
-        StatsMyPieChart(modifier, statsMyUiModel)
-        WinDrawLoseCountsRow(modifier, statsMyUiModel)
+        WinRatePieChart(statsMyUiModel)
+        WinDrawLoseCountsRow(statsMyUiModel)
     }
 }
 
 @Composable
-private fun StatsMyPieChart(
-    modifier: Modifier,
+private fun WinRatePieChart(
     statsMyUiModel: StatsMyUiModel,
+    modifier: Modifier = Modifier,
 ) {
     var pieChartManager by remember { mutableStateOf<PieChartManager?>(null) }
 
@@ -186,8 +180,8 @@ private fun StatsMyPieChart(
         }
         @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
         AndroidView(
-            modifier = modifier.size(200.dp),
-            factory = { context ->
+            modifier = Modifier.size(200.dp),
+            factory = { context: Context ->
                 val pieChart = PieChart(context)
                 pieChartManager = PieChartManager(context, pieChart)
                 pieChartManager?.setupChart()
@@ -205,13 +199,13 @@ private fun StatsMyPieChart(
 
 @Composable
 private fun WinDrawLoseCountsRow(
-    modifier: Modifier,
     statsMyUiModel: StatsMyUiModel,
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.padding(top = 10.dp)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = stringResource(R.string.stats_my_pie_chart_win),
@@ -226,13 +220,13 @@ private fun WinDrawLoseCountsRow(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = stringResource(R.string.stats_my_pie_chart_draw),
                 style = PretendardMedium16,
             )
-            Spacer(modifier = modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = statsMyUiModel.drawCount.toString(),
                 style = PretendardBold32,
@@ -241,13 +235,13 @@ private fun WinDrawLoseCountsRow(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = stringResource(R.string.stats_my_pie_chart_lose),
                 style = PretendardMedium16,
             )
-            Spacer(modifier = modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = statsMyUiModel.loseCount.toString(),
                 style = PretendardBold32,
@@ -269,36 +263,35 @@ private fun MyStatsRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             modifier
-                .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(White, RoundedCornerShape(12.dp)),
+                .background(White, RoundedCornerShape(12.dp))
+                .padding(vertical = 20.dp),
     ) {
         StatItem(
             title = stringResource(R.string.stats_my_team),
             value = statsMyUiModel.myTeam,
             emoji = stringResource(R.string.stats_my_team_emoji),
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(vertical = 20.dp),
+            modifier = Modifier.weight(1f),
         )
         VerticalDivider(
             thickness = 0.4.dp,
             color = Gray300,
-            modifier = Modifier.padding(vertical = 20.dp),
+            modifier = Modifier.padding(vertical = 10.dp),
         )
         Balloon(
             builder = balloonBuilder,
             modifier = Modifier.weight(1f),
         ) { balloonWindow: BalloonWindow ->
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
                 StatItem(
                     title = stringResource(R.string.stats_my_lucky_stadium),
                     value = statsMyUiModel.luckyStadium,
                     emoji = stringResource(R.string.stats_my_lucky_stadium_emoji),
                     modifier =
                         Modifier
-                            .padding(vertical = 20.dp)
                             .noRippleClickable {
                                 balloonWindow.showAlignBottom(yOff = -60)
                                 Firebase.analytics.logEvent("attendance_history_item_click", null)
@@ -319,24 +312,16 @@ private fun AttendanceStats(
         modifier =
             modifier
                 .background(White, RoundedCornerShape(12.dp))
-                .padding(vertical = 20.dp),
+                .padding(20.dp),
     ) {
         Text(
             text = stringResource(R.string.stats_attendance_stats_title),
             style = PretendardBold20,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
         )
 
         Row(
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min),
+            modifier = Modifier.height(IntrinsicSize.Min),
         ) {
             StatItem(
                 title = stringResource(R.string.stats_gain_score),
@@ -350,7 +335,7 @@ private fun AttendanceStats(
             VerticalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 20.dp),
+                modifier = Modifier.padding(vertical = 10.dp),
             )
             StatItem(
                 title = stringResource(R.string.stats_loss_score),
@@ -364,12 +349,8 @@ private fun AttendanceStats(
         }
 
         Row(
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min),
+            modifier = Modifier.height(IntrinsicSize.Min),
         ) {
             StatItem(
                 title = stringResource(R.string.stats_hit),
@@ -379,7 +360,7 @@ private fun AttendanceStats(
             VerticalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 5.dp),
+                modifier = Modifier.padding(vertical = 10.dp),
             )
             StatItem(
                 title = stringResource(R.string.stats_hit_allowed),
@@ -389,7 +370,7 @@ private fun AttendanceStats(
             VerticalDivider(
                 thickness = 0.4.dp,
                 color = Gray300,
-                modifier = Modifier.padding(vertical = 5.dp),
+                modifier = Modifier.padding(vertical = 10.dp),
             )
             StatItem(
                 title = stringResource(R.string.stats_error),
