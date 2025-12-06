@@ -91,7 +91,7 @@ private fun StatsDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(20.dp),
     ) {
-        VsTeamWinRateColumn(
+        VsTeamWinRates(
             onShowMoreClick = onShowMoreClick,
             vsTeamStatItems = vsTeamStatItems,
             isVsTeamStatsExpanded = isVsTeamStatsExpanded,
@@ -101,7 +101,7 @@ private fun StatsDetailScreen(
 }
 
 @Composable
-private fun VsTeamWinRateColumn(
+private fun VsTeamWinRates(
     onShowMoreClick: () -> Unit,
     vsTeamStatItems: List<VsTeamStatItem>,
     isVsTeamStatsExpanded: Boolean,
@@ -216,7 +216,7 @@ private fun StadiumVisitCounts(
 @Preview
 @Composable
 private fun VsTeamWinningPercentageColumnPreview() {
-    VsTeamWinRateColumn(
+    VsTeamWinRates(
         onShowMoreClick = { },
         vsTeamStatItems = DUMMY_VS_TEAM_STAT_ITEMS,
         isVsTeamStatsExpanded = false,

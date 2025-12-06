@@ -98,14 +98,14 @@ private fun StatsMyScreen(
                 .verticalScroll(scrollState)
                 .padding(20.dp),
     ) {
-        WinRateColumn(statsMyUiModel)
-        MyStatsRow(statsMyUiModel)
+        WinRates(statsMyUiModel)
+        MyStats(statsMyUiModel)
         AttendanceStats(averageStats)
     }
 }
 
 @Composable
-private fun WinRateColumn(
+private fun WinRates(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
@@ -251,7 +251,7 @@ private fun WinDrawLoseCountsRow(
 }
 
 @Composable
-private fun MyStatsRow(
+private fun MyStats(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
@@ -406,14 +406,14 @@ private fun StatItem(
 
 @Preview
 @Composable
-private fun WinRateColumnPreview() {
-    WinRateColumn(StatsMyUiModel())
+private fun WinRatesPreview() {
+    WinRates(StatsMyUiModel())
 }
 
 @Preview
 @Composable
-private fun MyStatsRowPreview() {
-    MyStatsRow(StatsMyUiModel())
+private fun MyStatsPreview() {
+    MyStats(StatsMyUiModel())
 }
 
 @Preview
