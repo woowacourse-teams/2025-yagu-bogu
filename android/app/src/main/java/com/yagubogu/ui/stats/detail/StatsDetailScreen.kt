@@ -4,18 +4,14 @@ import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,8 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,15 +35,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.common.component.ShowMoreButton
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import com.yagubogu.ui.theme.Gray050
-import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium12
-import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
@@ -183,36 +176,6 @@ private fun VsTeamStatItem(
             )
         }
         Text(text = stringResource(R.string.all_win_rate, vsTeamStatItem.winningPercentage))
-    }
-}
-
-@Composable
-private fun ShowMoreButton(
-    isVsTeamStatsExpanded: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .border((0.6).dp, Gray300, RoundedCornerShape(12.dp))
-                .padding(vertical = 8.dp),
-    ) {
-        Text(
-            text = stringResource(if (isVsTeamStatsExpanded) R.string.home_show_less else R.string.home_show_more),
-            color = Gray400,
-            style = PretendardRegular,
-            fontSize = 14.sp,
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Image(
-            painter = painterResource(if (isVsTeamStatsExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down),
-            contentDescription = stringResource(if (isVsTeamStatsExpanded) R.string.home_show_less else R.string.home_show_more),
-            colorFilter = ColorFilter.tint(Gray400),
-            modifier = Modifier.size(20.dp),
-        )
     }
 }
 
