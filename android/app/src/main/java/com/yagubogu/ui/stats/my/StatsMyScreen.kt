@@ -396,7 +396,7 @@ private fun StatItem(
             Spacer(modifier = Modifier.height(8.dp))
         }
         Text(
-            text = value ?: stringResource(R.string.stats_my_no_lucky_stadium),
+            text = value ?: stringResource(R.string.stats_no_data),
             style = PretendardSemiBold20,
         )
         Spacer(modifier = Modifier.height(4.dp))
