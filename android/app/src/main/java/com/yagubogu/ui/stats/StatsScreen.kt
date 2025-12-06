@@ -93,7 +93,7 @@ private fun StatsTabRow(
         },
         divider = {},
         modifier =
-            Modifier
+            modifier
                 .padding(top = 8.dp, start = 20.dp, end = 20.dp)
                 .height(60.dp)
                 .clip(RoundedCornerShape(12.dp))
