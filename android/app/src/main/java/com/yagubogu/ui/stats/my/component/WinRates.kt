@@ -91,7 +91,7 @@ fun WinRates(
 }
 
 @Composable
-fun WinRatePieChart(
+private fun WinRatePieChart(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
@@ -144,7 +144,7 @@ fun WinRatePieChart(
 }
 
 @Composable
-fun WinDrawLoseCounts(
+private fun WinDrawLoseCounts(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {

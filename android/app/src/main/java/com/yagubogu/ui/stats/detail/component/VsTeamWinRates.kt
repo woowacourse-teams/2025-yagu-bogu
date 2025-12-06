@@ -69,7 +69,7 @@ fun VsTeamWinRates(
 }
 
 @Composable
-fun VsTeamStatItem(
+private fun VsTeamStatItem(
     vsTeamStatItem: VsTeamStatItem,
     modifier: Modifier = Modifier,
 ) {
