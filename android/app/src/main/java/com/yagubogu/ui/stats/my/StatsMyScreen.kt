@@ -135,7 +135,7 @@ private fun WinRateColumn(
                             .padding(8.dp)
                             .noRippleClickable {
                                 balloonWindow.showAlignBottom(yOff = -30)
-                                Firebase.analytics.logEvent("attendance_history_item_click", null)
+                                Firebase.analytics.logEvent("tooltip_my_chart", null)
                             },
                 )
             }
@@ -293,7 +293,7 @@ private fun MyStatsRow(
                         Modifier
                             .noRippleClickable {
                                 balloonWindow.showAlignBottom(yOff = -60)
-                                Firebase.analytics.logEvent("attendance_history_item_click", null)
+                                Firebase.analytics.logEvent("tooltip_lucky_stadium", null)
                             },
                 )
             }
