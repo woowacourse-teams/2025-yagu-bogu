@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -29,6 +32,7 @@ import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.stats.StatsFragment
+import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -43,21 +47,32 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupView()
-        setupBindings()
-        setupBottomNavigationView()
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        handleBackPress()
-
-        if (savedInstanceState == null) {
-            binding.bnvNavigation.selectedItemId = R.id.item_home
-            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
-            switchFragment(
-                HomeFragment::class.java,
-                homeMenuItem,
-            )
+        enableEdgeToEdge()
+        setContent {
+            val view = LocalView.current
+            LaunchedEffect(Unit) {
+                WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
+            }
+            YaguBoguTheme {
+                MainScreen()
+            }
         }
+
+//        setupView()
+//        setupBindings()
+//        setupBottomNavigationView()
+//        setSupportActionBar(binding.toolbar)
+//        supportActionBar?.setDisplayShowTitleEnabled(false)
+//        handleBackPress()
+//
+//        if (savedInstanceState == null) {
+//            binding.bnvNavigation.selectedItemId = R.id.item_home
+//            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
+//            switchFragment(
+//                HomeFragment::class.java,
+//                homeMenuItem,
+//            )
+//        }
     }
 
     override fun onResume() {

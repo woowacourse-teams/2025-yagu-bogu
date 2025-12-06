@@ -2,6 +2,8 @@ package com.yagubogu.ui.main
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -20,6 +22,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.R
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.theme.Gray050
@@ -33,6 +38,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
     var selectedItem by rememberSaveable(stateSaver = BottomNavKey.keySaver) {
         mutableStateOf(BottomNavKey.Home)
     }
+
+    val backStack = rememberNavBackStack(BottomNavKey.Home)
 
     @StringRes
     val titleResId: Int =
@@ -57,7 +64,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 BottomNavKey.items.forEach { item: BottomNavKey ->
                     NavigationBarItem(
                         selected = selectedItem == item,
-                        onClick = { selectedItem = item },
+                        onClick = {
+                            backStack.clear()
+                            backStack.add(item)
+                            selectedItem = item
+                        },
                         icon = {
                             Icon(
                                 painter = painterResource(item.icon),
@@ -86,6 +97,17 @@ fun MainScreen(modifier: Modifier = Modifier) {
             }
         },
     ) { innerPadding: PaddingValues ->
+        NavDisplay(
+            modifier = Modifier.padding(innerPadding).fillMaxSize(),
+            backStack = backStack,
+            entryProvider =
+                entryProvider {
+                    // TODO: 다른 화면 모두 추가
+                    entry<BottomNavKey.Stats> {
+//                        StatsScreen(statsMyViewModel, statsDetailViewModel)
+                    }
+                },
+        )
     }
 }
 
