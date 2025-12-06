@@ -2,8 +2,8 @@ package com.yagubogu.presentation.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.domain.model.Team
-import com.yagubogu.domain.repository.MemberRepository
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ class FavoriteTeamViewModel @Inject constructor(
         viewModelScope.launch {
             selectedTeam?.let { team: Team ->
                 memberRepository
-                    .updateFavoriteTeam(team)
+                    .updateFavoriteTeam(team.name)
                     .onSuccess {
                         _favoriteTeamUpdateEvent.setValue(Unit)
                     }.onFailure { exception: Throwable ->

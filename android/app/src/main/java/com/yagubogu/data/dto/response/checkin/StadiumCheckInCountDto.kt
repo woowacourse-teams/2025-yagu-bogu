@@ -1,6 +1,5 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,10 +11,4 @@ data class StadiumCheckInCountDto(
     val location: String, // 구장 지역
     @SerialName("checkInCounts")
     val checkInCounts: Int, // 구장 방문 횟수
-) {
-    fun toPresentation(): StadiumVisitCount =
-        StadiumVisitCount(
-            location = location,
-            visitCounts = checkInCounts,
-        )
-}
+)

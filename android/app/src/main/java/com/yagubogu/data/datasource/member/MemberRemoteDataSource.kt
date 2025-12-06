@@ -13,7 +13,6 @@ import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
-import com.yagubogu.domain.model.Team
 import javax.inject.Inject
 
 class MemberRemoteDataSource @Inject constructor(
@@ -40,9 +39,9 @@ class MemberRemoteDataSource @Inject constructor(
             memberApiService.getFavoriteTeam()
         }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<MemberFavoriteResponse> =
+    override suspend fun updateFavoriteTeam(teamCode: String): Result<MemberFavoriteResponse> =
         safeApiCall {
-            val request = MemberFavoriteRequest(team.name)
+            val request = MemberFavoriteRequest(teamCode)
             memberApiService.patchFavoriteTeam(request)
         }
 

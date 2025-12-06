@@ -1,7 +1,5 @@
 package com.yagubogu.data.dto.response.stats
 
-import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,15 +21,4 @@ data class OpponentWinRateTeamDto(
     val draws: Int, // 무승부 횟수
     @SerialName("winRate")
     val winRate: Double, // 승률(%)
-) {
-    fun toPresentation(rank: Int): VsTeamStatItem =
-        VsTeamStatItem(
-            rank = rank,
-            team = Team.getByCode(teamCode),
-            teamName = shortName,
-            winCounts = wins,
-            drawCounts = draws,
-            loseCounts = losses,
-            winningPercentage = winRate,
-        )
-}
+)
