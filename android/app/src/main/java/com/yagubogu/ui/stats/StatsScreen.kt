@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -30,8 +31,9 @@ import com.yagubogu.ui.stats.detail.StatsDetailScreen
 import com.yagubogu.ui.stats.detail.StatsDetailViewModel
 import com.yagubogu.ui.stats.my.StatsMyScreen
 import com.yagubogu.ui.stats.my.StatsMyViewModel
-import com.yagubogu.ui.theme.PretendardSemiBold
+import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardSemiBold16
+import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary100
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
@@ -58,7 +60,7 @@ fun StatsScreen(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-        ) { page ->
+        ) { page: Int ->
             when (page) {
                 StatsTab.MY_STATS.ordinal -> StatsMyScreen(statsMyViewModel)
                 StatsTab.DETAIL_STATS.ordinal -> StatsDetailScreen(statsDetailViewModel)
@@ -74,9 +76,9 @@ private fun StatsTabRow(
 ) {
     TabRow(
         selectedTabIndex = pagerState.currentPage,
-        containerColor = Primary100,
+        containerColor = Primary050,
         contentColor = Primary500,
-        indicator = { tabPositions ->
+        indicator = { tabPositions: List<TabPosition> ->
             TabRowDefaults.PrimaryIndicator(
                 modifier =
                     Modifier
@@ -96,7 +98,7 @@ private fun StatsTabRow(
                 .clip(RoundedCornerShape(12.dp))
                 .border(1.dp, Primary100, RoundedCornerShape(12.dp)),
     ) {
-        StatsTab.entries.forEachIndexed { index, tab ->
+        StatsTab.entries.forEachIndexed { index: Int, tab: StatsTab ->
             val isSelected = pagerState.currentPage == index
 
             Tab(
@@ -117,7 +119,7 @@ private fun StatsTabRow(
                 content = {
                     val style: TextStyle =
                         if (isSelected) {
-                            PretendardSemiBold.copy(color = White, fontSize = 18.sp)
+                            PretendardBold.copy(color = White, fontSize = 18.sp)
                         } else {
                             PretendardSemiBold16.copy(color = Primary700)
                         }
