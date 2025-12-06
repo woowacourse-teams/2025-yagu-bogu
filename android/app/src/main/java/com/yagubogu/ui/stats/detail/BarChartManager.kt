@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail
 
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.yagubogu.R
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 
 /**
  * HorizontalBarChart의 스타일과 데이터를 관리하는 클래스
@@ -32,9 +33,13 @@ class BarChartManager(
             setTouchEnabled(false)
 
             // 값 축 숨김
-            axisLeft.isEnabled = false
+            axisLeft.apply {
+                isEnabled = false
+                axisMinimum = 0f
+            }
             axisRight.isEnabled = false
 
+            setExtraOffsets(-20f, 0f, 20f, 0f)
             // X축 (실제로는 화면에서 Y축처럼 보임)
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM // 왼쪽에 라벨이 오도록
@@ -44,7 +49,7 @@ class BarChartManager(
                 isGranularityEnabled = true
                 textSize = TEXT_SIZE
                 typeface = pretendardTypeface
-                xOffset = -10f // 라벨 좌우 간격
+                xOffset = 10f // 라벨 좌우 간격
             }
 
             // 오른쪽만 둥글게 그리는 Custom Renderer

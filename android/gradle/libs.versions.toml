@@ -58,6 +58,7 @@ androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 balloon = { module = "com.github.skydoves:balloon", version.ref = "balloon" }
+balloon-compose = { module = "com.github.skydoves:balloon-compose", version.ref = "balloon" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }

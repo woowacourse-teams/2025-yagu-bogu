@@ -10,6 +10,7 @@ val PretendardRegular =
         fontWeight = FontWeight.Normal,
     )
 val PretendardRegular12 = PretendardRegular.copy(fontSize = 12.sp)
+val PretendardRegular16 = PretendardRegular.copy(fontSize = 16.sp)
 
 val PretendardMedium =
     TextStyle(
@@ -24,6 +25,7 @@ val PretendardSemiBold =
         fontWeight = FontWeight.SemiBold,
     )
 val PretendardSemiBold12 = PretendardSemiBold.copy(fontSize = 12.sp)
+val PretendardSemiBold16 = PretendardSemiBold.copy(fontSize = 16.sp)
 val PretendardSemiBold20 = PretendardSemiBold.copy(fontSize = 20.sp)
 
 val PretendardBold =
@@ -34,6 +36,7 @@ val PretendardBold =
 val PretendardBold12 = PretendardBold.copy(fontSize = 12.sp)
 val PretendardBold16 = PretendardBold.copy(fontSize = 16.sp)
 val PretendardBold20 = PretendardBold.copy(fontSize = 20.sp)
+val PretendardBold32 = PretendardBold.copy(fontSize = 32.sp)
 
 val EsamanruMedium =
     TextStyle(
