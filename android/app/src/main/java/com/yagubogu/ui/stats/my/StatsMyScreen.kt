@@ -94,7 +94,6 @@ private fun StatsMyScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
-                .fillMaxSize()
                 .background(Gray050)
                 .verticalScroll(scrollState)
                 .padding(20.dp),

@@ -1,5 +1,6 @@
 package com.yagubogu.ui.stats.detail
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -11,13 +12,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -92,24 +91,24 @@ private fun StatsDetailScreen(
     onShowMoreClick: () -> Unit = {},
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
                 .background(Gray050)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .padding(20.dp),
     ) {
-        VsTeamWinningPercentageColumn(
+        VsTeamWinRateColumn(
             onShowMoreClick = onShowMoreClick,
             vsTeamStatItems = vsTeamStatItems,
             isVsTeamStatsExpanded = isVsTeamStatsExpanded,
-            modifier = modifier.fillMaxSize(),
         )
         StadiumVisitCounts(stadiumVisitCounts = stadiumVisitCounts)
     }
 }
 
 @Composable
-private fun VsTeamWinningPercentageColumn(
+private fun VsTeamWinRateColumn(
     onShowMoreClick: () -> Unit,
     vsTeamStatItems: List<VsTeamStatItem>,
     isVsTeamStatsExpanded: Boolean,
@@ -119,41 +118,19 @@ private fun VsTeamWinningPercentageColumn(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
-                .padding(vertical = 20.dp)
-                .noRippleClickable { onShowMoreClick() },
-    ) {
-        VsTeamWinningPercentage(
-            vsTeamStatItems = vsTeamStatItems,
-            isVsTeamStatsExpanded = isVsTeamStatsExpanded,
-            modifier =
-                Modifier.animateContentSize(
+                .noRippleClickable { onShowMoreClick() }
+                .animateContentSize(
                     animationSpec =
                         spring(
                             dampingRatio = Spring.DampingRatioLowBouncy,
                             stiffness = Spring.StiffnessLow,
                         ),
-                ),
-        )
-    }
-}
-
-@Composable
-private fun VsTeamWinningPercentage(
-    vsTeamStatItems: List<VsTeamStatItem>,
-    isVsTeamStatsExpanded: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier =
-            modifier
-                .background(White, RoundedCornerShape(12.dp))
+                ).background(White, RoundedCornerShape(12.dp))
                 .padding(20.dp),
     ) {
         Text(
             text = stringResource(R.string.stats_vs_team_winning_percentage),
             style = PretendardBold20,
-            modifier = Modifier.fillMaxWidth(),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -173,22 +150,26 @@ private fun VsTeamStatItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+        modifier = modifier.padding(vertical = 8.dp),
     ) {
         Text(
             text = vsTeamStatItem.rank.toString(),
             style = PretendardRegular16,
             textAlign = TextAlign.Center,
             color = Gray500,
-            modifier = Modifier.widthIn(min = 32.dp),
+            modifier = Modifier.width(20.dp),
         )
-        Text(text = vsTeamStatItem.teamEmoji, fontSize = 24.sp)
-        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = vsTeamStatItem.teamEmoji,
+            fontSize = 24.sp,
+            modifier = Modifier.padding(horizontal = 10.dp),
+        )
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = vsTeamStatItem.teamName, style = PretendardSemiBold, fontSize = 16.sp)
+            Text(
+                text = vsTeamStatItem.teamName,
+                style = PretendardSemiBold,
+                fontSize = 16.sp,
+            )
             Text(
                 text =
                     stringResource(
@@ -251,11 +232,10 @@ private fun StadiumVisitCounts(
         Text(
             text = stringResource(R.string.stats_stadium_visit_count),
             style = PretendardBold20,
-            modifier = Modifier.fillMaxWidth(),
         )
         @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
         AndroidView(
-            factory = { context ->
+            factory = { context: Context ->
                 val barChart = HorizontalBarChart(context)
                 barChartManager = BarChartManager(context, barChart)
                 barChartManager?.setupChart()
@@ -273,7 +253,7 @@ private fun StadiumVisitCounts(
 @Preview
 @Composable
 private fun VsTeamWinningPercentageColumnPreview() {
-    VsTeamWinningPercentageColumn(
+    VsTeamWinRateColumn(
         onShowMoreClick = { },
         vsTeamStatItems = DUMMY_VS_TEAM_STAT_ITEMS,
         isVsTeamStatsExpanded = false,
