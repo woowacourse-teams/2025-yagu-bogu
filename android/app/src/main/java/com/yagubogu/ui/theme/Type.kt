@@ -42,3 +42,4 @@ val EsamanruMedium =
 
 val EsamanruMedium12 = EsamanruMedium.copy(fontSize = 12.sp)
 val EsamanruMedium20 = EsamanruMedium.copy(fontSize = 20.sp)
+val EsamanruMedium24 = EsamanruMedium.copy(fontSize = 24.sp)
