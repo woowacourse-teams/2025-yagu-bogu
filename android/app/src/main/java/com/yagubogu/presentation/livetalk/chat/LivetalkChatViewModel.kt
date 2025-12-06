@@ -78,7 +78,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             fetchTeams(gameId)
-            fetchBeforeTalks()
             startPolling()
         }
     }
