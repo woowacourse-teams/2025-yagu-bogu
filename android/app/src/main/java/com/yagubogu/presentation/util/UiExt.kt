@@ -6,13 +6,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
-import com.skydoves.balloon.ArrowOrientation
-import com.skydoves.balloon.ArrowOrientationRules
 import com.skydoves.balloon.Balloon
-import com.skydoves.balloon.compose.rememberBalloonBuilder
 import com.yagubogu.R
 
 fun View.showSnackbar(
@@ -68,20 +64,3 @@ fun Context.buildBalloon(
     .setArrowTopPadding(4)
     .setLifecycleOwner(lifecycleOwner) // lifecycle에 맞춰 자동 dismiss
     .build()
-
-@Composable
-fun rememberBalloonBuilder(
-    @StringRes textResId: Int,
-): Balloon.Builder =
-    rememberBalloonBuilder {
-        setTextResource(textResId)
-        setWidthRatio(0.5f)
-        setCornerRadius(8f)
-        setPaddingHorizontal(10)
-        setPaddingVertical(8)
-        setTextColorResource(R.color.gray800)
-        setBackgroundColorResource(R.color.gray200)
-        setArrowTopPadding(4)
-        setArrowOrientation(ArrowOrientation.TOP)
-        setArrowOrientationRules(ArrowOrientationRules.ALIGN_FIXED)
-    }

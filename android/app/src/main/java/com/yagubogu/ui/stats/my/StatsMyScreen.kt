@@ -42,7 +42,6 @@ import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
-import com.yagubogu.presentation.util.rememberBalloonBuilder
 import com.yagubogu.ui.stats.my.model.AverageStats
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.theme.Gray050
@@ -59,6 +58,7 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.noRippleClickable
+import com.yagubogu.ui.util.rememberBalloonBuilder
 
 @Composable
 fun StatsMyScreen(
