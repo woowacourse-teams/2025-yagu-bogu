@@ -27,6 +27,7 @@ fun MainToolbar(
     modifier: Modifier = Modifier,
 ) {
     TopAppBar(
+        modifier = modifier,
         title = { Text(text = title, style = EsamanruMedium24) },
         actions = {
             IconButton(onClick = onBadgeClick) {
