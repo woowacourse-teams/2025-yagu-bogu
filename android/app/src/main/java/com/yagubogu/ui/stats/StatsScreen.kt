@@ -50,7 +50,7 @@ fun StatsScreen(
     statsDetailViewModel: StatsDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val pagerState: PagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     Column(
@@ -61,9 +61,9 @@ fun StatsScreen(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
-            when (page) {
-                StatsTab.MY_STATS.ordinal -> StatsMyScreen(statsMyViewModel)
-                StatsTab.DETAIL_STATS.ordinal -> StatsDetailScreen(statsDetailViewModel)
+            when (StatsTab.entries[page]) {
+                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel)
             }
         }
     }
@@ -73,6 +73,7 @@ fun StatsScreen(
 private fun StatsTabRow(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
+    modifier: Modifier = Modifier,
 ) {
     TabRow(
         selectedTabIndex = pagerState.currentPage,
