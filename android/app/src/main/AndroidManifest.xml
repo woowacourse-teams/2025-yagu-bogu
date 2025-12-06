@@ -42,7 +42,7 @@
             android:name=".presentation.favorite.FavoriteTeamActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false" />
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
