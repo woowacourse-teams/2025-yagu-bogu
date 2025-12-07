@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail.model
 
 data class StadiumVisitCount(
     val location: String,

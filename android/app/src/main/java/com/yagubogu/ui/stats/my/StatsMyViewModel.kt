@@ -1,15 +1,23 @@
-package com.yagubogu.presentation.stats.my
+package com.yagubogu.ui.stats.my
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
+import com.yagubogu.ui.stats.my.model.AverageStats
+import com.yagubogu.ui.stats.my.model.StatsCounts
+import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -21,11 +29,19 @@ class StatsMyViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-    private val _statsMyUiModel = MutableLiveData<StatsMyUiModel>()
-    val statsMyUiModel: LiveData<StatsMyUiModel> get() = _statsMyUiModel
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
 
-    private val _averageStats = MutableLiveData<AverageStats>()
-    val averageStats: LiveData<AverageStats> = _averageStats
+    private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
+    val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
+
+    private val _averageStats = MutableStateFlow(AverageStats())
+    val averageStats: StateFlow<AverageStats> = _averageStats.asStateFlow()
 
     init {
         fetchAll()
@@ -34,6 +50,12 @@ class StatsMyViewModel @Inject constructor(
     fun fetchAll() {
         fetchMyStats()
         fetchMyAverageStats()
+    }
+
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
+        }
     }
 
     private fun fetchMyStats(year: Int = LocalDate.now().year) {

@@ -13,7 +13,7 @@ import com.yagubogu.presentation.attendance.model.GameScoreBoard
 import com.yagubogu.presentation.attendance.model.GameTeam
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.home.stadium.TeamFanRate
-import com.yagubogu.presentation.stats.detail.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import java.time.LocalDate
 
 fun FanRateByGameDto.toUiModel(): StadiumFanRateItem =

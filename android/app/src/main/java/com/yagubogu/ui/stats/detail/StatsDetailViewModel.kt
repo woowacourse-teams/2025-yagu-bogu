@@ -1,8 +1,5 @@
-package com.yagubogu.presentation.stats.detail
+package com.yagubogu.ui.stats.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
@@ -11,7 +8,19 @@ import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
 import com.yagubogu.presentation.util.mapListIndexed
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -22,19 +31,32 @@ class StatsDetailViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
-    private val _isVsTeamStatsExpanded = MutableLiveData(false)
-    val isVsTeamStatsExpanded: LiveData<Boolean> get() = _isVsTeamStatsExpanded
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
 
-    private var vsTeamStatItems: List<VsTeamStatItem> = emptyList()
+    private val _isVsTeamStatsExpanded = MutableStateFlow(false)
+    val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
 
-    private val _stadiumVisitCounts = MutableLiveData<List<StadiumVisitCount>>()
-    val stadiumVisitCounts: LiveData<List<StadiumVisitCount>> get() = _stadiumVisitCounts
+    private val _stadiumVisitCounts = MutableStateFlow<List<StadiumVisitCount>>(emptyList())
+    val stadiumVisitCounts: StateFlow<List<StadiumVisitCount>> = _stadiumVisitCounts.asStateFlow()
 
-    private val _vsTeamStats: MutableLiveData<List<VsTeamStatItem>> =
-        MediatorLiveData<List<VsTeamStatItem>>().apply {
-            addSource(isVsTeamStatsExpanded) { value = updateVsTeamStats() }
-        }
-    val vsTeamStats: LiveData<List<VsTeamStatItem>> get() = _vsTeamStats
+    private val _vsTeamStatItems = MutableStateFlow<List<VsTeamStatItem>>(emptyList())
+    val vsTeamStatItems: StateFlow<List<VsTeamStatItem>> =
+        combine(
+            isVsTeamStatsExpanded,
+            _vsTeamStatItems,
+        ) { isExpanded: Boolean, vsTeamStats: List<VsTeamStatItem> ->
+            if (!isExpanded) vsTeamStats.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStats
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
 
     init {
         fetchAll()
@@ -45,8 +67,14 @@ class StatsDetailViewModel @Inject constructor(
         fetchStadiumVisitCounts()
     }
 
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
+        }
+    }
+
     fun toggleVsTeamStats() {
-        _isVsTeamStatsExpanded.value = isVsTeamStatsExpanded.value?.not() ?: true
+        _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
     }
 
     private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
@@ -59,8 +87,7 @@ class StatsDetailViewModel @Inject constructor(
                     }
             vsTeamStatsResult
                 .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
-                    vsTeamStatItems = updatedVsTeamStats
-                    _vsTeamStats.value = updateVsTeamStats()
+                    _vsTeamStatItems.value = updatedVsTeamStats
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -79,11 +106,6 @@ class StatsDetailViewModel @Inject constructor(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
-    }
-
-    private fun updateVsTeamStats(): List<VsTeamStatItem> {
-        val isExpanded: Boolean = isVsTeamStatsExpanded.value ?: false
-        return if (!isExpanded) vsTeamStatItems.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStatItems
     }
 
     companion object {
