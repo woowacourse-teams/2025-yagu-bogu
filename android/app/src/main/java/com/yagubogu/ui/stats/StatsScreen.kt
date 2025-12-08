@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     statsMyViewModel: StatsMyViewModel = hiltViewModel(),
     statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
@@ -55,7 +57,7 @@ fun StatsScreen(
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-    BackPressHandler()
+    BackPressHandler(snackbarHostState, coroutineScope)
 
     Column(
         modifier = modifier.fillMaxSize(),

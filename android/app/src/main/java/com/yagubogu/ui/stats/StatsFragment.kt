@@ -29,10 +29,10 @@ class StatsFragment :
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                StatsScreen(
-                    statsMyViewModel = statsMyViewModel,
-                    statsDetailViewModel = statsDetailViewModel,
-                )
+//                StatsScreen(
+//                    statsMyViewModel = statsMyViewModel,
+//                    statsDetailViewModel = statsDetailViewModel,
+//                )
             }
         }
 

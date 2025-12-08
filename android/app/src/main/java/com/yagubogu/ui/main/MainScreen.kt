@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +32,7 @@ import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.NavigationState
 import com.yagubogu.ui.util.Navigator
 import com.yagubogu.ui.util.rememberNavigationState
@@ -39,16 +44,17 @@ fun MainScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectedItem: BottomNavKey by rememberSaveable(stateSaver = BottomNavKey.keySaver) {
-        mutableStateOf(BottomNavKey.Home)
-    }
-
+    val snackbarHostState = remember { SnackbarHostState() }
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = BottomNavKey.Home,
             topLevelRoutes = BottomNavKey.items.toSet(),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
+
+    var selectedItem: BottomNavKey by rememberSaveable(stateSaver = BottomNavKey.keySaver) {
+        mutableStateOf(BottomNavKey.Home)
+    }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
     LaunchedEffect(selectedItem) {
@@ -85,12 +91,24 @@ fun MainScreen(
                 },
             )
         },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = {
+                    Snackbar(
+                        snackbarData = it,
+                        containerColor = Color.DarkGray,
+                        contentColor = White,
+                    )
+                },
+            )
+        },
     ) { innerPadding: PaddingValues ->
         val entryProvider: (NavKey) -> NavEntry<NavKey> =
             entryProvider {
-                entry<BottomNavKey.Home> { StatsScreen() }
+                entry<BottomNavKey.Home> { StatsScreen(snackbarHostState) }
                 entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
-                entry<BottomNavKey.Stats> { StatsScreen() }
+                entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState) }
                 entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
             }
 
