@@ -27,6 +27,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.R
+import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
@@ -70,13 +71,21 @@ fun MainScreen(modifier: Modifier = Modifier) {
             )
         },
         bottomBar = {
+            MainNavigationBar(
+                selectedItem = selectedItem,
+                onItemClick = { item: BottomNavKey ->
+                    navigator.navigate(item)
+                    selectedItem = item
+                },
+            )
+
             NavigationBar(containerColor = White) {
                 BottomNavKey.items.forEach { item: BottomNavKey ->
                     NavigationBarItem(
                         selected = selectedItem == item,
                         onClick = {
-                            navigator.navigate(item)
                             selectedItem = item
+                            navigator.navigate(selectedItem)
                         },
                         icon = {
                             Icon(
