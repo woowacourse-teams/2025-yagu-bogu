@@ -3,7 +3,6 @@ package com.yagubogu.ui.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -13,11 +12,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.setting.SettingActivity
@@ -81,30 +78,6 @@ class MainActivity : AppCompatActivity() {
             if (currentFragment is ScrollToTop) {
                 currentFragment.scrollToTop()
             }
-        }
-    }
-
-    private fun switchFragment(
-        fragmentClass: Class<out Fragment>,
-        item: MenuItem,
-    ) {
-        val tag: String = fragmentClass.name
-        val targetFragment: Fragment? = supportFragmentManager.findFragmentByTag(tag)
-        if (targetFragment?.isVisible == true) return
-
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            supportFragmentManager.fragments.forEach { if (it != targetFragment) hide(it) }
-
-            if (targetFragment == null) {
-                add(binding.fcvFragment.id, fragmentClass, null, tag)
-            } else {
-                show(targetFragment)
-            }
-        }
-
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            param(FirebaseAnalytics.Param.SCREEN_NAME, "${item.title} Fragment")
         }
     }
 

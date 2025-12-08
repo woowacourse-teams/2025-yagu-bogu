@@ -33,13 +33,13 @@ fun MainNavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(item.icon),
-                        contentDescription = stringResource(item.title),
+                        contentDescription = stringResource(item.label),
                         modifier = Modifier.size(24.dp),
                     )
                 },
                 label = {
                     Text(
-                        text = stringResource(item.title),
+                        text = stringResource(item.label),
                         style = PretendardSemiBold12,
                     )
                 },

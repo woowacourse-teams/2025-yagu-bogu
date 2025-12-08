@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,10 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
@@ -57,6 +62,13 @@ fun MainScreen(
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
 
+    val selectedItemLabel: String = stringResource(selectedItem.label)
+    LaunchedEffect(selectedItem) {
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+            param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel 화면")
+        }
+    }
+
     Scaffold(
         containerColor = Gray050,
         topBar = {
@@ -65,9 +77,10 @@ fun MainScreen(
                     stringResource(
                         when (selectedItem) {
                             BottomNavKey.Home -> R.string.app_name
-                            BottomNavKey.Livetalk -> R.string.bottom_navigation_livetalk
-                            BottomNavKey.Stats -> R.string.bottom_navigation_stats
-                            BottomNavKey.AttendanceHistory -> R.string.bottom_navigation_attendance_history
+                            BottomNavKey.Livetalk,
+                            BottomNavKey.Stats,
+                            BottomNavKey.AttendanceHistory,
+                            -> selectedItem.label
                         },
                     ),
                 onBadgeClick = onBadgeClick,
@@ -94,13 +107,13 @@ fun MainScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(item.icon),
-                                contentDescription = stringResource(item.title),
+                                contentDescription = stringResource(item.label),
                                 modifier = Modifier.size(24.dp),
                             )
                         },
                         label = {
                             Text(
-                                text = stringResource(item.title),
+                                text = stringResource(item.label),
                                 style = PretendardSemiBold12,
                             )
                         },
