@@ -1,5 +1,6 @@
 package com.yagubogu.ui.main.component
 
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -18,6 +19,8 @@ import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardSemiBold12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun MainNavigationBar(
@@ -51,7 +54,14 @@ fun MainNavigationBar(
                         unselectedTextColor = Gray500,
                         indicatorColor = White,
                     ),
-                interactionSource = MutableInteractionSource(),
+                interactionSource =
+                    object : MutableInteractionSource { // Ripple 효과 제거 위함
+                        override suspend fun emit(interaction: Interaction) {}
+
+                        override fun tryEmit(interaction: Interaction): Boolean = true
+
+                        override val interactions: Flow<Interaction> = emptyFlow()
+                    },
             )
         }
     }
