@@ -41,7 +41,11 @@ import com.yagubogu.ui.util.rememberNavigationState
 import com.yagubogu.ui.util.toEntries
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(
+    onBadgeClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     var selectedItem: BottomNavKey by rememberSaveable(stateSaver = BottomNavKey.keySaver) {
         mutableStateOf(BottomNavKey.Home)
     }
@@ -66,8 +70,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
                             BottomNavKey.AttendanceHistory -> R.string.bottom_navigation_attendance_history
                         },
                     ),
-                onBadgeClick = { },
-                onSettingsClick = { },
+                onBadgeClick = onBadgeClick,
+                onSettingsClick = onSettingsClick,
             )
         },
         bottomBar = {
@@ -137,5 +141,5 @@ fun MainScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(onBadgeClick = {}, onSettingsClick = {})
 }

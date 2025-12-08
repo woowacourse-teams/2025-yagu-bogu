@@ -20,14 +20,10 @@ import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.databinding.ActivityMainBinding
-import com.yagubogu.presentation.attendance.AttendanceHistoryFragment
-import com.yagubogu.presentation.home.HomeFragment
-import com.yagubogu.presentation.livetalk.LivetalkFragment
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.ui.badge.BadgeActivity
-import com.yagubogu.ui.stats.StatsFragment
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,24 +46,15 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
             }
             YaguBoguTheme {
-                MainScreen()
+                MainScreen(
+                    onBadgeClick = ::navigateToBadge,
+                    onSettingsClick = ::navigateToSettings,
+                )
             }
         }
 
-//        setupBindings()
 //        setupBottomNavigationView()
-//        setSupportActionBar(binding.toolbar)
-//        supportActionBar?.setDisplayShowTitleEnabled(false)
 //        handleBackPress()
-//
-//        if (savedInstanceState == null) {
-//            binding.bnvNavigation.selectedItemId = R.id.item_home
-//            val homeMenuItem = binding.bnvNavigation.menu.findItem(R.id.item_home)
-//            switchFragment(
-//                HomeFragment::class.java,
-//                homeMenuItem,
-//            )
-//        }
     }
 
     fun setLoadingScreen(isLoading: Boolean) {
@@ -76,38 +63,17 @@ class MainActivity : AppCompatActivity() {
         binding.cpiCheckInLoading.visibility = visibility
     }
 
-    private fun setupBindings() {
-        binding.ivBadge.setOnClickListener {
-            val intent = BadgeActivity.newIntent(this)
-            startActivity(intent)
-        }
+    private fun navigateToBadge() {
+        val intent = BadgeActivity.newIntent(this)
+        startActivity(intent)
+    }
 
-        binding.ivSettings.setOnClickListener {
-            val intent = SettingActivity.newIntent(this)
-            startActivity(intent)
-        }
+    private fun navigateToSettings() {
+        val intent = SettingActivity.newIntent(this)
+        startActivity(intent)
     }
 
     private fun setupBottomNavigationView() {
-        binding.bnvNavigation.setOnApplyWindowInsetsListener(null)
-        binding.bnvNavigation.setOnItemSelectedListener { item: MenuItem ->
-            val fragmentClass =
-                when (item.itemId) {
-                    R.id.item_home -> HomeFragment::class.java
-                    R.id.item_stats -> StatsFragment::class.java
-                    R.id.item_livetalk -> LivetalkFragment::class.java
-                    R.id.item_attendance_history -> AttendanceHistoryFragment::class.java
-                    else -> null
-                }
-
-            if (fragmentClass != null) {
-                switchFragment(fragmentClass, item)
-                true
-            } else {
-                false
-            }
-        }
-
         binding.bnvNavigation.setOnItemReselectedListener {
             val currentFragment: Fragment? =
                 supportFragmentManager.fragments.firstOrNull { it.isVisible }
