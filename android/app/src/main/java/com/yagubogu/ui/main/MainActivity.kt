@@ -8,8 +8,6 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
@@ -58,7 +56,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        setupView()
 //        setupBindings()
 //        setupBottomNavigationView()
 //        setSupportActionBar(binding.toolbar)
@@ -75,26 +72,10 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        setToolbarTitle(binding.bnvNavigation.selectedItemId)
-    }
-
     fun setLoadingScreen(isLoading: Boolean) {
         val visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.viewOverlay.visibility = visibility
         binding.cpiCheckInLoading.visibility = visibility
-    }
-
-    private fun setupView() {
-        enableEdgeToEdge()
-        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityMainRoot) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 
     private fun setupBindings() {
@@ -157,26 +138,10 @@ class MainActivity : AppCompatActivity() {
                 show(targetFragment)
             }
         }
-        setToolbarTitle(item.itemId)
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "${item.title} Fragment")
         }
-    }
-
-    private fun setToolbarTitle(
-        @IdRes selectedItemId: Int,
-    ) {
-        @StringRes
-        val titleResId: Int =
-            when (selectedItemId) {
-                R.id.item_home -> R.string.app_name
-                R.id.item_stats -> R.string.bottom_navigation_stats
-                R.id.item_attendance_history -> R.string.bottom_navigation_attendance_history
-                R.id.item_livetalk -> R.string.bottom_navigation_livetalk
-                else -> R.string.app_name
-            }
-        binding.tvToolbarTitle.text = getString(titleResId)
     }
 
     private fun handleBackPress() {
