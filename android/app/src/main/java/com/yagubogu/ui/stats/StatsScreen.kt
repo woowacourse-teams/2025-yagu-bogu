@@ -27,6 +27,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yagubogu.ui.stats.detail.StatsDetailScreen
 import com.yagubogu.ui.stats.detail.StatsDetailViewModel
 import com.yagubogu.ui.stats.my.StatsMyScreen
@@ -46,9 +48,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
-    statsMyViewModel: StatsMyViewModel,
-    statsDetailViewModel: StatsDetailViewModel,
     modifier: Modifier = Modifier,
+    statsMyViewModel: StatsMyViewModel = hiltViewModel(),
+    statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
 ) {
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
