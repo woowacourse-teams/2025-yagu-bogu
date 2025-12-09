@@ -1,5 +1,7 @@
 package com.yagubogu.ui.main
 
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,6 +11,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -31,6 +33,7 @@ import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.badge.BadgeActivity
+import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.stats.StatsScreen
@@ -43,7 +46,10 @@ import com.yagubogu.ui.util.toEntries
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier,
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navigationState: NavigationState =
         rememberNavigationState(
@@ -65,72 +71,75 @@ fun MainScreen(modifier: Modifier = Modifier) {
     val reselectFlow: MutableSharedFlow<Unit> =
         remember { MutableSharedFlow(extraBufferCapacity = 1) }
     val context = LocalContext.current
+    val activity = LocalActivity.current as MainActivity
 
-    Scaffold(
-        containerColor = Gray050,
-        topBar = {
-            MainToolbar(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                title =
-                    stringResource(
-                        when (selectedItem) {
-                            BottomNavKey.Home -> R.string.app_name
-                            BottomNavKey.Livetalk,
-                            BottomNavKey.Stats,
-                            BottomNavKey.AttendanceHistory,
-                            -> selectedItem.label
-                        },
-                    ),
-                onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
-                onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
-            )
-        },
-        bottomBar = {
-            MainNavigationBar(
-                selectedItem = selectedItem,
-                onItemClick = { item: BottomNavKey ->
-                    selectedItem = item
-                    navigator.navigate(item)
-                },
-                onItemReselect = { item: BottomNavKey ->
-                    reselectFlow.tryEmit(Unit)
-                },
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = {
-                    Snackbar(
-                        snackbarData = it,
-                        containerColor = Color.DarkGray,
-                        contentColor = White,
-                    )
-                },
-            )
-        },
-    ) { innerPadding: PaddingValues ->
-        val entryProvider: (NavKey) -> NavEntry<NavKey> =
-            entryProvider {
-                entry<BottomNavKey.Home> { StatsScreen(snackbarHostState, reselectFlow) }
-                entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
-                entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, reselectFlow) }
-                entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
-            }
+    val isLoading: Boolean by viewModel.isLoading.collectAsState(initial = false)
 
-        NavDisplay(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            entries = navigationState.toEntries(entryProvider),
-            onBack = { navigator.goBack() },
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = Gray050,
+            topBar = {
+                MainToolbar(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    title =
+                        stringResource(
+                            when (selectedItem) {
+                                BottomNavKey.Home -> R.string.app_name
+                                BottomNavKey.Livetalk,
+                                BottomNavKey.Stats,
+                                BottomNavKey.AttendanceHistory,
+                                -> selectedItem.label
+                            },
+                        ),
+                    onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                    onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
+                )
+            },
+            bottomBar = {
+                MainNavigationBar(
+                    selectedItem = selectedItem,
+                    onItemClick = { item: BottomNavKey ->
+                        selectedItem = item
+                        navigator.navigate(item)
+                    },
+                    onItemReselect = { item: BottomNavKey ->
+                        reselectFlow.tryEmit(Unit)
+                    },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = {
+                        Snackbar(
+                            snackbarData = it,
+                            containerColor = Color.DarkGray,
+                            contentColor = White,
+                        )
+                    },
+                )
+            },
+        ) { innerPadding: PaddingValues ->
+            val entryProvider: (NavKey) -> NavEntry<NavKey> =
+                entryProvider {
+                    entry<BottomNavKey.Home> { StatsScreen(snackbarHostState, reselectFlow) }
+                    entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
+                    entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, reselectFlow) }
+                    entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
+                }
+
+            NavDisplay(
+                modifier =
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                entries = navigationState.toEntries(entryProvider),
+                onBack = { navigator.goBack() },
+            )
+        }
+        LoadingOverlay(
+            isLoading = isLoading,
+            modifier = Modifier.fillMaxSize(),
         )
     }
-}
-
-@Preview
-@Composable
-private fun MainScreenPreview() {
-    MainScreen()
 }

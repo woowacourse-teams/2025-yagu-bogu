@@ -6,19 +6,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
-import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val binding: ActivityMainBinding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +27,17 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
             }
             YaguBoguTheme {
-                MainScreen()
+                MainScreen(viewModel)
             }
         }
     }
 
     fun setLoadingScreen(isLoading: Boolean) {
-        val visibility = if (isLoading) View.VISIBLE else View.GONE
-        binding.viewOverlay.visibility = visibility
-        binding.cpiCheckInLoading.visibility = visibility
+        if (isLoading) {
+            viewModel.showLoading()
+        } else {
+            viewModel.hideLoading()
+        }
     }
 
     companion object {
