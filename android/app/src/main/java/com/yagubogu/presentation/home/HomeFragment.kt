@@ -36,7 +36,7 @@ import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.buildBalloon
-import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -159,7 +159,9 @@ class HomeFragment :
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
                     CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
                 }
-            binding.root.showSnackbar(message, R.id.bnv_navigation)
+            // TODO("Compose 마이그레이션 시 snackbar로")
+            requireContext().showToast(message)
+//            binding.root.showSnackbar(message, R.id.bnv_navigation)
         }
 
         viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
@@ -215,10 +217,12 @@ class HomeFragment :
             when {
                 isPermissionGranted -> checkLocationSettingsThenCheckIn(requestLocationServices())
                 shouldShowRationale ->
-                    binding.root.showSnackbar(
-                        R.string.home_location_permission_denied_message,
-                        R.id.bnv_navigation,
-                    )
+                    // TODO("Compose 마이그레이션 시 snackbar로")
+                    requireContext().showToast(R.string.home_location_permission_denied_message)
+//                    binding.root.showSnackbar(
+//                        R.string.home_location_permission_denied_message,
+//                        R.id.bnv_navigation,
+//                    )
 
                 else -> showPermissionDeniedDialog()
             }
@@ -287,10 +291,12 @@ class HomeFragment :
                 if (exception is ResolvableApiException) {
                     exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
                 } else {
-                    binding.root.showSnackbar(
-                        R.string.home_location_settings_disabled,
-                        R.id.bnv_navigation,
-                    )
+                    // TODO("Compose 마이그레이션 시 snackbar로")
+                    requireContext().showToast(R.string.home_location_settings_disabled)
+//                    binding.root.showSnackbar(
+//                        R.string.home_location_settings_disabled,
+//                        R.id.bnv_navigation,
+//                    )
                 }
             }
     }
