@@ -43,6 +43,7 @@ import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.BackPressHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun StatsScreen(
     snackbarHostState: SnackbarHostState,
+    reselectFlow: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     statsMyViewModel: StatsMyViewModel = hiltViewModel(),
     statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
@@ -68,8 +70,8 @@ fun StatsScreen(
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
             when (StatsTab.entries[page]) {
-                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel)
-                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel)
+                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel, reselectFlow)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel, reselectFlow)
             }
         }
     }

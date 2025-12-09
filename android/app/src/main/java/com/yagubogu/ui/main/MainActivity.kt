@@ -10,10 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
 import com.yagubogu.databinding.ActivityMainBinding
 import com.yagubogu.presentation.setting.SettingActivity
-import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val view = LocalView.current
+            val view: View = LocalView.current
             LaunchedEffect(Unit) {
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
             }
@@ -39,8 +37,6 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
-//        setupBottomNavigationView()
     }
 
     fun setLoadingScreen(isLoading: Boolean) {
@@ -57,17 +53,6 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToSettings() {
         val intent = SettingActivity.newIntent(this)
         startActivity(intent)
-    }
-
-    private fun setupBottomNavigationView() {
-        binding.bnvNavigation.setOnItemReselectedListener {
-            val currentFragment: Fragment? =
-                supportFragmentManager.fragments.firstOrNull { it.isVisible }
-
-            if (currentFragment is ScrollToTop) {
-                currentFragment.scrollToTop()
-            }
-        }
     }
 
     companion object {

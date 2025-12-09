@@ -20,10 +20,12 @@ import com.yagubogu.ui.stats.detail.component.VsTeamWinRates
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import com.yagubogu.ui.theme.Gray050
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsDetailScreen(
     viewModel: StatsDetailViewModel,
+    reselectFlow: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
 ) {
     val vsTeamStatItems: List<VsTeamStatItem> by viewModel.vsTeamStatItems.collectAsStateWithLifecycle()
@@ -32,7 +34,8 @@ fun StatsDetailScreen(
     val scrollState: ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
+        viewModel.fetchAll()
+        reselectFlow.collect {
             scrollState.animateScrollTo(0)
         }
     }

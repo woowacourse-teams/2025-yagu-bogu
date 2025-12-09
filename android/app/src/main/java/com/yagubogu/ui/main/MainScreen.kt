@@ -37,6 +37,7 @@ import com.yagubogu.ui.util.NavigationState
 import com.yagubogu.ui.util.Navigator
 import com.yagubogu.ui.util.rememberNavigationState
 import com.yagubogu.ui.util.toEntries
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
@@ -62,6 +63,7 @@ fun MainScreen(
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
         }
     }
+    val reselectFlow: MutableSharedFlow<Unit> = remember { MutableSharedFlow(extraBufferCapacity = 1) }
 
     Scaffold(
         containerColor = Gray050,
@@ -86,8 +88,11 @@ fun MainScreen(
             MainNavigationBar(
                 selectedItem = selectedItem,
                 onItemClick = { item: BottomNavKey ->
-                    navigator.navigate(item)
                     selectedItem = item
+                    navigator.navigate(item)
+                },
+                onItemReselect = { item: BottomNavKey ->
+                    reselectFlow.tryEmit(Unit)
                 },
             )
         },
@@ -106,9 +111,9 @@ fun MainScreen(
     ) { innerPadding: PaddingValues ->
         val entryProvider: (NavKey) -> NavEntry<NavKey> =
             entryProvider {
-                entry<BottomNavKey.Home> { StatsScreen(snackbarHostState) }
+                entry<BottomNavKey.Home> { StatsScreen(snackbarHostState, reselectFlow) }
                 entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
-                entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState) }
+                entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, reselectFlow) }
                 entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
             }
 

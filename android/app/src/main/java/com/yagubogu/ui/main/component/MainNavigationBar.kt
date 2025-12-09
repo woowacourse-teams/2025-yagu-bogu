@@ -26,13 +26,20 @@ import kotlinx.coroutines.flow.emptyFlow
 fun MainNavigationBar(
     selectedItem: BottomNavKey,
     onItemClick: (BottomNavKey) -> Unit,
+    onItemReselect: (BottomNavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavigationBar(containerColor = White) {
         BottomNavKey.items.forEach { item: BottomNavKey ->
             NavigationBarItem(
                 selected = selectedItem == item,
-                onClick = { onItemClick(item) },
+                onClick = {
+                    if (selectedItem == item) {
+                        onItemReselect(item)
+                    } else {
+                        onItemClick(item)
+                    }
+                },
                 icon = {
                     Icon(
                         painter = painterResource(item.icon),
@@ -73,5 +80,6 @@ private fun MainNavigationBarPreview() {
     MainNavigationBar(
         selectedItem = BottomNavKey.Home,
         onItemClick = {},
+        onItemReselect = {},
     )
 }

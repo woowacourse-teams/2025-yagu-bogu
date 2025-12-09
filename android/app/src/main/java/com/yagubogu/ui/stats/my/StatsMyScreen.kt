@@ -1,5 +1,6 @@
 package com.yagubogu.ui.stats.my
 
+import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +21,12 @@ import com.yagubogu.ui.stats.my.component.WinRates
 import com.yagubogu.ui.stats.my.model.AverageStats
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.theme.Gray050
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsMyScreen(
     viewModel: StatsMyViewModel,
+    reselectFlow: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
 ) {
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
@@ -31,7 +34,8 @@ fun StatsMyScreen(
     val scrollState: ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
+        viewModel.fetchAll()
+        reselectFlow.collect {
             scrollState.animateScrollTo(0)
         }
     }
