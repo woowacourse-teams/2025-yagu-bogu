@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
+import com.yagubogu.presentation.setting.SettingActivity
+import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.stats.StatsScreen
@@ -40,11 +43,7 @@ import com.yagubogu.ui.util.toEntries
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
-fun MainScreen(
-    onBadgeClick: () -> Unit,
-    onSettingsClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun MainScreen(modifier: Modifier = Modifier) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navigationState: NavigationState =
         rememberNavigationState(
@@ -63,7 +62,9 @@ fun MainScreen(
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
         }
     }
-    val reselectFlow: MutableSharedFlow<Unit> = remember { MutableSharedFlow(extraBufferCapacity = 1) }
+    val reselectFlow: MutableSharedFlow<Unit> =
+        remember { MutableSharedFlow(extraBufferCapacity = 1) }
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = Gray050,
@@ -80,8 +81,8 @@ fun MainScreen(
                             -> selectedItem.label
                         },
                     ),
-                onBadgeClick = onBadgeClick,
-                onSettingsClick = onSettingsClick,
+                onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
             )
         },
         bottomBar = {
@@ -131,5 +132,5 @@ fun MainScreen(
 @Preview
 @Composable
 private fun MainScreenPreview() {
-    MainScreen(onBadgeClick = {}, onSettingsClick = {})
+    MainScreen()
 }

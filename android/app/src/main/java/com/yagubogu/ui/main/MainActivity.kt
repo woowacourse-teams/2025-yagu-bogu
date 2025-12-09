@@ -11,8 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.databinding.ActivityMainBinding
-import com.yagubogu.presentation.setting.SettingActivity
-import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,10 +29,7 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
             }
             YaguBoguTheme {
-                MainScreen(
-                    onBadgeClick = ::navigateToBadge,
-                    onSettingsClick = ::navigateToSettings,
-                )
+                MainScreen()
             }
         }
     }
@@ -43,16 +38,6 @@ class MainActivity : AppCompatActivity() {
         val visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.viewOverlay.visibility = visibility
         binding.cpiCheckInLoading.visibility = visibility
-    }
-
-    private fun navigateToBadge() {
-        val intent = BadgeActivity.newIntent(this)
-        startActivity(intent)
-    }
-
-    private fun navigateToSettings() {
-        val intent = SettingActivity.newIntent(this)
-        startActivity(intent)
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package com.yagubogu.ui.stats.my
 
-import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
