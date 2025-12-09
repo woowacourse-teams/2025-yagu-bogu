@@ -1,6 +1,6 @@
 package com.yagubogu.ui.main
 
-import androidx.activity.compose.LocalActivity
+import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,17 +11,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -50,17 +47,21 @@ fun MainScreen(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val context: Context = LocalContext.current
+
+    val selectedItem: BottomNavKey by viewModel.selectedBottomNavKey.collectAsStateWithLifecycle()
+    val isLoading: Boolean by viewModel.isLoading.collectAsStateWithLifecycle()
+
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = BottomNavKey.Home,
             topLevelRoutes = BottomNavKey.items.toSet(),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    var selectedItem: BottomNavKey by rememberSaveable(stateSaver = BottomNavKey.keySaver) {
-        mutableStateOf(BottomNavKey.Home)
-    }
+    val reselectFlow: MutableSharedFlow<Unit> =
+        remember { MutableSharedFlow(extraBufferCapacity = 1) }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
     LaunchedEffect(selectedItem) {
@@ -68,12 +69,6 @@ fun MainScreen(
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
         }
     }
-    val reselectFlow: MutableSharedFlow<Unit> =
-        remember { MutableSharedFlow(extraBufferCapacity = 1) }
-    val context = LocalContext.current
-    val activity = LocalActivity.current as MainActivity
-
-    val isLoading: Boolean by viewModel.isLoading.collectAsState(initial = false)
 
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
@@ -99,7 +94,7 @@ fun MainScreen(
                 MainNavigationBar(
                     selectedItem = selectedItem,
                     onItemClick = { item: BottomNavKey ->
-                        selectedItem = item
+                        viewModel.selectBottomNavKey(item)
                         navigator.navigate(item)
                     },
                     onItemReselect = { item: BottomNavKey ->

@@ -2,7 +2,6 @@ package com.yagubogu.ui.main
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.runtime.saveable.Saver
 import androidx.navigation3.runtime.NavKey
 import com.yagubogu.R
 import kotlinx.serialization.Serializable
@@ -40,17 +39,5 @@ sealed interface BottomNavKey : NavKey {
 
     companion object {
         val items: List<BottomNavKey> = listOf(Home, Livetalk, Stats, AttendanceHistory)
-
-        val keySaver =
-            Saver<BottomNavKey, String>(
-                save = { navKey: BottomNavKey ->
-                    navKey::class.qualifiedName
-                },
-                restore = { qualifiedClass: String ->
-                    items.firstOrNull { navKey: BottomNavKey ->
-                        navKey::class.qualifiedName == qualifiedClass
-                    } ?: Home
-                },
-            )
     }
 }

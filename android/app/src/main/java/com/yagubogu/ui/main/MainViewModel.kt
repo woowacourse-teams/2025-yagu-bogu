@@ -11,8 +11,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
+    private val _selectedBottomNavKey: MutableStateFlow<BottomNavKey> =
+        MutableStateFlow(BottomNavKey.Home)
+    val selectedBottomNavKey: StateFlow<BottomNavKey> = _selectedBottomNavKey.asStateFlow()
+
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    fun selectBottomNavKey(key: BottomNavKey) {
+        _selectedBottomNavKey.value = key
+    }
 
     fun showLoading() {
         _isLoading.value = true
