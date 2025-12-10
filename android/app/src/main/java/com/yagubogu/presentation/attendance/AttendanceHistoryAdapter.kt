@@ -4,28 +4,28 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 
 class AttendanceHistoryAdapter(
     private val attendanceHistorySummaryHandler: AttendanceHistorySummaryViewHolder.Handler,
     private val attendanceHistoryDetailHandler: AttendanceHistoryDetailViewHolder.Handler,
-) : ListAdapter<AttendanceHistoryItem, RecyclerView.ViewHolder>(diffCallback) {
+) : ListAdapter<AttendanceHistoryUiModel, RecyclerView.ViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder =
-        when (AttendanceHistoryItem.ViewType.entries[viewType]) {
-            AttendanceHistoryItem.ViewType.SUMMARY ->
+        when (AttendanceHistoryUiModel.ViewType.entries[viewType]) {
+            AttendanceHistoryUiModel.ViewType.SUMMARY ->
                 AttendanceHistorySummaryViewHolder.from(parent, attendanceHistorySummaryHandler)
 
-            AttendanceHistoryItem.ViewType.DETAIL ->
+            AttendanceHistoryUiModel.ViewType.DETAIL ->
                 AttendanceHistoryDetailViewHolder.from(parent, attendanceHistoryDetailHandler)
 
-            AttendanceHistoryItem.ViewType.CANCELED ->
+            AttendanceHistoryUiModel.ViewType.CANCELED ->
                 AttendanceHistorySummaryViewHolder.from(
                     parent,
                     object : AttendanceHistorySummaryViewHolder.Handler {
-                        override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) = Unit
+                        override fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary) = Unit
                     },
                 )
         }
@@ -34,14 +34,14 @@ class AttendanceHistoryAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        when (val item: AttendanceHistoryItem = getItem(position)) {
-            is AttendanceHistoryItem.Summary ->
+        when (val item: AttendanceHistoryUiModel = getItem(position)) {
+            is AttendanceHistoryUiModel.Summary ->
                 (holder as AttendanceHistorySummaryViewHolder).bind(item)
 
-            is AttendanceHistoryItem.Detail ->
+            is AttendanceHistoryUiModel.Detail ->
                 (holder as AttendanceHistoryDetailViewHolder).bind(item)
 
-            is AttendanceHistoryItem.Canceled ->
+            is AttendanceHistoryUiModel.Canceled ->
                 (holder as AttendanceHistorySummaryViewHolder).bind(item.summary)
         }
     }
@@ -50,30 +50,30 @@ class AttendanceHistoryAdapter(
 
     companion object {
         private val diffCallback =
-            object : DiffUtil.ItemCallback<AttendanceHistoryItem>() {
+            object : DiffUtil.ItemCallback<AttendanceHistoryUiModel>() {
                 override fun areItemsTheSame(
-                    oldItem: AttendanceHistoryItem,
-                    newItem: AttendanceHistoryItem,
+                    oldItem: AttendanceHistoryUiModel,
+                    newItem: AttendanceHistoryUiModel,
                 ): Boolean =
                     when {
-                        oldItem is AttendanceHistoryItem.Summary &&
-                            newItem is AttendanceHistoryItem.Summary ->
+                        oldItem is AttendanceHistoryUiModel.Summary &&
+                            newItem is AttendanceHistoryUiModel.Summary ->
                             oldItem.id == newItem.id
 
-                        oldItem is AttendanceHistoryItem.Detail &&
-                            newItem is AttendanceHistoryItem.Detail ->
+                        oldItem is AttendanceHistoryUiModel.Detail &&
+                            newItem is AttendanceHistoryUiModel.Detail ->
                             oldItem.summary.id == newItem.summary.id
 
-                        oldItem is AttendanceHistoryItem.Canceled &&
-                            newItem is AttendanceHistoryItem.Canceled ->
+                        oldItem is AttendanceHistoryUiModel.Canceled &&
+                            newItem is AttendanceHistoryUiModel.Canceled ->
                             oldItem.summary.id == newItem.summary.id
 
                         else -> false
                     }
 
                 override fun areContentsTheSame(
-                    oldItem: AttendanceHistoryItem,
-                    newItem: AttendanceHistoryItem,
+                    oldItem: AttendanceHistoryUiModel,
+                    newItem: AttendanceHistoryUiModel,
                 ): Boolean = oldItem == newItem
             }
     }

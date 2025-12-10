@@ -6,7 +6,7 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemAttendanceHistoryDetailBinding
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.presentation.attendance.model.GameScoreBoard
 
 class AttendanceHistoryDetailViewHolder private constructor(
@@ -21,7 +21,7 @@ class AttendanceHistoryDetailViewHolder private constructor(
         binding.handler = handler
     }
 
-    fun bind(item: AttendanceHistoryItem.Detail) {
+    fun bind(item: AttendanceHistoryUiModel.Detail) {
         binding.attendanceHistoryItem = item
 
         binding.tvAwayTeamPitcher.text =
@@ -47,7 +47,7 @@ class AttendanceHistoryDetailViewHolder private constructor(
     }
 
     interface Handler {
-        fun onDetailItemClick(item: AttendanceHistoryItem.Detail)
+        fun onDetailItemClick(item: AttendanceHistoryUiModel.Detail)
     }
 
     companion object {

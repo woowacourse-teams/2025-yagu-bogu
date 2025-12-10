@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemAttendanceHistorySummaryBinding
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 
 class AttendanceHistorySummaryViewHolder private constructor(
     private val binding: ItemAttendanceHistorySummaryBinding,
@@ -14,12 +14,12 @@ class AttendanceHistorySummaryViewHolder private constructor(
         binding.handler = handler
     }
 
-    fun bind(item: AttendanceHistoryItem.Summary) {
+    fun bind(item: AttendanceHistoryUiModel.Summary) {
         binding.attendanceHistoryItem = item
     }
 
     interface Handler {
-        fun onSummaryItemClick(item: AttendanceHistoryItem.Summary)
+        fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary)
     }
 
     companion object {

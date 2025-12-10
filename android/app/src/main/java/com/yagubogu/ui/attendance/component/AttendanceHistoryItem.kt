@@ -1,8 +1,6 @@
 package com.yagubogu.ui.attendance.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -16,16 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium12
@@ -41,34 +35,28 @@ import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun AttendanceHistoryItem(
-    item: AttendanceHistoryItem,
+    item: AttendanceHistoryUiModel,
+    onSummaryItemClick: (AttendanceHistoryUiModel.Summary) -> Unit,
+    onDetailItemClick: (AttendanceHistoryUiModel.Detail) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded: Boolean by remember {
-        mutableStateOf(
-            item !is AttendanceHistoryItem.Summary,
-        )
-    }
-
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp))
-                .noRippleClickable { isExpanded = !isExpanded }
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .noRippleClickable {
+                    when (item) {
+                        is AttendanceHistoryUiModel.Summary -> onSummaryItemClick(item)
+                        is AttendanceHistoryUiModel.Detail -> onDetailItemClick(item)
+                        is AttendanceHistoryUiModel.Canceled -> Unit
+                    }
+                }.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary()
         AnimatedVisibility(
-            visible = isExpanded,
-            enter =
-                expandVertically(
-                    animationSpec =
-                        spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow,
-                        ),
-                ),
+            visible = item is AttendanceHistoryUiModel.Detail,
+            enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
             AttendanceHistoryDetail()

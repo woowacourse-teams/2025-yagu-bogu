@@ -6,7 +6,7 @@ import com.yagubogu.R
 import com.yagubogu.domain.model.GameResult
 import java.time.LocalDate
 
-sealed class AttendanceHistoryItem(
+sealed class AttendanceHistoryUiModel(
     val type: ViewType,
 ) {
     data class Summary(
@@ -15,7 +15,7 @@ sealed class AttendanceHistoryItem(
         val stadiumName: String,
         val awayTeam: GameTeam,
         val homeTeam: GameTeam,
-    ) : AttendanceHistoryItem(ViewType.SUMMARY) {
+    ) : AttendanceHistoryUiModel(ViewType.SUMMARY) {
         @ColorRes
         val awayTeamColorRes: Int = determineTeamColorRes(awayTeam)
 
@@ -37,7 +37,7 @@ sealed class AttendanceHistoryItem(
         val homeTeamPitcher: String,
         val awayTeamScoreBoard: GameScoreBoard,
         val homeTeamScoreBoard: GameScoreBoard,
-    ) : AttendanceHistoryItem(ViewType.DETAIL) {
+    ) : AttendanceHistoryUiModel(ViewType.DETAIL) {
         val awayTeam: GameTeam get() = summary.awayTeam
         val homeTeam: GameTeam get() = summary.homeTeam
 
@@ -58,7 +58,7 @@ sealed class AttendanceHistoryItem(
 
     data class Canceled(
         val summary: Summary,
-    ) : AttendanceHistoryItem(ViewType.CANCELED)
+    ) : AttendanceHistoryUiModel(ViewType.CANCELED)
 
     enum class ViewType {
         SUMMARY,

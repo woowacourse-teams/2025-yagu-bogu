@@ -8,7 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.Firebase
@@ -17,8 +16,7 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,12 +86,12 @@ class AttendanceHistoryFragment :
         _binding = null
     }
 
-    override fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+    override fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary) {
         viewModel.onSummaryItemClick(item)
         firebaseAnalytics.logEvent("attendance_history_item_click", null)
     }
 
-    override fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+    override fun onDetailItemClick(item: AttendanceHistoryUiModel.Detail) {
         viewModel.onDetailItemClick(item)
         firebaseAnalytics.logEvent("attendance_history_item_click", null)
     }

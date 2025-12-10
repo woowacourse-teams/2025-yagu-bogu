@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,12 +24,12 @@ import javax.inject.Inject
 class AttendanceHistoryViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
-    private val items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
+    private val items = MutableStateFlow<List<AttendanceHistoryUiModel>>(emptyList())
 
     private val detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
 
     // 화면에 표시될 AttendanceHistoryItems
-    val attendanceHistoryItems: StateFlow<List<AttendanceHistoryItem>> =
+    val attendanceHistoryItems: StateFlow<List<AttendanceHistoryUiModel>> =
         combine(
             items,
             detailItemPosition,
@@ -62,8 +62,8 @@ class AttendanceHistoryViewModel @Inject constructor(
             checkInRepository
                 .getCheckInHistories(year, filter.name, order.name)
                 .mapList { it.toUiModel() }
-                .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
-                    items.value = attendanceHistoryItems
+                .onSuccess { attendanceHistoryUiModels: List<AttendanceHistoryUiModel> ->
+                    items.value = attendanceHistoryUiModels
                     detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -87,24 +87,24 @@ class AttendanceHistoryViewModel @Inject constructor(
         fetchAttendanceHistoryItems(order = attendanceHistorySort.value)
     }
 
-    fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
+    fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary) {
         val position: Int = attendanceHistoryItems.value.indexOf(item)
         if (position < FIRST_INDEX) return
         detailItemPosition.value = position
     }
 
-    fun onDetailItemClick(item: AttendanceHistoryItem.Detail) {
+    fun onDetailItemClick(item: AttendanceHistoryUiModel.Detail) {
         val position: Int = attendanceHistoryItems.value.indexOf(item)
         if (position < FIRST_INDEX) return
         detailItemPosition.value = null
     }
 
-    private fun buildAttendanceHistoryItems(): List<AttendanceHistoryItem> =
-        items.value.mapIndexed { index: Int, item: AttendanceHistoryItem ->
+    private fun buildAttendanceHistoryItems(): List<AttendanceHistoryUiModel> =
+        items.value.mapIndexed { index: Int, item: AttendanceHistoryUiModel ->
             when (item) {
-                is AttendanceHistoryItem.Summary -> item
-                is AttendanceHistoryItem.Detail -> if (index == detailItemPosition.value) item else item.summary
-                is AttendanceHistoryItem.Canceled -> item
+                is AttendanceHistoryUiModel.Summary -> item
+                is AttendanceHistoryUiModel.Detail -> if (index == detailItemPosition.value) item else item.summary
+                is AttendanceHistoryUiModel.Canceled -> item
             }
         }
 

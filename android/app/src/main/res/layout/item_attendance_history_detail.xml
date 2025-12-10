@@ -7,7 +7,7 @@
 
         <variable
             name="attendanceHistoryItem"
-            type="com.yagubogu.presentation.attendance.model.AttendanceHistoryItem.Detail" />
+            type="com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel.Detail" />
 
         <variable
             name="handler"

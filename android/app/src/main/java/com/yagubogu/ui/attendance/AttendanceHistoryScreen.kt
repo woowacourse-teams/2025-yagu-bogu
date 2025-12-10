@@ -40,8 +40,8 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.attendance.AttendanceHistoryViewModel
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.ui.attendance.component.AttendanceHistoryItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
@@ -56,12 +56,14 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val attendanceHistoryItems: List<AttendanceHistoryItem> by viewModel.attendanceHistoryItems.collectAsStateWithLifecycle()
+    val attendanceHistoryUiModels: List<AttendanceHistoryUiModel> by viewModel.attendanceHistoryItems.collectAsStateWithLifecycle()
     val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceHistoryFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistoryOrder by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
 
     AttendanceHistoryScreen(
-        attendanceHistoryItems = attendanceHistoryItems,
+        items = attendanceHistoryUiModels,
+        onSummaryItemClick = viewModel::onSummaryItemClick,
+        onDetailItemClick = viewModel::onDetailItemClick,
         filter = attendanceHistoryFilter,
         onFilterClick = viewModel::updateAttendanceHistoryFilter,
         sort = sort,
@@ -72,7 +74,9 @@ fun AttendanceHistoryScreen(
 
 @Composable
 private fun AttendanceHistoryScreen(
-    attendanceHistoryItems: List<AttendanceHistoryItem>,
+    items: List<AttendanceHistoryUiModel>,
+    onSummaryItemClick: (AttendanceHistoryUiModel.Summary) -> Unit,
+    onDetailItemClick: (AttendanceHistoryUiModel.Detail) -> Unit,
     filter: AttendanceHistoryFilter,
     onFilterClick: (AttendanceHistoryFilter) -> Unit,
     sort: AttendanceHistoryOrder,
@@ -103,8 +107,12 @@ private fun AttendanceHistoryScreen(
                     .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(attendanceHistoryItems) { item: AttendanceHistoryItem ->
-                AttendanceHistoryItem(item = item)
+            items(items) { item: AttendanceHistoryUiModel ->
+                AttendanceHistoryItem(
+                    item = item,
+                    onSummaryItemClick = onSummaryItemClick,
+                    onDetailItemClick = onDetailItemClick,
+                )
             }
             item { Spacer(modifier = Modifier.height(4.dp)) }
         }
