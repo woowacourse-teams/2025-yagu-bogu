@@ -37,11 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.attendance.AttendanceHistoryViewModel
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
-import com.yagubogu.ui.attendance.component.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.component.AttendanceItem
+import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
@@ -55,13 +54,13 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val attendanceHistoryUiModels: List<AttendanceHistoryUiModel> by viewModel.items.collectAsStateWithLifecycle()
+    val attendanceHistoryItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
     val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceHistoryFilter.collectAsStateWithLifecycle()
-    val sort: AttendanceHistoryOrder by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
+    val sort: AttendanceHistorySort by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
 
     AttendanceHistoryScreen(
-        items = attendanceHistoryUiModels,
+        items = attendanceHistoryItems,
         detailItemPosition = detailItemPosition,
         onItemClick = viewModel::onItemClick,
         filter = attendanceHistoryFilter,
@@ -74,12 +73,12 @@ fun AttendanceHistoryScreen(
 
 @Composable
 private fun AttendanceHistoryScreen(
-    items: List<AttendanceHistoryUiModel>,
+    items: List<AttendanceHistoryItem>,
     detailItemPosition: Int?,
-    onItemClick: (AttendanceHistoryUiModel) -> Unit,
+    onItemClick: (AttendanceHistoryItem) -> Unit,
     filter: AttendanceHistoryFilter,
     onFilterClick: (AttendanceHistoryFilter) -> Unit,
-    sort: AttendanceHistoryOrder,
+    sort: AttendanceHistorySort,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -108,8 +107,8 @@ private fun AttendanceHistoryScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(items.size) { index: Int ->
-                val item: AttendanceHistoryUiModel = items[index]
-                AttendanceHistoryItem(
+                val item: AttendanceHistoryItem = items[index]
+                AttendanceItem(
                     item = item,
                     isExpanded = index == detailItemPosition,
                     onItemClick = onItemClick,
@@ -191,7 +190,7 @@ private fun AttendanceHistoryFilterDropdown(
 
 @Composable
 private fun AttendanceHistorySortSwitch(
-    sort: AttendanceHistoryOrder,
+    sort: AttendanceHistorySort,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -208,8 +207,8 @@ private fun AttendanceHistorySortSwitch(
             text =
                 stringResource(
                     when (sort) {
-                        AttendanceHistoryOrder.LATEST -> R.string.attendance_history_latest
-                        AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
+                        AttendanceHistorySort.LATEST -> R.string.attendance_history_latest
+                        AttendanceHistorySort.OLDEST -> R.string.attendance_history_oldest
                     },
                 ),
             style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),

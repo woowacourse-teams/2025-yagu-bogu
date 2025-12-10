@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.attendance.model
+package com.yagubogu.ui.attendance.model
 
 enum class AttendanceHistoryFilter {
     ALL,

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.attendance.model
+package com.yagubogu.ui.attendance.model
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
@@ -8,7 +8,7 @@ import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.util.color
 import java.time.LocalDate
 
-sealed interface AttendanceHistoryUiModel {
+sealed interface AttendanceHistoryItem {
     val summary: Summary
 
     data class Summary(
@@ -34,7 +34,7 @@ sealed interface AttendanceHistoryUiModel {
         val homeTeamPitcher: String,
         val awayTeamScoreBoard: GameScoreBoard,
         val homeTeamScoreBoard: GameScoreBoard,
-    ) : AttendanceHistoryUiModel {
+    ) : AttendanceHistoryItem {
         val awayTeam: GameTeam get() = summary.awayTeam
         val homeTeam: GameTeam get() = summary.homeTeam
 
@@ -55,5 +55,5 @@ sealed interface AttendanceHistoryUiModel {
 
     data class Canceled(
         override val summary: Summary,
-    ) : AttendanceHistoryUiModel
+    ) : AttendanceHistoryItem
 }

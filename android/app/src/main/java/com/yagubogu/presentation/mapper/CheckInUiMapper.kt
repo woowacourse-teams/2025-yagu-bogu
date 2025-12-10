@@ -8,9 +8,9 @@ import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountDto
 import com.yagubogu.data.dto.response.checkin.TeamFanRateDto
 import com.yagubogu.domain.model.GameResult
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
-import com.yagubogu.presentation.attendance.model.GameScoreBoard
-import com.yagubogu.presentation.attendance.model.GameTeam
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.GameScoreBoard
+import com.yagubogu.ui.attendance.model.GameTeam
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.home.stadium.TeamFanRate
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
@@ -30,9 +30,9 @@ fun TeamFanRateDto.toUiModel(): TeamFanRate =
         fanRate = fanRate,
     )
 
-fun CheckInGameDto.toUiModel(): AttendanceHistoryUiModel {
+fun CheckInGameDto.toUiModel(): AttendanceHistoryItem {
     val summary =
-        AttendanceHistoryUiModel.Summary(
+        AttendanceHistoryItem.Summary(
             attendanceDate = LocalDate.parse(attendanceDate),
             stadiumName = stadiumFullName,
             awayTeam = awayTeam.toUiModel(homeTeam),
@@ -40,10 +40,10 @@ fun CheckInGameDto.toUiModel(): AttendanceHistoryUiModel {
         )
 
     if (homeScoreBoard == null || awayScoreBoard == null || awayTeam.pitcher == null || homeTeam.pitcher == null) {
-        return AttendanceHistoryUiModel.Canceled(summary = summary)
+        return AttendanceHistoryItem.Canceled(summary = summary)
     }
 
-    return AttendanceHistoryUiModel.Played(
+    return AttendanceHistoryItem.Played(
         summary = summary,
         awayTeamPitcher = awayTeam.pitcher,
         homeTeamPitcher = homeTeam.pitcher,

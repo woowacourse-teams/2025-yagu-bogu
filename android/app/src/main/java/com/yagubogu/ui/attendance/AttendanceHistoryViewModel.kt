@@ -1,13 +1,13 @@
-package com.yagubogu.presentation.attendance
+package com.yagubogu.ui.attendance
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.checkin.CheckInRepository
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
+import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +21,8 @@ import javax.inject.Inject
 class AttendanceHistoryViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
-    private val _items = MutableStateFlow<List<AttendanceHistoryUiModel>>(emptyList())
-    val items: StateFlow<List<AttendanceHistoryUiModel>> = _items.asStateFlow()
+    private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
+    val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
     private val _detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
     val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
@@ -31,8 +31,8 @@ class AttendanceHistoryViewModel @Inject constructor(
     val attendanceHistoryFilter: StateFlow<AttendanceHistoryFilter> =
         _attendanceHistoryFilter.asStateFlow()
 
-    private val _attendanceHistorySort = MutableStateFlow(AttendanceHistoryOrder.LATEST)
-    val attendanceHistorySort: StateFlow<AttendanceHistoryOrder> =
+    private val _attendanceHistorySort = MutableStateFlow(AttendanceHistorySort.LATEST)
+    val attendanceHistorySort: StateFlow<AttendanceHistorySort> =
         _attendanceHistorySort.asStateFlow()
 
     init {
@@ -42,12 +42,12 @@ class AttendanceHistoryViewModel @Inject constructor(
     fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val filter: AttendanceHistoryFilter = attendanceHistoryFilter.value
-            val sort: AttendanceHistoryOrder = attendanceHistorySort.value
+            val sort: AttendanceHistorySort = attendanceHistorySort.value
             checkInRepository
                 .getCheckInHistories(year, filter.name, sort.name)
                 .mapList { it.toUiModel() }
-                .onSuccess { attendanceHistoryUiModels: List<AttendanceHistoryUiModel> ->
-                    _items.value = attendanceHistoryUiModels
+                .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
+                    _items.value = attendanceHistoryItems
                     _detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -65,13 +65,13 @@ class AttendanceHistoryViewModel @Inject constructor(
     fun switchAttendanceHistoryOrder() {
         _attendanceHistorySort.value =
             when (attendanceHistorySort.value) {
-                AttendanceHistoryOrder.LATEST -> AttendanceHistoryOrder.OLDEST
-                AttendanceHistoryOrder.OLDEST -> AttendanceHistoryOrder.LATEST
+                AttendanceHistorySort.LATEST -> AttendanceHistorySort.OLDEST
+                AttendanceHistorySort.OLDEST -> AttendanceHistorySort.LATEST
             }
         fetchAttendanceHistoryItems()
     }
 
-    fun onItemClick(item: AttendanceHistoryUiModel) {
+    fun onItemClick(item: AttendanceHistoryItem) {
         val position: Int = items.value.indexOf(item)
         if (position < FIRST_INDEX) return
 

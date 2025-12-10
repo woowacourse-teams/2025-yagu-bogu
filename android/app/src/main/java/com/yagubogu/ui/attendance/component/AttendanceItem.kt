@@ -24,9 +24,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.domain.model.GameResult
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
-import com.yagubogu.presentation.attendance.model.GameScoreBoard
-import com.yagubogu.presentation.attendance.model.GameTeam
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.GameScoreBoard
+import com.yagubogu.ui.attendance.model.GameTeam
 import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
@@ -41,10 +41,10 @@ import com.yagubogu.ui.util.noRippleClickable
 import java.time.LocalDate
 
 @Composable
-fun AttendanceHistoryItem(
-    item: AttendanceHistoryUiModel,
+fun AttendanceItem(
+    item: AttendanceHistoryItem,
     isExpanded: Boolean,
-    onItemClick: (AttendanceHistoryUiModel) -> Unit,
+    onItemClick: (AttendanceHistoryItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -55,11 +55,12 @@ fun AttendanceHistoryItem(
                 .noRippleClickable {
                     onItemClick(item)
                     Firebase.analytics.logEvent("attendance_history_item_click", null)
-                }.padding(horizontal = 20.dp, vertical = 24.dp),
+                }
+                .padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary(item = item.summary)
         when (item) {
-            is AttendanceHistoryUiModel.Played -> {
+            is AttendanceHistoryItem.Played -> {
                 AnimatedVisibility(
                     visible = isExpanded,
                     enter = expandVertically(),
@@ -69,14 +70,14 @@ fun AttendanceHistoryItem(
                 }
             }
 
-            is AttendanceHistoryUiModel.Canceled -> Unit
+            is AttendanceHistoryItem.Canceled -> Unit
         }
     }
 }
 
 @Composable
 private fun AttendanceHistorySummary(
-    item: AttendanceHistoryUiModel.Summary,
+    item: AttendanceHistoryItem.Summary,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -135,7 +136,7 @@ private fun AttendanceHistorySummary(
 
 @Composable
 private fun AttendanceHistoryDetail(
-    item: AttendanceHistoryUiModel.Played,
+    item: AttendanceHistoryItem.Played,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -184,11 +185,11 @@ private fun AttendanceHistoryDetail(
 @Preview(name = "완료된 경기")
 @Composable
 private fun AttendanceItemPlayedPreview() {
-    AttendanceHistoryItem(
+    AttendanceItem(
         item =
-            AttendanceHistoryUiModel.Played(
+            AttendanceHistoryItem.Played(
                 summary =
-                    AttendanceHistoryUiModel.Summary(
+                    AttendanceHistoryItem.Summary(
                         attendanceDate = LocalDate.now(),
                         stadiumName = "잠실 야구장",
                         awayTeam =
@@ -235,11 +236,11 @@ private fun AttendanceItemPlayedPreview() {
 @Preview(name = "취소된 경기")
 @Composable
 private fun AttendanceItemCanceledPreview() {
-    AttendanceHistoryItem(
+    AttendanceItem(
         item =
-            AttendanceHistoryUiModel.Canceled(
+            AttendanceHistoryItem.Canceled(
                 summary =
-                    AttendanceHistoryUiModel.Summary(
+                    AttendanceHistoryItem.Summary(
                         attendanceDate = LocalDate.now(),
                         stadiumName = "잠실 야구장",
                         awayTeam =

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.attendance.model
+package com.yagubogu.ui.attendance.model
 
 import com.yagubogu.domain.model.GameResult
 import com.yagubogu.domain.model.Team
