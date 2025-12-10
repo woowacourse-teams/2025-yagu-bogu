@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -32,8 +33,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
+import com.yagubogu.presentation.attendance.AttendanceHistoryViewModel
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.component.AttendanceHistoryItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
@@ -44,7 +48,23 @@ import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
-fun AttendanceHistoryScreen(modifier: Modifier = Modifier) {
+fun AttendanceHistoryScreen(
+    viewModel: AttendanceHistoryViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val attendanceHistoryItems: List<AttendanceHistoryItem> by viewModel.attendanceHistoryItems.collectAsStateWithLifecycle()
+
+    AttendanceHistoryScreen(
+        attendanceHistoryItems = attendanceHistoryItems,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun AttendanceHistoryScreen(
+    attendanceHistoryItems: List<AttendanceHistoryItem>,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -69,8 +89,8 @@ fun AttendanceHistoryScreen(modifier: Modifier = Modifier) {
                     .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(10) {
-                AttendanceHistoryItem()
+            items(attendanceHistoryItems) { item: AttendanceHistoryItem ->
+                AttendanceHistoryItem(item = item)
             }
             item { Spacer(modifier = Modifier.height(4.dp)) }
         }
@@ -153,5 +173,5 @@ private fun AttendanceHistorySortSwitch() {
 @Preview(showBackground = true)
 @Composable
 private fun AttendanceHistoryScreenPreview() {
-    AttendanceHistoryScreen()
+//    AttendanceHistoryScreen()
 }

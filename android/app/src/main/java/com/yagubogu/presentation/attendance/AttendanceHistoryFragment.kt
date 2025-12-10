@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +20,7 @@ import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryOrder
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -45,20 +48,32 @@ class AttendanceHistoryFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentAttendanceHistoryBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AttendanceHistoryScreen(viewModel)
+            }
+        }
+
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?,
+//    ): View {
+//        _binding = FragmentAttendanceHistoryBinding.inflate(inflater, container, false)
+//        return binding.root
+//    }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupBindings()
-        setupSpinner()
-        setupObservers()
-        setupListeners()
+//        setupBindings()
+//        setupSpinner()
+//        setupObservers()
+//        setupListeners()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -122,29 +137,29 @@ class AttendanceHistoryFragment :
         }
     }
 
-    private fun setupObservers() {
-        viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
-            attendanceHistoryAdapter.submitList(value) {
-                viewModel.detailItemPosition.value?.let {
-                    binding.rvAttendanceHistory.smoothScrollToPosition(it)
-                }
-            }
-
-            val isEmpty: Boolean = value.isEmpty()
-            binding.ivEmptyHistory.isVisible = isEmpty
-            binding.tvEmptyHistory.isVisible = isEmpty
-        }
-
-        viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
-            binding.tvAttendanceHistoryOrder.text =
-                getString(
-                    when (value) {
-                        AttendanceHistoryOrder.LATEST -> R.string.attendance_history_latest
-                        AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
-                    },
-                )
-        }
-    }
+//    private fun setupObservers() {
+//        viewModel.attendanceHistoryItems.observe(viewLifecycleOwner) { value: List<AttendanceHistoryItem> ->
+//            attendanceHistoryAdapter.submitList(value) {
+//                viewModel.detailItemPosition.value?.let {
+//                    binding.rvAttendanceHistory.smoothScrollToPosition(it)
+//                }
+//            }
+//
+//            val isEmpty: Boolean = value.isEmpty()
+//            binding.ivEmptyHistory.isVisible = isEmpty
+//            binding.tvEmptyHistory.isVisible = isEmpty
+//        }
+//
+//        viewModel.attendanceHistoryOrder.observe(viewLifecycleOwner) { value: AttendanceHistoryOrder ->
+//            binding.tvAttendanceHistoryOrder.text =
+//                getString(
+//                    when (value) {
+//                        AttendanceHistoryOrder.LATEST -> R.string.attendance_history_latest
+//                        AttendanceHistoryOrder.OLDEST -> R.string.attendance_history_oldest
+//                    },
+//                )
+//        }
+//    }
 
     private fun setupListeners() {
         binding.tvAttendanceHistoryOrder.setOnClickListener {

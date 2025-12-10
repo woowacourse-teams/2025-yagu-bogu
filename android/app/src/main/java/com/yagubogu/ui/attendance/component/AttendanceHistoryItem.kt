@@ -6,7 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium12
@@ -40,8 +40,15 @@ import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
-fun AttendanceHistoryItem(modifier: Modifier = Modifier) {
-    var isExpanded: Boolean by remember { mutableStateOf(false) }
+fun AttendanceHistoryItem(
+    item: AttendanceHistoryItem,
+    modifier: Modifier = Modifier,
+) {
+    var isExpanded: Boolean by remember {
+        mutableStateOf(
+            item !is AttendanceHistoryItem.Summary,
+        )
+    }
 
     Column(
         modifier =
@@ -173,5 +180,5 @@ private fun AttendanceHistoryDetail(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun AttendanceHistoryItemPreview() {
-    AttendanceHistoryItem()
+//    AttendanceHistoryItem()
 }
