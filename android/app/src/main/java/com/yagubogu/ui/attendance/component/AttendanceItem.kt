@@ -22,12 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
-import com.yagubogu.domain.model.GameResult
-import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
-import com.yagubogu.ui.attendance.model.GameScoreBoard
-import com.yagubogu.ui.attendance.model.GameTeam
 import com.yagubogu.presentation.util.DateFormatter
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium12
@@ -38,7 +34,6 @@ import com.yagubogu.ui.theme.PretendardSemiBold20
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.noRippleClickable
-import java.time.LocalDate
 
 @Composable
 fun AttendanceItem(
@@ -55,8 +50,7 @@ fun AttendanceItem(
                 .noRippleClickable {
                     onItemClick(item)
                     Firebase.analytics.logEvent("attendance_history_item_click", null)
-                }
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                }.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary(item = item.summary)
         when (item) {
@@ -186,48 +180,7 @@ private fun AttendanceHistoryDetail(
 @Composable
 private fun AttendanceItemPlayedPreview() {
     AttendanceItem(
-        item =
-            AttendanceHistoryItem.Played(
-                summary =
-                    AttendanceHistoryItem.Summary(
-                        attendanceDate = LocalDate.now(),
-                        stadiumName = "잠실 야구장",
-                        awayTeam =
-                            GameTeam(
-                                team = Team.HT,
-                                name = "KIA",
-                                score = "10",
-                                isMyTeam = true,
-                                gameResult = GameResult.WIN,
-                            ),
-                        homeTeam =
-                            GameTeam(
-                                team = Team.HT,
-                                name = "두산",
-                                score = "4",
-                                isMyTeam = false,
-                                gameResult = GameResult.LOSE,
-                            ),
-                    ),
-                awayTeamPitcher = "이의리",
-                homeTeamPitcher = "김택연",
-                awayTeamScoreBoard =
-                    GameScoreBoard(
-                        runs = 10,
-                        hits = 13,
-                        errors = 0,
-                        basesOnBalls = 5,
-                        scores = listOf("0", "0", "1", "0", "1", "4", "1", "1", "2", "-", "-"),
-                    ),
-                homeTeamScoreBoard =
-                    GameScoreBoard(
-                        runs = 4,
-                        hits = 9,
-                        errors = 2,
-                        basesOnBalls = 3,
-                        scores = listOf("0", "0", "2", "0", "1", "0", "0", "1", "0", "-", "-"),
-                    ),
-            ),
+        item = ATTENDANCE_HISTORY_ITEM_PLAYED,
         isExpanded = true,
         onItemClick = {},
     )
@@ -237,30 +190,7 @@ private fun AttendanceItemPlayedPreview() {
 @Composable
 private fun AttendanceItemCanceledPreview() {
     AttendanceItem(
-        item =
-            AttendanceHistoryItem.Canceled(
-                summary =
-                    AttendanceHistoryItem.Summary(
-                        attendanceDate = LocalDate.now(),
-                        stadiumName = "잠실 야구장",
-                        awayTeam =
-                            GameTeam(
-                                team = Team.HT,
-                                name = "KIA",
-                                score = "-",
-                                isMyTeam = true,
-                                gameResult = GameResult.DRAW,
-                            ),
-                        homeTeam =
-                            GameTeam(
-                                team = Team.HT,
-                                name = "두산",
-                                score = "-",
-                                isMyTeam = false,
-                                gameResult = GameResult.DRAW,
-                            ),
-                    ),
-            ),
+        item = ATTENDANCE_HISTORY_ITEM_CANCELED,
         isExpanded = false,
         onItemClick = {},
     )
