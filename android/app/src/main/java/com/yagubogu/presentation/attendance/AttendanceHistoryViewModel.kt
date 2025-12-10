@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,9 +25,6 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
     private val items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
-
-    private val attendanceHistoryFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
-    private val attendanceHistoryOrder = MutableStateFlow(AttendanceHistoryOrder.LATEST)
 
     private val detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
 
@@ -43,6 +41,14 @@ class AttendanceHistoryViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
+    private val _attendanceHistoryFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
+    val attendanceHistoryFilter: StateFlow<AttendanceHistoryFilter> =
+        _attendanceHistoryFilter.asStateFlow()
+
+    private val _attendanceHistorySort = MutableStateFlow(AttendanceHistoryOrder.LATEST)
+    val attendanceHistorySort: StateFlow<AttendanceHistoryOrder> =
+        _attendanceHistorySort.asStateFlow()
+
     init {
         fetchAttendanceHistoryItems()
     }
@@ -50,7 +56,7 @@ class AttendanceHistoryViewModel @Inject constructor(
     fun fetchAttendanceHistoryItems(
         year: Int = LocalDate.now().year,
         filter: AttendanceHistoryFilter = attendanceHistoryFilter.value,
-        order: AttendanceHistoryOrder = attendanceHistoryOrder.value,
+        order: AttendanceHistoryOrder = attendanceHistorySort.value,
     ) {
         viewModelScope.launch {
             checkInRepository
@@ -67,18 +73,18 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun updateAttendanceHistoryFilter(filter: AttendanceHistoryFilter) {
         if (attendanceHistoryFilter.value != filter) {
-            attendanceHistoryFilter.value = filter
+            _attendanceHistoryFilter.value = filter
             fetchAttendanceHistoryItems(filter = filter)
         }
     }
 
     fun switchAttendanceHistoryOrder() {
-        attendanceHistoryOrder.value =
-            when (attendanceHistoryOrder.value) {
+        _attendanceHistorySort.value =
+            when (attendanceHistorySort.value) {
                 AttendanceHistoryOrder.LATEST -> AttendanceHistoryOrder.OLDEST
                 AttendanceHistoryOrder.OLDEST -> AttendanceHistoryOrder.LATEST
             }
-        fetchAttendanceHistoryItems(order = attendanceHistoryOrder.value)
+        fetchAttendanceHistoryItems(order = attendanceHistorySort.value)
     }
 
     fun onSummaryItemClick(item: AttendanceHistoryItem.Summary) {
