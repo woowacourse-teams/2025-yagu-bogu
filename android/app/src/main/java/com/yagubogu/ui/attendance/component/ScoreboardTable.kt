@@ -27,12 +27,12 @@ import com.yagubogu.ui.theme.dsp
 
 @Composable
 fun ScoreboardTable(
-    awayTeam: String,
-    homeTeam: String,
+    awayTeamName: String,
+    homeTeamName: String,
     awayInningScores: List<String>,
     homeInningScores: List<String>,
-    awayScore: String,
-    homeScore: String,
+    awayScore: Int,
+    homeScore: Int,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -48,16 +48,16 @@ fun ScoreboardTable(
 
         // Away 팀
         ScoreboardRow(
-            firstText = awayTeam,
-            values = awayInningScores + awayScore,
+            firstText = awayTeamName,
+            values = awayInningScores + awayScore.toString(),
             isHeader = false,
         )
         HorizontalDivider(color = Gray300, thickness = 0.4.dp)
 
         // Home 팀
         ScoreboardRow(
-            firstText = homeTeam,
-            values = homeInningScores + homeScore,
+            firstText = homeTeamName,
+            values = homeInningScores + homeScore.toString(),
             isHeader = false,
         )
         HorizontalDivider(color = Gray300, thickness = 0.4.dp)
@@ -118,11 +118,11 @@ private fun ScoreboardText(
 @Composable
 private fun ScoreboardTablePreview() {
     ScoreboardTable(
-        awayTeam = "KIA",
-        homeTeam = "두산",
+        awayTeamName = "KIA",
+        homeTeamName = "두산",
         awayInningScores = listOf("1", "0", "0", "2", "0", "0", "1", "0", "0", "-", "-"),
         homeInningScores = listOf("0", "1", "1", "0", "1", "0", "0", "2", "0", "-", "-"),
-        awayScore = "10",
-        homeScore = "4",
+        awayScore = 10,
+        homeScore = 4,
     )
 }

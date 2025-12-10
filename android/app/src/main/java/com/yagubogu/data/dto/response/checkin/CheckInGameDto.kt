@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CheckInGameDto(
-    @SerialName("checkInId")
-    val checkInId: Long, // 직관 ID
     @SerialName("stadiumFullName")
     val stadiumFullName: String, // 경기장 전체 이름
     @SerialName("homeTeam")

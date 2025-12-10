@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,7 +55,7 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val attendanceHistoryUiModels: List<AttendanceHistoryUiModel> by viewModel.attendanceHistoryItems.collectAsStateWithLifecycle()
+    val attendanceHistoryUiModels: List<AttendanceHistoryUiModel> by viewModel.items.collectAsStateWithLifecycle()
     val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceHistoryFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistoryOrder by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
@@ -135,10 +134,12 @@ private fun AttendanceHistoryFilterDropdown(
         ) {
             Text(
                 text =
-                    when (filter) {
-                        AttendanceHistoryFilter.ALL -> "전체 경기"
-                        AttendanceHistoryFilter.WIN -> "승리한 경기"
-                    },
+                    stringResource(
+                        when (filter) {
+                            AttendanceHistoryFilter.ALL -> R.string.attendance_history_all
+                            AttendanceHistoryFilter.WIN -> R.string.attendance_history_win
+                        },
+                    ),
                 style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -166,10 +167,12 @@ private fun AttendanceHistoryFilterDropdown(
                     text = {
                         Text(
                             text =
-                                when (filter) {
-                                    AttendanceHistoryFilter.ALL -> "전체 경기"
-                                    AttendanceHistoryFilter.WIN -> "승리한 경기"
-                                },
+                                stringResource(
+                                    when (filter) {
+                                        AttendanceHistoryFilter.ALL -> R.string.attendance_history_all
+                                        AttendanceHistoryFilter.WIN -> R.string.attendance_history_win
+                                    },
+                                ),
                             style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
                         )
                     },

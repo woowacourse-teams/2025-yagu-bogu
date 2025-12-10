@@ -16,12 +16,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
+import com.yagubogu.domain.model.GameResult
+import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
+import com.yagubogu.presentation.attendance.model.GameScoreBoard
+import com.yagubogu.presentation.attendance.model.GameTeam
+import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium12
@@ -29,11 +35,10 @@ import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.PretendardSemiBold20
-import com.yagubogu.ui.theme.TeamDoosan
-import com.yagubogu.ui.theme.TeamKia
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.noRippleClickable
+import java.time.LocalDate
 
 @Composable
 fun AttendanceHistoryItem(
@@ -52,19 +57,28 @@ fun AttendanceHistoryItem(
                     Firebase.analytics.logEvent("attendance_history_item_click", null)
                 }.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
-        AttendanceHistorySummary()
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = expandVertically(),
-            exit = shrinkVertically(),
-        ) {
-            AttendanceHistoryDetail()
+        AttendanceHistorySummary(item = item.summary)
+        when (item) {
+            is AttendanceHistoryUiModel.Played -> {
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    AttendanceHistoryDetail(item = item)
+                }
+            }
+
+            is AttendanceHistoryUiModel.Canceled -> Unit
         }
     }
 }
 
 @Composable
-private fun AttendanceHistorySummary(modifier: Modifier = Modifier) {
+private fun AttendanceHistorySummary(
+    item: AttendanceHistoryUiModel.Summary,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier =
             modifier
@@ -74,9 +88,9 @@ private fun AttendanceHistorySummary(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = "9",
+            text = item.awayTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dsp),
-            color = TeamKia,
+            color = item.awayTeamColor,
         )
 
         Column(
@@ -87,7 +101,7 @@ private fun AttendanceHistorySummary(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(
-                    text = "KIA",
+                    text = item.awayTeam.name,
                     style = PretendardSemiBold20,
                 )
                 Text(
@@ -95,32 +109,35 @@ private fun AttendanceHistorySummary(modifier: Modifier = Modifier) {
                     style = PretendardSemiBold16,
                 )
                 Text(
-                    text = "두산",
+                    text = item.homeTeam.name,
                     style = PretendardSemiBold20,
                 )
             }
 
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "2025.08.01",
+                text = item.attendanceDate.format(DateFormatter.yyyyMMdd),
                 style = PretendardRegular12.copy(color = Gray500),
             )
             Text(
-                text = "잠실 야구장",
+                text = item.stadiumName,
                 style = PretendardRegular.copy(fontSize = 10.sp, color = Gray500),
             )
         }
 
         Text(
-            text = "5",
+            text = item.homeTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dsp),
-            color = TeamDoosan,
+            color = item.homeTeamColor,
         )
     }
 }
 
 @Composable
-private fun AttendanceHistoryDetail(modifier: Modifier = Modifier) {
+private fun AttendanceHistoryDetail(
+    item: AttendanceHistoryUiModel.Played,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(20.dp))
         Row(
@@ -132,40 +149,118 @@ private fun AttendanceHistoryDetail(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "승 - 이의리",
+                text = stringResource(item.awayTeamPitcherStringRes, item.awayTeamPitcher),
                 style = PretendardMedium12,
             )
             Text(
-                text = "패 - 김택연",
+                text = stringResource(item.homeTeamPitcherStringRes, item.homeTeamPitcher),
                 style = PretendardMedium12,
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
 
         ScoreboardTable(
-            awayTeam = "KIA",
-            homeTeam = "두산",
-            awayInningScores = listOf("1", "0", "0", "2", "0", "0", "1", "0", "0", "-", "-"),
-            homeInningScores = listOf("0", "1", "1", "0", "1", "0", "0", "2", "0", "-", "-"),
-            awayScore = "10",
-            homeScore = "4",
+            awayTeamName = item.awayTeam.name,
+            homeTeamName = item.homeTeam.name,
+            awayInningScores = item.awayTeamScoreBoard.inningScores,
+            homeInningScores = item.homeTeamScoreBoard.inningScores,
+            awayScore = item.awayTeamScoreBoard.runs,
+            homeScore = item.homeTeamScoreBoard.runs,
         )
         Spacer(modifier = Modifier.height(20.dp))
         GameRecordTable(
-            awayTeamName = "KIA",
-            homeTeamName = "두산",
-            awayHits = 13,
-            homeHits = 9,
-            awayErrors = 0,
-            homeErrors = 2,
-            awayBalls = 5,
-            homeBalls = 3,
+            awayTeamName = item.awayTeam.name,
+            homeTeamName = item.homeTeam.name,
+            awayHits = item.awayTeamScoreBoard.hits,
+            homeHits = item.homeTeamScoreBoard.hits,
+            awayErrors = item.awayTeamScoreBoard.errors,
+            homeErrors = item.homeTeamScoreBoard.errors,
+            awayBalls = item.awayTeamScoreBoard.basesOnBalls,
+            homeBalls = item.homeTeamScoreBoard.basesOnBalls,
         )
     }
 }
 
-@Preview
+@Preview(name = "완료된 경기")
 @Composable
-private fun AttendanceHistoryItemPreview() {
-//    AttendanceHistoryItem()
+private fun AttendanceItemPlayedPreview() {
+    AttendanceHistoryItem(
+        item =
+            AttendanceHistoryUiModel.Played(
+                summary =
+                    AttendanceHistoryUiModel.Summary(
+                        attendanceDate = LocalDate.now(),
+                        stadiumName = "잠실 야구장",
+                        awayTeam =
+                            GameTeam(
+                                team = Team.HT,
+                                name = "KIA",
+                                score = "10",
+                                isMyTeam = true,
+                                gameResult = GameResult.WIN,
+                            ),
+                        homeTeam =
+                            GameTeam(
+                                team = Team.HT,
+                                name = "두산",
+                                score = "4",
+                                isMyTeam = false,
+                                gameResult = GameResult.LOSE,
+                            ),
+                    ),
+                awayTeamPitcher = "이의리",
+                homeTeamPitcher = "김택연",
+                awayTeamScoreBoard =
+                    GameScoreBoard(
+                        runs = 10,
+                        hits = 13,
+                        errors = 0,
+                        basesOnBalls = 5,
+                        scores = listOf("0", "0", "1", "0", "1", "4", "1", "1", "2", "-", "-"),
+                    ),
+                homeTeamScoreBoard =
+                    GameScoreBoard(
+                        runs = 4,
+                        hits = 9,
+                        errors = 2,
+                        basesOnBalls = 3,
+                        scores = listOf("0", "0", "2", "0", "1", "0", "0", "1", "0", "-", "-"),
+                    ),
+            ),
+        isExpanded = true,
+        onItemClick = {},
+    )
+}
+
+@Preview(name = "취소된 경기")
+@Composable
+private fun AttendanceItemCanceledPreview() {
+    AttendanceHistoryItem(
+        item =
+            AttendanceHistoryUiModel.Canceled(
+                summary =
+                    AttendanceHistoryUiModel.Summary(
+                        attendanceDate = LocalDate.now(),
+                        stadiumName = "잠실 야구장",
+                        awayTeam =
+                            GameTeam(
+                                team = Team.HT,
+                                name = "KIA",
+                                score = "-",
+                                isMyTeam = true,
+                                gameResult = GameResult.DRAW,
+                            ),
+                        homeTeam =
+                            GameTeam(
+                                team = Team.HT,
+                                name = "두산",
+                                score = "-",
+                                isMyTeam = false,
+                                gameResult = GameResult.DRAW,
+                            ),
+                    ),
+            ),
+        isExpanded = false,
+        onItemClick = {},
+    )
 }
