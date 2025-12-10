@@ -31,13 +31,11 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
     val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
 
-    private val _attendanceHistoryFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
-    val attendanceHistoryFilter: StateFlow<AttendanceHistoryFilter> =
-        _attendanceHistoryFilter.asStateFlow()
+    private val _attendanceFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
+    val attendanceFilter: StateFlow<AttendanceHistoryFilter> = _attendanceFilter.asStateFlow()
 
-    private val _attendanceHistorySort = MutableStateFlow(AttendanceHistorySort.LATEST)
-    val attendanceHistorySort: StateFlow<AttendanceHistorySort> =
-        _attendanceHistorySort.asStateFlow()
+    private val _attendanceSort = MutableStateFlow(AttendanceHistorySort.LATEST)
+    val attendanceSort: StateFlow<AttendanceHistorySort> = _attendanceSort.asStateFlow()
 
     private val _scrollToTopEvent =
         MutableSharedFlow<Unit>(
@@ -59,13 +57,13 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
-            val filter: AttendanceHistoryFilter = attendanceHistoryFilter.value
-            val sort: AttendanceHistorySort = attendanceHistorySort.value
+            val filter: AttendanceHistoryFilter = attendanceFilter.value
+            val sort: AttendanceHistorySort = attendanceSort.value
             checkInRepository
                 .getCheckInHistories(year, filter.name, sort.name)
                 .mapList { it.toUiModel() }
-                .onSuccess { attendanceHistoryItems: List<AttendanceHistoryItem> ->
-                    _items.value = attendanceHistoryItems
+                .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
+                    _items.value = attendanceItems
                     _detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -73,16 +71,16 @@ class AttendanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun updateAttendanceHistoryFilter(filter: AttendanceHistoryFilter) {
-        if (attendanceHistoryFilter.value != filter) {
-            _attendanceHistoryFilter.value = filter
+    fun updateAttendanceFilter(filter: AttendanceHistoryFilter) {
+        if (attendanceFilter.value != filter) {
+            _attendanceFilter.value = filter
             fetchAttendanceHistoryItems()
         }
     }
 
-    fun switchAttendanceHistoryOrder() {
-        _attendanceHistorySort.value =
-            when (attendanceHistorySort.value) {
+    fun switchAttendanceSort() {
+        _attendanceSort.value =
+            when (attendanceSort.value) {
                 AttendanceHistorySort.LATEST -> AttendanceHistorySort.OLDEST
                 AttendanceHistorySort.OLDEST -> AttendanceHistorySort.LATEST
             }

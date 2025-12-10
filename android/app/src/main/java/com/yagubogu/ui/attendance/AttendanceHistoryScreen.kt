@@ -64,8 +64,8 @@ fun AttendanceHistoryScreen(
     modifier: Modifier = Modifier,
 ) {
     val attendanceHistoryItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
-    val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceHistoryFilter.collectAsStateWithLifecycle()
-    val sort: AttendanceHistorySort by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
+    val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceFilter.collectAsStateWithLifecycle()
+    val sort: AttendanceHistorySort by viewModel.attendanceSort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
 
     when (attendanceHistoryItems.isEmpty()) {
@@ -76,9 +76,9 @@ fun AttendanceHistoryScreen(
                 detailItemPosition = detailItemPosition,
                 onItemClick = viewModel::onItemClick,
                 filter = attendanceHistoryFilter,
-                onFilterClick = viewModel::updateAttendanceHistoryFilter,
+                onFilterClick = viewModel::updateAttendanceFilter,
                 sort = sort,
-                onSortClick = viewModel::switchAttendanceHistoryOrder,
+                onSortClick = viewModel::switchAttendanceSort,
                 scrollToTopEvent = viewModel.scrollToTopEvent,
                 modifier = modifier,
             )
