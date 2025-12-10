@@ -26,7 +26,8 @@ class AttendanceHistoryViewModel @Inject constructor(
 ) : ViewModel() {
     private val items = MutableStateFlow<List<AttendanceHistoryUiModel>>(emptyList())
 
-    private val detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
+    private val _detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
+    val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
 
     // 화면에 표시될 AttendanceHistoryItems
     val attendanceHistoryItems: StateFlow<List<AttendanceHistoryUiModel>> =
@@ -64,7 +65,7 @@ class AttendanceHistoryViewModel @Inject constructor(
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceHistoryUiModels: List<AttendanceHistoryUiModel> ->
                     items.value = attendanceHistoryUiModels
-                    detailItemPosition.value = FIRST_INDEX
+                    _detailItemPosition.value = FIRST_INDEX
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -87,16 +88,14 @@ class AttendanceHistoryViewModel @Inject constructor(
         fetchAttendanceHistoryItems(order = attendanceHistorySort.value)
     }
 
-    fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary) {
+    fun onItemClick(item: AttendanceHistoryUiModel) {
         val position: Int = attendanceHistoryItems.value.indexOf(item)
         if (position < FIRST_INDEX) return
-        detailItemPosition.value = position
-    }
-
-    fun onDetailItemClick(item: AttendanceHistoryUiModel.Detail) {
-        val position: Int = attendanceHistoryItems.value.indexOf(item)
-        if (position < FIRST_INDEX) return
-        detailItemPosition.value = null
+        if (position == detailItemPosition.value) {
+            _detailItemPosition.value = null
+        } else {
+            _detailItemPosition.value = position
+        }
     }
 
     private fun buildAttendanceHistoryItems(): List<AttendanceHistoryUiModel> =

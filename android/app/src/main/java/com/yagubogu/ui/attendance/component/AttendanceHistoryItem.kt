@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray500
@@ -36,8 +38,8 @@ import com.yagubogu.ui.util.noRippleClickable
 @Composable
 fun AttendanceHistoryItem(
     item: AttendanceHistoryUiModel,
-    onSummaryItemClick: (AttendanceHistoryUiModel.Summary) -> Unit,
-    onDetailItemClick: (AttendanceHistoryUiModel.Detail) -> Unit,
+    isExpanded: Boolean,
+    onItemClick: (AttendanceHistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -46,16 +48,13 @@ fun AttendanceHistoryItem(
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp))
                 .noRippleClickable {
-                    when (item) {
-                        is AttendanceHistoryUiModel.Summary -> onSummaryItemClick(item)
-                        is AttendanceHistoryUiModel.Detail -> onDetailItemClick(item)
-                        is AttendanceHistoryUiModel.Canceled -> Unit
-                    }
+                    onItemClick(item)
+                    Firebase.analytics.logEvent("attendance_history_item_click", null)
                 }.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary()
         AnimatedVisibility(
-            visible = item is AttendanceHistoryUiModel.Detail,
+            visible = isExpanded,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {

@@ -4,19 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
-import com.yagubogu.R
 import com.yagubogu.databinding.FragmentAttendanceHistoryBinding
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryUiModel
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,22 +17,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AttendanceHistoryFragment :
     Fragment(),
-    AttendanceHistorySummaryViewHolder.Handler,
-    AttendanceHistoryDetailViewHolder.Handler,
     ScrollToTop {
     private var _binding: FragmentAttendanceHistoryBinding? = null
     private val binding: FragmentAttendanceHistoryBinding get() = _binding!!
 
     private val viewModel: AttendanceHistoryViewModel by viewModels()
-
-    private val attendanceHistoryAdapter by lazy {
-        AttendanceHistoryAdapter(
-            attendanceHistorySummaryHandler = this,
-            attendanceHistoryDetailHandler = this,
-        )
-    }
-
-    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,15 +34,6 @@ class AttendanceHistoryFragment :
                 AttendanceHistoryScreen(viewModel)
             }
         }
-
-//    override fun onCreateView(
-//        inflater: LayoutInflater,
-//        container: ViewGroup?,
-//        savedInstanceState: Bundle?,
-//    ): View {
-//        _binding = FragmentAttendanceHistoryBinding.inflate(inflater, container, false)
-//        return binding.root
-//    }
 
     override fun onViewCreated(
         view: View,
@@ -86,53 +58,8 @@ class AttendanceHistoryFragment :
         _binding = null
     }
 
-    override fun onSummaryItemClick(item: AttendanceHistoryUiModel.Summary) {
-        viewModel.onSummaryItemClick(item)
-        firebaseAnalytics.logEvent("attendance_history_item_click", null)
-    }
-
-    override fun onDetailItemClick(item: AttendanceHistoryUiModel.Detail) {
-        viewModel.onDetailItemClick(item)
-        firebaseAnalytics.logEvent("attendance_history_item_click", null)
-    }
-
     override fun scrollToTop() {
         binding.rvAttendanceHistory.smoothScrollToPosition(0)
-    }
-
-    private fun setupBindings() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-
-        binding.rvAttendanceHistory.apply {
-            adapter = attendanceHistoryAdapter
-            itemAnimator = null
-        }
-    }
-
-    private fun setupSpinner() {
-        val spinnerItems: Array<String> =
-            resources.getStringArray(R.array.attendance_history_filter)
-        val spinnerAdapter: ArrayAdapter<String> =
-            ArrayAdapter(requireContext(), R.layout.item_spinner_attendance_history, spinnerItems)
-        binding.spinnerAttendanceHistoryFilter.apply {
-            adapter = spinnerAdapter
-            onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long,
-                    ) {
-                        val filter = AttendanceHistoryFilter.entries[position]
-                        viewModel.updateAttendanceHistoryFilter(filter)
-                        firebaseAnalytics.logEvent("attendance_history_change_filter", null)
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-                }
-        }
     }
 
 //    private fun setupObservers() {
@@ -158,11 +85,4 @@ class AttendanceHistoryFragment :
 //                )
 //        }
 //    }
-
-    private fun setupListeners() {
-        binding.tvAttendanceHistoryOrder.setOnClickListener {
-            viewModel.switchAttendanceHistoryOrder()
-            firebaseAnalytics.logEvent("attendance_history_change_order", null)
-        }
-    }
 }

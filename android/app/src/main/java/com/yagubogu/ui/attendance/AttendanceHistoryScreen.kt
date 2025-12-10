@@ -59,11 +59,12 @@ fun AttendanceHistoryScreen(
     val attendanceHistoryUiModels: List<AttendanceHistoryUiModel> by viewModel.attendanceHistoryItems.collectAsStateWithLifecycle()
     val attendanceHistoryFilter: AttendanceHistoryFilter by viewModel.attendanceHistoryFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistoryOrder by viewModel.attendanceHistorySort.collectAsStateWithLifecycle()
+    val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
 
     AttendanceHistoryScreen(
         items = attendanceHistoryUiModels,
-        onSummaryItemClick = viewModel::onSummaryItemClick,
-        onDetailItemClick = viewModel::onDetailItemClick,
+        detailItemPosition = detailItemPosition,
+        onItemClick = viewModel::onItemClick,
         filter = attendanceHistoryFilter,
         onFilterClick = viewModel::updateAttendanceHistoryFilter,
         sort = sort,
@@ -75,8 +76,8 @@ fun AttendanceHistoryScreen(
 @Composable
 private fun AttendanceHistoryScreen(
     items: List<AttendanceHistoryUiModel>,
-    onSummaryItemClick: (AttendanceHistoryUiModel.Summary) -> Unit,
-    onDetailItemClick: (AttendanceHistoryUiModel.Detail) -> Unit,
+    detailItemPosition: Int?,
+    onItemClick: (AttendanceHistoryUiModel) -> Unit,
     filter: AttendanceHistoryFilter,
     onFilterClick: (AttendanceHistoryFilter) -> Unit,
     sort: AttendanceHistoryOrder,
@@ -107,11 +108,12 @@ private fun AttendanceHistoryScreen(
                     .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(items) { item: AttendanceHistoryUiModel ->
+            items(items.size) { index: Int ->
+                val item: AttendanceHistoryUiModel = items[index]
                 AttendanceHistoryItem(
                     item = item,
-                    onSummaryItemClick = onSummaryItemClick,
-                    onDetailItemClick = onDetailItemClick,
+                    isExpanded = index == detailItemPosition,
+                    onItemClick = onItemClick,
                 )
             }
             item { Spacer(modifier = Modifier.height(4.dp)) }
