@@ -1,9 +1,11 @@
 package com.yagubogu.ui.attendance
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -26,13 +29,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
+import com.yagubogu.presentation.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.component.AttendanceHistoryItem
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardRegular
+import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
@@ -71,9 +79,10 @@ fun AttendanceHistoryScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun AttendanceHistoryFilterDropdown() {
-    var expanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
     Box {
         Row(
+            modifier = Modifier.noRippleClickable { isExpanded = !isExpanded },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -82,27 +91,41 @@ private fun AttendanceHistoryFilterDropdown() {
             )
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
-                modifier =
-                    Modifier
-                        .size(20.dp)
-                        .noRippleClickable { expanded = !expanded },
+                modifier = Modifier.size(20.dp),
                 painter = painterResource(id = R.drawable.ic_arrow_down),
                 contentDescription = null,
                 tint = Gray500,
             )
         }
         DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+            offset = DpOffset(0.dp, 4.dp),
+            containerColor = White,
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(0.4.dp, Gray300),
+            modifier =
+                Modifier
+                    .crop(vertical = 8.dp)
+                    .padding(vertical = 4.dp),
         ) {
-            DropdownMenuItem(
-                text = { Text("Option 1") },
-                onClick = { /* Do something... */ },
-            )
-            DropdownMenuItem(
-                text = { Text("Option 2") },
-                onClick = { /* Do something... */ },
-            )
+            AttendanceHistoryFilter.entries.forEach { filter: AttendanceHistoryFilter ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text =
+                                when (filter) {
+                                    AttendanceHistoryFilter.ALL -> "전체 경기"
+                                    AttendanceHistoryFilter.WIN -> "승리한 경기"
+                                },
+                            style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
+                        )
+                    },
+                    onClick = { /* Do something... */ },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
+                )
+            }
         }
     }
 }
@@ -110,6 +133,7 @@ private fun AttendanceHistoryFilterDropdown() {
 @Composable
 private fun AttendanceHistorySortSwitch() {
     Row(
+        modifier = Modifier.noRippleClickable {},
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -118,10 +142,7 @@ private fun AttendanceHistorySortSwitch() {
         )
         Spacer(modifier = Modifier.width(4.dp))
         Icon(
-            modifier =
-                Modifier
-                    .size(16.dp)
-                    .noRippleClickable { },
+            modifier = Modifier.size(16.dp),
             painter = painterResource(id = R.drawable.ic_switch),
             contentDescription = null,
             tint = Gray500,
