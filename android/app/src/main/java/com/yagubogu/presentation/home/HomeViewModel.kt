@@ -1,7 +1,6 @@
 package com.yagubogu.presentation.home
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,13 +39,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.LocalTime
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -71,22 +68,15 @@ class HomeViewModel @Inject constructor(
     private val _isStadiumStatsExpanded = MutableStateFlow(false)
     val isStadiumStatsExpanded: StateFlow<Boolean> get() = _isStadiumStatsExpanded.asStateFlow()
 
-    val isShowMoreVisible: LiveData<Boolean> =
-        MediatorLiveData<Boolean>().apply {
-//            addSource(stadiumFanRateItems) { value = it.size > 1 }
-        }
-
     val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> =
-        combine(
-            isStadiumStatsExpanded,
-            stadiumFanRateItems,
-        ) { isExpanded: Boolean, items: List<StadiumFanRateItem> ->
-            buildStadiumStatsUiModel(isExpanded, items)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = StadiumStatsUiModel(),
-        )
+        stadiumFanRateItems
+            .map { items: List<StadiumFanRateItem> ->
+                StadiumStatsUiModel(stadiumFanRates = items)
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = StadiumStatsUiModel(),
+            )
 
     private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
     val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
@@ -206,22 +196,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun buildStadiumStatsUiModel(
-        isExpanded: Boolean = isStadiumStatsExpanded.value,
-        items: List<StadiumFanRateItem> = stadiumFanRateItems.value,
-    ): StadiumStatsUiModel {
-        val newItems: List<StadiumFanRateItem> =
-            if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
-        val newStadiumStats =
-            StadiumStatsUiModel(
-                stadiumFanRates = newItems,
-                refreshTime = LocalTime.now(),
-            )
-        return newStadiumStats
-    }
-
     fun toggleStadiumStats() {
-        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value.not()
+        _isStadiumStatsExpanded.value = !isStadiumStatsExpanded.value
     }
 
     fun fetchMemberProfile(memberId: Long) {

@@ -77,7 +77,7 @@ fun WinRates(
                     colorFilter = ColorFilter.tint(color = Gray300),
                     modifier =
                         Modifier
-                            .padding(8.dp)
+                            .padding(horizontal = 8.dp)
                             .noRippleClickable {
                                 balloonWindow.showAlignBottom(yOff = -30)
                                 Firebase.analytics.logEvent("tooltip_my_chart", null)

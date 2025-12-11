@@ -39,11 +39,14 @@ fun HomeScreen(
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
     val stadiumStatsUiModel: StadiumStatsUiModel by viewModel.stadiumStatsUiModel.collectAsStateWithLifecycle()
+    val isStadiumStatsExpanded: Boolean by viewModel.isStadiumStatsExpanded.collectAsStateWithLifecycle()
     val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
 
     HomeScreen(
         memberStatsUiModel = memberStatsUiModel,
         stadiumStatsUiModel = stadiumStatsUiModel,
+        isStadiumStatsExpanded = isStadiumStatsExpanded,
+        onStadiumStatsClick = viewModel::toggleStadiumStats,
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
     )
@@ -54,6 +57,8 @@ fun HomeScreen(
 private fun HomeScreen(
     memberStatsUiModel: MemberStatsUiModel,
     stadiumStatsUiModel: StadiumStatsUiModel,
+    isStadiumStatsExpanded: Boolean,
+    onStadiumStatsClick: () -> Unit,
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -96,7 +101,13 @@ private fun HomeScreen(
             )
         }
 
-        StadiumFanRate(uiModel = stadiumStatsUiModel)
+        if (stadiumStatsUiModel.stadiumFanRates.isNotEmpty()) {
+            StadiumFanRate(
+                uiModel = stadiumStatsUiModel,
+                isExpanded = isStadiumStatsExpanded,
+                onClick = onStadiumStatsClick,
+            )
+        }
         VictoryFairyRanking(
             ranking = victoryFairyRanking,
             onRankingItemClick = onVictoryFairyRankingClick,
@@ -115,6 +126,8 @@ private fun HomeScreenPreview() {
                 winRate = 75,
             ),
         stadiumStatsUiModel = STADIUM_STATS_UI_MODEL,
+        isStadiumStatsExpanded = false,
+        onStadiumStatsClick = {},
         victoryFairyRanking = VICTORY_FAIRY_RANKING,
         onVictoryFairyRankingClick = {},
     )

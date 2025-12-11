@@ -1,5 +1,6 @@
 package com.yagubogu.ui.home.component
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -60,22 +61,26 @@ import com.yagubogu.ui.util.rememberBalloonBuilder
 @Composable
 fun StadiumFanRate(
     uiModel: StadiumStatsUiModel,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val balloonBuilder = rememberBalloonBuilder(R.string.home_stadium_stats_tooltip)
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier =
             modifier
                 .fillMaxWidth()
                 .background(White, RoundedCornerShape(12.dp))
-                .padding(20.dp),
+                .padding(top = 20.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -91,7 +96,7 @@ fun StadiumFanRate(
                         tint = Gray300,
                         modifier =
                             Modifier
-                                .padding(8.dp)
+                                .padding(horizontal = 8.dp)
                                 .noRippleClickable {
                                     balloonWindow.showAlignBottom(yOff = -30)
                                     Firebase.analytics.logEvent("tooltip_stadium_stats", null)
@@ -127,15 +132,28 @@ fun StadiumFanRate(
         }
 
         Column(
-            modifier = Modifier.padding(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier =
+                Modifier
+                    .padding(top = 12.dp)
+                    .noRippleClickable(onClick)
+                    .animateContentSize(),
         ) {
-            uiModel.stadiumFanRates.forEach { item: StadiumFanRateItem ->
-                StadiumFanRateItem(item)
+            when (isExpanded) {
+                true -> uiModel.stadiumFanRates.forEach { StadiumFanRateItem(it) }
+                false -> StadiumFanRateItem(uiModel.stadiumFanRates.first())
             }
         }
 
-        ShowMoreButton(isExpanded = false)
+        if (uiModel.stadiumFanRates.size > 1) {
+            ShowMoreButton(
+                isExpanded = isExpanded,
+                onClick = onClick,
+                modifier =
+                    Modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 20.dp),
+            )
+        }
     }
 }
 
@@ -152,6 +170,8 @@ private fun StadiumFanRateItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier =
             modifier
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 20.dp)
                 .height(itemHeight)
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp)),
@@ -275,8 +295,7 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }
@@ -290,10 +309,24 @@ private fun remapToChartRange(percentage: Double): Double {
     return scaledRange / 100.0
 }
 
-@Preview
+@Preview("경기 여러 개")
 @Composable
 private fun StadiumFanRatePreview() {
-    StadiumFanRate(uiModel = STADIUM_STATS_UI_MODEL)
+    StadiumFanRate(
+        uiModel = STADIUM_STATS_UI_MODEL,
+        isExpanded = false,
+        onClick = {},
+    )
+}
+
+@Preview("경기 한 개")
+@Composable
+private fun StadiumFanRateOnePreview() {
+    StadiumFanRate(
+        uiModel = StadiumStatsUiModel(stadiumFanRates = listOf(STADIUM_FAN_RATE_ITEM)),
+        isExpanded = false,
+        onClick = {},
+    )
 }
 
 @Preview

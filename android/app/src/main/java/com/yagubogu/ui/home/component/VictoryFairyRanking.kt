@@ -83,7 +83,7 @@ fun VictoryFairyRanking(
                         tint = Gray300,
                         modifier =
                             Modifier
-                                .padding(8.dp)
+                                .padding(horizontal = 8.dp)
                                 .noRippleClickable {
                                     balloonWindow.showAlignBottom(yOff = -30)
                                     Firebase.analytics.logEvent(

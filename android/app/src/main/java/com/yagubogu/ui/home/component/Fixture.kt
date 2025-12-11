@@ -24,7 +24,8 @@ val STADIUM_FAN_RATE_ITEM =
             ),
     )
 
-val STADIUM_STATS_UI_MODEL = StadiumStatsUiModel(stadiumFanRates = listOf(STADIUM_FAN_RATE_ITEM))
+val STADIUM_STATS_UI_MODEL =
+    StadiumStatsUiModel(stadiumFanRates = List(5) { STADIUM_FAN_RATE_ITEM })
 
 val VICTORY_FAIRY_RANKING_ITEM =
     VictoryFairyItem(
