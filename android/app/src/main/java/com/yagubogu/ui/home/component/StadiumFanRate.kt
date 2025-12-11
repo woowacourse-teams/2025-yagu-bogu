@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -40,6 +39,7 @@ import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+import com.yagubogu.ui.common.component.HeartbeatAnimation
 import com.yagubogu.ui.common.component.ShowMoreButton
 import com.yagubogu.ui.common.component.shape.ParallelogramShape
 import com.yagubogu.ui.theme.EsamanruMedium
@@ -257,23 +257,25 @@ private fun StadiumFanRateDivider(
                         shape = ParallelogramShape(skewed = skewed, size = 0.dp),
                     ),
         )
-        Surface(
-            shadowElevation = 8.dp,
-            shape = CircleShape,
-            modifier = Modifier.align(Alignment.Center),
-        ) {
-            Text(
-                text = "VS",
-                style = PretendardBold.copy(fontSize = 16.dsp, color = Gray700),
-                modifier =
-                    Modifier
-                        .background(color = White, shape = CircleShape)
-                        .border(
-                            width = 1.dp,
-                            color = Gray100,
-                            shape = CircleShape,
-                        ).padding(horizontal = 10.dp, vertical = 4.dp),
-            )
+        HeartbeatAnimation {
+            Surface(
+                shadowElevation = 8.dp,
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Text(
+                    text = "VS",
+                    style = PretendardBold.copy(fontSize = 16.dsp, color = Gray700),
+                    modifier =
+                        Modifier
+                            .background(color = White, shape = CircleShape)
+                            .border(
+                                width = 1.dp,
+                                color = Gray100,
+                                shape = CircleShape,
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            }
         }
     }
 }

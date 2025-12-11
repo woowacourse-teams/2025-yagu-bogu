@@ -32,7 +32,6 @@ import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.presentation.util.showSnackbar
@@ -52,8 +51,6 @@ class HomeFragment :
     private val viewModel: HomeViewModel by viewModels()
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
-
-    private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
 
@@ -134,8 +131,6 @@ class HomeFragment :
 //            firebaseAnalytics.logEvent("check_in", null)
 //        }
 //
-//        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
-//
 //        binding.ivRefresh.setOnClickListener { view: View ->
 //            viewModel.buildStadiumStatsUiModel()
 //            view
@@ -162,10 +157,6 @@ class HomeFragment :
                 }
 //            binding.root.showSnackbar(message, R.id.bnv_navigation)
         }
-
-//        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
-//            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
-//        }
 
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)

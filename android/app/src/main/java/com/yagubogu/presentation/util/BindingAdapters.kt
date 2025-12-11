@@ -14,20 +14,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-@BindingAdapter("setConstraintWidthPercent")
-fun View.setConstraintWidthPercent(percent: Double) {
-    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return
-    layoutParams.matchConstraintPercentWidth = percent.toFloat()
-    this.layoutParams = layoutParams
-}
-
-@BindingAdapter("setConstraintGuidePercent")
-fun View.setConstraintGuidePercent(percent: Double) {
-    val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return
-    layoutParams.guidePercent = percent.toFloat()
-    this.layoutParams = layoutParams
-}
-
 @BindingAdapter("textColorRes")
 fun TextView.setTextColorRes(
     @ColorRes colorRes: Int?,
