@@ -145,6 +145,8 @@ private fun StadiumFanRateItem(
     modifier: Modifier = Modifier,
 ) {
     val itemHeight: Dp = 85.dp
+    val awayTeamChartRange: Float = remapToChartRange(item.awayTeamPercentage).toFloat()
+    val homeTeamChartRange: Float = remapToChartRange(item.homeTeamPercentage).toFloat()
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -159,7 +161,7 @@ private fun StadiumFanRateItem(
                 Column(
                     modifier =
                         Modifier
-                            .weight(item.awayTeamChartRange.toFloat())
+                            .weight(awayTeamChartRange)
                             .height(itemHeight)
                             .background(color = item.awayTeamFanRate.team.color)
                             .padding(vertical = 18.dp)
@@ -181,7 +183,7 @@ private fun StadiumFanRateItem(
                 Column(
                     modifier =
                         Modifier
-                            .weight(item.homeTeamChartRange.toFloat())
+                            .weight(homeTeamChartRange)
                             .height(itemHeight)
                             .background(color = item.homeTeamFanRate.team.color)
                             .padding(vertical = 18.dp)
@@ -201,7 +203,7 @@ private fun StadiumFanRateItem(
                 }
             }
 
-            val centerOffset: Dp = maxWidth * item.awayTeamChartRange.toFloat()
+            val centerOffset: Dp = maxWidth * awayTeamChartRange
             val dividerWidth: Dp = 32.dp
             StadiumFanRateDivider(
                 awayTeamColor = item.awayTeamFanRate.team.color,
@@ -273,11 +275,19 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }
     }
+}
+
+private fun remapToChartRange(percentage: Double): Double {
+    val chartEndPaddingSize = 28.0
+    val scalingFactor: Double = (100.0 - chartEndPaddingSize * 2) / 100.0
+    val scaledRange: Double = chartEndPaddingSize + percentage.toFloat() * scalingFactor
+    return scaledRange / 100.0
 }
 
 @Preview
