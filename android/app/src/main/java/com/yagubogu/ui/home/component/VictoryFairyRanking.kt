@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +29,10 @@ import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
+import com.yagubogu.presentation.home.ranking.VictoryFairyItem
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.theme.Bronze
 import com.yagubogu.ui.theme.Gold
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -38,13 +42,17 @@ import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.PretendardSemiBold16
+import com.yagubogu.ui.theme.Silver
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.rememberBalloonBuilder
 
 @Composable
-fun VictoryFairyRanking(modifier: Modifier = Modifier) {
+fun VictoryFairyRanking(
+    victoryFairyRanking: VictoryFairyRanking,
+    modifier: Modifier = Modifier,
+) {
     val balloonBuilder = rememberBalloonBuilder(R.string.home_victory_fairy_tooltip)
 
     Column(
@@ -94,11 +102,18 @@ fun VictoryFairyRanking(modifier: Modifier = Modifier) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            VictoryFairyRankingItem(onClick = {})
+            VictoryFairyRankingItem(
+                item = victoryFairyRanking.myRanking,
+                onClick = {},
+                isMyRanking = true,
+            )
             HorizontalDivider(color = Gray300, thickness = 0.4.dp)
 
-            List(5) {
-                VictoryFairyRankingItem(onClick = {})
+            victoryFairyRanking.topRankings.forEach { item: VictoryFairyItem ->
+                VictoryFairyRankingItem(
+                    item = item,
+                    onClick = {},
+                )
             }
         }
     }
@@ -106,8 +121,10 @@ fun VictoryFairyRanking(modifier: Modifier = Modifier) {
 
 @Composable
 private fun VictoryFairyRankingItem(
+    item: VictoryFairyItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isMyRanking: Boolean = false,
 ) {
     Row(
         modifier =
@@ -118,7 +135,7 @@ private fun VictoryFairyRankingItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "1",
+            text = item.rank.toString(),
             style = PretendardRegular.copy(fontSize = 16.dsp, color = Gray500),
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp),
@@ -126,7 +143,7 @@ private fun VictoryFairyRankingItem(
         Spacer(modifier = Modifier.width(4.dp))
 
         ProfileImage(
-            imageUrl = "",
+            imageUrl = item.profileImageUrl,
             modifier = Modifier.size(40.dp),
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -138,39 +155,65 @@ private fun VictoryFairyRankingItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "닉네암",
+                    text =
+                        if (isMyRanking) {
+                            stringResource(
+                                R.string.home_victory_fairy_my_nickname,
+                                item.nickname,
+                            )
+                        } else {
+                            item.nickname
+                        },
                     style = PretendardSemiBold16,
                 )
-                Spacer(modifier = Modifier.width(6.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_medal_first),
-                    contentDescription = null,
-                    tint = Gold,
-                    modifier = Modifier.height(14.dp),
-                )
+                if (item.rank in 1..3) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    VictoryFairyMedal(rank = item.rank)
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "KIA 팬",
+                text = stringResource(R.string.all_fan, item.teamName),
                 style = PretendardMedium12.copy(color = Gray400),
             )
         }
 
         Text(
-            text = "100.0점",
+            text = stringResource(R.string.home_victory_fairy_score_format, item.score),
             style = PretendardRegular16,
         )
     }
 }
 
+@Composable
+private fun VictoryFairyMedal(
+    rank: Int,
+    modifier: Modifier = Modifier,
+) {
+    val (iconRes: Int, color: Color) =
+        when (rank) {
+            1 -> R.drawable.ic_medal_first to Gold
+            2 -> R.drawable.ic_medal_second to Silver
+            3 -> R.drawable.ic_medal_third to Bronze
+            else -> null
+        } ?: return
+
+    Icon(
+        painter = painterResource(id = iconRes),
+        contentDescription = null,
+        tint = color,
+        modifier = modifier.height(14.dp),
+    )
+}
+
 @Preview
 @Composable
 private fun VictoryFairyRankingPreview() {
-    VictoryFairyRanking()
+    VictoryFairyRanking(victoryFairyRanking = VICTORY_FAIRY_RANKING)
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun VictoryFairyRankingItemPreview() {
-    VictoryFairyRankingItem(onClick = {})
+    VictoryFairyRankingItem(item = VICTORY_FAIRY_RANKING_ITEM, onClick = {})
 }

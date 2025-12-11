@@ -80,14 +80,14 @@ class HomeViewModel @Inject constructor(
         }
     val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
 
-    private val _victoryFairyRanking = MutableLiveData<VictoryFairyRanking>()
-    val victoryFairyRanking: LiveData<VictoryFairyRanking> get() = _victoryFairyRanking
+    private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
+    val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
 
     private val _isCheckInLoading = MutableLiveData<Boolean>()
     val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
 
     private val _dialogEvent = MutableSharedFlow<HomeDialogEvent>()
-    val dialogEvent: SharedFlow<HomeDialogEvent> = _dialogEvent.asSharedFlow()
+    val dialogEvent: SharedFlow<HomeDialogEvent> get() = _dialogEvent.asSharedFlow()
 
     private var stadiums: StadiumsWithGames? = null
 

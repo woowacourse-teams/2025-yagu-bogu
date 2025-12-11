@@ -21,10 +21,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
+import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStatsItem
 import com.yagubogu.ui.home.component.StadiumFanRate
+import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
 import com.yagubogu.ui.home.component.VictoryFairyRanking
 import com.yagubogu.ui.theme.Gray050
 
@@ -34,9 +36,11 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
+    val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
 
     HomeScreen(
         memberStatsUiModel = memberStatsUiModel,
+        victoryFairyRanking = victoryFairyRanking,
     )
     HomeDialog(viewModel)
 }
@@ -44,6 +48,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     memberStatsUiModel: MemberStatsUiModel,
+    victoryFairyRanking: VictoryFairyRanking,
     modifier: Modifier = Modifier,
 ) {
     val scrollState: ScrollState = rememberScrollState()
@@ -85,7 +90,7 @@ private fun HomeScreen(
         }
 
         StadiumFanRate()
-        VictoryFairyRanking()
+        VictoryFairyRanking(victoryFairyRanking = victoryFairyRanking)
     }
 }
 
@@ -99,5 +104,6 @@ private fun HomeScreenPreview() {
                 attendanceCount = 24,
                 winRate = 75,
             ),
+        victoryFairyRanking = VICTORY_FAIRY_RANKING,
     )
 }
