@@ -14,22 +14,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-@BindingAdapter("setCustomChartDividerTint")
-fun ImageView.setCustomChartDividerTint(
-    @ColorRes colorRes: Int?,
-) {
-    if (colorRes == null || colorRes == 0) return
-    this.imageTintList = context.getColorStateList(colorRes)
-}
-
-@BindingAdapter("setCustomChartBackground")
-fun View.setCustomChartBackground(
-    @ColorRes colorRes: Int?,
-) {
-    if (colorRes == null || colorRes == 0) return
-    setBackgroundColor(context.getColor(colorRes))
-}
-
 @BindingAdapter("setConstraintWidthPercent")
 fun View.setConstraintWidthPercent(percent: Double) {
     val layoutParams = this.layoutParams as? ConstraintLayout.LayoutParams ?: return

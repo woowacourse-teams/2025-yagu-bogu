@@ -4,14 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,8 @@ import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
+import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.ui.common.component.ShowMoreButton
 import com.yagubogu.ui.common.component.shape.ParallelogramShape
 import com.yagubogu.ui.theme.EsamanruMedium
@@ -47,15 +51,17 @@ import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
-import com.yagubogu.ui.theme.TeamKia
-import com.yagubogu.ui.theme.TeamKiwoom
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.rememberBalloonBuilder
 
 @Composable
-fun StadiumFanRate(modifier: Modifier = Modifier) {
+fun StadiumFanRate(
+    uiModel: StadiumStatsUiModel,
+    modifier: Modifier = Modifier,
+) {
     val balloonBuilder = rememberBalloonBuilder(R.string.home_stadium_stats_tooltip)
 
     Column(
@@ -98,7 +104,12 @@ fun StadiumFanRate(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.home_stadium_stats_refresh_time, 14, 30),
+                    text =
+                        stringResource(
+                            R.string.home_stadium_stats_refresh_time,
+                            uiModel.refreshTime.hour,
+                            uiModel.refreshTime.minute,
+                        ),
                     style = PretendardRegular.copy(fontSize = 14.sp, color = Gray400),
                 )
                 Icon(
@@ -119,7 +130,9 @@ fun StadiumFanRate(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            List(2) { StadiumFanRateItem() }
+            uiModel.stadiumFanRates.forEach { item: StadiumFanRateItem ->
+                StadiumFanRateItem(item)
+            }
         }
 
         ShowMoreButton(isExpanded = false)
@@ -127,99 +140,91 @@ fun StadiumFanRate(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StadiumFanRateItem(modifier: Modifier = Modifier) {
+private fun StadiumFanRateItem(
+    item: StadiumFanRateItem,
+    modifier: Modifier = Modifier,
+) {
+    val itemHeight: Dp = 85.dp
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier =
             modifier
-                .height(IntrinsicSize.Min)
+                .height(itemHeight)
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp)),
     ) {
-        Box {
+        BoxWithConstraints {
             Row {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+                Column(
                     modifier =
                         Modifier
-                            .weight(0.5f)
-                            .background(color = TeamKia)
+                            .weight(item.awayTeamChartRange.toFloat())
+                            .height(itemHeight)
+                            .background(color = item.awayTeamFanRate.team.color)
                             .padding(vertical = 18.dp)
                             .padding(start = 20.dp),
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.Start,
-                    ) {
-                        Text(
-                            text = "KIA",
-                            style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "10.0%",
-                            style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
-                        )
-                    }
-                }
-
-                Box(
-                    contentAlignment = Alignment.CenterEnd,
-                    modifier =
-                        Modifier
-                            .weight(0.5f)
-                            .background(color = TeamKiwoom)
-                            .padding(vertical = 18.dp)
-                            .padding(end = 20.dp),
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                    ) {
-                        Text(
-                            text = "키움",
-                            style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "10.0%",
-                            style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
-                        )
-                    }
-                }
-            }
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                StadiumFanRateDivider()
-                Surface(
-                    shadowElevation = 8.dp,
-                    shape = CircleShape,
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
-                        text = "VS",
-                        style = PretendardBold.copy(fontSize = 16.dsp, color = Gray700),
-                        modifier =
-                            Modifier
-                                .background(color = White, shape = CircleShape)
-                                .border(
-                                    width = 1.dp,
-                                    color = Gray100,
-                                    shape = CircleShape,
-                                ).padding(horizontal = 10.dp, vertical = 4.dp),
+                        text = item.awayTeamFanRate.teamName,
+                        style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.all_win_rate, item.awayTeamPercentage),
+                        style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
+                    )
+                }
+
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(item.homeTeamChartRange.toFloat())
+                            .height(itemHeight)
+                            .background(color = item.homeTeamFanRate.team.color)
+                            .padding(vertical = 18.dp)
+                            .padding(end = 20.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    Text(
+                        text = item.homeTeamFanRate.teamName,
+                        style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.all_win_rate, item.homeTeamPercentage),
+                        style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
                     )
                 }
             }
+
+            val centerOffset: Dp = maxWidth * item.awayTeamChartRange.toFloat()
+            val dividerWidth: Dp = 32.dp
+            StadiumFanRateDivider(
+                awayTeamColor = item.awayTeamFanRate.team.color,
+                homeTeamColor = item.homeTeamFanRate.team.color,
+                width = dividerWidth,
+                modifier = Modifier.offset(x = centerOffset - dividerWidth / 2),
+            )
         }
     }
 }
 
 @Composable
-private fun StadiumFanRateDivider(modifier: Modifier = Modifier) {
-    val width: Dp = 32.dp
-    val skewed = 0.7f
-
-    Box {
+private fun StadiumFanRateDivider(
+    awayTeamColor: Color,
+    homeTeamColor: Color,
+    width: Dp,
+    modifier: Modifier = Modifier,
+    skewed: Float = 0.7f,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
         Spacer(
             modifier =
                 Modifier
@@ -227,12 +232,8 @@ private fun StadiumFanRateDivider(modifier: Modifier = Modifier) {
                     .width(width)
                     .fillMaxHeight(0.5f)
                     .background(
-                        color = TeamKia,
-                        shape =
-                            ParallelogramShape(
-                                skewed = skewed / 2,
-                                size = 0.dp,
-                            ),
+                        color = awayTeamColor,
+                        shape = ParallelogramShape(skewed = skewed / 2, size = 0.dp),
                     ),
         )
         Spacer(
@@ -242,39 +243,49 @@ private fun StadiumFanRateDivider(modifier: Modifier = Modifier) {
                     .width(width)
                     .fillMaxHeight(0.5f)
                     .background(
-                        color = TeamKiwoom,
-                        shape =
-                            ParallelogramShape(
-                                skewed = skewed / 2,
-                                size = 0.dp,
-                            ),
+                        color = homeTeamColor,
+                        shape = ParallelogramShape(skewed = skewed / 2, size = 0.dp),
                     ),
         )
         Spacer(
             modifier =
                 Modifier
                     .width(width)
-                    .fillMaxSize()
+                    .fillMaxHeight()
                     .background(
                         color = White,
-                        shape =
-                            ParallelogramShape(
-                                skewed = skewed,
-                                size = 0.dp,
-                            ),
+                        shape = ParallelogramShape(skewed = skewed, size = 0.dp),
                     ),
         )
+        Surface(
+            shadowElevation = 8.dp,
+            shape = CircleShape,
+            modifier = Modifier.align(Alignment.Center),
+        ) {
+            Text(
+                text = "VS",
+                style = PretendardBold.copy(fontSize = 16.dsp, color = Gray700),
+                modifier =
+                    Modifier
+                        .background(color = White, shape = CircleShape)
+                        .border(
+                            width = 1.dp,
+                            color = Gray100,
+                            shape = CircleShape,
+                        ).padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun StadiumFanRatePreview() {
-    StadiumFanRate()
+    StadiumFanRate(uiModel = STADIUM_STATS_UI_MODEL)
 }
 
 @Preview
 @Composable
 private fun StadiumFanRateItemPreview() {
-    StadiumFanRateItem()
+    StadiumFanRateItem(item = STADIUM_FAN_RATE_ITEM)
 }

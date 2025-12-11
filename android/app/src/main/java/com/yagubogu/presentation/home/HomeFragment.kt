@@ -137,7 +137,7 @@ class HomeFragment :
 //        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
 //
 //        binding.ivRefresh.setOnClickListener { view: View ->
-//            viewModel.updateStadiumStats()
+//            viewModel.buildStadiumStatsUiModel()
 //            view
 //                .animate()
 //                .rotationBy(REFRESH_ANIMATION_ROTATION)

@@ -36,10 +36,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -63,22 +66,27 @@ class HomeViewModel @Inject constructor(
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
-    private val stadiumFanRateItems = MutableLiveData<List<StadiumFanRateItem>>()
+    private val stadiumFanRateItems = MutableStateFlow<List<StadiumFanRateItem>>(emptyList())
 
-    private val _isStadiumStatsExpanded = MutableLiveData(false)
-    val isStadiumStatsExpanded: LiveData<Boolean> get() = _isStadiumStatsExpanded
+    private val _isStadiumStatsExpanded = MutableStateFlow(false)
+    val isStadiumStatsExpanded: StateFlow<Boolean> get() = _isStadiumStatsExpanded.asStateFlow()
 
     val isShowMoreVisible: LiveData<Boolean> =
         MediatorLiveData<Boolean>().apply {
-            addSource(stadiumFanRateItems) { value = it.size > 1 }
+//            addSource(stadiumFanRateItems) { value = it.size > 1 }
         }
 
-    private val _stadiumStatsUiModel: MutableLiveData<StadiumStatsUiModel> =
-        MediatorLiveData<StadiumStatsUiModel>().apply {
-            addSource(stadiumFanRateItems) { updateStadiumStats() }
-            addSource(isStadiumStatsExpanded) { updateStadiumStats() }
-        }
-    val stadiumStatsUiModel: LiveData<StadiumStatsUiModel> get() = _stadiumStatsUiModel
+    val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> =
+        combine(
+            isStadiumStatsExpanded,
+            stadiumFanRateItems,
+        ) { isExpanded: Boolean, items: List<StadiumFanRateItem> ->
+            buildStadiumStatsUiModel(isExpanded, items)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = StadiumStatsUiModel(),
+        )
 
     private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
     val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
@@ -198,21 +206,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateStadiumStats() {
-        val items: List<StadiumFanRateItem> = cachedStadiumFanRateItems.values.toList()
-        val isExpanded: Boolean = isStadiumStatsExpanded.value ?: false
-
-        val newItems = if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
+    fun buildStadiumStatsUiModel(
+        isExpanded: Boolean = isStadiumStatsExpanded.value,
+        items: List<StadiumFanRateItem> = stadiumFanRateItems.value,
+    ): StadiumStatsUiModel {
+        val newItems: List<StadiumFanRateItem> =
+            if (!isExpanded) listOfNotNull(items.firstOrNull()) else items
         val newStadiumStats =
             StadiumStatsUiModel(
                 stadiumFanRates = newItems,
                 refreshTime = LocalTime.now(),
             )
-        _stadiumStatsUiModel.value = newStadiumStats
+        return newStadiumStats
     }
 
     fun toggleStadiumStats() {
-        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value?.not() ?: true
+        _isStadiumStatsExpanded.value = isStadiumStatsExpanded.value.not()
     }
 
     fun fetchMemberProfile(memberId: Long) {
@@ -263,7 +272,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
+    private fun fetchStadiumStats(date: LocalDate = LocalDate.of(2025, 10, 3)) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }

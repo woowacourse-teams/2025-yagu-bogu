@@ -30,7 +30,6 @@
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:setConstraintWidthPercent="@{stadiumFanRate.awayTeamChartRange}"
-                app:setCustomChartBackground="@{stadiumFanRate.awayTeamFanRate.teamColor}"
                 tools:background="@color/team_kia"
                 tools:layout_constraintWidth_percent="0.3" />
 
@@ -40,7 +39,6 @@
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:setConstraintWidthPercent="@{stadiumFanRate.homeTeamChartRange}"
-                app:setCustomChartBackground="@{stadiumFanRate.homeTeamFanRate.teamColor}"
                 tools:background="@color/team_kiwoom"
                 tools:layout_constraintWidth_percent="0.7" />
 
@@ -86,7 +84,6 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumFanRate.awayTeamFanRate.teamColor}"
                 tools:tint="@color/team_kia" />
 
             <ImageView
@@ -101,9 +98,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_separate_point"
                 app:layout_constraintStart_toStartOf="@id/guideline_separate_point"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setCustomChartDividerTint="@{stadiumFanRate.homeTeamFanRate.teamColor}"
                 tools:tint="@color/team_kiwoom" />
-
 
             <TextView
                 android:id="@+id/tv_vs_design"

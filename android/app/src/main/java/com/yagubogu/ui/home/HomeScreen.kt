@@ -21,10 +21,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
+import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStatsItem
+import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
 import com.yagubogu.ui.home.component.VictoryFairyRanking
@@ -36,10 +38,12 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
+    val stadiumStatsUiModel: StadiumStatsUiModel by viewModel.stadiumStatsUiModel.collectAsStateWithLifecycle()
     val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
 
     HomeScreen(
         memberStatsUiModel = memberStatsUiModel,
+        stadiumStatsUiModel = stadiumStatsUiModel,
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
     )
@@ -49,6 +53,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     memberStatsUiModel: MemberStatsUiModel,
+    stadiumStatsUiModel: StadiumStatsUiModel,
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -91,7 +96,7 @@ private fun HomeScreen(
             )
         }
 
-        StadiumFanRate()
+        StadiumFanRate(uiModel = stadiumStatsUiModel)
         VictoryFairyRanking(
             ranking = victoryFairyRanking,
             onRankingItemClick = onVictoryFairyRankingClick,
@@ -109,6 +114,7 @@ private fun HomeScreenPreview() {
                 attendanceCount = 24,
                 winRate = 75,
             ),
+        stadiumStatsUiModel = STADIUM_STATS_UI_MODEL,
         victoryFairyRanking = VICTORY_FAIRY_RANKING,
         onVictoryFairyRankingClick = {},
     )
