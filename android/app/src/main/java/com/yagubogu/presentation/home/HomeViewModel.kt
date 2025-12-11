@@ -34,8 +34,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -53,8 +56,8 @@ class HomeViewModel @Inject constructor(
     private val stadiumRepository: StadiumRepository,
     private val streamRepository: StreamRepository,
 ) : ViewModel() {
-    private val _memberStatsUiModel = MutableLiveData<MemberStatsUiModel>()
-    val memberStatsUiModel: LiveData<MemberStatsUiModel> get() = _memberStatsUiModel
+    private val _memberStatsUiModel = MutableStateFlow(MemberStatsUiModel())
+    val memberStatsUiModel: StateFlow<MemberStatsUiModel> get() = _memberStatsUiModel.asStateFlow()
 
     private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
@@ -173,10 +176,10 @@ class HomeViewModel @Inject constructor(
                 .addCheckIn(gameId)
                 .onSuccess {
                     _checkInUiEvent.setValue(CheckInUiEvent.Success(stadium))
+
+                    val currentMemberStatsUiModel: MemberStatsUiModel = memberStatsUiModel.value
                     _memberStatsUiModel.value =
-                        memberStatsUiModel.value?.let { currentMemberStatsUiModel: MemberStatsUiModel ->
-                            currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
-                        }
+                        currentMemberStatsUiModel.copy(attendanceCount = currentMemberStatsUiModel.attendanceCount + 1)
                     _isCheckInLoading.value = false
                 }.onFailure { exception: Throwable ->
                     when (exception) {

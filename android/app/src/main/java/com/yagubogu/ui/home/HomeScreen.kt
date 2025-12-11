@@ -11,11 +11,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.R
+import com.yagubogu.presentation.home.HomeViewModel
+import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.component.CheckInButton
+import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStatsItem
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VictoryFairyRanking
@@ -23,7 +30,20 @@ import com.yagubogu.ui.theme.Gray050
 
 @Composable
 fun HomeScreen(
-//    viewModel: HomeViewModel,
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
+
+    HomeScreen(
+        memberStatsUiModel = memberStatsUiModel,
+    )
+    HomeDialog(viewModel)
+}
+
+@Composable
+private fun HomeScreen(
+    memberStatsUiModel: MemberStatsUiModel,
     modifier: Modifier = Modifier,
 ) {
     val scrollState: ScrollState = rememberScrollState()
@@ -48,18 +68,18 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MemberStatsItem(
-                title = "우리 팀",
-                value = "KIA",
+                title = stringResource(R.string.home_my_team),
+                value = memberStatsUiModel.myTeam ?: "",
                 modifier = Modifier.weight(1f),
             )
             MemberStatsItem(
-                title = "우리 팀",
-                value = "KIA",
+                title = stringResource(R.string.home_attendance_count),
+                value = memberStatsUiModel.attendanceCount.toString(),
                 modifier = Modifier.weight(1f),
             )
             MemberStatsItem(
-                title = "우리 팀",
-                value = "KIA",
+                title = stringResource(R.string.home_winning_percentage),
+                value = stringResource(R.string.all_rounded_win_rate, memberStatsUiModel.winRate),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -72,5 +92,12 @@ fun HomeScreen(
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(
+        memberStatsUiModel =
+            MemberStatsUiModel(
+                myTeam = "KIA",
+                attendanceCount = 24,
+                winRate = 75,
+            ),
+    )
 }
