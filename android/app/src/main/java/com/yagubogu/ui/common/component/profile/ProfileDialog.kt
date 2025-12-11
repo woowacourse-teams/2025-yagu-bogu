@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -107,7 +108,8 @@ fun ProfileHeader(
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(12.dp),
-                    ).padding(
+                    )
+                    .padding(
                         top = profileImageOverlap - 20.dp,
                         bottom = 20.dp,
                         start = 20.dp,
@@ -152,7 +154,10 @@ fun ProfileHeader(
                     .background(Gray050, CircleShape)
                     .padding(10.dp),
         ) {
-            ProfileImage(imageUrl = memberProfile.profileImageUrl)
+            ProfileImage(
+                imageUrl = memberProfile.profileImageUrl,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }
