@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -30,14 +31,13 @@ import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.ranking.VictoryFairyAdapter
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.home.ranking.VictoryFairyViewHolder
 import com.yagubogu.presentation.home.stadium.StadiumFanRateAdapter
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
-import com.yagubogu.presentation.util.buildBalloon
 import com.yagubogu.presentation.util.showSnackbar
+import com.yagubogu.ui.attendance.AttendanceHistoryScreen
+import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.home.component.HomeDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,39 +45,48 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment :
     Fragment(),
-    ScrollToTop,
-    VictoryFairyViewHolder.Handler {
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
+    ScrollToTop {
+//    private var _binding: FragmentHomeBinding? = null
+//    private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
 
     private val stadiumFanRateAdapter: StadiumFanRateAdapter by lazy { StadiumFanRateAdapter() }
-    private val victoryFairyAdapter: VictoryFairyAdapter by lazy { VictoryFairyAdapter(this) }
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
+
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?,
+//    ): View {
+//        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+//        return binding.root
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                HomeScreen(viewModel)
+            }
+        }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        setupComposeView()
-        setupBindings()
-        setupObservers()
-        setupBalloons()
-    }
+//    override fun onViewCreated(
+//        view: View,
+//        savedInstanceState: Bundle?,
+//    ) {
+//        super.onViewCreated(view, savedInstanceState)
+//        setupComposeView()
+//        setupBindings()
+//        setupObservers()
+//    }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
@@ -86,64 +95,56 @@ class HomeFragment :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.startStreaming()
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        viewModel.startStreaming()
+//    }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.stopStreaming()
-    }
+//    override fun onStop() {
+//        super.onStop()
+//        viewModel.stopStreaming()
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+//        _binding = null
     }
 
     override fun scrollToTop() {
-        binding.nsvRoot.smoothScrollTo(0, 0)
-    }
-
-    override fun onProfileImageClick(memberId: Long) {
-        viewModel.fetchMemberProfile(memberId)
-        firebaseAnalytics.logEvent("member_profile", null)
+//        binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
     private fun setupComposeView() {
-        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        binding.composeView.setContent {
-            HomeDialog(viewModel = viewModel)
-        }
+//        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+//        binding.composeView.setContent {
+//            HomeDialog(viewModel = viewModel)
+//        }
     }
 
     private fun setupBindings() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-
-        binding.btnCheckIn.setOnClickListener {
-            if (isLocationPermissionGranted()) {
-                checkLocationSettingsThenCheckIn(requestLocationServices())
-            } else {
-                requestLocationPermissions()
-            }
-            firebaseAnalytics.logEvent("check_in", null)
-        }
-
-        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
-        binding.rvVictoryFairy.adapter = victoryFairyAdapter
-
-        binding.ivRefresh.setOnClickListener { view: View ->
-            viewModel.updateStadiumStats()
-            view
-                .animate()
-                .rotationBy(REFRESH_ANIMATION_ROTATION)
-                .setDuration(REFRESH_ANIMATION_DURATION)
-                .start()
-            firebaseAnalytics.logEvent("fan_rate_refresh", null)
-        }
-
-        binding.layoutMyVictoryFairy.handler = this
+//        binding.lifecycleOwner = viewLifecycleOwner
+//        binding.viewModel = viewModel
+//
+//        binding.btnCheckIn.setOnClickListener {
+//            if (isLocationPermissionGranted()) {
+//                checkLocationSettingsThenCheckIn(requestLocationServices())
+//            } else {
+//                requestLocationPermissions()
+//            }
+//            firebaseAnalytics.logEvent("check_in", null)
+//        }
+//
+//        binding.rvStadiumFanRate.adapter = stadiumFanRateAdapter
+//
+//        binding.ivRefresh.setOnClickListener { view: View ->
+//            viewModel.updateStadiumStats()
+//            view
+//                .animate()
+//                .rotationBy(REFRESH_ANIMATION_ROTATION)
+//                .setDuration(REFRESH_ANIMATION_DURATION)
+//                .start()
+//            firebaseAnalytics.logEvent("fan_rate_refresh", null)
+//        }
     }
 
     private fun setupObservers() {
@@ -159,49 +160,15 @@ class HomeFragment :
                     CheckInUiEvent.LocationFetchFailed -> getString(R.string.home_check_in_location_fetch_failed_message)
                     CheckInUiEvent.NetworkFailed -> getString(R.string.home_check_in_network_failed_message)
                 }
-            binding.root.showSnackbar(message, R.id.bnv_navigation)
+//            binding.root.showSnackbar(message, R.id.bnv_navigation)
         }
 
-        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
-            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
-        }
-
-        viewModel.victoryFairyRanking.observe(viewLifecycleOwner) { value: VictoryFairyRanking ->
-            victoryFairyAdapter.submitList(value.topRankings)
-            binding.layoutMyVictoryFairy.victoryFairyItem =
-                value.myRanking.copy(
-                    nickname =
-                        getString(
-                            R.string.home_victory_fairy_my_nickname,
-                            value.myRanking.nickname,
-                        ),
-                )
-        }
+//        viewModel.stadiumStatsUiModel.observe(viewLifecycleOwner) { value: StadiumStatsUiModel ->
+//            stadiumFanRateAdapter.submitList(value.stadiumFanRates)
+//        }
 
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)
-        }
-    }
-
-    private fun setupBalloons() {
-        val stadiumStatsInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_stadium_stats_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameStadiumStatsTooltip.setOnClickListener {
-            stadiumStatsInfoBalloon.showAlignBottom(binding.ivStadiumStatsTooltip)
-            firebaseAnalytics.logEvent("tooltip_stadium_stats", null)
-        }
-
-        val victoryFairyInfoBalloon =
-            requireContext().buildBalloon(
-                getString(R.string.home_victory_fairy_tooltip),
-                viewLifecycleOwner,
-            )
-        binding.frameVictoryFairyRankingTooltip.setOnClickListener {
-            victoryFairyInfoBalloon.showAlignBottom(binding.ivVictoryFairyRankingTooltip)
-            firebaseAnalytics.logEvent("tooltip_victory_fairy_ranking", null)
         }
     }
 
@@ -214,11 +181,11 @@ class HomeFragment :
                 }
             when {
                 isPermissionGranted -> checkLocationSettingsThenCheckIn(requestLocationServices())
-                shouldShowRationale ->
-                    binding.root.showSnackbar(
-                        R.string.home_location_permission_denied_message,
-                        R.id.bnv_navigation,
-                    )
+                shouldShowRationale -> {}
+//                    binding.root.showSnackbar(
+//                        R.string.home_location_permission_denied_message,
+//                        R.id.bnv_navigation,
+//                    )
 
                 else -> showPermissionDeniedDialog()
             }
@@ -287,10 +254,10 @@ class HomeFragment :
                 if (exception is ResolvableApiException) {
                     exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
                 } else {
-                    binding.root.showSnackbar(
-                        R.string.home_location_settings_disabled,
-                        R.id.bnv_navigation,
-                    )
+//                    binding.root.showSnackbar(
+//                        R.string.home_location_settings_disabled,
+//                        R.id.bnv_navigation,
+//                    )
                 }
             }
     }

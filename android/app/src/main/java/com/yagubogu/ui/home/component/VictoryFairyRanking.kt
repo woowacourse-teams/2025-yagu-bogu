@@ -50,7 +50,8 @@ import com.yagubogu.ui.util.rememberBalloonBuilder
 
 @Composable
 fun VictoryFairyRanking(
-    victoryFairyRanking: VictoryFairyRanking,
+    ranking: VictoryFairyRanking,
+    onRankingItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val balloonBuilder = rememberBalloonBuilder(R.string.home_victory_fairy_tooltip)
@@ -103,16 +104,16 @@ fun VictoryFairyRanking(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             VictoryFairyRankingItem(
-                item = victoryFairyRanking.myRanking,
-                onClick = {},
+                item = ranking.myRanking,
+                onClick = onRankingItemClick,
                 isMyRanking = true,
             )
             HorizontalDivider(color = Gray300, thickness = 0.4.dp)
 
-            victoryFairyRanking.topRankings.forEach { item: VictoryFairyItem ->
+            ranking.topRankings.forEach { item: VictoryFairyItem ->
                 VictoryFairyRankingItem(
                     item = item,
-                    onClick = {},
+                    onClick = onRankingItemClick,
                 )
             }
         }
@@ -122,7 +123,7 @@ fun VictoryFairyRanking(
 @Composable
 private fun VictoryFairyRankingItem(
     item: VictoryFairyItem,
-    onClick: () -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isMyRanking: Boolean = false,
 ) {
@@ -131,7 +132,10 @@ private fun VictoryFairyRankingItem(
             modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
-                .noRippleClickable { onClick() },
+                .noRippleClickable {
+                    onClick(item.memberId)
+                    Firebase.analytics.logEvent("member_profile", null)
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -209,7 +213,10 @@ private fun VictoryFairyMedal(
 @Preview
 @Composable
 private fun VictoryFairyRankingPreview() {
-    VictoryFairyRanking(victoryFairyRanking = VICTORY_FAIRY_RANKING)
+    VictoryFairyRanking(
+        ranking = VICTORY_FAIRY_RANKING,
+        onRankingItemClick = {},
+    )
 }
 
 @Preview(showBackground = true)

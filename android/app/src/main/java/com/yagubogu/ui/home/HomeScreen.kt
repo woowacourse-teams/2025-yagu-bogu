@@ -41,6 +41,7 @@ fun HomeScreen(
     HomeScreen(
         memberStatsUiModel = memberStatsUiModel,
         victoryFairyRanking = victoryFairyRanking,
+        onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
     )
     HomeDialog(viewModel)
 }
@@ -49,6 +50,7 @@ fun HomeScreen(
 private fun HomeScreen(
     memberStatsUiModel: MemberStatsUiModel,
     victoryFairyRanking: VictoryFairyRanking,
+    onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState: ScrollState = rememberScrollState()
@@ -90,7 +92,10 @@ private fun HomeScreen(
         }
 
         StadiumFanRate()
-        VictoryFairyRanking(victoryFairyRanking = victoryFairyRanking)
+        VictoryFairyRanking(
+            ranking = victoryFairyRanking,
+            onRankingItemClick = onVictoryFairyRankingClick,
+        )
     }
 }
 
@@ -105,5 +110,6 @@ private fun HomeScreenPreview() {
                 winRate = 75,
             ),
         victoryFairyRanking = VICTORY_FAIRY_RANKING,
+        onVictoryFairyRankingClick = {},
     )
 }

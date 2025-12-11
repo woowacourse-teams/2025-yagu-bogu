@@ -119,7 +119,7 @@ fun StadiumFanRate(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            List(5) { StadiumFanRateItem() }
+            List(2) { StadiumFanRateItem() }
         }
 
         ShowMoreButton(isExpanded = false)
@@ -206,8 +206,7 @@ private fun StadiumFanRateItem(modifier: Modifier = Modifier) {
                                     width = 1.dp,
                                     color = Gray100,
                                     shape = CircleShape,
-                                )
-                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                                ).padding(horizontal = 10.dp, vertical = 4.dp),
                     )
                 }
             }
