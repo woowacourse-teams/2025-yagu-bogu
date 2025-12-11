@@ -1,7 +1,6 @@
 package com.yagubogu.ui.home.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,22 +17,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
+import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.theme.Gold
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -167,30 +161,6 @@ private fun VictoryFairyRankingItem(
             style = PretendardRegular16,
         )
     }
-}
-
-@Composable
-private fun ProfileImage(
-    imageUrl: String,
-    modifier: Modifier = Modifier,
-) {
-    AsyncImage(
-        model =
-            if (LocalInspectionMode.current) {
-                R.drawable.ic_user
-            } else {
-                ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .crossfade(true)
-                    .build()
-            },
-        contentDescription = null,
-        modifier =
-            modifier
-                .border(width = 1.dp, color = Gray300, shape = CircleShape)
-                .padding(1.dp),
-    )
 }
 
 @Preview
