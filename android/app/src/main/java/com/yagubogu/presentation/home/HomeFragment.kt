@@ -23,21 +23,12 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.databinding.FragmentHomeBinding
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
-import com.yagubogu.presentation.util.showSnackbar
-import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import com.yagubogu.ui.home.HomeScreen
-import com.yagubogu.ui.home.component.HomeDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -45,23 +36,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment :
     Fragment(),
     ScrollToTop {
-//    private var _binding: FragmentHomeBinding? = null
-//    private val binding get() = _binding!!
-
     private val viewModel: HomeViewModel by viewModels()
 
     private val locationPermissionLauncher = createLocationPermissionLauncher()
-
-    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
-
-//    override fun onCreateView(
-//        inflater: LayoutInflater,
-//        container: ViewGroup?,
-//        savedInstanceState: Bundle?,
-//    ): View {
-//        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-//        return binding.root
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,19 +48,9 @@ class HomeFragment :
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                HomeScreen(viewModel)
+                HomeScreen(viewModel, onCheckInClick = ::checkIn)
             }
         }
-
-//    override fun onViewCreated(
-//        view: View,
-//        savedInstanceState: Bundle?,
-//    ) {
-//        super.onViewCreated(view, savedInstanceState)
-//        setupComposeView()
-//        setupBindings()
-//        setupObservers()
-//    }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
@@ -102,30 +69,22 @@ class HomeFragment :
 //        viewModel.stopStreaming()
 //    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-//        _binding = null
-    }
-
     override fun scrollToTop() {
 //        binding.nsvRoot.smoothScrollTo(0, 0)
+    }
+
+    private fun checkIn() {
+        if (isLocationPermissionGranted()) {
+            checkLocationSettingsThenCheckIn(requestLocationServices())
+        } else {
+            requestLocationPermissions()
+        }
     }
 
     private fun setupComposeView() {
 //        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 //        binding.composeView.setContent {
 //            HomeDialog(viewModel = viewModel)
-//        }
-    }
-
-    private fun setupBindings() {
-//        binding.btnCheckIn.setOnClickListener {
-//            if (isLocationPermissionGranted()) {
-//                checkLocationSettingsThenCheckIn(requestLocationServices())
-//            } else {
-//                requestLocationPermissions()
-//            }
-//            firebaseAnalytics.logEvent("check_in", null)
 //        }
     }
 

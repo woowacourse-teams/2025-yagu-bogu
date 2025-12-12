@@ -85,7 +85,7 @@ fun VictoryFairyRanking(
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .noRippleClickable {
-                                    balloonWindow.showAlignBottom(yOff = -30)
+                                    balloonWindow.showAlignBottom(yOff = -10)
                                     Firebase.analytics.logEvent(
                                         "tooltip_victory_fairy_ranking",
                                         null,

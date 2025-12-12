@@ -18,6 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
@@ -35,6 +37,7 @@ import com.yagubogu.ui.theme.Gray050
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    onCheckInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
@@ -43,6 +46,7 @@ fun HomeScreen(
     val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
 
     HomeScreen(
+        onCheckInClick = onCheckInClick,
         memberStatsUiModel = memberStatsUiModel,
         stadiumStatsUiModel = stadiumStatsUiModel,
         isStadiumStatsExpanded = isStadiumStatsExpanded,
@@ -56,6 +60,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreen(
+    onCheckInClick: () -> Unit,
     memberStatsUiModel: MemberStatsUiModel,
     stadiumStatsUiModel: StadiumStatsUiModel,
     isStadiumStatsExpanded: Boolean,
@@ -78,7 +83,10 @@ private fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         CheckInButton(
-            onClick = {},
+            onClick = {
+                onCheckInClick()
+                Firebase.analytics.logEvent("check_in", null)
+            },
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -122,6 +130,7 @@ private fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     HomeScreen(
+        onCheckInClick = {},
         memberStatsUiModel =
             MemberStatsUiModel(
                 myTeam = "KIA",

@@ -79,7 +79,7 @@ fun WinRates(
                         Modifier
                             .padding(horizontal = 8.dp)
                             .noRippleClickable {
-                                balloonWindow.showAlignBottom(yOff = -30)
+                                balloonWindow.showAlignBottom(yOff = -10)
                                 Firebase.analytics.logEvent("tooltip_my_chart", null)
                             },
                 )

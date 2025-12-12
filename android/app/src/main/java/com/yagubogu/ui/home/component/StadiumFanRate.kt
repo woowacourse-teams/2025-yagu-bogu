@@ -106,7 +106,7 @@ fun StadiumFanRate(
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .noRippleClickable {
-                                    balloonWindow.showAlignBottom(yOff = -30)
+                                    balloonWindow.showAlignBottom(yOff = -10)
                                     Firebase.analytics.logEvent("tooltip_stadium_stats", null)
                                 },
                     )
@@ -125,12 +125,7 @@ fun StadiumFanRate(
                         ),
                     style = PretendardRegular.copy(fontSize = 14.sp, color = Gray400),
                 )
-                RefreshIcon(
-                    onRefresh = {
-                        onRefresh()
-                        Firebase.analytics.logEvent("fan_rate_refresh", null)
-                    },
-                )
+                RefreshIcon(onRefresh = onRefresh)
             }
         }
 
@@ -181,9 +176,11 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }.noRippleClickable {
+                }
+                .noRippleClickable {
                     rotation += 360f
                     onRefresh()
+                    Firebase.analytics.logEvent("fan_rate_refresh", null)
                 },
     )
 }
@@ -326,8 +323,7 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }
