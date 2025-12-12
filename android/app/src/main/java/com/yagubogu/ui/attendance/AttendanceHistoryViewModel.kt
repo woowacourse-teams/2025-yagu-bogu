@@ -28,7 +28,7 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
-    private val _detailItemPosition = MutableStateFlow<Int?>(FIRST_INDEX)
+    private val _detailItemPosition = MutableStateFlow<Int?>(null)
     val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
 
     private val _attendanceFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
@@ -64,7 +64,8 @@ class AttendanceHistoryViewModel @Inject constructor(
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
-                    _detailItemPosition.value = FIRST_INDEX
+                    _detailItemPosition.value =
+                        if (attendanceItems.isNotEmpty()) FIRST_INDEX else null
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
