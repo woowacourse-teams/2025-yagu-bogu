@@ -55,8 +55,6 @@ import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun AttendanceHistoryScreen(
@@ -67,6 +65,13 @@ fun AttendanceHistoryScreen(
     val filter: AttendanceHistoryFilter by viewModel.attendanceFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistorySort by viewModel.attendanceSort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
+    val lazyListState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvent.collect {
+            lazyListState.animateScrollToItem(0)
+        }
+    }
 
     when (attendanceItems.isEmpty()) {
         true -> EmptyAttendanceHistoryScreen()
@@ -79,7 +84,6 @@ fun AttendanceHistoryScreen(
                 onFilterClick = viewModel::updateAttendanceFilter,
                 sort = sort,
                 onSortClick = viewModel::switchAttendanceSort,
-                scrollToTopEvent = viewModel.scrollToTopEvent,
                 modifier = modifier,
             )
     }
@@ -95,15 +99,8 @@ private fun AttendanceHistoryScreen(
     sort: AttendanceHistorySort,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
-    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val lazyListState: LazyListState = rememberLazyListState()
-    LaunchedEffect(Unit) {
-        scrollToTopEvent.collect {
-            lazyListState.animateScrollToItem(0)
-        }
-    }
-
     Column(
         modifier =
             modifier
@@ -129,7 +126,10 @@ private fun AttendanceHistoryScreen(
                     .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(items.size) { index: Int ->
+            items(
+                count = items.size,
+                key = { index: Int -> items[index].summary.id },
+            ) { index: Int ->
                 val item: AttendanceHistoryItem = items[index]
                 AttendanceItem(
                     item = item,

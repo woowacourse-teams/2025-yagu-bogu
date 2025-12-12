@@ -11,6 +11,7 @@ val ATTENDANCE_HISTORY_ITEM_PLAYED =
     AttendanceHistoryItem.Played(
         summary =
             AttendanceHistoryItem.Summary(
+                id = 0L,
                 attendanceDate = LocalDate.now(),
                 stadiumName = "잠실 야구장",
                 awayTeam =
@@ -23,7 +24,7 @@ val ATTENDANCE_HISTORY_ITEM_PLAYED =
                     ),
                 homeTeam =
                     GameTeam(
-                        team = Team.HT,
+                        team = Team.OB,
                         name = "두산",
                         score = "4",
                         isMyTeam = false,
@@ -54,6 +55,7 @@ val ATTENDANCE_HISTORY_ITEM_CANCELED =
     AttendanceHistoryItem.Canceled(
         summary =
             AttendanceHistoryItem.Summary(
+                id = 1L,
                 attendanceDate = LocalDate.now(),
                 stadiumName = "잠실 야구장",
                 awayTeam =
@@ -66,7 +68,7 @@ val ATTENDANCE_HISTORY_ITEM_CANCELED =
                     ),
                 homeTeam =
                     GameTeam(
-                        team = Team.HT,
+                        team = Team.OB,
                         name = "두산",
                         score = "-",
                         isMyTeam = false,

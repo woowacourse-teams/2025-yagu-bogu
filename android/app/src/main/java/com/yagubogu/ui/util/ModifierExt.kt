@@ -40,11 +40,13 @@ fun Modifier.crop(
         fun Dp.toPxInt(): Int = this.toPx().toInt()
 
         val placeable: Placeable = measurable.measure(constraints)
+        val croppedWidth = (placeable.width - (horizontal * 2).toPxInt()).coerceAtLeast(0)
+        val croppedHeight = (placeable.height - (vertical * 2).toPxInt()).coerceAtLeast(0)
         layout(
-            width = placeable.width - (horizontal * 2).toPxInt(),
-            height = placeable.height - (vertical * 2).toPxInt(),
+            width = croppedWidth,
+            height = croppedHeight,
         ) {
-            placeable.placeRelative(-horizontal.toPx().toInt(), -vertical.toPx().toInt())
+            placeable.placeRelative(-horizontal.toPxInt(), -vertical.toPxInt())
         }
     }
 

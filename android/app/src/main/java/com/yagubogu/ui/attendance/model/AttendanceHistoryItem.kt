@@ -12,15 +12,16 @@ sealed interface AttendanceHistoryItem {
     val summary: Summary
 
     data class Summary(
+        val id: Long,
         val attendanceDate: LocalDate,
         val stadiumName: String,
         val awayTeam: GameTeam,
         val homeTeam: GameTeam,
     ) {
-        val awayTeamColor: Color = determineTeamColorRes(awayTeam)
-        val homeTeamColor: Color = determineTeamColorRes(homeTeam)
+        val awayTeamColor: Color = determineTeamColor(awayTeam)
+        val homeTeamColor: Color = determineTeamColor(homeTeam)
 
-        private fun determineTeamColorRes(team: GameTeam): Color =
+        private fun determineTeamColor(team: GameTeam): Color =
             if (team.isMyTeam && team.gameResult == GameResult.WIN) {
                 team.team.color
             } else {
