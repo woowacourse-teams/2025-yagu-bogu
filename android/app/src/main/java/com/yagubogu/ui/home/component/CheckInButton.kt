@@ -2,8 +2,10 @@ package com.yagubogu.ui.home.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +29,7 @@ fun CheckInButton(
 ) {
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(100),
+        shape = CircleShape,
         colors =
             ButtonDefaults.buttonColors(
                 containerColor = Primary500,
@@ -35,7 +37,7 @@ fun CheckInButton(
             ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_marker_pin),

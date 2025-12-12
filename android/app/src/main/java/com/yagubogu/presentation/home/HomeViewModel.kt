@@ -35,15 +35,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -63,20 +62,12 @@ class HomeViewModel @Inject constructor(
     val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
-    private val stadiumFanRateItems = MutableStateFlow<List<StadiumFanRateItem>>(emptyList())
 
     private val _isStadiumStatsExpanded = MutableStateFlow(false)
     val isStadiumStatsExpanded: StateFlow<Boolean> get() = _isStadiumStatsExpanded.asStateFlow()
 
-    val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> =
-        stadiumFanRateItems
-            .map { items: List<StadiumFanRateItem> ->
-                StadiumStatsUiModel(stadiumFanRates = items)
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = StadiumStatsUiModel(),
-            )
+    private val _stadiumStatsUiModel = MutableStateFlow(StadiumStatsUiModel())
+    val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> get() = _stadiumStatsUiModel.asStateFlow()
 
     private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
     val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
@@ -114,7 +105,8 @@ class HomeViewModel @Inject constructor(
                             newItems.forEach { item: StadiumFanRateItem ->
                                 cachedStadiumFanRateItems[item.gameId] = item
                             }
-                            stadiumFanRateItems.value = newItems
+                            _stadiumStatsUiModel.value =
+                                StadiumStatsUiModel(stadiumFanRates = newItems)
                         }
 
                         CheckInSseEvent.Connect,
@@ -200,6 +192,10 @@ class HomeViewModel @Inject constructor(
         _isStadiumStatsExpanded.value = !isStadiumStatsExpanded.value
     }
 
+    fun refreshStadiumStats() {
+        _stadiumStatsUiModel.value = stadiumStatsUiModel.value.copy(refreshTime = LocalTime.now())
+    }
+
     fun fetchMemberProfile(memberId: Long) {
         viewModelScope.launch {
             val memberProfileResult: Result<MemberProfile> =
@@ -258,7 +254,8 @@ class HomeViewModel @Inject constructor(
                     stadiumFanRates.forEach { stadiumFanRateItem: StadiumFanRateItem ->
                         cachedStadiumFanRateItems[stadiumFanRateItem.gameId] = stadiumFanRateItem
                     }
-                    stadiumFanRateItems.value = stadiumFanRates
+                    _stadiumStatsUiModel.value =
+                        StadiumStatsUiModel(stadiumFanRates = stadiumFanRates)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

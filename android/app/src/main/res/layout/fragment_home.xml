@@ -256,7 +256,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginBottom="20dp"
-                    android:background="@drawable/bg_stroke_gray300_radius_12dp"
                     android:onClick="@{() -> viewModel.toggleStadiumStats()}"
                     android:paddingVertical="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"

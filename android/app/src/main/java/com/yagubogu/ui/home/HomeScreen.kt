@@ -47,6 +47,7 @@ fun HomeScreen(
         stadiumStatsUiModel = stadiumStatsUiModel,
         isStadiumStatsExpanded = isStadiumStatsExpanded,
         onStadiumStatsClick = viewModel::toggleStadiumStats,
+        onStadiumStatsRefresh = viewModel::refreshStadiumStats,
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
     )
@@ -59,6 +60,7 @@ private fun HomeScreen(
     stadiumStatsUiModel: StadiumStatsUiModel,
     isStadiumStatsExpanded: Boolean,
     onStadiumStatsClick: () -> Unit,
+    onStadiumStatsRefresh: () -> Unit,
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -106,6 +108,7 @@ private fun HomeScreen(
                 uiModel = stadiumStatsUiModel,
                 isExpanded = isStadiumStatsExpanded,
                 onClick = onStadiumStatsClick,
+                onRefresh = onStadiumStatsRefresh,
             )
         }
         VictoryFairyRanking(
@@ -128,6 +131,7 @@ private fun HomeScreenPreview() {
         stadiumStatsUiModel = STADIUM_STATS_UI_MODEL,
         isStadiumStatsExpanded = false,
         onStadiumStatsClick = {},
+        onStadiumStatsRefresh = {},
         victoryFairyRanking = VICTORY_FAIRY_RANKING,
         onVictoryFairyRankingClick = {},
     )

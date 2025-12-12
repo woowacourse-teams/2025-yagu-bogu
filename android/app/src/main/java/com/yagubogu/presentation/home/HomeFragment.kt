@@ -119,9 +119,6 @@ class HomeFragment :
     }
 
     private fun setupBindings() {
-//        binding.lifecycleOwner = viewLifecycleOwner
-//        binding.viewModel = viewModel
-//
 //        binding.btnCheckIn.setOnClickListener {
 //            if (isLocationPermissionGranted()) {
 //                checkLocationSettingsThenCheckIn(requestLocationServices())
@@ -129,16 +126,6 @@ class HomeFragment :
 //                requestLocationPermissions()
 //            }
 //            firebaseAnalytics.logEvent("check_in", null)
-//        }
-//
-//        binding.ivRefresh.setOnClickListener { view: View ->
-//            viewModel.buildStadiumStatsUiModel()
-//            view
-//                .animate()
-//                .rotationBy(REFRESH_ANIMATION_ROTATION)
-//                .setDuration(REFRESH_ANIMATION_DURATION)
-//                .start()
-//            firebaseAnalytics.logEvent("fan_rate_refresh", null)
 //        }
     }
 
@@ -255,8 +242,6 @@ class HomeFragment :
 
     companion object {
         private const val PACKAGE_SCHEME = "package"
-        private const val REFRESH_ANIMATION_ROTATION = 360f
-        private const val REFRESH_ANIMATION_DURATION = 1000L
         private const val RC_LOCATION_SETTINGS = 1001
     }
 }

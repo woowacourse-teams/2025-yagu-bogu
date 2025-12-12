@@ -1,6 +1,8 @@
 package com.yagubogu.ui.home.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +26,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +70,7 @@ fun StadiumFanRate(
     uiModel: StadiumStatsUiModel,
     isExpanded: Boolean,
     onClick: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val balloonBuilder = rememberBalloonBuilder(R.string.home_stadium_stats_tooltip)
@@ -117,16 +125,11 @@ fun StadiumFanRate(
                         ),
                     style = PretendardRegular.copy(fontSize = 14.sp, color = Gray400),
                 )
-                Icon(
-                    painter = painterResource(R.drawable.ic_refresh),
-                    contentDescription = null,
-                    tint = Gray400,
-                    modifier =
-                        Modifier
-                            .padding(4.dp)
-                            .size(20.dp)
-                            .noRippleClickable {
-                            },
+                RefreshIcon(
+                    onRefresh = {
+                        onRefresh()
+                        Firebase.analytics.logEvent("fan_rate_refresh", null)
+                    },
                 )
             }
         }
@@ -134,7 +137,7 @@ fun StadiumFanRate(
         Column(
             modifier =
                 Modifier
-                    .padding(top = 12.dp)
+                    .padding(top = 20.dp)
                     .noRippleClickable(onClick)
                     .animateContentSize(),
         ) {
@@ -155,6 +158,34 @@ fun StadiumFanRate(
             )
         }
     }
+}
+
+@Composable
+private fun RefreshIcon(
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var rotation: Float by remember { mutableFloatStateOf(0f) }
+    val animatedRotation: Float by animateFloatAsState(
+        targetValue = rotation,
+        animationSpec = tween(durationMillis = 1_000),
+    )
+
+    Icon(
+        painter = painterResource(R.drawable.ic_refresh),
+        contentDescription = null,
+        tint = Gray400,
+        modifier =
+            modifier
+                .padding(horizontal = 4.dp)
+                .size(20.dp)
+                .graphicsLayer {
+                    rotationZ = animatedRotation
+                }.noRippleClickable {
+                    rotation += 360f
+                    onRefresh()
+                },
+    )
 }
 
 @Composable
@@ -295,7 +326,8 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }
@@ -316,6 +348,7 @@ private fun StadiumFanRatePreview() {
         uiModel = STADIUM_STATS_UI_MODEL,
         isExpanded = false,
         onClick = {},
+        onRefresh = {},
     )
 }
 
@@ -326,6 +359,7 @@ private fun StadiumFanRateOnePreview() {
         uiModel = StadiumStatsUiModel(stadiumFanRates = listOf(STADIUM_FAN_RATE_ITEM)),
         isExpanded = false,
         onClick = {},
+        onRefresh = {},
     )
 }
 
