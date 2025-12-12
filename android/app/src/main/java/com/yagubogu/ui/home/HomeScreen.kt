@@ -1,6 +1,5 @@
 package com.yagubogu.ui.home
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -22,28 +21,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsResponse
-import com.google.android.gms.location.Priority
-import com.google.android.gms.location.SettingsClient
-import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
+import com.yagubogu.presentation.home.LocationPermissionManager
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStats
@@ -65,18 +57,18 @@ fun HomeScreen(
 
     val context: Context = LocalContext.current
     val activity: Activity = LocalActivity.current ?: return
+
+    val locationPermissionManager: LocationPermissionManager =
+        remember { LocationPermissionManager(activity) }
+
     val locationPermissionLauncher: ActivityResultLauncher<Array<String>> =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val isPermissionGranted: Boolean = permissions.any { it.value }
             val shouldShowRationale: Boolean =
-                permissions.keys.any { PermissionUtil.shouldShowRationale(activity, it) }
+                permissions.any { locationPermissionManager.shouldShowRationale(it.key) }
             when {
                 isPermissionGranted ->
-                    checkLocationSettingsThenCheckIn(
-                        requestLocationServices(activity),
-                        activity,
-                        viewModel::fetchStadiums,
-                    )
+                    locationPermissionManager.checkLocationSettingsThenAction(viewModel::fetchStadiums)
 
                 shouldShowRationale -> {
 //                    binding.root.showSnackbar(
@@ -92,8 +84,7 @@ fun HomeScreen(
     HomeScreen(
         onCheckInClick = {
             checkIn(
-                context,
-                activity,
+                locationPermissionManager,
                 locationPermissionLauncher,
                 viewModel::fetchStadiums,
             )
@@ -158,36 +149,15 @@ private fun HomeScreen(
 }
 
 private fun checkIn(
-    context: Context,
-    activity: Activity,
-    locationPermissionLauncher: ActivityResultLauncher<Array<String>>,
+    manager: LocationPermissionManager,
+    launcher: ActivityResultLauncher<Array<String>>,
     action: () -> Unit,
 ) {
-    if (isLocationPermissionGranted(context)) {
-        checkLocationSettingsThenCheckIn(requestLocationServices(activity), activity, action)
+    if (manager.isPermissionGranted()) {
+        manager.checkLocationSettingsThenAction(action)
     } else {
-        requestLocationPermissions(locationPermissionLauncher)
+        manager.requestPermissions(launcher)
     }
-}
-
-private fun isLocationPermissionGranted(context: Context): Boolean {
-    val isFineLocationPermissionGranted =
-        PermissionUtil.isGranted(context, Manifest.permission.ACCESS_FINE_LOCATION)
-    val isCoarseLocationPermissionGranted =
-        PermissionUtil.isGranted(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        )
-    return isFineLocationPermissionGranted || isCoarseLocationPermissionGranted
-}
-
-private fun requestLocationPermissions(locationPermissionLauncher: ActivityResultLauncher<Array<String>>) {
-    locationPermissionLauncher.launch(
-        arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ),
-    )
 }
 
 private fun showPermissionDeniedDialog(context: Context) {
@@ -208,41 +178,6 @@ private fun openAppSettings(context: Context) {
             data = Uri.fromParts("package", context.packageName, null)
         }
     context.startActivity(intent)
-}
-
-private fun requestLocationServices(activity: Activity): Task<LocationSettingsResponse> {
-    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
-
-    val locationSettingsRequestBuilder =
-        LocationSettingsRequest
-            .Builder()
-            .addLocationRequest(locationRequest)
-            .setAlwaysShow(true)
-
-    val settingsClient: SettingsClient = LocationServices.getSettingsClient(activity)
-    return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
-}
-
-private fun checkLocationSettingsThenCheckIn(
-    task: Task<LocationSettingsResponse>,
-    activity: Activity,
-    action: () -> Unit,
-) {
-    task
-        .addOnSuccessListener {
-            // 위치 설정이 활성화된 경우 구장 불러오기
-            action()
-        }.addOnFailureListener { exception: Exception ->
-            // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
-            if (exception is ResolvableApiException) {
-                exception.startResolutionForResult(activity, 1001)
-            } else {
-//                    binding.root.showSnackbar(
-//                        R.string.home_location_settings_disabled,
-//                        R.id.bnv_navigation,
-//                    )
-            }
-        }
 }
 
 @Preview
