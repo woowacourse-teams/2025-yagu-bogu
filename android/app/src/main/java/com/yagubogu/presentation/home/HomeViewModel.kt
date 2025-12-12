@@ -1,5 +1,6 @@
 package com.yagubogu.presentation.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,13 +26,12 @@ import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.mapper.toDomain
 import com.yagubogu.presentation.mapper.toUiModel
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.presentation.util.mapList
 import com.yagubogu.ui.common.model.MemberProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -55,11 +55,16 @@ class HomeViewModel @Inject constructor(
     private val stadiumRepository: StadiumRepository,
     private val streamRepository: StreamRepository,
 ) : ViewModel() {
+    private val _checkInUiEvent =
+        MutableSharedFlow<CheckInUiEvent>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val checkInUiEvent: SharedFlow<CheckInUiEvent> get() = _checkInUiEvent.asSharedFlow()
+
     private val _memberStatsUiModel = MutableStateFlow(MemberStatsUiModel())
     val memberStatsUiModel: StateFlow<MemberStatsUiModel> get() = _memberStatsUiModel.asStateFlow()
-
-    private val _checkInUiEvent = MutableSingleLiveData<CheckInUiEvent>()
-    val checkInUiEvent: SingleLiveData<CheckInUiEvent> get() = _checkInUiEvent
 
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
 
@@ -122,21 +127,21 @@ class HomeViewModel @Inject constructor(
         streamRepository.disconnect()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiums(date: LocalDate = LocalDate.of(2025, 10, 3)) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
                 .map { it.toUiModel() }
                 .onSuccess { stadiumsWithGames: StadiumsWithGames ->
                     if (stadiumsWithGames.isEmpty()) {
-                        _checkInUiEvent.setValue(CheckInUiEvent.NoGame)
+                        _checkInUiEvent.emit(CheckInUiEvent.NoGame)
                     } else {
                         stadiums = stadiumsWithGames
                         fetchCheckInStatus(date)
                     }
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
-                    _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                    _checkInUiEvent.emit(CheckInUiEvent.NetworkFailed)
                 }
         }
     }
@@ -151,7 +156,7 @@ class HomeViewModel @Inject constructor(
             },
             onFailure = { exception: Exception ->
                 Timber.w(exception, "위치 불러오기 실패")
-                _checkInUiEvent.setValue(CheckInUiEvent.LocationFetchFailed)
+                _checkInUiEvent.tryEmit(CheckInUiEvent.LocationFetchFailed)
                 _isCheckInLoading.value = false
             },
         )
@@ -165,7 +170,7 @@ class HomeViewModel @Inject constructor(
             checkInRepository
                 .addCheckIn(gameId)
                 .onSuccess {
-                    _checkInUiEvent.setValue(CheckInUiEvent.Success(stadium))
+                    _checkInUiEvent.emit(CheckInUiEvent.Success(stadium))
 
                     val currentMemberStatsUiModel: MemberStatsUiModel = memberStatsUiModel.value
                     _memberStatsUiModel.value =
@@ -173,8 +178,8 @@ class HomeViewModel @Inject constructor(
                     _isCheckInLoading.value = false
                 }.onFailure { exception: Throwable ->
                     when (exception) {
-                        is ApiException.Conflict -> _checkInUiEvent.setValue(CheckInUiEvent.AlreadyCheckedIn)
-                        else -> _checkInUiEvent.setValue(CheckInUiEvent.NetworkFailed)
+                        is ApiException.Conflict -> _checkInUiEvent.emit(CheckInUiEvent.AlreadyCheckedIn)
+                        else -> _checkInUiEvent.emit(CheckInUiEvent.NetworkFailed)
                     }
                     _isCheckInLoading.value = false
                     Timber.w(exception, "API 호출 실패")
@@ -307,7 +312,7 @@ class HomeViewModel @Inject constructor(
                 ?: return
 
         if (!nearestDistance.isWithin(Distance(THRESHOLD_IN_METERS))) {
-            _checkInUiEvent.setValue(CheckInUiEvent.OutOfRange)
+            _checkInUiEvent.tryEmit(CheckInUiEvent.OutOfRange)
             return
         }
 

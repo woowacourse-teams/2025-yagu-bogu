@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,9 +34,11 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.LocationPermissionManager
+import com.yagubogu.presentation.home.model.CheckInUiEvent
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
+import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStats
@@ -70,23 +73,26 @@ fun HomeScreen(
                 isPermissionGranted ->
                     locationPermissionManager.checkLocationSettingsThenAction(viewModel::fetchStadiums)
 
-                shouldShowRationale -> {
-//                    binding.root.showSnackbar(
-//                        R.string.home_location_permission_denied_message,
-//                        R.id.bnv_navigation,
-//                    )
-                }
+                // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
+                shouldShowRationale -> context.showToast(R.string.home_location_permission_denied_message)
 
                 else -> showPermissionDeniedDialog(context)
             }
         }
 
+    LaunchedEffect(Unit) {
+        viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
+            // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
+            context.showToast(event.toMessage(context))
+        }
+    }
+
     HomeScreen(
         onCheckInClick = {
             checkIn(
-                locationPermissionManager,
-                locationPermissionLauncher,
-                viewModel::fetchStadiums,
+                manager = locationPermissionManager,
+                launcher = locationPermissionLauncher,
+                action = viewModel::fetchStadiums,
             )
         },
         memberStatsUiModel = memberStatsUiModel,
@@ -179,6 +185,27 @@ private fun openAppSettings(context: Context) {
         }
     context.startActivity(intent)
 }
+
+private fun CheckInUiEvent.toMessage(context: Context): String =
+    when (this) {
+        is CheckInUiEvent.Success ->
+            context.getString(R.string.home_check_in_success_message, stadium.name)
+
+        CheckInUiEvent.NoGame ->
+            context.getString(R.string.home_check_in_no_game_message)
+
+        CheckInUiEvent.OutOfRange ->
+            context.getString(R.string.home_check_in_out_of_range_message)
+
+        CheckInUiEvent.AlreadyCheckedIn ->
+            context.getString(R.string.home_already_checked_in_message)
+
+        CheckInUiEvent.LocationFetchFailed ->
+            context.getString(R.string.home_check_in_location_fetch_failed_message)
+
+        CheckInUiEvent.NetworkFailed ->
+            context.getString(R.string.home_check_in_network_failed_message)
+    }
 
 @Preview
 @Composable

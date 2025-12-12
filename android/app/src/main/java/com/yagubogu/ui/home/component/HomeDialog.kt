@@ -13,7 +13,9 @@ fun HomeDialog(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val dialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(initialValue = null)
+    val dialogEvent: HomeDialogEvent? by viewModel.dialogEvent.collectAsStateWithLifecycle(
+        initialValue = null,
+    )
     dialogEvent?.let { dialogEvent: HomeDialogEvent ->
         when (dialogEvent) {
             is HomeDialogEvent.CheckInDialog -> {
