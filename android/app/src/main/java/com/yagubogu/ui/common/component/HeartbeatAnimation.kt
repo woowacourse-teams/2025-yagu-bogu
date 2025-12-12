@@ -9,20 +9,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlin.random.Random
 
 @Composable
 fun HeartbeatAnimation(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val scale = remember { Animatable(1f) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(enabled) {
+        if (!enabled) return@LaunchedEffect
+
         val randomDelay: Long = Random.nextLong(0, 1_000)
         delay(randomDelay)
 
-        while (true) {
+        while (isActive) {
             scale.apply {
                 // Strong beat: 1 → 1.2 → 1
                 animateTo(

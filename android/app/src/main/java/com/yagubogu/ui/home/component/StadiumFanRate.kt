@@ -136,9 +136,11 @@ fun StadiumFanRate(
                     .noRippleClickable(onClick)
                     .animateContentSize(),
         ) {
+            val items: List<StadiumFanRateItem> = uiModel.stadiumFanRates
+            if (items.isEmpty()) return@Column
             when (isExpanded) {
-                true -> uiModel.stadiumFanRates.forEach { StadiumFanRateItem(it) }
-                false -> StadiumFanRateItem(uiModel.stadiumFanRates.first())
+                true -> items.forEach { StadiumFanRateItem(it) }
+                false -> StadiumFanRateItem(items.first())
             }
         }
 
@@ -176,8 +178,9 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }.noRippleClickable {
-                    rotation += 360f
+                }
+                .noRippleClickable {
+                    rotation = (rotation + 360f) % 720f
                     onRefresh()
                     Firebase.analytics.logEvent("fan_rate_refresh", null)
                 },
@@ -322,8 +325,7 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }
@@ -333,7 +335,7 @@ private fun StadiumFanRateDivider(
 private fun remapToChartRange(percentage: Double): Double {
     val chartEndPaddingSize = 28.0
     val scalingFactor: Double = (100.0 - chartEndPaddingSize * 2) / 100.0
-    val scaledRange: Double = chartEndPaddingSize + percentage.toFloat() * scalingFactor
+    val scaledRange: Double = chartEndPaddingSize + percentage * scalingFactor
     return scaledRange / 100.0
 }
 

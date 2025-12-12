@@ -33,6 +33,7 @@ fun MemberStats(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
     ) {
         MemberStatsItem(
             title = stringResource(R.string.home_my_team),

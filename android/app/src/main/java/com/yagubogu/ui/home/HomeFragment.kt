@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import com.yagubogu.presentation.util.ScrollToTop
 import dagger.hilt.android.AndroidEntryPoint
 
-@Suppress("ktlint:standard:backing-property-naming")
 @AndroidEntryPoint
 class HomeFragment :
     Fragment(),

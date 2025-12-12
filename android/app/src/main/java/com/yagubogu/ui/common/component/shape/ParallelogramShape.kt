@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.sin
@@ -93,7 +94,7 @@ private fun drawRoundedParallelogramShape(
     val y1 = 0f
     val x2 = width - skewedWidth
     val topRightAngle = -atan((height - y1) / (x2 - width))
-    val topRightAngleDegree = (topRightAngle * 180 / Math.PI)
+    val topRightAngleDegree = (topRightAngle * 180 / PI)
     val halfTan = tan((topRightAngle / 2))
 
     path.apply {

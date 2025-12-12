@@ -58,10 +58,14 @@ class LocationPermissionManager(
             }.addOnFailureListener { exception: Exception ->
                 // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
                 if (exception is ResolvableApiException) {
-                    exception.startResolutionForResult(activity, 1001)
+                    exception.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS)
                 } else {
                     activity.showToast(R.string.home_location_settings_disabled)
                 }
             }
+    }
+
+    companion object {
+        private const val REQUEST_CHECK_SETTINGS = 1001
     }
 }
