@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.home.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,12 +49,13 @@ class HomeFragment :
 //    }
 
     override fun scrollToTop() {
-//        binding.nsvRoot.smoothScrollTo(0, 0)
+        viewModel.scrollToTop()
     }
 
     private fun setupObservers() {
-        viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
-            (requireActivity() as MainActivity).setLoadingScreen(value)
-        }
+        // TODO: MainActivity 마이그레이션 시 로딩 처리
+//        viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
+//            (requireActivity() as MainActivity).setLoadingScreen(value)
+//        }
     }
 }

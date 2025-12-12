@@ -1,8 +1,5 @@
 package com.yagubogu.presentation.home
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.location.CoordinateDto
@@ -77,16 +74,30 @@ class HomeViewModel @Inject constructor(
     private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
     val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
 
-    private val _isCheckInLoading = MutableLiveData<Boolean>()
-    val isCheckInLoading: LiveData<Boolean> get() = _isCheckInLoading
+    private val _isCheckInLoading = MutableStateFlow(false)
+    val isCheckInLoading: StateFlow<Boolean> get() = _isCheckInLoading.asStateFlow()
 
     private val _dialogEvent = MutableSharedFlow<HomeDialogEvent>()
     val dialogEvent: SharedFlow<HomeDialogEvent> get() = _dialogEvent.asSharedFlow()
 
     private var stadiums: StadiumsWithGames? = null
 
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+
     init {
         fetchAll()
+    }
+
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
+        }
     }
 
     fun fetchAll() {

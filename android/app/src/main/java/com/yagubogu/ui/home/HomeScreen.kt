@@ -80,6 +80,13 @@ fun HomeScreen(
             }
         }
 
+    val scrollState: ScrollState = rememberScrollState()
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
             // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
@@ -102,6 +109,8 @@ fun HomeScreen(
         onStadiumStatsRefresh = viewModel::refreshStadiumStats,
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
+        modifier = modifier,
+        scrollState = scrollState,
     )
     HomeDialog(viewModel)
 }
@@ -117,9 +126,8 @@ private fun HomeScreen(
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
 ) {
-    val scrollState: ScrollState = rememberScrollState()
-
     Column(
         modifier =
             modifier
