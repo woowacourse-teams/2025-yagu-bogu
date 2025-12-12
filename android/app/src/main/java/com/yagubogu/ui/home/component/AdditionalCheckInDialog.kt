@@ -6,8 +6,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
-import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.ui.common.component.DefaultDialog
+import com.yagubogu.ui.home.HomeViewModel
 
 @Composable
 fun AdditionalCheckInDialog(

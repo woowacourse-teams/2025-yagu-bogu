@@ -29,9 +29,9 @@ import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
-import com.yagubogu.presentation.home.ranking.VictoryFairyItem
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.home.model.VictoryFairyItem
+import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.theme.Bronze
 import com.yagubogu.ui.theme.Gold
 import com.yagubogu.ui.theme.Gray300

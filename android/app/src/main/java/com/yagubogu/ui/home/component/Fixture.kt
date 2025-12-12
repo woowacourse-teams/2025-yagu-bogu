@@ -1,11 +1,11 @@
 package com.yagubogu.ui.home.component
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.ranking.VictoryFairyItem
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
-import com.yagubogu.presentation.home.stadium.TeamFanRate
+import com.yagubogu.ui.home.model.StadiumFanRateItem
+import com.yagubogu.ui.home.model.StadiumStatsUiModel
+import com.yagubogu.ui.home.model.TeamFanRate
+import com.yagubogu.ui.home.model.VictoryFairyItem
+import com.yagubogu.ui.home.model.VictoryFairyRanking
 
 val STADIUM_FAN_RATE_ITEM =
     StadiumFanRateItem(

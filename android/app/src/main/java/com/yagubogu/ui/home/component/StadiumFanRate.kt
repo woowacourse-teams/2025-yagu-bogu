@@ -45,11 +45,11 @@ import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
-import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.ui.common.component.HeartbeatAnimation
 import com.yagubogu.ui.common.component.ShowMoreButton
 import com.yagubogu.ui.common.component.shape.ParallelogramShape
+import com.yagubogu.ui.home.model.StadiumFanRateItem
+import com.yagubogu.ui.home.model.StadiumStatsUiModel
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray300
@@ -176,8 +176,7 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }
-                .noRippleClickable {
+                }.noRippleClickable {
                     rotation += 360f
                     onRefresh()
                     Firebase.analytics.logEvent("fan_rate_refresh", null)
@@ -323,7 +322,8 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }

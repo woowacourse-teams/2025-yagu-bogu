@@ -33,12 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.home.HomeViewModel
-import com.yagubogu.presentation.home.LocationPermissionManager
-import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.MemberStatsUiModel
-import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
@@ -47,6 +41,10 @@ import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
 import com.yagubogu.ui.home.component.VictoryFairyRanking
+import com.yagubogu.ui.home.model.CheckInUiEvent
+import com.yagubogu.ui.home.model.MemberStatsUiModel
+import com.yagubogu.ui.home.model.StadiumStatsUiModel
+import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.theme.Gray050
 
 @Composable

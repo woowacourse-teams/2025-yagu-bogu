@@ -29,8 +29,8 @@ import com.yagubogu.R
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
-import com.yagubogu.presentation.home.HomeViewModel
-import com.yagubogu.presentation.home.model.StadiumWithGame
+import com.yagubogu.ui.home.HomeViewModel
+import com.yagubogu.ui.home.model.StadiumWithGame
 import com.yagubogu.ui.theme.EsamanruMedium20
 import com.yagubogu.ui.theme.Gray200
 import com.yagubogu.ui.theme.Gray500

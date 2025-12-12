@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.ranking
+package com.yagubogu.ui.home.model
 
 data class VictoryFairyItem(
     val rank: Int = 0,

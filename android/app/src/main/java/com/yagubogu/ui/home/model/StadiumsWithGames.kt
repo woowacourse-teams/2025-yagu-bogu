@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.ui.home.model
 
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance

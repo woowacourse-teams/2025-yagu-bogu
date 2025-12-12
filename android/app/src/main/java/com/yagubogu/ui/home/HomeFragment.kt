@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home
+package com.yagubogu.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.yagubogu.presentation.util.ScrollToTop
-import com.yagubogu.ui.home.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")

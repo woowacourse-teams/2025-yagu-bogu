@@ -1,6 +1,4 @@
-package com.yagubogu.presentation.home.model
-
-import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
+package com.yagubogu.ui.home.model
 
 sealed interface CheckInSseEvent {
     data class CheckInCreated(

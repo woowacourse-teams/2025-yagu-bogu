@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.ui.home.model
 
 data class MemberStatsUiModel(
     val myTeam: String? = null,

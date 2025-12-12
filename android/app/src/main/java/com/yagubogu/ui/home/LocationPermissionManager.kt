@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home
+package com.yagubogu.ui.home
 
 import android.Manifest
 import android.app.Activity

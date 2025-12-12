@@ -1,6 +1,5 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.ui.home.model
 
-import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import java.time.LocalTime
 
 data class StadiumStatsUiModel(

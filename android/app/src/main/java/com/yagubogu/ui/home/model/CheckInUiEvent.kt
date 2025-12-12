@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.model
+package com.yagubogu.ui.home.model
 
 sealed interface CheckInUiEvent {
     data class Success(

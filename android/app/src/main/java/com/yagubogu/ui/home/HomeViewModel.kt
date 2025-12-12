@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home
+package com.yagubogu.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,19 +12,19 @@ import com.yagubogu.data.repository.stream.StreamRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
-import com.yagubogu.presentation.home.model.CheckInSseEvent
-import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.home.model.HomeDialogEvent
-import com.yagubogu.presentation.home.model.MemberStatsUiModel
-import com.yagubogu.presentation.home.model.StadiumStatsUiModel
-import com.yagubogu.presentation.home.model.StadiumWithGame
-import com.yagubogu.presentation.home.model.StadiumsWithGames
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.mapper.toDomain
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.home.model.CheckInSseEvent
+import com.yagubogu.ui.home.model.CheckInUiEvent
+import com.yagubogu.ui.home.model.HomeDialogEvent
+import com.yagubogu.ui.home.model.MemberStatsUiModel
+import com.yagubogu.ui.home.model.StadiumFanRateItem
+import com.yagubogu.ui.home.model.StadiumStatsUiModel
+import com.yagubogu.ui.home.model.StadiumWithGame
+import com.yagubogu.ui.home.model.StadiumsWithGames
+import com.yagubogu.ui.home.model.VictoryFairyRanking
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async

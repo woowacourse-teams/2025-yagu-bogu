@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.home.stadium
+package com.yagubogu.ui.home.model
 
 data class StadiumFanRateItem(
     val gameId: Long,
