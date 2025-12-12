@@ -4,7 +4,6 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,20 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
-import com.yagubogu.R
 import com.yagubogu.presentation.home.HomeViewModel
 import com.yagubogu.presentation.home.model.MemberStatsUiModel
 import com.yagubogu.presentation.home.model.StadiumStatsUiModel
 import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
-import com.yagubogu.ui.home.component.MemberStatsItem
+import com.yagubogu.ui.home.component.MemberStats
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
@@ -89,27 +86,7 @@ private fun HomeScreen(
             },
             modifier = Modifier.fillMaxWidth(),
         )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MemberStatsItem(
-                title = stringResource(R.string.home_my_team),
-                value = memberStatsUiModel.myTeam ?: "",
-                modifier = Modifier.weight(1f),
-            )
-            MemberStatsItem(
-                title = stringResource(R.string.home_attendance_count),
-                value = memberStatsUiModel.attendanceCount.toString(),
-                modifier = Modifier.weight(1f),
-            )
-            MemberStatsItem(
-                title = stringResource(R.string.home_winning_percentage),
-                value = stringResource(R.string.all_rounded_win_rate, memberStatsUiModel.winRate),
-                modifier = Modifier.weight(1f),
-            )
-        }
+        MemberStats(uiModel = memberStatsUiModel)
 
         if (stadiumStatsUiModel.stadiumFanRates.isNotEmpty()) {
             StadiumFanRate(
