@@ -1,8 +1,8 @@
 package com.yagubogu.presentation.util
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.fragment.app.FragmentActivity
 
 object PermissionUtil {
     fun isGranted(
@@ -11,7 +11,7 @@ object PermissionUtil {
     ): Boolean = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
     fun shouldShowRationale(
-        fragmentActivity: FragmentActivity,
+        activity: Activity,
         permission: String,
-    ): Boolean = fragmentActivity.shouldShowRequestPermissionRationale(permission)
+    ): Boolean = activity.shouldShowRequestPermissionRationale(permission)
 }

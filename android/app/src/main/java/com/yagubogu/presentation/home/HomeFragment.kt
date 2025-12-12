@@ -1,32 +1,16 @@
 package com.yagubogu.presentation.home
 
-import android.Manifest
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsResponse
-import com.google.android.gms.location.Priority
-import com.google.android.gms.location.SettingsClient
-import com.google.android.gms.tasks.Task
 import com.yagubogu.R
 import com.yagubogu.presentation.MainActivity
 import com.yagubogu.presentation.home.model.CheckInUiEvent
-import com.yagubogu.presentation.util.PermissionUtil
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.home.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,8 +22,6 @@ class HomeFragment :
     ScrollToTop {
     private val viewModel: HomeViewModel by viewModels()
 
-    private val locationPermissionLauncher = createLocationPermissionLauncher()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,7 +30,7 @@ class HomeFragment :
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                HomeScreen(viewModel, onCheckInClick = ::checkIn)
+                HomeScreen(viewModel)
             }
         }
 
@@ -71,14 +53,6 @@ class HomeFragment :
 
     override fun scrollToTop() {
 //        binding.nsvRoot.smoothScrollTo(0, 0)
-    }
-
-    private fun checkIn() {
-        if (isLocationPermissionGranted()) {
-            checkLocationSettingsThenCheckIn(requestLocationServices())
-        } else {
-            requestLocationPermissions()
-        }
     }
 
     private fun setupComposeView() {
@@ -107,100 +81,5 @@ class HomeFragment :
         viewModel.isCheckInLoading.observe(viewLifecycleOwner) { value: Boolean ->
             (requireActivity() as MainActivity).setLoadingScreen(value)
         }
-    }
-
-    private fun createLocationPermissionLauncher(): ActivityResultLauncher<Array<String>> =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val isPermissionGranted: Boolean = permissions.any { it.value }
-            val shouldShowRationale: Boolean =
-                permissions.keys.any { permission: String ->
-                    PermissionUtil.shouldShowRationale(requireActivity(), permission)
-                }
-            when {
-                isPermissionGranted -> checkLocationSettingsThenCheckIn(requestLocationServices())
-                shouldShowRationale -> {}
-//                    binding.root.showSnackbar(
-//                        R.string.home_location_permission_denied_message,
-//                        R.id.bnv_navigation,
-//                    )
-
-                else -> showPermissionDeniedDialog()
-            }
-        }
-
-    private fun isLocationPermissionGranted(): Boolean {
-        val isFineLocationPermissionGranted =
-            PermissionUtil.isGranted(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-        val isCoarseLocationPermissionGranted =
-            PermissionUtil.isGranted(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            )
-        return isFineLocationPermissionGranted || isCoarseLocationPermissionGranted
-    }
-
-    private fun requestLocationPermissions() {
-        locationPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ),
-        )
-    }
-
-    private fun showPermissionDeniedDialog() {
-        AlertDialog
-            .Builder(requireContext())
-            .setTitle(R.string.permission_dialog_location_title)
-            .setMessage(R.string.permission_dialog_location_description)
-            .setPositiveButton(R.string.permission_dialog_open_settings) { _, _ ->
-                openAppSettings()
-            }.setNegativeButton(R.string.all_cancel, null)
-            .setCancelable(false)
-            .show()
-    }
-
-    private fun openAppSettings() {
-        val intent =
-            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts(PACKAGE_SCHEME, requireContext().packageName, null)
-            }
-        startActivity(intent)
-    }
-
-    private fun requestLocationServices(): Task<LocationSettingsResponse> {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).build()
-
-        val locationSettingsRequestBuilder =
-            LocationSettingsRequest
-                .Builder()
-                .addLocationRequest(locationRequest)
-                .setAlwaysShow(true)
-
-        val settingsClient: SettingsClient = LocationServices.getSettingsClient(requireActivity())
-        return settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
-    }
-
-    private fun checkLocationSettingsThenCheckIn(task: Task<LocationSettingsResponse>) {
-        task
-            .addOnSuccessListener {
-                // 위치 설정이 활성화된 경우 구장 불러오기
-                viewModel.fetchStadiums()
-            }.addOnFailureListener { exception: Exception ->
-                // 다이얼로그 띄워서 사용자가 GPS 켜도록 안내
-                if (exception is ResolvableApiException) {
-                    exception.startResolutionForResult(requireActivity(), RC_LOCATION_SETTINGS)
-                } else {
-//                    binding.root.showSnackbar(
-//                        R.string.home_location_settings_disabled,
-//                        R.id.bnv_navigation,
-//                    )
-                }
-            }
-    }
-
-    companion object {
-        private const val PACKAGE_SCHEME = "package"
-        private const val RC_LOCATION_SETTINGS = 1001
     }
 }
