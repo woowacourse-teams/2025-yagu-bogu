@@ -55,13 +55,6 @@ class HomeFragment :
 //        binding.nsvRoot.smoothScrollTo(0, 0)
     }
 
-    private fun setupComposeView() {
-//        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-//        binding.composeView.setContent {
-//            HomeDialog(viewModel = viewModel)
-//        }
-    }
-
     private fun setupObservers() {
         viewModel.checkInUiEvent.observe(viewLifecycleOwner) { value: CheckInUiEvent ->
             val message: String =
