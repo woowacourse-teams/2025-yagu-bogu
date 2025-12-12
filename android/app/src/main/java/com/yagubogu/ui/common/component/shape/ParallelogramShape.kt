@@ -29,6 +29,10 @@ class ParallelogramShape(
     private val bottomEnd: CornerSize,
     private val bottomStart: CornerSize,
 ) : Shape {
+    init {
+        require(skewed > 0f) { "skewed must be positive, but was $skewed" }
+    }
+
     override fun createOutline(
         size: Size,
         layoutDirection: LayoutDirection,
