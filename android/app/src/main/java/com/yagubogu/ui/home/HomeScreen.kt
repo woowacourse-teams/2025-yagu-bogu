@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
@@ -91,6 +92,14 @@ fun HomeScreen(
         viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
             // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
             context.showToast(event.toMessage(context))
+        }
+    }
+
+    LifecycleStartEffect(viewModel) {
+        viewModel.startStreaming()
+
+        onStopOrDispose {
+            viewModel.stopStreaming()
         }
     }
 
