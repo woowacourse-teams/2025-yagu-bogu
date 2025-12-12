@@ -126,7 +126,10 @@ private fun AttendanceHistoryScreen(
                     .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(items.size) { index: Int ->
+            items(
+                count = items.size,
+                key = { index: Int -> items[index].summary.id },
+            ) { index: Int ->
                 val item: AttendanceHistoryItem = items[index]
                 AttendanceItem(
                     item = item,

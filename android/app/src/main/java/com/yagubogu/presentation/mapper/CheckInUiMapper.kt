@@ -33,6 +33,7 @@ fun TeamFanRateDto.toUiModel(): TeamFanRate =
 fun CheckInGameDto.toUiModel(): AttendanceHistoryItem {
     val summary =
         AttendanceHistoryItem.Summary(
+            id = checkInId,
             attendanceDate = LocalDate.parse(attendanceDate),
             stadiumName = stadiumFullName,
             awayTeam = awayTeam.toUiModel(homeTeam),
