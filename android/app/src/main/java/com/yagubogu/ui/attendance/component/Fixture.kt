@@ -23,7 +23,7 @@ val ATTENDANCE_HISTORY_ITEM_PLAYED =
                     ),
                 homeTeam =
                     GameTeam(
-                        team = Team.HT,
+                        team = Team.OB,
                         name = "두산",
                         score = "4",
                         isMyTeam = false,
@@ -66,7 +66,7 @@ val ATTENDANCE_HISTORY_ITEM_CANCELED =
                     ),
                 homeTeam =
                     GameTeam(
-                        team = Team.HT,
+                        team = Team.OB,
                         name = "두산",
                         score = "-",
                         isMyTeam = false,
