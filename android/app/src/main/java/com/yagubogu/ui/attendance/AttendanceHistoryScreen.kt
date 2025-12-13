@@ -85,6 +85,7 @@ fun AttendanceHistoryScreen(
                 sort = sort,
                 onSortClick = viewModel::switchAttendanceSort,
                 modifier = modifier,
+                lazyListState = lazyListState,
             )
     }
 }
