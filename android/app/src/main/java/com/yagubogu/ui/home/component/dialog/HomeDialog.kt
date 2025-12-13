@@ -13,42 +13,41 @@ fun HomeDialog(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val dialogEvent: HomeDialogEvent? by viewModel.dialogEvent.collectAsStateWithLifecycle(
-        initialValue = null,
+    val dialogEvent: HomeDialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(
+        initialValue = HomeDialogEvent.HideDialog,
     )
-    dialogEvent?.let { dialogEvent: HomeDialogEvent ->
-        when (dialogEvent) {
-            is HomeDialogEvent.CheckInDialog -> {
-                CheckInDialog(
-                    viewModel = viewModel,
-                    stadium = dialogEvent.stadium,
-                    modifier = modifier,
-                )
-            }
-
-            HomeDialogEvent.AdditionalCheckInDialog -> {
-                AdditionalCheckInDialog(
-                    viewModel = viewModel,
-                    modifier = modifier,
-                )
-            }
-
-            is HomeDialogEvent.DoubleHeaderDialog -> {
-                DoubleHeaderDialog(
-                    viewModel = viewModel,
-                    stadium = dialogEvent.stadium,
-                    modifier = modifier,
-                )
-            }
-
-            is HomeDialogEvent.ProfileDialog -> {
-                ProfileDialog(
-                    onDismissRequest = viewModel::hideCheckInDialog,
-                    memberProfile = dialogEvent.memberProfile,
-                    modifier = modifier,
-                )
-            }
-            HomeDialogEvent.HideDialog -> {}
+    when (val event: HomeDialogEvent = dialogEvent) {
+        is HomeDialogEvent.CheckInDialog -> {
+            CheckInDialog(
+                viewModel = viewModel,
+                stadium = event.stadium,
+                modifier = modifier,
+            )
         }
+
+        HomeDialogEvent.AdditionalCheckInDialog -> {
+            AdditionalCheckInDialog(
+                viewModel = viewModel,
+                modifier = modifier,
+            )
+        }
+
+        is HomeDialogEvent.DoubleHeaderDialog -> {
+            DoubleHeaderDialog(
+                viewModel = viewModel,
+                stadium = event.stadium,
+                modifier = modifier,
+            )
+        }
+
+        is HomeDialogEvent.ProfileDialog -> {
+            ProfileDialog(
+                onDismissRequest = viewModel::hideCheckInDialog,
+                memberProfile = event.memberProfile,
+                modifier = modifier,
+            )
+        }
+
+        HomeDialogEvent.HideDialog -> Unit
     }
 }
