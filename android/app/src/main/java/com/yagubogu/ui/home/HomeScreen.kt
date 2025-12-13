@@ -36,13 +36,13 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
-import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStats
-import com.yagubogu.ui.home.component.PermissionDeniedDialog
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
 import com.yagubogu.ui.home.component.VictoryFairyRanking
+import com.yagubogu.ui.home.component.dialog.HomeDialog
+import com.yagubogu.ui.home.component.dialog.PermissionDeniedDialog
 import com.yagubogu.ui.home.model.CheckInUiEvent
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumStatsUiModel

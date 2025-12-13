@@ -1,4 +1,4 @@
-package com.yagubogu.ui.home.component
+package com.yagubogu.ui.home.component.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

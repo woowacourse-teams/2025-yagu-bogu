@@ -178,8 +178,7 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }
-                .noRippleClickable {
+                }.noRippleClickable {
                     rotation = (rotation + 360f) % 720f
                     onRefresh()
                     Firebase.analytics.logEvent("fan_rate_refresh", null)

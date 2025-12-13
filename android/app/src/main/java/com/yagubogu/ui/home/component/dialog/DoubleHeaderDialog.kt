@@ -1,4 +1,4 @@
-package com.yagubogu.ui.home.component
+package com.yagubogu.ui.home.component.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
