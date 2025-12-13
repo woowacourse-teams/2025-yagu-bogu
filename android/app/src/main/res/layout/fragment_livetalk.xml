@@ -14,9 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="12dp"
-            tools:itemCount="5"
-            tools:listitem="@layout/item_livetalk_stadium" />
+            android:paddingBottom="12dp" />
 
         <ImageView
             android:id="@+id/iv_empty_game"

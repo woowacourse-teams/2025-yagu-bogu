@@ -1,7 +1,7 @@
 package com.yagubogu.presentation.livetalk.chat
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.ui.util.getEmoji
 
 // 현장톡 최초 진입시 필요한 정보를 담은 객체
 class LivetalkTeams(

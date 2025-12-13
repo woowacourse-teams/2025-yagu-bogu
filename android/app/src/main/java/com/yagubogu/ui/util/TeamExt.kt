@@ -27,3 +27,17 @@ val Team.color: Color
             Team.HH -> TeamHanwha
             Team.OB -> TeamDoosan
         }
+
+fun Team.getEmoji(): String =
+    when (this) {
+        Team.HT -> "\uD83D\uDC2F"
+        Team.LG -> "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1"
+        Team.WO -> "\uD83E\uDDB8"
+        Team.KT -> "\uD83E\uDDD9"
+        Team.SS -> "\uD83E\uDD81"
+        Team.LT -> "\uD83C\uDF3A"
+        Team.SK -> "\uD83D\uDE80"
+        Team.NC -> "\uD83E\uDD95"
+        Team.HH -> "\uD83E\uDD85"
+        Team.OB -> "\uD83D\uDC3B"
+    }

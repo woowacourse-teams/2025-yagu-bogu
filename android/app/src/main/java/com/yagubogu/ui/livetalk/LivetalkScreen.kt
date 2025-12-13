@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUM_ITEM_VERIFIED
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
 import com.yagubogu.ui.theme.Gray050
 
@@ -31,7 +32,7 @@ fun LivetalkScreen(
                 .padding(horizontal = 20.dp)
                 .padding(top = 8.dp, bottom = 20.dp),
     ) {
-        List(5) { LivetalkStadiumItem(isVerified = true) }
+        List(5) { LivetalkStadiumItem(item = LIVETALK_STADIUM_ITEM_VERIFIED, onClick = {}) }
     }
 }
 

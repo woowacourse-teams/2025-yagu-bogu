@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
+import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
@@ -32,13 +33,14 @@ import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
-import com.yagubogu.ui.theme.TeamKia
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.util.color
+import com.yagubogu.ui.util.getEmoji
 
 @Composable
 fun LivetalkStadiumItem(
-    isVerified: Boolean,
+    item: LivetalkStadiumItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -47,15 +49,18 @@ fun LivetalkStadiumItem(
             modifier
                 .fillMaxWidth()
                 .background(color = White, RoundedCornerShape(12.dp))
-                .border(1.dp, if (isVerified) Primary500 else Gray100, RoundedCornerShape(12.dp))
-                .clickable { onClick() }
+                .border(
+                    1.dp,
+                    if (item.isVerified) Primary500 else Gray100,
+                    RoundedCornerShape(12.dp),
+                ).clickable { onClick() }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "고척 스카이돔",
+                text = item.stadiumName,
                 style = PretendardBold20,
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -72,7 +77,7 @@ fun LivetalkStadiumItem(
                     modifier = Modifier.size(14.dp),
                 )
                 Text(
-                    text = "100",
+                    text = item.userCount.toString(),
                     style = PretendardMedium12.copy(color = Gray500),
                 )
             }
@@ -90,9 +95,9 @@ fun LivetalkStadiumItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TeamItem(
-                name = "베어스",
-                emoji = "\uD83D\uDC3B",
-                teamColor = TeamKia,
+                name = item.awayTeam.shortname,
+                emoji = item.awayTeam.getEmoji(),
+                teamColor = item.awayTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
             Text(
@@ -100,9 +105,9 @@ fun LivetalkStadiumItem(
                 style = PretendardMedium.copy(fontSize = 20.dsp, color = Gray500),
             )
             TeamItem(
-                name = "베어스",
-                emoji = "\uD83D\uDC3B",
-                teamColor = TeamKia,
+                name = item.homeTeam.shortname,
+                emoji = item.homeTeam.getEmoji(),
+                teamColor = item.homeTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
         }
@@ -136,7 +141,7 @@ private fun TeamItem(
 @Composable
 private fun LivetalkStadiumItemVerifiedPreview() {
     LivetalkStadiumItem(
-        isVerified = true,
+        item = LIVETALK_STADIUM_ITEM_VERIFIED,
         onClick = {},
     )
 }
@@ -145,7 +150,7 @@ private fun LivetalkStadiumItemVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemUnVerifiedPreview() {
     LivetalkStadiumItem(
-        isVerified = false,
+        item = LIVETALK_STADIUM_ITEM_UNVERIFIED,
         onClick = {},
     )
 }

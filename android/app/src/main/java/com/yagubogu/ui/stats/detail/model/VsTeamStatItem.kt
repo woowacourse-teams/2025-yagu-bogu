@@ -1,7 +1,7 @@
 package com.yagubogu.ui.stats.detail.model
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.ui.util.getEmoji
 
 data class VsTeamStatItem(
     val rank: Int,

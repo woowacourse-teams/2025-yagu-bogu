@@ -2,7 +2,7 @@ package com.yagubogu.presentation.favorite
 
 import android.os.Parcelable
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.ui.util.getEmoji
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

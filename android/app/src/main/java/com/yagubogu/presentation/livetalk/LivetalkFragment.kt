@@ -9,9 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yagubogu.databinding.FragmentLivetalkBinding
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 import com.yagubogu.presentation.util.ScrollToTop
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,21 +23,21 @@ class LivetalkFragment :
 
     private val viewModel: LivetalkViewModel by viewModels()
 
-    private val livetalkStadiumAdapter by lazy {
-        LivetalkStadiumAdapter(
-            object : LivetalkStadiumViewHolder.Handler {
-                override fun onItemClick(item: LivetalkStadiumItem) {
-                    val intent =
-                        LivetalkChatActivity.newIntent(
-                            requireContext(),
-                            item.gameId,
-                            item.isVerified,
-                        )
-                    startActivity(intent)
-                }
-            },
-        )
-    }
+//    private val livetalkStadiumAdapter by lazy {
+//        LivetalkStadiumAdapter(
+//            object : LivetalkStadiumViewHolder.Handler {
+//                override fun onItemClick(item: LivetalkStadiumItem) {
+//                    val intent =
+//                        LivetalkChatActivity.newIntent(
+//                            requireContext(),
+//                            item.gameId,
+//                            item.isVerified,
+//                        )
+//                    startActivity(intent)
+//                }
+//            },
+//        )
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +53,6 @@ class LivetalkFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        setupBindings()
         setupObservers()
     }
 
@@ -75,23 +72,11 @@ class LivetalkFragment :
         binding.rvLivetalkStadium.smoothScrollToPosition(0)
     }
 
-    private fun setupBindings() {
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        binding.rvLivetalkStadium.apply {
-            adapter = livetalkStadiumAdapter
-            layoutManager = linearLayoutManager
-        }
-    }
-
     private fun setupObservers() {
-        viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
-            livetalkStadiumAdapter.submitList(value) {
-                binding.rvLivetalkStadium.scrollToPosition(0)
-            }
-
-            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
-            binding.ivEmptyGame.visibility = visibility
-            binding.tvEmptyGame.visibility = visibility
-        }
+//        viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
+//            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
+//            binding.ivEmptyGame.visibility = visibility
+//            binding.tvEmptyGame.visibility = visibility
+//        }
     }
 }
