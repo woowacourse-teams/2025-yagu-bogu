@@ -41,7 +41,7 @@ import com.yagubogu.ui.util.getEmoji
 @Composable
 fun LivetalkStadiumItem(
     item: LivetalkStadiumItem,
-    onClick: () -> Unit,
+    onClick: (LivetalkStadiumItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -53,7 +53,7 @@ fun LivetalkStadiumItem(
                     1.dp,
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
-                ).clickable { onClick() }
+                ).clickable { onClick(item) }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
