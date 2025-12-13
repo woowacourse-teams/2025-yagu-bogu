@@ -4,23 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.yagubogu.databinding.FragmentLivetalkBinding
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.ui.livetalk.LivetalkScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-@Suppress("ktlint:standard:backing-property-naming")
 @AndroidEntryPoint
 class LivetalkFragment :
     Fragment(),
     ScrollToTop {
-    private var _binding: FragmentLivetalkBinding? = null
-    private val binding get() = _binding!!
-
     private val viewModel: LivetalkViewModel by viewModels()
 
 //    private val livetalkStadiumAdapter by lazy {
@@ -43,23 +38,13 @@ class LivetalkFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentLivetalkBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        setupObservers()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    ): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                LivetalkScreen(viewModel)
+            }
+        }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
@@ -69,7 +54,7 @@ class LivetalkFragment :
     }
 
     override fun scrollToTop() {
-        binding.rvLivetalkStadium.smoothScrollToPosition(0)
+//        binding.rvLivetalkStadium.smoothScrollToPosition(0)
     }
 
     private fun setupObservers() {
