@@ -9,7 +9,6 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +38,7 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.HomeDialog
 import com.yagubogu.ui.home.component.MemberStats
+import com.yagubogu.ui.home.component.PermissionDeniedDialog
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
@@ -56,6 +58,7 @@ fun HomeScreen(
     val stadiumStatsUiModel: StadiumStatsUiModel by viewModel.stadiumStatsUiModel.collectAsStateWithLifecycle()
     val isStadiumStatsExpanded: Boolean by viewModel.isStadiumStatsExpanded.collectAsStateWithLifecycle()
     val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
+    var isPermissionDenied: Boolean by remember { mutableStateOf(false) }
 
     val context: Context = LocalContext.current
     val activity: Activity = LocalActivity.current ?: return
@@ -75,7 +78,7 @@ fun HomeScreen(
                 // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
                 shouldShowRationale -> context.showToast(R.string.home_location_permission_denied_message)
 
-                else -> showPermissionDeniedDialog(context)
+                else -> isPermissionDenied = true
             }
         }
 
@@ -119,7 +122,19 @@ fun HomeScreen(
         modifier = modifier,
         scrollState = scrollState,
     )
+
     HomeDialog(viewModel)
+    if (isPermissionDenied) {
+        PermissionDeniedDialog(
+            onOpenSettings = {
+                isPermissionDenied = false
+                openAppSettings(context)
+            },
+            onDismiss = {
+                isPermissionDenied = false
+            },
+        )
+    }
 }
 
 @Composable
@@ -179,18 +194,6 @@ private fun checkIn(
     } else {
         manager.requestPermissions(launcher)
     }
-}
-
-private fun showPermissionDeniedDialog(context: Context) {
-    AlertDialog
-        .Builder(context)
-        .setTitle(R.string.permission_dialog_location_title)
-        .setMessage(R.string.permission_dialog_location_description)
-        .setPositiveButton(R.string.permission_dialog_open_settings) { _, _ ->
-            openAppSettings(context)
-        }.setNegativeButton(R.string.all_cancel, null)
-        .setCancelable(false)
-        .show()
 }
 
 private fun openAppSettings(context: Context) {

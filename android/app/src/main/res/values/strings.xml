@@ -24,6 +24,7 @@
     <string name="permission_dialog_open_settings">"설정으로 이동"</string>
     <string name="permission_dialog_location_title">위치 권한 필요</string>
     <string name="permission_dialog_location_description">인증하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
+    <string name="permission_dialog_location_emoji">⚙️</string>
 
     <string name="login_app_description">야구보구 인증하구 통계보구</string>
     <string name="login_google_icon_description">구글 G 아이콘</string>
