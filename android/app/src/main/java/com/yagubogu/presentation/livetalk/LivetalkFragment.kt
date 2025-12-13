@@ -54,7 +54,7 @@ class LivetalkFragment :
     }
 
     override fun scrollToTop() {
-//        binding.rvLivetalkStadium.smoothScrollToPosition(0)
+        viewModel.scrollToTop()
     }
 
     private fun setupObservers() {

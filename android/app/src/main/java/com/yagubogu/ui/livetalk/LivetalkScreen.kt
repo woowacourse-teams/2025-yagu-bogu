@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +28,12 @@ fun LivetalkScreen(
 ) {
     val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.livetalkStadiumItems.collectAsStateWithLifecycle()
     val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        viewModel.scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
 
     LivetalkScreen(
         items = livetalkStadiumItems,

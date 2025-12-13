@@ -7,8 +7,12 @@ import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -22,8 +26,22 @@ class LivetalkViewModel @Inject constructor(
     private val _livetalkStadiumItems = MutableStateFlow<List<LivetalkStadiumItem>>(emptyList())
     val livetalkStadiumItems: StateFlow<List<LivetalkStadiumItem>> get() = _livetalkStadiumItems.asStateFlow()
 
+    private val _scrollToTopEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
+
     init {
         fetchGames()
+    }
+
+    fun scrollToTop() {
+        viewModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
+        }
     }
 
     fun fetchGames(date: LocalDate = LocalDate.now()) {
