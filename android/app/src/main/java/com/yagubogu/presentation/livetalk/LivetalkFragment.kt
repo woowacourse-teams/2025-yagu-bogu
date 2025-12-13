@@ -18,22 +18,6 @@ class LivetalkFragment :
     ScrollToTop {
     private val viewModel: LivetalkViewModel by viewModels()
 
-//    private val livetalkStadiumAdapter by lazy {
-//        LivetalkStadiumAdapter(
-//            object : LivetalkStadiumViewHolder.Handler {
-//                override fun onItemClick(item: LivetalkStadiumItem) {
-//                    val intent =
-//                        LivetalkChatActivity.newIntent(
-//                            requireContext(),
-//                            item.gameId,
-//                            item.isVerified,
-//                        )
-//                    startActivity(intent)
-//                }
-//            },
-//        )
-//    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,13 +39,5 @@ class LivetalkFragment :
 
     override fun scrollToTop() {
         viewModel.scrollToTop()
-    }
-
-    private fun setupObservers() {
-//        viewModel.livetalkStadiumItems.observe(viewLifecycleOwner) { value: List<LivetalkStadiumItem> ->
-//            val visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
-//            binding.ivEmptyGame.visibility = visibility
-//            binding.tvEmptyGame.visibility = visibility
-//        }
     }
 }

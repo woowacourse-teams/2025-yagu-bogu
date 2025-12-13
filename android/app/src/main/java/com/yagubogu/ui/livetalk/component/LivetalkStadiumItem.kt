@@ -2,7 +2,6 @@ package com.yagubogu.ui.livetalk.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +36,7 @@ import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.getEmoji
+import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun LivetalkStadiumItem(
@@ -53,7 +53,7 @@ fun LivetalkStadiumItem(
                     1.dp,
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
-                ).clickable { onClick(item) }
+                ).noRippleClickable { onClick(item) }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
