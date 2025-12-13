@@ -23,8 +23,8 @@ import javax.inject.Inject
 class LivetalkViewModel @Inject constructor(
     private val gameRepository: GameRepository,
 ) : ViewModel() {
-    private val _livetalkStadiumItems = MutableStateFlow<List<LivetalkStadiumItem>>(emptyList())
-    val livetalkStadiumItems: StateFlow<List<LivetalkStadiumItem>> get() = _livetalkStadiumItems.asStateFlow()
+    private val _stadiumItems = MutableStateFlow<List<LivetalkStadiumItem>>(emptyList())
+    val stadiumItems: StateFlow<List<LivetalkStadiumItem>> = _stadiumItems.asStateFlow()
 
     private val _scrollToTopEvent =
         MutableSharedFlow<Unit>(
@@ -50,7 +50,7 @@ class LivetalkViewModel @Inject constructor(
                 gameRepository.getGames(date).mapList { it.toUiModel() }
             gamesResult
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
-                    _livetalkStadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)
+                    _stadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

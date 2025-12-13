@@ -41,7 +41,7 @@ fun LivetalkScreen(
     viewModel: LivetalkViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.livetalkStadiumItems.collectAsStateWithLifecycle()
+    val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.stadiumItems.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
     val scrollState: ScrollState = rememberScrollState()
 
