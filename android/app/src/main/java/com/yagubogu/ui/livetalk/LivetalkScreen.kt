@@ -64,7 +64,7 @@ fun LivetalkScreen(
                 scrollState = scrollState,
             )
 
-        false -> EmptyLivetalkScreen()
+        false -> EmptyLivetalkScreen(modifier = modifier)
     }
 }
 

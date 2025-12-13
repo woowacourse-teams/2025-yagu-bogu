@@ -35,7 +35,7 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dsp
 import com.yagubogu.ui.util.color
-import com.yagubogu.ui.util.getEmoji
+import com.yagubogu.ui.util.emoji
 import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
@@ -53,7 +53,8 @@ fun LivetalkStadiumItem(
                     1.dp,
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
-                ).noRippleClickable { onClick(item) }
+                )
+                .noRippleClickable { onClick(item) }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
@@ -96,7 +97,7 @@ fun LivetalkStadiumItem(
         ) {
             TeamItem(
                 name = item.awayTeam.shortname,
-                emoji = item.awayTeam.getEmoji(),
+                emoji = item.awayTeam.emoji,
                 teamColor = item.awayTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
@@ -106,7 +107,7 @@ fun LivetalkStadiumItem(
             )
             TeamItem(
                 name = item.homeTeam.shortname,
-                emoji = item.homeTeam.getEmoji(),
+                emoji = item.homeTeam.emoji,
                 teamColor = item.homeTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
