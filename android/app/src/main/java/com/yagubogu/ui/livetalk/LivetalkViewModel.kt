@@ -1,11 +1,11 @@
-package com.yagubogu.presentation.livetalk
+package com.yagubogu.ui.livetalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.game.GameRepository
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
