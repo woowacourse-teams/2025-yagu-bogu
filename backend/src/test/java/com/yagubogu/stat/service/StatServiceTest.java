@@ -81,7 +81,8 @@ class StatServiceTest {
 
     @BeforeEach
     void setUp() {
-        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository);
+        statService = new StatService(checkInRepository, memberRepository, victoryFairyRankingRepository,
+                new com.yagubogu.stat.cache.StatsCache());
     }
 
     @DisplayName("승이 1인 맴버의 통계를 계산한다.")

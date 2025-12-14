@@ -81,16 +81,19 @@ class CheckInServiceTest {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    private com.yagubogu.stat.cache.StatsCache statsCache;
 
     private Team kia, kt, lg, samsung, doosan, lotte;
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
     @BeforeEach
     void setUp() {
+        statsCache = new com.yagubogu.stat.cache.StatsCache();
         checkInService = new CheckInService(
                 checkInRepository,
                 memberRepository,
                 gameRepository,
+                statsCache,
                 applicationEventPublisher
         );
 

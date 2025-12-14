@@ -1,7 +1,11 @@
 package com.yagubogu.global.config;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -38,5 +42,20 @@ public class AsyncConfig {
         );
         executor.initialize();
         return executor;
+    }
+
+    @Bean(name = "statsSseExecutor")
+    public ExecutorService statsSseExecutor(
+            @Value("${sse.stats.executor.pool-size:10}") final int poolSize,
+            @Value("${sse.stats.executor.queue-capacity:200}") final int queueCapacity
+    ) {
+        return new ThreadPoolExecutor(
+                poolSize,
+                poolSize,
+                60L,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(queueCapacity),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
     }
 }

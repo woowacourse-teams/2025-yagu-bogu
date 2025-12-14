@@ -4,6 +4,7 @@ import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.stat.dto.StadiumStatsDto;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
 import java.util.List;
@@ -66,6 +67,17 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
             @Param("date") LocalDate date,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT new com.yagubogu.stat.dto.StadiumStatsDto(
+                ci.game.stadium.id,
+                ci.team.id,
+                COUNT(ci)
+            )
+            FROM CheckIn ci
+            GROUP BY ci.game.stadium.id, ci.team.id
+            """)
+    List<StadiumStatsDto> findStadiumStats();
 
     boolean existsByGameAndMember(Game game, Member member);
 }

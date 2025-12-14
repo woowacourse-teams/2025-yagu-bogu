@@ -26,16 +26,19 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.sse.dto.GameWithFanRateParam;
 import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
+import com.yagubogu.stat.cache.StatsCache;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -46,6 +49,7 @@ public class CheckInService {
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
+    private final StatsCache statsCache;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
@@ -56,6 +60,7 @@ public class CheckInService {
 
         validateNotExistGameAndMember(game, member);
         saveCheckInSafely(game, member, team);
+        updateStatsCacheAsync(game.getStadium().getId(), team.getId());
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
         applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
@@ -160,6 +165,15 @@ public class CheckInService {
     private void validateNotExistGameAndMember(final Game game, final Member member) {
         if (checkInRepository.existsByGameAndMember(game, member)) {
             throw new ConflictException("CheckIn is already exists");
+        }
+    }
+
+    private void updateStatsCacheAsync(final Long stadiumId, final Long teamId) {
+        try {
+            statsCache.incrementStadiumTotal(stadiumId);
+            statsCache.incrementTeamCount(stadiumId, teamId);
+        } catch (Exception e) {
+            log.warn("Failed to update stats cache for stadiumId={} teamId={}", stadiumId, teamId, e);
         }
     }
 

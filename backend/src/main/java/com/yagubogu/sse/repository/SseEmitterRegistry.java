@@ -63,7 +63,7 @@ public class SseEmitterRegistry {
 
     public void removeWithError(final SseEmitter emitter, final Throwable throwable) {
         emitter.completeWithError(throwable);
-        sseEmitterMap.values().removeIf(e -> e.equals(emitter));
+        sseEmitterMap.entrySet().removeIf(entry -> entry.getValue().equals(emitter));
     }
 
     private boolean isClientDisconnect(Throwable t) {

@@ -69,6 +69,16 @@ sse:
   heartbeat:
     enabled: true
     interval-ms: 25000
+  stats:
+    chunk-size: 100
+    executor:
+      pool-size: 10
+      queue-capacity: 200
+
+logging:
+  level:
+    com.yagubogu.sse: info
+    com.yagubogu.stat: info
 
 app:
   s3:
