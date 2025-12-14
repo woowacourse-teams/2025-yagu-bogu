@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.stadium
+package com.yagubogu.ui.livetalk.model
 
 import com.yagubogu.domain.model.Team
 

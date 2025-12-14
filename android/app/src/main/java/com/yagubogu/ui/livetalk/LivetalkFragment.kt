@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk
+package com.yagubogu.ui.livetalk
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.yagubogu.presentation.util.ScrollToTop
-import com.yagubogu.ui.livetalk.LivetalkScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

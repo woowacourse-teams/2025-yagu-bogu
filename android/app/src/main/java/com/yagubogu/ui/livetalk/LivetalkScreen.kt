@@ -27,11 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
-import com.yagubogu.presentation.livetalk.LivetalkViewModel
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUM_ITEMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardMedium

@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500

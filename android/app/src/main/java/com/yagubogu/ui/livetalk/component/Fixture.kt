@@ -1,7 +1,7 @@
 package com.yagubogu.ui.livetalk.component
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 
 val LIVETALK_STADIUM_ITEM_VERIFIED =
     LivetalkStadiumItem(
