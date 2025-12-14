@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.SharedFlow
 @Composable
 fun StatsMyScreen(
     viewModel: StatsMyViewModel,
-    reselectFlow: SharedFlow<Unit>,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
 ) {
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
@@ -34,7 +34,7 @@ fun StatsMyScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchAll()
-        reselectFlow.collect {
+        scrollToTopEvent.collect {
             scrollState.animateScrollTo(0)
         }
     }

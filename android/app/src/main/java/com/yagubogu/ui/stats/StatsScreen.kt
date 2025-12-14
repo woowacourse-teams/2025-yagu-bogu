@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun StatsScreen(
     snackbarHostState: SnackbarHostState,
-    reselectFlow: SharedFlow<Unit>,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     statsMyViewModel: StatsMyViewModel = hiltViewModel(),
     statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
@@ -68,8 +68,8 @@ fun StatsScreen(
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
             when (StatsTab.entries[page]) {
-                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel, reselectFlow)
-                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel, reselectFlow)
+                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel, scrollToTopEvent)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel, scrollToTopEvent)
             }
         }
     }

@@ -30,6 +30,7 @@ import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.badge.BadgeActivity
+import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
@@ -58,10 +59,9 @@ fun MainScreen(
             topLevelRoutes = BottomNavKey.items.toSet(),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
-    val reselectFlow: MutableSharedFlow<Unit> =
-        remember { MutableSharedFlow(extraBufferCapacity = 1) }
+    val scrollToTopEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
     LaunchedEffect(selectedItem) {
@@ -98,7 +98,7 @@ fun MainScreen(
                         navigator.navigate(item)
                     },
                     onItemReselect = { item: BottomNavKey ->
-                        reselectFlow.tryEmit(Unit)
+                        scrollToTopEvent.tryEmit(Unit)
                     },
                 )
             },
@@ -117,9 +117,15 @@ fun MainScreen(
         ) { innerPadding: PaddingValues ->
             val entryProvider: (NavKey) -> NavEntry<NavKey> =
                 entryProvider {
-                    entry<BottomNavKey.Home> { StatsScreen(snackbarHostState, reselectFlow) }
+                    entry<BottomNavKey.Home> {
+                        HomeScreen(
+                            snackbarHostState = snackbarHostState,
+                            scrollToTopEvent = scrollToTopEvent,
+                            onLoading = viewModel::setLoading,
+                        )
+                    }
                     entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
-                    entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, reselectFlow) }
+                    entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, scrollToTopEvent) }
                     entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
                 }
 

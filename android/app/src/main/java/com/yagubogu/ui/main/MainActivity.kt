@@ -32,14 +32,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setLoadingScreen(isLoading: Boolean) {
-        if (isLoading) {
-            viewModel.showLoading()
-        } else {
-            viewModel.hideLoading()
-        }
-    }
-
     companion object {
         fun newIntent(context: Context): Intent =
             Intent(context, MainActivity::class.java).apply {

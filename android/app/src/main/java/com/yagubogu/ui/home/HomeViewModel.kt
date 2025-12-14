@@ -82,24 +82,6 @@ class HomeViewModel @Inject constructor(
 
     private var stadiums: StadiumsWithGames? = null
 
-    private val _scrollToTopEvent =
-        MutableSharedFlow<Unit>(
-            replay = 0,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
-    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
-
-    init {
-        fetchAll()
-    }
-
-    fun scrollToTop() {
-        viewModelScope.launch {
-            _scrollToTopEvent.emit(Unit)
-        }
-    }
-
     fun fetchAll() {
         fetchMemberStats()
         fetchStadiumStats()
@@ -138,7 +120,7 @@ class HomeViewModel @Inject constructor(
         streamRepository.disconnect()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiums(date: LocalDate = LocalDate.of(2025, 10, 19)) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
@@ -260,7 +242,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
+    private fun fetchStadiumStats(date: LocalDate = LocalDate.of(2025, 10, 19)) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }
