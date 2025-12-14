@@ -37,24 +37,6 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _attendanceSort = MutableStateFlow(AttendanceHistorySort.LATEST)
     val attendanceSort: StateFlow<AttendanceHistorySort> = _attendanceSort.asStateFlow()
 
-    private val _scrollToTopEvent =
-        MutableSharedFlow<Unit>(
-            replay = 0,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
-    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
-
-    init {
-        fetchAttendanceHistoryItems()
-    }
-
-    fun scrollToTop() {
-        viewModelScope.launch {
-            _scrollToTopEvent.emit(Unit)
-        }
-    }
-
     fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val filter: AttendanceHistoryFilter = attendanceFilter.value

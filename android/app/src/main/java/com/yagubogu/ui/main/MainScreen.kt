@@ -29,6 +29,7 @@ import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.SettingActivity
+import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.livetalk.LivetalkScreen
@@ -131,8 +132,18 @@ fun MainScreen(
                             scrollToTopEvent = scrollToTopEvent,
                         )
                     }
-                    entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, scrollToTopEvent) }
-                    entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
+                    entry<BottomNavKey.Stats> {
+                        StatsScreen(
+                            snackbarHostState = snackbarHostState,
+                            scrollToTopEvent = scrollToTopEvent,
+                        )
+                    }
+                    entry<BottomNavKey.AttendanceHistory> {
+                        AttendanceHistoryScreen(
+                            snackbarHostState = snackbarHostState,
+                            scrollToTopEvent = scrollToTopEvent,
+                        )
+                    }
                 }
 
             NavDisplay(

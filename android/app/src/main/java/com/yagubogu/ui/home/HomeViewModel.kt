@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
         streamRepository.disconnect()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.of(2025, 10, 19)) {
+    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
@@ -242,7 +242,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumStats(date: LocalDate = LocalDate.of(2025, 10, 19)) {
+    private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }
