@@ -31,18 +31,6 @@
     <color name="dimming025">#40000000</color>
     <color name="dimming050">#80000000</color>
 
-    <!-- Team Colors -->
-    <color name="team_kia">#FFEA0029</color>
-    <color name="team_samsung">#FF074CA1</color>
-    <color name="team_lg">#FFC30452</color>
-    <color name="team_doosan">#FF1A1748</color>
-    <color name="team_kt">#FF000000</color>
-    <color name="team_ssg">#FFCE0E2D</color>
-    <color name="team_lotte">#FF041E42</color>
-    <color name="team_hanwha">#FFFC4E00</color>
-    <color name="team_nc">#FF315288</color>
-    <color name="team_kiwoom">#FF570514</color>
-
     <!-- Colors -->
     <color name="red">#FFFF2C2C</color>
     <color name="gold">#FFC9B037</color>

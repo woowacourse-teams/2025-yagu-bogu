@@ -43,14 +43,14 @@ fun VsTeamWinRates(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
             modifier
-                .noRippleClickable { onShowMoreClick() }
                 .animateContentSize(
                     animationSpec =
                         spring(
                             dampingRatio = Spring.DampingRatioLowBouncy,
                             stiffness = Spring.StiffnessLow,
                         ),
-                ).background(White, RoundedCornerShape(12.dp))
+                )
+                .background(White, RoundedCornerShape(12.dp))
                 .padding(20.dp),
     ) {
         Text(
@@ -59,12 +59,16 @@ fun VsTeamWinRates(
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.noRippleClickable(onShowMoreClick),
         ) {
             vsTeamStatItems.forEach { vsTeamStatItem: VsTeamStatItem ->
                 VsTeamStatItem(vsTeamStatItem = vsTeamStatItem)
             }
         }
-        ShowMoreButton(isVsTeamStatsExpanded)
+        ShowMoreButton(
+            isExpanded = isVsTeamStatsExpanded,
+            onClick = onShowMoreClick,
+        )
     }
 }
 
