@@ -26,24 +26,6 @@ class LivetalkViewModel @Inject constructor(
     private val _stadiumItems = MutableStateFlow<List<LivetalkStadiumItem>>(emptyList())
     val stadiumItems: StateFlow<List<LivetalkStadiumItem>> = _stadiumItems.asStateFlow()
 
-    private val _scrollToTopEvent =
-        MutableSharedFlow<Unit>(
-            replay = 0,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
-    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
-
-    init {
-        fetchGames()
-    }
-
-    fun scrollToTop() {
-        viewModelScope.launch {
-            _scrollToTopEvent.emit(Unit)
-        }
-    }
-
     fun fetchGames(date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
             val gamesResult: Result<List<LivetalkStadiumItem>> =

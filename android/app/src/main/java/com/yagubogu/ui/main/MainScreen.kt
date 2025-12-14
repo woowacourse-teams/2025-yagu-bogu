@@ -31,6 +31,7 @@ import com.yagubogu.R
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.home.HomeScreen
+import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
@@ -124,7 +125,12 @@ fun MainScreen(
                             onLoading = viewModel::setLoading,
                         )
                     }
-                    entry<BottomNavKey.Livetalk> { TODO("LivetalkScreen()") }
+                    entry<BottomNavKey.Livetalk> {
+                        LivetalkScreen(
+                            snackbarHostState = snackbarHostState,
+                            scrollToTopEvent = scrollToTopEvent,
+                        )
+                    }
                     entry<BottomNavKey.Stats> { StatsScreen(snackbarHostState, scrollToTopEvent) }
                     entry<BottomNavKey.AttendanceHistory> { TODO("AttendanceHistoryScreen()") }
                 }
