@@ -37,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.MemberStats
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
