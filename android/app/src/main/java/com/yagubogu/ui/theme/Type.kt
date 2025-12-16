@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 
-val Int.dsp
+val Int.dpToSp
     @Composable
     get() = with(LocalDensity.current) { Dp(toFloat()).toSp() }
 

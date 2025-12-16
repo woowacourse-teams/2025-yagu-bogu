@@ -33,7 +33,7 @@ import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.emoji
 import com.yagubogu.ui.util.noRippleClickable
@@ -53,7 +53,8 @@ fun LivetalkStadiumItem(
                     1.dp,
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
-                ).noRippleClickable { onClick(item) }
+                )
+                .noRippleClickable { onClick(item) }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
@@ -102,7 +103,7 @@ fun LivetalkStadiumItem(
             )
             Text(
                 text = "vs",
-                style = PretendardMedium.copy(fontSize = 20.dsp, color = Gray500),
+                style = PretendardMedium.copy(fontSize = 20.dpToSp, color = Gray500),
             )
             TeamItem(
                 name = item.homeTeam.shortname,

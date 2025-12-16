@@ -60,7 +60,7 @@ import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.rememberBalloonBuilder
@@ -178,7 +178,8 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }.noRippleClickable {
+                }
+                .noRippleClickable {
                     rotation = (rotation + 360f) % 720f
                     onRefresh()
                     Firebase.analytics.logEvent("fan_rate_refresh", null)
@@ -220,12 +221,12 @@ private fun StadiumFanRateItem(
                 ) {
                     Text(
                         text = item.awayTeamFanRate.teamName,
-                        style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
+                        style = EsamanruMedium.copy(fontSize = 22.dpToSp, color = White),
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.all_win_rate, item.awayTeamPercentage),
-                        style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
+                        style = PretendardMedium.copy(fontSize = 16.dpToSp, color = White),
                     )
                 }
 
@@ -242,12 +243,12 @@ private fun StadiumFanRateItem(
                 ) {
                     Text(
                         text = item.homeTeamFanRate.teamName,
-                        style = EsamanruMedium.copy(fontSize = 22.dsp, color = White),
+                        style = EsamanruMedium.copy(fontSize = 22.dpToSp, color = White),
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.all_win_rate, item.homeTeamPercentage),
-                        style = PretendardMedium.copy(fontSize = 16.dsp, color = White),
+                        style = PretendardMedium.copy(fontSize = 16.dpToSp, color = White),
                     )
                 }
             }
@@ -316,7 +317,7 @@ private fun StadiumFanRateDivider(
             ) {
                 Text(
                     text = "VS",
-                    style = PretendardBold.copy(fontSize = 16.dsp, color = Gray700),
+                    style = PretendardBold.copy(fontSize = 16.dpToSp, color = Gray700),
                     modifier =
                         Modifier
                             .background(color = White, shape = CircleShape)
@@ -324,7 +325,8 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }

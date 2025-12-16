@@ -32,7 +32,7 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.PretendardSemiBold20
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
@@ -50,7 +50,8 @@ fun AttendanceItem(
                 .noRippleClickable {
                     onItemClick(item)
                     Firebase.analytics.logEvent("attendance_history_item_click", null)
-                }.padding(horizontal = 20.dp, vertical = 24.dp),
+                }
+                .padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary(item = item.summary)
         when (item) {
@@ -84,7 +85,7 @@ private fun AttendanceHistorySummary(
     ) {
         Text(
             text = item.awayTeam.score,
-            style = EsamanruBold.copy(fontSize = 56.dsp),
+            style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.awayTeamColor,
         )
 
@@ -122,7 +123,7 @@ private fun AttendanceHistorySummary(
 
         Text(
             text = item.homeTeam.score,
-            style = EsamanruBold.copy(fontSize = 56.dsp),
+            style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.homeTeamColor,
         )
     }
