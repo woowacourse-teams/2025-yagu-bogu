@@ -6,10 +6,13 @@ import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.sse.repository.SseEmitterRegistry;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,31 +60,40 @@ public class SseEventHandler {
                 return;
             }
 
+            List<SseEmitter> emitterList = new ArrayList<>(allEmitters);
+            Collections.shuffle(emitterList);
+
             // 1. DB 조회 (1번 발생)
             List<GameWithFanRateParam> eventData = checkInService.buildCheckInEventData(LocalDate.now());
 
             // 2. 전체 방송 (Fan-Out)
-            List<CompletableFuture<Void>> futures = allEmitters.stream()
-                    .map(emitter -> CompletableFuture.runAsync(() -> {
-                        try {
-                            emitter.send(SseEmitter.event()
-                                    .name("check-in-created")
-                                    .data(eventData));
-                        } catch (IOException e) {
-                            log.info("[SSE-Client] I/O 예외 발생, 메시지: {}", e.getMessage());
-                            sseEmitterRegistry.removeWithError(emitter, e);
-                        }
-                    }, sseBroadcastExecutor))
-                    .toList();
-
-            CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
             try {
-                allFutures.get(5, TimeUnit.SECONDS);
+                List<CompletableFuture<Void>> futures = emitterList.stream()
+                        .map(emitter -> CompletableFuture.runAsync(() -> {
+                            try {
+                                emitter.send(SseEmitter.event()
+                                        .name("check-in-created")
+                                        .data(eventData));
+                            } catch (IOException e) {
+                                log.info("[SSE-Client] I/O 예외 발생, 메시지: {}", e.getMessage());
+                                sseEmitterRegistry.removeWithError(emitter, e);
+                            }
+                        }, sseBroadcastExecutor))
+                        .toList();
+
+                CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+                allFutures.get(200, TimeUnit.MILLISECONDS);
                 log.info("[SSE-Scheduler] 전송 완료 ({}명)", emitterCount);
+            } catch (RejectedExecutionException e) {
+                isDirty.set(true);
+                log.warn("[SSE-Reject] 스레드 풀 자원 부족으로 일부 전송 스킵 - 다음 주기 재전송 예약");
             } catch (TimeoutException e) {
-                log.warn("[SSE-Scheduler] 5초 타임아웃 발생");
+                isDirty.set(true);
+                log.warn("[SSE-Timeout] 200ms 내 전송 미완료 - 다음 주기 재전송 예약");
             } catch (Exception e) {
-                log.error("[SSE-Scheduler] 전송 중 예외 발생", e);
+                isDirty.set(true);
+                log.error("[SSE-Error] 전송 중 예기치 않은 오류 발생", e);
             }
         }
     }

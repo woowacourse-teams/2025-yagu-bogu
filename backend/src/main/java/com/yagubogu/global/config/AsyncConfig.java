@@ -34,7 +34,7 @@ public class AsyncConfig {
         taskExecutor.setQueueCapacity(2000);
         taskExecutor.setThreadNamePrefix("Sse-Broadcast-");
 
-        taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         taskExecutor.initialize();
         return taskExecutor;
