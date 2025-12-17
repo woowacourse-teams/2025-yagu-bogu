@@ -73,9 +73,8 @@ fun AttendanceHistoryScreen(
         }
     }
 
-    when (attendanceItems.isEmpty()) {
-        true -> EmptyAttendanceHistoryScreen()
-        false ->
+    when (attendanceItems.isNotEmpty()) {
+        true ->
             AttendanceHistoryScreen(
                 items = attendanceItems,
                 detailItemPosition = detailItemPosition,
@@ -87,6 +86,8 @@ fun AttendanceHistoryScreen(
                 modifier = modifier,
                 lazyListState = lazyListState,
             )
+
+        false -> EmptyAttendanceHistoryScreen()
     }
 }
 
