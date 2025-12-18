@@ -56,10 +56,10 @@ class MessageStateHolder(
         val beforeChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
-        lock.withLock {
-            val currentChats: List<LivetalkChatBubbleItem> =
-                liveTalkChatBubbleItems.value ?: emptyList()
+        val currentChats: List<LivetalkChatBubbleItem> =
+            liveTalkChatBubbleItems.value ?: emptyList()
 
+        lock.withLock {
             _liveTalkChatBubbleItems.value = currentChats + beforeChats
 
             hasNext = response.cursor.hasNext
@@ -75,8 +75,9 @@ class MessageStateHolder(
 
         if (newChats.isEmpty()) return
 
+        val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
+
         lock.withLock {
-            val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
             _liveTalkChatBubbleItems.value = newChats + currentChats
 
             hasNext = response.cursor.hasNext
@@ -86,12 +87,12 @@ class MessageStateHolder(
     }
 
     suspend fun deleteChat(chatId: Long) {
-        lock.withLock {
-            val currentChats: List<LivetalkChatBubbleItem> =
-                _liveTalkChatBubbleItems.value ?: emptyList()
-            val deletedChats: List<LivetalkChatBubbleItem> =
-                currentChats.filter { it.livetalkChatItem.chatId != chatId }
+        val currentChats: List<LivetalkChatBubbleItem> =
+            _liveTalkChatBubbleItems.value ?: emptyList()
+        val deletedChats: List<LivetalkChatBubbleItem> =
+            currentChats.filter { it.livetalkChatItem.chatId != chatId }
 
+        lock.withLock {
             newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
             oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
             _liveTalkChatBubbleItems.value = deletedChats
@@ -100,22 +101,22 @@ class MessageStateHolder(
     }
 
     suspend fun reportChat(chatId: Long) {
-        lock.withLock {
-            val currentChats: List<LivetalkChatBubbleItem> =
-                _liveTalkChatBubbleItems.value ?: emptyList()
-            val updatedChats: List<LivetalkChatBubbleItem> =
-                currentChats.map { chatBubbleItem: LivetalkChatBubbleItem ->
-                    if (chatBubbleItem.livetalkChatItem.chatId == chatId) {
-                        val updatedChatItem =
-                            chatBubbleItem.livetalkChatItem.copy(
-                                reported = true,
-                                message = "숨김처리되었습니다",
-                            )
-                        LivetalkChatBubbleItem.OtherBubbleItem(updatedChatItem)
-                    } else {
-                        chatBubbleItem
-                    }
+        val currentChats: List<LivetalkChatBubbleItem> =
+            _liveTalkChatBubbleItems.value ?: emptyList()
+        val updatedChats: List<LivetalkChatBubbleItem> =
+            currentChats.map { chatBubbleItem: LivetalkChatBubbleItem ->
+                if (chatBubbleItem.livetalkChatItem.chatId == chatId) {
+                    val updatedChatItem =
+                        chatBubbleItem.livetalkChatItem.copy(
+                            reported = true,
+                            message = "숨김처리되었습니다",
+                        )
+                    LivetalkChatBubbleItem.OtherBubbleItem(updatedChatItem)
+                } else {
+                    chatBubbleItem
                 }
+            }
+        lock.withLock {
             _liveTalkChatBubbleItems.value = updatedChats
         }
     }
