@@ -63,7 +63,7 @@ class MessageStateHolder(
             _liveTalkChatBubbleItems.value = currentChats + beforeChats
 
             hasNext = response.cursor.hasNext
-            oldestMessageCursor = response.cursor.nextCursorId
+            oldestMessageCursor = response.cursor.nextCursorId ?: oldestMessageCursor
             newestMessageCursor =
                 currentChats.firstOrNull()?.livetalkChatItem?.chatId
         }
@@ -73,13 +73,15 @@ class MessageStateHolder(
         val newChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
-        lock.withLock {
-            if (newChats.isNotEmpty()) {
-                val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
-                _liveTalkChatBubbleItems.value = newChats + currentChats
+        if (newChats.isEmpty()) return
 
-                newestMessageCursor = newChats.first().livetalkChatItem.chatId
-            }
+        lock.withLock {
+            val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
+            _liveTalkChatBubbleItems.value = newChats + currentChats
+
+            hasNext = response.cursor.hasNext
+            newestMessageCursor = newChats.first().livetalkChatItem.chatId
+            oldestMessageCursor = oldestMessageCursor ?: newChats.last().livetalkChatItem.chatId
         }
     }
 
