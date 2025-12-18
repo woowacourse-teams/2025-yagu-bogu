@@ -2,7 +2,6 @@ package com.yagubogu.ui.livetalk
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +42,11 @@ fun LivetalkScreen(
 ) {
     val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.stadiumItems.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
-    val scrollState: ScrollState = rememberScrollState()
+    val lazyListState: LazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.scrollToTopEvent.collect {
-            scrollState.animateScrollTo(0)
+            lazyListState.animateScrollToItem(0)
         }
     }
 
@@ -60,7 +60,7 @@ fun LivetalkScreen(
                     context.startActivity(intent)
                 },
                 modifier = modifier,
-                scrollState = scrollState,
+                lazyListState = lazyListState,
             )
 
         false -> EmptyLivetalkScreen(modifier = modifier)
@@ -72,19 +72,23 @@ private fun LivetalkScreen(
     items: List<LivetalkStadiumItem>,
     onItemClick: (LivetalkStadiumItem) -> Unit,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
+    lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    Column(
+    LazyColumn(
+        state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier =
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
                 .padding(top = 8.dp, bottom = 20.dp),
     ) {
-        items.forEach { item: LivetalkStadiumItem ->
+        items(
+            count = items.size,
+            key = { index: Int -> items[index].gameId },
+        ) { index: Int ->
+            val item: LivetalkStadiumItem = items[index]
             LivetalkStadiumItem(
                 item = item,
                 onClick = onItemClick,
