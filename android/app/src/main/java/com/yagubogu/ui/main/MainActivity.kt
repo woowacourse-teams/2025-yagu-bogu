@@ -3,13 +3,10 @@ package com.yagubogu.ui.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,11 +18,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
         setContent {
-            val view: View = LocalView.current
-            LaunchedEffect(Unit) {
-                WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
-            }
             YaguBoguTheme {
                 MainScreen(viewModel)
             }
