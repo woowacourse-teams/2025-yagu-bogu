@@ -108,8 +108,7 @@ fun ProfileHeader(
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(12.dp),
-                    )
-                    .padding(
+                    ).padding(
                         top = profileImageOverlap - 20.dp,
                         bottom = 20.dp,
                         start = 20.dp,
