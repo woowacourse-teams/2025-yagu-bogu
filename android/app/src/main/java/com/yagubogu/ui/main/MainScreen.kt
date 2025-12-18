@@ -155,9 +155,6 @@ fun MainScreen(
                 onBack = { navigator.goBack() },
             )
         }
-        LoadingOverlay(
-            isLoading = isLoading,
-            modifier = Modifier.fillMaxSize(),
-        )
+        LoadingOverlay(isLoading = isLoading)
     }
 }
