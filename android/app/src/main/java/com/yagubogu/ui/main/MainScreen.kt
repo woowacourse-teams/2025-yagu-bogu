@@ -80,12 +80,10 @@ fun MainScreen(
                     modifier = Modifier.padding(horizontal = 10.dp),
                     title =
                         stringResource(
-                            when (selectedItem) {
-                                BottomNavKey.Home -> R.string.app_name
-                                BottomNavKey.Livetalk,
-                                BottomNavKey.Stats,
-                                BottomNavKey.AttendanceHistory,
-                                -> selectedItem.label
+                            if (selectedItem == BottomNavKey.Home) {
+                                R.string.app_name
+                            } else {
+                                selectedItem.label
                             },
                         ),
                     onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },

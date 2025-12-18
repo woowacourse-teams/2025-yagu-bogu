@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,7 +33,7 @@ fun MainNavigationBar(
     onItemReselect: (BottomNavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         HorizontalDivider(color = Gray200, thickness = 0.4.dp)
         NavigationBar(containerColor = White) {
             BottomNavKey.items.forEach { item: BottomNavKey ->
@@ -67,12 +68,14 @@ fun MainNavigationBar(
                             indicatorColor = White,
                         ),
                     interactionSource =
-                        object : MutableInteractionSource { // Ripple 효과 제거 위함
-                            override suspend fun emit(interaction: Interaction) {}
+                        remember {
+                            object : MutableInteractionSource { // Ripple 효과 제거 위함
+                                override suspend fun emit(interaction: Interaction) {}
 
-                            override fun tryEmit(interaction: Interaction): Boolean = true
+                                override fun tryEmit(interaction: Interaction): Boolean = true
 
-                            override val interactions: Flow<Interaction> = emptyFlow()
+                                override val interactions: Flow<Interaction> = emptyFlow()
+                            }
                         },
                 )
             }
