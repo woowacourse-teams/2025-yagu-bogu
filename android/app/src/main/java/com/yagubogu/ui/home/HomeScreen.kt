@@ -97,7 +97,9 @@ fun HomeScreen(
     }
 
     LifecycleStartEffect(viewModel) {
-        viewModel.startStreaming()
+        if (stadiumStatsUiModel.stadiumFanRates.isNotEmpty()) {
+            viewModel.startStreaming()
+        }
 
         onStopOrDispose {
             viewModel.stopStreaming()
