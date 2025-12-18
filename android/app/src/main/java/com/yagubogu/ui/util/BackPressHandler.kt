@@ -26,7 +26,7 @@ fun BackPressHandler(
 
     BackHandler {
         val currentTime: Long = System.currentTimeMillis()
-        if (currentTime - backPressedTime > 1000L) {
+        if (currentTime - backPressedTime > BACK_PRESS_INTERVAL_MS) {
             backPressedTime = currentTime
             coroutineScope.launch {
                 snackbarHostState.currentSnackbarData?.dismiss()
@@ -37,3 +37,5 @@ fun BackPressHandler(
         }
     }
 }
+
+private const val BACK_PRESS_INTERVAL_MS: Long = 1000L
