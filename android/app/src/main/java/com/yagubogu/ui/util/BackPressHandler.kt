@@ -5,6 +5,10 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.yagubogu.R
@@ -18,7 +22,7 @@ fun BackPressHandler(
 ) {
     val context: Context = LocalContext.current
     val message = stringResource(R.string.main_back_press_to_exit)
-    var backPressedTime = 0L
+    var backPressedTime: Long by remember { mutableLongStateOf(0L) }
 
     BackHandler {
         val currentTime: Long = System.currentTimeMillis()
@@ -29,7 +33,7 @@ fun BackPressHandler(
                 snackbarHostState.showSnackbar(message)
             }
         } else {
-            (context as Activity).finish()
+            (context as? Activity)?.finish()
         }
     }
 }
