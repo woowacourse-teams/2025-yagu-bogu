@@ -178,8 +178,7 @@ private fun RefreshIcon(
                 .size(20.dp)
                 .graphicsLayer {
                     rotationZ = animatedRotation
-                }
-                .noRippleClickable {
+                }.noRippleClickable {
                     rotation = (rotation + 360f) % 720f
                     onRefresh()
                     Firebase.analytics.logEvent("fan_rate_refresh", null)
@@ -325,8 +324,7 @@ private fun StadiumFanRateDivider(
                                 width = 1.dp,
                                 color = Gray100,
                                 shape = CircleShape,
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             }
         }

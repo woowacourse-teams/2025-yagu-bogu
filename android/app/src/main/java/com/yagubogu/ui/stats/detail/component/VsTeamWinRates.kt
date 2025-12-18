@@ -49,8 +49,7 @@ fun VsTeamWinRates(
                             dampingRatio = Spring.DampingRatioLowBouncy,
                             stiffness = Spring.StiffnessLow,
                         ),
-                )
-                .background(White, RoundedCornerShape(12.dp))
+                ).background(White, RoundedCornerShape(12.dp))
                 .padding(20.dp),
     ) {
         Text(

@@ -50,8 +50,7 @@ fun AttendanceItem(
                 .noRippleClickable {
                     onItemClick(item)
                     Firebase.analytics.logEvent("attendance_history_item_click", null)
-                }
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                }.padding(horizontal = 20.dp, vertical = 24.dp),
     ) {
         AttendanceHistorySummary(item = item.summary)
         when (item) {

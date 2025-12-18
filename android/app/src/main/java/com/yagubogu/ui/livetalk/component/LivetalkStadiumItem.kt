@@ -53,8 +53,7 @@ fun LivetalkStadiumItem(
                     1.dp,
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
-                )
-                .noRippleClickable { onClick(item) }
+                ).noRippleClickable { onClick(item) }
                 .padding(horizontal = 24.dp, vertical = 20.dp),
     ) {
         Row(
