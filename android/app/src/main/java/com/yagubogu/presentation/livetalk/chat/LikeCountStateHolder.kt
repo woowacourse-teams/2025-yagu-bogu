@@ -2,6 +2,7 @@ package com.yagubogu.presentation.livetalk.chat
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.common.util.concurrent.Striped.lock
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -42,23 +43,23 @@ class LikeCountStateHolder {
         livetalkTeams: LivetalkTeams,
         likeCountsResponse: LikeCountsResponse,
     ) {
-        lock.withLock {
-            // 서버에서 받아온 좋아요 수
-            val remoteMyTeamLikeCount: Long =
-                if (likeCountsResponse.counts.isEmpty()) {
-                    0L
-                } else {
-                    likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.myTeam.name }?.totalCount
-                        ?: 0L
-                }
-            val remoteOtherTeamLikeCount: Long =
-                if (likeCountsResponse.counts.isEmpty()) {
-                    0L
-                } else {
-                    likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
-                        ?: 0L
-                }
+        // 서버에서 받아온 좋아요 수
+        val remoteMyTeamLikeCount: Long =
+            if (likeCountsResponse.counts.isEmpty()) {
+                0L
+            } else {
+                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.myTeam.name }?.totalCount
+                    ?: 0L
+            }
+        val remoteOtherTeamLikeCount: Long =
+            if (likeCountsResponse.counts.isEmpty()) {
+                0L
+            } else {
+                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
+                    ?: 0L
+            }
 
+        lock.withLock {
             if (myTeamLikeRealCount == 0L) {
                 myTeamLikeRealCount = remoteMyTeamLikeCount
                 _myTeamLikeShowingCount.value = remoteMyTeamLikeCount

@@ -53,9 +53,10 @@ class MessageStateHolder(
     val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
     suspend fun addBeforeChats(response: LivetalkResponseItem) {
+        val beforeChats: List<LivetalkChatBubbleItem> =
+            response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+
         lock.withLock {
-            val beforeChats: List<LivetalkChatBubbleItem> =
-                response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
             val currentChats: List<LivetalkChatBubbleItem> =
                 liveTalkChatBubbleItems.value ?: emptyList()
 
@@ -69,9 +70,10 @@ class MessageStateHolder(
     }
 
     suspend fun addAfterChats(response: LivetalkResponseItem) {
+        val newChats: List<LivetalkChatBubbleItem> =
+            response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
+
         lock.withLock {
-            val newChats: List<LivetalkChatBubbleItem> =
-                response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
             if (newChats.isNotEmpty()) {
                 val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
                 _liveTalkChatBubbleItems.value = newChats + currentChats
