@@ -41,7 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEM_PLAYED
+import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
 import com.yagubogu.ui.attendance.component.AttendanceItem
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
@@ -278,7 +278,7 @@ private fun AttendanceHistorySortSwitch(
 @Composable
 private fun AttendanceHistoryScreenPreview() {
     AttendanceHistoryScreen(
-        items = List(4) { ATTENDANCE_HISTORY_ITEM_PLAYED },
+        items = ATTENDANCE_HISTORY_ITEMS,
         detailItemPosition = 0,
         onItemClick = {},
         filter = AttendanceHistoryFilter.ALL,
