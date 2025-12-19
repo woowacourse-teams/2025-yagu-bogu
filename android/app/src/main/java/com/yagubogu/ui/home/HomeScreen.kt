@@ -97,7 +97,8 @@ fun HomeScreen(
     }
 
     LifecycleStartEffect(viewModel) {
-        if (stadiumStatsUiModel.stadiumFanRates.isNotEmpty()) {
+        val isMatchDay: Boolean = stadiumStatsUiModel.stadiumFanRates.isNotEmpty()
+        if (isMatchDay) {
             viewModel.startStreaming()
         }
 
