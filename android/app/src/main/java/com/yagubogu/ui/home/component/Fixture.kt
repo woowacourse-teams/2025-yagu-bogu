@@ -1,11 +1,19 @@
 package com.yagubogu.ui.home.component
 
 import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
 import com.yagubogu.ui.home.model.TeamFanRate
 import com.yagubogu.ui.home.model.VictoryFairyItem
 import com.yagubogu.ui.home.model.VictoryFairyRanking
+
+val MEMBER_STATS_UI_MODEL =
+    MemberStatsUiModel(
+        myTeam = "KIA",
+        attendanceCount = 24,
+        winRate = 75,
+    )
 
 val STADIUM_FAN_RATE_ITEM =
     StadiumFanRateItem(

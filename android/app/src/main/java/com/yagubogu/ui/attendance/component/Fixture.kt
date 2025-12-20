@@ -76,3 +76,11 @@ val ATTENDANCE_HISTORY_ITEM_CANCELED =
                     ),
             ),
     )
+
+val ATTENDANCE_HISTORY_ITEMS =
+    listOf(
+        ATTENDANCE_HISTORY_ITEM_PLAYED,
+        ATTENDANCE_HISTORY_ITEM_CANCELED,
+        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(summary = ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(id = 2L)),
+        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(summary = ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(id = 3L)),
+    )

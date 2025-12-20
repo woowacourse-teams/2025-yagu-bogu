@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEM_PLAYED
+import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
 import com.yagubogu.ui.attendance.component.AttendanceItem
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
@@ -61,6 +61,7 @@ import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun AttendanceHistoryScreen(
@@ -75,20 +76,15 @@ fun AttendanceHistoryScreen(
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
 
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
-    val lazyListState: LazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchAttendanceHistoryItems()
-        scrollToTopEvent.collect {
-            lazyListState.animateScrollToItem(0)
-        }
     }
 
     BackPressHandler(snackbarHostState, coroutineScope)
 
-    when (attendanceItems.isEmpty()) {
-        true -> EmptyAttendanceHistoryScreen()
-        false ->
+    when (attendanceItems.isNotEmpty()) {
+        true ->
             AttendanceHistoryScreen(
                 items = attendanceItems,
                 detailItemPosition = detailItemPosition,
@@ -98,8 +94,10 @@ fun AttendanceHistoryScreen(
                 sort = sort,
                 onSortClick = viewModel::switchAttendanceSort,
                 modifier = modifier,
-                lazyListState = lazyListState,
+                scrollToTopEvent = scrollToTopEvent,
             )
+
+        false -> EmptyAttendanceHistoryScreen()
     }
 }
 
@@ -113,8 +111,16 @@ private fun AttendanceHistoryScreen(
     sort: AttendanceHistorySort,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val lazyListState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            lazyListState.animateScrollToItem(0)
+        }
+    }
+
     Column(
         modifier =
             modifier
@@ -290,7 +296,7 @@ private fun AttendanceHistorySortSwitch(
 @Composable
 private fun AttendanceHistoryScreenPreview() {
     AttendanceHistoryScreen(
-        items = List(4) { ATTENDANCE_HISTORY_ITEM_PLAYED },
+        items = ATTENDANCE_HISTORY_ITEMS,
         detailItemPosition = 0,
         onItemClick = {},
         filter = AttendanceHistoryFilter.ALL,

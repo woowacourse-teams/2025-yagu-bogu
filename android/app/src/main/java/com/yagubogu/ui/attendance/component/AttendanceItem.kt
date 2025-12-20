@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,15 +81,17 @@ private fun AttendanceHistorySummary(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = item.awayTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.awayTeamColor,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Start,
         )
 
         Column(
+            modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
@@ -124,6 +127,8 @@ private fun AttendanceHistorySummary(
             text = item.homeTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.homeTeamColor,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End,
         )
     }
 }
