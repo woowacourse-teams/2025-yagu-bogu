@@ -5,9 +5,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import timber.log.Timber
 import java.time.Clock
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import javax.inject.Singleton
 
 @Module
@@ -17,11 +18,18 @@ object TimeModule {
     @Singleton
     fun provideClock(): Clock {
         val kstZone = ZoneId.of("Asia/Seoul")
-        return if (BuildConfig.DEBUG) {
-            val fixedDateTime = ZonedDateTime.of(2025, 9, 24, 18, 0, 0, 0, kstZone)
-            Clock.fixed(fixedDateTime.toInstant(), kstZone)
-        } else {
-            Clock.system(kstZone)
+        if (BuildConfig.DEBUG) {
+            return runCatching {
+                val localDateTime = LocalDateTime.parse(BuildConfig.DEBUG_FIXED_DATE)
+                val fixedZonedDateTime = localDateTime.atZone(kstZone)
+
+                Clock.fixed(fixedZonedDateTime.toInstant(), kstZone)
+            }.getOrElse { e: Throwable ->
+                Timber.e("디버그 Clock 생성 실패: $e")
+                Clock.system(kstZone)
+            }
         }
+
+        return Clock.system(kstZone)
     }
 }
