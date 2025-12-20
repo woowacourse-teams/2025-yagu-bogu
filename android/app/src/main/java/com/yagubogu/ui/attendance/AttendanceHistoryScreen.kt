@@ -55,6 +55,8 @@ import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun AttendanceHistoryScreen(
@@ -65,13 +67,6 @@ fun AttendanceHistoryScreen(
     val filter: AttendanceHistoryFilter by viewModel.attendanceFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistorySort by viewModel.attendanceSort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
-    val lazyListState: LazyListState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
-            lazyListState.animateScrollToItem(0)
-        }
-    }
 
     when (attendanceItems.isNotEmpty()) {
         true ->
@@ -84,7 +79,7 @@ fun AttendanceHistoryScreen(
                 sort = sort,
                 onSortClick = viewModel::switchAttendanceSort,
                 modifier = modifier,
-                lazyListState = lazyListState,
+                scrollToTopEvent = viewModel.scrollToTopEvent,
             )
 
         false -> EmptyAttendanceHistoryScreen()
@@ -101,8 +96,16 @@ private fun AttendanceHistoryScreen(
     sort: AttendanceHistorySort,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val lazyListState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            lazyListState.animateScrollToItem(0)
+        }
+    }
+
     Column(
         modifier =
             modifier
