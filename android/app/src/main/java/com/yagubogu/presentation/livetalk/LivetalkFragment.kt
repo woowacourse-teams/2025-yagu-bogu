@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yagubogu.databinding.FragmentLivetalkBinding
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumAdapter
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumItem
 import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 import com.yagubogu.presentation.util.ScrollToTop
+import com.yagubogu.ui.livetalk.chat.LivetalkChatActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("ktlint:standard:backing-property-naming")
@@ -29,12 +29,15 @@ class LivetalkFragment :
         LivetalkStadiumAdapter(
             object : LivetalkStadiumViewHolder.Handler {
                 override fun onItemClick(item: LivetalkStadiumItem) {
-                    val intent =
-                        LivetalkChatActivity.newIntent(
-                            requireContext(),
-                            item.gameId,
-                            item.isVerified,
-                        )
+//                    val intent =
+//                        LivetalkChatActivity.newIntent(
+//                            requireContext(),
+//                            item.gameId,
+//                            item.isVerified,
+//                        )
+//                    startActivity(intent)
+
+                    val intent = LivetalkChatActivity.newIntent(requireContext())
                     startActivity(intent)
                 }
             },
