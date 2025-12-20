@@ -94,10 +94,8 @@
 
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>
     <string name="attendance_history_empty_scoreboard_illustration_description">비어있는 스코어보드 일러스트</string>
-    <string-array name="attendance_history_filter">
-        <item name="all">전체 경기</item>
-        <item name="win">승리한 경기</item>
-    </string-array>
+    <string name="attendance_history_all">전체 경기</string>
+    <string name="attendance_history_win">승리한 경기</string>
     <string name="attendance_history_latest">최신순</string>
     <string name="attendance_history_oldest">오래된순</string>
     <string name="attendance_history_winning_pitcher">승 - %s</string>

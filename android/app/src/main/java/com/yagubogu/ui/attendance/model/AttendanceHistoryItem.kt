@@ -1,43 +1,41 @@
-package com.yagubogu.presentation.attendance.model
+package com.yagubogu.ui.attendance.model
 
-import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import com.yagubogu.R
 import com.yagubogu.domain.model.GameResult
+import com.yagubogu.ui.theme.Gray400
+import com.yagubogu.ui.util.color
 import java.time.LocalDate
 
-sealed class AttendanceHistoryItem(
-    val type: ViewType,
-) {
+sealed interface AttendanceHistoryItem {
+    val summary: Summary
+
     data class Summary(
         val id: Long,
         val attendanceDate: LocalDate,
         val stadiumName: String,
         val awayTeam: GameTeam,
         val homeTeam: GameTeam,
-    ) : AttendanceHistoryItem(ViewType.SUMMARY) {
-        @ColorRes
-        val awayTeamColorRes: Int = determineTeamColorRes(awayTeam)
+    ) {
+        val awayTeamColor: Color = determineTeamColor(awayTeam)
+        val homeTeamColor: Color = determineTeamColor(homeTeam)
 
-        @ColorRes
-        val homeTeamColorRes: Int = determineTeamColorRes(homeTeam)
-
-        @ColorRes
-        private fun determineTeamColorRes(team: GameTeam): Int =
+        private fun determineTeamColor(team: GameTeam): Color =
             if (team.isMyTeam && team.gameResult == GameResult.WIN) {
-                team.teamColor
+                team.team.color
             } else {
-                R.color.gray400
+                Gray400
             }
     }
 
-    data class Detail(
-        val summary: Summary,
+    data class Played(
+        override val summary: Summary,
         val awayTeamPitcher: String,
         val homeTeamPitcher: String,
         val awayTeamScoreBoard: GameScoreBoard,
         val homeTeamScoreBoard: GameScoreBoard,
-    ) : AttendanceHistoryItem(ViewType.DETAIL) {
+    ) : AttendanceHistoryItem {
         val awayTeam: GameTeam get() = summary.awayTeam
         val homeTeam: GameTeam get() = summary.homeTeam
 
@@ -57,12 +55,6 @@ sealed class AttendanceHistoryItem(
     }
 
     data class Canceled(
-        val summary: Summary,
-    ) : AttendanceHistoryItem(ViewType.CANCELED)
-
-    enum class ViewType {
-        SUMMARY,
-        DETAIL,
-        CANCELED,
-    }
+        override val summary: Summary,
+    ) : AttendanceHistoryItem
 }

@@ -8,11 +8,11 @@ import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountDto
 import com.yagubogu.data.dto.response.checkin.TeamFanRateDto
 import com.yagubogu.domain.model.GameResult
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
-import com.yagubogu.presentation.attendance.model.GameScoreBoard
-import com.yagubogu.presentation.attendance.model.GameTeam
 import com.yagubogu.presentation.home.stadium.StadiumFanRateItem
 import com.yagubogu.presentation.home.stadium.TeamFanRate
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.GameScoreBoard
+import com.yagubogu.ui.attendance.model.GameTeam
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import java.time.LocalDate
 
@@ -44,7 +44,7 @@ fun CheckInGameDto.toUiModel(): AttendanceHistoryItem {
         return AttendanceHistoryItem.Canceled(summary = summary)
     }
 
-    return AttendanceHistoryItem.Detail(
+    return AttendanceHistoryItem.Played(
         summary = summary,
         awayTeamPitcher = awayTeam.pitcher,
         homeTeamPitcher = homeTeam.pitcher,

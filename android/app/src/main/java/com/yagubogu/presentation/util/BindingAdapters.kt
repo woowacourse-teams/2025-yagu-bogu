@@ -70,12 +70,6 @@ fun TextView.setTextColorRes(
     setTextColor(context.getColor(colorRes))
 }
 
-@BindingAdapter("dateFormat")
-fun TextView.setDateFormat(date: LocalDate?) {
-    date ?: return
-    text = date.format(DateFormatter.yyyyMMdd)
-}
-
 @BindingAdapter("signUpDateFormat")
 fun TextView.setSignUpDateFormat(date: LocalDate?) {
     date ?: return
