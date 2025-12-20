@@ -60,8 +60,8 @@ import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun AttendanceHistoryScreen(
