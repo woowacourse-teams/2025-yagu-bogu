@@ -2,6 +2,7 @@
 agp = "8.9.3"
 balloon = "1.6.13"
 appUpdate = "2.1.0"
+calendar = "2.9.0"
 coilCompose = "3.3.0"
 coilNetworkOkhttp = "3.3.0"
 coreSplashscreen = "1.0.1"
@@ -74,6 +75,7 @@ balloon = { module = "com.github.skydoves:balloon", version.ref = "balloon" }
 balloon-compose = { module = "com.github.skydoves:balloon-compose", version.ref = "balloon" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
+calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = "calendar" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
