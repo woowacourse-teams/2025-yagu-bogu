@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -28,6 +29,7 @@ import kotlin.math.roundToInt
 class StatsMyViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _scrollToTopEvent =
         MutableSharedFlow<Unit>(
@@ -58,7 +60,7 @@ class StatsMyViewModel @Inject constructor(
         }
     }
 
-    private fun fetchMyStats(year: Int = LocalDate.now().year) {
+    private fun fetchMyStats(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                 async { statsRepository.getStatsCounts(year).map { it.toUiModel() } }

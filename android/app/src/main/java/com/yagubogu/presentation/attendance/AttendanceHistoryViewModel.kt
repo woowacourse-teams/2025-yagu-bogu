@@ -14,12 +14,14 @@ import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class AttendanceHistoryViewModel @Inject constructor(
     private val checkInRepository: CheckInRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private var items: List<AttendanceHistoryItem> = emptyList()
 
@@ -37,7 +39,7 @@ class AttendanceHistoryViewModel @Inject constructor(
             addSource(_attendanceHistoryOrder) { fetchAttendanceHistoryItems() }
         }
 
-    fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
+    fun fetchAttendanceHistoryItems(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val filter: AttendanceHistoryFilter =
                 attendanceHistoryFilter.value ?: AttendanceHistoryFilter.ALL

@@ -11,12 +11,14 @@ import com.yagubogu.presentation.util.mapList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class LivetalkViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _livetalkStadiumItems = MutableLiveData<List<LivetalkStadiumItem>>()
     val livetalkStadiumItems: LiveData<List<LivetalkStadiumItem>> get() = _livetalkStadiumItems
@@ -25,7 +27,7 @@ class LivetalkViewModel @Inject constructor(
         fetchGames()
     }
 
-    fun fetchGames(date: LocalDate = LocalDate.now()) {
+    fun fetchGames(date: LocalDate = LocalDate.now(clock)) {
         viewModelScope.launch {
             val gamesResult: Result<List<LivetalkStadiumItem>> =
                 gameRepository.getGames(date).mapList { it.toUiModel() }
