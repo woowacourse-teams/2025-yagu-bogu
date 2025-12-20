@@ -34,6 +34,8 @@ import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardMedium
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun LivetalkScreen(
@@ -42,13 +44,6 @@ fun LivetalkScreen(
 ) {
     val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.stadiumItems.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
-    val lazyListState: LazyListState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
-            lazyListState.animateScrollToItem(0)
-        }
-    }
 
     when (livetalkStadiumItems.isNotEmpty()) {
         true ->
@@ -60,7 +55,7 @@ fun LivetalkScreen(
                     context.startActivity(intent)
                 },
                 modifier = modifier,
-                lazyListState = lazyListState,
+                scrollToTopEvent = viewModel.scrollToTopEvent,
             )
 
         false -> EmptyLivetalkScreen(modifier = modifier)
@@ -72,8 +67,16 @@ private fun LivetalkScreen(
     items: List<LivetalkStadiumItem>,
     onItemClick: (LivetalkStadiumItem) -> Unit,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val lazyListState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            lazyListState.animateScrollToItem(0)
+        }
+    }
+
     LazyColumn(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
