@@ -58,27 +58,27 @@ class HomeViewModel @Inject constructor(
             extraBufferCapacity = 1,
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
-    val checkInUiEvent: SharedFlow<CheckInUiEvent> get() = _checkInUiEvent.asSharedFlow()
+    val checkInUiEvent: SharedFlow<CheckInUiEvent> = _checkInUiEvent.asSharedFlow()
 
     private val _memberStatsUiModel = MutableStateFlow(MemberStatsUiModel())
-    val memberStatsUiModel: StateFlow<MemberStatsUiModel> get() = _memberStatsUiModel.asStateFlow()
+    val memberStatsUiModel: StateFlow<MemberStatsUiModel> = _memberStatsUiModel.asStateFlow()
 
     private val cachedStadiumFanRateItems = mutableMapOf<Long, StadiumFanRateItem>()
 
     private val _isStadiumStatsExpanded = MutableStateFlow(false)
-    val isStadiumStatsExpanded: StateFlow<Boolean> get() = _isStadiumStatsExpanded.asStateFlow()
+    val isStadiumStatsExpanded: StateFlow<Boolean> = _isStadiumStatsExpanded.asStateFlow()
 
     private val _stadiumStatsUiModel = MutableStateFlow(StadiumStatsUiModel())
-    val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> get() = _stadiumStatsUiModel.asStateFlow()
+    val stadiumStatsUiModel: StateFlow<StadiumStatsUiModel> = _stadiumStatsUiModel.asStateFlow()
 
     private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
-    val victoryFairyRanking: StateFlow<VictoryFairyRanking> get() = _victoryFairyRanking.asStateFlow()
+    val victoryFairyRanking: StateFlow<VictoryFairyRanking> = _victoryFairyRanking.asStateFlow()
 
     private val _isCheckInLoading = MutableStateFlow(false)
-    val isCheckInLoading: StateFlow<Boolean> get() = _isCheckInLoading.asStateFlow()
+    val isCheckInLoading: StateFlow<Boolean> = _isCheckInLoading.asStateFlow()
 
     private val _dialogEvent = MutableSharedFlow<HomeDialogEvent>()
-    val dialogEvent: SharedFlow<HomeDialogEvent> get() = _dialogEvent.asSharedFlow()
+    val dialogEvent: SharedFlow<HomeDialogEvent> = _dialogEvent.asSharedFlow()
 
     private var stadiums: StadiumsWithGames? = null
 

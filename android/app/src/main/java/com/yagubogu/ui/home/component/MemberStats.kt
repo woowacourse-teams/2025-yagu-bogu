@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +63,7 @@ private fun MemberStatsItem(
     Column(
         modifier =
             modifier
+                .fillMaxWidth()
                 .border(width = 1.dp, color = Primary100, shape = RoundedCornerShape(12.dp))
                 .background(color = White, shape = RoundedCornerShape(12.dp))
                 .padding(vertical = 14.dp),
@@ -77,6 +79,12 @@ private fun MemberStatsItem(
             style = PretendardRegular12.copy(color = Gray500),
         )
     }
+}
+
+@Preview
+@Composable
+private fun MemberStatsPreview() {
+    MemberStats(uiModel = MEMBER_STATS_UI_MODEL)
 }
 
 @Preview
