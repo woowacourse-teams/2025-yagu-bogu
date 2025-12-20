@@ -26,6 +26,7 @@ import com.yagubogu.ui.theme.Gray300
 fun LivetalkChatScreen(
     onBackClick: () -> Unit,
     stadiumName: String?,
+    team: Team?,
     matchText: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -60,11 +61,14 @@ fun LivetalkChatScreen(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
-                LivetalkChatCheeringBar(
-                    team = Team.WO,
-                    cheeringCount = 12345L,
-                    onCheeringClick = { /* 응원 전송 이벤트 */ },
-                )
+                if (team != null) {
+                    LivetalkChatCheeringBar(
+                        team = Team.WO,
+                        cheeringCount = 12345L,
+                        onCheeringClick = { /* 응원 전송 이벤트 */ },
+                    )
+                }
+
             }
         }
     }
@@ -72,9 +76,10 @@ fun LivetalkChatScreen(
 
 @Preview
 @Composable
-private fun BadgeScreenPreview() {
+private fun LivetalkChatScreenPreview() {
     LivetalkChatScreen(
         onBackClick = {},
+        team = Team.WO,
         stadiumName = "고척 스카이돔",
         matchText = "두산 vs 키움",
     )
@@ -85,6 +90,7 @@ private fun BadgeScreenPreview() {
 private fun LivetalkChatLoadingScreenPreview() {
     LivetalkChatScreen(
         onBackClick = {},
+        team = null,
         stadiumName = null,
         matchText = null,
     )

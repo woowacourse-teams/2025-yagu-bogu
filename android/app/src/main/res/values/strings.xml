@@ -118,7 +118,8 @@
     <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
     <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
 
-    <string name="livetalk_send_btn_description">메시지 전송 버튼 비행기 아이콘</string>
+    <string name="livetalk_send_btn_description">메시지 전송</string>
+    <string name="livetalk_send_btn_locked_description">잠긴 메시지 전송</string>
     <string name="livetalk_away_home_name">%s vs %s</string>
     <string name="livetalk_chat_input_hint">현재 %s 상황은…</string>
     <string name="livetalk_chat_input_hint_unverified">직관 인증을 먼저 해주세요</string>

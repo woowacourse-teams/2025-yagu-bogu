@@ -38,6 +38,7 @@ import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.Primary400
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.shimmerIf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,7 @@ fun LivetalkChatInputBar(
             enabled = isVerified,
             modifier =
                 Modifier
+                    .shimmerIf(stadiumName == null)
                     .weight(1f)
                     .defaultMinSize(minHeight = 40.dp),
             textStyle = PretendardRegular16,
@@ -140,6 +142,7 @@ fun LivetalkChatInputBar(
         Box(
             modifier =
                 Modifier
+                    .shimmerIf(stadiumName == null)
                     .size(40.dp)
                     .align(Alignment.Bottom)
                     .clip(RoundedCornerShape(12.dp))
@@ -152,12 +155,22 @@ fun LivetalkChatInputBar(
         ) {
             Icon(
                 painter = painterResource(id = sendIconResource),
-                contentDescription = if (isVerified) "전송" else "잠김",
+                contentDescription =
+                    when (isVerified) {
+                        true -> stringResource(id = R.string.livetalk_send_btn_description)
+                        false -> stringResource(id = R.string.livetalk_send_btn_locked_description)
+                    },
                 tint = White,
                 modifier = Modifier.size(24.dp),
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun LivetalkChatInputBarPreviewShimmerInput() {
+    LivetalkChatInputBar("", null, isVerified = true, onTextChange = {}, onSendMessage = {})
 }
 
 @Preview
