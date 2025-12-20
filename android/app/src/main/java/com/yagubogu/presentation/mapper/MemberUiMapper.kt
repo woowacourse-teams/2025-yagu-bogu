@@ -13,15 +13,22 @@ import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.common.model.MemberProfile
 import kotlinx.datetime.toJavaLocalDate
+import java.time.Clock
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
-fun MemberInfoResponse.toUiModel(): MemberInfoItem =
-    MemberInfoItem(
+fun MemberInfoResponse.toUiModel(clock: Clock): MemberInfoItem {
+    val createdDate = LocalDate.parse(createdAt)
+    val period = ChronoUnit.DAYS.between(createdDate, LocalDate.now(clock)).toInt() + 1
+
+    return MemberInfoItem(
         nickName = nickname,
-        createdAt = LocalDate.parse(createdAt),
+        createdAt = createdDate,
+        memberPeriod = period,
         favoriteTeam = favoriteTeam,
         profileImageUrl = profileImageUrl,
     )
+}
 
 fun RepresentativeBadgeDto.toUiModel(): BadgeUiModel =
     BadgeUiModel(

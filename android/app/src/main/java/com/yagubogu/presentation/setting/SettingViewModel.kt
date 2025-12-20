@@ -14,6 +14,7 @@ import com.yagubogu.presentation.util.livedata.SingleLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +22,7 @@ class SettingViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
@@ -121,7 +123,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
-                .map { it.toUiModel() }
+                .map { it.toUiModel(clock) }
                 .onSuccess { memberInfoItem: MemberInfoItem ->
                     _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->
