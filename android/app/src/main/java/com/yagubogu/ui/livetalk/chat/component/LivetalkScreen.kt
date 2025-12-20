@@ -22,6 +22,15 @@ fun LivetalkChatScreen(
 ) {
     Scaffold(
         topBar = { LivetalkChatToolbar(onBackClick = onBackClick, stadiumName, matchText) },
+        bottomBar = {
+            LivetalkChatInputBar(
+                messageFormText = "임시 텍스트인 것이다",
+                stadiumName = stadiumName,
+                isVerified = true,
+                onTextChange = {},
+                onSendMessage = {},
+            )
+        },
         containerColor = Gray050,
         modifier = modifier.background(Gray300),
     ) { innerPadding: PaddingValues ->

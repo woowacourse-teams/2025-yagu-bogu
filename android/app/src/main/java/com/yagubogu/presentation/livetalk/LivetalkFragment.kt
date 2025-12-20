@@ -14,6 +14,7 @@ import com.yagubogu.presentation.livetalk.stadium.LivetalkStadiumViewHolder
 import com.yagubogu.presentation.util.ScrollToTop
 import com.yagubogu.ui.livetalk.chat.LivetalkChatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity as LivetalkChatDeprecatedActivity
 
 @Suppress("ktlint:standard:backing-property-naming")
 @AndroidEntryPoint
@@ -29,13 +30,12 @@ class LivetalkFragment :
         LivetalkStadiumAdapter(
             object : LivetalkStadiumViewHolder.Handler {
                 override fun onItemClick(item: LivetalkStadiumItem) {
-//                    val intent =
-//                        LivetalkChatActivity.newIntent(
-//                            requireContext(),
-//                            item.gameId,
-//                            item.isVerified,
-//                        )
-//                    startActivity(intent)
+                    val intentDeprecated =
+                        LivetalkChatDeprecatedActivity.newIntent(
+                            requireContext(),
+                            item.gameId,
+                            item.isVerified,
+                        )
 
                     val intent = LivetalkChatActivity.newIntent(requireContext())
                     startActivity(intent)
