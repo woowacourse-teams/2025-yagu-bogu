@@ -2,7 +2,6 @@ package com.yagubogu.ui.attendance.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +43,6 @@ import com.yagubogu.R
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
-import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
@@ -102,12 +100,7 @@ private fun AttendanceListContent(
     }
 
     Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(Gray050)
-                .padding(horizontal = 20.dp)
-                .padding(top = 8.dp),
+        modifier = modifier.fillMaxSize(),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -175,10 +168,7 @@ private fun AttendanceListContent(
 @Composable
 private fun EmptyAttendanceListContent(modifier: Modifier = Modifier) {
     Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(Gray050),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -205,7 +195,7 @@ private fun AttendanceHistoryFilterDropdown(
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    Box {
+    Box(modifier = modifier) {
         Row(
             modifier = Modifier.noRippleClickable { isExpanded = !isExpanded },
             verticalAlignment = Alignment.CenterVertically,
@@ -302,7 +292,7 @@ private fun AttendanceHistorySortSwitch(
     }
 }
 
-@Preview("직관내역 리스트 화면")
+@Preview("직관내역 리스트 화면", showBackground = true)
 @Composable
 private fun AttendanceListContentPreview() {
     AttendanceListContent(
@@ -311,7 +301,7 @@ private fun AttendanceListContentPreview() {
     )
 }
 
-@Preview("빈 직관내역 리스트 화면")
+@Preview("빈 직관내역 리스트 화면", showBackground = true)
 @Composable
 private fun EmptyAttendanceListContentPreview() {
     EmptyAttendanceListContent()
