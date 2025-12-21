@@ -301,7 +301,7 @@ private fun AttendanceHistorySortSwitch(
     }
 }
 
-@Preview("직관내역 리스트 화면", showBackground = true)
+@Preview("리스트 화면", showBackground = true)
 @Composable
 private fun AttendanceListContentPreview() {
     AttendanceListContent(
@@ -310,7 +310,7 @@ private fun AttendanceListContentPreview() {
     )
 }
 
-@Preview("빈 직관내역 리스트 화면", showBackground = true)
+@Preview("빈 리스트 화면", showBackground = true)
 @Composable
 private fun EmptyAttendanceListContentPreview() {
     EmptyAttendanceListContent()

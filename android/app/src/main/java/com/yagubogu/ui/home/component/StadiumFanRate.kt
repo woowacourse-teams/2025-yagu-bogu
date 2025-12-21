@@ -133,7 +133,7 @@ fun StadiumFanRate(
             modifier =
                 Modifier
                     .padding(top = 20.dp)
-                    .noRippleClickable(onClick)
+                    .noRippleClickable(onClick =onClick)
                     .animateContentSize(),
         ) {
             val items: List<StadiumFanRateItem> = uiModel.stadiumFanRates

@@ -38,6 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
+import com.yagubogu.ui.attendance.component.AttendanceCalendarScreen
 import com.yagubogu.ui.attendance.component.AttendanceListScreen
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
@@ -63,6 +64,9 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
+    var viewType: AttendanceHistoryViewType by rememberSaveable {
+        mutableStateOf(AttendanceHistoryViewType.CALENDAR)
+    }
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -72,6 +76,8 @@ fun AttendanceHistoryScreen(
     BackPressHandler(snackbarHostState, coroutineScope)
 
     AttendanceHistoryScreen(
+        viewType = viewType,
+        onViewTypeChange = { viewType = viewType.toggle() },
         items = attendanceItems,
         updateItems = { filter: AttendanceHistoryFilter, sort: AttendanceHistorySort ->
             viewModel.fetchAttendanceHistoryItems(filter, sort)
@@ -83,15 +89,13 @@ fun AttendanceHistoryScreen(
 
 @Composable
 private fun AttendanceHistoryScreen(
+    viewType: AttendanceHistoryViewType,
+    onViewTypeChange: () -> Unit,
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var type: AttendanceHistoryViewType by rememberSaveable {
-        mutableStateOf(AttendanceHistoryViewType.CALENDAR)
-    }
-
     Column(
         modifier =
             modifier
@@ -101,23 +105,33 @@ private fun AttendanceHistoryScreen(
     ) {
         AttendanceHistoryHeader(
             currentMonth = YearMonth.now(),
-            type = type,
-            onToggleSwitch = { type = type.toggle() },
+            viewType = viewType,
+            onViewTypeChange = onViewTypeChange,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        AttendanceListScreen(
-            items = items,
-            updateItems = updateItems,
-            scrollToTopEvent = scrollToTopEvent,
-        )
+
+        when (viewType) {
+            AttendanceHistoryViewType.CALENDAR ->
+                AttendanceCalendarScreen(
+                    items = items,
+                    currentMonth = YearMonth.now(),
+                )
+
+            AttendanceHistoryViewType.LIST ->
+                AttendanceListScreen(
+                    items = items,
+                    updateItems = updateItems,
+                    scrollToTopEvent = scrollToTopEvent,
+                )
+        }
     }
 }
 
 @Composable
 private fun AttendanceHistoryHeader(
     currentMonth: YearMonth,
-    type: AttendanceHistoryViewType,
-    onToggleSwitch: () -> Unit,
+    viewType: AttendanceHistoryViewType,
+    onViewTypeChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -148,22 +162,22 @@ private fun AttendanceHistoryHeader(
             )
         }
         AttendanceViewToggle(
-            type = type,
-            onToggle = onToggleSwitch,
+            viewType = viewType,
+            onChange = onViewTypeChange,
         )
     }
 }
 
 @Composable
 private fun AttendanceViewToggle(
-    type: AttendanceHistoryViewType,
-    onToggle: () -> Unit,
+    viewType: AttendanceHistoryViewType,
+    onChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // -1f: 왼쪽 끝, 1f: 오른쪽 끝
     val alignBias: Float by animateFloatAsState(
         targetValue =
-            when (type) {
+            when (viewType) {
                 AttendanceHistoryViewType.CALENDAR -> -1f
                 AttendanceHistoryViewType.LIST -> 1f
             },
@@ -177,7 +191,7 @@ private fun AttendanceViewToggle(
                 .width(intrinsicSize = IntrinsicSize.Min)
                 .background(color = White, shape = CircleShape)
                 .border(width = 1.dp, color = Gray200, shape = CircleShape)
-                .noRippleClickable(onClick = onToggle)
+                .noRippleClickable(onClick = onChange)
                 .padding(4.dp),
     ) {
         Box(
@@ -199,24 +213,37 @@ private fun AttendanceViewToggle(
             Icon(
                 painter = painterResource(R.drawable.ic_calendar),
                 contentDescription = null,
-                tint = if (type == AttendanceHistoryViewType.CALENDAR) White else Gray500,
+                tint = if (viewType == AttendanceHistoryViewType.CALENDAR) White else Gray500,
                 modifier = Modifier.size(16.dp),
             )
             Spacer(modifier = Modifier.width(12.dp))
             Icon(
                 painter = painterResource(R.drawable.ic_list),
                 contentDescription = null,
-                tint = if (type == AttendanceHistoryViewType.LIST) White else Gray500,
+                tint = if (viewType == AttendanceHistoryViewType.LIST) White else Gray500,
                 modifier = Modifier.size(16.dp),
             )
         }
     }
 }
 
-@Preview
+@Preview("캘린더 화면")
 @Composable
-private fun AttendanceHistoryScreenPreview() {
+private fun AttendanceCalenderScreenPreview() {
     AttendanceHistoryScreen(
+        viewType = AttendanceHistoryViewType.CALENDAR,
+        onViewTypeChange = {},
+        items = ATTENDANCE_HISTORY_ITEMS,
+        updateItems = { _, _ -> },
+    )
+}
+
+@Preview("리스트 화면")
+@Composable
+private fun AttendanceListScreenPreview() {
+    AttendanceHistoryScreen(
+        viewType = AttendanceHistoryViewType.LIST,
+        onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
         updateItems = { _, _ -> },
     )

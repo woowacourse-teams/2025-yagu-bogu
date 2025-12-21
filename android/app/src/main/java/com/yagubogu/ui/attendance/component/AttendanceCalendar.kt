@@ -1,7 +1,6 @@
 package com.yagubogu.ui.attendance.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,12 +31,14 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
+import com.yagubogu.ui.util.noRippleClickable
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -47,12 +48,15 @@ import java.util.Locale
 @Composable
 fun AttendanceCalendar(
     currentMonth: YearMonth,
+    items: List<AttendanceHistoryItem>,
     modifier: Modifier = Modifier,
 ) {
     val startMonth: YearMonth = remember { YearMonth.of(2025, 3) }
     val endMonth: YearMonth = remember { YearMonth.now().plusMonths(12) }
     val daysOfWeek: List<DayOfWeek> = daysOfWeek()
     var selectedDate: LocalDate by remember { mutableStateOf(LocalDate.now()) }
+    val attendanceDates: Set<LocalDate> =
+        remember(items) { items.map { it.summary.attendanceDate } }.toSet()
 
     val state: CalendarState =
         rememberCalendarState(
@@ -76,7 +80,7 @@ fun AttendanceCalendar(
                 Day(
                     day = day,
                     isSelected = selectedDate == day.date,
-                    hasAttendance = true,
+                    hasAttendance = day.date in attendanceDates,
                     onClick = { day: CalendarDay ->
                         selectedDate = day.date
                     },
@@ -115,8 +119,8 @@ private fun Day(
         modifier =
             modifier
                 .aspectRatio(0.8f)
-                .clickable(
-                    enabled = day.position == DayPosition.MonthDate,
+                .noRippleClickable(
+                    enabled = day.position == DayPosition.MonthDate && !day.date.isAfter(LocalDate.now()),
                     onClick = { onClick(day) },
                 ),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -125,12 +129,11 @@ private fun Day(
             text = day.date.dayOfMonth.toString(),
             style = PretendardRegular.copy(fontSize = 16.dpToSp),
             color =
-                if (isSelected) {
-                    White
-                } else if (day.position == DayPosition.MonthDate) {
-                    Black
-                } else {
-                    Gray400
+                when {
+                    isSelected -> White
+                    day.position != DayPosition.MonthDate -> Gray400
+                    day.date.isAfter(LocalDate.now()) -> Gray400
+                    else -> Black
                 },
             textAlign = TextAlign.Center,
             modifier =
@@ -144,7 +147,7 @@ private fun Day(
         )
 
         if (hasAttendance) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Spacer(
                 modifier =
                     Modifier
@@ -158,5 +161,8 @@ private fun Day(
 @Preview
 @Composable
 private fun AttendanceCalendarPreview() {
-    AttendanceCalendar(currentMonth = YearMonth.now())
+    AttendanceCalendar(
+        currentMonth = YearMonth.now(),
+        items = ATTENDANCE_HISTORY_ITEMS,
+    )
 }

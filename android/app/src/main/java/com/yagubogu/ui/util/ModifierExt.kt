@@ -22,14 +22,17 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier =
+fun Modifier.noRippleClickable(
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+): Modifier =
     composed {
         clickable(
             indication = null,
             interactionSource = remember { MutableInteractionSource() },
-        ) {
-            onClick()
-        }
+            enabled = enabled,
+            onClick = onClick,
+        )
     }
 
 fun Modifier.crop(
