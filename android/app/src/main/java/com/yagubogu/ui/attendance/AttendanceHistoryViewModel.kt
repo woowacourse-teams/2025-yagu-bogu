@@ -24,60 +24,20 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
-    private val _detailItemPosition = MutableStateFlow<Int?>(null)
-    val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
-
-    private val _attendanceFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
-    val attendanceFilter: StateFlow<AttendanceHistoryFilter> = _attendanceFilter.asStateFlow()
-
-    private val _attendanceSort = MutableStateFlow(AttendanceHistorySort.LATEST)
-    val attendanceSort: StateFlow<AttendanceHistorySort> = _attendanceSort.asStateFlow()
-
-    fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
+    fun fetchAttendanceHistoryItems(
+        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
+        sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
+        year: Int = LocalDate.now().year,
+    ) {
         viewModelScope.launch {
-            val filter: AttendanceHistoryFilter = attendanceFilter.value
-            val sort: AttendanceHistorySort = attendanceSort.value
             checkInRepository
                 .getCheckInHistories(year, filter.name, sort.name)
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
-                    _detailItemPosition.value =
-                        if (attendanceItems.isNotEmpty()) FIRST_INDEX else null
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
-    }
-
-    fun updateAttendanceFilter(filter: AttendanceHistoryFilter) {
-        if (attendanceFilter.value != filter) {
-            _attendanceFilter.value = filter
-            fetchAttendanceHistoryItems()
-        }
-    }
-
-    fun switchAttendanceSort() {
-        _attendanceSort.value =
-            when (attendanceSort.value) {
-                AttendanceHistorySort.LATEST -> AttendanceHistorySort.OLDEST
-                AttendanceHistorySort.OLDEST -> AttendanceHistorySort.LATEST
-            }
-        fetchAttendanceHistoryItems()
-    }
-
-    fun onItemClick(item: AttendanceHistoryItem) {
-        val position: Int = items.value.indexOf(item)
-        if (position < FIRST_INDEX) return
-
-        if (position == detailItemPosition.value) {
-            _detailItemPosition.value = null
-        } else {
-            _detailItemPosition.value = position
-        }
-    }
-
-    companion object {
-        private const val FIRST_INDEX = 0
     }
 }
