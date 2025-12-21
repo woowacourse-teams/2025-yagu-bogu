@@ -90,11 +90,9 @@ fun Modifier.shimmerLoading(): Modifier =
         }
     }
 
-
-fun Modifier.shimmerIf(condition: Boolean): Modifier {
-    return if (condition) {
+fun Modifier.shimmerIf(condition: Boolean): Modifier =
+    if (condition) {
         this.shimmerLoading()
     } else {
         this
     }
-}

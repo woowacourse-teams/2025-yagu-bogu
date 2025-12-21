@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.yagubogu.domain.model.Team
+import com.yagubogu.presentation.livetalk.chat.LivetalkChatBubbleItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 
@@ -29,6 +30,7 @@ fun LivetalkChatScreen(
     onBackClick: () -> Unit,
     stadiumName: String?,
     myTeam: Team?,
+    chatItems: List<LivetalkChatBubbleItem>,
     matchText: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -59,6 +61,12 @@ fun LivetalkChatScreen(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth(),
             ) {
+                // 채팅 버블
+                LivetalkChatBubbleList(
+                    chatItems = chatItems,
+                    modifier = Modifier.weight(1f),
+                )
+
                 // 구분선
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
@@ -87,6 +95,7 @@ private fun LivetalkChatMyTeamScreenPreview() {
     LivetalkChatScreen(
         onBackClick = {},
         myTeam = Team.WO,
+        chatItems = fixtureItems,
         stadiumName = "고척 스카이돔",
         matchText = "두산 vs 키움",
     )
@@ -98,6 +107,7 @@ private fun LivetalkChatOtherTeamScreenPreview() {
     LivetalkChatScreen(
         onBackClick = {},
         myTeam = null,
+        chatItems = fixtureItems,
         stadiumName = "고척 스카이돔",
         matchText = "두산 vs 키움",
     )
@@ -109,6 +119,7 @@ private fun LivetalkChatLoadingScreenPreview() {
     LivetalkChatScreen(
         onBackClick = {},
         myTeam = null,
+        chatItems = emptyList(),
         stadiumName = null,
         matchText = null,
     )

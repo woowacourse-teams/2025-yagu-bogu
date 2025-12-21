@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatScreen
+import com.yagubogu.ui.livetalk.chat.component.fixtureItems
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,6 +26,7 @@ class LivetalkChatActivity : ComponentActivity() {
                 LivetalkChatScreen(
                     onBackClick = { finish() },
                     myTeam = Team.WO,
+                    chatItems = fixtureItems,
                     stadiumName = "고척 스카이돔",
                     matchText = "두산 vs 키움",
                 )
