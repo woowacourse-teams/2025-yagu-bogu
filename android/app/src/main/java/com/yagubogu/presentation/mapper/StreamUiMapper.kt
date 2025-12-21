@@ -1,7 +1,7 @@
 package com.yagubogu.presentation.mapper
 
 import com.yagubogu.data.dto.response.stream.SseCheckInResponse
-import com.yagubogu.presentation.home.model.CheckInSseEvent
+import com.yagubogu.ui.home.model.CheckInSseEvent
 
 fun SseCheckInResponse.toUiModel(): CheckInSseEvent =
     when (this) {

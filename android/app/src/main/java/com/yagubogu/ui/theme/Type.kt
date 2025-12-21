@@ -1,8 +1,15 @@
 package com.yagubogu.ui.theme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+
+val Int.dsp
+    @Composable
+    get() = with(LocalDensity.current) { Dp(toFloat()).toSp() }
 
 val PretendardRegular =
     TextStyle(
@@ -46,3 +53,9 @@ val EsamanruMedium =
 
 val EsamanruMedium12 = EsamanruMedium.copy(fontSize = 12.sp)
 val EsamanruMedium20 = EsamanruMedium.copy(fontSize = 20.sp)
+
+val EsamanruBold =
+    TextStyle(
+        fontFamily = EsamanruFontFamily,
+        fontWeight = FontWeight.Bold,
+    )

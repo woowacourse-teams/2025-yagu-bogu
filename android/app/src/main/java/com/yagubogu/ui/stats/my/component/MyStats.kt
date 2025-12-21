@@ -69,7 +69,7 @@ fun MyStats(
                     modifier =
                         Modifier
                             .noRippleClickable {
-                                balloonWindow.showAlignBottom(yOff = -60)
+                                balloonWindow.showAlignBottom(yOff = -10)
                                 Firebase.analytics.logEvent("tooltip_lucky_stadium", null)
                             },
                 )
