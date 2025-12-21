@@ -17,7 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,14 +30,16 @@ import com.yagubogu.R
 import com.yagubogu.domain.model.Team
 import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.ui.theme.PretendardMedium16
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatCheeringBar(
+    modifier: Modifier = Modifier,
     team: Team,
     cheeringCount: Long,
     onCheeringClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    onPositioned: (Offset) -> Unit = {},
 ) {
     Row(
         modifier =
@@ -74,7 +79,16 @@ fun LivetalkChatCheeringBar(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = onCheeringClick,
-                        ),
+                        ).onGloballyPositioned { coordinates ->
+                            val posInRoot = coordinates.positionInRoot()
+                            val centerPos =
+                                Offset(
+                                    x = posInRoot.x + coordinates.size.width / 2f,
+                                    y = posInRoot.y + coordinates.size.height / 2f,
+                                )
+                            Timber.d("응원 버튼 이모지 중앙 좌표 : $centerPos")
+                            onPositioned(centerPos)
+                        },
             )
         }
     }
@@ -83,5 +97,10 @@ fun LivetalkChatCheeringBar(
 @Preview
 @Composable
 private fun LivetalkChatCheeringBarPreviewEmptyInput() {
-    LivetalkChatCheeringBar(Team.HH, 12345L, {})
+    LivetalkChatCheeringBar(
+        team = Team.HH,
+        cheeringCount = 12345L,
+        onCheeringClick = {},
+        onPositioned = {},
+    )
 }
