@@ -97,7 +97,6 @@ private fun AttendanceHistoryScreen(
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(horizontal = 20.dp)
                 .padding(top = 8.dp),
     ) {
         AttendanceHistoryHeader(
@@ -122,7 +121,10 @@ private fun AttendanceHistoryHeader(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

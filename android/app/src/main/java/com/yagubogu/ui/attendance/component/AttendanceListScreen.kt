@@ -103,7 +103,10 @@ private fun AttendanceListContent(
         modifier = modifier.fillMaxSize(),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -136,8 +139,15 @@ private fun AttendanceListContent(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(top = 12.dp),
+                    .padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding =
+                PaddingValues(
+                    top = 4.dp,
+                    start = 20.dp,
+                    end = 20.dp,
+                    bottom = 20.dp,
+                ),
         ) {
             items(
                 count = items.size,
@@ -160,7 +170,6 @@ private fun AttendanceListContent(
                     },
                 )
             }
-            item { Spacer(modifier = Modifier.height(4.dp)) }
         }
     }
 }
