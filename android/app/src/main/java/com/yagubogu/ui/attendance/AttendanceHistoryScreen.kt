@@ -137,6 +137,7 @@ private fun AttendanceHistoryScreen(
                     endMonth = endMonth,
                     currentMonth = currentMonth,
                     onMonthChange = onMonthChange,
+                    scrollToTopEvent = scrollToTopEvent,
                 )
 
             AttendanceHistoryViewType.LIST ->
