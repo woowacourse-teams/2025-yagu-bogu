@@ -30,6 +30,7 @@ import com.yagubogu.team.domain.QTeam;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.domain.TeamStatus;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
@@ -237,7 +238,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     public List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
-            int year,
+            YearMonth yearMonth,
             final CheckInResultFilter resultFilter,
             final CheckInOrderFilter orderFilter
     ) {
@@ -266,7 +267,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .leftJoin(GAME.awayScoreBoard, awayScoreBoard)
                 .where(
                         CHECK_IN.member.eq(member),
-                        isBetweenYear(GAME, year),
+                        isBetweenYearMonth(GAME, yearMonth),
                         isCompleteOrCanceled(),
                         myTeamWinFilter
                 ).orderBy(order)
@@ -619,9 +620,16 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return checkIn.team.eq(member.getTeam());
     }
 
-    private BooleanExpression isBetweenYear(QGame game, final int year) {
+    private BooleanExpression isBetweenYear(final QGame game, final int year) {
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
+
+        return game.date.between(start, end);
+    }
+
+    private BooleanExpression isBetweenYearMonth(final QGame game, final YearMonth yearMonth) {
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
 
         return game.date.between(start, end);
     }

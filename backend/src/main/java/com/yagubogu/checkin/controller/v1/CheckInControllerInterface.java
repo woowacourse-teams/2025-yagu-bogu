@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +57,7 @@ public interface CheckInControllerInterface {
     @GetMapping("/members")
     ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year,
+            @RequestParam YearMonth yearMonth,
             @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
     );

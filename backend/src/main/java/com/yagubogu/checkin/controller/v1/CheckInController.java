@@ -12,6 +12,7 @@ import com.yagubogu.checkin.dto.v1.FanRateResponse;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
 import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,13 +48,13 @@ public class CheckInController implements CheckInControllerInterface {
     @Override
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             final MemberClaims memberClaims,
-            @RequestParam final int year,
+            @RequestParam final YearMonth yearMonth,
             @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") final CheckInOrderFilter orderFilter
     ) {
         CheckInHistoryResponse response = checkInService.findCheckInHistory(
                 memberClaims.id(),
-                year,
+                yearMonth,
                 resultFilter,
                 orderFilter
         );
