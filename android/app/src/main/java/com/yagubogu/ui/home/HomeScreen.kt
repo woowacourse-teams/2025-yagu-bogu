@@ -52,6 +52,7 @@ import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.util.BackPressHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
@@ -72,7 +73,6 @@ fun HomeScreen(
     val context: Context = LocalContext.current
     val activity: Activity = LocalActivity.current ?: return
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
-    val scrollState: ScrollState = rememberScrollState()
 
     val locationPermissionManager: LocationPermissionManager =
         remember { LocationPermissionManager(activity) }
@@ -97,20 +97,17 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchAll()
-        scrollToTopEvent.collect {
-            scrollState.animateScrollTo(0)
-        }
-    }
 
-    LaunchedEffect(Unit) {
-        viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
-            snackbarHostState.showSnackbar(event.toMessage(context))
+        launch {
+            viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
+                snackbarHostState.showSnackbar(event.toMessage(context))
+            }
         }
-    }
 
-    LaunchedEffect(Unit) {
-        viewModel.isCheckInLoading.collect { isLoading: Boolean ->
-            onLoading(isLoading)
+        launch {
+            viewModel.isCheckInLoading.collect { isLoading: Boolean ->
+                onLoading(isLoading)
+            }
         }
     }
 
@@ -143,7 +140,7 @@ fun HomeScreen(
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
         modifier = modifier,
-        scrollState = scrollState,
+        scrollToTopEvent = scrollToTopEvent,
     )
 
     HomeDialog(viewModel)
@@ -171,8 +168,16 @@ private fun HomeScreen(
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     Column(
         modifier =
             modifier

@@ -52,7 +52,6 @@ fun LivetalkScreen(
     val livetalkStadiumItems: List<LivetalkStadiumItem> by viewModel.stadiumItems.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
-    val lazyListState: LazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchGames()
