@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +48,13 @@ import java.util.Locale
 
 @Composable
 fun AttendanceCalendar(
+    startMonth: YearMonth,
+    endMonth: YearMonth,
     currentMonth: YearMonth,
+    onMonthChange: (YearMonth) -> Unit,
     items: List<AttendanceHistoryItem>,
     modifier: Modifier = Modifier,
 ) {
-    val startMonth: YearMonth = remember { YearMonth.of(2025, 3) }
-    val endMonth: YearMonth = remember { YearMonth.now().plusMonths(12) }
     val daysOfWeek: List<DayOfWeek> = daysOfWeek()
     var selectedDate: LocalDate by remember { mutableStateOf(LocalDate.now()) }
     val attendanceDates: Set<LocalDate> =
@@ -65,6 +67,18 @@ fun AttendanceCalendar(
             firstVisibleMonth = currentMonth,
             firstDayOfWeek = daysOfWeek.first(),
         )
+
+    LaunchedEffect(currentMonth) {
+        if (state.firstVisibleMonth.yearMonth != currentMonth) {
+            state.animateScrollToMonth(currentMonth)
+        }
+    }
+
+    LaunchedEffect(state.firstVisibleMonth) {
+        if (state.firstVisibleMonth.yearMonth != currentMonth) {
+            onMonthChange(state.firstVisibleMonth.yearMonth)
+        }
+    }
 
     Column(
         modifier =
@@ -162,7 +176,10 @@ private fun Day(
 @Composable
 private fun AttendanceCalendarPreview() {
     AttendanceCalendar(
+        startMonth = YearMonth.now().minusMonths(1),
+        endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
+        onMonthChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
     )
 }

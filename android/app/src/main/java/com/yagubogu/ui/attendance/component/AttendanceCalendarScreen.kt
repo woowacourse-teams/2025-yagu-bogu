@@ -13,7 +13,10 @@ import java.time.YearMonth
 @Composable
 fun AttendanceCalendarScreen(
     items: List<AttendanceHistoryItem>,
+    startMonth: YearMonth,
+    endMonth: YearMonth,
     currentMonth: YearMonth,
+    onMonthChange: (YearMonth) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -23,7 +26,10 @@ fun AttendanceCalendarScreen(
                 .padding(horizontal = 20.dp),
     ) {
         AttendanceCalendar(
+            startMonth = startMonth,
+            endMonth = endMonth,
             currentMonth = currentMonth,
+            onMonthChange = onMonthChange,
             items = items,
         )
     }
@@ -34,6 +40,9 @@ fun AttendanceCalendarScreen(
 private fun AttendanceCalendarScreenPreview() {
     AttendanceCalendarScreen(
         items = ATTENDANCE_HISTORY_ITEMS,
+        startMonth = YearMonth.now().minusMonths(1),
+        endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
+        onMonthChange = {},
     )
 }

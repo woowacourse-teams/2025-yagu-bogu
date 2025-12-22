@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,13 +25,13 @@ class AttendanceHistoryViewModel @Inject constructor(
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
     fun fetchAttendanceHistoryItems(
+        yearMonth: YearMonth = YearMonth.now(),
         filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
         sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
-        year: Int = LocalDate.now().year,
     ) {
         viewModelScope.launch {
             checkInRepository
-                .getCheckInHistories(year, filter.name, sort.name)
+                .getCheckInHistories(yearMonth.year, filter.name, sort.name)
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
