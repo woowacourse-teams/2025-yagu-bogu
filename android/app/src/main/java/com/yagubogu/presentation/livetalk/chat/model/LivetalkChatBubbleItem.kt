@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.presentation.livetalk.chat.model
 
 sealed class LivetalkChatBubbleItem {
     abstract val livetalkChatItem: LivetalkChatItem
