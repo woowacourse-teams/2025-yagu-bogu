@@ -40,8 +40,8 @@ import com.yagubogu.ui.util.noRippleClickable
 fun AttendanceItem(
     item: AttendanceHistoryItem,
     isExpanded: Boolean,
-    onItemClick: (AttendanceHistoryItem) -> Unit,
     modifier: Modifier = Modifier,
+    onItemClick: (AttendanceHistoryItem) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -187,7 +187,6 @@ private fun AttendanceItemPlayedPreview() {
     AttendanceItem(
         item = ATTENDANCE_HISTORY_ITEM_PLAYED,
         isExpanded = true,
-        onItemClick = {},
     )
 }
 
@@ -197,6 +196,5 @@ private fun AttendanceItemCanceledPreview() {
     AttendanceItem(
         item = ATTENDANCE_HISTORY_ITEM_CANCELED,
         isExpanded = false,
-        onItemClick = {},
     )
 }

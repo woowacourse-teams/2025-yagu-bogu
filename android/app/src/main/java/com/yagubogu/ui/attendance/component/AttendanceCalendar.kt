@@ -52,13 +52,12 @@ fun AttendanceCalendar(
     endMonth: YearMonth,
     currentMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
-    items: List<AttendanceHistoryItem>,
+    currentDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
+    attendanceDates: Set<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
     val daysOfWeek: List<DayOfWeek> = daysOfWeek()
-    var selectedDate: LocalDate by remember { mutableStateOf(LocalDate.now()) }
-    val attendanceDates: Set<LocalDate> =
-        remember(items) { items.map { it.summary.attendanceDate } }.toSet()
 
     val state: CalendarState =
         rememberCalendarState(
@@ -93,11 +92,9 @@ fun AttendanceCalendar(
             dayContent = { day: CalendarDay ->
                 Day(
                     day = day,
-                    isSelected = selectedDate == day.date,
+                    isSelected = currentDate == day.date,
                     hasAttendance = day.date in attendanceDates,
-                    onClick = { day: CalendarDay ->
-                        selectedDate = day.date
-                    },
+                    onClick = { day: CalendarDay -> onDateChange(day.date) },
                 )
             },
         )
@@ -180,6 +177,8 @@ private fun AttendanceCalendarPreview() {
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onMonthChange = {},
-        items = ATTENDANCE_HISTORY_ITEMS,
+        currentDate = LocalDate.now(),
+        onDateChange = {},
+        attendanceDates = ATTENDANCE_HISTORY_ITEMS.map { it.summary.attendanceDate }.toSet(),
     )
 }
