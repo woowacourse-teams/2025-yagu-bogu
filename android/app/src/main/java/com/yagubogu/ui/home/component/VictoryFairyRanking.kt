@@ -44,7 +44,7 @@ import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.Silver
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.rememberBalloonBuilder
 
@@ -140,7 +140,7 @@ private fun VictoryFairyRankingItem(
     ) {
         Text(
             text = item.rank.toString(),
-            style = PretendardRegular.copy(fontSize = 16.dsp, color = Gray500),
+            style = PretendardRegular.copy(fontSize = 16.dpToSp, color = Gray500),
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp),
         )

@@ -84,24 +84,6 @@ class HomeViewModel @Inject constructor(
 
     private var stadiums: StadiumsWithGames? = null
 
-    private val _scrollToTopEvent =
-        MutableSharedFlow<Unit>(
-            replay = 0,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
-    val scrollToTopEvent: SharedFlow<Unit> = _scrollToTopEvent.asSharedFlow()
-
-    init {
-        fetchAll()
-    }
-
-    fun scrollToTop() {
-        viewModelScope.launch {
-            _scrollToTopEvent.emit(Unit)
-        }
-    }
-
     fun fetchAll() {
         fetchMemberStats()
         fetchStadiumStats()

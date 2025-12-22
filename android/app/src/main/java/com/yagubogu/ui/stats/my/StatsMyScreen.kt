@@ -20,27 +20,27 @@ import com.yagubogu.ui.stats.my.component.WinRates
 import com.yagubogu.ui.stats.my.model.AverageStats
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.theme.Gray050
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsMyScreen(
     viewModel: StatsMyViewModel,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
 ) {
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
     val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
-    val scrollState: ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
-            scrollState.animateScrollTo(0)
-        }
+        viewModel.fetchAll()
     }
 
     StatsMyScreen(
         statsMyUiModel = statsMyUiModel,
         averageStats = averageStats,
-        scrollState = scrollState,
         modifier = modifier,
+        scrollToTopEvent = scrollToTopEvent,
     )
 }
 
@@ -49,8 +49,16 @@ private fun StatsMyScreen(
     statsMyUiModel: StatsMyUiModel,
     averageStats: AverageStats,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =

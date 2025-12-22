@@ -1,7 +1,7 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.presentation.livetalk.chat.model
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.ui.util.emoji
 
 // 현장톡 최초 진입시 필요한 정보를 담은 객체
 class LivetalkTeams(
@@ -13,7 +13,7 @@ class LivetalkTeams(
     val homeTeam: Team = Team.getByCode(homeTeamCode)
     val awayTeam: Team = Team.getByCode(awayTeamCode)
     val myTeam: Team = Team.getByCode(myTeamCode)
-    val myTeamEmoji: String = myTeam.getEmoji()
+    val myTeamEmoji: String = myTeam.emoji
     val myTeamType: HomeAwayType? =
         when (myTeam) {
             homeTeam -> HomeAwayType.HOME
@@ -28,8 +28,8 @@ class LivetalkTeams(
         }
     val otherTeamEmoji: String =
         when (myTeamType) {
-            HomeAwayType.HOME -> awayTeam.getEmoji()
-            HomeAwayType.AWAY -> homeTeam.getEmoji()
+            HomeAwayType.HOME -> awayTeam.emoji
+            HomeAwayType.AWAY -> homeTeam.emoji
             null -> ""
         }
 }
