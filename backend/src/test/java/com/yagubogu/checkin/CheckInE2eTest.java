@@ -28,6 +28,7 @@ import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -205,7 +206,8 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        LocalDate date = LocalDate.of(2025, 7, 25);
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+        LocalDate date = yearMonth.atDay(25);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
@@ -230,7 +232,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
+                .queryParam("yearMonth", yearMonth.toString())
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.LATEST)
                 .when().get("/api/v1/check-ins/members")
@@ -245,7 +247,8 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        LocalDate date = LocalDate.of(2025, 7, 25);
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+        LocalDate date = yearMonth.atDay(25);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
@@ -270,7 +273,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
+                .queryParam("yearMonth", yearMonth.toString())
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/v1/check-ins/members")
@@ -285,7 +288,8 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        LocalDate date = LocalDate.of(2025, 7, 25);
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+        LocalDate date = yearMonth.atDay(25);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
@@ -310,7 +314,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
+                .queryParam("yearMonth", yearMonth.toString())
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.LATEST)
                 .when().get("/api/v1/check-ins/members")
@@ -325,7 +329,8 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        LocalDate date = LocalDate.of(2025, 7, 25);
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+        LocalDate date = yearMonth.atDay(25);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
@@ -350,7 +355,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("year", 2025)
+                .queryParam("yearMonth", yearMonth.toString())
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/v1/check-ins/members")
