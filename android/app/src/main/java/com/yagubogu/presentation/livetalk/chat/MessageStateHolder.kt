@@ -56,10 +56,9 @@ class MessageStateHolder(
         val beforeChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
-        val currentChats: List<LivetalkChatBubbleItem> =
-            liveTalkChatBubbleItems.value ?: emptyList()
-
         lock.withLock {
+            val currentChats: List<LivetalkChatBubbleItem> =
+                liveTalkChatBubbleItems.value ?: emptyList()
             _liveTalkChatBubbleItems.value = currentChats + beforeChats
 
             hasNext = response.cursor.hasNext
@@ -75,9 +74,9 @@ class MessageStateHolder(
 
         if (newChats.isEmpty()) return
 
-        val currentChats = _liveTalkChatBubbleItems.value ?: emptyList()
-
         lock.withLock {
+            val currentChats: List<LivetalkChatBubbleItem> =
+                _liveTalkChatBubbleItems.value ?: emptyList()
             _liveTalkChatBubbleItems.value = newChats + currentChats
 
             hasNext = response.cursor.hasNext
