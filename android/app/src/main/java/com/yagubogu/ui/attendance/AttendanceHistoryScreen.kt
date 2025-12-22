@@ -41,8 +41,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
-import com.yagubogu.ui.attendance.component.AttendanceCalendarScreen
-import com.yagubogu.ui.attendance.component.AttendanceListScreen
+import com.yagubogu.ui.attendance.component.AttendanceCalendarContent
+import com.yagubogu.ui.attendance.component.AttendanceListContent
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
@@ -131,7 +131,7 @@ private fun AttendanceHistoryScreen(
 
         when (viewType) {
             AttendanceHistoryViewType.CALENDAR ->
-                AttendanceCalendarScreen(
+                AttendanceCalendarContent(
                     items = items,
                     startMonth = startMonth,
                     endMonth = endMonth,
@@ -140,7 +140,7 @@ private fun AttendanceHistoryScreen(
                 )
 
             AttendanceHistoryViewType.LIST ->
-                AttendanceListScreen(
+                AttendanceListContent(
                     items = items,
                     updateItems = updateItems,
                     scrollToTopEvent = scrollToTopEvent,

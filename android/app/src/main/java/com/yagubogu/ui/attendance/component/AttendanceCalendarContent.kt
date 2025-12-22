@@ -11,7 +11,7 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import java.time.YearMonth
 
 @Composable
-fun AttendanceCalendarScreen(
+fun AttendanceCalendarContent(
     items: List<AttendanceHistoryItem>,
     startMonth: YearMonth,
     endMonth: YearMonth,
@@ -35,10 +35,10 @@ fun AttendanceCalendarScreen(
     }
 }
 
-@Preview("직관내역 캘린더 화면", showBackground = true)
+@Preview("캘린더 화면", showBackground = true)
 @Composable
-private fun AttendanceCalendarScreenPreview() {
-    AttendanceCalendarScreen(
+private fun AttendanceCalendarContentPreview() {
+    AttendanceCalendarContent(
         items = ATTENDANCE_HISTORY_ITEMS,
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),

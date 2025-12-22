@@ -57,7 +57,7 @@ import kotlinx.coroutines.flow.SharedFlow
 private const val FIRST_INDEX = 0
 
 @Composable
-fun AttendanceListScreen(
+fun AttendanceListContent(
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
@@ -65,19 +65,19 @@ fun AttendanceListScreen(
 ) {
     when (items.isNotEmpty()) {
         true ->
-            AttendanceListContent(
+            AttendanceList(
                 items = items,
                 updateItems = updateItems,
                 modifier = modifier,
                 scrollToTopEvent = scrollToTopEvent,
             )
 
-        false -> EmptyAttendanceListContent()
+        false -> EmptyAttendanceList()
     }
 }
 
 @Composable
-private fun AttendanceListContent(
+private fun AttendanceList(
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
@@ -175,7 +175,7 @@ private fun AttendanceListContent(
 }
 
 @Composable
-private fun EmptyAttendanceListContent(modifier: Modifier = Modifier) {
+private fun EmptyAttendanceList(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -303,8 +303,8 @@ private fun AttendanceHistorySortSwitch(
 
 @Preview("리스트 화면", showBackground = true)
 @Composable
-private fun AttendanceListContentPreview() {
-    AttendanceListContent(
+private fun AttendanceListPreview() {
+    AttendanceList(
         items = ATTENDANCE_HISTORY_ITEMS,
         updateItems = { _, _ -> },
     )
@@ -312,6 +312,6 @@ private fun AttendanceListContentPreview() {
 
 @Preview("빈 리스트 화면", showBackground = true)
 @Composable
-private fun EmptyAttendanceListContentPreview() {
-    EmptyAttendanceListContent()
+private fun EmptyAttendancePreview() {
+    EmptyAttendanceList()
 }
