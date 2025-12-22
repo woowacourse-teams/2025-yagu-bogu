@@ -1,4 +1,4 @@
-package com.yagubogu.ui.util
+package com.yagubogu.ui.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey

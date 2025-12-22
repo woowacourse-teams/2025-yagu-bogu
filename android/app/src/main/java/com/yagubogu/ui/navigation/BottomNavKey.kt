@@ -1,4 +1,4 @@
-package com.yagubogu.ui.main
+package com.yagubogu.ui.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

@@ -36,13 +36,14 @@ import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
+import com.yagubogu.ui.navigation.BottomNavKey
+import com.yagubogu.ui.navigation.NavigationState
+import com.yagubogu.ui.navigation.Navigator
+import com.yagubogu.ui.navigation.rememberNavigationState
+import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.NavigationState
-import com.yagubogu.ui.util.Navigator
-import com.yagubogu.ui.util.rememberNavigationState
-import com.yagubogu.ui.util.toEntries
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
