@@ -1,8 +1,6 @@
 package com.yagubogu.ui.stats
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -40,10 +38,9 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.BackPressHandler
+import com.yagubogu.ui.util.rememberNoRippleInteractionSource
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -115,14 +112,7 @@ private fun StatsTabRow(
                         pagerState.animateScrollToPage(index)
                     }
                 },
-                interactionSource =
-                    object : MutableInteractionSource { // Ripple 효과 제거 위함
-                        override suspend fun emit(interaction: Interaction) {}
-
-                        override fun tryEmit(interaction: Interaction): Boolean = true
-
-                        override val interactions: Flow<Interaction> = emptyFlow()
-                    },
+                interactionSource = rememberNoRippleInteractionSource(),
                 content = {
                     val style: TextStyle =
                         if (isSelected) {
