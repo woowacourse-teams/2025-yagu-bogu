@@ -2,7 +2,7 @@ package com.yagubogu.presentation.favorite
 
 import android.os.Parcelable
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
+import com.yagubogu.ui.util.emoji
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -12,7 +12,7 @@ data class FavoriteTeamItem(
 ) : Parcelable {
     companion object {
         fun of(team: Team): FavoriteTeamItem {
-            val emoji: String = team.getEmoji()
+            val emoji: String = team.emoji
             return FavoriteTeamItem(team, emoji)
         }
     }
