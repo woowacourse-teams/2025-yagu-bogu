@@ -123,6 +123,7 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
+    implementation(libs.balloon.compose)
     implementation(libs.ucrop)
 
     // firebase
@@ -148,6 +149,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // coil
     implementation(libs.coil.compose)

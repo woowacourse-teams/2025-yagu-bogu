@@ -1,7 +1,6 @@
 package com.yagubogu.ui.common.component.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -153,16 +151,11 @@ fun ProfileHeader(
                 Modifier
                     .size(100.dp)
                     .background(Gray050, CircleShape)
-                    .padding(10.dp)
-                    .clip(CircleShape),
+                    .padding(10.dp),
         ) {
-            AsyncImage(
-                model = memberProfile.profileImageUrl,
-                contentDescription = stringResource(R.string.profile_image_url_content_description),
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .border(1.dp, Gray300, CircleShape), // 검은색 테두리 추가
+            ProfileImage(
+                imageUrl = memberProfile.profileImageUrl,
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

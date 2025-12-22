@@ -5,8 +5,8 @@ import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
-import com.yagubogu.presentation.home.model.StadiumWithGame
-import com.yagubogu.presentation.home.model.StadiumsWithGames
+import com.yagubogu.ui.home.model.StadiumWithGame
+import com.yagubogu.ui.home.model.StadiumsWithGames
 
 fun StadiumsWithGamesResponse.toUiModel(): StadiumsWithGames = StadiumsWithGames(values = stadiums.map { it.toUiModel() })
 

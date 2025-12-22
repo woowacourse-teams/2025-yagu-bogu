@@ -15,7 +15,7 @@ interface CheckInRepository {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
-        order: String,
+        sort: String,
     ): Result<List<CheckInGameDto>>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<Boolean>

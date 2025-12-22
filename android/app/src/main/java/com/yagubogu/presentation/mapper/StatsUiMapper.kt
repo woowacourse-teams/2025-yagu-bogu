@@ -6,11 +6,11 @@ import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingDto
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.home.ranking.VictoryFairyItem
-import com.yagubogu.presentation.home.ranking.VictoryFairyRanking
-import com.yagubogu.presentation.stats.detail.VsTeamStatItem
-import com.yagubogu.presentation.stats.my.AverageStats
-import com.yagubogu.presentation.stats.my.StatsCounts
+import com.yagubogu.ui.home.model.VictoryFairyItem
+import com.yagubogu.ui.home.model.VictoryFairyRanking
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
+import com.yagubogu.ui.stats.my.model.AverageStats
+import com.yagubogu.ui.stats.my.model.StatsCounts
 
 fun StatsCountsResponse.toUiModel(): StatsCounts =
     StatsCounts(
