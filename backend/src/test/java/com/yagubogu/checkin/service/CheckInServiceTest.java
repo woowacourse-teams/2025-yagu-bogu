@@ -209,7 +209,7 @@ class CheckInServiceTest {
         assertThat(actual.checkInCounts()).isEqualTo(expectedSize * 2);
     }
 
-    @DisplayName("직관 인증 내역을 모두 최신순으로 조회한다")
+    @DisplayName("해당하는 달의 직관 인증 내역을 모두 최신순으로 조회한다")
     @Test
     void findCheckInHistory_allCheckInsGivenYearOrderByLatest() {
         // given
@@ -220,11 +220,14 @@ class CheckInServiceTest {
         CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.LATEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
-
         makeGames(startDate, savedCheckIns, member);
 
+        LocalDate previousMonthDate = yearMonth.minusMonths(1).atDay(25);
+        savedCheckIns.add(makeOneGame(previousMonthDate, member));
+
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(4) // 먼저 승리한 경기 4개만 필터링되었는지 확인
@@ -257,7 +260,8 @@ class CheckInServiceTest {
         makeGames(startDate, savedCheckIns, member);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(4)
@@ -294,7 +298,8 @@ class CheckInServiceTest {
         makeLosingGames(startDate, savedCheckIns, por);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
@@ -330,7 +335,8 @@ class CheckInServiceTest {
         makeLosingGames(startDate, savedCheckIns, por);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, yearMonth, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
@@ -898,6 +904,20 @@ class CheckInServiceTest {
                         .gameState(GameState.COMPLETED)
         );
         savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game4)));
+    }
+
+    private CheckIn makeOneGame(final LocalDate startDate, final Member member) {
+        Game game1 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(0))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                        .homePitcher("일승리")
+                        .awayPitcher("일패배")
+                        .gameState(GameState.COMPLETED)
+        );
+
+        return checkInFactory.save(builder -> builder.team(lotte).member(member).game(game1));
     }
 
     private void makeWinningGames(final LocalDate startDate, final List<CheckIn> savedCheckIns, final Member member) {
