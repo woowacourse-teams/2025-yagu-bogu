@@ -14,6 +14,7 @@ import com.yagubogu.checkin.service.CheckInService;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +49,7 @@ public class CheckInController implements CheckInControllerInterface {
     @Override
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             final MemberClaims memberClaims,
-            @RequestParam final YearMonth yearMonth,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") final YearMonth yearMonth,
             @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") final CheckInOrderFilter orderFilter
     ) {
