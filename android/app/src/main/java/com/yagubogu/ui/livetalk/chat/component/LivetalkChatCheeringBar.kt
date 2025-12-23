@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import com.yagubogu.R
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.util.emoji
+import com.yagubogu.ui.util.shimmerIf
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +39,7 @@ import timber.log.Timber
 fun LivetalkChatCheeringBar(
     modifier: Modifier = Modifier,
     team: Team,
-    cheeringCount: Long,
+    cheeringCount: Long?,
     onCheeringClick: () -> Unit,
     onPositioned: (Offset) -> Unit = {},
 ) {
@@ -54,16 +56,37 @@ fun LivetalkChatCheeringBar(
             stringResource(
                 id = R.string.livetalk_like_count_message,
                 team.shortname,
-                cheeringCount,
+                cheeringCount ?: 0L,
             )
 
-        Text(
-            text = cheeringText,
-            style = PretendardMedium16,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
+        Box(
             modifier = Modifier.weight(1f),
-        )
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = cheeringText,
+                style = PretendardMedium16,
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                modifier =
+                    Modifier
+                        .shimmerIf(cheeringCount == null)
+                        .then(
+                            when {
+                                cheeringCount == null -> {
+                                    Modifier.size(
+                                        width = 180.dp,
+                                        height = 20.dp,
+                                    )
+                                }
+
+                                else -> {
+                                    Modifier.wrapContentSize()
+                                }
+                            },
+                        ),
+            )
+        }
         Spacer(Modifier.width(8.dp))
 
         Box(
@@ -75,6 +98,7 @@ fun LivetalkChatCheeringBar(
                 fontSize = 28.sp,
                 modifier =
                     Modifier
+                        .shimmerIf(cheeringCount == null)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -96,7 +120,18 @@ fun LivetalkChatCheeringBar(
 
 @Preview
 @Composable
-private fun LivetalkChatCheeringBarPreviewEmptyInput() {
+private fun LivetalkChatCheeringBarPreviewShimmer() {
+    LivetalkChatCheeringBar(
+        team = Team.HH,
+        cheeringCount = null,
+        onCheeringClick = {},
+        onPositioned = {},
+    )
+}
+
+@Preview
+@Composable
+private fun LivetalkChatCheeringBarPreview() {
     LivetalkChatCheeringBar(
         team = Team.HH,
         cheeringCount = 12345L,

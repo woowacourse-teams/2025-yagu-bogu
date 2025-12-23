@@ -36,8 +36,8 @@ class LikeCountStateHolder {
     private val _myTeamLikeShowingCountLiveData = MutableLiveData(0L) // deprecated
     val myTeamLikeShowingCountLiveData: LiveData<Long> get() = _myTeamLikeShowingCountLiveData // deprecated
 
-    private val _myTeamLikeShowingCount = MutableStateFlow(0L)
-    val myTeamLikeShowingCount: StateFlow<Long> = _myTeamLikeShowingCount.asStateFlow()
+    private val _myTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
+    val myTeamLikeShowingCount: StateFlow<Long?> = _myTeamLikeShowingCount.asStateFlow()
 
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
     val myTeamLikeAnimationEvent: SingleLiveData<Long> get() = _myTeamLikeAnimationEvent
@@ -93,7 +93,7 @@ class LikeCountStateHolder {
             _myTeamLikeShowingCountLiveData.value =
                 _myTeamLikeShowingCountLiveData.value?.plus(addValue)
             _myTeamLikeShowingCount.value =
-                _myTeamLikeShowingCount.value.plus(addValue)
+                _myTeamLikeShowingCount.value?.plus(addValue) ?: addValue
         }
     }
 
