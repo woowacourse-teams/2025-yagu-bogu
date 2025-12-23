@@ -47,6 +47,8 @@ fun LivetalkChatScreen(
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
     val emojiQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
     val teams by viewModel.teams.collectAsStateWithLifecycle()
+    val messageText by viewModel.messageStateHolder.messageText.collectAsStateWithLifecycle()
+    val showingLikeCount by viewModel.likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -61,11 +63,11 @@ fun LivetalkChatScreen(
         },
         bottomBar = {
             LivetalkChatInputBar(
-                messageFormText = "임시 텍스트인 것이다",
+                messageFormText = messageText,
                 stadiumName = teams?.stadiumName,
-                isVerified = true,
-                onTextChange = {},
-                onSendMessage = {},
+                isVerified = viewModel.messageStateHolder.isVerified,
+                onTextChange = { viewModel.messageStateHolder.updateMessageText(it) },
+                onSendMessage = { viewModel.sendMessage() },
             )
         },
         containerColor = Gray050,
@@ -96,11 +98,14 @@ fun LivetalkChatScreen(
                 // 응원 바
                 val myTeam = teams?.myTeam
                 when {
-                    myTeam != null -> {
+                    myTeam != null && teams?.myTeamType != null -> {
                         LivetalkChatCheeringBar(
                             team = myTeam,
-                            cheeringCount = 12345L,
-                            onCheeringClick = { generateEmojiAnimation() },
+                            cheeringCount = showingLikeCount,
+                            onCheeringClick = {
+                                generateEmojiAnimation()
+                                viewModel.addLikeToBatch()
+                            },
                             onPositioned = { pos: Offset -> emojiButtonPos = pos },
                         )
                     }

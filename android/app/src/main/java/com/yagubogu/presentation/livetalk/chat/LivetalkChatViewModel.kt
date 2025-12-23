@@ -122,7 +122,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     fun sendMessage() {
-        val message = messageStateHolder.messageFormText.value ?: ""
+        val message = messageStateHolder.messageText.value
         if (message.isBlank()) return
 
         viewModelScope.launch {
@@ -132,7 +132,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess {
                     stopPolling()
                     startPolling()
-                    messageStateHolder.messageFormText.value = ""
+                    messageStateHolder.messageFormText.value = "" // deprecated
+                    messageStateHolder.updateMessageText("")
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -186,6 +187,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     fun addLikeToBatch() {
         viewModelScope.launch {
+            likeCountStateHolder.increaseMyTeamShowingCount()
             likeCountStateHolder.increaseLikeCount()
             if (likeBatchingJob?.isActive != true) {
                 likeBatchingJob =

@@ -2,11 +2,13 @@ package com.yagubogu.presentation.livetalk.chat
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.common.util.concurrent.Striped.lock
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -31,8 +33,11 @@ class LikeCountStateHolder {
 
     private val lock = Mutex()
 
-    private val _myTeamLikeShowingCount = MutableLiveData(0L)
-    val myTeamLikeShowingCount: LiveData<Long> get() = _myTeamLikeShowingCount
+    private val _myTeamLikeShowingCountLiveData = MutableLiveData(0L) // deprecated
+    val myTeamLikeShowingCountLiveData: LiveData<Long> get() = _myTeamLikeShowingCountLiveData // deprecated
+
+    private val _myTeamLikeShowingCount = MutableStateFlow(0L)
+    val myTeamLikeShowingCount: StateFlow<Long> = _myTeamLikeShowingCount.asStateFlow()
 
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
     val myTeamLikeAnimationEvent: SingleLiveData<Long> get() = _myTeamLikeAnimationEvent
@@ -62,6 +67,7 @@ class LikeCountStateHolder {
         lock.withLock {
             if (myTeamLikeRealCount == 0L) {
                 myTeamLikeRealCount = remoteMyTeamLikeCount
+                _myTeamLikeShowingCountLiveData.value = remoteMyTeamLikeCount
                 _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
             }
             if (otherTeamLikeRealCount == 0L) {
@@ -84,7 +90,10 @@ class LikeCountStateHolder {
 
     suspend fun increaseMyTeamShowingCount(addValue: Long = 1L) {
         lock.withLock {
-            _myTeamLikeShowingCount.value = _myTeamLikeShowingCount.value?.plus(addValue)
+            _myTeamLikeShowingCountLiveData.value =
+                _myTeamLikeShowingCountLiveData.value?.plus(addValue)
+            _myTeamLikeShowingCount.value =
+                _myTeamLikeShowingCount.value.plus(addValue)
         }
     }
 

@@ -8,6 +8,9 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -29,7 +32,7 @@ import kotlinx.coroutines.sync.withLock
  * @property liveTalkChatBubbleItems 화면에 표시될 현재 채팅 메시지 목록을 담고 있는 [LiveData].
  */
 class MessageStateHolder(
-    private val isVerified: Boolean = false,
+    val isVerified: Boolean = false,
 ) {
     private val lock = Mutex()
     var hasNext: Boolean = true
@@ -39,9 +42,12 @@ class MessageStateHolder(
     var newestMessageCursor: Long? = null
         private set
 
-    val messageFormText = MutableLiveData<String>()
-    val canSendMessage: LiveData<Boolean> =
-        messageFormText.map { isVerified && !it.isNullOrBlank() }
+    val messageFormText = MutableLiveData<String>() // deprecated
+    val canSendMessage: LiveData<Boolean> = // deprecated
+        messageFormText.map { isVerified && !it.isNullOrBlank() } // deprecated
+
+    private val _messageText = MutableStateFlow("")
+    val messageText: StateFlow<String> = _messageText.asStateFlow()
 
     private val _liveTalkChatBubbleItems = MutableLiveData<List<LivetalkChatBubbleItem>>()
     val liveTalkChatBubbleItems: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItems
@@ -122,5 +128,9 @@ class MessageStateHolder(
 
     fun updateLivetalkReportEvent(event: LivetalkReportEvent) {
         _livetalkReportEvent.setValue(event)
+    }
+
+    fun updateMessageText(text: String) {
+        _messageText.value = text
     }
 }
