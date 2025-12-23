@@ -7,10 +7,12 @@ import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.v1.CheckInCountsResponse;
+import com.yagubogu.checkin.dto.v1.CheckInHistoryResponse;
 import com.yagubogu.checkin.dto.v1.CheckInStatusResponse;
 import com.yagubogu.checkin.dto.v1.CreateCheckInRequest;
 import com.yagubogu.checkin.dto.v1.StadiumCheckInCountsResponse;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -27,6 +29,8 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -199,15 +203,17 @@ public class CheckInE2eTest extends E2eTestBase {
         assertThat(actual.checkInCounts()).isEqualTo(3);
     }
 
-    @DisplayName("직관 내역을 최신순으로 조회한다")
+    @DisplayName("년도별 직관 내역을 최신순으로 조회한다")
     @Test
-    void findCheckInHistory_findAllOrderByLatest() {
+    void findCheckInHistory_findAllWithYearOrderByLatest() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        YearMonth yearMonth = YearMonth.of(2025, 7);
-        LocalDate date = yearMonth.atDay(25);
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate date = LocalDate.of(year, month, day);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
@@ -232,12 +238,70 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("yearMonth", yearMonth.toString())
+                .queryParam("year", year)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.LATEST)
                 .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("년도, 월별 직관 내역을 최신순으로 조회한다")
+    @Test
+    void findCheckInHistory_findAllWithYearMonthOrderByLatest() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate date = LocalDate.of(year, month, day);
+        Game game1 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date)
+                        .gameState(GameState.COMPLETED)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(1))
+                        .gameState(GameState.COMPLETED)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game3 = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.plusDays(2))
+                        .gameState(GameState.COMPLETED)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game previousGame = gameFactory.save(builder ->
+                builder.stadium(stadiumJamsil)
+                        .date(date.minusMonths(1))
+                        .gameState(GameState.COMPLETED)
+                        .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game3).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(previousGame).team(kia).member(fora));
+
+        // when & then
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("year", year)
+                .queryParam("month", month)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/v1/check-ins/members")
+                .then().log().all()
+                .statusCode(200)
+                .extract();
+
+        CheckInHistoryResponse result = response.as(CheckInHistoryResponse.class);
+        assertThat(result.checkInHistory()).hasSize(3);
     }
 
     @DisplayName("모든 직관 내역을 오래된순으로 조회한다")
@@ -247,21 +311,26 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        YearMonth yearMonth = YearMonth.of(2025, 7);
-        LocalDate date = yearMonth.atDay(25);
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate date = LocalDate.of(year, month, day);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
@@ -273,7 +342,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("yearMonth", yearMonth.toString())
+                .queryParam("year", year)
                 .queryParam("result", CheckInResultFilter.ALL)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/v1/check-ins/members")
@@ -288,21 +357,26 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        YearMonth yearMonth = YearMonth.of(2025, 7);
-        LocalDate date = yearMonth.atDay(25);
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate date = LocalDate.of(year, month, day);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
@@ -314,7 +388,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("yearMonth", yearMonth.toString())
+                .queryParam("year", year)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.LATEST)
                 .when().get("/api/v1/check-ins/members")
@@ -329,21 +403,26 @@ public class CheckInE2eTest extends E2eTestBase {
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
-        YearMonth yearMonth = YearMonth.of(2025, 7);
-        LocalDate date = yearMonth.atDay(25);
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate date = LocalDate.of(year, month, day);
         Game game1 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date)
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game2 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(1))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
         Game game3 = gameFactory.save(builder ->
                 builder.stadium(stadiumJamsil)
                         .date(date.plusDays(2))
+                        .gameState(GameState.COMPLETED)
                         .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
                         .awayTeam(samsung).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
 
@@ -355,7 +434,7 @@ public class CheckInE2eTest extends E2eTestBase {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .queryParam("yearMonth", yearMonth.toString())
+                .queryParam("year", year)
                 .queryParam("result", CheckInResultFilter.WIN)
                 .queryParam("order", CheckInOrderFilter.OLDEST)
                 .when().get("/api/v1/check-ins/members")
