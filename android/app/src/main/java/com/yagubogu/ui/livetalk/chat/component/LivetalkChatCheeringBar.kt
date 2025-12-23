@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.getEmoji
 import com.yagubogu.ui.theme.PretendardMedium16
+import com.yagubogu.ui.util.emoji
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +71,7 @@ fun LivetalkChatCheeringBar(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = team.getEmoji(),
+                text = team.emoji,
                 fontSize = 28.sp,
                 modifier =
                     Modifier

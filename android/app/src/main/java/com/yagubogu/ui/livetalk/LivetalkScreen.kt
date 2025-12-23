@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatActivity
+import com.yagubogu.ui.livetalk.chat.LivetalkChatActivity
 import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUM_ITEMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem

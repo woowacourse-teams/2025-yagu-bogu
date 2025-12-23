@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatBubbleItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import java.time.LocalDateTime
 
 @Composable
