@@ -87,8 +87,9 @@ fun LivetalkChatScreen(
             ) {
                 // 채팅 버블
                 LivetalkChatBubbleList(
-                    chatItems = livetalkChatBubbleItems,
                     modifier = Modifier.weight(1f),
+                    chatItems = livetalkChatBubbleItems,
+                    fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
                 )
 
                 // 구분선

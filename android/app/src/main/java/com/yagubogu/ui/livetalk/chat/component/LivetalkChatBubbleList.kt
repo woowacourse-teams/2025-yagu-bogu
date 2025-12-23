@@ -4,23 +4,50 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 
 @Composable
 fun LivetalkChatBubbleList(
-    chatItems: List<LivetalkChatBubbleItem>,
     modifier: Modifier = Modifier,
+    chatItems: List<LivetalkChatBubbleItem>,
+    fetchBeforeTalks: () -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
 ) {
+    LaunchedEffect(chatItems.size) {
+        if (listState.firstVisibleItemIndex <= 5) {
+            listState.animateScrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .map { visibleItems: List<LazyListItemInfo> ->
+                val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
+                val totalItems = listState.layoutInfo.totalItemsCount
+
+                totalItems > 0 && lastVisibleItemIndex >= totalItems - 5
+            }.distinctUntilChanged()
+            .filter { it }
+            .collect {
+                fetchBeforeTalks()
+            }
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         state = listState,
@@ -89,5 +116,5 @@ val fixtureItems =
 @Preview
 @Composable
 private fun LivetalkChatBubbleListPreview() {
-    LivetalkChatBubbleList(fixtureItems)
+    LivetalkChatBubbleList(chatItems = fixtureItems)
 }
