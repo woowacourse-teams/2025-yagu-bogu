@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,23 +75,21 @@ private fun AttendanceHistorySummary(
     item: AttendanceHistoryItem.Summary,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Box(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = item.awayTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.awayTeamColor,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Start,
+            modifier = Modifier.align(Alignment.CenterStart),
         )
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
@@ -127,8 +125,7 @@ private fun AttendanceHistorySummary(
             text = item.homeTeam.score,
             style = EsamanruBold.copy(fontSize = 56.dpToSp),
             color = item.homeTeamColor,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.End,
+            modifier = Modifier.align(Alignment.CenterEnd),
         )
     }
 }

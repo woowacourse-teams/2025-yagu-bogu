@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +34,8 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -61,7 +62,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import java.time.YearMonth
 
-private val START_MONTH: YearMonth = YearMonth.of(2025, 3)
+private val START_MONTH: YearMonth = YearMonth.of(2015, 1)
 private val END_MONTH: YearMonth = YearMonth.now()
 
 @Composable
@@ -91,7 +92,11 @@ fun AttendanceHistoryScreen(
         onViewTypeChange = { viewType = viewType.toggle() },
         items = attendanceItems,
         updateItems = { filter: AttendanceHistoryFilter, sort: AttendanceHistorySort ->
-            viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth, filter = filter, sort = sort)
+            viewModel.fetchAttendanceHistoryItems(
+                yearMonth = currentMonth,
+                filter = filter,
+                sort = sort,
+            )
         },
         modifier = modifier,
         scrollToTopEvent = scrollToTopEvent,
@@ -189,8 +194,15 @@ private fun AttendanceHistoryHeader(
                         ),
             )
             Text(
-                text = "${currentMonth.year}년 ${currentMonth.monthValue}월",
+                text =
+                    stringResource(
+                        R.string.attendance_history_year_month,
+                        currentMonth.year,
+                        currentMonth.monthValue,
+                    ),
                 style = PretendardSemiBold20,
+                modifier = Modifier.width(140.dp),
+                textAlign = TextAlign.Center,
             )
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_right),
@@ -232,8 +244,6 @@ private fun AttendanceViewToggle(
     Box(
         modifier =
             modifier
-                .height(intrinsicSize = IntrinsicSize.Min)
-                .width(intrinsicSize = IntrinsicSize.Min)
                 .background(color = White, shape = CircleShape)
                 .border(width = 1.dp, color = Gray200, shape = CircleShape)
                 .noRippleClickable(onClick = onChange)
