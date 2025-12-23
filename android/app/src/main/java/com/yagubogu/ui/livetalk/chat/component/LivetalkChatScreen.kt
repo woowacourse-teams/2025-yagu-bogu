@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -41,7 +40,6 @@ import timber.log.Timber
 fun LivetalkChatScreen(
     viewModel: LivetalkChatViewModel,
     onBackClick: () -> Unit,
-    chatItems: List<LivetalkChatBubbleItem>,
     modifier: Modifier = Modifier,
 ) {
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
@@ -49,6 +47,7 @@ fun LivetalkChatScreen(
     val teams by viewModel.teams.collectAsStateWithLifecycle()
     val messageText by viewModel.messageStateHolder.messageText.collectAsStateWithLifecycle()
     val showingLikeCount by viewModel.likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val livetalkChatBubbleItems by viewModel.messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -88,7 +87,7 @@ fun LivetalkChatScreen(
             ) {
                 // 채팅 버블
                 LivetalkChatBubbleList(
-                    chatItems = chatItems,
+                    chatItems = livetalkChatBubbleItems,
                     modifier = Modifier.weight(1f),
                 )
 
@@ -143,7 +142,6 @@ private fun LivetalkChatMyTeamScreenPreview() {
     LivetalkChatScreen(
         viewModel = viewModel(),
         onBackClick = {},
-        chatItems = fixtureItems,
     )
 }
 
@@ -153,7 +151,6 @@ private fun LivetalkChatOtherTeamScreenPreview() {
     LivetalkChatScreen(
         viewModel = viewModel(),
         onBackClick = {},
-        chatItems = fixtureItems,
     )
 }
 
@@ -163,6 +160,5 @@ private fun LivetalkChatLoadingScreenPreview() {
     LivetalkChatScreen(
         viewModel = viewModel(),
         onBackClick = {},
-        chatItems = emptyList(),
     )
 }

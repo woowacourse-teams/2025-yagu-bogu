@@ -170,7 +170,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
-        viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(
+        viewModel.messageStateHolder.liveTalkChatBubbleItemsLiveData.observe(
             this,
             ::handleLiveTalkChatBubbleItem,
         )
@@ -292,17 +292,19 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun handleLivetalkReportEvent(livetalkReportEvent: LivetalkReportEvent) {
         when (livetalkReportEvent) {
-            LivetalkReportEvent.DuplicatedReport ->
+            LivetalkReportEvent.DuplicatedReport -> {
                 binding.root.showSnackbar(
                     R.string.livetalk_already_reported,
                     R.id.divider,
                 )
+            }
 
-            LivetalkReportEvent.Success ->
+            LivetalkReportEvent.Success -> {
                 binding.root.showSnackbar(
                     R.string.livetalk_report_succeed,
                     R.id.divider,
                 )
+            }
         }
     }
 

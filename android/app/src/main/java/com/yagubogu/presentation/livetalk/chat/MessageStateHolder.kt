@@ -29,7 +29,7 @@ import kotlinx.coroutines.sync.withLock
  * @property newestMessageCursor 최신 메시지를 가져오기 위한 커서 ID.
  * @property messageFormText 메시지 입력 필드의 현재 텍스트를 담고 있는 [MutableLiveData].
  * @property canSendMessage 사용자가 인증되었고 메시지 입력이 비어있지 않을 때 true가 되는 [LiveData].
- * @property liveTalkChatBubbleItems 화면에 표시될 현재 채팅 메시지 목록을 담고 있는 [LiveData].
+ * @property liveTalkChatBubbleItemsLiveData 화면에 표시될 현재 채팅 메시지 목록을 담고 있는 [LiveData].
  */
 class MessageStateHolder(
     val isVerified: Boolean = false,
@@ -49,8 +49,13 @@ class MessageStateHolder(
     private val _messageText = MutableStateFlow("")
     val messageText: StateFlow<String> = _messageText.asStateFlow()
 
-    private val _liveTalkChatBubbleItems = MutableLiveData<List<LivetalkChatBubbleItem>>()
-    val liveTalkChatBubbleItems: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItems
+    private val _liveTalkChatBubbleItemsLiveData =
+        MutableLiveData<List<LivetalkChatBubbleItem>>() // deprecated
+    val liveTalkChatBubbleItemsLiveData: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItemsLiveData // deprecated
+
+    private val _livetalkChatBubbleItems =
+        MutableStateFlow<List<LivetalkChatBubbleItem>>(emptyList())
+    val livetalkChatBubbleItems: StateFlow<List<LivetalkChatBubbleItem>> = _livetalkChatBubbleItems
 
     private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
     val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
@@ -63,9 +68,8 @@ class MessageStateHolder(
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
         lock.withLock {
-            val currentChats: List<LivetalkChatBubbleItem> =
-                liveTalkChatBubbleItems.value ?: emptyList()
-            _liveTalkChatBubbleItems.value = currentChats + beforeChats
+            val currentChats: List<LivetalkChatBubbleItem> = livetalkChatBubbleItems.value
+            _livetalkChatBubbleItems.value = currentChats + beforeChats
 
             hasNext = response.cursor.hasNext
             oldestMessageCursor = response.cursor.nextCursorId ?: oldestMessageCursor
@@ -82,8 +86,8 @@ class MessageStateHolder(
 
         lock.withLock {
             val currentChats: List<LivetalkChatBubbleItem> =
-                _liveTalkChatBubbleItems.value ?: emptyList()
-            _liveTalkChatBubbleItems.value = newChats + currentChats
+                _livetalkChatBubbleItems.value
+            _livetalkChatBubbleItems.value = newChats + currentChats
 
             hasNext = response.cursor.hasNext
             newestMessageCursor = newChats.first().livetalkChatItem.chatId
@@ -94,13 +98,13 @@ class MessageStateHolder(
     suspend fun deleteChat(chatId: Long) {
         lock.withLock {
             val currentChats: List<LivetalkChatBubbleItem> =
-                _liveTalkChatBubbleItems.value ?: emptyList()
+                _livetalkChatBubbleItems.value
             val deletedChats: List<LivetalkChatBubbleItem> =
                 currentChats.filter { it.livetalkChatItem.chatId != chatId }
 
             newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
             oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
-            _liveTalkChatBubbleItems.value = deletedChats
+            _livetalkChatBubbleItems.value = deletedChats
             _livetalkDeleteEvent.setValue(Unit)
         }
     }
@@ -108,7 +112,7 @@ class MessageStateHolder(
     suspend fun reportChat(chatId: Long) {
         lock.withLock {
             val currentChats: List<LivetalkChatBubbleItem> =
-                _liveTalkChatBubbleItems.value ?: emptyList()
+                _livetalkChatBubbleItems.value
             val updatedChats: List<LivetalkChatBubbleItem> =
                 currentChats.map { chatBubbleItem: LivetalkChatBubbleItem ->
                     if (chatBubbleItem.livetalkChatItem.chatId == chatId) {
@@ -122,7 +126,7 @@ class MessageStateHolder(
                         chatBubbleItem
                     }
                 }
-            _liveTalkChatBubbleItems.value = updatedChats
+            _livetalkChatBubbleItems.value = updatedChats
         }
     }
 

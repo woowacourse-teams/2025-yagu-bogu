@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatScreen
-import com.yagubogu.ui.livetalk.chat.component.fixtureItems
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,7 +32,6 @@ class LivetalkChatActivity : ComponentActivity() {
                 LivetalkChatScreen(
                     viewModel = viewModel,
                     onBackClick = { finish() },
-                    chatItems = fixtureItems,
                 )
             }
         }
