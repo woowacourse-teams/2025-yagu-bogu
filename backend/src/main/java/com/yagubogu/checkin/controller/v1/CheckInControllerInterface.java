@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +48,7 @@ public interface CheckInControllerInterface {
             @RequestParam int year
     );
 
-    @Operation(summary = "인증 내역 조회", description = "연도별 인증 내역을 조회합니다.")
+    @Operation(summary = "인증 내역 조회", description = "연도, 월별 인증 내역을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "인증 내역 조회 성공"),
             @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없음")
@@ -57,7 +56,8 @@ public interface CheckInControllerInterface {
     @GetMapping("/members")
     ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam YearMonth yearMonth,
+            @RequestParam final int year,
+            @RequestParam(required = false) final Integer month,
             @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
     );

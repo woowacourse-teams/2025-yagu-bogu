@@ -12,7 +12,6 @@ import com.yagubogu.stat.dto.AverageStatisticParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 
 public interface CustomCheckInRepository {
@@ -34,7 +33,8 @@ public interface CustomCheckInRepository {
     List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
-            YearMonth yearMonth,
+            int year,
+            Integer month,
             CheckInResultFilter resultFilter,
             CheckInOrderFilter orderFilter
     );

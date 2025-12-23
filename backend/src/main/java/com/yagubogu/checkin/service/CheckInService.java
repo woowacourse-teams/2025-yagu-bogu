@@ -94,7 +94,8 @@ public class CheckInService {
 
     public CheckInHistoryResponse findCheckInHistory(
             final long memberId,
-            final YearMonth yearMonth,
+            final int year,
+            final Integer month,
             final CheckInResultFilter resultFilter,
             final CheckInOrderFilter orderFilter
     ) {
@@ -103,7 +104,8 @@ public class CheckInService {
         List<CheckInGameParam> checkIns = checkInRepository.findCheckInHistory(
                 member,
                 team,
-                yearMonth,
+                year,
+                month,
                 resultFilter,
                 orderFilter
         );
