@@ -28,8 +28,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -61,8 +64,11 @@ class LivetalkChatViewModel @AssistedInject constructor(
     val isStadiumLoading: LiveData<Boolean> =
         livetalkUiState.map { it !is LivetalkUiState.Success }
 
-    private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
-    val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
+    private val _livetalkTeams = MutableLiveData<LivetalkTeams>() // deprecated
+    val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams // deprecated
+
+    private val _teams = MutableStateFlow<LivetalkTeams?>(null)
+    val teams: StateFlow<LivetalkTeams?> = _teams.asStateFlow()
 
     lateinit var cachedLivetalkTeams: LivetalkTeams
         private set
@@ -232,7 +238,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
         val result: Result<LivetalkTeams> = talkRepository.getInitial(gameId).map { it.toUiModel() }
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
-                _livetalkTeams.value = livetalkTeams
+                _livetalkTeams.value = livetalkTeams // deprecated
+                _teams.value = livetalkTeams
+
                 cachedLivetalkTeams = livetalkTeams
                 _livetalkUiState.value = LivetalkUiState.Success
             }.onFailure { exception ->

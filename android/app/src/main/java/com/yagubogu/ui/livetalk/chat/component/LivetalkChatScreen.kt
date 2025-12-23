@@ -27,36 +27,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatBubbleItem
-import com.yagubogu.presentation.util.getEmoji
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.util.emoji
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatScreen(
+    viewModel: LivetalkChatViewModel,
     onBackClick: () -> Unit,
-    stadiumName: String?,
-    myTeam: Team?,
     chatItems: List<LivetalkChatBubbleItem>,
-    matchText: String?,
     modifier: Modifier = Modifier,
 ) {
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
     val emojiQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
+    val teams by viewModel.teams.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
         emojiQueue.add(System.nanoTime() to emojiButtonPos)
     }
     Scaffold(
-        topBar = { LivetalkChatToolbar(onBackClick = onBackClick, stadiumName, matchText) },
+        topBar = {
+            LivetalkChatToolbar(
+                teams = teams,
+                onBackClick = onBackClick,
+            )
+        },
         bottomBar = {
             LivetalkChatInputBar(
                 messageFormText = "임시 텍스트인 것이다",
-                stadiumName = stadiumName,
+                stadiumName = teams?.stadiumName,
                 isVerified = true,
                 onTextChange = {},
                 onSendMessage = {},
@@ -88,15 +94,14 @@ fun LivetalkChatScreen(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
+                val myTeam = teams?.myTeam
                 when {
                     myTeam != null -> {
                         LivetalkChatCheeringBar(
-                            team = Team.WO,
+                            team = myTeam,
                             cheeringCount = 12345L,
                             onCheeringClick = { generateEmojiAnimation() },
-                            onPositioned = { pos: Offset ->
-                                emojiButtonPos = pos
-                            },
+                            onPositioned = { pos: Offset -> emojiButtonPos = pos },
                         )
                     }
 
@@ -113,7 +118,10 @@ fun LivetalkChatScreen(
                             Timber.d("이모지 애니메이션 시작 좌표 : $startPos")
                         }
                         FloatingEmojiItem(
-                            emoji = myTeam?.getEmoji() ?: "",
+                            emoji =
+                                viewModel.livetalkTeams.value
+                                    ?.myTeam
+                                    ?.emoji ?: "",
                             startOffset = startPos,
                             onAnimationFinished = { emojiQueue.remove(key to startPos) },
                         )
@@ -128,11 +136,9 @@ fun LivetalkChatScreen(
 @Composable
 private fun LivetalkChatMyTeamScreenPreview() {
     LivetalkChatScreen(
+        viewModel = viewModel(),
         onBackClick = {},
-        myTeam = Team.WO,
         chatItems = fixtureItems,
-        stadiumName = "고척 스카이돔",
-        matchText = "두산 vs 키움",
     )
 }
 
@@ -140,11 +146,9 @@ private fun LivetalkChatMyTeamScreenPreview() {
 @Composable
 private fun LivetalkChatOtherTeamScreenPreview() {
     LivetalkChatScreen(
+        viewModel = viewModel(),
         onBackClick = {},
-        myTeam = null,
         chatItems = fixtureItems,
-        stadiumName = "고척 스카이돔",
-        matchText = "두산 vs 키움",
     )
 }
 
@@ -152,10 +156,8 @@ private fun LivetalkChatOtherTeamScreenPreview() {
 @Composable
 private fun LivetalkChatLoadingScreenPreview() {
     LivetalkChatScreen(
+        viewModel = viewModel(),
         onBackClick = {},
-        myTeam = null,
         chatItems = emptyList(),
-        stadiumName = null,
-        matchText = null,
     )
 }

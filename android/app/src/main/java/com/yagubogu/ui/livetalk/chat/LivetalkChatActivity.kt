@@ -6,54 +6,57 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.yagubogu.domain.model.Team
+import androidx.activity.viewModels
+import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatScreen
 import com.yagubogu.ui.livetalk.chat.component.fixtureItems
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LivetalkChatActivity : ComponentActivity() {
+    @Inject
+    lateinit var viewModelFactory: LivetalkChatViewModel.Factory
+
+    private val viewModel: LivetalkChatViewModel by viewModels {
+        val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
+        val isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        LivetalkChatViewModel.provideFactory(viewModelFactory, gameId, isVerified)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             YaguBoguTheme {
                 LivetalkChatScreen(
+                    viewModel = viewModel,
                     onBackClick = { finish() },
-                    myTeam = Team.WO,
                     chatItems = fixtureItems,
-                    stadiumName = "고척 스카이돔",
-                    matchText = "두산 vs 키움",
                 )
             }
         }
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, LivetalkChatActivity::class.java)
-    }
-}
+        private const val KEY_GAME_ID = "gameId"
+        private const val KEY_IS_VERIFIED = "isVerified"
+        private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
+        private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
+        private const val MAX_ANIMATION_COUNT = 50
 
-@Composable
-fun Greeting(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    YaguBoguTheme {
-        Greeting("Android")
+        fun newIntent(
+            context: Context,
+            gameId: Long,
+            isVerified: Boolean,
+        ): Intent =
+            Intent(
+                context,
+                LivetalkChatActivity::class.java,
+            ).apply {
+                putExtra(KEY_GAME_ID, gameId)
+                putExtra(KEY_IS_VERIFIED, isVerified)
+            }
     }
 }

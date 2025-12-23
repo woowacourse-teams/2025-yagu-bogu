@@ -9,22 +9,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.R
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatToolbar(
+    teams: LivetalkTeams?,
     onBackClick: () -> Unit,
-    stadiumName: String?,
-    matchText: String?,
     modifier: Modifier = Modifier,
 ) {
+    val awayName = teams?.awayTeam?.shortname ?: ""
+    val homeName = teams?.homeTeam?.shortname ?: ""
+    val matchText =
+        stringResource(
+            R.string.livetalk_away_home_name,
+            awayName,
+            homeName,
+        )
+
     CenterAlignedTopAppBar(
         title = {
-            LivetalkChatScreenTitle(stadiumName, matchText)
+            LivetalkChatScreenTitle(
+                teams?.stadiumName,
+                matchText,
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -46,14 +57,14 @@ fun LivetalkChatToolbar(
     )
 }
 
-@Preview
-@Composable
-private fun LivetalkChatToolbarPreview() {
-    LivetalkChatToolbar(onBackClick = {}, "고척 스카이돔", "두산 vs 키움")
-}
-
-@Preview
-@Composable
-private fun LivetalkChatToolbarShimmerPreview() {
-    LivetalkChatToolbar(onBackClick = {}, null, null)
-}
+// @Preview
+// @Composable
+// private fun LivetalkChatToolbarPreview() {
+//    LivetalkChatToolbar(onBackClick = {}, "고척 스카이돔", "두산 vs 키움")
+// }
+//
+// @Preview
+// @Composable
+// private fun LivetalkChatToolbarShimmerPreview() {
+//    LivetalkChatToolbar(onBackClick = {}, null)
+// }
