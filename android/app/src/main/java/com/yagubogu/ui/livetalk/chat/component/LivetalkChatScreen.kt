@@ -23,13 +23,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.yagubogu.R
+import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
+import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -42,12 +46,16 @@ fun LivetalkChatScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val messageStateHolder = viewModel.messageStateHolder
+    val likeCountStateHolder = viewModel.likeCountStateHolder
+
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
     val emojiQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
     val teams by viewModel.teams.collectAsStateWithLifecycle()
-    val messageText by viewModel.messageStateHolder.messageText.collectAsStateWithLifecycle()
-    val showingLikeCount by viewModel.likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
-    val livetalkChatBubbleItems by viewModel.messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
+    val messageText by messageStateHolder.messageText.collectAsStateWithLifecycle()
+    val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
+    val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -89,6 +97,7 @@ fun LivetalkChatScreen(
                 LivetalkChatBubbleList(
                     modifier = Modifier.weight(1f),
                     chatItems = livetalkChatBubbleItems,
+                    onDeleteClick = viewModel.messageStateHolder::requestDelete,
                     fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
                 )
 
@@ -116,6 +125,27 @@ fun LivetalkChatScreen(
                 }
             }
 
+            // 삭제 다이얼로그 레이어
+            pendingDeleteChat?.let { chat ->
+                DefaultDialog(
+                    dialogUiModel =
+                        DefaultDialogUiModel(
+                            title = stringResource(R.string.livetalk_trash_btn),
+                            message = stringResource(R.string.livetalk_trash_dialog_message),
+                            positiveText = stringResource(R.string.livetalk_trash_btn),
+                            negativeText = stringResource(R.string.all_cancel),
+                        ),
+                    onConfirm = {
+                        viewModel.deleteMessage(
+                            messageStateHolder.pendingDeleteChat.value?.chatId
+                                ?: return@DefaultDialog,
+                        )
+                    },
+                    onCancel = { messageStateHolder.dismissDeleteDialog() },
+                )
+            }
+
+            // 이모지 애니메이션 레이어
             Box(modifier = Modifier.fillMaxSize()) {
                 emojiQueue.forEach { (key, startPos) ->
                     key(key) {

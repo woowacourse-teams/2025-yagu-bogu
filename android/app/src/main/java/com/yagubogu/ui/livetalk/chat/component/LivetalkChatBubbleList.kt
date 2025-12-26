@@ -10,6 +10,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,12 +30,18 @@ fun LivetalkChatBubbleList(
     modifier: Modifier = Modifier,
     chatItems: List<LivetalkChatBubbleItem>,
     fetchBeforeTalks: () -> Unit = {},
+    onDeleteClick: (LivetalkChatItem) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
 ) {
+    var previousItemsCount by remember { mutableIntStateOf(chatItems.size) }
+
     LaunchedEffect(chatItems.size) {
-        if (listState.firstVisibleItemIndex <= 5) {
-            listState.animateScrollToItem(0)
+        if (chatItems.size > previousItemsCount) {
+            when {
+                listState.firstVisibleItemIndex <= 5 -> listState.animateScrollToItem(0)
+            }
         }
+        previousItemsCount = chatItems.size
     }
 
     LaunchedEffect(listState) {
@@ -63,7 +73,7 @@ fun LivetalkChatBubbleList(
                 is LivetalkChatBubbleItem.MyBubbleItem -> {
                     LivetalkMyChatBubble(
                         livetalkChatItem = item.livetalkChatItem,
-                        onDeleteClick = {},
+                        onDeleteClick = { onDeleteClick(item.livetalkChatItem) },
                     )
                 }
 

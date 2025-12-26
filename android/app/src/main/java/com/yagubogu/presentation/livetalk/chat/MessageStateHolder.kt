@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import timber.log.Timber
 
 /**
  * 현장톡 채팅 화면의 메시지 상태를 관리합니다.
@@ -63,6 +65,9 @@ class MessageStateHolder(
     private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
     val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
+    private val _pendingDeleteChat = MutableStateFlow<LivetalkChatItem?>(null)
+    val pendingDeleteChat: StateFlow<LivetalkChatItem?> = _pendingDeleteChat.asStateFlow()
+
     suspend fun addBeforeChats(response: LivetalkResponseItem) {
         val beforeChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
@@ -106,6 +111,7 @@ class MessageStateHolder(
             oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
             _livetalkChatBubbleItems.value = deletedChats
             _livetalkDeleteEvent.setValue(Unit)
+            _pendingDeleteChat.value = null
         }
     }
 
@@ -128,6 +134,15 @@ class MessageStateHolder(
                 }
             _livetalkChatBubbleItems.value = updatedChats
         }
+    }
+
+    fun requestDelete(chat: LivetalkChatItem) {
+        _pendingDeleteChat.value = chat
+        Timber.d("삭제 요청: ${chat.chatId}")
+    }
+
+    fun dismissDeleteDialog() {
+        _pendingDeleteChat.value = null
     }
 
     fun updateLivetalkReportEvent(event: LivetalkReportEvent) {
