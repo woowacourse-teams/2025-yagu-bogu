@@ -12,6 +12,9 @@ import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,8 +28,8 @@ class SettingViewModel @Inject constructor(
     private val _settingTitle = MutableLiveData<String>()
     val settingTitle: LiveData<String> get() = _settingTitle
 
-    private val _myMemberInfoItem = MutableLiveData<MemberInfoItem>()
-    val myMemberInfoItem: LiveData<MemberInfoItem> get() = _myMemberInfoItem
+    private val _myMemberInfoItem = MutableStateFlow(MemberInfoItem())
+    val myMemberInfoItem: StateFlow<MemberInfoItem> = _myMemberInfoItem.asStateFlow()
 
     private val _nicknameEditedEvent = MutableSingleLiveData<String>()
     val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
@@ -53,7 +56,7 @@ class SettingViewModel @Inject constructor(
             memberRepository
                 .updateNickname(newNickname)
                 .onSuccess {
-                    _myMemberInfoItem.value = myMemberInfoItem.value?.copy(nickName = newNickname)
+                    _myMemberInfoItem.value = myMemberInfoItem.value.copy(nickName = newNickname)
                     _nicknameEditedEvent.setValue(newNickname)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
@@ -112,7 +115,7 @@ class SettingViewModel @Inject constructor(
                     .getOrThrow()
                     .toUiModel()
             _myMemberInfoItem.value =
-                myMemberInfoItem.value?.copy(profileImageUrl = completeItem.imageUrl)
+                myMemberInfoItem.value.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
             Timber.e(exception, "프로필 이미지 업로드 실패")
         }

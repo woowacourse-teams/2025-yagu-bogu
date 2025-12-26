@@ -1,7 +1,18 @@
 package com.yagubogu.ui.setting
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.provider.OpenableColumns
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -20,6 +31,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,9 +43,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.database.getLongOrNull
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.SettingViewModel
+import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
@@ -39,14 +58,57 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.noRippleClickable
+import com.yalantis.ucrop.UCrop
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import java.time.LocalDate
+import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
 fun SettingScreen(
-    memberInfoItem: MemberInfoItem,
     modifier: Modifier = Modifier,
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
+    val context: Context = LocalContext.current
+    val scope: CoroutineScope = rememberCoroutineScope()
+    val memberInfoItem: MemberInfoItem =
+        viewModel.myMemberInfoItem.collectAsStateWithLifecycle().value
+
+    val uCropLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result: ActivityResult ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    val intent: Intent = result.data ?: return@rememberLauncherForActivityResult
+                    val resultUri: Uri =
+                        UCrop.getOutput(intent) ?: return@rememberLauncherForActivityResult
+                    scope.launch {
+                        handleCroppedImage(context, resultUri, viewModel::uploadProfileImage)
+                    }
+                }
+
+                UCrop.RESULT_ERROR -> {
+                    val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
+                    Timber.e(cropError, "uCrop Error")
+                    context.showToast(context.getString(R.string.setting_edit_profile_image_crop_failed))
+                }
+            }
+        }
+    val pickImageLauncher: ManagedActivityResultLauncher<String, Uri?> =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                createUCropIntent(
+                    context = context,
+                    sourceUri = it,
+                    onCropIntentReady = uCropLauncher::launch,
+                )
+            }
+        }
+
     Column(
         modifier =
             modifier
@@ -58,7 +120,10 @@ fun SettingScreen(
     ) {
         MyProfile(memberInfoItem = memberInfoItem)
         SettingButtonGroup {
-            SettingButton(text = stringResource(R.string.setting_edit_profile_image), onClick = {})
+            SettingButton(
+                text = stringResource(R.string.setting_edit_profile_image),
+                onClick = { pickImageLauncher.launch("image/*") },
+            )
             SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {})
             SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {})
             SettingButton(text = stringResource(R.string.setting_manage_account), onClick = {})
@@ -131,7 +196,12 @@ fun SettingButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .noRippleClickable { onClick() },
+    ) {
         Spacer(
             modifier =
                 Modifier
@@ -176,16 +246,89 @@ private fun getAppVersion(): String {
     }
 }
 
+private fun createUCropIntent(
+    context: Context,
+    sourceUri: Uri,
+    onCropIntentReady: (Intent) -> Unit,
+) {
+    val fileName = "cropped_image_${System.currentTimeMillis()}"
+    val destinationUri = Uri.fromFile(File(context.cacheDir, fileName))
+
+    val options: UCrop.Options =
+        UCrop.Options().apply {
+            setFreeStyleCropEnabled(false)
+            setHideBottomControls(false)
+            setCircleDimmedLayer(true)
+            setToolbarColor(context.getColor(R.color.gray050))
+            setCompressionFormat(Bitmap.CompressFormat.JPEG)
+            setCompressionQuality(85)
+        }
+
+    val uCropIntent: Intent? =
+        UCrop
+            .of(sourceUri, destinationUri)
+            .withAspectRatio(1f, 1f)
+            .withMaxResultSize(500, 500)
+            .withOptions(options)
+            .getIntent(context)
+
+    uCropIntent?.let { onCropIntentReady(it) }
+}
+
+private suspend fun handleCroppedImage(
+    context: Context,
+    uri: Uri,
+    onProfileImageUpload: suspend (Uri, String, Long) -> Result<Unit>,
+) {
+    runCatching {
+        val mimeType: String =
+            context
+                .contentResolver
+                .getType(uri) ?: "image/jpeg"
+
+        val fileSize: Long =
+            uri
+                .fileSize(context)
+                .getOrNull()
+                ?: error("파일 사이즈 획득 실패")
+
+        onProfileImageUpload(uri, mimeType, fileSize)
+    }.fold(
+        onSuccess = { result: Result<Unit> ->
+            result.onFailure { e ->
+                if (e is CancellationException) throw e
+                context.showToast(context.getString(R.string.setting_edit_profile_image_upload_failed))
+            }
+        },
+        onFailure = { e: Throwable ->
+            if (e is CancellationException) throw e
+            Timber.e(e, "프로필 이미지 전처리 실패")
+            context.showToast(context.getString(R.string.setting_edit_profile_image_processing_failed))
+        },
+    )
+}
+
+private fun Uri.fileSize(context: Context): Result<Long?> =
+    runCatching {
+        context.contentResolver
+            .query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
+            ?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val idx = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE)
+                    cursor.getLongOrNull(idx)
+                } else {
+                    null
+                }
+            }
+            ?: context.contentResolver
+                .openFileDescriptor(this, "r")
+                ?.use { parcelFileDescriptor: ParcelFileDescriptor ->
+                    parcelFileDescriptor.statSize.takeIf { it >= 0 }
+                }
+    }
+
 @Preview(showBackground = true)
 @Composable
 private fun SettingScreenPreview() {
-    SettingScreen(
-        memberInfoItem =
-            MemberInfoItem(
-                nickName = "귀여운보욱이",
-                createdAt = LocalDate.now(),
-                favoriteTeam = "KIA",
-                profileImageUrl = "",
-            ),
-    )
+    SettingScreen()
 }
