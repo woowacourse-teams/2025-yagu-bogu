@@ -57,13 +57,13 @@ fun SettingScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         MyProfile(memberInfoItem = memberInfoItem)
-        ButtonGroup {
+        SettingButtonGroup {
             SettingButton(text = stringResource(R.string.setting_edit_profile_image), onClick = {})
             SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {})
             SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {})
             SettingButton(text = stringResource(R.string.setting_manage_account), onClick = {})
         }
-        ButtonGroup {
+        SettingButtonGroup {
             SettingButton(text = stringResource(R.string.setting_notice), onClick = {})
             SettingButton(text = stringResource(R.string.setting_contact_us), onClick = {})
             SettingButton(text = stringResource(R.string.setting_open_source_license), onClick = {})
@@ -106,7 +106,7 @@ private fun MyProfile(
 }
 
 @Composable
-private fun ButtonGroup(
+fun SettingButtonGroup(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
