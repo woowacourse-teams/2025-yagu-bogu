@@ -27,6 +27,9 @@ import timber.log.Timber
 class MessageStateHolder(
     val isVerified: Boolean = false,
 ) {
+    private val _isInitialLoadCompleted = MutableStateFlow(false)
+    val isInitialLoadCompleted: StateFlow<Boolean> = _isInitialLoadCompleted.asStateFlow()
+
     private val lock = Mutex()
     var hasNext: Boolean = true
         private set
@@ -49,6 +52,7 @@ class MessageStateHolder(
     val pendingDeleteChat: StateFlow<LivetalkChatItem?> = _pendingDeleteChat.asStateFlow()
 
     suspend fun addBeforeChats(response: LivetalkResponseItem) {
+        _isInitialLoadCompleted.value = true
         val beforeChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
@@ -64,6 +68,7 @@ class MessageStateHolder(
     }
 
     suspend fun addAfterChats(response: LivetalkResponseItem) {
+        _isInitialLoadCompleted.value = true
         val newChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 

@@ -34,11 +34,13 @@ import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.component.profile.ProfileDialog
 import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleListShimmer
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatCheeringBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
 import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -63,6 +65,7 @@ fun LivetalkChatScreen(
     val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
     val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
     val clickedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
+    val chatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation(emoji: String) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -113,14 +116,25 @@ fun LivetalkChatScreen(
                         .fillMaxWidth(),
             ) {
                 // 채팅 버블
-                LivetalkChatBubbleList(
-                    modifier = Modifier.weight(1f),
-                    chatItems = livetalkChatBubbleItems,
-                    onDeleteClick = viewModel.messageStateHolder::requestDelete,
-                    onReportClick = viewModel.messageStateHolder::requestReport,
-                    onProfileClick = { viewModel.fetchMemberProfile(it.memberId) },
-                    fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
-                )
+                when (chatUiState) {
+                    is LivetalkChatUiState.Success -> {
+                        LivetalkChatBubbleList(
+                            modifier = Modifier.weight(1f),
+                            chatItems = livetalkChatBubbleItems,
+                            onDeleteClick = viewModel.messageStateHolder::requestDelete,
+                            onReportClick = viewModel.messageStateHolder::requestReport,
+                            onProfileClick = { viewModel.fetchMemberProfile(it.memberId) },
+                            fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
+                        )
+                    }
+
+                    is LivetalkChatUiState.Loading -> {
+                        LivetalkChatBubbleListShimmer()
+                    }
+
+                    is LivetalkChatUiState.Empty -> {
+                    }
+                }
 
                 // 구분선
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)

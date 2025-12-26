@@ -14,6 +14,7 @@ import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
 import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import dagger.assisted.Assisted
@@ -25,9 +26,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -68,6 +72,24 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private val _emojiAnimationSignal = MutableSharedFlow<LikeDeltaItem>()
     val emojiAnimationSignal = _emojiAnimationSignal.asSharedFlow()
+
+    val chatUiState: StateFlow<LivetalkChatUiState> =
+        combine(
+            messageStateHolder.livetalkChatBubbleItems,
+            messageStateHolder.isInitialLoadCompleted,
+        ) { items, isInitialLoadCompleted ->
+            when {
+                !isInitialLoadCompleted -> LivetalkChatUiState.Loading
+
+                items.isEmpty() -> LivetalkChatUiState.Empty
+
+                else -> LivetalkChatUiState.Success(items)
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = LivetalkChatUiState.Loading,
+        )
 
     init {
         viewModelScope.launch {
