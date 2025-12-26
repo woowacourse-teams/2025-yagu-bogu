@@ -1,13 +1,7 @@
 package com.yagubogu.ui.livetalk.chat
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
-import com.yagubogu.ui.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,9 +23,6 @@ import timber.log.Timber
  * @property hasNext 불러올 이전 메시지가 더 있는지 여부를 나타냅니다.
  * @property oldestMessageCursor 이전 메시지를 가져오기 위한 커서 ID (페이지네이션용).
  * @property newestMessageCursor 최신 메시지를 가져오기 위한 커서 ID.
- * @property messageFormText 메시지 입력 필드의 현재 텍스트를 담고 있는 [MutableLiveData].
- * @property canSendMessage 사용자가 인증되었고 메시지 입력이 비어있지 않을 때 true가 되는 [LiveData].
- * @property liveTalkChatBubbleItemsLiveData 화면에 표시될 현재 채팅 메시지 목록을 담고 있는 [LiveData].
  */
 class MessageStateHolder(
     val isVerified: Boolean = false,
@@ -44,29 +35,15 @@ class MessageStateHolder(
     var newestMessageCursor: Long? = null
         private set
 
-    val messageFormText = MutableLiveData<String>() // deprecated
-    val canSendMessage: LiveData<Boolean> = // deprecated
-        messageFormText.map { isVerified && !it.isNullOrBlank() } // deprecated
-
     private val _messageText = MutableStateFlow("")
     val messageText: StateFlow<String> = _messageText.asStateFlow()
-
-    private val _liveTalkChatBubbleItemsLiveData =
-        MutableLiveData<List<LivetalkChatBubbleItem>>() // deprecated
-    val liveTalkChatBubbleItemsLiveData: LiveData<List<LivetalkChatBubbleItem>> get() = _liveTalkChatBubbleItemsLiveData // deprecated
 
     private val _livetalkChatBubbleItems =
         MutableStateFlow<List<LivetalkChatBubbleItem>>(emptyList())
     val livetalkChatBubbleItems: StateFlow<List<LivetalkChatBubbleItem>> = _livetalkChatBubbleItems
 
-    private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
-    val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
-
     private val _pendingReportChat = MutableStateFlow<LivetalkChatItem?>(null)
     val pendingReportChat: StateFlow<LivetalkChatItem?> = _pendingReportChat.asStateFlow()
-
-    private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
-    val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
     private val _pendingDeleteChat = MutableStateFlow<LivetalkChatItem?>(null)
     val pendingDeleteChat: StateFlow<LivetalkChatItem?> = _pendingDeleteChat.asStateFlow()
@@ -113,7 +90,6 @@ class MessageStateHolder(
             newestMessageCursor = deletedChats.firstOrNull()?.livetalkChatItem?.chatId
             oldestMessageCursor = deletedChats.lastOrNull()?.livetalkChatItem?.chatId
             _livetalkChatBubbleItems.value = deletedChats
-            _livetalkDeleteEvent.setValue(Unit)
             _pendingDeleteChat.value = null
         }
     }
@@ -156,10 +132,6 @@ class MessageStateHolder(
 
     fun dismissReportDialog() {
         _pendingReportChat.value = null
-    }
-
-    fun updateLivetalkReportEvent(event: LivetalkReportEvent) {
-        _livetalkReportEvent.setValue(event)
     }
 
     fun updateMessageText(text: String) {

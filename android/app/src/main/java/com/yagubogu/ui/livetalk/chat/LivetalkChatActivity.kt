@@ -38,9 +38,6 @@ class LivetalkChatActivity : ComponentActivity() {
     companion object {
         private const val KEY_GAME_ID = "gameId"
         private const val KEY_IS_VERIFIED = "isVerified"
-        private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
-        private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
-        private const val MAX_ANIMATION_COUNT = 50
 
         fun newIntent(
             context: Context,

@@ -1,10 +1,7 @@
 package com.yagubogu.ui.livetalk.chat
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
@@ -17,10 +14,8 @@ import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
-import com.yagubogu.ui.livetalk.chat.model.LivetalkReportEvent
 import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
-import com.yagubogu.ui.livetalk.chat.model.LivetalkUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -56,16 +51,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     val messageStateHolder = MessageStateHolder(isVerified)
     val likeCountStateHolder = LikeCountStateHolder()
-
-    private val _livetalkUiState =
-        MutableLiveData<LivetalkUiState>(LivetalkUiState.Loading)
-    val livetalkUiState: LiveData<LivetalkUiState> get() = _livetalkUiState
-
-    val isStadiumLoading: LiveData<Boolean> =
-        livetalkUiState.map { it !is LivetalkUiState.Success }
-
-    private val _livetalkTeams = MutableLiveData<LivetalkTeams>() // deprecated
-    val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams // deprecated
 
     private val _teams = MutableStateFlow<LivetalkTeams?>(null)
     val teams: StateFlow<LivetalkTeams?> = _teams.asStateFlow()
@@ -186,7 +171,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess {
                     stopPolling()
                     startPolling()
-                    messageStateHolder.messageFormText.value = "" // deprecated
                     messageStateHolder.updateMessageText("")
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
@@ -218,12 +202,10 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .reportTalks(chatId)
                 .onSuccess {
                     messageStateHolder.reportChat(chatId)
-                    messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.Success)
                     Timber.d("현장톡 정상 신고")
                 }.onFailure { exception: Throwable ->
                     when (exception) {
                         is ApiException.BadRequest -> {
-                            messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.DuplicatedReport)
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
@@ -294,14 +276,11 @@ class LivetalkChatViewModel @AssistedInject constructor(
         val result: Result<LivetalkTeams> = talkRepository.getInitial(gameId).map { it.toUiModel() }
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
-                _livetalkTeams.value = livetalkTeams // deprecated
                 _teams.value = livetalkTeams
 
                 cachedLivetalkTeams = livetalkTeams
-                _livetalkUiState.value = LivetalkUiState.Success
             }.onFailure { exception ->
                 Timber.w(exception, "최초 팀 정보 가져오기 실패")
-                _livetalkUiState.value = LivetalkUiState.Error
             }
     }
 

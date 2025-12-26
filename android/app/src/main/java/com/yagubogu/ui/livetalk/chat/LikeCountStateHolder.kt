@@ -1,10 +1,6 @@
 package com.yagubogu.ui.livetalk.chat
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +19,7 @@ import timber.log.Timber
  * - 서버로부터 받은 실제 좋아요 수(`myTeamLikeRealCount`, `otherTeamLikeRealCount`)를 추적합니다.
  * - 사용자의 로컬 인터랙션을 포함하여 UI에 표시되는 좋아요 수(`myTeamLikeShowingCount`)를 관리합니다.
  * - 사용자가 누른 '좋아요' 클릭(`pendingLikeCount`)을 버퍼링하여 서버에 일괄 전송합니다.
- * - [SingleLiveData] 이벤트를 통해 다른 사용자로부터 들어온 '좋아요'에 대한 애니메이션을 트리거합니다.
+ * - [SharedFlow] 이벤트를 통해 다른 사용자로부터 들어온 '좋아요'에 대한 값을 트리거합니다.
  *
  * [Mutex]를 사용하여 '좋아요' 수 업데이트 시 스레드 안전성을 보장하며, 사용자가 '좋아요' 버튼을
  * 빠르게 연속으로 클릭할 때 발생할 수 있는 경쟁 상태(race condition)를 방지합니다.
@@ -37,20 +33,11 @@ class LikeCountStateHolder {
 
     private val lock = Mutex()
 
-    private val _myTeamLikeShowingCountLiveData = MutableLiveData(0L) // deprecated
-    val myTeamLikeShowingCountLiveData: LiveData<Long> get() = _myTeamLikeShowingCountLiveData // deprecated
-
     private val _myTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
     val myTeamLikeShowingCount: StateFlow<Long?> = _myTeamLikeShowingCount.asStateFlow()
 
-    private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
-    val myTeamLikeAnimationEvent: SingleLiveData<Long> get() = _myTeamLikeAnimationEvent
-
     private val _myTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
     val myTeamLikeChangeAmount: SharedFlow<Long?> = _myTeamLikeChangeAmount.asSharedFlow()
-
-    private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
-    val otherTeamLikeAnimationEvent: SingleLiveData<Long> get() = _otherTeamLikeAnimationEvent
 
     private val _otherTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
     val otherTeamLikeChangeAmount: SharedFlow<Long?> = _otherTeamLikeChangeAmount.asSharedFlow()
@@ -80,7 +67,6 @@ class LikeCountStateHolder {
         lock.withLock {
             if (myTeamLikeRealCount == 0L) {
                 myTeamLikeRealCount = remoteMyTeamLikeCount
-                _myTeamLikeShowingCountLiveData.value = remoteMyTeamLikeCount
                 _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
             }
             if (otherTeamLikeRealCount == 0L) {
@@ -91,13 +77,11 @@ class LikeCountStateHolder {
             if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
                 val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
                 myTeamLikeRealCount = remoteMyTeamLikeCount
-                _myTeamLikeAnimationEvent.setValue(diffCount)
                 _myTeamLikeChangeAmount.emit(diffCount)
             }
             if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
                 val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
                 otherTeamLikeRealCount = remoteOtherTeamLikeCount
-                _otherTeamLikeAnimationEvent.setValue(diffCount)
                 _otherTeamLikeChangeAmount.emit(diffCount)
             }
         }
@@ -105,8 +89,6 @@ class LikeCountStateHolder {
 
     suspend fun increaseMyTeamShowingCount(addValue: Long = 1L) {
         lock.withLock {
-            _myTeamLikeShowingCountLiveData.value =
-                _myTeamLikeShowingCountLiveData.value?.plus(addValue)
             _myTeamLikeShowingCount.value =
                 _myTeamLikeShowingCount.value?.plus(addValue) ?: addValue
         }
