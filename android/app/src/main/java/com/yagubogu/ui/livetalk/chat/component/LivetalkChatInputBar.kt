@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -54,7 +55,7 @@ fun LivetalkChatInputBar(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Gray050)
                 .padding(
                     start = 20.dp,
                     end = 20.dp,

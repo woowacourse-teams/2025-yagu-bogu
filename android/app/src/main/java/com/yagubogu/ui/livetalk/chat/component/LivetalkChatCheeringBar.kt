@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.util.emoji
 import com.yagubogu.ui.util.shimmerIf
@@ -48,7 +49,7 @@ fun LivetalkChatCheeringBar(
             modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(Color.White)
+                .background(Gray050)
                 .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
