@@ -51,6 +51,8 @@ class MessageStateHolder(
     private val _pendingDeleteChat = MutableStateFlow<LivetalkChatItem?>(null)
     val pendingDeleteChat: StateFlow<LivetalkChatItem?> = _pendingDeleteChat.asStateFlow()
 
+    private val pendingWriteChatIds = mutableSetOf<Long>()
+
     suspend fun addBeforeChats(response: LivetalkResponseItem) {
         _isInitialLoadCompleted.value = true
         val beforeChats: List<LivetalkChatBubbleItem> =
@@ -67,6 +69,25 @@ class MessageStateHolder(
         }
     }
 
+    suspend fun addPendingWriteChat(pendingChat: LivetalkChatBubbleItem.MyPendingBubbleItem) {
+        lock.withLock {
+            val currentChats: List<LivetalkChatBubbleItem> = _livetalkChatBubbleItems.value
+            pendingWriteChatIds.add(pendingChat.livetalkChatItem.chatId)
+            _livetalkChatBubbleItems.value = listOf(pendingChat) + currentChats
+        }
+    }
+
+    private suspend fun clearPendingWriteChats() {
+        lock.withLock {
+            pendingWriteChatIds.forEach { chatId ->
+                val currentChats: List<LivetalkChatBubbleItem> = _livetalkChatBubbleItems.value
+                _livetalkChatBubbleItems.value =
+                    currentChats.filter { it.livetalkChatItem.chatId != chatId }
+            }
+            pendingWriteChatIds.clear()
+        }
+    }
+
     suspend fun addAfterChats(response: LivetalkResponseItem) {
         _isInitialLoadCompleted.value = true
         val newChats: List<LivetalkChatBubbleItem> =
@@ -74,6 +95,7 @@ class MessageStateHolder(
 
         if (newChats.isEmpty()) return
 
+        clearPendingWriteChats()
         lock.withLock {
             val currentChats: List<LivetalkChatBubbleItem> =
                 _livetalkChatBubbleItems.value

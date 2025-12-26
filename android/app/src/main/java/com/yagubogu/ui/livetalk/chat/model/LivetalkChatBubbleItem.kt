@@ -3,6 +3,10 @@ package com.yagubogu.ui.livetalk.chat.model
 sealed class LivetalkChatBubbleItem {
     abstract val livetalkChatItem: LivetalkChatItem
 
+    data class MyPendingBubbleItem(
+        override val livetalkChatItem: LivetalkChatItem,
+    ) : LivetalkChatBubbleItem()
+
     data class MyBubbleItem(
         override val livetalkChatItem: LivetalkChatItem,
     ) : LivetalkChatBubbleItem()

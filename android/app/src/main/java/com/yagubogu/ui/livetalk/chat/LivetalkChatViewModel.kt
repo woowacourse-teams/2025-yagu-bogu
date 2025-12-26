@@ -13,6 +13,7 @@ import com.yagubogu.data.util.ApiException
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
 import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
@@ -37,6 +38,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
+import java.time.LocalDateTime
 
 class LivetalkChatViewModel @AssistedInject constructor(
     @Assisted private val gameId: Long,
@@ -80,9 +82,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
         ) { items, isInitialLoadCompleted ->
             when {
                 !isInitialLoadCompleted -> LivetalkChatUiState.Loading
-
                 items.isEmpty() -> LivetalkChatUiState.Empty
-
                 else -> LivetalkChatUiState.Success(items)
             }
         }.stateIn(
@@ -187,13 +187,31 @@ class LivetalkChatViewModel @AssistedInject constructor(
         if (message.isBlank()) return
 
         viewModelScope.launch {
+            messageStateHolder.updateMessageText("")
+            messageStateHolder.addPendingWriteChat(
+                LivetalkChatBubbleItem.MyPendingBubbleItem(
+                    LivetalkChatItem(
+                        System.currentTimeMillis(),
+                        0L,
+                        true,
+                        message,
+                        null,
+                        null,
+                        null,
+                        LocalDateTime.now(),
+                        false,
+                    ),
+                ),
+            )
+        }
+
+        viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
                 talkRepository.postTalks(gameId, message.trim()).map { it.toUiModel() }
             talksResult
                 .onSuccess {
                     stopPolling()
                     startPolling()
-                    messageStateHolder.updateMessageText("")
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }

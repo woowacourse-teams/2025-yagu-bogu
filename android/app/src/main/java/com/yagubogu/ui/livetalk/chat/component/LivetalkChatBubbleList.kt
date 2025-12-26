@@ -87,6 +87,14 @@ fun LivetalkChatBubbleList(
                         onProfileClick = { onProfileClick(item.livetalkChatItem) },
                     )
                 }
+
+                is LivetalkChatBubbleItem.MyPendingBubbleItem -> {
+                    LivetalkMyChatBubble(
+                        livetalkChatItem = item.livetalkChatItem,
+                        onDeleteClick = { onDeleteClick(item.livetalkChatItem) },
+                        isPending = true,
+                    )
+                }
             }
         }
     }
