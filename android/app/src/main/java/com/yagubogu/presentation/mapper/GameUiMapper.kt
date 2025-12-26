@@ -5,7 +5,7 @@ import com.yagubogu.data.dto.response.game.TeamByGameDto
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 
-fun GameWithCheckInDto.toUiModel(): LivetalkStadiumItem =
+fun GameWithCheckInDto.toLivetalkUiModel(): LivetalkStadiumItem =
     LivetalkStadiumItem(
         gameId = gameId,
         stadiumName = stadium.name,
