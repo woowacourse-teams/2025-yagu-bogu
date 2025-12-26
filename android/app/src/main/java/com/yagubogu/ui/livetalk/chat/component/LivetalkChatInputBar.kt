@@ -82,6 +82,7 @@ fun LivetalkChatInputBar(
             enabled = isVerified,
             modifier =
                 Modifier
+                    .clip(RoundedCornerShape(12.dp))
                     .shimmerIf(stadiumName == null)
                     .weight(1f)
                     .defaultMinSize(minHeight = 40.dp),
@@ -142,10 +143,10 @@ fun LivetalkChatInputBar(
         Box(
             modifier =
                 Modifier
-                    .shimmerIf(stadiumName == null)
                     .size(40.dp)
                     .align(Alignment.Bottom)
                     .clip(RoundedCornerShape(12.dp))
+                    .shimmerIf(stadiumName == null)
                     .background(sendBtnBackgroundColor)
                     .clickable(
                         enabled = messageFormText.isNotEmpty(),
