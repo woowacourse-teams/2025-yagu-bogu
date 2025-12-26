@@ -40,6 +40,7 @@ import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.noRippleClickable
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +65,7 @@ fun LivetalkOtherChatBubble(
             modifier =
                 Modifier
                     .padding(bottom = 4.dp)
-                    .clickable(onClick = onProfileClick),
+                    .noRippleClickable(onClick = onProfileClick),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AsyncImage(

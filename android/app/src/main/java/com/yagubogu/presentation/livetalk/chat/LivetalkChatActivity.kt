@@ -6,13 +6,10 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +28,6 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileDialog
-import com.yagubogu.ui.common.model.MemberProfile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -344,17 +340,11 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun showMemberProfileDialog() {
         binding.composeView.setContent {
-            var memberProfile by remember { mutableStateOf<MemberProfile?>(null) }
-
-            LaunchedEffect(Unit) {
-                viewModel.profileInfoClickEvent.collect { profile: MemberProfile ->
-                    memberProfile = profile
-                }
-            }
+            val memberProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
 
             memberProfile?.let { profile ->
                 ProfileDialog(
-                    onDismissRequest = { memberProfile = null },
+                    onDismissRequest = { viewModel.dismissProfile() },
                     memberProfile = profile,
                 )
             }

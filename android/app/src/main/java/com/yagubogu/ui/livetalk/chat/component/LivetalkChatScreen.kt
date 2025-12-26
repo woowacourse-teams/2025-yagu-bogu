@@ -34,6 +34,7 @@ import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.common.component.DefaultDialog
+import com.yagubogu.ui.common.component.profile.ProfileDialog
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -57,6 +58,7 @@ fun LivetalkChatScreen(
     val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
     val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
     val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
+    val clickedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -100,6 +102,7 @@ fun LivetalkChatScreen(
                     chatItems = livetalkChatBubbleItems,
                     onDeleteClick = viewModel.messageStateHolder::requestDelete,
                     onReportClick = viewModel.messageStateHolder::requestReport,
+                    onProfileClick = { viewModel.fetchMemberProfile(it.memberId) },
                     fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
                 )
 
@@ -168,6 +171,15 @@ fun LivetalkChatScreen(
                         )
                     },
                     onCancel = { messageStateHolder.dismissReportDialog() },
+                )
+            }
+
+            // 프로필 다이얼로그 레이어
+            clickedProfile?.let { profile ->
+                ProfileDialog(
+                    onDismissRequest = { viewModel.dismissProfile() },
+                    memberProfile = profile,
+                    modifier = modifier,
                 )
             }
 

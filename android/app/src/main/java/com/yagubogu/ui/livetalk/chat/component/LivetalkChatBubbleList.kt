@@ -32,6 +32,7 @@ fun LivetalkChatBubbleList(
     fetchBeforeTalks: () -> Unit = {},
     onDeleteClick: (LivetalkChatItem) -> Unit = {},
     onReportClick: (LivetalkChatItem) -> Unit = {},
+    onProfileClick: (LivetalkChatItem) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
 ) {
     var previousItemsCount by remember { mutableIntStateOf(chatItems.size) }
@@ -82,7 +83,7 @@ fun LivetalkChatBubbleList(
                     LivetalkOtherChatBubble(
                         livetalkChatItem = item.livetalkChatItem,
                         onReportClick = { onReportClick(item.livetalkChatItem) },
-                        onProfileClick = {},
+                        onProfileClick = { onProfileClick(item.livetalkChatItem) },
                     )
                 }
             }

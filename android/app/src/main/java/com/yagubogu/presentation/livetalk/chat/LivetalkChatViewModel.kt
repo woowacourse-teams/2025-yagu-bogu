@@ -27,11 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -78,8 +75,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private var likeBatchingJob: Job? = null
 
-    private val _profileInfoClickEvent = MutableSharedFlow<MemberProfile>()
-    val profileInfoClickEvent: SharedFlow<MemberProfile> = _profileInfoClickEvent.asSharedFlow()
+    private val _selectedProfile = MutableStateFlow<MemberProfile?>(null)
+    val selectedProfile: StateFlow<MemberProfile?> = _selectedProfile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -257,10 +254,16 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
-                    _profileInfoClickEvent.emit(memberProfile)
+                    _selectedProfile.emit(memberProfile)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
                 }
+        }
+    }
+
+    fun dismissProfile() {
+        viewModelScope.launch {
+            _selectedProfile.emit(null)
         }
     }
 
