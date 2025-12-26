@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import java.time.LocalDate
 import java.time.YearMonth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceCalendarContent(
     items: List<AttendanceHistoryItem>,
@@ -47,6 +49,8 @@ fun AttendanceCalendarContent(
     endMonth: YearMonth,
     currentMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
+    pastGames: List<PastGameUiModel>,
+    fetchPastGames: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -54,11 +58,19 @@ fun AttendanceCalendarContent(
     val itemsByDate: Map<LocalDate, AttendanceHistoryItem> =
         items.associateBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
     val scrollState: ScrollState = rememberScrollState()
+    var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
             scrollState.animateScrollTo(0)
         }
+    }
+
+    if (showBottomSheet) {
+        AttendanceAdditionBottomSheet(
+            items = pastGames,
+            onDismiss = { showBottomSheet = false },
+        )
     }
 
     Column(
@@ -86,28 +98,23 @@ fun AttendanceCalendarContent(
             AttendanceItem(item = item, isExpanded = true)
         } else {
             AttendanceAdditionButton(
-                onClick = { },
+                onClick = {
+                    fetchPastGames(currentDate)
+                    showBottomSheet = true
+                },
                 modifier = Modifier.padding(vertical = 30.dp),
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AttendanceAdditionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
-    if (showBottomSheet) {
-        AttendanceAdditionBottomSheet(
-            onDismiss = { showBottomSheet = false },
-        )
-    }
-
     Button(
-        onClick = { showBottomSheet = true },
+        onClick = onClick,
         shape = CircleShape,
         colors =
             ButtonDefaults.buttonColors(
@@ -136,6 +143,8 @@ private fun AttendanceAdditionButton(
 private fun AttendanceCalendarContentPreview() {
     AttendanceCalendarContent(
         items = ATTENDANCE_HISTORY_ITEMS,
+        pastGames = listOf(),
+        fetchPastGames = {},
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
@@ -148,6 +157,8 @@ private fun AttendanceCalendarContentPreview() {
 private fun AttendanceCalendarContentNoItemPreview() {
     AttendanceCalendarContent(
         items = emptyList(),
+        pastGames = listOf(),
+        fetchPastGames = {},
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),

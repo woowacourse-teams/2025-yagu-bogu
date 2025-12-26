@@ -48,6 +48,7 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.AttendanceHistoryViewType
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray200
@@ -60,6 +61,7 @@ import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import java.time.LocalDate
 import java.time.YearMonth
 
 private val START_MONTH: YearMonth = YearMonth.of(2015, 1)
@@ -73,6 +75,7 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
+    val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
     var currentMonth: YearMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
     var viewType: AttendanceHistoryViewType by rememberSaveable {
         mutableStateOf(AttendanceHistoryViewType.CALENDAR)
@@ -98,6 +101,8 @@ fun AttendanceHistoryScreen(
                 sort = sort,
             )
         },
+        pastGames = pastGames,
+        fetchPastGames = viewModel::fetchPastGames,
         modifier = modifier,
         scrollToTopEvent = scrollToTopEvent,
     )
@@ -111,6 +116,8 @@ private fun AttendanceHistoryScreen(
     onViewTypeChange: () -> Unit,
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
+    pastGames: List<PastGameUiModel>,
+    fetchPastGames: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -142,6 +149,8 @@ private fun AttendanceHistoryScreen(
                     endMonth = endMonth,
                     currentMonth = currentMonth,
                     onMonthChange = onMonthChange,
+                    pastGames = pastGames,
+                    fetchPastGames = fetchPastGames,
                     scrollToTopEvent = scrollToTopEvent,
                 )
 
@@ -308,6 +317,8 @@ private fun AttendanceCalenderScreenPreview() {
         viewType = AttendanceHistoryViewType.CALENDAR,
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        pastGames = listOf(),
+        fetchPastGames = {},
         updateItems = { _, _ -> },
     )
 }
@@ -321,6 +332,8 @@ private fun AttendanceListScreenPreview() {
         viewType = AttendanceHistoryViewType.LIST,
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        pastGames = listOf(),
+        fetchPastGames = {},
         updateItems = { _, _ -> },
     )
 }

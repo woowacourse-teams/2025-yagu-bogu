@@ -30,6 +30,9 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
+    private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
+    val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
+
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth = YearMonth.now(),
         filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
@@ -57,8 +60,10 @@ class AttendanceHistoryViewModel @Inject constructor(
                     }.mapList { it.toAttendanceUiModel(date = date) }
             gamesResult
                 .onSuccess { pastGameUiModels: List<PastGameUiModel> ->
+                    _pastGames.value = pastGameUiModels
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
+                    _pastGames.value = emptyList()
                 }
         }
     }

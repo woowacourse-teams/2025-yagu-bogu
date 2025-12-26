@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,19 +28,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.R
+import com.yagubogu.presentation.util.DateFormatter
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.theme.EsamanruBold32
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium24
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold16
-import com.yagubogu.ui.theme.TeamKia
-import com.yagubogu.ui.theme.TeamLotte
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceAdditionBottomSheet(
+    items: List<PastGameUiModel>,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
@@ -69,8 +72,11 @@ fun AttendanceAdditionBottomSheet(
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                items(count = 4) {
-                    PastAttendanceItem()
+                items(
+                    items = items,
+                    key = { item: PastGameUiModel -> item.gameId },
+                ) { item: PastGameUiModel ->
+                    PastAttendanceItem(item = item)
                 }
             }
         }
@@ -78,7 +84,10 @@ fun AttendanceAdditionBottomSheet(
 }
 
 @Composable
-private fun PastAttendanceItem(modifier: Modifier = Modifier) {
+private fun PastAttendanceItem(
+    item: PastGameUiModel,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -92,8 +101,8 @@ private fun PastAttendanceItem(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "롯데",
-                style = EsamanruBold32.copy(color = TeamLotte),
+                text = item.awayTeamName,
+                style = EsamanruBold32.copy(color = item.awayTeam.color),
                 textAlign = TextAlign.End,
                 modifier = Modifier.weight(1f),
             )
@@ -102,8 +111,8 @@ private fun PastAttendanceItem(modifier: Modifier = Modifier) {
                 style = PretendardMedium24,
             )
             Text(
-                text = "KIA",
-                style = EsamanruBold32.copy(color = TeamKia),
+                text = item.homeTeamName,
+                style = EsamanruBold32.copy(color = item.homeTeam.color),
                 textAlign = TextAlign.Start,
                 modifier = Modifier.weight(1f),
             )
@@ -111,11 +120,11 @@ private fun PastAttendanceItem(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "2025.12.17 14:00",
+            text = item.date.format(DateFormatter.yyyyMMdd),
             style = PretendardRegular12.copy(color = Gray500),
         )
         Text(
-            text = "광주 KIA 챔피언스필드",
+            text = item.stadiumName,
             style = PretendardRegular12.copy(color = Gray500),
         )
     }
@@ -126,6 +135,7 @@ private fun PastAttendanceItem(modifier: Modifier = Modifier) {
 @Composable
 private fun AttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
+        items = List(4) { PAST_GAME_UI_MODEL },
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
     )
@@ -134,5 +144,5 @@ private fun AttendanceAdditionBottomSheetPreview() {
 @Preview
 @Composable
 private fun PastAttendanceItemPreview() {
-    PastAttendanceItem()
+    PastAttendanceItem(item = PAST_GAME_UI_MODEL)
 }
