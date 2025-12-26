@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.R
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.ui.theme.Black
@@ -57,14 +58,23 @@ fun LivetalkChatToolbar(
     )
 }
 
-// @Preview
-// @Composable
-// private fun LivetalkChatToolbarPreview() {
-//    LivetalkChatToolbar(onBackClick = {}, "고척 스카이돔", "두산 vs 키움")
-// }
-//
-// @Preview
-// @Composable
-// private fun LivetalkChatToolbarShimmerPreview() {
-//    LivetalkChatToolbar(onBackClick = {}, null)
-// }
+@Preview
+@Composable
+private fun LivetalkChatToolbarPreview() {
+    LivetalkChatToolbar(
+        teams =
+            LivetalkTeams(
+                stadiumName = "고척 스카이돔",
+                homeTeamCode = "HH",
+                awayTeamCode = "HT",
+                myTeamCode = "HH",
+            ),
+        onBackClick = {},
+    )
+}
+
+@Preview
+@Composable
+private fun LivetalkChatToolbarShimmerPreview() {
+    LivetalkChatToolbar(teams = null, onBackClick = {})
+}

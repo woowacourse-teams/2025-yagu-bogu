@@ -24,12 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.ui.common.component.DefaultDialog
@@ -220,31 +218,4 @@ fun LivetalkChatScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun LivetalkChatMyTeamScreenPreview() {
-    LivetalkChatScreen(
-        viewModel = viewModel(),
-        onBackClick = {},
-    )
-}
-
-@Preview
-@Composable
-private fun LivetalkChatOtherTeamScreenPreview() {
-    LivetalkChatScreen(
-        viewModel = viewModel(),
-        onBackClick = {},
-    )
-}
-
-@Preview
-@Composable
-private fun LivetalkChatLoadingScreenPreview() {
-    LivetalkChatScreen(
-        viewModel = viewModel(),
-        onBackClick = {},
-    )
 }
