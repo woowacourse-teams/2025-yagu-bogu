@@ -56,6 +56,7 @@ fun LivetalkChatScreen(
     val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
     val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
     val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
+    val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
 
     fun generateEmojiAnimation() {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -98,6 +99,7 @@ fun LivetalkChatScreen(
                     modifier = Modifier.weight(1f),
                     chatItems = livetalkChatBubbleItems,
                     onDeleteClick = viewModel.messageStateHolder::requestDelete,
+                    onReportClick = viewModel.messageStateHolder::requestReport,
                     fetchBeforeTalks = { viewModel.fetchBeforeTalks() },
                 )
 
@@ -142,6 +144,30 @@ fun LivetalkChatScreen(
                         )
                     },
                     onCancel = { messageStateHolder.dismissDeleteDialog() },
+                )
+            }
+
+            // 신고 다이얼로그 레이어
+            pendingReportChat?.let { chat ->
+                DefaultDialog(
+                    dialogUiModel =
+                        DefaultDialogUiModel(
+                            title = stringResource(R.string.livetalk_user_report_btn),
+                            message =
+                                stringResource(
+                                    R.string.livetalk_user_report_dialog_message,
+                                    chat.nickname ?: stringResource(R.string.all_null_nick_name),
+                                ),
+                            positiveText = stringResource(R.string.livetalk_user_report_btn),
+                            negativeText = stringResource(R.string.all_cancel),
+                        ),
+                    onConfirm = {
+                        viewModel.reportMessage(
+                            messageStateHolder.pendingReportChat.value?.chatId
+                                ?: return@DefaultDialog,
+                        )
+                    },
+                    onCancel = { messageStateHolder.dismissReportDialog() },
                 )
             }
 

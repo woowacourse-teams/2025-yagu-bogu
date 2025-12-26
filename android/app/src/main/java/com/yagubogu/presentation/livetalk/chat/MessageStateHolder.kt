@@ -62,6 +62,9 @@ class MessageStateHolder(
     private val _livetalkReportEvent = MutableSingleLiveData<LivetalkReportEvent>()
     val livetalkReportEvent: SingleLiveData<LivetalkReportEvent> get() = _livetalkReportEvent
 
+    private val _pendingReportChat = MutableStateFlow<LivetalkChatItem?>(null)
+    val pendingReportChat: StateFlow<LivetalkChatItem?> = _pendingReportChat.asStateFlow()
+
     private val _livetalkDeleteEvent = MutableSingleLiveData<Unit>()
     val livetalkDeleteEvent: SingleLiveData<Unit> get() = _livetalkDeleteEvent
 
@@ -133,6 +136,7 @@ class MessageStateHolder(
                     }
                 }
             _livetalkChatBubbleItems.value = updatedChats
+            _pendingReportChat.value = null
         }
     }
 
@@ -143,6 +147,15 @@ class MessageStateHolder(
 
     fun dismissDeleteDialog() {
         _pendingDeleteChat.value = null
+    }
+
+    fun requestReport(chat: LivetalkChatItem) {
+        _pendingReportChat.value = chat
+        Timber.d("신고 요청: ${chat.chatId}")
+    }
+
+    fun dismissReportDialog() {
+        _pendingReportChat.value = null
     }
 
     fun updateLivetalkReportEvent(event: LivetalkReportEvent) {
