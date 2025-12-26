@@ -46,8 +46,8 @@ import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
 import com.yagubogu.ui.common.component.HeartbeatAnimation
+import com.yagubogu.ui.common.component.ParallelogramShape
 import com.yagubogu.ui.common.component.ShowMoreButton
-import com.yagubogu.ui.common.component.shape.ParallelogramShape
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
 import com.yagubogu.ui.theme.EsamanruMedium

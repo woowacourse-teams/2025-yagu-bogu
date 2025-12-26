@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -115,8 +114,8 @@ private fun AttendanceHistoryScreen(
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    val startMonth: YearMonth = remember { START_MONTH }
-    val endMonth: YearMonth = remember { END_MONTH }
+    val startMonth: YearMonth = START_MONTH
+    val endMonth: YearMonth = END_MONTH
 
     Column(
         modifier =

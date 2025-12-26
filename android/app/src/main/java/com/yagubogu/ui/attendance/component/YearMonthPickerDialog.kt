@@ -94,7 +94,7 @@ fun YearMonthPickerDialog(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Picker(
-                        items = years.toList(),
+                        items = years,
                         onValueChange = { year = it },
                         startIndex = years.indexOf(year).coerceAtLeast(0),
                         label = { yearFormat.format(it) },
@@ -102,7 +102,7 @@ fun YearMonthPickerDialog(
                         modifier = Modifier.weight(1f),
                     )
                     Picker(
-                        items = months.toList(),
+                        items = months,
                         onValueChange = { month = it },
                         startIndex = months.indexOf(month).coerceAtLeast(0),
                         label = { monthFormat.format(it) },
