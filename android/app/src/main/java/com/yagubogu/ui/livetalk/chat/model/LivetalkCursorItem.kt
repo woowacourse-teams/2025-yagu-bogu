@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat.model
+package com.yagubogu.ui.livetalk.chat.model
 
 data class LivetalkCursorItem(
     val chats: List<LivetalkChatItem>,

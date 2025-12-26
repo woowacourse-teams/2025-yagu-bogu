@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat.model
+package com.yagubogu.ui.livetalk.chat.model
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.util.emoji

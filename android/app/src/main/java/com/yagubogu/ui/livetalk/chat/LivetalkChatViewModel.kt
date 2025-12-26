@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.ui.livetalk.chat
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,14 +13,14 @@ import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
-import com.yagubogu.ui.livetalk.chat.component.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
+import com.yagubogu.ui.livetalk.chat.model.LivetalkUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

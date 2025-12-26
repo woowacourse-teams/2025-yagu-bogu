@@ -1,11 +1,11 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.ui.livetalk.chat
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

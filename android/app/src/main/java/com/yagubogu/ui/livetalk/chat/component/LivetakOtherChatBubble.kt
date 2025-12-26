@@ -28,8 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yagubogu.R
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.presentation.util.formatTimestamp
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400

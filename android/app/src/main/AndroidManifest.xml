@@ -25,10 +25,6 @@
             android:name=".presentation.setting.SettingActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.livetalk.chat.LivetalkChatActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".ui.livetalk.chat.LivetalkChatActivity"
             android:exported="false" />
         <activity

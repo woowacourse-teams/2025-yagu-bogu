@@ -1,4 +1,4 @@
-package com.yagubogu.ui.livetalk.chat.component.model
+package com.yagubogu.ui.livetalk.chat.model
 
 data class LikeDeltaItem(
     val emoji: String,

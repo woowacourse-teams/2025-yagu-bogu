@@ -1,14 +1,14 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.ui.livetalk.chat
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

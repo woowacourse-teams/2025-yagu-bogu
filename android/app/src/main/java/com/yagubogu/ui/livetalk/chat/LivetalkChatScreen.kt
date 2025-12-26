@@ -1,4 +1,4 @@
-package com.yagubogu.ui.livetalk.chat.component
+package com.yagubogu.ui.livetalk.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -32,11 +32,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.component.profile.ProfileDialog
-import com.yagubogu.ui.livetalk.chat.component.model.EmojiAnimationItem
-import com.yagubogu.ui.livetalk.chat.component.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatCheeringBar
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
+import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
+import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji

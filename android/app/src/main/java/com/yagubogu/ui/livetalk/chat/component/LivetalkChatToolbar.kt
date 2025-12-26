@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.yagubogu.R
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
+import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 
