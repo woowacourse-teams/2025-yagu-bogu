@@ -14,8 +14,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,11 +26,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +49,8 @@ import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardRegular12
@@ -64,7 +63,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.time.LocalDate
 import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
@@ -115,7 +113,7 @@ fun SettingScreen(
                 .fillMaxSize()
                 .background(Gray050)
                 .padding(20.dp)
-                .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical),
+                .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         MyProfile(memberInfoItem = memberInfoItem)
@@ -124,7 +122,9 @@ fun SettingScreen(
                 text = stringResource(R.string.setting_edit_profile_image),
                 onClick = { pickImageLauncher.launch("image/*") },
             )
-            SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {})
+            SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {
+                viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog)
+            })
             SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {})
             SettingButton(text = stringResource(R.string.setting_manage_account), onClick = {})
         }
@@ -142,6 +142,8 @@ fun SettingScreen(
                     .padding(top = 10.dp),
         )
     }
+
+    SettingDialog(viewModel = viewModel)
 }
 
 @Composable

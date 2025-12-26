@@ -9,7 +9,7 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.ui.common.component.DefaultDialog
 
 @Composable
-private fun DeleteAccountDialog(
+fun DeleteAccountDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,

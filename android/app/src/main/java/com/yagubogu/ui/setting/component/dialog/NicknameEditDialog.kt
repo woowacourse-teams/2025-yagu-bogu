@@ -41,7 +41,7 @@ import com.yagubogu.ui.theme.Primary500
 @Composable
 fun NicknameEditDialog(
     nickname: String,
-    onConfirm: () -> Unit,
+    onConfirm: (String) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -107,7 +107,7 @@ fun NicknameEditDialog(
                     }
 
                     Button(
-                        onClick = onConfirm,
+                        onClick = { onConfirm(nickname.value) },
                         modifier = Modifier.weight(1f),
                         colors =
                             ButtonDefaults.buttonColors(
