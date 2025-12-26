@@ -4,10 +4,10 @@ import com.yagubogu.data.dto.response.talk.CursorResultTalkDto
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
-import com.yagubogu.presentation.livetalk.chat.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkCursorItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkCursorItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import java.time.LocalDateTime
 
 fun TalkCursorResponse.toUiModel(): LivetalkResponseItem =

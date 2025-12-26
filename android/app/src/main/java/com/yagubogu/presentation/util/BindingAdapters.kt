@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.ColorRes
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -12,14 +11,6 @@ import com.yagubogu.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-
-@BindingAdapter("textColorRes")
-fun TextView.setTextColorRes(
-    @ColorRes colorRes: Int?,
-) {
-    if (colorRes == null || colorRes == 0) return
-    setTextColor(context.getColor(colorRes))
-}
 
 @BindingAdapter("signUpDateFormat")
 fun TextView.setSignUpDateFormat(date: LocalDate?) {

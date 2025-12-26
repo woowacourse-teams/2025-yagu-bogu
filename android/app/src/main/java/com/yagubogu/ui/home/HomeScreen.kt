@@ -18,23 +18,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.MemberStats
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
@@ -48,11 +50,19 @@ import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
 import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.util.BackPressHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
+    snackbarHostState: SnackbarHostState,
+    scrollToTopEvent: SharedFlow<Unit>,
+    onLoading: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
     val stadiumStatsUiModel: StadiumStatsUiModel by viewModel.stadiumStatsUiModel.collectAsStateWithLifecycle()
@@ -62,10 +72,10 @@ fun HomeScreen(
 
     val context: Context = LocalContext.current
     val activity: Activity = LocalActivity.current ?: return
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     val locationPermissionManager: LocationPermissionManager =
         remember { LocationPermissionManager(activity) }
-
     val locationPermissionLauncher: ActivityResultLauncher<Array<String>> =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val isPermissionGranted: Boolean = permissions.any { it.value }
@@ -75,24 +85,29 @@ fun HomeScreen(
                 isPermissionGranted ->
                     locationPermissionManager.checkLocationSettingsThenAction(viewModel::fetchStadiums)
 
-                // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
-                shouldShowRationale -> context.showToast(R.string.home_location_permission_denied_message)
+                shouldShowRationale -> {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(context.getString(R.string.home_location_permission_denied_message))
+                    }
+                }
 
                 else -> isPermissionDenied = true
             }
         }
 
-    val scrollState: ScrollState = rememberScrollState()
     LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
-            scrollState.animateScrollTo(0)
-        }
-    }
+        viewModel.fetchAll()
 
-    LaunchedEffect(Unit) {
-        viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
-            // TODO: MainActivity 마이그레이션 시 Snackbar로 대체
-            context.showToast(event.toMessage(context))
+        launch {
+            viewModel.checkInUiEvent.collect { event: CheckInUiEvent ->
+                snackbarHostState.showSnackbar(event.toMessage(context))
+            }
+        }
+
+        launch {
+            viewModel.isCheckInLoading.collect { isLoading: Boolean ->
+                onLoading(isLoading)
+            }
         }
     }
 
@@ -106,6 +121,8 @@ fun HomeScreen(
             viewModel.stopStreaming()
         }
     }
+
+    BackPressHandler(snackbarHostState, coroutineScope)
 
     HomeScreen(
         onCheckInClick = {
@@ -123,7 +140,7 @@ fun HomeScreen(
         victoryFairyRanking = victoryFairyRanking,
         onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
         modifier = modifier,
-        scrollState = scrollState,
+        scrollToTopEvent = scrollToTopEvent,
     )
 
     HomeDialog(viewModel)
@@ -151,8 +168,16 @@ private fun HomeScreen(
     victoryFairyRanking: VictoryFairyRanking,
     onVictoryFairyRankingClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     Column(
         modifier =
             modifier

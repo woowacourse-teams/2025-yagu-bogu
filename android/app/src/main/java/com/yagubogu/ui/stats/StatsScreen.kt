@@ -1,8 +1,6 @@
 package com.yagubogu.ui.stats
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -11,7 +9,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
@@ -27,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.ui.stats.detail.StatsDetailScreen
 import com.yagubogu.ui.stats.detail.StatsDetailViewModel
 import com.yagubogu.ui.stats.my.StatsMyScreen
@@ -38,20 +37,24 @@ import com.yagubogu.ui.theme.Primary100
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.BackPressHandler
+import com.yagubogu.ui.util.rememberNoRippleInteractionSource
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
-    statsMyViewModel: StatsMyViewModel,
-    statsDetailViewModel: StatsDetailViewModel,
+    snackbarHostState: SnackbarHostState,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
+    statsMyViewModel: StatsMyViewModel = hiltViewModel(),
+    statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
 ) {
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    BackPressHandler(snackbarHostState, coroutineScope)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -62,8 +65,8 @@ fun StatsScreen(
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
             when (StatsTab.entries[page]) {
-                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel)
-                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel)
+                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel, scrollToTopEvent)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel, scrollToTopEvent)
             }
         }
     }
@@ -109,14 +112,7 @@ private fun StatsTabRow(
                         pagerState.animateScrollToPage(index)
                     }
                 },
-                interactionSource =
-                    object : MutableInteractionSource { // Ripple 효과 제거 위함
-                        override suspend fun emit(interaction: Interaction) {}
-
-                        override fun tryEmit(interaction: Interaction): Boolean = true
-
-                        override val interactions: Flow<Interaction> = emptyFlow()
-                    },
+                interactionSource = rememberNoRippleInteractionSource(),
                 content = {
                     val style: TextStyle =
                         if (isSelected) {

@@ -22,12 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
@@ -53,20 +56,32 @@ import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun AttendanceHistoryScreen(
-    viewModel: AttendanceHistoryViewModel,
+    snackbarHostState: SnackbarHostState,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
+    viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
     val filter: AttendanceHistoryFilter by viewModel.attendanceFilter.collectAsStateWithLifecycle()
     val sort: AttendanceHistorySort by viewModel.attendanceSort.collectAsStateWithLifecycle()
     val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
+
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAttendanceHistoryItems()
+    }
+
+    BackPressHandler(snackbarHostState, coroutineScope)
 
     when (attendanceItems.isNotEmpty()) {
         true ->
@@ -79,7 +94,7 @@ fun AttendanceHistoryScreen(
                 sort = sort,
                 onSortClick = viewModel::switchAttendanceSort,
                 modifier = modifier,
-                scrollToTopEvent = viewModel.scrollToTopEvent,
+                scrollToTopEvent = scrollToTopEvent,
             )
 
         false -> EmptyAttendanceHistoryScreen()

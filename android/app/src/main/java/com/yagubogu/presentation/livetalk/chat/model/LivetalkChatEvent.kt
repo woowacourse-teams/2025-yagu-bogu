@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.presentation.livetalk.chat.model
 
 sealed interface LivetalkChatEvent {
     data class ViewProfile(

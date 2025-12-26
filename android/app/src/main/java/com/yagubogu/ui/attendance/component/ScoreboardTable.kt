@@ -23,7 +23,7 @@ import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 
 @Composable
 fun ScoreboardTable(
@@ -106,9 +106,9 @@ private fun ScoreboardText(
         text = text,
         style =
             if (isHeader) {
-                PretendardRegular.copy(fontSize = 10.dsp, textAlign = TextAlign.Center)
+                PretendardRegular.copy(fontSize = 10.dpToSp, textAlign = TextAlign.Center)
             } else {
-                PretendardMedium.copy(fontSize = 12.dsp, textAlign = TextAlign.Center)
+                PretendardMedium.copy(fontSize = 12.dpToSp, textAlign = TextAlign.Center)
             },
         modifier = modifier.padding(4.dp),
     )

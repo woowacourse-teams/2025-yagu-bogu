@@ -9,7 +9,7 @@
 
         <variable
             name="livetalkChatItem"
-            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
+            type="com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

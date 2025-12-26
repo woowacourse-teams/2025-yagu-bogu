@@ -21,7 +21,7 @@ import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary900
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dsp
+import com.yagubogu.ui.theme.dpToSp
 
 @Composable
 fun GameRecordTable(
@@ -124,14 +124,14 @@ private fun GameRecordText(
         style =
             if (isTitle) {
                 PretendardMedium.copy(
-                    fontSize = 12.dsp,
+                    fontSize = 12.dpToSp,
                     color = Primary900,
                     textAlign = TextAlign.Center,
                 )
             } else if (isHeader) {
-                PretendardRegular.copy(fontSize = 12.dsp, textAlign = TextAlign.Center)
+                PretendardRegular.copy(fontSize = 12.dpToSp, textAlign = TextAlign.Center)
             } else {
-                PretendardMedium.copy(fontSize = 12.dsp, textAlign = TextAlign.Center)
+                PretendardMedium.copy(fontSize = 12.dpToSp, textAlign = TextAlign.Center)
             },
         modifier = modifier.padding(vertical = 8.dp),
     )
