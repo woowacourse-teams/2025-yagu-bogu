@@ -100,11 +100,19 @@ val ATTENDANCE_HISTORY_ITEMS =
 
 val PAST_GAME_UI_MODEL =
     PastGameUiModel(
-        gameId = 1L,
+        gameId = 0L,
         date = LocalDate.now(),
         stadiumName = "광주 KIA 챔피언스필드",
         awayTeam = Team.LT,
         awayTeamName = "롯데",
         homeTeam = Team.HT,
         homeTeamName = "KIA",
+    )
+
+val PAST_GAME_UI_MODELS =
+    listOf(
+        PAST_GAME_UI_MODEL,
+        PAST_GAME_UI_MODEL.copy(gameId = 1L),
+        PAST_GAME_UI_MODEL.copy(gameId = 2L),
+        PAST_GAME_UI_MODEL.copy(gameId = 3L),
     )
