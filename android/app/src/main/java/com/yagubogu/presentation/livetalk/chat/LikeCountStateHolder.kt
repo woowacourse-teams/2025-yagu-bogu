@@ -6,11 +6,15 @@ import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import timber.log.Timber
 
 /**
  * 현장톡 내에서 우리 팀과 상대 팀의 '좋아요' 수 상태를 관리합니다.
@@ -41,8 +45,15 @@ class LikeCountStateHolder {
 
     private val _myTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
     val myTeamLikeAnimationEvent: SingleLiveData<Long> get() = _myTeamLikeAnimationEvent
+
+    private val _myTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
+    val myTeamLikeChangeAmount: SharedFlow<Long?> = _myTeamLikeChangeAmount.asSharedFlow()
+
     private val _otherTeamLikeAnimationEvent = MutableSingleLiveData<Long>()
     val otherTeamLikeAnimationEvent: SingleLiveData<Long> get() = _otherTeamLikeAnimationEvent
+
+    private val _otherTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
+    val otherTeamLikeChangeAmount: SharedFlow<Long?> = _otherTeamLikeChangeAmount.asSharedFlow()
 
     suspend fun updateLikeCount(
         livetalkTeams: LivetalkTeams,
@@ -63,6 +74,8 @@ class LikeCountStateHolder {
                 likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
                     ?: 0L
             }
+        Timber.d("remoteMyTeamLikeCount : $remoteMyTeamLikeCount")
+        Timber.d("remoteOtherTeamLikeCount : $remoteOtherTeamLikeCount")
 
         lock.withLock {
             if (myTeamLikeRealCount == 0L) {
@@ -79,11 +92,13 @@ class LikeCountStateHolder {
                 val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
                 myTeamLikeRealCount = remoteMyTeamLikeCount
                 _myTeamLikeAnimationEvent.setValue(diffCount)
+                _myTeamLikeChangeAmount.emit(diffCount)
             }
             if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
                 val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
                 otherTeamLikeRealCount = remoteOtherTeamLikeCount
                 _otherTeamLikeAnimationEvent.setValue(diffCount)
+                _otherTeamLikeChangeAmount.emit(diffCount)
             }
         }
     }

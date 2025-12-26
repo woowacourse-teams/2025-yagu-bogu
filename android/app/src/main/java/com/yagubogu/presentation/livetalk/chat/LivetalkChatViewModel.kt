@@ -20,6 +20,7 @@ import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.livetalk.chat.component.model.LikeDeltaItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,8 +28,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -78,10 +81,64 @@ class LivetalkChatViewModel @AssistedInject constructor(
     private val _selectedProfile = MutableStateFlow<MemberProfile?>(null)
     val selectedProfile: StateFlow<MemberProfile?> = _selectedProfile.asStateFlow()
 
+    private val _emojiAnimationSignal = MutableSharedFlow<LikeDeltaItem>()
+    val emojiAnimationSignal = _emojiAnimationSignal.asSharedFlow()
+
     init {
         viewModelScope.launch {
             fetchTeams(gameId)
             startPolling()
+        }
+
+        // 우리 팀 좋아요 수집
+        viewModelScope.launch {
+            likeCountStateHolder.myTeamLikeChangeAmount.collect { diffCount ->
+                diffCount?.let { scheduleEmojiAnimations(it, isMyTeam = true) }
+            }
+        }
+
+        // 상대 팀 좋아요 수집
+        viewModelScope.launch {
+            likeCountStateHolder.otherTeamLikeChangeAmount.collect { diffCount ->
+                diffCount?.let { scheduleEmojiAnimations(it, isMyTeam = false) }
+            }
+        }
+    }
+
+    private fun scheduleEmojiAnimations(
+        count: Long,
+        isMyTeam: Boolean,
+    ) {
+        if (count <= 0) return
+        val animationCount: Int = minOf(MAX_ANIMATION_COUNT, count.toInt())
+
+        // 각 애니메이션이 담당할 기본 카운트 (몫)
+        val baseIncrement: Long = count / animationCount
+
+        // 기본 카운트를 분배하고 남은 카운트 (나머지)
+        val remainder = count % animationCount
+
+        val emoji =
+            when {
+                isMyTeam -> teams.value?.myTeamEmoji ?: return
+                else -> teams.value?.otherTeamEmoji ?: return
+            }
+
+        viewModelScope.launch {
+            repeat(animationCount) { index: Int ->
+                launch {
+                    // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
+                    // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
+                    val increment: Long =
+                        if (index < remainder) baseIncrement + 1 else baseIncrement
+
+                    val randomDelay = (0L..POLLING_INTERVAL_MILLS).random()
+                    delay(randomDelay)
+
+                    _emojiAnimationSignal.emit(LikeDeltaItem(emoji, isMyTeam, increment))
+                    Timber.d("$emoji 이모지 애니메이션 및 $increment 만큼 카운트 증가")
+                }
+            }
         }
     }
 
@@ -311,6 +368,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
+
+        private const val MAX_ANIMATION_COUNT = 50
 
         fun provideFactory(
             assistedFactory: Factory,

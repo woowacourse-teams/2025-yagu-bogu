@@ -35,6 +35,8 @@ import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.component.profile.ProfileDialog
+import com.yagubogu.ui.livetalk.chat.component.model.EmojiAnimationItem
+import com.yagubogu.ui.livetalk.chat.component.model.LikeDeltaItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -51,7 +53,7 @@ fun LivetalkChatScreen(
     val likeCountStateHolder = viewModel.likeCountStateHolder
 
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
-    val emojiQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
+    val emojiQueue = remember { mutableStateListOf<EmojiAnimationItem>() }
     val teams by viewModel.teams.collectAsStateWithLifecycle()
     val messageText by messageStateHolder.messageText.collectAsStateWithLifecycle()
     val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
@@ -60,10 +62,22 @@ fun LivetalkChatScreen(
     val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
     val clickedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
 
-    fun generateEmojiAnimation() {
+    fun generateEmojiAnimation(emoji: String) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
-        emojiQueue.add(System.nanoTime() to emojiButtonPos)
+        emojiQueue.add(EmojiAnimationItem(System.nanoTime(), emoji, emojiButtonPos))
     }
+    LaunchedEffect(Unit) {
+        viewModel.emojiAnimationSignal.collect { deltaItem: LikeDeltaItem ->
+            // 1. 이모지 애니메이션 큐에 추가
+            generateEmojiAnimation(deltaItem.emoji)
+
+            // 2. 우리 팀의 변화량인 경우에만 UI 카운트 증가 (상대 팀은 카운트 텍스트가 없으므로 제외 가능)
+            if (deltaItem.isMyTeam) {
+                likeCountStateHolder.increaseMyTeamShowingCount(deltaItem.amount)
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             LivetalkChatToolbar(
@@ -117,7 +131,7 @@ fun LivetalkChatScreen(
                             team = myTeam,
                             cheeringCount = showingLikeCount,
                             onCheeringClick = {
-                                generateEmojiAnimation()
+                                generateEmojiAnimation(myTeam.emoji)
                                 viewModel.addLikeToBatch()
                             },
                             onPositioned = { pos: Offset -> emojiButtonPos = pos },
@@ -185,18 +199,17 @@ fun LivetalkChatScreen(
 
             // 이모지 애니메이션 레이어
             Box(modifier = Modifier.fillMaxSize()) {
-                emojiQueue.forEach { (key, startPos) ->
-                    key(key) {
+                emojiQueue.forEach { item: EmojiAnimationItem ->
+                    key(item.id) {
                         LaunchedEffect(Unit) {
-                            Timber.d("이모지 애니메이션 시작 좌표 : $startPos")
+                            Timber.d("이모지 애니메이션 시작 좌표 : ${item.startOffset}")
                         }
                         FloatingEmojiItem(
-                            emoji =
-                                viewModel.livetalkTeams.value
-                                    ?.myTeam
-                                    ?.emoji ?: "",
-                            startOffset = startPos,
-                            onAnimationFinished = { emojiQueue.remove(key to startPos) },
+                            emoji = item.emoji,
+                            startOffset = item.startOffset,
+                            onAnimationFinished = {
+                                emojiQueue.remove(item)
+                            },
                         )
                     }
                 }
