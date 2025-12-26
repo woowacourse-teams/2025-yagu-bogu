@@ -2,6 +2,7 @@ package com.yagubogu.ui.attendance.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,7 @@ import com.yagubogu.ui.util.color
 @Composable
 fun AttendanceAdditionBottomSheet(
     items: List<PastGameUiModel>,
+    onPastCheckIn: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
@@ -59,7 +61,12 @@ fun AttendanceAdditionBottomSheet(
         modifier = modifier,
     ) {
         when (items.isNotEmpty()) {
-            true -> PastGamesContent(items = items)
+            true ->
+                PastGamesContent(
+                    items = items,
+                    onItemClick = onPastCheckIn,
+                )
+
             false -> EmptyPastGameContent()
         }
     }
@@ -68,6 +75,7 @@ fun AttendanceAdditionBottomSheet(
 @Composable
 private fun PastGamesContent(
     items: List<PastGameUiModel>,
+    onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
@@ -93,7 +101,10 @@ private fun PastGamesContent(
                 items = items,
                 key = { item: PastGameUiModel -> item.gameId },
             ) { item: PastGameUiModel ->
-                PastAttendanceItem(item = item)
+                PastAttendanceItem(
+                    item = item,
+                    onClick = onItemClick,
+                )
             }
         }
     }
@@ -124,6 +135,7 @@ private fun EmptyPastGameContent(modifier: Modifier = Modifier) {
 @Composable
 private fun PastAttendanceItem(
     item: PastGameUiModel,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -131,6 +143,7 @@ private fun PastAttendanceItem(
             modifier
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp))
+                .clickable { onClick(item.gameId) }
                 .padding(horizontal = 20.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -174,6 +187,7 @@ private fun PastAttendanceItem(
 private fun AttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
         items = PAST_GAME_UI_MODELS,
+        onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
     )
@@ -185,6 +199,7 @@ private fun AttendanceAdditionBottomSheetPreview() {
 private fun EmptyAttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
         items = emptyList(),
+        onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
     )

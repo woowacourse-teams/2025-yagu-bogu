@@ -13,8 +13,12 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.PastGameUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -32,6 +36,14 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
     val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
+
+    private val _pastCheckInUiEvent =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val pastCheckInUiEvent: SharedFlow<Unit> = _pastCheckInUiEvent.asSharedFlow()
 
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth = YearMonth.now(),
@@ -64,6 +76,18 @@ class AttendanceHistoryViewModel @Inject constructor(
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                     _pastGames.value = emptyList()
+                }
+        }
+    }
+
+    fun addPastCheckIn(gameId: Long) {
+        viewModelScope.launch {
+            checkInRepository
+                .addPastCheckIn(gameId)
+                .onSuccess {
+                    _pastCheckInUiEvent.emit(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
                 }
         }
     }

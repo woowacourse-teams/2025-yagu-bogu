@@ -50,7 +50,8 @@ fun AttendanceCalendarContent(
     currentMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
     pastGames: List<PastGameUiModel>,
-    fetchPastGames: (LocalDate) -> Unit,
+    onRequestGames: (LocalDate) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -69,6 +70,10 @@ fun AttendanceCalendarContent(
     if (showBottomSheet) {
         AttendanceAdditionBottomSheet(
             items = pastGames,
+            onPastCheckIn = { gameId: Long ->
+                onPastCheckIn(gameId)
+                showBottomSheet = false
+            },
             onDismiss = { showBottomSheet = false },
         )
     }
@@ -99,7 +104,7 @@ fun AttendanceCalendarContent(
         } else {
             AttendanceAdditionButton(
                 onClick = {
-                    fetchPastGames(currentDate)
+                    onRequestGames(currentDate)
                     showBottomSheet = true
                 },
                 modifier = Modifier.padding(vertical = 30.dp),
@@ -143,12 +148,13 @@ private fun AttendanceAdditionButton(
 private fun AttendanceCalendarContentPreview() {
     AttendanceCalendarContent(
         items = ATTENDANCE_HISTORY_ITEMS,
-        pastGames = listOf(),
-        fetchPastGames = {},
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onMonthChange = {},
+        pastGames = listOf(),
+        onRequestGames = {},
+        onPastCheckIn = {},
     )
 }
 
@@ -157,11 +163,12 @@ private fun AttendanceCalendarContentPreview() {
 private fun AttendanceCalendarContentNoItemPreview() {
     AttendanceCalendarContent(
         items = emptyList(),
-        pastGames = listOf(),
-        fetchPastGames = {},
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onMonthChange = {},
+        pastGames = listOf(),
+        onRequestGames = {},
+        onPastCheckIn = {},
     )
 }

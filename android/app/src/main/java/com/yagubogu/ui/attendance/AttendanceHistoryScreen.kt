@@ -86,6 +86,14 @@ fun AttendanceHistoryScreen(
         viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth)
     }
 
+    val checkInSuccessMessage: String =
+        stringResource(R.string.attendance_history_check_in_success_message)
+    LaunchedEffect(Unit) {
+        viewModel.pastCheckInUiEvent.collect {
+            snackbarHostState.showSnackbar(checkInSuccessMessage)
+        }
+    }
+
     BackPressHandler(snackbarHostState, coroutineScope)
 
     AttendanceHistoryScreen(
@@ -102,7 +110,8 @@ fun AttendanceHistoryScreen(
             )
         },
         pastGames = pastGames,
-        fetchPastGames = viewModel::fetchPastGames,
+        onRequestGames = viewModel::fetchPastGames,
+        onPastCheckIn = viewModel::addPastCheckIn,
         modifier = modifier,
         scrollToTopEvent = scrollToTopEvent,
     )
@@ -117,7 +126,8 @@ private fun AttendanceHistoryScreen(
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
     pastGames: List<PastGameUiModel>,
-    fetchPastGames: (LocalDate) -> Unit,
+    onRequestGames: (LocalDate) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -150,7 +160,8 @@ private fun AttendanceHistoryScreen(
                     currentMonth = currentMonth,
                     onMonthChange = onMonthChange,
                     pastGames = pastGames,
-                    fetchPastGames = fetchPastGames,
+                    onRequestGames = onRequestGames,
+                    onPastCheckIn = onPastCheckIn,
                     scrollToTopEvent = scrollToTopEvent,
                 )
 
@@ -318,7 +329,8 @@ private fun AttendanceCalenderScreenPreview() {
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
         pastGames = listOf(),
-        fetchPastGames = {},
+        onRequestGames = {},
+        onPastCheckIn = {},
         updateItems = { _, _ -> },
     )
 }
@@ -333,7 +345,8 @@ private fun AttendanceListScreenPreview() {
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
         pastGames = listOf(),
-        fetchPastGames = {},
+        onRequestGames = {},
+        onPastCheckIn = {},
         updateItems = { _, _ -> },
     )
 }
