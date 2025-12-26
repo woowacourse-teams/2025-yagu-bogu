@@ -93,6 +93,8 @@
     <string name="stats_winning_percentage">직관 승률</string>
     <string name="stats_stadium_visit_count">구장 방문 횟수</string>
 
+    <string name="attendance_history_year">%d년</string>
+    <string name="attendance_history_month">%d월</string>
     <string name="attendance_history_year_month">%d년 %d월</string>
     <string name="attendance_history_add_attendance">직관 내역 추가하기</string>
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>

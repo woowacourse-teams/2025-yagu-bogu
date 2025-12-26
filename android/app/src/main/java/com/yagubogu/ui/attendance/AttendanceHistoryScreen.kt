@@ -44,6 +44,7 @@ import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
 import com.yagubogu.ui.attendance.component.AttendanceCalendarContent
 import com.yagubogu.ui.attendance.component.AttendanceListContent
+import com.yagubogu.ui.attendance.component.YearMonthPickerDialog
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
@@ -168,6 +169,20 @@ private fun AttendanceHistoryHeader(
     val isStartMonth: Boolean = currentMonth == startMonth
     val isEndMonth: Boolean = currentMonth == endMonth
 
+    var showDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+    if (showDialog) {
+        YearMonthPickerDialog(
+            startMonth = startMonth,
+            endMonth = endMonth,
+            currentMonth = currentMonth,
+            onConfirm = { newMonth: YearMonth ->
+                onMonthChange(newMonth)
+                showDialog = false
+            },
+            onCancel = { showDialog = false },
+        )
+    }
+
     Row(
         modifier =
             modifier
@@ -201,7 +216,10 @@ private fun AttendanceHistoryHeader(
                         currentMonth.monthValue,
                     ),
                 style = PretendardSemiBold20,
-                modifier = Modifier.width(140.dp),
+                modifier =
+                    Modifier
+                        .width(140.dp)
+                        .noRippleClickable { showDialog = true },
                 textAlign = TextAlign.Center,
             )
             Icon(

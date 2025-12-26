@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +40,8 @@ import java.time.YearMonth
 
 @Composable
 fun YearMonthPickerDialog(
+    startMonth: YearMonth,
+    endMonth: YearMonth,
     currentMonth: YearMonth,
     onConfirm: (YearMonth) -> Unit,
     onCancel: () -> Unit,
@@ -46,6 +49,15 @@ fun YearMonthPickerDialog(
 ) {
     var year: Int by rememberSaveable { mutableIntStateOf(currentMonth.year) }
     var month: Int by rememberSaveable { mutableIntStateOf(currentMonth.monthValue) }
+
+    val years: List<Int> =
+        remember(startMonth, endMonth) {
+            (startMonth.year..endMonth.year).toList()
+        }
+    val months: List<Int> = remember { (1..12).toList() }
+
+    val yearFormat: String = stringResource(R.string.attendance_history_year)
+    val monthFormat: String = stringResource(R.string.attendance_history_month)
 
     Dialog(
         onDismissRequest = onCancel,
@@ -82,17 +94,18 @@ fun YearMonthPickerDialog(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Picker(
-                        items = (2015..2025).toList(),
+                        items = years.toList(),
                         onValueChange = { year = it },
-                        label = { "${it}년" },
+                        startIndex = years.indexOf(year).coerceAtLeast(0),
+                        label = { yearFormat.format(it) },
                         textAlign = TextAlign.End,
                         modifier = Modifier.weight(1f),
                     )
                     Picker(
-                        items = (1..12).toList(),
+                        items = months.toList(),
                         onValueChange = { month = it },
-                        startIndex = 11,
-                        label = { "${it}월" },
+                        startIndex = months.indexOf(month).coerceAtLeast(0),
+                        label = { monthFormat.format(it) },
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f),
                     )
@@ -143,6 +156,8 @@ fun YearMonthPickerDialog(
 @Composable
 private fun YearMonthPickerDialogPreview() {
     YearMonthPickerDialog(
+        startMonth = YearMonth.now().minusYears(1),
+        endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onConfirm = {},
         onCancel = {},
