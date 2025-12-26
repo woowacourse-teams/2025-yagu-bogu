@@ -77,19 +77,20 @@ class MessageStateHolder(
         }
     }
 
-    private suspend fun clearPendingWriteChats() {
-        lock.withLock {
-            pendingWriteChatIds.forEach { chatId ->
-                val currentChats: List<LivetalkChatBubbleItem> = _livetalkChatBubbleItems.value
-                _livetalkChatBubbleItems.value =
-                    currentChats.filter { it.livetalkChatItem.chatId != chatId }
-            }
-            pendingWriteChatIds.clear()
+    private fun clearPendingWriteChats() {
+        pendingWriteChatIds.forEach { chatId ->
+            val currentChats: List<LivetalkChatBubbleItem> = _livetalkChatBubbleItems.value
+            _livetalkChatBubbleItems.value =
+                currentChats.filter { it.livetalkChatItem.chatId != chatId }
         }
+        pendingWriteChatIds.clear()
     }
 
     suspend fun addAfterChats(response: LivetalkResponseItem) {
         _isInitialLoadCompleted.value = true
+        lock.withLock {
+            hasNext = response.cursor.hasNext
+        }
         val newChats: List<LivetalkChatBubbleItem> =
             response.cursor.chats.map { LivetalkChatBubbleItem.of(it) }
 
@@ -97,11 +98,14 @@ class MessageStateHolder(
 
         clearPendingWriteChats()
         lock.withLock {
-            val currentChats: List<LivetalkChatBubbleItem> =
-                _livetalkChatBubbleItems.value
-            _livetalkChatBubbleItems.value = newChats + currentChats
+            val currentChats = _livetalkChatBubbleItems.value
+            val incomingChatIds = newChats.map { it.livetalkChatItem.chatId }.toSet()
+            val idsToRemove = pendingWriteChatIds + incomingChatIds
+            val filteredChats = currentChats.filterNot { it.livetalkChatItem.chatId in idsToRemove }
 
-            hasNext = response.cursor.hasNext
+            _livetalkChatBubbleItems.value = newChats + filteredChats
+            pendingWriteChatIds.clear()
+
             newestMessageCursor = newChats.first().livetalkChatItem.chatId
             oldestMessageCursor = oldestMessageCursor ?: newChats.last().livetalkChatItem.chatId
         }

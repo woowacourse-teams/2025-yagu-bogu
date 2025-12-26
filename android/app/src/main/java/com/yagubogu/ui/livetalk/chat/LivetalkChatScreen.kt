@@ -32,6 +32,7 @@ import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.component.profile.ProfileDialog
+import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
 import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleListShimmer
@@ -133,6 +134,7 @@ fun LivetalkChatScreen(
                     }
 
                     is LivetalkChatUiState.Empty -> {
+                        EmptyLivetalkChat(isCheckIn = viewModel.messageStateHolder.isVerified)
                     }
                 }
 
