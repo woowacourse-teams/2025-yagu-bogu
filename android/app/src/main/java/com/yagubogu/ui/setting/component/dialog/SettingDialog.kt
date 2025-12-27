@@ -1,6 +1,7 @@
 package com.yagubogu.ui.setting.component.dialog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,7 +20,7 @@ fun SettingDialog(
         SettingDialogEvent.DeleteAccountDialog -> {
             DeleteAccountDialog(
                 onConfirm = viewModel::deleteAccount,
-                onCancel = viewModel::cancelDeleteAccount,
+                onCancel = viewModel::hideDialog,
             )
         }
 
@@ -32,7 +33,10 @@ fun SettingDialog(
 
         SettingDialogEvent.NicknameEditDialog -> {
             NicknameEditDialog(
-                nickname = viewModel.myMemberInfoItem.value.nickName,
+                nickname =
+                    viewModel.myMemberInfoItem
+                        .collectAsState()
+                        .value.nickName,
                 onConfirm = viewModel::updateNickname,
                 onCancel = viewModel::hideDialog,
             )

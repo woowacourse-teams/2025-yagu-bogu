@@ -31,10 +31,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.SettingEvent
 import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.ui.setting.component.SettingEventHandler
+import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.model.MemberInfoItem
+import com.yagubogu.ui.setting.component.model.SettingDialogEvent
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardBold
@@ -59,7 +62,7 @@ fun SettingDeleteAccountScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(White)
+                .background(Gray050)
                 .padding(horizontal = 30.dp, vertical = 40.dp)
                 .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -68,8 +71,10 @@ fun SettingDeleteAccountScreen(
         RememberImageMessage(memberInfoItem.value)
         DeleteAccountButtons(
             onCancel = viewModel::cancelDeleteAccount,
-            onConfirm = viewModel::deleteAccount,
+            onConfirm = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
         )
+
+        SettingDialog(viewModel = viewModel)
 
         SettingEventHandler(
             settingEvent = settingEvent.value,
