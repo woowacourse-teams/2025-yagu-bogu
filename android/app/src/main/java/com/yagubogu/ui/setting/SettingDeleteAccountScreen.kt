@@ -47,7 +47,7 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingDeleteAccountScreen(
-    onDeleteAccountCancel: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -56,6 +56,25 @@ fun SettingDeleteAccountScreen(
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
+    SettingDeleteAccountScreen(
+        navigateToHome = navigateToHome,
+        onCancelDeleteAccount = viewModel::cancelDeleteAccount,
+        onConfirmDeleteAccount = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
+        memberInfoItem = memberInfoItem.value,
+        settingEvent = settingEvent.value,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun SettingDeleteAccountScreen(
+    navigateToHome: () -> Unit,
+    onCancelDeleteAccount: () -> Unit,
+    onConfirmDeleteAccount: () -> Unit,
+    memberInfoItem: MemberInfoItem,
+    settingEvent: SettingEvent?,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -66,23 +85,23 @@ fun SettingDeleteAccountScreen(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         DeleteAccountQuestion()
-        RememberImageMessage(memberInfoItem.value)
+        RememberImageMessage(memberInfoItem)
         DeleteAccountButtons(
-            onCancel = viewModel::cancelDeleteAccount,
-            onConfirm = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
+            onCancel = onCancelDeleteAccount,
+            onConfirm = onConfirmDeleteAccount,
         )
 
         SettingDialog()
 
         SettingEventHandler(
-            settingEvent = settingEvent.value,
-            onDeleteAccountCancel = onDeleteAccountCancel,
+            settingEvent = settingEvent,
+            navigateToHome = navigateToHome,
         )
     }
 }
 
 @Composable
-fun DeleteAccountQuestion(modifier: Modifier = Modifier) {
+private fun DeleteAccountQuestion(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.setting_delete_account_question_title),
@@ -100,7 +119,7 @@ fun DeleteAccountQuestion(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RememberImageMessage(
+private fun RememberImageMessage(
     memberInfoItem: MemberInfoItem,
     modifier: Modifier = Modifier,
 ) {
@@ -132,7 +151,7 @@ fun RememberImageMessage(
 }
 
 @Composable
-fun DeleteAccountButtons(
+private fun DeleteAccountButtons(
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
@@ -183,5 +202,11 @@ fun DeleteAccountButtons(
 @Preview
 @Composable
 private fun SettingDeleteAccountScreenPreview() {
-    SettingDeleteAccountScreen(onDeleteAccountCancel = {})
+    SettingDeleteAccountScreen(
+        navigateToHome = {},
+        onCancelDeleteAccount = {},
+        onConfirmDeleteAccount = {},
+        memberInfoItem = MemberInfoItem(),
+        settingEvent = null,
+    )
 }

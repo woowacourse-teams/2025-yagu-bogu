@@ -197,7 +197,7 @@ fun MainScreen(
                                     )
                             },
                     ) {
-                        SettingDeleteAccountScreen(onDeleteAccountCancel = {
+                        SettingDeleteAccountScreen(navigateToHome = {
                             navigator.clearStackAndNavigate(BottomNavKey.Home)
                         })
                     }

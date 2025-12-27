@@ -14,7 +14,7 @@ import com.yagubogu.ui.setting.SettingEvent
 @Composable
 fun SettingEventHandler(
     settingEvent: SettingEvent?,
-    onDeleteAccountCancel: () -> Unit = {},
+    navigateToHome: () -> Unit = {},
 ) {
     val context: Context = LocalContext.current
 
@@ -29,7 +29,7 @@ fun SettingEventHandler(
                 }
 
                 SettingEvent.DeleteAccountCancel -> {
-                    onDeleteAccountCancel()
+                    navigateToHome()
                     context.getString(R.string.setting_delete_account_cancel_select_alert)
                 }
 
