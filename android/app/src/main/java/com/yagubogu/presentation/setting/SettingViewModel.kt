@@ -13,6 +13,7 @@ import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
 import com.yagubogu.presentation.util.livedata.SingleLiveData
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,6 +23,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+
+sealed interface SettingEvent {
+    data class NicknameEdit(
+        val newNickname: String,
+    ) : SettingEvent
+
+    data object Logout : SettingEvent
+
+    data object DeleteAccount : SettingEvent
+
+    data object DeleteAccountCancel : SettingEvent
+}
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -38,17 +51,8 @@ class SettingViewModel @Inject constructor(
     private val _dialogEvent = MutableSharedFlow<SettingDialogEvent>()
     val dialogEvent: SharedFlow<SettingDialogEvent> = _dialogEvent.asSharedFlow()
 
-    private val _nicknameEditedEvent = MutableSingleLiveData<String>()
-    val nicknameEditedEvent: SingleLiveData<String> get() = _nicknameEditedEvent
-
-    private val _logoutEvent = MutableSingleLiveData<Unit>()
-    val logoutEvent: SingleLiveData<Unit> get() = _logoutEvent
-
-    private val _deleteAccountEvent = MutableSingleLiveData<Unit>()
-    val deleteAccountEvent: SingleLiveData<Unit> get() = _deleteAccountEvent
-
-    private val _deleteAccountCancelEvent = MutableSingleLiveData<Unit>()
-    val deleteAccountCancelEvent: SingleLiveData<Unit> get() = _deleteAccountCancelEvent
+    private val _settingEvent = MutableSharedFlow<SettingEvent>()
+    val settingEvent: SharedFlow<SettingEvent> = _settingEvent.asSharedFlow()
 
     init {
         fetchMemberInfo()
@@ -65,6 +69,7 @@ class SettingViewModel @Inject constructor(
                 .onSuccess {
                     _myMemberInfoItem.value = myMemberInfoItem.value.copy(nickName = newNickname)
                     _dialogEvent.emit(SettingDialogEvent.HideDialog)
+                    _settingEvent.emit(SettingEvent.NicknameEdit(newNickname))
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
                 }
@@ -77,7 +82,7 @@ class SettingViewModel @Inject constructor(
                 .logout()
                 .onSuccess {
                     memberRepository.invalidateCache()
-                    _logoutEvent.setValue(Unit)
+                    _settingEvent.emit(SettingEvent.Logout)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "로그아웃 API 호출 실패")
                 }
@@ -89,10 +94,17 @@ class SettingViewModel @Inject constructor(
             memberRepository
                 .deleteMember()
                 .onSuccess {
-                    _deleteAccountEvent.setValue(Unit)
+                    _settingEvent.emit(SettingEvent.DeleteAccount)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "계정 삭제 API 호출 실패")
                 }
+        }
+    }
+
+    fun cancelDeleteAccount() {
+        viewModelScope.launch {
+            _dialogEvent.emit(SettingDialogEvent.HideDialog)
+            _settingEvent.emit(SettingEvent.DeleteAccountCancel)
         }
     }
 

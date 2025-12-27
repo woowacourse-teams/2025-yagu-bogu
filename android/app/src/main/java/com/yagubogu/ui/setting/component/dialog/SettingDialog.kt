@@ -19,7 +19,7 @@ fun SettingDialog(
         SettingDialogEvent.DeleteAccountDialog -> {
             DeleteAccountDialog(
                 onConfirm = viewModel::deleteAccount,
-                onCancel = viewModel::hideDialog,
+                onCancel = viewModel::cancelDeleteAccount,
             )
         }
 

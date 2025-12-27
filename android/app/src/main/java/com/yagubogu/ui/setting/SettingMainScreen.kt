@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +47,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.SettingEvent
 import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import com.yagubogu.ui.theme.Gray050
@@ -110,6 +113,9 @@ fun SettingMainScreen(
             }
         }
 
+    val settingEvent: State<SettingEvent?> =
+        viewModel.settingEvent.collectAsStateWithLifecycle(null)
+
     Column(
         modifier =
             modifier
@@ -151,6 +157,8 @@ fun SettingMainScreen(
         )
 
         SettingDialog(viewModel = viewModel)
+
+        SettingEventHandler(settingEvent = settingEvent.value)
     }
 }
 
@@ -340,5 +348,5 @@ private fun Uri.fileSize(context: Context): Result<Long?> =
 @Preview(showBackground = true)
 @Composable
 private fun SettingMainScreenPreview() {
-//    SettingMainScreen()
+    SettingMainScreen(onClickSettingAccount = {})
 }

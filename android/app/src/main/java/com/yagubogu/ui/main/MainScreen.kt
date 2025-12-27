@@ -69,7 +69,7 @@ fun MainScreen(
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = BottomNavKey.Home,
-            topLevelRoutes = BottomNavKey.items.toSet(),
+            topLevelRoutes = (BottomNavKey.items + TopNavKey.SettingMain).toSet(),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -182,10 +182,23 @@ fun MainScreen(
                         )
                     }
                     entry<TopNavKey.SettingAccount> {
-                        SettingAccountScreen(onClickDeleteAccount = { navigator.navigate(TopNavKey.SettingDeleteAccount) })
+                        SettingAccountScreen(
+                            onClickDeleteAccount = { navigator.navigate(TopNavKey.SettingDeleteAccount) },
+                        )
                     }
-                    entry<TopNavKey.SettingDeleteAccount> {
-                        SettingDeleteAccountScreen()
+                    entry<TopNavKey.SettingDeleteAccount>(
+                        metadata =
+                            NavDisplay.popTransitionSpec {
+                                EnterTransition.None togetherWith
+                                    slideOutOfContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                        animationSpec = tween(300),
+                                    )
+                            },
+                    ) {
+                        SettingDeleteAccountScreen(onDeleteAccountCancel = {
+                            navigator.clearStackAndNavigate(BottomNavKey.Home)
+                        })
                     }
                 }
 

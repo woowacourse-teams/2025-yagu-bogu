@@ -30,7 +30,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.SettingEvent
 import com.yagubogu.presentation.setting.SettingViewModel
+import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardBold
@@ -42,11 +44,14 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingDeleteAccountScreen(
-    viewModel: SettingViewModel = hiltViewModel(),
+    onDeleteAccountCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle()
+    val settingEvent: State<SettingEvent?> =
+        viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     Column(
         modifier =
@@ -60,8 +65,13 @@ fun SettingDeleteAccountScreen(
         DeleteAccountQuestion()
         RememberImageMessage(memberInfoItem.value)
         DeleteAccountButtons(
-            onCancel = {},
-            onConfirm = {},
+            onCancel = viewModel::cancelDeleteAccount,
+            onConfirm = viewModel::deleteAccount,
+        )
+
+        SettingEventHandler(
+            settingEvent = settingEvent.value,
+            onDeleteAccountCancel = onDeleteAccountCancel,
         )
     }
 }
@@ -162,5 +172,5 @@ fun DeleteAccountButtons(
 @Preview
 @Composable
 private fun SettingDeleteAccountScreenPreview() {
-    SettingDeleteAccountScreen()
+    SettingDeleteAccountScreen(onDeleteAccountCancel = {})
 }

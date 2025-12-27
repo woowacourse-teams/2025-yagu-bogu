@@ -35,4 +35,11 @@ class Navigator(
             currentStack.removeLastOrNull()
         }
     }
+
+    fun clearStackAndNavigate(route: NavKey) {
+        while (currentStack.size > 1) {
+            goBack()
+        }
+        navigate(route)
+    }
 }
