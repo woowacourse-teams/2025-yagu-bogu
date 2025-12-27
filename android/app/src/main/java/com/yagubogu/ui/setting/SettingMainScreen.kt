@@ -42,10 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.database.getLongOrNull
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
+import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.SettingEvent
 import com.yagubogu.presentation.setting.SettingViewModel
@@ -126,6 +129,7 @@ fun SettingMainScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         MyProfile(memberInfoItem = memberInfoItem)
+
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(R.string.setting_edit_profile_image),
@@ -134,17 +138,29 @@ fun SettingMainScreen(
             SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {
                 viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog)
             })
-            SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {})
+            SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {
+                context.startActivity(Intent(context, FavoriteTeamActivity::class.java))
+            })
             SettingButton(
                 text = stringResource(R.string.setting_manage_account),
                 onClick = onClickSettingAccount,
             )
         }
+
         SettingButtonGroup {
-            SettingButton(text = stringResource(R.string.setting_notice), onClick = {})
-            SettingButton(text = stringResource(R.string.setting_contact_us), onClick = {})
-            SettingButton(text = stringResource(R.string.setting_open_source_license), onClick = {})
+            SettingButton(
+                text = stringResource(R.string.setting_notice),
+                onClick = { context.openUrl(NOTICE_URL) },
+            )
+            SettingButton(
+                text = stringResource(R.string.setting_contact_us),
+                onClick = { context.openUrl(CONTACT_URL) },
+            )
+            SettingButton(text = stringResource(R.string.setting_open_source_license), onClick = {
+                context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+            })
         }
+
         Text(
             text = stringResource(R.string.setting_app_version, getAppVersion()),
             textAlign = TextAlign.Center,
@@ -344,6 +360,15 @@ private fun Uri.fileSize(context: Context): Result<Long?> =
                     parcelFileDescriptor.statSize.takeIf { it >= 0 }
                 }
     }
+
+private fun Context.openUrl(url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    startActivity(intent)
+}
+
+private const val NOTICE_URL =
+    "https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74"
+private const val CONTACT_URL = "https://forms.gle/wBhXjfTLyobZa19K8"
 
 @Preview(showBackground = true)
 @Composable
