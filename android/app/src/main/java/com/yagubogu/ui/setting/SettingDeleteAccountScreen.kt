@@ -31,8 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.setting.SettingEvent
-import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.MemberInfoItem

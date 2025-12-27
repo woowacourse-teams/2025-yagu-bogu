@@ -49,8 +49,6 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.setting.SettingEvent
-import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage

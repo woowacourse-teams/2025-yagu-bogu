@@ -17,8 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
-import com.yagubogu.presentation.setting.SettingEvent
-import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent

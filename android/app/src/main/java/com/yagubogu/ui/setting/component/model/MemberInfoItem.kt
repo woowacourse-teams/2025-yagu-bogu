@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.setting
+package com.yagubogu.ui.setting.component.model
 
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.setting
+package com.yagubogu.ui.setting
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
@@ -9,11 +9,11 @@ import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.presentation.mapper.toUiModel
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
+import com.yagubogu.ui.setting.component.model.MemberInfoItem
+import com.yagubogu.ui.setting.component.model.PresignedUrlCompleteItem
+import com.yagubogu.ui.setting.component.model.PresignedUrlItem
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
