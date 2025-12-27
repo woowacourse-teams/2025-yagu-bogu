@@ -72,7 +72,7 @@ fun SettingDeleteAccountScreen(
             onConfirm = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
         )
 
-        SettingDialog(viewModel = viewModel)
+        SettingDialog()
 
         SettingEventHandler(
             settingEvent = settingEvent.value,

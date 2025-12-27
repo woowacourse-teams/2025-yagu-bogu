@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
+import com.yagubogu.ui.setting.component.SettingButton
+import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
@@ -51,7 +53,7 @@ fun SettingAccountScreen(
             )
         }
 
-        SettingDialog(viewModel = viewModel)
+        SettingDialog()
 
         SettingEventHandler(settingEvent = settingEvent.value)
     }

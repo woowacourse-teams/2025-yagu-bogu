@@ -15,9 +15,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -35,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +48,8 @@ import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.setting.component.SettingButton
+import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.MemberInfoItem
@@ -62,9 +60,7 @@ import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
-import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.noRippleClickable
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -80,8 +76,11 @@ fun SettingMainScreen(
 ) {
     val context: Context = LocalContext.current
     val scope: CoroutineScope = rememberCoroutineScope()
-    val memberInfoItem: MemberInfoItem =
-        viewModel.myMemberInfoItem.collectAsStateWithLifecycle().value
+    val memberInfoItem: State<MemberInfoItem> =
+        viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
+
+    val settingEvent: State<SettingEvent?> =
+        viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     val uCropLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
@@ -115,8 +114,26 @@ fun SettingMainScreen(
             }
         }
 
-    val settingEvent: State<SettingEvent?> =
-        viewModel.settingEvent.collectAsStateWithLifecycle(null)
+    SettingMainScreen(
+        onClickSettingAccount = onClickSettingAccount,
+        onNicknameEdit = { viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog) },
+        onProfileImageUpload = { pickImageLauncher.launch("image/*") },
+        memberInfoItem = memberInfoItem.value,
+        settingEvent = settingEvent.value,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun SettingMainScreen(
+    onClickSettingAccount: () -> Unit,
+    onNicknameEdit: () -> Unit,
+    onProfileImageUpload: () -> Unit,
+    memberInfoItem: MemberInfoItem,
+    settingEvent: SettingEvent?,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
 
     Column(
         modifier =
@@ -132,11 +149,12 @@ fun SettingMainScreen(
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(R.string.setting_edit_profile_image),
-                onClick = { pickImageLauncher.launch("image/*") },
+                onClick = onProfileImageUpload,
             )
-            SettingButton(text = stringResource(R.string.setting_edit_nickname), onClick = {
-                viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog)
-            })
+            SettingButton(
+                text = stringResource(R.string.setting_edit_nickname),
+                onClick = onNicknameEdit,
+            )
             SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {
                 context.startActivity(Intent(context, FavoriteTeamActivity::class.java))
             })
@@ -161,7 +179,7 @@ fun SettingMainScreen(
         }
 
         Text(
-            text = stringResource(R.string.setting_app_version, getAppVersion()),
+            text = stringResource(R.string.setting_app_version, context.getAppVersion()),
             textAlign = TextAlign.Center,
             style = PretendardMedium12,
             color = Gray400,
@@ -171,9 +189,9 @@ fun SettingMainScreen(
                     .padding(top = 10.dp),
         )
 
-        SettingDialog(viewModel = viewModel)
+        SettingDialog()
 
-        SettingEventHandler(settingEvent = settingEvent.value)
+        SettingEventHandler(settingEvent = settingEvent)
     }
 }
 
@@ -207,81 +225,15 @@ private fun MyProfile(
     }
 }
 
-@Composable
-fun SettingButtonGroup(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .background(White, RoundedCornerShape(12.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            content()
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-    }
-}
-
-@Composable
-fun SettingButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .noRippleClickable { onClick() },
-    ) {
-        Spacer(
-            modifier =
-                Modifier
-                    .height(10.dp)
-                    .fillMaxWidth(),
-        )
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(text = text, style = PretendardSemiBold16)
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = Gray500,
-            )
-        }
-        Spacer(
-            modifier =
-                Modifier
-                    .height(10.dp)
-                    .fillMaxWidth(),
-        )
-    }
-}
-
-@Composable
-private fun getAppVersion(): String {
-    val context = LocalContext.current
-    return try {
+private fun Context.getAppVersion(): String =
+    try {
         val packageInfo: PackageInfo =
-            context.packageManager.getPackageInfo(context.packageName, 0)
+            packageManager.getPackageInfo(packageName, 0)
         packageInfo.versionName ?: DEFAULT_VERSION_NAME
     } catch (e: PackageManager.NameNotFoundException) {
         Timber.d("앱 버전 로드 실패 ${e.message}")
         DEFAULT_VERSION_NAME
     }
-}
 
 private fun createUCropIntent(
     context: Context,
@@ -376,5 +328,11 @@ private const val CONTACT_URL = "https://forms.gle/wBhXjfTLyobZa19K8"
 @Preview(showBackground = true)
 @Composable
 private fun SettingMainScreenPreview() {
-    SettingMainScreen(onClickSettingAccount = {})
+    SettingMainScreen(
+        onClickSettingAccount = {},
+        onNicknameEdit = {},
+        onProfileImageUpload = {},
+        memberInfoItem = MemberInfoItem(),
+        settingEvent = null,
+    )
 }
