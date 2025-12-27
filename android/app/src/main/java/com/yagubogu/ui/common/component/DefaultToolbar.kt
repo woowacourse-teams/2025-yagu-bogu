@@ -1,4 +1,4 @@
-package com.yagubogu.ui.badge.component
+package com.yagubogu.ui.common.component
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,12 +18,13 @@ import com.yagubogu.ui.theme.PretendardBold20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BadgeToolbar(
+fun DefaultToolbar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    title: String = "",
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(R.string.badge_title), style = PretendardBold20) },
+        title = { Text(text = title, style = PretendardBold20) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -46,6 +47,6 @@ fun BadgeToolbar(
 
 @Preview
 @Composable
-private fun BadgeToolbarPreview() {
-    BadgeToolbar(onBackClick = {})
+private fun DefaultToolbarPreview() {
+    DefaultToolbar(onBackClick = {})
 }
