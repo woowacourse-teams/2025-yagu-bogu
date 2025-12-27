@@ -69,7 +69,7 @@ fun MainScreen(
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = BottomNavKey.Home,
-            topLevelRoutes = (BottomNavKey.items + TopNavKey.SettingMain).toSet(),
+            topLevelRoutes = BottomNavKey.items.toSet(),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
