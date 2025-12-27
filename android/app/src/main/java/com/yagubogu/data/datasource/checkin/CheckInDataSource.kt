@@ -17,7 +17,7 @@ interface CheckInDataSource {
     suspend fun getCheckInHistories(
         year: Int,
         filter: String,
-        order: String,
+        sort: String,
     ): Result<CheckInHistoryResponse>
 
     suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse>

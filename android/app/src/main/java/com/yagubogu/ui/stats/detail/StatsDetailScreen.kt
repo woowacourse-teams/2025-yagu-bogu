@@ -20,30 +20,30 @@ import com.yagubogu.ui.stats.detail.component.VsTeamWinRates
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import com.yagubogu.ui.theme.Gray050
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsDetailScreen(
     viewModel: StatsDetailViewModel,
+    scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
 ) {
     val vsTeamStatItems: List<VsTeamStatItem> by viewModel.vsTeamStatItems.collectAsStateWithLifecycle()
     val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
-    val scrollState: ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.scrollToTopEvent.collect {
-            scrollState.animateScrollTo(0)
-        }
+        viewModel.fetchAll()
     }
 
     StatsDetailScreen(
         vsTeamStatItems = vsTeamStatItems,
         stadiumVisitCounts = stadiumVisitCounts,
         isVsTeamStatsExpanded = isVsTeamStatsExpanded,
-        scrollState = scrollState,
-        modifier = modifier,
         onShowMoreClick = { viewModel.toggleVsTeamStats() },
+        modifier = modifier,
+        scrollToTopEvent = scrollToTopEvent,
     )
 }
 
@@ -52,10 +52,18 @@ private fun StatsDetailScreen(
     vsTeamStatItems: List<VsTeamStatItem>,
     stadiumVisitCounts: List<StadiumVisitCount>,
     isVsTeamStatsExpanded: Boolean,
+    onShowMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
-    onShowMoreClick: () -> Unit = {},
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
+    val scrollState: ScrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        scrollToTopEvent.collect {
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier =
@@ -97,5 +105,6 @@ private fun StatsDetailScreenPreview() {
                 )
             },
         isVsTeamStatsExpanded = false,
+        onShowMoreClick = {},
     )
 }
