@@ -49,13 +49,14 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.SettingEvent
 import com.yagubogu.presentation.setting.SettingViewModel
+import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.model.MemberInfoItem
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
@@ -196,7 +197,11 @@ private fun MyProfile(
         Text(text = memberInfoItem.nickName, style = PretendardSemiBold, fontSize = 24.sp)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = stringResource(R.string.setting_main_sign_up_date, memberInfoItem.createdAt),
+            text =
+                stringResource(
+                    R.string.setting_main_sign_up_date,
+                    memberInfoItem.createdAt.format(DateFormatter.yyyyMMdd),
+                ),
             style = PretendardRegular12,
             color = Gray500,
         )
