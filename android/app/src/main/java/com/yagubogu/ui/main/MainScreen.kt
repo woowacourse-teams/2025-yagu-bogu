@@ -89,25 +89,29 @@ fun MainScreen(
         Scaffold(
             containerColor = Gray050,
             topBar = {
-                if (navigator.currentRoute is BottomNavKey) {
-                    MainToolbar(
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        title =
-                            stringResource(
-                                if (selectedItem == BottomNavKey.Home) {
-                                    R.string.app_name
-                                } else {
-                                    selectedItem.label
-                                },
-                            ),
-                        onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
-                        onSettingsClick = { navigator.navigate(TopNavKey.SettingMain) },
-                    )
-                } else {
-                    DefaultToolbar(
-                        onBackClick = { navigator.goBack() },
-                        title = stringResource((navigator.currentRoute as TopNavKey).label),
-                    )
+                when (navigator.currentRoute) {
+                    is BottomNavKey -> {
+                        MainToolbar(
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            title =
+                                stringResource(
+                                    if (selectedItem == BottomNavKey.Home) {
+                                        R.string.app_name
+                                    } else {
+                                        selectedItem.label
+                                    },
+                                ),
+                            onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                            onSettingsClick = { navigator.navigate(TopNavKey.SettingMain) },
+                        )
+                    }
+
+                    is TopNavKey -> {
+                        DefaultToolbar(
+                            onBackClick = { navigator.goBack() },
+                            title = stringResource((navigator.currentRoute as TopNavKey).label),
+                        )
+                    }
                 }
             },
             bottomBar = {
