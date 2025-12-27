@@ -87,7 +87,7 @@ fun MainScreen(
         Scaffold(
             containerColor = Gray050,
             topBar = {
-                if (navigator.currentRoute !is TopNavKey) {
+                if (navigator.currentRoute is BottomNavKey) {
                     MainToolbar(
                         modifier = Modifier.padding(horizontal = 10.dp),
                         title =
@@ -104,11 +104,12 @@ fun MainScreen(
                 } else {
                     DefaultToolbar(
                         onBackClick = { navigator.goBack() },
+                        title = stringResource((navigator.currentRoute as TopNavKey).label),
                     )
                 }
             },
             bottomBar = {
-                if (navigator.currentRoute !is TopNavKey) {
+                if (navigator.currentRoute is BottomNavKey) {
                     MainNavigationBar(
                         selectedItem = selectedItem,
                         onItemClick = { item: BottomNavKey ->
