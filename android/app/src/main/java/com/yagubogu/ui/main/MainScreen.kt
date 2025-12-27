@@ -47,6 +47,8 @@ import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
 import com.yagubogu.ui.navigation.TopNavKey
 import com.yagubogu.ui.navigation.rememberNavigationState
+import com.yagubogu.ui.navigation.slideInTransition
+import com.yagubogu.ui.navigation.slideOutTransition
 import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.setting.SettingAccountScreen
 import com.yagubogu.ui.setting.SettingDeleteAccountScreen
@@ -163,20 +165,7 @@ fun MainScreen(
                         )
                     }
                     entry<TopNavKey.SettingMain>(
-                        metadata =
-                            NavDisplay.transitionSpec {
-                                slideIntoContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                    animationSpec = tween(200),
-                                ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                            } +
-                                NavDisplay.popTransitionSpec {
-                                    EnterTransition.None togetherWith
-                                        slideOutOfContainer(
-                                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                            animationSpec = tween(300),
-                                        )
-                                },
+                        metadata = slideInTransition + slideOutTransition,
                     ) {
                         SettingMainScreen(
                             onClickSettingAccount = { navigator.navigate(TopNavKey.SettingAccount) },
@@ -188,14 +177,7 @@ fun MainScreen(
                         )
                     }
                     entry<TopNavKey.SettingDeleteAccount>(
-                        metadata =
-                            NavDisplay.popTransitionSpec {
-                                EnterTransition.None togetherWith
-                                    slideOutOfContainer(
-                                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                        animationSpec = tween(300),
-                                    )
-                            },
+                        metadata = slideOutTransition,
                     ) {
                         SettingDeleteAccountScreen(navigateToHome = {
                             navigator.clearStackAndNavigate(BottomNavKey.Home)
