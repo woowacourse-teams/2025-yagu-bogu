@@ -13,11 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.R
+import com.yagubogu.presentation.setting.SettingViewModel
+import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import com.yagubogu.ui.theme.Gray050
 
 @Composable
-fun SettingAccountScreen(modifier: Modifier = Modifier) {
+fun SettingAccountScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SettingViewModel = hiltViewModel(),
+    onClickDeleteAccount: () -> Unit = {},
+) {
     Column(
         modifier =
             modifier
@@ -30,13 +38,15 @@ fun SettingAccountScreen(modifier: Modifier = Modifier) {
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(R.string.setting_logout),
-                onClick = {},
+                onClick = { viewModel.emitDialogEvent(SettingDialogEvent.LogoutDialog) },
             )
             SettingButton(
                 text = stringResource(R.string.setting_delete_account),
-                onClick = {},
+                onClick = onClickDeleteAccount,
             )
         }
+
+        SettingDialog(viewModel = viewModel)
     }
 }
 

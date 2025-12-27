@@ -52,7 +52,9 @@ import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 import com.yagubogu.ui.theme.Gray050
+import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
+import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold16
@@ -66,7 +68,8 @@ import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
-fun SettingScreen(
+fun SettingMainScreen(
+    onClickSettingAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -126,7 +129,10 @@ fun SettingScreen(
                 viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog)
             })
             SettingButton(text = stringResource(R.string.setting_edit_my_team), onClick = {})
-            SettingButton(text = stringResource(R.string.setting_manage_account), onClick = {})
+            SettingButton(
+                text = stringResource(R.string.setting_manage_account),
+                onClick = onClickSettingAccount,
+            )
         }
         SettingButtonGroup {
             SettingButton(text = stringResource(R.string.setting_notice), onClick = {})
@@ -136,14 +142,16 @@ fun SettingScreen(
         Text(
             text = stringResource(R.string.setting_app_version, getAppVersion()),
             textAlign = TextAlign.Center,
+            style = PretendardMedium12,
+            color = Gray400,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp),
         )
-    }
 
-    SettingDialog(viewModel = viewModel)
+        SettingDialog(viewModel = viewModel)
+    }
 }
 
 @Composable
@@ -331,6 +339,6 @@ private fun Uri.fileSize(context: Context): Result<Long?> =
 
 @Preview(showBackground = true)
 @Composable
-private fun SettingScreenPreview() {
-    SettingScreen()
+private fun SettingMainScreenPreview() {
+//    SettingMainScreen()
 }

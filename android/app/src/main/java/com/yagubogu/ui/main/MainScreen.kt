@@ -1,6 +1,11 @@
 package com.yagubogu.ui.main
 
 import android.content.Context
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,9 +34,9 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
-import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import com.yagubogu.ui.badge.BadgeActivity
+import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
@@ -40,8 +45,12 @@ import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.BottomNavKey
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
+import com.yagubogu.ui.navigation.TopNavKey
 import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
+import com.yagubogu.ui.setting.SettingAccountScreen
+import com.yagubogu.ui.setting.SettingDeleteAccountScreen
+import com.yagubogu.ui.setting.SettingMainScreen
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
@@ -78,31 +87,39 @@ fun MainScreen(
         Scaffold(
             containerColor = Gray050,
             topBar = {
-                MainToolbar(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    title =
-                        stringResource(
-                            if (selectedItem == BottomNavKey.Home) {
-                                R.string.app_name
-                            } else {
-                                selectedItem.label
-                            },
-                        ),
-                    onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
-                    onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
-                )
+                if (navigator.currentRoute !is TopNavKey) {
+                    MainToolbar(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        title =
+                            stringResource(
+                                if (selectedItem == BottomNavKey.Home) {
+                                    R.string.app_name
+                                } else {
+                                    selectedItem.label
+                                },
+                            ),
+                        onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                        onSettingsClick = { navigator.navigate(TopNavKey.SettingMain) },
+                    )
+                } else {
+                    DefaultToolbar(
+                        onBackClick = { navigator.goBack() },
+                    )
+                }
             },
             bottomBar = {
-                MainNavigationBar(
-                    selectedItem = selectedItem,
-                    onItemClick = { item: BottomNavKey ->
-                        viewModel.selectBottomNavKey(item)
-                        navigator.navigate(item)
-                    },
-                    onItemReselect = { item: BottomNavKey ->
-                        scrollToTopEvent.tryEmit(Unit)
-                    },
-                )
+                if (navigator.currentRoute !is TopNavKey) {
+                    MainNavigationBar(
+                        selectedItem = selectedItem,
+                        onItemClick = { item: BottomNavKey ->
+                            viewModel.selectBottomNavKey(item)
+                            navigator.navigate(item)
+                        },
+                        onItemReselect = { item: BottomNavKey ->
+                            scrollToTopEvent.tryEmit(Unit)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(
@@ -143,6 +160,32 @@ fun MainScreen(
                             snackbarHostState = snackbarHostState,
                             scrollToTopEvent = scrollToTopEvent,
                         )
+                    }
+                    entry<TopNavKey.SettingMain>(
+                        metadata =
+                            NavDisplay.transitionSpec {
+                                slideIntoContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                    animationSpec = tween(200),
+                                ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                            } +
+                                NavDisplay.popTransitionSpec {
+                                    EnterTransition.None togetherWith
+                                        slideOutOfContainer(
+                                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                            animationSpec = tween(300),
+                                        )
+                                },
+                    ) {
+                        SettingMainScreen(
+                            onClickSettingAccount = { navigator.navigate(TopNavKey.SettingAccount) },
+                        )
+                    }
+                    entry<TopNavKey.SettingAccount> {
+                        SettingAccountScreen(onClickDeleteAccount = { navigator.navigate(TopNavKey.SettingDeleteAccount) })
+                    }
+                    entry<TopNavKey.SettingDeleteAccount> {
+                        SettingDeleteAccountScreen()
                     }
                 }
 

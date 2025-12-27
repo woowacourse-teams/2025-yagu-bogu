@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,8 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.MemberInfoItem
+import com.yagubogu.presentation.setting.SettingViewModel
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardBold
@@ -35,13 +39,15 @@ import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import java.time.LocalDate
 
 @Composable
 fun SettingDeleteAccountScreen(
-    memberInfoItem: MemberInfoItem,
+    viewModel: SettingViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
+    val memberInfoItem: State<MemberInfoItem> =
+        viewModel.myMemberInfoItem.collectAsStateWithLifecycle()
+
     Column(
         modifier =
             modifier
@@ -52,7 +58,7 @@ fun SettingDeleteAccountScreen(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         DeleteAccountQuestion()
-        RememberImageMessage(memberInfoItem)
+        RememberImageMessage(memberInfoItem.value)
         DeleteAccountButtons(
             onCancel = {},
             onConfirm = {},
@@ -156,13 +162,5 @@ fun DeleteAccountButtons(
 @Preview
 @Composable
 private fun SettingDeleteAccountScreenPreview() {
-    SettingDeleteAccountScreen(
-        memberInfoItem =
-            MemberInfoItem(
-                nickName = "귀여운보욱이",
-                createdAt = LocalDate.now(),
-                favoriteTeam = "KIA",
-                profileImageUrl = "",
-            ),
-    )
+    SettingDeleteAccountScreen()
 }
