@@ -26,13 +26,28 @@ import com.yagubogu.ui.theme.Gray050
 
 @Composable
 fun SettingAccountScreen(
+    onClickDeleteAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
-    onClickDeleteAccount: () -> Unit = {},
 ) {
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
+    SettingAccountScreen(
+        onClickLogout = { viewModel.emitDialogEvent(SettingDialogEvent.LogoutDialog) },
+        onClickDeleteAccount = onClickDeleteAccount,
+        settingEvent = settingEvent.value,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun SettingAccountScreen(
+    onClickLogout: () -> Unit,
+    onClickDeleteAccount: () -> Unit,
+    settingEvent: SettingEvent?,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -45,7 +60,7 @@ fun SettingAccountScreen(
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(R.string.setting_logout),
-                onClick = { viewModel.emitDialogEvent(SettingDialogEvent.LogoutDialog) },
+                onClick = onClickLogout,
             )
             SettingButton(
                 text = stringResource(R.string.setting_delete_account),
@@ -55,12 +70,16 @@ fun SettingAccountScreen(
 
         SettingDialog()
 
-        SettingEventHandler(settingEvent = settingEvent.value)
+        SettingEventHandler(settingEvent = settingEvent)
     }
 }
 
 @Preview
 @Composable
 private fun SettingAccountScreenPreview() {
-    SettingAccountScreen()
+    SettingAccountScreen(
+        onClickLogout = {},
+        onClickDeleteAccount = {},
+        settingEvent = null,
+    )
 }
