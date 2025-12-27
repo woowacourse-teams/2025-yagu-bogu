@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.MemberInfoItem
 import com.yagubogu.presentation.setting.SettingEvent
@@ -134,7 +136,10 @@ fun DeleteAccountButtons(
 ) {
     Column(modifier = modifier) {
         Button(
-            onClick = onCancel,
+            onClick = {
+                onCancel()
+                Firebase.analytics.logEvent("delete_account_cancel", null)
+            },
             modifier = Modifier.fillMaxWidth(),
             colors =
                 ButtonDefaults.buttonColors(
@@ -151,7 +156,10 @@ fun DeleteAccountButtons(
         }
         Spacer(modifier = Modifier.height(14.dp))
         Button(
-            onClick = onConfirm,
+            onClick = {
+                onConfirm()
+                Firebase.analytics.logEvent("delete_account_confirm", null)
+            },
             modifier = Modifier.fillMaxWidth(),
             colors =
                 ButtonDefaults.buttonColors(
