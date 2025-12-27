@@ -86,6 +86,7 @@ class AttendanceHistoryViewModel @Inject constructor(
                 .addPastCheckIn(gameId)
                 .onSuccess {
                     _pastCheckInUiEvent.emit(Unit)
+                    fetchAttendanceHistoryItems()
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
