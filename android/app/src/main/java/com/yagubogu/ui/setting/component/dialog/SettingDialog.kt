@@ -11,8 +11,8 @@ import com.yagubogu.ui.setting.component.model.SettingDialogEvent
 
 @Composable
 fun SettingDialog(
+    viewModel: SettingViewModel,
     modifier: Modifier = Modifier,
-    viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val dialogEvent: SettingDialogEvent by viewModel.dialogEvent.collectAsStateWithLifecycle(
         initialValue = SettingDialogEvent.HideDialog,

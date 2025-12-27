@@ -39,6 +39,8 @@ fun SettingAccountScreen(
         settingEvent = settingEvent.value,
         modifier = modifier,
     )
+
+    SettingDialog(viewModel = viewModel)
 }
 
 @Composable
@@ -67,8 +69,6 @@ private fun SettingAccountScreen(
                 onClick = onClickDeleteAccount,
             )
         }
-
-        SettingDialog()
 
         SettingEventHandler(settingEvent = settingEvent)
     }

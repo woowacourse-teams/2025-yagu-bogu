@@ -57,22 +57,25 @@ fun SettingDeleteAccountScreen(
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     SettingDeleteAccountScreen(
-        navigateToHome = navigateToHome,
         onCancelDeleteAccount = viewModel::cancelDeleteAccount,
         onConfirmDeleteAccount = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
         memberInfoItem = memberInfoItem.value,
-        settingEvent = settingEvent.value,
         modifier = modifier,
+    )
+
+    SettingDialog(viewModel = viewModel)
+
+    SettingEventHandler(
+        settingEvent = settingEvent.value,
+        navigateToHome = navigateToHome,
     )
 }
 
 @Composable
 private fun SettingDeleteAccountScreen(
-    navigateToHome: () -> Unit,
     onCancelDeleteAccount: () -> Unit,
     onConfirmDeleteAccount: () -> Unit,
     memberInfoItem: MemberInfoItem,
-    settingEvent: SettingEvent?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -89,13 +92,6 @@ private fun SettingDeleteAccountScreen(
         DeleteAccountButtons(
             onCancel = onCancelDeleteAccount,
             onConfirm = onConfirmDeleteAccount,
-        )
-
-        SettingDialog()
-
-        SettingEventHandler(
-            settingEvent = settingEvent,
-            navigateToHome = navigateToHome,
         )
     }
 }
@@ -203,10 +199,8 @@ private fun DeleteAccountButtons(
 @Composable
 private fun SettingDeleteAccountScreenPreview() {
     SettingDeleteAccountScreen(
-        navigateToHome = {},
         onCancelDeleteAccount = {},
         onConfirmDeleteAccount = {},
         memberInfoItem = MemberInfoItem(),
-        settingEvent = null,
     )
 }

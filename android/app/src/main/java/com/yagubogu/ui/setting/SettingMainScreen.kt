@@ -119,9 +119,13 @@ fun SettingMainScreen(
         onNicknameEdit = { viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog) },
         onProfileImageUpload = { pickImageLauncher.launch("image/*") },
         memberInfoItem = memberInfoItem.value,
-        settingEvent = settingEvent.value,
+        appVersion = context.getAppVersion(),
         modifier = modifier,
     )
+
+    SettingDialog(viewModel = viewModel)
+
+    SettingEventHandler(settingEvent = settingEvent.value)
 }
 
 @Composable
@@ -130,7 +134,7 @@ private fun SettingMainScreen(
     onNicknameEdit: () -> Unit,
     onProfileImageUpload: () -> Unit,
     memberInfoItem: MemberInfoItem,
-    settingEvent: SettingEvent?,
+    appVersion: String,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -179,7 +183,7 @@ private fun SettingMainScreen(
         }
 
         Text(
-            text = stringResource(R.string.setting_app_version, context.getAppVersion()),
+            text = stringResource(R.string.setting_app_version, appVersion),
             textAlign = TextAlign.Center,
             style = PretendardMedium12,
             color = Gray400,
@@ -188,10 +192,6 @@ private fun SettingMainScreen(
                     .fillMaxWidth()
                     .padding(top = 10.dp),
         )
-
-        SettingDialog()
-
-        SettingEventHandler(settingEvent = settingEvent)
     }
 }
 
@@ -332,7 +332,7 @@ private fun SettingMainScreenPreview() {
         onClickSettingAccount = {},
         onNicknameEdit = {},
         onProfileImageUpload = {},
-        memberInfoItem = MemberInfoItem(),
-        settingEvent = null,
+        memberInfoItem = MemberInfoItem(nickName = "야구보구"),
+        appVersion = "1.0.0",
     )
 }
