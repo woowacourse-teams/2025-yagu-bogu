@@ -13,6 +13,7 @@ import com.yagubogu.ui.setting.component.model.MemberInfoItem
 import com.yagubogu.ui.setting.component.model.PresignedUrlCompleteItem
 import com.yagubogu.ui.setting.component.model.PresignedUrlItem
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
+import com.yagubogu.ui.setting.component.model.SettingEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,27 +25,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-sealed interface SettingEvent {
-    data class NicknameEdit(
-        val newNickname: String,
-    ) : SettingEvent
-
-    data object Logout : SettingEvent
-
-    data object DeleteAccount : SettingEvent
-
-    data object DeleteAccountCancel : SettingEvent
-}
-
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
 ) : ViewModel() {
-    private val _settingTitle = MutableLiveData<String>()
-    val settingTitle: LiveData<String> get() = _settingTitle
-
     private val _myMemberInfoItem = MutableStateFlow(MemberInfoItem())
     val myMemberInfoItem: StateFlow<MemberInfoItem> = _myMemberInfoItem.asStateFlow()
 
@@ -56,10 +42,6 @@ class SettingViewModel @Inject constructor(
 
     init {
         fetchMemberInfo()
-    }
-
-    fun setSettingTitle(title: String) {
-        _settingTitle.value = title
     }
 
     fun updateNickname(newNickname: String) {

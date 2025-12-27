@@ -35,6 +35,7 @@ import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
 import com.yagubogu.ui.setting.component.model.MemberInfoItem
 import com.yagubogu.ui.setting.component.model.SettingDialogEvent
+import com.yagubogu.ui.setting.component.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400

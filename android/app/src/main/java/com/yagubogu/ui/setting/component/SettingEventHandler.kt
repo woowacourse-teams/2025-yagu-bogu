@@ -9,7 +9,7 @@ import com.yagubogu.R
 import com.yagubogu.presentation.login.LoginActivity
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.main.MainActivity
-import com.yagubogu.ui.setting.SettingEvent
+import com.yagubogu.ui.setting.component.model.SettingEvent
 
 @Composable
 fun SettingEventHandler(
