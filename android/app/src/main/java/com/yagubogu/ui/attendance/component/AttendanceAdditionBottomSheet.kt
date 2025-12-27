@@ -23,6 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -64,7 +68,7 @@ fun AttendanceAdditionBottomSheet(
             true ->
                 PastGamesContent(
                     items = items,
-                    onItemClick = onPastCheckIn,
+                    onPastCheckIn = onPastCheckIn,
                 )
 
             false -> EmptyPastGameContent()
@@ -75,7 +79,7 @@ fun AttendanceAdditionBottomSheet(
 @Composable
 private fun PastGamesContent(
     items: List<PastGameUiModel>,
-    onItemClick: (Long) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
@@ -103,7 +107,7 @@ private fun PastGamesContent(
             ) { item: PastGameUiModel ->
                 PastAttendanceItem(
                     item = item,
-                    onClick = onItemClick,
+                    onPastCheckIn = onPastCheckIn,
                 )
             }
         }
@@ -135,15 +139,27 @@ private fun EmptyPastGameContent(modifier: Modifier = Modifier) {
 @Composable
 private fun PastAttendanceItem(
     item: PastGameUiModel,
-    onClick: (Long) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+    if (showDialog) {
+        PastCheckInDialog(
+            pastGameUiModel = item,
+            onConfirm = {
+                onPastCheckIn(item.gameId)
+                showDialog = false
+            },
+            onCancel = { showDialog = false },
+        )
+    }
+
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .background(color = White, shape = RoundedCornerShape(12.dp))
-                .clickable { onClick(item.gameId) }
+                .clickable { showDialog = true }
                 .padding(horizontal = 20.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
