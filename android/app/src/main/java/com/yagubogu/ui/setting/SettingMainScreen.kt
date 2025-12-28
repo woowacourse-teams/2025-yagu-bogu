@@ -42,7 +42,6 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.google.firebase.crashlytics.internal.common.IdManager.DEFAULT_VERSION_NAME
 import com.yagubogu.R
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.util.DateFormatter
@@ -325,6 +324,7 @@ private fun Context.openUrl(url: String) {
 private const val NOTICE_URL =
     "https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74"
 private const val CONTACT_URL = "https://forms.gle/wBhXjfTLyobZa19K8"
+private const val DEFAULT_VERSION_NAME = "x.x.x"
 
 @Preview(showBackground = true)
 @Composable
