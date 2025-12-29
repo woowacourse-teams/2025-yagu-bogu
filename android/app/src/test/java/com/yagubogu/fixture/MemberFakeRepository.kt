@@ -1,22 +1,21 @@
 package com.yagubogu.fixture
 
-import com.yagubogu.domain.model.Team
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
-import com.yagubogu.presentation.setting.PresignedUrlItem
-import com.yagubogu.ui.badge.BadgeUiState
-import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
-import com.yagubogu.ui.badge.model.BadgeInfoUiModel
+import com.yagubogu.data.dto.response.member.BadgeDto
+import com.yagubogu.data.dto.response.member.BadgeResponse
+import com.yagubogu.data.dto.response.member.MemberInfoResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
+import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
+import com.yagubogu.data.repository.member.MemberRepository
 
 /**
  * @param isFailureMode `true`면 Result.failure를 반환
  */
 class MemberFakeRepository(
     var isFailureMode: Boolean = false,
-    private val badgeList: List<BadgeInfoUiModel> = emptyList(),
+    private val badgeList: List<BadgeDto> = emptyList(),
 ) : MemberRepository {
-    override suspend fun getMemberInfo(): Result<MemberInfoItem> {
+    override suspend fun getMemberInfo(): Result<MemberInfoResponse> {
         TODO("Not yet implemented")
     }
 
@@ -32,7 +31,7 @@ class MemberFakeRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<Unit> {
+    override suspend fun updateFavoriteTeam(teamCode: String): Result<Unit> {
         TODO("Not yet implemented")
     }
 
@@ -40,7 +39,7 @@ class MemberFakeRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getBadges(): Result<BadgeUiState> =
+    override suspend fun getBadges(): Result<BadgeResponse> =
         when (isFailureMode) {
             true -> {
                 Result.failure(Exception())
@@ -48,8 +47,8 @@ class MemberFakeRepository(
 
             false -> {
                 Result.success(
-                    BadgeUiState.Success(
-                        BADGE_ID_0_ACQUIRED_FIXTURE.badge,
+                    BadgeResponse(
+                        REPRESENTATIVE_BADGE_FIXTURE,
                         badgeList,
                     ),
                 )
@@ -74,11 +73,15 @@ class MemberFakeRepository(
     override suspend fun getPresignedUrl(
         contentType: String,
         contentLength: Long,
-    ): Result<PresignedUrlItem> {
+    ): Result<PresignedUrlStartResponse> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteItem> {
+    override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> {
         TODO("Not yet implemented")
     }
 }

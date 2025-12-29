@@ -15,6 +15,12 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier =
     composed {
@@ -23,6 +29,24 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier =
             interactionSource = remember { MutableInteractionSource() },
         ) {
             onClick()
+        }
+    }
+
+fun Modifier.crop(
+    horizontal: Dp = 0.dp,
+    vertical: Dp = 0.dp,
+): Modifier =
+    layout { measurable: Measurable, constraints: Constraints ->
+        fun Dp.toPxInt(): Int = this.toPx().toInt()
+
+        val placeable: Placeable = measurable.measure(constraints)
+        val croppedWidth = (placeable.width - (horizontal * 2).toPxInt()).coerceAtLeast(0)
+        val croppedHeight = (placeable.height - (vertical * 2).toPxInt()).coerceAtLeast(0)
+        layout(
+            width = croppedWidth,
+            height = croppedHeight,
+        ) {
+            placeable.placeRelative(-horizontal.toPxInt(), -vertical.toPxInt())
         }
     }
 

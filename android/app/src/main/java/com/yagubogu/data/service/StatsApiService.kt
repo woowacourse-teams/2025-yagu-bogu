@@ -37,6 +37,6 @@ interface StatsApiService {
     @GET("/api/v1/stats/victory-fairy/rankings")
     suspend fun getVictoryFairyRankings(
         @Query("year") year: Int,
-        @Query("team") team: String?,
+        @Query("team") teamCode: String?,
     ): Response<VictoryFairyRankingResponse>
 }

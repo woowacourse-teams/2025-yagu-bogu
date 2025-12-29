@@ -1,0 +1,226 @@
+package com.yagubogu.ui.home.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.skydoves.balloon.compose.Balloon
+import com.skydoves.balloon.compose.BalloonWindow
+import com.yagubogu.R
+import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.home.model.VictoryFairyItem
+import com.yagubogu.ui.home.model.VictoryFairyRanking
+import com.yagubogu.ui.theme.Bronze
+import com.yagubogu.ui.theme.Gold
+import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.theme.Gray400
+import com.yagubogu.ui.theme.Gray500
+import com.yagubogu.ui.theme.PretendardBold20
+import com.yagubogu.ui.theme.PretendardMedium12
+import com.yagubogu.ui.theme.PretendardRegular
+import com.yagubogu.ui.theme.PretendardRegular16
+import com.yagubogu.ui.theme.PretendardSemiBold16
+import com.yagubogu.ui.theme.Silver
+import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.theme.dpToSp
+import com.yagubogu.ui.util.noRippleClickable
+import com.yagubogu.ui.util.rememberBalloonBuilder
+
+@Composable
+fun VictoryFairyRanking(
+    ranking: VictoryFairyRanking,
+    onRankingItemClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val balloonBuilder = rememberBalloonBuilder(R.string.home_victory_fairy_tooltip)
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(White, RoundedCornerShape(12.dp))
+                .padding(20.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.home_victory_fairy_ranking),
+                    style = PretendardBold20,
+                )
+                Balloon(builder = balloonBuilder) { balloonWindow: BalloonWindow ->
+                    Icon(
+                        painter = painterResource(R.drawable.ic_info),
+                        contentDescription = null,
+                        tint = Gray300,
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .noRippleClickable {
+                                    balloonWindow.showAlignBottom(yOff = -10)
+                                    Firebase.analytics.logEvent(
+                                        "tooltip_victory_fairy_ranking",
+                                        null,
+                                    )
+                                },
+                    )
+                }
+            }
+            Text(
+                text = stringResource(R.string.home_victory_fairy_score),
+                style = PretendardRegular.copy(fontSize = 14.sp, color = Gray400),
+            )
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            VictoryFairyRankingItem(
+                item = ranking.myRanking,
+                onClick = onRankingItemClick,
+                isMyRanking = true,
+            )
+            HorizontalDivider(color = Gray300, thickness = 0.4.dp)
+
+            ranking.topRankings.forEach { item: VictoryFairyItem ->
+                VictoryFairyRankingItem(
+                    item = item,
+                    onClick = onRankingItemClick,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun VictoryFairyRankingItem(
+    item: VictoryFairyItem,
+    onClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+    isMyRanking: Boolean = false,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .noRippleClickable {
+                    onClick(item.memberId)
+                    Firebase.analytics.logEvent("member_profile", null)
+                },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = item.rank.toString(),
+            style = PretendardRegular.copy(fontSize = 16.dpToSp, color = Gray500),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp),
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+
+        ProfileImage(
+            imageUrl = item.profileImageUrl,
+            modifier = Modifier.size(40.dp),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            modifier = Modifier.weight(1.0f),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text =
+                        if (isMyRanking) {
+                            stringResource(
+                                R.string.home_victory_fairy_my_nickname,
+                                item.nickname,
+                            )
+                        } else {
+                            item.nickname
+                        },
+                    style = PretendardSemiBold16,
+                )
+                if (item.rank in 1..3) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    VictoryFairyMedal(rank = item.rank)
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.all_fan, item.teamName),
+                style = PretendardMedium12.copy(color = Gray400),
+            )
+        }
+
+        Text(
+            text = stringResource(R.string.home_victory_fairy_score_format, item.score),
+            style = PretendardRegular16,
+        )
+    }
+}
+
+@Composable
+private fun VictoryFairyMedal(
+    rank: Int,
+    modifier: Modifier = Modifier,
+) {
+    val (iconRes: Int, color: Color) =
+        when (rank) {
+            1 -> R.drawable.ic_medal_first to Gold
+            2 -> R.drawable.ic_medal_second to Silver
+            3 -> R.drawable.ic_medal_third to Bronze
+            else -> null
+        } ?: return
+
+    Icon(
+        painter = painterResource(id = iconRes),
+        contentDescription = null,
+        tint = color,
+        modifier = modifier.height(14.dp),
+    )
+}
+
+@Preview
+@Composable
+private fun VictoryFairyRankingPreview() {
+    VictoryFairyRanking(
+        ranking = VICTORY_FAIRY_RANKING,
+        onRankingItemClick = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun VictoryFairyRankingItemPreview() {
+    VictoryFairyRankingItem(item = VICTORY_FAIRY_RANKING_ITEM, onClick = {})
+}

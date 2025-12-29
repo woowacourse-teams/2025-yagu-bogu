@@ -6,6 +6,12 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,31 +20,36 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.YaguBoguApplication
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
+import com.yagubogu.ui.common.component.profile.ProfileDialog
+import com.yagubogu.ui.common.model.MemberProfile
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LivetalkChatActivity : AppCompatActivity() {
     private val binding: ActivityLivetalkChatBinding by lazy {
         ActivityLivetalkChatBinding.inflate(layoutInflater)
     }
 
+    @Inject
+    lateinit var viewModelFactory: LivetalkChatViewModel.Factory
+
     private val viewModel: LivetalkChatViewModel by viewModels {
-        val app = application as YaguBoguApplication
         val gameId = intent.getLongExtra(KEY_GAME_ID, 1L)
-        LivetalkChatViewModelFactory(
-            gameId,
-            app.talksRepository,
-            app.gamesRepository,
-            intent.getBooleanExtra(KEY_IS_VERIFIED, false),
-        )
+        val isVerified = intent.getBooleanExtra(KEY_IS_VERIFIED, false)
+        LivetalkChatViewModel.provideFactory(viewModelFactory, gameId, isVerified)
     }
 
     private var pendingDeleteMessageId: Long? = null
@@ -58,6 +69,11 @@ class LivetalkChatActivity : AppCompatActivity() {
                         event.livetalkChatItem.nickname ?: getString(R.string.all_null_nick_name),
                     )
                 }
+
+                is LivetalkChatEvent.ViewProfile -> {
+                    viewModel.fetchMemberProfile(event.livetalkChatItem.memberId)
+                    firebaseAnalytics.logEvent("member_profile", null)
+                }
             }
         }
     }
@@ -76,6 +92,8 @@ class LivetalkChatActivity : AppCompatActivity() {
         setupListener()
         setupRecyclerView()
         setupObservers()
+        setupComposeView()
+        showMemberProfileDialog()
     }
 
     private fun setupBinding() {
@@ -152,9 +170,12 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.livetalkUiState.observe(this, ::handleLivetalkResponseUiState)
-        viewModel.liveTalkChatBubbleItem.observe(this, ::handleLiveTalkChatBubbleItem)
-        viewModel.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
-        viewModel.livetalkDeleteEvent.observe(this) {
+        viewModel.messageStateHolder.liveTalkChatBubbleItems.observe(
+            this,
+            ::handleLiveTalkChatBubbleItem,
+        )
+        viewModel.messageStateHolder.livetalkReportEvent.observe(this, ::handleLivetalkReportEvent)
+        viewModel.messageStateHolder.livetalkDeleteEvent.observe(this) {
             binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
         }
         observePollingLikeAnimation()
@@ -162,7 +183,7 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun observePollingLikeAnimation() {
         val likeButton = binding.tvLikeButton
-        viewModel.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+        viewModel.likeCountStateHolder.myTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
             val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
 
@@ -183,7 +204,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                         val randomDelay = (0L..10000L).random()
                         delay(randomDelay)
 
-                        viewModel.addMyTeamShowingCount(increment)
+                        viewModel.likeCountStateHolder.increaseMyTeamShowingCount(increment)
                         showLikeEmojiAnimation(
                             viewModel.cachedLivetalkTeams.myTeamEmoji,
                             likeButton,
@@ -192,7 +213,7 @@ class LivetalkChatActivity : AppCompatActivity() {
                 }
             }
         }
-        viewModel.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
+        viewModel.likeCountStateHolder.otherTeamLikeAnimationEvent.observe(this) { newLikesCount: Long ->
             if (newLikesCount <= 0) return@observe
             val animationCount: Int = minOf(MAX_ANIMATION_COUNT, newLikesCount.toInt())
 
@@ -215,7 +236,9 @@ class LivetalkChatActivity : AppCompatActivity() {
         val likeButton = binding.tvLikeButton
 
         likeButton.setOnClickListener {
-            viewModel.addMyTeamShowingCount()
+            lifecycleScope.launch {
+                viewModel.likeCountStateHolder.increaseMyTeamShowingCount()
+            }
             viewModel.addLikeToBatch()
             showLikeEmojiAnimation(likeButton.text.toString(), likeButton)
         }
@@ -281,10 +304,6 @@ class LivetalkChatActivity : AppCompatActivity() {
                     R.id.divider,
                 )
         }
-
-        viewModel.livetalkDeleteEvent.observe(this) {
-            binding.root.showSnackbar(R.string.livetalk_delete_succeed, R.id.divider)
-        }
     }
 
     private fun showTalkDeleteDialog() {
@@ -315,6 +334,29 @@ class LivetalkChatActivity : AppCompatActivity() {
         val talkReportDialog =
             DefaultDialogFragment.newInstance(KEY_TALK_REPORT_DIALOG, dialogUiModel)
         talkReportDialog.show(supportFragmentManager, KEY_TALK_REPORT_DIALOG)
+    }
+
+    private fun setupComposeView() {
+        binding.composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    }
+
+    private fun showMemberProfileDialog() {
+        binding.composeView.setContent {
+            var memberProfile by remember { mutableStateOf<MemberProfile?>(null) }
+
+            LaunchedEffect(Unit) {
+                viewModel.profileInfoClickEvent.collect { profile: MemberProfile ->
+                    memberProfile = profile
+                }
+            }
+
+            memberProfile?.let { profile ->
+                ProfileDialog(
+                    onDismissRequest = { memberProfile = null },
+                    memberProfile = profile,
+                )
+            }
+        }
     }
 
     companion object {

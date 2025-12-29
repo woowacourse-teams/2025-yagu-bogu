@@ -9,8 +9,9 @@ import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
 import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.util.safeApiCall
 import java.time.LocalDate
+import javax.inject.Inject
 
-class CheckInRemoteDataSource(
+class CheckInRemoteDataSource @Inject constructor(
     private val checkInApiService: CheckInApiService,
 ) : CheckInDataSource {
     override suspend fun addCheckIn(gameId: Long): Result<Unit> {
@@ -33,10 +34,10 @@ class CheckInRemoteDataSource(
     override suspend fun getCheckInHistories(
         year: Int,
         filter: String,
-        order: String,
+        sort: String,
     ): Result<CheckInHistoryResponse> =
         safeApiCall {
-            checkInApiService.getCheckInHistories(year, filter, order)
+            checkInApiService.getCheckInHistories(year, filter, sort)
         }
 
     override suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse> =

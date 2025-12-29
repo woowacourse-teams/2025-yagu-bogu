@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.oss.licenses.plugin)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -23,8 +25,8 @@ android {
         applicationId = "com.yagubogu"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2_00_00
-        versionName = "2.0.0"
+        versionCode = 2_01_00
+        versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -121,6 +123,7 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(libs.shimmer)
     implementation(libs.balloon)
+    implementation(libs.balloon.compose)
     implementation(libs.ucrop)
 
     // firebase
@@ -146,6 +149,13 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // navigation3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // coil
     implementation(libs.coil.compose)
@@ -158,6 +168,10 @@ dependencies {
     // kotest
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
+
+    // hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)

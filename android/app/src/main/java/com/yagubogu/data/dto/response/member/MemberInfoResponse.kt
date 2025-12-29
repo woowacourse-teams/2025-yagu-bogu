@@ -1,9 +1,7 @@
 package com.yagubogu.data.dto.response.member
 
-import com.yagubogu.presentation.setting.MemberInfoItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 
 @Serializable
 data class MemberInfoResponse(
@@ -15,12 +13,4 @@ data class MemberInfoResponse(
     val favoriteTeam: String, // 나의 팀
     @SerialName("profileImageUrl")
     val profileImageUrl: String, // 프로필 이미지
-) {
-    fun toPresentation(): MemberInfoItem =
-        MemberInfoItem(
-            nickName = nickname,
-            createdAt = LocalDate.parse(createdAt),
-            favoriteTeam = favoriteTeam,
-            profileImageUrl = profileImageUrl,
-        )
-}
+)

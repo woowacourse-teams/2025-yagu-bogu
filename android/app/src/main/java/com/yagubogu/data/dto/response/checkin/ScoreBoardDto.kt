@@ -1,6 +1,5 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.presentation.attendance.model.GameScoreBoard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,13 +17,4 @@ data class ScoreBoardDto(
     val basesOnBalls: Int, // 사사구 개수
     @SerialName("inningScores")
     val inningScores: List<String>, // 이닝별 점수
-) {
-    fun toPresentation(): GameScoreBoard =
-        GameScoreBoard(
-            runs = runs,
-            hits = hits,
-            errors = errors,
-            basesOnBalls = basesOnBalls,
-            scores = inningScores,
-        )
-}
+)

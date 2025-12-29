@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemLivetalkMyBubbleBinding
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEvent
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEventHandler
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 
 class LivetalkMyBubbleViewHolder private constructor(
     private val binding: ItemLivetalkMyBubbleBinding,
