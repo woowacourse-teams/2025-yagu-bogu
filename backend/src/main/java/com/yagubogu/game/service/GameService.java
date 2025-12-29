@@ -1,9 +1,9 @@
 package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;

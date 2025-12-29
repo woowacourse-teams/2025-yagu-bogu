@@ -1,5 +1,6 @@
 package com.yagubogu.global;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.yagubogu.game.exception.GameSyncException;
 import com.yagubogu.global.exception.BadGatewayException;
 import com.yagubogu.global.exception.BadRequestException;
@@ -7,9 +8,9 @@ import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.ForbiddenException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.PayloadTooLargeException;
+import com.yagubogu.global.exception.RateLimitExceededException;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
-import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.global.exception.YaguBoguException;
 import com.yagubogu.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -124,24 +126,10 @@ public class GlobalExceptionHandler {
         return new ExceptionResponse(e.getMessage());
     }
 
-    /**
-     * 413 Payload Too Large
-     */
-    @ExceptionHandler(value = PayloadTooLargeException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
-    public ExceptionResponse handlePayloadTooLarge(final PayloadTooLargeException e) {
-        log.info("[PayloadTooLargeException]- {}", e.getMessage());
-
-        return new ExceptionResponse(e.getMessage());
-    }
-
-    /**
-     * 415 Unsupported Media Type
-     */
-    @ExceptionHandler(value = UnsupportedMediaTypeException.class)
-    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    public ExceptionResponse handleUnsupportedMediaType(final PayloadTooLargeException e) {
-        log.info("[UnsupportedMediaTypeException]- {}", e.getMessage());
+    @ExceptionHandler(DuplicateRequestException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleDuplicateRequest(DuplicateRequestException e) {
+        log.info("[DuplicateRequestException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
@@ -153,6 +141,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ExceptionResponse handleUnprocessableException(final UnprocessableEntityException e) {
         log.info("[UnprocessableEntityException]- {}", e.getMessage());
+
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    /**
+     * 429 Too Many Requests
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ExceptionResponse handleRateLimitExceeded(RateLimitExceededException e) {
+        log.info("[RateLimitExceededException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
@@ -174,18 +173,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YaguBoguException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleYaguBoguException(final YaguBoguException e) {
-        log.error("[{}]- {} AT {}", e.getClass().getSimpleName(), safeMsg(e.getMessage()), firstLine(e));
+        log.error("[YaguBoguException]- {}", e.getMessage());
 
         return new ExceptionResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleRuntimeException(final RuntimeException e) {
-        String simpleName = e.getClass().getSimpleName();
-        log.error("[{}] - {} AT {}", simpleName, safeMsg(e.getMessage()), firstLine(e));
-
+    public ExceptionResponse handleRuntimeException(final RuntimeException runtimeException) {
         String message = "Unexpected server error is occurred";
+        log.error("[RuntimeException]- {}", runtimeException.getMessage());
+
         return new ExceptionResponse(message);
     }
 

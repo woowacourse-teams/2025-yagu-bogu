@@ -54,4 +54,13 @@ public class ScoreBoard {
         this.basesOnBalls = basesOnBalls;
         this.inningScores = new ArrayList<>(inningScores);
     }
+
+    public void update(Integer runs, Integer hits, Integer errors,
+                       Integer basesOnBalls, List<String> inningScores) {
+        this.runs = runs;
+        this.hits = hits;
+        this.errors = errors;
+        this.basesOnBalls = basesOnBalls;
+        this.inningScores = inningScores;
+    }
 }
