@@ -1,5 +1,10 @@
 package com.yagubogu.checkin.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
@@ -43,11 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -104,121 +104,6 @@ class CheckInServiceTest {
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
         stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
         stadiumIncheon = stadiumRepository.findById(7L).orElseThrow();
-    }
-
-    @DisplayName("취소된 경기도 직관 내역에 포함된다 - 최신순")
-    @Test
-    void findCheckInHistory_includesCanceled_orderByLatest() {
-        // given
-        Member member = memberFactory.save(b -> b.team(lotte));
-        long memberId = member.getId();
-        int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
-
-        // COMPLETED
-        Game completed1 = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate)
-                .homeTeam(lotte).homeScore(3).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(3))
-                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(lotte).member(member).game(completed1));
-
-        // CANCELED - 스코어보드 없음
-        Game canceled = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate.plusDays(1))
-                .homeTeam(lotte)
-                .awayTeam(kia)
-                .homeScoreBoard(null)
-                .awayScoreBoard(null)
-                .gameState(GameState.CANCELED));
-        checkInFactory.save(b -> b.team(lotte).member(member).game(canceled));
-
-        // COMPLETED
-        Game completed2 = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate.plusDays(2))
-                .homeTeam(lotte).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
-                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(lotte).member(member).game(completed2));
-
-        // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(
-                memberId,
-                year,
-                CheckInResultFilter.ALL,
-                CheckInOrderFilter.LATEST
-        );
-
-        // then
-        assertThat(actual.checkInHistory()).hasSize(3)
-                .extracting(
-                        CheckInGameParam::attendanceDate,
-                        r -> r.homeTeam().name(),
-                        r -> r.awayTeam().name()
-                ).containsExactly(
-                        tuple(startDate.plusDays(2), "롯데", "KIA"),
-                        tuple(startDate.plusDays(1), "롯데", "KIA"),
-                        tuple(startDate, "롯데", "KIA")
-                );
-
-        CheckInGameParam canceledResponse = actual.checkInHistory().get(1);
-        assertThat(canceledResponse.homeScoreBoard()).isNull();
-        assertThat(canceledResponse.awayScoreBoard()).isNull();
-    }
-
-    @DisplayName("이긴 내역 필터 시 취소 경기는 제외된다")
-    @Test
-    void findCheckInWinHistory_excludesCanceled() {
-        // given
-        Member member = memberFactory.save(b -> b.team(kia));
-        long memberId = member.getId();
-        int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
-
-        // CANCELED
-        Game canceled = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate.plusDays(2))
-                .homeTeam(kia)
-                .awayTeam(samsung)
-                .homeScoreBoard(null)
-                .awayScoreBoard(null)
-                .gameState(GameState.CANCELED));
-        checkInFactory.save(b -> b.team(kia).member(member).game(canceled));
-
-        // COMPLETED win
-        Game win = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate.plusDays(1))
-                .homeTeam(kia).homeScore(4).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(4))
-                .awayTeam(samsung).awayScore(0).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(0))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(kia).member(member).game(win));
-
-        // COMPLETED lose
-        Game lose = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate)
-                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
-                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(kia).member(member).game(lose));
-
-        // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(
-                memberId,
-                year,
-                CheckInResultFilter.WIN,
-                CheckInOrderFilter.LATEST
-        );
-
-        // then
-        assertThat(actual.checkInHistory()).hasSize(1)
-                .extracting(CheckInGameParam::attendanceDate)
-                .containsExactly(startDate.plusDays(1));
     }
 
     @DisplayName("인증을 저장한다")
@@ -323,22 +208,27 @@ class CheckInServiceTest {
         assertThat(actual.checkInCounts()).isEqualTo(expectedSize * 2);
     }
 
-    @DisplayName("직관 인증 내역을 모두 최신순으로 조회한다")
+    @DisplayName("해당하는 달의 직관 인증 내역을 모두 최신순으로 조회한다")
     @Test
     void findCheckInHistory_allCheckInsGivenYearOrderByLatest() {
         // given
         Member member = memberFactory.save(builder -> builder.team(lotte));
         long memberId = member.getId();
         int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
         CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.LATEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
-
         makeGames(startDate, savedCheckIns, member);
 
+        LocalDate previousMonthDate = startDate.minusMonths(1);
+        savedCheckIns.add(makeOneGame(previousMonthDate, member));
+
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(4) // 먼저 승리한 경기 4개만 필터링되었는지 확인
@@ -363,7 +253,9 @@ class CheckInServiceTest {
         Member member = memberFactory.save(builder -> builder.team(lotte));
         long memberId = member.getId();
         int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
         CheckInResultFilter resultFilter = CheckInResultFilter.ALL;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.OLDEST;
         List<CheckIn> savedCheckIns = new ArrayList<>();
@@ -371,7 +263,8 @@ class CheckInServiceTest {
         makeGames(startDate, savedCheckIns, member);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(4)
@@ -396,7 +289,9 @@ class CheckInServiceTest {
         Member por = memberFactory.save(b -> b.team(kia).nickname("포르"));
         long memberId = por.getId();
         int year = 2025;
-        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
 
         CheckInResultFilter resultFilter = CheckInResultFilter.WIN;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.LATEST;
@@ -408,7 +303,8 @@ class CheckInServiceTest {
         makeLosingGames(startDate, savedCheckIns, por);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
@@ -432,7 +328,9 @@ class CheckInServiceTest {
         Member por = memberFactory.save(b -> b.team(kia).nickname("포르"));
         long memberId = por.getId();
         int year = 2025;
-        LocalDate startDate = LocalDate.of(2025, 7, 25);
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
 
         CheckInResultFilter resultFilter = CheckInResultFilter.WIN;
         CheckInOrderFilter orderFilter = CheckInOrderFilter.OLDEST;
@@ -444,7 +342,8 @@ class CheckInServiceTest {
         makeLosingGames(startDate, savedCheckIns, por);
 
         // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, resultFilter, orderFilter);
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month, resultFilter,
+                orderFilter);
 
         // then
         assertThat(actual.checkInHistory()).hasSize(3) // 먼저 승리한 경기 3개만 필터링되었는지 확인
@@ -462,18 +361,224 @@ class CheckInServiceTest {
 
     }
 
+    @DisplayName("취소된 경기도 직관 내역에 포함된다 - 최신순")
+    @Test
+    void findCheckInHistory_includesCanceled_orderByLatest() {
+        // given
+        Member member = memberFactory.save(b -> b.team(lotte));
+        long memberId = member.getId();
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
 
-    private void checkInFavorite(Member member, Game... games) {
-        for (Game g : games) {
-            boolean participates =
-                    g.getHomeTeam().getId().equals(member.getTeam().getId()) ||
-                            g.getAwayTeam().getId().equals(member.getTeam().getId());
-            if (participates) {
-                checkInFactory.save(b -> b.member(member).team(member.getTeam()).game(g));
-            }
-        }
+        // COMPLETED
+        Game completed1 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate)
+                .homeTeam(lotte).homeScore(3).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(3))
+                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(completed1));
+
+        // CANCELED - 스코어보드 없음
+        Game canceled = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(1))
+                .homeTeam(lotte)
+                .awayTeam(kia)
+                .homeScoreBoard(null)
+                .awayScoreBoard(null)
+                .gameState(GameState.CANCELED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(canceled));
+
+        // COMPLETED
+        Game completed2 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(2))
+                .homeTeam(lotte).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(lotte).member(member).game(completed2));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month,
+                CheckInResultFilter.ALL, CheckInOrderFilter.LATEST);
+
+        // then
+        assertThat(actual.checkInHistory()).hasSize(3)
+                .extracting(
+                        CheckInGameParam::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.awayTeam().name()
+                ).containsExactly(
+                        tuple(startDate.plusDays(2), "롯데", "KIA"),
+                        tuple(startDate.plusDays(1), "롯데", "KIA"),
+                        tuple(startDate, "롯데", "KIA")
+                );
+
+        CheckInGameParam canceledResponse = actual.checkInHistory().get(1);
+        assertThat(canceledResponse.homeScoreBoard()).isNull();
+        assertThat(canceledResponse.awayScoreBoard()).isNull();
     }
 
+    @DisplayName("이긴 내역 필터 시 취소 경기는 제외된다")
+    @Test
+    void findCheckInWinHistory_excludesCanceled() {
+        // given
+        Member member = memberFactory.save(b -> b.team(kia));
+        long memberId = member.getId();
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
+
+        // CANCELED
+        Game canceled = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(2))
+                .homeTeam(kia)
+                .awayTeam(samsung)
+                .homeScoreBoard(null)
+                .awayScoreBoard(null)
+                .gameState(GameState.CANCELED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(canceled));
+
+        // COMPLETED win
+        Game win = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(1))
+                .homeTeam(kia).homeScore(4).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(4))
+                .awayTeam(samsung).awayScore(0).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(0))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(win));
+
+        // COMPLETED lose
+        Game lose = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(lose));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month,
+                CheckInResultFilter.WIN, CheckInOrderFilter.LATEST);
+
+        // then
+        assertThat(actual.checkInHistory()).hasSize(1)
+                .extracting(CheckInGameParam::attendanceDate)
+                .containsExactly(startDate.plusDays(1));
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 직관 인증 내역을 조회한다")
+    @Test
+    void findCheckInHistory_withPastCheckIn() {
+        // given
+        Member member = memberFactory.save(builder -> builder.team(kia));
+        long memberId = member.getId();
+        int year = 2025;
+        int month = 7;
+        int day = 25;
+        LocalDate startDate = LocalDate.of(year, month, day);
+
+        // CheckIn 데이터 2개
+        Game checkInGame1 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate)
+                .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                .awayTeam(kt).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(checkInGame1));
+
+        Game checkInGame2 = gameFactory.save(b -> b
+                .stadium(stadiumJamsil)
+                .date(startDate.plusDays(1))
+                .homeTeam(kia).homeScore(1).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(1))
+                .awayTeam(lg).awayScore(5).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(5))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.team(kia).member(member).game(checkInGame2));
+
+        // PastCheckIn 데이터 2개
+        Game pastCheckInGame1 = gameFactory.save(b -> b
+                .stadium(stadiumGocheok)
+                .date(startDate.minusDays(10))
+                .homeTeam(kia).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
+                .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        Game pastCheckInGame2 = gameFactory.save(b -> b
+                .stadium(stadiumGocheok)
+                .date(startDate.minusDays(9))
+                .homeTeam(doosan).homeScore(8).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(8))
+                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(
+                b -> b.game(pastCheckInGame2).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        // when
+        CheckInHistoryResponse actual = checkInService.findCheckInHistory(memberId, year, month,
+                CheckInResultFilter.ALL, CheckInOrderFilter.LATEST
+        );
+
+        // then
+        assertThat(actual.checkInHistory()).hasSize(4)
+                .extracting(
+                        CheckInGameParam::attendanceDate,
+                        r -> r.homeTeam().name(),
+                        r -> r.awayTeam().name()
+                ).containsExactly(
+                        tuple(startDate.plusDays(1), "KIA", "LG"),
+                        tuple(startDate, "KIA", "KT"),
+                        tuple(startDate.minusDays(9), "두산", "KIA"),
+                        tuple(startDate.minusDays(10), "KIA", "삼성")
+                );
+    }
+
+    @DisplayName("PastCheckIn과 CheckIn을 통합하여 총 인증 횟수를 조회한다")
+    @Test
+    void findCheckInCounts_withPastCheckIn() {
+        // given
+        Member member = memberFactory.save(builder -> builder.team(lotte));
+        int year = 2025;
+        LocalDate startDate = LocalDate.of(year, 7, 25);
+
+        // CheckIn 3개
+        for (int i = 0; i < 3; i++) {
+            final int index = i;
+            Game game = gameFactory.save(gameBuilder ->
+                    gameBuilder.date(startDate.plusDays(index))
+                            .stadium(stadiumJamsil)
+                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                            .awayTeam(kia).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                            .gameState(GameState.COMPLETED)
+            );
+            checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
+        }
+
+        // PastCheckIn 4개
+        for (int i = 0; i < 4; i++) {
+            final int index = i;
+            Game game = gameFactory.save(gameBuilder ->
+                    gameBuilder.date(startDate.minusDays(20 - index))
+                            .stadium(stadiumGocheok)
+                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(5))
+                            .awayTeam(samsung).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
+                            .gameState(GameState.COMPLETED)
+            );
+            checkInFactory.save(
+                    b -> b.game(game).member(member).team(lotte).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+        }
+
+        // when
+        CheckInCountsResponse actual = checkInService.findCheckInCounts(member.getId(), year);
+
+        // then
+        assertThat(actual.checkInCounts()).isEqualTo(7);
+    }
 
     @DisplayName("요청받은 날짜에 인증을 했는지 검사한다")
     @Test
@@ -663,115 +768,6 @@ class CheckInServiceTest {
         assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("PastCheckIn과 CheckIn을 통합하여 직관 인증 내역을 조회한다")
-    @Test
-    void findCheckInHistory_withPastCheckIn() {
-        // given
-        Member member = memberFactory.save(builder -> builder.team(kia));
-        long memberId = member.getId();
-        int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
-
-        // CheckIn 데이터 2개
-        Game checkInGame1 = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate)
-                .homeTeam(kia).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
-                .awayTeam(kt).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(kia).member(member).game(checkInGame1));
-
-        Game checkInGame2 = gameFactory.save(b -> b
-                .stadium(stadiumJamsil)
-                .date(startDate.plusDays(1))
-                .homeTeam(kia).homeScore(1).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(1))
-                .awayTeam(lg).awayScore(5).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(5))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.team(kia).member(member).game(checkInGame2));
-
-        // PastCheckIn 데이터 2개
-        Game pastCheckInGame1 = gameFactory.save(b -> b
-                .stadium(stadiumGocheok)
-                .date(startDate.minusDays(10))
-                .homeTeam(kia).homeScore(7).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(7))
-                .awayTeam(samsung).awayScore(3).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(
-                b -> b.game(pastCheckInGame1).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
-
-        Game pastCheckInGame2 = gameFactory.save(b -> b
-                .stadium(stadiumGocheok)
-                .date(startDate.minusDays(9))
-                .homeTeam(doosan).homeScore(8).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(8))
-                .awayTeam(kia).awayScore(2).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(2))
-                .gameState(GameState.COMPLETED));
-        checkInFactory.save(
-                b -> b.game(pastCheckInGame2).member(member).team(kia).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
-
-        // when
-        CheckInHistoryResponse actual = checkInService.findCheckInHistory(
-                memberId,
-                year,
-                CheckInResultFilter.ALL,
-                CheckInOrderFilter.LATEST
-        );
-
-        // then
-        assertThat(actual.checkInHistory()).hasSize(4)
-                .extracting(
-                        CheckInGameParam::attendanceDate,
-                        r -> r.homeTeam().name(),
-                        r -> r.awayTeam().name()
-                ).containsExactly(
-                        tuple(startDate.plusDays(1), "KIA", "LG"),
-                        tuple(startDate, "KIA", "KT"),
-                        tuple(startDate.minusDays(9), "두산", "KIA"),
-                        tuple(startDate.minusDays(10), "KIA", "삼성")
-                );
-    }
-
-    @DisplayName("PastCheckIn과 CheckIn을 통합하여 총 인증 횟수를 조회한다")
-    @Test
-    void findCheckInCounts_withPastCheckIn() {
-        // given
-        Member member = memberFactory.save(builder -> builder.team(lotte));
-        int year = 2025;
-        LocalDate startDate = LocalDate.of(year, 7, 25);
-
-        // CheckIn 3개
-        for (int i = 0; i < 3; i++) {
-            final int index = i;
-            Game game = gameFactory.save(gameBuilder ->
-                    gameBuilder.date(startDate.plusDays(index))
-                            .stadium(stadiumJamsil)
-                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
-                            .awayTeam(kia).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
-                            .gameState(GameState.COMPLETED)
-            );
-            checkInFactory.save(builder -> builder.team(lotte).member(member).game(game));
-        }
-
-        // PastCheckIn 4개
-        for (int i = 0; i < 4; i++) {
-            final int index = i;
-            Game game = gameFactory.save(gameBuilder ->
-                    gameBuilder.date(startDate.minusDays(20 - index))
-                            .stadium(stadiumGocheok)
-                            .homeTeam(lotte).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(5))
-                            .awayTeam(samsung).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(3))
-                            .gameState(GameState.COMPLETED)
-            );
-            checkInFactory.save(
-                    b -> b.game(game).member(member).team(lotte).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
-        }
-
-        // when
-        CheckInCountsResponse actual = checkInService.findCheckInCounts(member.getId(), year);
-
-        // then
-        assertThat(actual.checkInCounts()).isEqualTo(7);
-    }
-
     @DisplayName("PastCheckIn과 CheckIn을 통합하여 구장별 방문 횟수를 조회한다")
     @Test
     void findStadiumCheckInCounts_withPastCheckIn() {
@@ -910,6 +906,20 @@ class CheckInServiceTest {
                         .gameState(GameState.COMPLETED)
         );
         savedCheckIns.add(checkInFactory.save(builder -> builder.team(lotte).member(member).game(game4)));
+    }
+
+    private CheckIn makeOneGame(final LocalDate startDate, final Member member) {
+        Game game1 = gameFactory.save(gameBuilder ->
+                gameBuilder.date(startDate.plusDays(0))
+                        .stadium(stadiumJamsil)
+                        .homeTeam(lotte).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoardAbout(10))
+                        .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoardAbout(1))
+                        .homePitcher("일승리")
+                        .awayPitcher("일패배")
+                        .gameState(GameState.COMPLETED)
+        );
+
+        return checkInFactory.save(builder -> builder.team(lotte).member(member).game(game1));
     }
 
     private void makeWinningGames(final LocalDate startDate, final List<CheckIn> savedCheckIns, final Member member) {

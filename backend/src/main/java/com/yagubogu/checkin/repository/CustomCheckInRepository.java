@@ -34,6 +34,7 @@ public interface CustomCheckInRepository {
             Member member,
             Team team,
             int year,
+            Integer month,
             CheckInResultFilter resultFilter,
             CheckInOrderFilter orderFilter
     );
