@@ -46,7 +46,7 @@ interface CheckInApiService {
         @Query("year") year: Int,
     ): Response<StadiumCheckInCountsResponse>
 
-    @POST("/api/past-check-ins")
+    @POST("/api/v1/past-check-ins")
     suspend fun postPastCheckIn(
         @Body body: PastCheckInRequest,
     ): Response<Unit>
