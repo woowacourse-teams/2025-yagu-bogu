@@ -1,9 +1,7 @@
 package com.yagubogu.data.dto.response.checkin
 
-import com.yagubogu.presentation.attendance.model.AttendanceHistoryItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 
 @Serializable
 data class CheckInGameDto(
@@ -21,27 +19,4 @@ data class CheckInGameDto(
     val homeScoreBoard: ScoreBoardDto?,
     @SerialName("awayScoreBoard")
     val awayScoreBoard: ScoreBoardDto?,
-) {
-    fun toPresentation(): AttendanceHistoryItem {
-        val summary =
-            AttendanceHistoryItem.Summary(
-                id = checkInId,
-                attendanceDate = LocalDate.parse(attendanceDate),
-                stadiumName = stadiumFullName,
-                awayTeam = awayTeam.toPresentation(homeTeam),
-                homeTeam = homeTeam.toPresentation(awayTeam),
-            )
-
-        if (homeScoreBoard == null || awayScoreBoard == null || awayTeam.pitcher == null || homeTeam.pitcher == null) {
-            return AttendanceHistoryItem.Canceled(summary = summary)
-        }
-
-        return AttendanceHistoryItem.Detail(
-            summary = summary,
-            awayTeamPitcher = awayTeam.pitcher,
-            homeTeamPitcher = homeTeam.pitcher,
-            awayTeamScoreBoard = awayScoreBoard.toPresentation(),
-            homeTeamScoreBoard = homeScoreBoard.toPresentation(),
-        )
-    }
-}
+)

@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import javax.inject.Inject
 
-class StreamRemoteDataSource(
+class StreamRemoteDataSource @Inject constructor(
     private val sseClient: SseClient,
     private val json: Json = Json { ignoreUnknownKeys = true },
-) {
+) : StreamDataSource {
     private val eventFlow =
         MutableSharedFlow<SseCheckInResponse>(
             replay = 1,
@@ -65,12 +66,12 @@ class StreamRemoteDataSource(
             }
         }
 
-    fun connect(): Flow<SseCheckInResponse> {
+    override fun connect(): Flow<SseCheckInResponse> {
         sseClient.connect(checkInSseHandler)
         return eventFlow
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         sseClient.disconnect()
     }
 

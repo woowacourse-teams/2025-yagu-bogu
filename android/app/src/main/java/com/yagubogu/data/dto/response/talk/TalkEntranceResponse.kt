@@ -1,6 +1,5 @@
 package com.yagubogu.data.dto.response.talk
 
-import com.yagubogu.presentation.livetalk.chat.LivetalkTeams
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,12 +14,4 @@ data class TalkEntranceResponse(
     val awayTeamCode: String, // 어웨이팀 코드
     @SerialName("myTeamCode")
     val myTeamCode: String, // 내 팀 코드
-) {
-    fun toPresentation() =
-        LivetalkTeams(
-            stadiumName = stadiumName,
-            homeTeamCode = homeTeamCode,
-            awayTeamCode = awayTeamCode,
-            myTeamCode = myTeamCode,
-        )
-}
+)

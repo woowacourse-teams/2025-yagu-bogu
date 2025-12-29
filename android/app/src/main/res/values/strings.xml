@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">야구보구</string>
 
     <string name="all_settings">설정</string>
@@ -10,6 +10,9 @@
     <string name="all_count">%d회</string>
     <string name="all_null_nick_name">(알 수 없음)</string>
     <string name="all_back_button_content_description">뒤로가기</string>
+    <string name="all_ranking">%d등</string>
+    <string name="all_score">%d점</string>
+    <string name="all_score_first_float">%.1f점</string>
 
     <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
 
@@ -21,6 +24,7 @@
     <string name="permission_dialog_open_settings">"설정으로 이동"</string>
     <string name="permission_dialog_location_title">위치 권한 필요</string>
     <string name="permission_dialog_location_description">인증하려면 위치 권한이 필요합니다.\n설정에서 위치 권한을 허용해 주세요.</string>
+    <string name="permission_dialog_location_emoji">⚙️</string>
 
     <string name="login_app_description">야구보구 인증하구 통계보구</string>
     <string name="login_google_icon_description">구글 G 아이콘</string>
@@ -73,7 +77,7 @@
     <string name="stats_my_team">응원팀</string>
     <string name="stats_my_lucky_stadium">행운의 구장</string>
     <string name="stats_my_lucky_stadium_tooltip">직관 승률이 제일 높은 구장이에요.</string>
-    <string name="stats_my_no_lucky_stadium">없어요..</string>
+    <string name="stats_no_data">없어요..</string>
     <string name="stats_attendance_stats_title">직관 평균 통계</string>
     <string name="stats_gain_score_emoji">😊</string>
     <string name="stats_loss_score_emoji">😡</string>
@@ -91,10 +95,8 @@
 
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>
     <string name="attendance_history_empty_scoreboard_illustration_description">비어있는 스코어보드 일러스트</string>
-    <string-array name="attendance_history_filter">
-        <item name="all">전체 경기</item>
-        <item name="win">승리한 경기</item>
-    </string-array>
+    <string name="attendance_history_all">전체 경기</string>
+    <string name="attendance_history_win">승리한 경기</string>
     <string name="attendance_history_latest">최신순</string>
     <string name="attendance_history_oldest">오래된순</string>
     <string name="attendance_history_winning_pitcher">승 - %s</string>
@@ -159,6 +161,10 @@
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
     <string name="setting_edit_my_team">응원팀 수정</string>
 
+    <!--    uCrop의 문자열 리소스 오버라이딩-->
+    <string name="ucrop_rotate" tools:ignore="PrivateResource">회전</string>
+    <string name="ucrop_scale" tools:ignore="PrivateResource">배율</string>
+
     <string name="setting_manage_account">계정 관리</string>
     <string name="setting_logout">로그아웃</string>
     <string name="setting_logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
@@ -178,5 +184,20 @@
     <string name="setting_contact_us">문의하기</string>
     <string name="setting_open_source_license">오픈소스 라이선스</string>
     <string name="setting_app_version">앱 버전: %s</string>
+
+    <string name="profile_ranking_all">"전체 랭킹 : "</string>
+    <string name="profile_ranking_within_team">" 랭킹 : "</string>
+    <string name="profile_ranking_rank">위</string>
+    <string name="profile_victory_fairy_ranking">승리요정 랭킹</string>
+    <string name="profile_victory_fairy_score">승리요정 점수</string>
+    <string name="profile_check_in_counts">직관 횟수</string>
+    <string name="profile_winning_percentage">직관 승률</string>
+    <string name="profile_win_draw_lose">승 무 패</string>
+    <string name="profile_register_date">가입일</string>
+    <string name="profile_latest_check_in_date">최근 직관일</string>
+    <string name="profile_image_url_content_description">프로필 이미지</string>
+    <string name="profile_representative_badge_content_description">대표 배지 이미지</string>
+    <string name="profile_victory_fairy_ranking_emoji">🎖️</string>
+    <string name="profile_victory_fairy_score_emoji">🧚</string>
 
 </resources>

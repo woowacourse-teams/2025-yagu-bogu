@@ -4,20 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yagubogu.data.auth.GoogleCredentialManager
-import com.yagubogu.data.auth.GoogleCredentialResult
-import com.yagubogu.domain.model.LoginResult
-import com.yagubogu.domain.repository.AuthRepository
-import com.yagubogu.domain.repository.MemberRepository
-import com.yagubogu.domain.repository.TokenRepository
+import com.yagubogu.data.dto.response.auth.LoginResultResponse
+import com.yagubogu.data.repository.auth.AuthRepository
+import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.token.TokenRepository
+import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.presentation.login.auth.GoogleCredentialResult
+import com.yagubogu.presentation.login.model.LoginResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class LoginViewModel(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
-    private val googleCredentialManager: GoogleCredentialManager,
 ) : ViewModel() {
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> get() = _loginResult
@@ -26,7 +29,7 @@ class LoginViewModel(
 
     suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
 
-    fun signInWithGoogle() {
+    fun signInWithGoogle(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
             val googleCredentialResult: GoogleCredentialResult =
                 googleCredentialManager.getGoogleCredentialResult()
@@ -38,7 +41,12 @@ class LoginViewModel(
                         authRepository
                             .login(idToken)
                             .fold(
-                                onSuccess = { result: LoginResult -> result },
+                                onSuccess = { result: LoginResultResponse ->
+                                    when (result) {
+                                        LoginResultResponse.SignUp -> LoginResult.SignUp
+                                        LoginResultResponse.SignIn -> LoginResult.SignIn
+                                    }
+                                },
                                 onFailure = { exception: Throwable ->
                                     Timber.w(exception, "API 호출 실패")
                                     LoginResult.Failure(exception)
@@ -55,7 +63,7 @@ class LoginViewModel(
         }
     }
 
-    private fun signOutWithGoogle() {
+    fun signOutWithGoogle(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
             googleCredentialManager.signOut()
         }

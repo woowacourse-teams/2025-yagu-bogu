@@ -6,8 +6,9 @@ import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.util.safeApiCall
+import javax.inject.Inject
 
-class TalkRemoteDataSource(
+class TalkRemoteDataSource @Inject constructor(
     private val talkApiService: TalkApiService,
 ) : TalkDataSource {
     override suspend fun getTalks(

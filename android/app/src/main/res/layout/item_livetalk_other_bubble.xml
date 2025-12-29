@@ -9,7 +9,7 @@
 
         <variable
             name="livetalkChatItem"
-            type="com.yagubogu.presentation.livetalk.chat.LivetalkChatItem" />
+            type="com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,52 +21,63 @@
         android:paddingStart="12dp"
         android:paddingTop="12dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/iv_profile"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="4dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_member_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/tv_chat_body"
             app:layout_constraintStart_toStartOf="parent"
-            app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
-            app:strokeColor="@color/gray300"
-            app:strokeWidth="1dp"
-            app:userProfileImage="@{livetalkChatItem.profileImageUrl}"
-            tools:src="@drawable/ic_users" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_user_nick_name"
-            style="@style/TextView.Pretendard.Bold.16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:includeFontPadding="false"
-            android:text="@{livetalkChatItem.nickname}"
-            app:layout_constraintBottom_toBottomOf="@id/iv_profile"
-            app:layout_constraintStart_toEndOf="@id/iv_profile"
-            app:layout_constraintTop_toTopOf="@id/iv_profile"
-            tools:text="제미나이(잼민이 아님)" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_profile"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
 
-        <TextView
-            android:id="@+id/tv_fan_team_name"
-            style="@style/TextView.Pretendard.Medium.12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:includeFontPadding="false"
-            android:text="@{@string/all_fan(livetalkChatItem.teamName)}"
-            android:textColor="@color/gray500"
-            app:layout_constraintBottom_toBottomOf="@id/tv_user_nick_name"
-            app:layout_constraintStart_toEndOf="@id/tv_user_nick_name"
-            app:layout_constraintTop_toTopOf="@id/tv_user_nick_name"
-            tools:text="KIA 팬" />
+                app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Button"
+                app:strokeColor="@color/gray300"
+                app:strokeWidth="1dp"
+                app:userProfileImage="@{livetalkChatItem.profileImageUrl}"
+                tools:src="@drawable/ic_users" />
+
+            <TextView
+                android:id="@+id/tv_user_nick_name"
+                style="@style/TextView.Pretendard.Bold.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:includeFontPadding="false"
+                android:text="@{livetalkChatItem.nickname}"
+                app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+                app:layout_constraintStart_toEndOf="@id/iv_profile"
+                app:layout_constraintTop_toTopOf="@id/iv_profile"
+                tools:text="제미나이(잼민이 아님)" />
+
+            <TextView
+                android:id="@+id/tv_fan_team_name"
+                style="@style/TextView.Pretendard.Medium.12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:includeFontPadding="false"
+                android:text="@{@string/all_fan(livetalkChatItem.teamName)}"
+                android:textColor="@color/gray500"
+                app:layout_constraintBottom_toBottomOf="@id/tv_user_nick_name"
+                app:layout_constraintStart_toEndOf="@id/tv_user_nick_name"
+                app:layout_constraintTop_toTopOf="@id/tv_user_nick_name"
+                tools:text="KIA 팬" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Space
             android:id="@+id/space_profile_bottom_spacing"
             android:layout_width="wrap_content"
             android:layout_height="4dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_profile" />
+            app:layout_constraintTop_toBottomOf="@id/constraint_member_profile" />
 
         <TextView
             android:id="@+id/tv_chat_body"

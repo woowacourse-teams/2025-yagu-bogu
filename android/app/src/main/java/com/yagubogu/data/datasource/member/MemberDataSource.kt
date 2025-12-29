@@ -4,9 +4,9 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import com.yagubogu.domain.model.Team
 
 interface MemberDataSource {
     suspend fun getMemberInfo(): Result<MemberInfoResponse>
@@ -17,7 +17,7 @@ interface MemberDataSource {
 
     suspend fun getFavoriteTeam(): Result<MemberFavoriteResponse>
 
-    suspend fun updateFavoriteTeam(team: Team): Result<MemberFavoriteResponse>
+    suspend fun updateFavoriteTeam(teamCode: String): Result<MemberFavoriteResponse>
 
     suspend fun deleteMember(): Result<Unit>
 
@@ -31,4 +31,6 @@ interface MemberDataSource {
     ): Result<PresignedUrlStartResponse>
 
     suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse>
+
+    suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse>
 }

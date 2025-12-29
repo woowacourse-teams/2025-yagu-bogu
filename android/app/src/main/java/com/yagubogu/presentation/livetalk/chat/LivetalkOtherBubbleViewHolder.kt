@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemLivetalkOtherBubbleBinding
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEvent
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEventHandler
+import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
 
 class LivetalkOtherBubbleViewHolder private constructor(
     private val binding: ItemLivetalkOtherBubbleBinding,
@@ -14,6 +17,9 @@ class LivetalkOtherBubbleViewHolder private constructor(
 
         binding.constraintReportContainer.setOnClickListener {
             livetalkChatEventHandler.onEvent(LivetalkChatEvent.Report(item))
+        }
+        binding.constraintMemberProfile.setOnClickListener {
+            livetalkChatEventHandler.onEvent(LivetalkChatEvent.ViewProfile(item))
         }
         binding.executePendingBindings()
     }

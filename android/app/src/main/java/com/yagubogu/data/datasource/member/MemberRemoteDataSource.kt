@@ -8,13 +8,14 @@ import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
 import com.yagubogu.data.dto.response.member.MemberInfoResponse
 import com.yagubogu.data.dto.response.member.MemberNicknameResponse
+import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
 import com.yagubogu.data.util.safeApiCall
-import com.yagubogu.domain.model.Team
+import javax.inject.Inject
 
-class MemberRemoteDataSource(
+class MemberRemoteDataSource @Inject constructor(
     private val memberApiService: MemberApiService,
 ) : MemberDataSource {
     override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
@@ -38,9 +39,9 @@ class MemberRemoteDataSource(
             memberApiService.getFavoriteTeam()
         }
 
-    override suspend fun updateFavoriteTeam(team: Team): Result<MemberFavoriteResponse> =
+    override suspend fun updateFavoriteTeam(teamCode: String): Result<MemberFavoriteResponse> =
         safeApiCall {
-            val request = MemberFavoriteRequest(team.name)
+            val request = MemberFavoriteRequest(teamCode)
             memberApiService.patchFavoriteTeam(request)
         }
 
@@ -76,5 +77,10 @@ class MemberRemoteDataSource(
         safeApiCall {
             val request = PresignedUrlCompleteRequest(key)
             memberApiService.postCompleteUpload(request)
+        }
+
+    override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> =
+        safeApiCall {
+            memberApiService.getMemberProfile(memberId)
         }
 }
