@@ -1,0 +1,122 @@
+spring:
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/mysql
+    validate-on-migrate: true
+
+  datasource:
+    hikari:
+      maximumPoolSize: 10
+      minimumIdle: 5
+      connectionTimeout: 5000
+      idleTimeout: 0
+      maxLifetime: 1500000
+      validationTimeout: 1000
+      poolName: crawling-hikari-pool
+
+kbo:
+  crawler:
+    base-url: https://www.koreabaseball.com
+    score-board-url: https://www.koreabaseball.com/Schedule/ScoreBoard.aspx
+    game-center-url: https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx
+    navigation-timeout: 10000
+    table-timeout: 5000
+    wait-timeout: 5000
+    max-retries: 1
+    retry-delay: 500
+
+    context-pool-size: 2
+
+  scheduler:
+    default-game-start-time: "18:30"
+    polling-interval: 1m
+
+  retry:
+    per-game:
+      quick-threshold: 5
+      quick-interval: 2m
+      max-backoff: 8m
+      max-attempts: 12
+      warn-threshold: 15
+    global:
+      first: 1m
+      second: 2m
+      max: 5m
+
+  selectors:
+    # 달력 네비게이션
+    calendar:
+      trigger: "//img[contains(@class, 'ui-datepicker-trigger')]"
+      container: "//div[@id='ui-datepicker-div']"
+      yearSelect: "//select[contains(@class, 'ui-datepicker-year')]"
+      monthSelect: "//select[contains(@class, 'ui-datepicker-month')]"
+      dayLink: "//div[@id='ui-datepicker-div']//td[not(contains(@class,'ui-datepicker-other-month'))]//a[normalize-space(text())='%s']"
+      dateLabel: "//span[@id='cphContents_cphContents_cphContents_lblGameDate']"
+      updatePanel: "//div[@id='cphContents_cphContents_cphContents_udpRecord']"
+
+    # 스코어보드 (CSS Selector - 안정적)
+    scoreboard:
+      container: ".smsScore"
+      status: ".flag span"
+      stadium: ".place"
+      startTime: ".place span"
+
+      # 팀 정보
+      awayTeam:
+        name: ".leftTeam .teamT"
+        score: ".leftTeam .score span"
+
+      homeTeam:
+        name: ".rightTeam .teamT"
+        score: ".rightTeam .score span"
+
+      # 박스스코어 링크
+      boxScoreLink: ".btnSms a[href*='gameId=']"
+
+      # 이닝별 점수 테이블
+      scoreTable:
+        table: "table.tScore"
+        rows: "tbody tr"
+        team-name: "th"
+        cells: "td"
+
+      # 투수 정보
+      pitcher:
+        container: ".score_wrap p.win"
+        spans: "span"
+
+  # 정규표현식 패턴
+  patterns:
+    pitcherLabel: "^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$"
+    dateFormat: "yyyy.MM.dd"
+    timeFormat: "HH:mm"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
