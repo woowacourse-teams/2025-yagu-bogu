@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.internal.dsl.SigningConfig
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -12,9 +13,10 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.oss.licenses.plugin)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ktorfit)
 }
 
 android {
@@ -91,13 +93,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
     buildFeatures {
         dataBinding = true
         buildConfig = true
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
