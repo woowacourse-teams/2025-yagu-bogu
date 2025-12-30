@@ -53,13 +53,17 @@ public class SseEmitterRegistry {
         return sseEmitter;
     }
 
+    public int size() {
+        return sseEmitterMap.size();
+    }
+
     public Collection<SseEmitter> all() {
         return sseEmitterMap.values();
     }
 
     public void removeWithError(final SseEmitter emitter, final Throwable throwable) {
         emitter.completeWithError(throwable);
-        sseEmitterMap.values().removeIf(e -> e.equals(emitter));
+        sseEmitterMap.entrySet().removeIf(entry -> entry.getValue().equals(emitter));
     }
 
     private boolean isClientDisconnect(Throwable t) {

@@ -11,10 +11,12 @@ import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import com.yagubogu.stat.cache.StatsCache;
 import com.yagubogu.stat.dto.AverageStatisticParam;
 import com.yagubogu.stat.dto.CheckInSummaryParam;
 import com.yagubogu.stat.dto.OpponentWinRateRowParam;
 import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
+import com.yagubogu.stat.dto.StadiumStatsDto;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
@@ -27,7 +29,12 @@ import com.yagubogu.stat.repository.VictoryFairyRankingRepository;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +57,7 @@ public class StatService {
     private final CheckInRepository checkInRepository;
     private final MemberRepository memberRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
+    private final StatsCache statsCache;
 
     public StatCountsResponse findStatCounts(final long memberId, final int year) {
         Member member = getMember(memberId);
@@ -227,6 +235,18 @@ public class StatService {
         return Math.round(rate * 10) / 10.0;
     }
 
+    @Transactional(readOnly = true)
+    public Set<Long> refreshCacheFromDb() {
+        Map<String, Long> values = rebuildStatsFromDb();
+        statsCache.overwriteAll(values);
+
+        return values.keySet().stream()
+                .filter(key -> key.startsWith("stats:stadium:"))
+                .map(this::extractStadiumId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
     private Member getMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("Member is not found"));
@@ -262,5 +282,40 @@ public class StatService {
                 })
                 .sorted(OPPONENT_WIN_RATE_TEAM_COMPARATOR)
                 .toList();
+    }
+
+    private Map<String, Long> rebuildStatsFromDb() {
+        Map<String, Long> values = new HashMap<>();
+
+        List<StadiumStatsDto> stats = checkInRepository.findStadiumStats();
+        Map<Long, Long> stadiumTotals = new HashMap<>();
+
+        for (StadiumStatsDto stat : stats) {
+            Long stadiumId = stat.stadiumId();
+            Long teamId = stat.teamId();
+            Long count = stat.count();
+
+            values.put(StatsCache.stadiumTeamKey(stadiumId, teamId), count);
+            stadiumTotals.merge(stadiumId, count, Long::sum);
+        }
+
+        stadiumTotals.forEach((stadiumId, total) ->
+                values.put(StatsCache.stadiumTotalKey(stadiumId), total)
+        );
+
+        return values;
+    }
+
+    private Long extractStadiumId(final String key) {
+        String[] tokens = key.split(":");
+        if (tokens.length < 3) {
+            return null;
+        }
+        try {
+            return Long.parseLong(tokens[2]);
+        } catch (NumberFormatException e) {
+            log.debug("Skip parsing stadium id from key {}", key, e);
+            return null;
+        }
     }
 }

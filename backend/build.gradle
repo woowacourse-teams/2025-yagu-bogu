@@ -44,6 +44,8 @@ dependencies {
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
     implementation 'io.opentelemetry:opentelemetry-sdk'
 
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
     compileOnly 'org.projectlombok:lombok'
 
     runtimeOnly 'com.h2database:h2'

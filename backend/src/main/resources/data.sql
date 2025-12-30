@@ -69,6 +69,46 @@ VALUES (5000, 2, '엘지1', '엘지1@example.com', 'GOOGLE', 'sub-엘지1', 'USE
        (5020, 2, '엘지6', '엘지6@example.com', 'GOOGLE', 'sub-엘지6', 'USER', 'https://image.com/엘지6.png', null),
        (5021, 2, '엘지7', '엘지7@example.com', 'GOOGLE', 'sub-엘지7', 'USER', 'https://image.com/엘지7.png', null);
 
+-- 테스트용 멤버 1~1000번 생성
+-- nickname은 unique 제약이 있으므로 test_user_{id} 형식으로
+
+INSERT INTO members (
+    member_id,
+    team_id,
+    nickname,
+    email,
+    provider,
+    oauth_id,
+    role,
+    image_url,
+    representative_badge_id,
+    created_at,
+    updated_at
+)
+SELECT
+    n AS member_id,
+    2 AS team_id,  -- 선호 팀 없음
+    CONCAT('test_user_', n) AS nickname,
+    CONCAT('test', n, '@test.com') AS email,
+    'GOOGLE' AS provider,
+    CONCAT('test_oauth_', n) AS oauth_id,
+    'USER' AS role,
+    NULL AS image_url,
+    NULL AS representative_badge_id,
+    NOW() AS created_at,
+    NOW() AS updated_at
+FROM
+    (SELECT @row := @row + 1 AS n
+     FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+           UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t1,
+          (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+           UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t2,
+          (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+           UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) t3,
+          (SELECT @row := 0) r
+    ) numbers
+WHERE n BETWEEN 1 AND 1000;
+
 -- 4. 스코어보드 데이터
 INSERT INTO score_boards (runs, hits, errors, bases_on_balls, inning_scores)
 VALUES
