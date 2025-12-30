@@ -1,8 +1,10 @@
 package com.yagubogu.talk;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -19,10 +21,20 @@ import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.domain.Talk;
 import com.yagubogu.talk.dto.v1.TalkRequest;
+import com.yagubogu.talk.dto.v1.TalkResponse;
+import com.yagubogu.talk.repository.TalkRepository;
+import com.yagubogu.talk.service.TalkService;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +62,9 @@ public class TalkE2eTest extends E2eTestBase {
     private TalkFactory talkFactory;
 
     @Autowired
+    private TalkService talkService;
+
+    @Autowired
     private TalkReportFactory talkReportFactory;
 
     @Autowired
@@ -57,6 +72,9 @@ public class TalkE2eTest extends E2eTestBase {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private TalkRepository talkRepository;
 
     private String accessToken;
 
@@ -267,18 +285,75 @@ public class TalkE2eTest extends E2eTestBase {
                 .awayTeam(awayTeam)
                 .stadium(stadium));
 
+        String clientId = UUID.randomUUID().toString();
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new TalkRequest(content))
+                .body(new TalkRequest(clientId, content))
                 .pathParam("gameId", game.getId())
                 .when().post("/api/v1/talks/{gameId}")
                 .then().log().all()
                 .statusCode(201)
                 .body("content", is(content));
+    }
+
+    @Test
+    @DisplayName("동시 요청 시 하나만 생성되고 나머지는 중복 감지 또는 예외 발생")
+    void concurrentRequestsWithSameClientMessageId() throws InterruptedException {
+        // given
+        String clientMessageId = UUID.randomUUID().toString();
+        TalkRequest request = new TalkRequest(clientMessageId, "동시 요청 테스트");
+
+        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
+        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
+        Member member = memberFactory.save(builder -> builder.team(homeTeam));
+        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+
+        Long gameId = game.getId();
+        Long memberId = member.getId();
+
+        // when: 3개 스레드에서 동시에 같은 clientMessageId로 요청
+        int threadCount = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        List<TalkResponse> responses = new CopyOnWriteArrayList<>();
+        List<Exception> exceptions = new CopyOnWriteArrayList<>();
+
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    TalkResponse response = talkService.createTalk(gameId, request, memberId);
+                    responses.add(response);
+                } catch (Exception e) {
+                    exceptions.add(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await(5, TimeUnit.SECONDS);
+        executorService.shutdown();
+
+        // then
+        // 성공 + 예외 = 총 3개 처리
+        assertThat(responses.size() + exceptions.size()).isEqualTo(3);
+
+        // DB에는 1개만 저장
+        assertThat(talkRepository.findAll()).hasSize(1);
+
+        // 발생한 예외는 모두 DuplicateRequestException
+        assertThat(exceptions)
+                .allMatch(e -> e instanceof DuplicateRequestException);
+
+        // 최소 1개는 성공, 나머지는 예외 (0~3개 성공 가능)
+        assertThat(responses.size()).isBetween(0, 3);
     }
 
     @DisplayName("예외: 신고를 기준보다 많이 받은 사용자는 톡을 생성할 수 없다")
@@ -349,13 +424,14 @@ public class TalkE2eTest extends E2eTestBase {
                 .reporter(kindMember10)
         );
 
+        String clientId = UUID.randomUUID().toString();
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, blockedMemberAccessToken)
-                .body(new TalkRequest(content))
+                .body(new TalkRequest(clientId, content))
                 .pathParam("gameId", game.getId())
                 .when()
                 .post("/api/v1/talks/{gameId}")
@@ -368,13 +444,14 @@ public class TalkE2eTest extends E2eTestBase {
     void createTalk_withInvalidGameId() {
         // given
         long invalidGameId = 999L;
+        String clientId = UUID.randomUUID().toString();
         String content = "오늘 야구보구 인증하구";
 
         // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .body(new TalkRequest(content))
+                .body(new TalkRequest(clientId, content))
                 .pathParam("gameId", invalidGameId)
                 .when().post("/api/v1/talks/{gameId}")
                 .then().log().all()
