@@ -4,6 +4,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,16 +32,15 @@ import com.yagubogu.ui.theme.Primary500
  * @param strokeColor 호(arc)의 색상.
  * @param startAngle 호가 시작되는 각도(도 단위). 기본값은 12시 방향에 해당하는 -90도입니다.
  * @param sweepAngle 애니메이션이 완료되었을 때 그려질 전체 각도(도 단위).
- * @param diameter 차트의 두께 포함 전체 지름.
  * @param strokeWidth 호의 두께.
  */
 @Composable
 fun SingleAnimatedPieChart(
+    modifier: Modifier = Modifier,
     durationMillis: Int = 1000,
     strokeColor: Color = Primary500,
     startAngle: Float = -90f,
     sweepAngle: Float = 360f,
-    diameter: Dp = 200.dp,
     strokeWidth: Dp = 25.dp,
 ) {
     var targetProgress by remember { mutableFloatStateOf(0f) }
@@ -51,7 +51,7 @@ fun SingleAnimatedPieChart(
 
     LaunchedEffect(Unit) { targetProgress = 1f }
 
-    Canvas(modifier = Modifier.size(diameter)) {
+    Canvas(modifier = modifier) {
         val strokeWidthPx = strokeWidth.toPx()
         val halfStroke = strokeWidthPx / 2
 
@@ -70,5 +70,5 @@ fun SingleAnimatedPieChart(
 @Preview("단일 파이 차트")
 @Composable
 private fun SingleAnimatedPieChartPreview() {
-    SingleAnimatedPieChart()
+    SingleAnimatedPieChart(modifier = Modifier.size(200.dp))
 }

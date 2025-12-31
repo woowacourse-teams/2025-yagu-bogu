@@ -22,15 +22,14 @@ import com.yagubogu.ui.theme.Primary500
  * 시작하여 시계 방향으로 동시에 채워지는 애니메이션을 가집니다.
  *
  * @param durationMillis 차트가 채워지는 애니메이션의 총 재생 시간(밀리초).
- * @param diameter 차트 전체의 크기를 결정하는 지름.
  * @param strokeWidth 차트 테두리(호)의 두께.
  * @param items 차트에 표시할 각 항목의 정보(색상, 퍼센트)가 담긴 리스트.
  *              항목들의 퍼센트 합계가 100이 되도록 데이터를 전달하는 것이 권장됩니다.
  */
 @Composable
 fun AnimatedPieChart(
+    modifier: Modifier = Modifier,
     durationMillis: Int = 1000,
-    diameter: Dp = 200.dp,
     strokeWidth: Dp = 25.dp,
     items: List<ChartItemValue>,
 ) {
@@ -46,12 +45,12 @@ fun AnimatedPieChart(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(diameter),
+        modifier = modifier,
     ) {
         reversedItems.forEachIndexed { index, item ->
             SingleAnimatedPieChart(
+                modifier = modifier,
                 durationMillis = durationMillis,
-                diameter = diameter,
                 strokeWidth = strokeWidth,
                 strokeColor = item.strokeColor,
                 sweepAngle = (cumulativePercentages[index] / 100f) * 360f,
@@ -64,6 +63,7 @@ fun AnimatedPieChart(
 @Composable
 private fun AnimatedPieChartPreview() {
     AnimatedPieChart(
+        modifier = Modifier.size(200.dp),
         items =
             listOf(
                 ChartItemValue(strokeColor = Primary500, percentage = 50f),
