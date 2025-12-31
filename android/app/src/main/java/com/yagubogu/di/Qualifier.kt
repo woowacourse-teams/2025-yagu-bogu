@@ -22,8 +22,8 @@ annotation class StreamClient
 // --- Retrofit ---
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BaseRetrofit
+annotation class BaseKtorfit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BaseTokenRetrofit
+annotation class BaseTokenKtorfit

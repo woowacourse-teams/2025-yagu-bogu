@@ -66,7 +66,7 @@ object NetworkModule {
     // --- baseRetrofit ---
     @Provides
     @Singleton
-    @BaseRetrofit
+    @BaseKtorfit
     fun provideBaseRetrofit(
         @BaseUrl baseUrl: String,
         @BaseClient client: OkHttpClient,
@@ -98,7 +98,7 @@ object NetworkModule {
     // --- baseTokenRetrofit ---
     @Provides
     @Singleton
-    @BaseTokenRetrofit
+    @BaseTokenKtorfit
     fun provideBaseTokenRetrofit(
         @BaseUrl baseUrl: String,
         @BaseTokenClient client: OkHttpClient,
@@ -135,54 +135,54 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideTokenApiService(
-        @BaseRetrofit retrofit: Retrofit,
+        @BaseKtorfit retrofit: Retrofit,
     ): TokenApiService = retrofit.create(TokenApiService::class.java)
 
     @Provides
     @Singleton
     fun provideThirdPartyApiService(
-        @BaseRetrofit retrofit: Retrofit,
+        @BaseKtorfit retrofit: Retrofit,
     ): ThirdPartyApiService = retrofit.create(ThirdPartyApiService::class.java)
 
     @Provides
     @Singleton
     fun provideAuthApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): AuthApiService = retrofit.create(AuthApiService::class.java)
 
     @Provides
     @Singleton
     fun provideMemberApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): MemberApiService = retrofit.create(MemberApiService::class.java)
 
     @Provides
     @Singleton
     fun provideStadiumApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): StadiumApiService = retrofit.create(StadiumApiService::class.java)
 
     @Provides
     @Singleton
     fun provideCheckInApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): CheckInApiService = retrofit.create(CheckInApiService::class.java)
 
     @Provides
     @Singleton
     fun provideStatsApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): StatsApiService = retrofit.create(StatsApiService::class.java)
 
     @Provides
     @Singleton
     fun provideGameApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): GameApiService = retrofit.create(GameApiService::class.java)
 
     @Provides
     @Singleton
     fun provideTalkApiService(
-        @BaseTokenRetrofit retrofit: Retrofit,
+        @BaseTokenKtorfit retrofit: Retrofit,
     ): TalkApiService = retrofit.create(TalkApiService::class.java)
 }
