@@ -37,7 +37,6 @@ timber = "5.0.1"
 ucrop = "2.2.11"
 viewpager2 = "1.1.0"
 playServicesLocation = "21.3.0"
-mpandroidchart = "v3.1.0"
 googleServices = "4.4.3"
 firebaseCrashlytics = "3.0.5"
 googleidVersion = "1.1.1"
@@ -98,7 +97,6 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttpEventsource" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
-mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
