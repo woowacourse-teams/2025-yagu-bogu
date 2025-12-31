@@ -5,7 +5,7 @@ import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.data.service.TalkApiService
-import com.yagubogu.data.util.safeApiCall
+import com.yagubogu.data.util.safeKtorApiCall
 import javax.inject.Inject
 
 class TalkRemoteDataSource @Inject constructor(
@@ -16,7 +16,7 @@ class TalkRemoteDataSource @Inject constructor(
         before: Long?,
         limit: Int,
     ): Result<TalkCursorResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             talkApiService.getTalks(gameId, before, limit)
         }
 
@@ -25,7 +25,7 @@ class TalkRemoteDataSource @Inject constructor(
         after: Long?,
         limit: Int,
     ): Result<TalkCursorResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             when (after) {
                 null -> talkApiService.getTalks(gameId, null, limit)
                 else -> talkApiService.getLatestTalks(gameId, after, limit)
@@ -36,7 +36,7 @@ class TalkRemoteDataSource @Inject constructor(
         gameId: Long,
         content: String,
     ): Result<TalkResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             talkApiService.postTalks(gameId, TalkRequest(content))
         }
 
@@ -44,17 +44,17 @@ class TalkRemoteDataSource @Inject constructor(
         gameId: Long,
         talkId: Long,
     ): Result<Unit> =
-        safeApiCall {
+        safeKtorApiCall {
             talkApiService.deleteTalks(gameId, talkId)
         }
 
     override suspend fun reportTalks(talkId: Long): Result<Unit> =
-        safeApiCall {
+        safeKtorApiCall {
             talkApiService.reportTalks(talkId)
         }
 
     override suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             talkApiService.getInitial(gameId)
         }
 }

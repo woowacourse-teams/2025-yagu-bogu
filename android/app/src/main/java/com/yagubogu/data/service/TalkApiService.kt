@@ -1,51 +1,48 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.talk.TalkRequest
-import com.yagubogu.data.dto.response.talk.TalkCursorResponse
-import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
-import com.yagubogu.data.dto.response.talk.TalkResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Path
+import de.jensklingenberg.ktorfit.http.Query
+import io.ktor.client.statement.HttpResponse
 
 interface TalkApiService {
-    @GET("/api/v1/talks/{gameId}")
+    @GET("api/v1/talks/{gameId}")
     suspend fun getTalks(
         @Path("gameId") gameId: Long,
         @Query("before") before: Long?,
         @Query("limit") limit: Int,
-    ): Response<TalkCursorResponse>
+    ): HttpResponse
 
-    @GET("/api/v1/talks/{gameId}/latest")
+    @GET("api/v1/talks/{gameId}/latest")
     suspend fun getLatestTalks(
         @Path("gameId") gameId: Long,
         @Query("after") after: Long,
         @Query("limit") limit: Int,
-    ): Response<TalkCursorResponse>
+    ): HttpResponse
 
-    @POST("/api/v1/talks/{gameId}")
+    @POST("api/v1/talks/{gameId}")
     suspend fun postTalks(
         @Path("gameId") gameId: Long,
         @Body request: TalkRequest,
-    ): Response<TalkResponse>
+    ): HttpResponse
 
-    @DELETE("/api/v1/talks/{gameId}/{talkId}")
+    @DELETE("api/v1/talks/{gameId}/{talkId}")
     suspend fun deleteTalks(
         @Path("gameId") gameId: Long,
         @Path("talkId") talkId: Long,
-    ): Response<Unit>
+    ): HttpResponse
 
-    @POST("/api/v1/talks/{talkId}/reports")
+    @POST("api/v1/talks/{talkId}/reports")
     suspend fun reportTalks(
         @Path("talkId") talkId: Long,
-    ): Response<Unit>
+    ): HttpResponse
 
-    @GET("/api/v1/talks/{gameId}/initial")
+    @GET("api/v1/talks/{gameId}/initial")
     suspend fun getInitial(
         @Path("gameId") gameId: Long,
-    ): Response<TalkEntranceResponse>
+    ): HttpResponse
 }

@@ -19,6 +19,7 @@ import com.yagubogu.data.service.createGameApiService
 import com.yagubogu.data.service.createMemberApiService
 import com.yagubogu.data.service.createStadiumApiService
 import com.yagubogu.data.service.createStatsApiService
+import com.yagubogu.data.service.createTalkApiService
 import com.yagubogu.data.service.createThirdPartyApiService
 import com.yagubogu.data.service.createTokenApiService
 import dagger.Module
@@ -35,11 +36,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -193,21 +191,6 @@ object NetworkModule {
             .httpClient(client)
             .build()
 
-    @Provides
-    @Singleton
-    @TokenKtorfit
-    fun provideBaseTokenRetrofit(
-        @BaseUrl baseUrl: String,
-        @TokenClient client: OkHttpClient,
-        json: Json,
-    ): Retrofit =
-        Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .client(client)
-            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
-            .build()
-
     // --- streamClient (SSE 용) ---
     @Provides
     @Singleton
@@ -280,6 +263,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideTalkApiService(
-        @TokenKtorfit retrofit: Retrofit,
-    ): TalkApiService = retrofit.create(TalkApiService::class.java)
+        @TokenKtorfit ktorfit: Ktorfit,
+    ): TalkApiService = ktorfit.createTalkApiService()
 }
