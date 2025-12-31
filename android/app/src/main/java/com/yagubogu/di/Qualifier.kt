@@ -13,7 +13,7 @@ annotation class BaseClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BaseTokenClient
+annotation class TokenClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -26,4 +26,4 @@ annotation class BaseKtorfit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BaseTokenKtorfit
+annotation class TokenKtorfit

@@ -13,6 +13,7 @@ import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
+import com.yagubogu.data.service.createAuthApiService
 import com.yagubogu.data.service.createThirdPartyApiService
 import com.yagubogu.data.service.createTokenApiService
 import dagger.Module
@@ -86,7 +87,7 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor,
         json: Json,
     ): HttpClient =
-        // 엔진은 OkHttp 사용
+        // OkHttp 엔진 사용
         HttpClient(OkHttp) {
             defaultRequest {
                 contentType(ContentType.Application.Json)
@@ -121,10 +122,46 @@ object NetworkModule {
             .httpClient(client)
             .build()
 
-    // --- BaseTokenClient ---
+    // --- TokenHttpClient (인증 있는 클라이언트) ---
     @Provides
     @Singleton
-    @BaseTokenClient
+    @TokenClient
+    fun provideTokenClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
+        json: Json,
+    ): HttpClient =
+        // OkHttp 엔진 사용
+        HttpClient(OkHttp) {
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+            }
+
+            engine {
+                addInterceptor(loggingInterceptor)
+                addInterceptor(tokenInterceptor)
+
+                config {
+                    authenticator(tokenAuthenticator)
+                    readTimeout(30, TimeUnit.SECONDS)
+                }
+            }
+
+            install(ContentNegotiation) {
+                json(json)
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000
+                connectTimeoutMillis = 10_000
+                socketTimeoutMillis = 10_000
+            }
+        }
+
+    @Provides
+    @Singleton
+    @TokenClient
     fun provideBaseTokenClient(
         @BaseClient client: OkHttpClient,
         tokenInterceptor: TokenInterceptor,
@@ -140,10 +177,23 @@ object NetworkModule {
     // --- baseTokenRetrofit ---
     @Provides
     @Singleton
-    @BaseTokenKtorfit
+    @TokenKtorfit
+    fun provideTokenKtorfit(
+        @BaseUrl baseUrl: String,
+        @TokenClient client: HttpClient,
+    ): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(baseUrl)
+            .httpClient(client)
+            .build()
+
+    @Provides
+    @Singleton
+    @TokenKtorfit
     fun provideBaseTokenRetrofit(
         @BaseUrl baseUrl: String,
-        @BaseTokenClient client: OkHttpClient,
+        @TokenClient client: OkHttpClient,
         json: Json,
     ): Retrofit =
         Retrofit
@@ -158,7 +208,7 @@ object NetworkModule {
     @Singleton
     @StreamClient
     fun provideStreamClient(
-        @BaseTokenClient client: OkHttpClient,
+        @TokenClient client: OkHttpClient,
     ): OkHttpClient =
         client
             .newBuilder()
@@ -189,42 +239,42 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideAuthApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
-    ): AuthApiService = retrofit.create(AuthApiService::class.java)
+        @TokenKtorfit ktorfit: Ktorfit,
+    ): AuthApiService = ktorfit.createAuthApiService()
 
     @Provides
     @Singleton
     fun provideMemberApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): MemberApiService = retrofit.create(MemberApiService::class.java)
 
     @Provides
     @Singleton
     fun provideStadiumApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): StadiumApiService = retrofit.create(StadiumApiService::class.java)
 
     @Provides
     @Singleton
     fun provideCheckInApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): CheckInApiService = retrofit.create(CheckInApiService::class.java)
 
     @Provides
     @Singleton
     fun provideStatsApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): StatsApiService = retrofit.create(StatsApiService::class.java)
 
     @Provides
     @Singleton
     fun provideGameApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): GameApiService = retrofit.create(GameApiService::class.java)
 
     @Provides
     @Singleton
     fun provideTalkApiService(
-        @BaseTokenKtorfit retrofit: Retrofit,
+        @TokenKtorfit retrofit: Retrofit,
     ): TalkApiService = retrofit.create(TalkApiService::class.java)
 }
