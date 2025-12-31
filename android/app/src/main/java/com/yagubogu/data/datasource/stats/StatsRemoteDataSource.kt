@@ -7,34 +7,34 @@ import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
 import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
 import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 import com.yagubogu.data.service.StatsApiService
-import com.yagubogu.data.util.safeApiCall
+import com.yagubogu.data.util.safeKtorApiCall
 import javax.inject.Inject
 
 class StatsRemoteDataSource @Inject constructor(
     private val statsApiService: StatsApiService,
 ) : StatsDataSource {
     override suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getStatsWinRate(year)
         }
 
     override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getStatsCounts(year)
         }
 
     override suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getLuckyStadiums(year)
         }
 
     override suspend fun getAverageStats(): Result<AverageStatisticResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getAverageStats()
         }
 
     override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getVsTeamStats(year)
         }
 
@@ -42,7 +42,7 @@ class StatsRemoteDataSource @Inject constructor(
         year: Int,
         teamCode: String?,
     ): Result<VictoryFairyRankingResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             statsApiService.getVictoryFairyRankings(year, teamCode)
         }
 }
