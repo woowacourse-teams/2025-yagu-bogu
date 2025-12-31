@@ -47,6 +47,7 @@ fun SingleAnimatedHorizontalBarChart(
         animationSpec = tween(durationMillis = durationMillis, easing = LinearEasing),
         label = "BarProgress",
     )
+    val currentFraction = (item.amount.toFloat() / maxValue).coerceIn(0f, 1f) * progress
 
     LaunchedEffect(Unit) { targetProgress = 1f }
 
@@ -54,7 +55,7 @@ fun SingleAnimatedHorizontalBarChart(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // 1. 시작 레이블 영역 (고정 너비로 시작점 일치)
+        // 타이틀 레이블 영역
         if (item.titleLabel != null) {
             Box(modifier = Modifier.width(maxTitleLabelWidth)) {
                 Text(text = item.titleLabel.value, style = item.titleLabel.textStyle)
@@ -62,50 +63,87 @@ fun SingleAnimatedHorizontalBarChart(
             Spacer(modifier = Modifier.width(item.titleLabel.gap))
         }
 
-        // 2. 가로 막대 영역 (weight로 가변 공간 확보)
-        Box(
-            modifier =
-                modifier
-                    .weight(1f), // 핵심: 남은 공간을 모두 차지함
+        // 차트 트랙 영역 (막대 + 데이터 레이블이 움직이는 공간)
+        Row(
+            modifier = modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            // 막대 부분 (현재 비율만큼 공간 점유)
             Box(
                 modifier =
                     Modifier
+                        .weight(currentFraction + 0.0001f) // 0 방어
                         .fillMaxHeight()
-                        .fillMaxWidth(
-                            fraction =
-                                (item.amount.toFloat() / maxValue).coerceIn(
-                                    0f,
-                                    1f,
-                                ) * progress,
-                        ).background(strokeColor, strokeShape),
+                        .background(strokeColor, strokeShape),
             )
-        }
 
-        if (item.dataLabel != null) {
-            Spacer(modifier = Modifier.width(item.dataLabel.gap))
-            Box(
-                modifier = Modifier.width(maxDataTitleWidth),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                Text(text = item.dataLabel.value, style = item.dataLabel.textStyle)
+            // 막대 끝의 고정 크기 데이터 레이블
+            if (item.dataLabel != null) {
+                Spacer(modifier = Modifier.width(item.dataLabel.gap))
+                Box(
+                    modifier = Modifier.width(maxDataTitleWidth),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = item.dataLabel.value,
+                        style = item.dataLabel.textStyle,
+                        maxLines = 1,
+                    )
+                }
             }
+
+            // 데이터 레이블을 그리고 남은 오른쪽 영역
+            Spacer(modifier = Modifier.weight(1.0001f - currentFraction))
         }
     }
 }
 
-@Preview("단일 가로 바 차트")
+@Preview("단일 가로 바 차트 0%")
 @Composable
-private fun SingleAnimatedPieChartPreview() {
+private fun SingleAnimatedPieChartPreview0() {
     SingleAnimatedHorizontalBarChart(
         modifier = Modifier.height(18.dp),
-        maxValue = 50f,
+        maxValue = 100f,
         item =
             BarChartItemValue(
                 strokeColor = Primary500,
                 titleLabel = DefaultBarChartTitleLabel.copy(value = "고척"),
-                amount = 50,
-                dataLabel = DefaultBarChartDataLabel.copy(value = "50회"),
+                amount = 0,
+                dataLabel = DefaultBarChartDataLabel.copy(value = "0회"),
+            ),
+    )
+}
+
+
+@Preview("단일 가로 바 차트 30%")
+@Composable
+private fun SingleAnimatedPieChartPreview30() {
+    SingleAnimatedHorizontalBarChart(
+        modifier = Modifier.height(18.dp),
+        maxValue = 100f,
+        item =
+            BarChartItemValue(
+                strokeColor = Primary500,
+                titleLabel = DefaultBarChartTitleLabel.copy(value = "고척"),
+                amount = 30,
+                dataLabel = DefaultBarChartDataLabel.copy(value = "30회"),
+            ),
+    )
+}
+
+
+@Preview("단일 가로 바 차트 100%")
+@Composable
+private fun SingleAnimatedPieChartPreview() {
+    SingleAnimatedHorizontalBarChart(
+        modifier = Modifier.height(18.dp),
+        maxValue = 100f,
+        item =
+            BarChartItemValue(
+                strokeColor = Primary500,
+                titleLabel = DefaultBarChartTitleLabel.copy(value = "고척"),
+                amount = 100,
+                dataLabel = DefaultBarChartDataLabel.copy(value = "100회"),
             ),
     )
 }
