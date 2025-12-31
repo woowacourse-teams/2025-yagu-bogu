@@ -89,6 +89,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun startStreaming() {
+        val isMatchDay: Boolean = cachedStadiumFanRateItems.isNotEmpty()
+        if (!isMatchDay) return
+
         viewModelScope.launch {
             streamRepository
                 .connect()
