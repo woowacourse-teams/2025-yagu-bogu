@@ -15,6 +15,7 @@ import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.service.createAuthApiService
 import com.yagubogu.data.service.createCheckInApiService
+import com.yagubogu.data.service.createGameApiService
 import com.yagubogu.data.service.createMemberApiService
 import com.yagubogu.data.service.createStadiumApiService
 import com.yagubogu.data.service.createStatsApiService
@@ -273,8 +274,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideGameApiService(
-        @TokenKtorfit retrofit: Retrofit,
-    ): GameApiService = retrofit.create(GameApiService::class.java)
+        @TokenKtorfit ktorfit: Ktorfit,
+    ): GameApiService = ktorfit.createGameApiService()
 
     @Provides
     @Singleton
