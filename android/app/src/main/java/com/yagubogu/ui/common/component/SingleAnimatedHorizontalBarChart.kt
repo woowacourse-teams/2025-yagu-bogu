@@ -39,7 +39,7 @@ fun SingleAnimatedHorizontalBarChart(
     modifier: Modifier = Modifier,
     durationMillis: Int = 1000,
     strokeColor: Color = Primary500,
-    value: Float = 50f,
+    value: Float = 30f,
     maxValue: Float = 100f,
     strokeShape: RoundedCornerShape =
         RoundedCornerShape(
