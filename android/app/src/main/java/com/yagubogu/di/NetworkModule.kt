@@ -13,6 +13,7 @@ import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
+import com.yagubogu.data.service.createThirdPartyApiService
 import com.yagubogu.data.service.createTokenApiService
 import dagger.Module
 import dagger.Provides
@@ -110,21 +111,6 @@ object NetworkModule {
     @Provides
     @Singleton
     @BaseKtorfit
-    fun provideBaseRetrofit(
-        @BaseUrl baseUrl: String,
-        @BaseClient client: OkHttpClient,
-        json: Json,
-    ): Retrofit =
-        Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .client(client)
-            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
-            .build()
-
-    @Provides
-    @Singleton
-    @BaseKtorfit
     fun provideBaseKtorfit(
         @BaseUrl baseUrl: String,
         @BaseClient client: HttpClient,
@@ -197,8 +183,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideThirdPartyApiService(
-        @BaseKtorfit retrofit: Retrofit,
-    ): ThirdPartyApiService = retrofit.create(ThirdPartyApiService::class.java)
+        @BaseKtorfit ktorfit: Ktorfit,
+    ): ThirdPartyApiService = ktorfit.createThirdPartyApiService()
 
     @Provides
     @Singleton
