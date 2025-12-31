@@ -14,6 +14,7 @@ import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.service.createAuthApiService
+import com.yagubogu.data.service.createCheckInApiService
 import com.yagubogu.data.service.createMemberApiService
 import com.yagubogu.data.service.createStadiumApiService
 import com.yagubogu.data.service.createThirdPartyApiService
@@ -259,8 +260,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCheckInApiService(
-        @TokenKtorfit retrofit: Retrofit,
-    ): CheckInApiService = retrofit.create(CheckInApiService::class.java)
+        @TokenKtorfit ktorfit: Ktorfit,
+    ): CheckInApiService = ktorfit.createCheckInApiService()
 
     @Provides
     @Singleton
