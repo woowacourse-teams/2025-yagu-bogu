@@ -6,7 +6,7 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class BaseUrl
 
-// --- OkHttpClient ---
+// --- HttpClient ---
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class BaseClient
@@ -19,7 +19,7 @@ annotation class BaseTokenClient
 @Retention(AnnotationRetention.BINARY)
 annotation class StreamClient
 
-// --- Retrofit ---
+// --- Ktorfit ---
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class BaseKtorfit

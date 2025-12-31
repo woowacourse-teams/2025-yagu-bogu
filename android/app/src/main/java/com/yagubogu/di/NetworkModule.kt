@@ -13,10 +13,20 @@ import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
+import com.yagubogu.data.service.createTokenApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import de.jensklingenberg.ktorfit.Ktorfit
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -38,7 +48,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson(): Json = Json { ignoreUnknownKeys = true }
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            prettyPrint = true
+        }
 
     // --- Logging Interceptor ---
     @Provides
@@ -53,7 +68,7 @@ object NetworkModule {
                 }
         }
 
-    // --- baseClient ---
+    // --- BaseHttpClient (인증 없는 클라이언트) ---
     @Provides
     @Singleton
     @BaseClient
@@ -63,7 +78,35 @@ object NetworkModule {
             .addInterceptor(loggingInterceptor)
             .build()
 
-    // --- baseRetrofit ---
+    @Provides
+    @Singleton
+    @BaseClient
+    fun provideBaseHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        json: Json,
+    ): HttpClient =
+        // 엔진은 OkHttp 사용
+        HttpClient(OkHttp) {
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+            }
+
+            engine {
+                addInterceptor(loggingInterceptor)
+            }
+
+            install(ContentNegotiation) {
+                json(json)
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000
+                connectTimeoutMillis = 10_000
+                socketTimeoutMillis = 10_000
+            }
+        }
+
+    // --- BaseKtorfit ---
     @Provides
     @Singleton
     @BaseKtorfit
@@ -79,7 +122,20 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
             .build()
 
-    // --- baseTokenClient ---
+    @Provides
+    @Singleton
+    @BaseKtorfit
+    fun provideBaseKtorfit(
+        @BaseUrl baseUrl: String,
+        @BaseClient client: HttpClient,
+    ): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(baseUrl)
+            .httpClient(client)
+            .build()
+
+    // --- BaseTokenClient ---
     @Provides
     @Singleton
     @BaseTokenClient
@@ -135,8 +191,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideTokenApiService(
-        @BaseKtorfit retrofit: Retrofit,
-    ): TokenApiService = retrofit.create(TokenApiService::class.java)
+        @BaseKtorfit ktorfit: Ktorfit,
+    ): TokenApiService = ktorfit.createTokenApiService()
 
     @Provides
     @Singleton

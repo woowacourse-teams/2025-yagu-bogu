@@ -5,7 +5,7 @@ import com.yagubogu.data.dto.response.token.TokenResponse
 import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.util.addTokenHeader
 import com.yagubogu.data.util.getTokenFromHeader
-import com.yagubogu.data.util.safeApiCall
+import com.yagubogu.data.util.safeKtorApiCall
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -70,8 +70,10 @@ class TokenAuthenticator(
      */
     private suspend fun refreshAccessToken(): TokenResponse? {
         val refreshToken: String = tokenManager.getRefreshToken() ?: return null
-        return safeApiCall {
-            tokenApiService.postRefresh(TokenRequest(refreshToken))
+
+        return safeKtorApiCall<TokenResponse> {
+            val tokenRequest = TokenRequest(refreshToken)
+            tokenApiService.postRefresh(tokenRequest)
         }.getOrElse {
             tokenManager.clearTokens()
             null
