@@ -28,7 +28,7 @@ import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
 import com.yagubogu.ui.common.component.AnimatedPieChart
-import com.yagubogu.ui.common.model.ChartItemValue
+import com.yagubogu.ui.common.model.PieChartItemValue
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -118,11 +118,11 @@ private fun WinRatePieChart(
             modifier = Modifier.size(200.dp),
             items =
                 listOf(
-                    ChartItemValue(
+                    PieChartItemValue(
                         strokeColor = Primary500,
                         percentage = statsMyUiModel.winningPercentage,
                     ),
-                    ChartItemValue(
+                    PieChartItemValue(
                         strokeColor = Gray300,
                         percentage = statsMyUiModel.etcPercentage,
                     ),

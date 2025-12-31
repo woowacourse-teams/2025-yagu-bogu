@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.yagubogu.ui.common.model.ChartItemValue
+import com.yagubogu.ui.common.model.PieChartItemValue
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray900
 import com.yagubogu.ui.theme.Primary500
@@ -31,7 +31,7 @@ fun AnimatedPieChart(
     modifier: Modifier = Modifier,
     durationMillis: Int = 1000,
     strokeWidth: Dp = 25.dp,
-    items: List<ChartItemValue>,
+    items: List<PieChartItemValue>,
 ) {
     val cumulativePercentages =
         remember(items) {
@@ -66,9 +66,9 @@ private fun AnimatedPieChartPreview() {
         modifier = Modifier.size(200.dp),
         items =
             listOf(
-                ChartItemValue(strokeColor = Primary500, percentage = 50f),
-                ChartItemValue(strokeColor = Gray400, percentage = 30f),
-                ChartItemValue(strokeColor = Gray900, percentage = 20f),
+                PieChartItemValue(strokeColor = Primary500, percentage = 50f),
+                PieChartItemValue(strokeColor = Gray400, percentage = 30f),
+                PieChartItemValue(strokeColor = Gray900, percentage = 20f),
             ),
     )
 }
