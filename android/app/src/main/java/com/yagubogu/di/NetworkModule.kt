@@ -14,6 +14,7 @@ import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.service.createAuthApiService
+import com.yagubogu.data.service.createMemberApiService
 import com.yagubogu.data.service.createThirdPartyApiService
 import com.yagubogu.data.service.createTokenApiService
 import dagger.Module
@@ -245,8 +246,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideMemberApiService(
-        @TokenKtorfit retrofit: Retrofit,
-    ): MemberApiService = retrofit.create(MemberApiService::class.java)
+        @TokenKtorfit ktorfit: Ktorfit,
+    ): MemberApiService = ktorfit.createMemberApiService()
 
     @Provides
     @Singleton

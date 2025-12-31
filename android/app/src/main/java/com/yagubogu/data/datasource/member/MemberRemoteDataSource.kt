@@ -12,51 +12,51 @@ import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.data.service.MemberApiService
-import com.yagubogu.data.util.safeApiCall
+import com.yagubogu.data.util.safeKtorApiCall
 import javax.inject.Inject
 
 class MemberRemoteDataSource @Inject constructor(
     private val memberApiService: MemberApiService,
 ) : MemberDataSource {
     override suspend fun getMemberInfo(): Result<MemberInfoResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.getMemberInfo()
         }
 
     override suspend fun getNickname(): Result<MemberNicknameResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.getNickname()
         }
 
     override suspend fun updateNickname(nickname: String): Result<MemberNicknameResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             val request = MemberNicknameRequest(nickname)
             memberApiService.patchNickname(request)
         }
 
     override suspend fun getFavoriteTeam(): Result<MemberFavoriteResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.getFavoriteTeam()
         }
 
     override suspend fun updateFavoriteTeam(teamCode: String): Result<MemberFavoriteResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             val request = MemberFavoriteRequest(teamCode)
             memberApiService.patchFavoriteTeam(request)
         }
 
     override suspend fun deleteMember(): Result<Unit> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.deleteMember()
         }
 
     override suspend fun getBadges(): Result<BadgeResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.getBadges()
         }
 
     override suspend fun updateRepresentativeBadge(badgeId: Long): Result<Unit> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.patchRepresentativeBadge(badgeId)
         }
 
@@ -64,7 +64,7 @@ class MemberRemoteDataSource @Inject constructor(
         contentType: String,
         contentLength: Long,
     ): Result<PresignedUrlStartResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             val request =
                 PresignedUrlStartRequest(
                     contentType,
@@ -74,13 +74,13 @@ class MemberRemoteDataSource @Inject constructor(
         }
 
     override suspend fun completeUploadProfileImage(key: String): Result<PresignedUrlCompleteResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             val request = PresignedUrlCompleteRequest(key)
             memberApiService.postCompleteUpload(request)
         }
 
     override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> =
-        safeApiCall {
+        safeKtorApiCall {
             memberApiService.getMemberProfile(memberId)
         }
 }

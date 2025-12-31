@@ -4,64 +4,57 @@ import com.yagubogu.data.dto.request.member.MemberFavoriteRequest
 import com.yagubogu.data.dto.request.member.MemberNicknameRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlCompleteRequest
 import com.yagubogu.data.dto.request.presigned.PresignedUrlStartRequest
-import com.yagubogu.data.dto.response.member.BadgeResponse
-import com.yagubogu.data.dto.response.member.MemberFavoriteResponse
-import com.yagubogu.data.dto.response.member.MemberInfoResponse
-import com.yagubogu.data.dto.response.member.MemberNicknameResponse
-import com.yagubogu.data.dto.response.member.MemberProfileResponse
-import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
-import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.PATCH
-import retrofit2.http.POST
-import retrofit2.http.Path
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.PATCH
+import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Path
+import io.ktor.client.statement.HttpResponse
 
 interface MemberApiService {
-    @GET("/api/v1/members/me")
-    suspend fun getMemberInfo(): Response<MemberInfoResponse>
+    @GET("api/v1/members/me")
+    suspend fun getMemberInfo(): HttpResponse
 
-    @GET("/api/v1/members/me/nickname")
-    suspend fun getNickname(): Response<MemberNicknameResponse>
+    @GET("api/v1/members/me/nickname")
+    suspend fun getNickname(): HttpResponse
 
-    @PATCH("/api/v1/members/me/nickname")
+    @PATCH("api/v1/members/me/nickname")
     suspend fun patchNickname(
         @Body body: MemberNicknameRequest,
-    ): Response<MemberNicknameResponse>
+    ): HttpResponse
 
-    @GET("/api/v1/members/favorites")
-    suspend fun getFavoriteTeam(): Response<MemberFavoriteResponse>
+    @GET("api/v1/members/favorites")
+    suspend fun getFavoriteTeam(): HttpResponse
 
-    @PATCH("/api/v1/members/favorites")
+    @PATCH("api/v1/members/favorites")
     suspend fun patchFavoriteTeam(
         @Body body: MemberFavoriteRequest,
-    ): Response<MemberFavoriteResponse>
+    ): HttpResponse
 
-    @DELETE("/api/v1/members/me")
-    suspend fun deleteMember(): Response<Unit>
+    @DELETE("api/v1/members/me")
+    suspend fun deleteMember(): HttpResponse
 
-    @GET("/api/v1/members/me/badges")
-    suspend fun getBadges(): Response<BadgeResponse>
+    @GET("api/v1/members/me/badges")
+    suspend fun getBadges(): HttpResponse
 
-    @PATCH("/api/v1/members/me/badges/{badgeId}/representative")
+    @PATCH("api/v1/members/me/badges/{badgeId}/representative")
     suspend fun patchRepresentativeBadge(
         @Path("badgeId") badgeId: Long,
-    ): Response<Unit>
+    ): HttpResponse
 
-    @POST("/api/v1/members/me/profile-image/pre-signed")
+    @POST("api/v1/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
         @Body request: PresignedUrlStartRequest,
-    ): Response<PresignedUrlStartResponse>
+    ): HttpResponse
 
-    @POST("/api/v1/members/me/profile-image/update")
+    @POST("api/v1/members/me/profile-image/update")
     suspend fun postCompleteUpload(
         @Body request: PresignedUrlCompleteRequest,
-    ): Response<PresignedUrlCompleteResponse>
+    ): HttpResponse
 
-    @GET("/api/v1/members/{memberId}")
+    @GET("api/v1/members/{memberId}")
     suspend fun getMemberProfile(
         @Path("memberId") memberId: Long,
-    ): Response<MemberProfileResponse>
+    ): HttpResponse
 }
