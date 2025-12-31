@@ -1,58 +1,62 @@
 package com.yagubogu.data.network
 
+import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
+import com.yagubogu.data.dto.response.stream.SseStreamResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
 import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class SseClient(
     private val baseUrl: String,
     private val httpClient: HttpClient,
+    private val json: Json,
 ) {
-    private var sseJob: Job? = null
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    fun connect(): Flow<SseStreamResponse> =
+        flow {
+            try {
+                httpClient.sse("$baseUrl$EVENT_STREAM_ENDPOINT") {
+                    emit(SseStreamResponse.ConnectionOpened)
 
-    fun connect(sseHandler: SseHandler) {
-        if (sseJob?.isActive == true) return
+                    incoming.collect { serverSentEvent: ServerSentEvent ->
+                        val eventType: String? = serverSentEvent.event
+                        val rawData: String = serverSentEvent.data ?: ""
 
-        sseJob =
-            scope.launch {
-                try {
-                    httpClient.sse(urlString = "$baseUrl$EVENT_STREAM_ENDPOINT") {
-                        sseHandler.onConnectionOpened()
+                        val response: SseStreamResponse =
+                            when (eventType) {
+                                EVENT_CHECK_IN_CREATED -> {
+                                    try {
+                                        val items: List<FanRateByGameDto> =
+                                            json.decodeFromString(rawData)
+                                        SseStreamResponse.CheckInCreated(items)
+                                    } catch (e: Exception) {
+                                        SseStreamResponse.Error(e)
+                                    }
+                                }
 
-                        incoming.collect { serverSentEvent: ServerSentEvent ->
-                            val event: String? = serverSentEvent.event
-                            val data: String? = serverSentEvent.data
-
-                            if (event == null || data == null) {
-                                sseHandler.onComment(serverSentEvent.comments ?: "")
-                            } else {
-                                sseHandler.onEventReceived(event, data)
+                                EVENT_CONNECT -> SseStreamResponse.Connect(rawData)
+                                EVENT_TIMEOUT -> SseStreamResponse.Timeout(rawData)
+                                else -> SseStreamResponse.Comment(serverSentEvent.comments ?: "")
                             }
-                        }
+                        emit(response)
                     }
-                } catch (exception: Exception) {
-                    // CancellationException은 의도된 종료(disconnect)이므로 에러로 처리 안 함
-                    if (exception !is CancellationException) {
-                        sseHandler.onError(exception)
-                    }
-                } finally {
-                    sseHandler.onConnectionClosed()
                 }
+            } catch (e: Exception) {
+                emit(SseStreamResponse.Error(e))
+            } finally {
+                emit(SseStreamResponse.ConnectionClosed)
             }
-    }
+        }
 
-    fun disconnect() {
-        sseJob?.cancel()
-        sseJob = null
-    }
+    fun disconnect() {}
 
     companion object {
         private const val EVENT_STREAM_ENDPOINT = "api/v1/event-stream"
+
+        private const val EVENT_CHECK_IN_CREATED = "check-in-created"
+        private const val EVENT_CONNECT = "connect"
+        private const val EVENT_TIMEOUT = "timeout"
     }
 }

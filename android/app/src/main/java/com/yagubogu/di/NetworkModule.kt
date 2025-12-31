@@ -179,17 +179,11 @@ object NetworkModule {
         tokenInterceptor: TokenInterceptor,
         tokenAuthenticator: TokenAuthenticator,
         loggingInterceptor: HttpLoggingInterceptor,
+        json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
-            install(SSE) {
-                showCommentEvents()
-                showRetryEvents()
-            }
-
-            install(HttpTimeout) {
-                requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
-                connectTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
-                socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+            defaultRequest {
+                contentType(ContentType.Application.Json)
             }
 
             engine {
@@ -203,6 +197,21 @@ object NetworkModule {
                     connectTimeout(0, TimeUnit.MILLISECONDS)
                 }
             }
+
+            install(SSE) {
+                showCommentEvents()
+                showRetryEvents()
+            }
+
+            install(ContentNegotiation) {
+                json(json)
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                connectTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+            }
         }
 
     @Provides
@@ -210,7 +219,8 @@ object NetworkModule {
     fun provideSseClient(
         @BaseUrl baseUrl: String,
         @StreamClient client: HttpClient,
-    ): SseClient = SseClient(baseUrl, client)
+        json: Json,
+    ): SseClient = SseClient(baseUrl, client, json)
 
     // --- API Services ---
     @Provides

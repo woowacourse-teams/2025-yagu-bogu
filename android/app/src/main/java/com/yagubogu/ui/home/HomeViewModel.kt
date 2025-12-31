@@ -108,12 +108,21 @@ class HomeViewModel @Inject constructor(
                             }
                             _stadiumStatsUiModel.value =
                                 StadiumStatsUiModel(stadiumFanRates = newItems)
+                            Timber.d("SSE event: $event")
                         }
 
-                        CheckInSseEvent.Connect,
-                        CheckInSseEvent.Timeout,
-                        CheckInSseEvent.Unknown,
-                        -> Unit
+                        is CheckInSseEvent.Connect,
+                        is CheckInSseEvent.Timeout,
+                        -> Timber.d("SSE event: $event")
+                        is CheckInSseEvent.Comment,
+                        -> Timber.d("SSE comment: ${event.text}")
+
+                        CheckInSseEvent.ConnectionClosed,
+                        CheckInSseEvent.ConnectionOpened,
+                        -> Timber.d("SSE: $event")
+
+                        is CheckInSseEvent.Error,
+                        -> Timber.d("SSE error: ${event.error}")
                     }
                 }
         }
