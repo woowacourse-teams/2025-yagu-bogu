@@ -30,13 +30,14 @@ import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpTimeoutConfig
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -44,12 +45,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val MEDIA_TYPE = "application/json; charset=UTF-8"
-
     @Provides
     @Singleton
     @BaseUrl
-    fun provideBaseUrl(): String = if (BuildConfig.DEBUG) BuildConfig.BASE_URL_DEBUG else BuildConfig.BASE_URL_RELEASE
+    fun provideBaseUrl(): String =
+        if (BuildConfig.DEBUG) {
+            BuildConfig.BASE_URL_DEBUG
+        } else {
+            BuildConfig.BASE_URL_RELEASE
+        }
 
     @Provides
     @Singleton
@@ -74,15 +78,6 @@ object NetworkModule {
         }
 
     // --- BaseHttpClient (인증 없는 클라이언트) ---
-    @Provides
-    @Singleton
-    @BaseClient
-    fun provideBaseClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient =
-        OkHttpClient
-            .Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-
     @Provides
     @Singleton
     @BaseClient
@@ -162,21 +157,6 @@ object NetworkModule {
             }
         }
 
-    @Provides
-    @Singleton
-    @TokenClient
-    fun provideBaseTokenClient(
-        @BaseClient client: OkHttpClient,
-        tokenInterceptor: TokenInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
-    ): OkHttpClient =
-        client
-            .newBuilder()
-            .addInterceptor(tokenInterceptor)
-            .authenticator(tokenAuthenticator)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-
     // --- baseTokenRetrofit ---
     @Provides
     @Singleton
@@ -191,25 +171,46 @@ object NetworkModule {
             .httpClient(client)
             .build()
 
-    // --- streamClient (SSE 용) ---
+    // --- StreamHttpClient (SSE 전용) ---
     @Provides
     @Singleton
     @StreamClient
-    fun provideStreamClient(
-        @TokenClient client: OkHttpClient,
-    ): OkHttpClient =
-        client
-            .newBuilder()
-            .connectTimeout(0, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.SECONDS)
-            .build()
+    fun provideStreamHttpClient(
+        tokenInterceptor: TokenInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
+        loggingInterceptor: HttpLoggingInterceptor,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            install(SSE) {
+                showCommentEvents()
+                showRetryEvents()
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                connectTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+            }
+
+            engine {
+                addInterceptor(loggingInterceptor)
+                addInterceptor(tokenInterceptor)
+
+                config {
+                    authenticator(tokenAuthenticator)
+
+                    readTimeout(0, TimeUnit.MILLISECONDS)
+                    connectTimeout(0, TimeUnit.MILLISECONDS)
+                }
+            }
+        }
 
     @Provides
     @Singleton
     fun provideSseClient(
         @BaseUrl baseUrl: String,
-        @StreamClient okHttpClient: OkHttpClient,
-    ): SseClient = SseClient(baseUrl, okHttpClient)
+        @StreamClient client: HttpClient,
+    ): SseClient = SseClient(baseUrl, client)
 
     // --- API Services ---
     @Provides
