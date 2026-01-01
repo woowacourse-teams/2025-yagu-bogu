@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import timber.log.Timber
 
-suspend inline fun <reified T> safeKtorApiCall(crossinline apiCall: suspend () -> HttpResponse): Result<T> =
+suspend inline fun <reified T> safeApiCall(crossinline apiCall: suspend () -> HttpResponse): Result<T> =
     runCatching {
         val response: HttpResponse = apiCall()
 

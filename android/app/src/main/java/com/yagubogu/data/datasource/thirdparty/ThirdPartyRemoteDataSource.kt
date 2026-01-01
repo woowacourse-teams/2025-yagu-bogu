@@ -3,7 +3,7 @@ package com.yagubogu.data.datasource.thirdparty
 import android.content.ContentResolver
 import android.net.Uri
 import com.yagubogu.data.service.ThirdPartyApiService
-import com.yagubogu.data.util.safeKtorApiCall
+import com.yagubogu.data.util.safeApiCall
 import io.ktor.http.ContentType
 import io.ktor.http.content.OutgoingContent
 import io.ktor.utils.io.ByteReadChannel
@@ -21,7 +21,7 @@ class ThirdPartyRemoteDataSource @Inject constructor(
         contentType: String,
         contentLength: Long,
     ): Result<Unit> =
-        safeKtorApiCall<Unit> {
+        safeApiCall<Unit> {
             val requestBody: OutgoingContent =
                 createRequestBody(imageFileUri, contentType, contentLength)
             thirdPartyApiService.putImageToS3(url, requestBody)
