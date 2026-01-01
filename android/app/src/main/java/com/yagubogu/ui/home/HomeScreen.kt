@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
@@ -108,14 +107,6 @@ fun HomeScreen(
             viewModel.isCheckInLoading.collect { isLoading: Boolean ->
                 onLoading(isLoading)
             }
-        }
-    }
-
-    LifecycleStartEffect(viewModel) {
-        viewModel.startStreaming()
-
-        onStopOrDispose {
-            viewModel.stopStreaming()
         }
     }
 

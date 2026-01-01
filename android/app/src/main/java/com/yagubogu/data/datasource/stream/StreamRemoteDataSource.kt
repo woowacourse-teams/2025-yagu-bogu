@@ -9,8 +9,4 @@ class StreamRemoteDataSource @Inject constructor(
     private val sseClient: SseClient,
 ) : StreamDataSource {
     override fun connect(): Flow<SseStreamResponse> = sseClient.connect()
-
-    override fun disconnect() {
-        sseClient.disconnect()
-    }
 }

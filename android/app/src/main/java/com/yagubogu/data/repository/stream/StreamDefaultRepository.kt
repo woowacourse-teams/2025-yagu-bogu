@@ -9,8 +9,4 @@ class StreamDefaultRepository @Inject constructor(
     private val streamDataSource: StreamDataSource,
 ) : StreamRepository {
     override fun connect(): Flow<SseStreamResponse> = streamDataSource.connect()
-
-    override fun disconnect() {
-        streamDataSource.disconnect()
-    }
 }

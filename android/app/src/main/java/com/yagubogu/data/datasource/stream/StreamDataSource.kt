@@ -5,6 +5,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface StreamDataSource {
     fun connect(): Flow<SseStreamResponse>
-
-    fun disconnect()
 }

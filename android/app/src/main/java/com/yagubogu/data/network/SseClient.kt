@@ -8,6 +8,7 @@ import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class SseClient(
     private val baseUrl: String,
@@ -18,6 +19,7 @@ class SseClient(
         flow {
             try {
                 httpClient.sse("$baseUrl$EVENT_STREAM_ENDPOINT") {
+                    Timber.d("SSE: Connection Opened")
                     emit(SseStreamResponse.ConnectionOpened)
 
                     incoming.collect { serverSentEvent: ServerSentEvent ->
@@ -40,17 +42,18 @@ class SseClient(
                                 EVENT_TIMEOUT -> SseStreamResponse.Timeout(rawData)
                                 else -> SseStreamResponse.Comment(serverSentEvent.comments ?: "")
                             }
+                        Timber.d("SSE: $response")
                         emit(response)
                     }
                 }
             } catch (e: Exception) {
+                Timber.d("SSE error: $e")
                 emit(SseStreamResponse.Error(e))
             } finally {
+                Timber.d("SSE: Connection Closed")
                 emit(SseStreamResponse.ConnectionClosed)
             }
         }
-
-    fun disconnect() {}
 
     companion object {
         private const val EVENT_STREAM_ENDPOINT = "api/v1/event-stream"
