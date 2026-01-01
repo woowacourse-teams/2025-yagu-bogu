@@ -2,7 +2,6 @@ package com.yagubogu.di
 
 import android.content.Context
 import com.yagubogu.data.network.TokenAuthenticator
-import com.yagubogu.data.network.TokenInterceptor
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.service.TokenApiService
 import dagger.Module
@@ -21,11 +20,6 @@ object TokenModule {
     fun provideTokenManager(
         @ApplicationContext context: Context,
     ): TokenManager = TokenManager(context)
-
-    // --- Token Interceptor ---
-    @Provides
-    @Singleton
-    fun provideTokenInterceptor(tokenManager: TokenManager): TokenInterceptor = TokenInterceptor(tokenManager)
 
     // --- Token Authenticator ---
     @Provides

@@ -3,7 +3,7 @@ package com.yagubogu.di
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.network.SseClient
 import com.yagubogu.data.network.TokenAuthenticator
-import com.yagubogu.data.network.TokenInterceptor
+import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.service.GameApiService
@@ -31,6 +31,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.HttpTimeoutConfig
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.ANDROID
@@ -113,7 +116,7 @@ object NetworkModule {
     @Singleton
     @TokenClient
     fun provideTokenClient(
-        tokenInterceptor: TokenInterceptor,
+        tokenManager: TokenManager,
         tokenAuthenticator: TokenAuthenticator,
         json: Json,
     ): HttpClient =
@@ -123,11 +126,25 @@ object NetworkModule {
             }
 
             engine {
-                addInterceptor(tokenInterceptor)
-
                 config {
                     authenticator(tokenAuthenticator)
                     readTimeout(30, TimeUnit.SECONDS)
+                }
+            }
+
+            install(Auth) {
+                bearer {
+                    // Interceptor 역할: 요청 헤더에 엑세스 토큰 추가
+                    loadTokens {
+                        val accessToken: String? = tokenManager.getAccessToken()
+                        val refreshToken: String? = tokenManager.getRefreshToken()
+
+                        if (accessToken != null && refreshToken != null) {
+                            BearerTokens(accessToken, refreshToken)
+                        } else {
+                            null
+                        }
+                    }
                 }
             }
 
@@ -166,7 +183,7 @@ object NetworkModule {
     @Singleton
     @StreamClient
     fun provideStreamHttpClient(
-        tokenInterceptor: TokenInterceptor,
+        tokenManager: TokenManager,
         tokenAuthenticator: TokenAuthenticator,
         json: Json,
     ): HttpClient =
@@ -176,13 +193,26 @@ object NetworkModule {
             }
 
             engine {
-                addInterceptor(tokenInterceptor)
-
                 config {
                     authenticator(tokenAuthenticator)
 
                     readTimeout(0, TimeUnit.MILLISECONDS)
                     connectTimeout(0, TimeUnit.MILLISECONDS)
+                }
+            }
+
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val accessToken: String? = tokenManager.getAccessToken()
+                        val refreshToken: String? = tokenManager.getRefreshToken()
+
+                        if (accessToken != null && refreshToken != null) {
+                            BearerTokens(accessToken, refreshToken)
+                        } else {
+                            null
+                        }
+                    }
                 }
             }
 
