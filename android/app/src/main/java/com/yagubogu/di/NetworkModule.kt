@@ -76,54 +76,13 @@ object NetworkModule {
             prettyPrint = true
         }
 
-    // --- BaseHttpClient (인증 없는 클라이언트) ---
-    @Provides
-    @Singleton
-    @BaseClient
-    fun provideBaseHttpClient(json: Json): HttpClient =
-        // OkHttp 엔진 사용
-        HttpClient(OkHttp) {
-            defaultRequest {
-                contentType(ContentType.Application.Json)
-            }
-
-            install(Logging) {
-                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
-                logger = Logger.ANDROID
-            }
-
-            install(ContentNegotiation) {
-                json(json)
-            }
-
-            install(HttpTimeout) {
-                requestTimeoutMillis = 30_000
-                connectTimeoutMillis = 10_000
-                socketTimeoutMillis = 10_000
-            }
-        }
-
-    // --- BaseKtorfit ---
-    @Provides
-    @Singleton
-    @BaseKtorfit
-    fun provideBaseKtorfit(
-        @BaseUrl baseUrl: String,
-        @BaseClient client: HttpClient,
-    ): Ktorfit =
-        Ktorfit
-            .Builder()
-            .baseUrl(baseUrl)
-            .httpClient(client)
-            .build()
-
-    // --- TokenHttpClient (인증 있는 클라이언트) ---
     private val mutex = Mutex()
 
+    // --- GlobalClient (일반 API + 인증 API를 처리하는 단일 클라이언트) ---
     @Provides
     @Singleton
-    @TokenClient
-    fun provideTokenClient(
+    @GlobalClient
+    fun provideGlobalHttpClient(
         tokenManager: TokenManager,
         tokenApiServiceProvider: Provider<TokenApiService>,
         json: Json,
@@ -187,7 +146,8 @@ object NetworkModule {
                         val path: String = request.url.encodedPath
 
                         host == "yagubogu.com" &&
-                            !path.endsWith("/auth/refresh")
+                            !path.endsWith("/auth/refresh") &&
+                            !path.endsWith("/auth/login")
                     }
                 }
             }
@@ -208,13 +168,12 @@ object NetworkModule {
             }
         }
 
-    // --- TokenKtorfit ---
+    // --- Ktorfit ---
     @Provides
     @Singleton
-    @TokenKtorfit
-    fun provideTokenKtorfit(
+    fun provideKtorfit(
         @BaseUrl baseUrl: String,
-        @TokenClient client: HttpClient,
+        @GlobalClient client: HttpClient,
     ): Ktorfit =
         Ktorfit
             .Builder()
@@ -309,55 +268,37 @@ object NetworkModule {
     // --- API Services ---
     @Provides
     @Singleton
-    fun provideTokenApiService(
-        @BaseKtorfit ktorfit: Ktorfit,
-    ): TokenApiService = ktorfit.createTokenApiService()
+    fun provideTokenApiService(ktorfit: Ktorfit): TokenApiService = ktorfit.createTokenApiService()
 
     @Provides
     @Singleton
-    fun provideThirdPartyApiService(
-        @BaseKtorfit ktorfit: Ktorfit,
-    ): ThirdPartyApiService = ktorfit.createThirdPartyApiService()
+    fun provideThirdPartyApiService(ktorfit: Ktorfit): ThirdPartyApiService = ktorfit.createThirdPartyApiService()
 
     @Provides
     @Singleton
-    fun provideAuthApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): AuthApiService = ktorfit.createAuthApiService()
+    fun provideAuthApiService(ktorfit: Ktorfit): AuthApiService = ktorfit.createAuthApiService()
 
     @Provides
     @Singleton
-    fun provideMemberApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): MemberApiService = ktorfit.createMemberApiService()
+    fun provideMemberApiService(ktorfit: Ktorfit): MemberApiService = ktorfit.createMemberApiService()
 
     @Provides
     @Singleton
-    fun provideStadiumApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): StadiumApiService = ktorfit.createStadiumApiService()
+    fun provideStadiumApiService(ktorfit: Ktorfit): StadiumApiService = ktorfit.createStadiumApiService()
 
     @Provides
     @Singleton
-    fun provideCheckInApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): CheckInApiService = ktorfit.createCheckInApiService()
+    fun provideCheckInApiService(ktorfit: Ktorfit): CheckInApiService = ktorfit.createCheckInApiService()
 
     @Provides
     @Singleton
-    fun provideStatsApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): StatsApiService = ktorfit.createStatsApiService()
+    fun provideStatsApiService(ktorfit: Ktorfit): StatsApiService = ktorfit.createStatsApiService()
 
     @Provides
     @Singleton
-    fun provideGameApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): GameApiService = ktorfit.createGameApiService()
+    fun provideGameApiService(ktorfit: Ktorfit): GameApiService = ktorfit.createGameApiService()
 
     @Provides
     @Singleton
-    fun provideTalkApiService(
-        @TokenKtorfit ktorfit: Ktorfit,
-    ): TalkApiService = ktorfit.createTalkApiService()
+    fun provideTalkApiService(ktorfit: Ktorfit): TalkApiService = ktorfit.createTalkApiService()
 }

@@ -9,21 +9,8 @@ annotation class BaseUrl
 // --- HttpClient ---
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BaseClient
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class TokenClient
+annotation class GlobalClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class StreamClient
-
-// --- Ktorfit ---
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class BaseKtorfit
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class TokenKtorfit
