@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
 
 class SseClient(
     private val baseUrl: String,
@@ -28,16 +29,7 @@ class SseClient(
 
                         val response: SseStreamResponse =
                             when (eventType) {
-                                EVENT_CHECK_IN_CREATED -> {
-                                    try {
-                                        val items: List<FanRateByGameDto> =
-                                            json.decodeFromString(rawData)
-                                        SseStreamResponse.CheckInCreated(items)
-                                    } catch (e: Exception) {
-                                        SseStreamResponse.Error(e)
-                                    }
-                                }
-
+                                EVENT_CHECK_IN_CREATED -> parseCheckInCreated(rawData)
                                 EVENT_CONNECT -> SseStreamResponse.Connect(rawData)
                                 EVENT_TIMEOUT -> SseStreamResponse.Timeout(rawData)
                                 else -> SseStreamResponse.Comment(serverSentEvent.comments ?: "")
@@ -47,12 +39,22 @@ class SseClient(
                     }
                 }
             } catch (e: Exception) {
-                Timber.d("SSE error: $e")
-                emit(SseStreamResponse.Error(e))
+                if (e !is CancellationException) {
+                    Timber.e("SSE error: $e")
+                    emit(SseStreamResponse.Error(e))
+                }
             } finally {
                 Timber.d("SSE: Connection Closed")
                 emit(SseStreamResponse.ConnectionClosed)
             }
+        }
+
+    private fun parseCheckInCreated(data: String): SseStreamResponse =
+        try {
+            val items: List<FanRateByGameDto> = json.decodeFromString(data)
+            SseStreamResponse.CheckInCreated(items)
+        } catch (e: Exception) {
+            SseStreamResponse.Error(e)
         }
 
     companion object {
