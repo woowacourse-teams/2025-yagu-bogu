@@ -33,12 +33,15 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.HttpTimeoutConfig
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.ANDROID
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.sse.SSE
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -64,35 +67,20 @@ object NetworkModule {
             prettyPrint = true
         }
 
-    // --- Logging Interceptor ---
-    @Provides
-    @Singleton
-    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply {
-            level =
-                if (BuildConfig.DEBUG) {
-                    HttpLoggingInterceptor.Level.BODY
-                } else {
-                    HttpLoggingInterceptor.Level.NONE
-                }
-        }
-
     // --- BaseHttpClient (인증 없는 클라이언트) ---
     @Provides
     @Singleton
     @BaseClient
-    fun provideBaseHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor,
-        json: Json,
-    ): HttpClient =
+    fun provideBaseHttpClient(json: Json): HttpClient =
         // OkHttp 엔진 사용
         HttpClient(OkHttp) {
             defaultRequest {
                 contentType(ContentType.Application.Json)
             }
 
-            engine {
-                addInterceptor(loggingInterceptor)
+            install(Logging) {
+                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+                logger = Logger.ANDROID
             }
 
             install(ContentNegotiation) {
@@ -125,25 +113,27 @@ object NetworkModule {
     @Singleton
     @TokenClient
     fun provideTokenClient(
-        loggingInterceptor: HttpLoggingInterceptor,
         tokenInterceptor: TokenInterceptor,
         tokenAuthenticator: TokenAuthenticator,
         json: Json,
     ): HttpClient =
-        // OkHttp 엔진 사용
         HttpClient(OkHttp) {
             defaultRequest {
                 contentType(ContentType.Application.Json)
             }
 
             engine {
-                addInterceptor(loggingInterceptor)
                 addInterceptor(tokenInterceptor)
 
                 config {
                     authenticator(tokenAuthenticator)
                     readTimeout(30, TimeUnit.SECONDS)
                 }
+            }
+
+            install(Logging) {
+                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+                logger = Logger.ANDROID
             }
 
             install(ContentNegotiation) {
@@ -157,7 +147,7 @@ object NetworkModule {
             }
         }
 
-    // --- baseTokenRetrofit ---
+    // --- TokenKtorfit ---
     @Provides
     @Singleton
     @TokenKtorfit
@@ -178,7 +168,6 @@ object NetworkModule {
     fun provideStreamHttpClient(
         tokenInterceptor: TokenInterceptor,
         tokenAuthenticator: TokenAuthenticator,
-        loggingInterceptor: HttpLoggingInterceptor,
         json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
@@ -187,7 +176,6 @@ object NetworkModule {
             }
 
             engine {
-                addInterceptor(loggingInterceptor)
                 addInterceptor(tokenInterceptor)
 
                 config {
@@ -201,6 +189,11 @@ object NetworkModule {
             install(SSE) {
                 showCommentEvents()
                 showRetryEvents()
+            }
+
+            install(Logging) {
+                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+                logger = Logger.ANDROID
             }
 
             install(ContentNegotiation) {
