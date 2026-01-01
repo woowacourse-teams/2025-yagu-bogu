@@ -47,6 +47,13 @@ android {
             "WEB_CLIENT_ID",
             "\"${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}\"",
         )
+
+        val fixedDate = gradleLocalProperties(rootDir, providers).getProperty("DEBUG_FIXED_DATE")
+        if (fixedDate != null) {
+            buildConfigField("String", "DEBUG_FIXED_DATE", "\"$fixedDate\"")
+        } else {
+            buildConfigField("String", "DEBUG_FIXED_DATE", "null")
+        }
     }
 
     val signingFile = rootProject.file("keystore.properties")
