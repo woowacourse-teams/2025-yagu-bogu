@@ -3,7 +3,6 @@ package com.yagubogu.data.service
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Url
-import io.ktor.client.statement.HttpResponse
 import io.ktor.http.content.OutgoingContent
 
 interface ThirdPartyApiService {
@@ -11,5 +10,5 @@ interface ThirdPartyApiService {
     suspend fun putImageToS3(
         @Url url: String,
         @Body body: OutgoingContent,
-    ): HttpResponse
+    )
 }

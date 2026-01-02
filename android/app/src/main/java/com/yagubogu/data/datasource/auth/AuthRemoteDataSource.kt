@@ -13,19 +13,19 @@ class AuthRemoteDataSource @Inject constructor(
     private val authApiService: AuthApiService,
 ) : AuthDataSource {
     override suspend fun refreshToken(refreshToken: String): Result<TokenResponse> =
-        safeApiCall<TokenResponse> {
+        safeApiCall {
             val tokenRequest = TokenRequest(refreshToken)
             authApiService.postRefresh(tokenRequest)
         }
 
     override suspend fun login(idToken: String): Result<LoginResponse> =
-        safeApiCall<LoginResponse> {
+        safeApiCall {
             val loginRequest = LoginRequest(idToken)
             authApiService.postLogin(loginRequest)
         }
 
     override suspend fun logout(refreshToken: String): Result<Unit> =
-        safeApiCall<Unit> {
+        safeApiCall {
             val request = LogoutRequest(refreshToken)
             authApiService.logout(request)
         }

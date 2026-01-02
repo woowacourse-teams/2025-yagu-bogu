@@ -1,30 +1,40 @@
 package com.yagubogu.data.util
 
-import io.ktor.client.call.body
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
-import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
 
-suspend inline fun <reified T> safeApiCall(crossinline apiCall: suspend () -> HttpResponse): Result<T> =
+suspend inline fun <T> safeApiCall(crossinline apiCall: suspend () -> T): Result<T> =
     runCatching {
-        val response: HttpResponse = apiCall()
+        apiCall()
+    }.fold(
+        onSuccess = {
+            Result.success(it)
+        },
+        onFailure = { e: Throwable ->
+            // 코루틴 취소 예외는 잡지 말고 던져야 함 (구조적 동시성 유지)
+            if (e is CancellationException) throw e
 
-        if (response.status.isSuccess()) {
-            response.body<T>()
-        } else {
-            val errorBody: String = response.bodyAsText()
+            val exception: Throwable =
+                when (e) {
+                    // HTTP 에러 (3xx, 4xx, 5xx)
+                    is ResponseException -> {
+                        val errorBody: String = e.response.bodyAsText()
 
-            when (response.status) {
-                HttpStatusCode.BadRequest -> throw ApiException.BadRequest(errorBody)
-                HttpStatusCode.Unauthorized -> throw ApiException.Unauthorized(errorBody)
-                HttpStatusCode.Forbidden -> throw ApiException.Forbidden(errorBody)
-                HttpStatusCode.NotFound -> throw ApiException.NotFound(errorBody)
-                HttpStatusCode.Conflict -> throw ApiException.Conflict(errorBody)
-                else -> throw Exception("HTTP ${response.status.value}: $errorBody")
-            }
-        }
-    }.onFailure { exception: Throwable ->
-        Timber.e(exception)
-    }
+                        when (e.response.status) {
+                            HttpStatusCode.BadRequest -> ApiException.BadRequest(errorBody)
+                            HttpStatusCode.Unauthorized -> ApiException.Unauthorized(errorBody)
+                            HttpStatusCode.Forbidden -> ApiException.Forbidden(errorBody)
+                            HttpStatusCode.NotFound -> ApiException.NotFound(errorBody)
+                            HttpStatusCode.Conflict -> ApiException.Conflict(errorBody)
+                            else -> e
+                        }
+                    }
+
+                    else -> e
+                }
+
+            Result.failure(exception)
+        },
+    )

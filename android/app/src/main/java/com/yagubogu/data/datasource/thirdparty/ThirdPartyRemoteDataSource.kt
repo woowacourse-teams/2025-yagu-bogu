@@ -21,7 +21,7 @@ class ThirdPartyRemoteDataSource @Inject constructor(
         contentType: String,
         contentLength: Long,
     ): Result<Unit> =
-        safeApiCall<Unit> {
+        safeApiCall {
             val requestBody: OutgoingContent =
                 createRequestBody(imageFileUri, contentType, contentLength)
             thirdPartyApiService.putImageToS3(url, requestBody)

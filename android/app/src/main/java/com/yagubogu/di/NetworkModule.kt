@@ -177,6 +177,12 @@ object NetworkModule {
     fun provideTalkApiService(ktorfit: Ktorfit): TalkApiService = ktorfit.createTalkApiService()
 
     private fun HttpClientConfig<*>.configureBase(json: Json) {
+        // 응답 코드가 2xx가 아니면 예외 발생
+        // - 3xx: RedirectResponseException
+        // - 4xx: ClientRequestException
+        // - 5xx: ServerResponseException
+        expectSuccess = true
+
         // 기본 헤더 설정
         defaultRequest {
             contentType(ContentType.Application.Json)
