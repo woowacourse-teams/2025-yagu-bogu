@@ -58,7 +58,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    // 토큰 동시성 제어를 위한 Mutex
     private val mutex = Mutex()
 
     @Provides
@@ -183,14 +182,13 @@ object NetworkModule {
     @Singleton
     fun provideTalkApiService(ktorfit: Ktorfit): TalkApiService = ktorfit.createTalkApiService()
 
-    /**
-     * JSON, Logging, DefaultRequest 등 기본 설정을 적용합니다.
-     */
     private fun HttpClientConfig<*>.configureBase(json: Json) {
+        // 기본 헤더 설정
         defaultRequest {
             contentType(ContentType.Application.Json)
         }
 
+        // JSON 파싱 설정
         install(ContentNegotiation) {
             json(json)
         }
@@ -201,16 +199,13 @@ object NetworkModule {
         }
     }
 
-    /**
-     * 복잡한 Auth (토큰 추가 및 갱신) 로직을 관리합니다.
-     */
     private fun HttpClientConfig<*>.configureAuth(
         tokenManager: TokenManager,
         tokenApiServiceProvider: Provider<TokenApiService>,
     ) {
         install(Auth) {
             bearer {
-                // 요청 헤더에 엑세스 토큰 추가 (Interceptor)
+                // 요청 시 헤더에 Access Token 추가
                 loadTokens {
                     val accessToken: String? = tokenManager.getAccessToken()
                     val refreshToken: String? = tokenManager.getRefreshToken()
@@ -222,24 +217,31 @@ object NetworkModule {
                     }
                 }
 
-                // 401 응답 시 토큰 갱신 (Authenticator)
+                // 서버로부터 401 응답을 받으면 토큰 갱신 및 재시도
+                // - 새로운 토큰(BearerTokens)을 반환하면 Ktor가 자동으로 원래 요청을 재시도
+                // - null을 반환하면 재시도를 중단
                 refreshTokens {
+                    // [동시성 문제 해결 (Mutex)]
+                    // 여러 API가 동시에 401을 받더라도, 토큰 갱신 요청은 한 번만 순차적으로 실행되도록 잠금을 겁니다.
                     mutex.withLock {
-                        val refreshToken =
+                        val refreshToken: String =
                             tokenManager.getRefreshToken() ?: return@refreshTokens null
-                        val invalidToken: String? = oldTokens?.accessToken
-                        val storedToken: String? = tokenManager.getAccessToken()
 
-                        // 만약 저장소의 토큰이 만료된 토큰과 다르다면?
-                        // -> 다른 스레드가 이미 갱신을 완료했다는 뜻입니다!
-                        // -> API 호출 없이 저장된 새 토큰을 바로 반환합니다.
-                        if (storedToken != null && storedToken != invalidToken) {
-                            return@refreshTokens BearerTokens(storedToken, refreshToken)
+                        val invalidAccessToken: String? = oldTokens?.accessToken
+                        val storedAccessToken: String? = tokenManager.getAccessToken()
+
+                        // 저장소의 토큰이 만료된 토큰과 다르다면, 이미 갱신된 것이므로 API 호출을 생략합니다.
+                        if (storedAccessToken != null && storedAccessToken != invalidAccessToken) {
+                            return@refreshTokens BearerTokens(storedAccessToken, refreshToken)
                         }
 
-                        // 토큰 갱신 API 호출
+                        // [순환 참조 방지]
+                        // HttpClient 생성 시점에는 TokenApiService가 아직 만들어지지 않았을 수 있어서,
+                        // Provider를 통해 필요할 때(Lazy) 객체를 꺼내 씁니다.
                         val tokenApiService: TokenApiService = tokenApiServiceProvider.get()
-                        val (newAccess, newRefresh) =
+
+                        // RefreshToken을 사용해 AccessToken 재발급
+                        val (newAccessToken: String, newRefreshToken: String) =
                             safeApiCall<TokenResponse> {
                                 val tokenRequest = TokenRequest(refreshToken)
                                 tokenApiService.postRefresh(tokenRequest)
@@ -248,17 +250,19 @@ object NetworkModule {
                                 null
                             } ?: return@refreshTokens null
 
-                        // 성공 시 저장 및 반환 (Ktor가 자동으로 재시도함)
-                        tokenManager.saveTokens(newAccess, newRefresh)
-                        BearerTokens(newAccess, newRefresh)
+                        tokenManager.saveTokens(newAccessToken, newRefreshToken)
+                        BearerTokens(newAccessToken, newRefreshToken)
                     }
                 }
 
-                // 인증 제외 경로
+                // [토큰 포함 조건 설정]
+                // true를 반환하면 Authorization 헤더를 포함하고, false면 포함하지 않습니다.
                 sendWithoutRequest { request: HttpRequestBuilder ->
                     val host: String = request.url.host
                     val path: String = request.url.encodedPath
 
+                    // 우리 서버(yagubogu.com)로 보내는 요청이면서,
+                    // 로그인이나 토큰 갱신 요청이 '아닌' 경우에만 토큰을 붙입니다.
                     host == YAGUBOGU_HOSTNAME &&
                         !path.endsWith(AUTH_LOGIN_ENDPOINT) &&
                         !path.endsWith(AUTH_REFRESH_ENDPOINT)
