@@ -13,7 +13,6 @@ import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
-import com.yagubogu.data.service.TokenApiService
 import com.yagubogu.data.service.createAuthApiService
 import com.yagubogu.data.service.createCheckInApiService
 import com.yagubogu.data.service.createGameApiService
@@ -22,7 +21,6 @@ import com.yagubogu.data.service.createStadiumApiService
 import com.yagubogu.data.service.createStatsApiService
 import com.yagubogu.data.service.createTalkApiService
 import com.yagubogu.data.service.createThirdPartyApiService
-import com.yagubogu.data.service.createTokenApiService
 import com.yagubogu.data.util.safeApiCall
 import dagger.Module
 import dagger.Provides
@@ -85,12 +83,12 @@ object NetworkModule {
     @GlobalClient
     fun provideGlobalHttpClient(
         tokenManager: TokenManager,
-        tokenApiServiceProvider: Provider<TokenApiService>,
+        authApiServiceProvider: Provider<AuthApiService>,
         json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             configureBase(json)
-            configureAuth(tokenManager, tokenApiServiceProvider)
+            configureAuth(tokenManager, authApiServiceProvider)
 
             install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
@@ -105,12 +103,12 @@ object NetworkModule {
     @StreamClient
     fun provideStreamHttpClient(
         tokenManager: TokenManager,
-        tokenApiServiceProvider: Provider<TokenApiService>,
+        authApiServiceProvider: Provider<AuthApiService>,
         json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             configureBase(json)
-            configureAuth(tokenManager, tokenApiServiceProvider)
+            configureAuth(tokenManager, authApiServiceProvider)
 
             install(SSE) {
                 showCommentEvents()
@@ -148,15 +146,11 @@ object NetworkModule {
     // ========== API Services ==========
     @Provides
     @Singleton
-    fun provideTokenApiService(ktorfit: Ktorfit): TokenApiService = ktorfit.createTokenApiService()
+    fun provideAuthApiService(ktorfit: Ktorfit): AuthApiService = ktorfit.createAuthApiService()
 
     @Provides
     @Singleton
     fun provideThirdPartyApiService(ktorfit: Ktorfit): ThirdPartyApiService = ktorfit.createThirdPartyApiService()
-
-    @Provides
-    @Singleton
-    fun provideAuthApiService(ktorfit: Ktorfit): AuthApiService = ktorfit.createAuthApiService()
 
     @Provides
     @Singleton
@@ -201,7 +195,7 @@ object NetworkModule {
 
     private fun HttpClientConfig<*>.configureAuth(
         tokenManager: TokenManager,
-        tokenApiServiceProvider: Provider<TokenApiService>,
+        authApiServiceProvider: Provider<AuthApiService>,
     ) {
         install(Auth) {
             bearer {
@@ -236,15 +230,15 @@ object NetworkModule {
                         }
 
                         // [순환 참조 방지]
-                        // HttpClient 생성 시점에는 TokenApiService가 아직 만들어지지 않았을 수 있어서,
+                        // HttpClient 생성 시점에는 AuthApiService가 아직 만들어지지 않았을 수 있어서,
                         // Provider를 통해 필요할 때(Lazy) 객체를 꺼내 씁니다.
-                        val tokenApiService: TokenApiService = tokenApiServiceProvider.get()
+                        val authApiService: AuthApiService = authApiServiceProvider.get()
 
                         // RefreshToken을 사용해 AccessToken 재발급
                         val (newAccessToken: String, newRefreshToken: String) =
                             safeApiCall<TokenResponse> {
                                 val tokenRequest = TokenRequest(refreshToken)
-                                tokenApiService.postRefresh(tokenRequest)
+                                authApiService.postRefresh(tokenRequest)
                             }.getOrElse {
                                 tokenManager.clearTokens()
                                 null

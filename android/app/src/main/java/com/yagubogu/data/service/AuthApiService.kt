@@ -2,11 +2,17 @@ package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.auth.LoginRequest
 import com.yagubogu.data.dto.request.auth.LogoutRequest
+import com.yagubogu.data.dto.request.token.TokenRequest
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.POST
 import io.ktor.client.statement.HttpResponse
 
 interface AuthApiService {
+    @POST("api/v1/auth/refresh")
+    suspend fun postRefresh(
+        @Body body: TokenRequest,
+    ): HttpResponse
+
     @POST("api/v1/auth/login")
     suspend fun postLogin(
         @Body body: LoginRequest,
