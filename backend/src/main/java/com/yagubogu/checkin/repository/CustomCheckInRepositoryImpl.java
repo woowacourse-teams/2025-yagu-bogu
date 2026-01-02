@@ -167,15 +167,18 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     /**
      * m : 전체 유저 평균 승률
      * <p>
-     * 정의: 특정 연도의 모든 "완료된 경기" 기준으로, 각 유저의 인증(CheckIn) 중에서 승리한 횟수 / 전체 인증 횟수
+     * 정의: ...
      * <p>
-     * 계산식: - 분자: 승리한 인증 수 (유저가 응원한 팀이 이긴 경우) - 분모: 전체 인증 수 - 전체 유저를 합산하여 평균 승률을 반환
+     * [수정] 최소 표본 수(N) 규칙 적용: - 전체 인증(totalCounts)이 N 미만이면, 기본 m값(0.5)을 반환합니다. - 전체 인증이 N 이상이면, 실제 계산된 m값을 반환합니다.
      *
      * @param year 기준 연도
-     * @return 전체 유저 평균 승률 (0.0 ~ 1.0). 인증이 없으면 0.0
+     * @return 보정된 전체 유저 평균 승률 (0.0 ~ 1.0)
      */
     @Override
     public double calculateTotalAverageWinRate(final int year) {
+        final int MINIMUM_SAMPLE_SIZE = 100; // 예시: 최소 100건의 직관 데이터가 쌓여야 m을 신뢰
+        final double DEFAULT_M = 0.500;      // N 미만일 때 사용할 기본 m값 (리그 평균 5할)
+
         NumberExpression<Long> w = calculateWinCounts(year);
         NumberExpression<Long> n = new CaseBuilder()
                 .when(GAME.gameState.eq(GameState.COMPLETED).and(GAME.homeScore.ne(GAME.awayScore)))
@@ -192,7 +195,15 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 (tuple == null || tuple.get(0, Long.class) == null) ? 0L : tuple.get(0, Long.class).longValue();
         long totalCounts = (tuple == null || tuple.get(1, Long.class) == null) ? 0L : tuple.get(1, Long.class);
 
-        return (totalCounts == 0) ? 0.0 : (double) winCounts / totalCounts;
+        if (totalCounts == 0) {
+            return 0.0;
+        }
+
+        if (totalCounts < MINIMUM_SAMPLE_SIZE) {
+            return DEFAULT_M;
+        }
+
+        return (double) winCounts / totalCounts;
     }
 
     /**
