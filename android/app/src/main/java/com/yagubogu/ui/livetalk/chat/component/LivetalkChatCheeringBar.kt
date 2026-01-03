@@ -38,9 +38,9 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatCheeringBar(
-    modifier: Modifier = Modifier,
     team: Team,
     cheeringCount: Long?,
+    modifier: Modifier = Modifier,
     onCheeringClick: () -> Unit,
     onPositioned: (Offset) -> Unit = {},
 ) {
