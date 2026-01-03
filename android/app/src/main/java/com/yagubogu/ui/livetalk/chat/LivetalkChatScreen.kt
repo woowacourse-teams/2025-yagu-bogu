@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -41,16 +42,21 @@ import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
 import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenActions
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenStates
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
+import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.theme.YaguBoguTheme
 import com.yagubogu.ui.util.emoji
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -348,3 +354,113 @@ private fun scheduleEmojiAnimations(
 
 private const val MAX_ANIMATION_COUNT = 50
 private const val POLLING_INTERVAL_MILLS = 10_000L
+
+@Preview(showBackground = true, name = "KIA vs 한화")
+@Composable
+fun LivetalkChatPreviewSuccess() {
+    // 1. 개별 채팅 데이터 생성 (기아와 한화 팬의 대화)
+    val chat1 =
+        LivetalkChatItem(
+            chatId = 1L,
+            memberId = 101L,
+            isMine = false,
+            message = "아사람 논란있는 사람아닌가요?",
+            profileImageUrl = null,
+            nickname = "무빙맨",
+            teamName = "한화",
+            timestamp = LocalDateTime.now().minusMinutes(5),
+            reported = false,
+        )
+
+    val chat2 =
+        LivetalkChatItem(
+            chatId = 2L,
+            memberId = 102L,
+            isMine = true,
+            message = "타이거즈 가즈아!",
+            profileImageUrl = null,
+            nickname = "포르",
+            teamName = "기아",
+            timestamp = LocalDateTime.now().minusMinutes(2),
+            reported = false,
+        )
+
+    val mockChatBubbleItems =
+        listOf(
+            LivetalkChatBubbleItem.OtherBubbleItem(chat1),
+            LivetalkChatBubbleItem.MyBubbleItem(chat2),
+        )
+
+    // 2. LivetalkTeams 구성
+    // 홈팀: HT(KIA), 원정팀: HH, 내 팀: HT(KIA) (홈 팬 입장)
+    val mockTeams =
+        LivetalkTeams(
+            stadiumName = "챔피언스 필드",
+            homeTeamCode = "HT", // 기아 타이거즈
+            awayTeamCode = "HH", // 한화 이글스
+            myTeamCode = "HT", // 내 팀
+        )
+
+    val mockState =
+        LivetalkChatScreenStates(
+            messageText = "오늘 경기 직관 중인데 분위기 최고예요!",
+            showingLikeCount = 1250L,
+            livetalkChatBubbleItems = mockChatBubbleItems,
+            teams = mockTeams,
+            chatUiState = LivetalkChatUiState.Success(chatItems = mockChatBubbleItems),
+            isVerified = true,
+        )
+
+    val mockActions = LivetalkChatScreenActions()
+
+    YaguBoguTheme {
+        LivetalkChatScreenContent(
+            state = mockState,
+            actions = mockActions,
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "로딩 중")
+@Composable
+fun LivetalkChatPreviewLoading() {
+    val mockState =
+        LivetalkChatScreenStates(
+            chatUiState = LivetalkChatUiState.Loading,
+        )
+
+    YaguBoguTheme {
+        LivetalkChatScreenContent(
+            state = mockState,
+            actions = LivetalkChatScreenActions(),
+        )
+    }
+}
+
+// 내 팀이 홈/원정 어디에도 속하지 않고 인증하지 않은 경우
+@Preview(showBackground = true, name = "채팅 없음 (비인증/제3자)")
+@Composable
+fun LivetalkChatPreviewEmpty() {
+    val neutralTeams =
+        LivetalkTeams(
+            stadiumName = "고척 스카이돔",
+            homeTeamCode = "KT", // 홈: KT
+            awayTeamCode = "NC", // 원정: NC
+            myTeamCode = "SS", // 내 팀: 삼성
+        )
+
+    val mockState =
+        LivetalkChatScreenStates(
+            chatUiState = LivetalkChatUiState.Empty,
+            teams = neutralTeams,
+            isVerified = false, // 인증되지 않은 상태
+            messageText = "", // 입력창 비움
+        )
+
+    YaguBoguTheme {
+        LivetalkChatScreenContent(
+            state = mockState,
+            actions = LivetalkChatScreenActions(),
+        )
+    }
+}
