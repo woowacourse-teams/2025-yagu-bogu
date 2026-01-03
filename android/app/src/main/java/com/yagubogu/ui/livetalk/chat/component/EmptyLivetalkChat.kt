@@ -45,23 +45,18 @@ fun EmptyLivetalkChat(
                     .fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(20.dp))
-        when (isCheckIn) {
-            true -> {
-                Text(
-                    text = stringResource(R.string.livetalk_empty_livetalk_description),
-                    textAlign = TextAlign.Center,
-                    style = PretendardMedium.copy(fontSize = 18.sp, color = Gray400),
-                )
-            }
 
-            false -> {
-                Text(
-                    text = stringResource(R.string.livetalk_empty_not_check_in_livetalk_description),
-                    textAlign = TextAlign.Center,
-                    style = PretendardMedium.copy(fontSize = 18.sp, color = Gray400),
-                )
-            }
-        }
+        Text(
+            text =
+                stringResource(
+                    when (isCheckIn) {
+                        true -> R.string.livetalk_empty_livetalk_description
+                        false -> R.string.livetalk_empty_not_check_in_livetalk_description
+                    },
+                ),
+            textAlign = TextAlign.Center,
+            style = PretendardMedium.copy(fontSize = 18.sp, color = Gray400),
+        )
     }
 }
 
