@@ -33,9 +33,9 @@ import java.time.LocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkMyChatBubble(
-    modifier: Modifier = Modifier,
     livetalkChatItem: LivetalkChatItem,
     onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isPending: Boolean = false,
 ) {
     Column(
