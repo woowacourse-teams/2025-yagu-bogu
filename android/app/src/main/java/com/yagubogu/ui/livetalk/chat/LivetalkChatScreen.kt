@@ -299,20 +299,18 @@ fun LivetalkChatScreenContent(
             }
 
             // 이모지 애니메이션 레이어
-            Box(modifier = Modifier.fillMaxSize()) {
-                state.emojiQueue.forEach { item: EmojiAnimationItem ->
-                    key(item.id) {
-                        LaunchedEffect(Unit) {
-                            Timber.d("이모지 애니메이션 시작 좌표 : ${item.startOffset}")
-                        }
-                        FloatingEmojiItem(
-                            emoji = item.emoji,
-                            startOffset = item.startOffset,
-                            onAnimationFinished = {
-                                actions.onAnimationFinished(item)
-                            },
-                        )
+            state.emojiQueue.forEach { item: EmojiAnimationItem ->
+                key(item.id) {
+                    LaunchedEffect(Unit) {
+                        Timber.d("이모지 애니메이션 시작 좌표 : ${item.startOffset}")
                     }
+                    FloatingEmojiItem(
+                        emoji = item.emoji,
+                        startOffset = item.startOffset,
+                        onAnimationFinished = {
+                            actions.onAnimationFinished(item)
+                        },
+                    )
                 }
             }
         }
