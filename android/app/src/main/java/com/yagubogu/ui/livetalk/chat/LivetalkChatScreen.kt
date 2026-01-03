@@ -32,7 +32,6 @@ import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.component.profile.ProfileDialog
-import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
 import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
@@ -42,8 +41,9 @@ import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
 import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
 import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenActions
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenStates
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
-import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
@@ -65,6 +65,12 @@ fun LivetalkChatScreen(
     val clickedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
     val chatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
+    val messageText by messageStateHolder.messageText.collectAsStateWithLifecycle()
+    val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
+    val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
+    val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
+
     val emojiQueue = remember { mutableStateListOf<EmojiAnimationItem>() }
     var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
 
@@ -72,6 +78,44 @@ fun LivetalkChatScreen(
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
         emojiQueue.add(EmojiAnimationItem(System.nanoTime(), emoji, emojiButtonPos))
     }
+
+    val uiContentState =
+        LivetalkChatScreenStates(
+            messageText = messageText,
+            showingLikeCount = showingLikeCount,
+            livetalkChatBubbleItems = livetalkChatBubbleItems,
+            pendingDeleteChat = pendingDeleteChat,
+            pendingReportChat = pendingReportChat,
+            emojiQueue = emojiQueue.toList(),
+            teams = teams,
+            clickedProfile = clickedProfile,
+            chatUiState = chatUiState,
+            isVerified = messageStateHolder.isVerified,
+        )
+
+    val actions =
+        remember(viewModel, onBackClick) {
+            LivetalkChatScreenActions(
+                onMessageTextChange = messageStateHolder::updateMessageText,
+                onRequestDelete = messageStateHolder::requestDelete,
+                onRequestReport = messageStateHolder::requestReport,
+                onDismissDeleteDialog = messageStateHolder::dismissDeleteDialog,
+                onDismissReportDialog = messageStateHolder::dismissReportDialog,
+                onBackClick = onBackClick,
+                onEmojiButtonPositioned = { pos -> emojiButtonPos = pos },
+                onCheeringClick = { emoji ->
+                    generateEmojiAnimation(emoji)
+                    viewModel.addLikeToBatch()
+                },
+                onAnimationFinished = { item -> emojiQueue.remove(item) },
+                onSendMessage = viewModel::sendMessage,
+                onFetchMemberProfile = viewModel::fetchMemberProfile,
+                onFetchBeforeTalks = viewModel::fetchBeforeTalks,
+                onDeleteMessage = viewModel::deleteMessage,
+                onReportMessage = viewModel::reportMessage,
+                onDismissProfile = viewModel::dismissProfile,
+            )
+        }
 
     LaunchedEffect(Unit) {
         viewModel.emojiAnimationSignal.collect { deltaItem: LikeDeltaItem ->
@@ -111,29 +155,8 @@ fun LivetalkChatScreen(
     }
 
     LivetalkChatScreenContent(
-        emojiQueue = emojiQueue,
-        messageStateHolder = messageStateHolder,
-        likeCountStateHolder = likeCountStateHolder,
-        teams = teams,
-        clickedProfile = clickedProfile,
-        chatUiState = chatUiState,
-        onBackClick = onBackClick,
-        onEmojiButtonPositioned = { pos: Offset ->
-            emojiButtonPos = pos
-        },
-        onCheeringClick = { emoji: String ->
-            generateEmojiAnimation(emoji)
-            viewModel.addLikeToBatch()
-        },
-        onAnimationFinished = { item: EmojiAnimationItem ->
-            emojiQueue.remove(item)
-        },
-        onSendMessage = viewModel::sendMessage,
-        onFetchMemberProfile = viewModel::fetchMemberProfile,
-        onFetchBeforeTalks = viewModel::fetchBeforeTalks,
-        onDeleteMessage = viewModel::deleteMessage,
-        onReportMessage = viewModel::reportMessage,
-        onDismissProfile = viewModel::dismissProfile,
+        state = uiContentState,
+        actions = actions,
         modifier = modifier,
     )
 }
@@ -141,44 +164,24 @@ fun LivetalkChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatScreenContent(
-    emojiQueue: List<EmojiAnimationItem>,
-    messageStateHolder: MessageStateHolder,
-    likeCountStateHolder: LikeCountStateHolder,
-    teams: LivetalkTeams?,
-    clickedProfile: MemberProfile?,
-    chatUiState: LivetalkChatUiState,
-    onBackClick: () -> Unit,
-    onEmojiButtonPositioned: (Offset) -> Unit,
-    onCheeringClick: (String) -> Unit,
-    onAnimationFinished: (EmojiAnimationItem) -> Unit,
-    onSendMessage: () -> Unit,
-    onFetchMemberProfile: (Long) -> Unit,
-    onFetchBeforeTalks: () -> Unit,
-    onDeleteMessage: (Long) -> Unit,
-    onReportMessage: (Long) -> Unit,
-    onDismissProfile: () -> Unit,
+    state: LivetalkChatScreenStates,
+    actions: LivetalkChatScreenActions,
     modifier: Modifier = Modifier,
 ) {
-    val messageText by messageStateHolder.messageText.collectAsStateWithLifecycle()
-    val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
-    val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
-    val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
-    val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
-
     Scaffold(
         topBar = {
             LivetalkChatToolbar(
-                teams = teams,
-                onBackClick = onBackClick,
+                teams = state.teams,
+                onBackClick = actions.onBackClick,
             )
         },
         bottomBar = {
             LivetalkChatInputBar(
-                messageFormText = messageText,
-                stadiumName = teams?.stadiumName,
-                isVerified = messageStateHolder.isVerified,
-                onTextChange = { messageStateHolder.updateMessageText(it) },
-                onSendMessage = { onSendMessage() },
+                messageFormText = state.messageText,
+                stadiumName = state.teams?.stadiumName,
+                isVerified = state.isVerified,
+                onTextChange = actions.onMessageTextChange,
+                onSendMessage = actions.onSendMessage,
             )
         },
         containerColor = Gray050,
@@ -198,15 +201,15 @@ fun LivetalkChatScreenContent(
                         .fillMaxWidth(),
             ) {
                 // 채팅 버블
-                when (chatUiState) {
+                when (state.chatUiState) {
                     is LivetalkChatUiState.Success -> {
                         LivetalkChatBubbleList(
-                            chatItems = livetalkChatBubbleItems,
+                            chatItems = state.livetalkChatBubbleItems,
                             modifier = Modifier.weight(1f),
-                            onDeleteClick = messageStateHolder::requestDelete,
-                            onReportClick = messageStateHolder::requestReport,
-                            onProfileClick = { onFetchMemberProfile(it.memberId) },
-                            fetchBeforeTalks = { onFetchBeforeTalks() },
+                            onDeleteClick = actions.onRequestDelete,
+                            onReportClick = actions.onRequestReport,
+                            onProfileClick = { actions.onFetchMemberProfile(it.memberId) },
+                            fetchBeforeTalks = { actions.onFetchBeforeTalks() },
                         )
                     }
 
@@ -215,7 +218,7 @@ fun LivetalkChatScreenContent(
                     }
 
                     is LivetalkChatUiState.Empty -> {
-                        EmptyLivetalkChat(isCheckIn = messageStateHolder.isVerified)
+                        EmptyLivetalkChat(isCheckIn = state.isVerified)
                     }
                 }
 
@@ -223,16 +226,16 @@ fun LivetalkChatScreenContent(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
-                val myTeam = teams?.myTeam
+                val myTeam = state.teams?.myTeam
                 when {
-                    myTeam != null && teams.myTeamType != null -> {
+                    myTeam != null && state.teams.myTeamType != null -> {
                         LivetalkChatCheeringBar(
                             team = myTeam,
-                            cheeringCount = showingLikeCount,
+                            cheeringCount = state.showingLikeCount,
                             onCheeringClick = {
-                                onCheeringClick(myTeam.emoji)
+                                actions.onCheeringClick(myTeam.emoji)
                             },
-                            onPositioned = onEmojiButtonPositioned,
+                            onPositioned = actions.onEmojiButtonPositioned,
                         )
                     }
 
@@ -243,7 +246,7 @@ fun LivetalkChatScreenContent(
             }
 
             // 삭제 다이얼로그 레이어
-            pendingDeleteChat?.let {
+            state.pendingDeleteChat?.let { chat ->
                 DefaultDialog(
                     dialogUiModel =
                         DefaultDialogUiModel(
@@ -253,17 +256,14 @@ fun LivetalkChatScreenContent(
                             negativeText = stringResource(R.string.all_cancel),
                         ),
                     onConfirm = {
-                        onDeleteMessage(
-                            messageStateHolder.pendingDeleteChat.value?.chatId
-                                ?: return@DefaultDialog,
-                        )
+                        actions.onDeleteMessage(chat.chatId)
                     },
-                    onCancel = { messageStateHolder.dismissDeleteDialog() },
+                    onCancel = actions.onDismissDeleteDialog,
                 )
             }
 
             // 신고 다이얼로그 레이어
-            pendingReportChat?.let { chat ->
+            state.pendingReportChat?.let { chat ->
                 DefaultDialog(
                     dialogUiModel =
                         DefaultDialogUiModel(
@@ -277,19 +277,16 @@ fun LivetalkChatScreenContent(
                             negativeText = stringResource(R.string.all_cancel),
                         ),
                     onConfirm = {
-                        onReportMessage(
-                            messageStateHolder.pendingReportChat.value?.chatId
-                                ?: return@DefaultDialog,
-                        )
+                        actions.onReportMessage(chat.chatId)
                     },
-                    onCancel = { messageStateHolder.dismissReportDialog() },
+                    onCancel = actions.onDismissReportDialog,
                 )
             }
 
             // 프로필 다이얼로그 레이어
-            clickedProfile?.let { profile ->
+            state.clickedProfile?.let { profile ->
                 ProfileDialog(
-                    onDismissRequest = { onDismissProfile() },
+                    onDismissRequest = { actions.onDismissProfile() },
                     memberProfile = profile,
                     modifier = modifier,
                 )
@@ -297,7 +294,7 @@ fun LivetalkChatScreenContent(
 
             // 이모지 애니메이션 레이어
             Box(modifier = Modifier.fillMaxSize()) {
-                emojiQueue.forEach { item: EmojiAnimationItem ->
+                state.emojiQueue.forEach { item: EmojiAnimationItem ->
                     key(item.id) {
                         LaunchedEffect(Unit) {
                             Timber.d("이모지 애니메이션 시작 좌표 : ${item.startOffset}")
@@ -306,7 +303,7 @@ fun LivetalkChatScreenContent(
                             emoji = item.emoji,
                             startOffset = item.startOffset,
                             onAnimationFinished = {
-                                onAnimationFinished(item)
+                                actions.onAnimationFinished(item)
                             },
                         )
                     }
