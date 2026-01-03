@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
@@ -51,6 +52,7 @@ class HomeViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
     private val streamRepository: StreamRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _checkInUiEvent =
         MutableSharedFlow<CheckInUiEvent>(
@@ -120,7 +122,7 @@ class HomeViewModel @Inject constructor(
         streamRepository.disconnect()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiums(date: LocalDate = LocalDate.now(clock)) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
@@ -207,7 +209,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchMemberStats(year: Int = LocalDate.now().year) {
+    private fun fetchMemberStats(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val myTeamDeferred: Deferred<Result<String?>> =
                 async { memberRepository.getFavoriteTeam() }
@@ -242,7 +244,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumStats(date: LocalDate = LocalDate.now()) {
+    private fun fetchStadiumStats(date: LocalDate = LocalDate.now(clock)) {
         viewModelScope.launch {
             val stadiumFanRatesResult: Result<List<StadiumFanRateItem>> =
                 checkInRepository.getStadiumFanRates(date).mapList { it.toUiModel() }
@@ -260,7 +262,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchVictoryFairyRanking(year: Int = LocalDate.now().year) {
+    private fun fetchVictoryFairyRanking(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val victoryFairyRankingResult: Result<VictoryFairyRanking> =
                 statsRepository.getVictoryFairyRankings(year, null).map { it.toUiModel() }

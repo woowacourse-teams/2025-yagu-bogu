@@ -64,7 +64,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import java.time.LocalDate
 import java.time.YearMonth
 
-private val START_MONTH: YearMonth = YearMonth.of(2015, 1)
+private val START_MONTH: YearMonth = YearMonth.of(2021, 1)
 private val END_MONTH: YearMonth = YearMonth.now()
 
 @Composable
