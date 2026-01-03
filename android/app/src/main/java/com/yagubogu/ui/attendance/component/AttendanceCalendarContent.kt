@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.PastGameUiModel
@@ -119,7 +121,10 @@ private fun AttendanceAdditionButton(
     modifier: Modifier = Modifier,
 ) {
     Button(
-        onClick = onClick,
+        onClick = {
+            onClick()
+            Firebase.analytics.logEvent("past_attendance_addition", null)
+        },
         shape = CircleShape,
         colors =
             ButtonDefaults.buttonColors(
