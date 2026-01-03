@@ -26,6 +26,20 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 
+/**
+ * 현장톡 채팅 메시지 목록을 표시하는 컴포저블
+ *
+ * 역순 레이아웃으로 최신 메시지(0번 인덱스)가 화면 하단에 표시되며,
+ * 최근 채팅을 보는 중, 새 메시지 도착 시 자동 스크롤과 무한 스크롤 페이징을 지원합니다.
+ *
+ * @param chatItems 표시할 채팅 메시지 아이템 리스트
+ * @param modifier 컴포저블에 적용할 Modifier
+ * @param fetchBeforeTalks 이전 메시지를 불러오는 콜백 (무한 스크롤)
+ * @param onDeleteClick 내 메시지 삭제 클릭 시 호출되는 콜백
+ * @param onReportClick 다른 사용자 메시지 신고 클릭 시 호출되는 콜백
+ * @param onProfileClick 다른 사용자 프로필 클릭 시 호출되는 콜백
+ * @param listState LazyColumn의 스크롤 상태를 제어하는 LazyListState
+ */
 @Composable
 fun LivetalkChatBubbleList(
     chatItems: List<LivetalkChatBubbleItem>,
@@ -36,24 +50,31 @@ fun LivetalkChatBubbleList(
     onProfileClick: (LivetalkChatItem) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
 ) {
+    // 이전 리컴포지션 시점의 채팅 아이템 개수 (새 메시지 감지용)
     var previousItemsCount by remember { mutableIntStateOf(chatItems.size) }
 
+    // 새 메시지가 추가되고 사용자가 최근 채팅(~5개)을 보고 있으면 자동으로 0번 메시지로 스크롤
     LaunchedEffect(chatItems.size) {
         if (chatItems.size > previousItemsCount) {
-            when {
-                listState.firstVisibleItemIndex <= 5 -> listState.animateScrollToItem(0)
+            val isNearLatest = listState.firstVisibleItemIndex <= 5
+
+            if (isNearLatest) {
+                listState.animateScrollToItem(0)
             }
         }
         previousItemsCount = chatItems.size
     }
 
+    // 사용자가 과거 메시지 방향으로 스크롤하여 5개 이하의 과거 메시지가 남았을 때 fetchBeforeTalks 호출
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .map { visibleItems: List<LazyListItemInfo> ->
                 val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
                 val totalItems = listState.layoutInfo.totalItemsCount
 
-                totalItems > 0 && lastVisibleItemIndex >= totalItems - 5
+                val shouldFetchBeforeTalks =
+                    totalItems > 0 && lastVisibleItemIndex >= totalItems - 5
+                shouldFetchBeforeTalks
             }.distinctUntilChanged()
             .filter { it }
             .collect {
