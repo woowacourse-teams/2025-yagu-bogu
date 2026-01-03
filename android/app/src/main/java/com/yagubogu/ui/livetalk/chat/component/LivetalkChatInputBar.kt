@@ -51,6 +51,8 @@ fun LivetalkChatInputBar(
     onSendMessage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Row(
         modifier =
             modifier
@@ -103,13 +105,13 @@ fun LivetalkChatInputBar(
                     },
                     singleLine = false,
                     enabled = true,
-                    interactionSource = remember { MutableInteractionSource() },
+                    interactionSource = interactionSource,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     container = {
                         OutlinedTextFieldDefaults.Container(
                             enabled = true,
                             isError = false,
-                            interactionSource = remember { MutableInteractionSource() },
+                            interactionSource = interactionSource,
                             colors =
                                 OutlinedTextFieldDefaults.colors(
                                     focusedContainerColor = Gray100,
