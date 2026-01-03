@@ -128,7 +128,7 @@
     <string name="livetalk_trash_icon_description">삭제 쓰레기통 아이콘</string>
     <string name="livetalk_trash_btn">삭제</string>
     <string name="livetalk_pending_message">전송중…</string>
-    <string name="livetalk_empty_not_check_in_livetalk_description">직관 인증을 한 뒤\n오늘의 첫 현장톡을 남겨보세요</string>
+    <string name="livetalk_empty_not_check_in_livetalk_description">직관 인증을 하고\n오늘의 첫 현장톡을 남겨보세요</string>
     <string name="livetalk_empty_livetalk_description">오늘의 첫 현장톡을 남겨보세요</string>
     <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
     <string name="livetalk_delete_succeed">메시지가 삭제되었습니다.</string>
