@@ -45,6 +45,9 @@ import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.util.emoji
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +75,7 @@ fun LivetalkChatScreen(
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
         emojiQueue.add(EmojiAnimationItem(System.nanoTime(), emoji, emojiButtonPos))
     }
+
     LaunchedEffect(Unit) {
         viewModel.emojiAnimationSignal.collect { deltaItem: LikeDeltaItem ->
             // 1. 이모지 애니메이션 큐에 추가
@@ -80,6 +84,31 @@ fun LivetalkChatScreen(
             // 2. 우리 팀의 변화량인 경우에만 UI 카운트 증가 (상대 팀은 카운트 텍스트가 없으므로 제외 가능)
             if (deltaItem.isMyTeam) {
                 likeCountStateHolder.increaseMyTeamShowingCount(deltaItem.amount)
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        likeCountStateHolder.myTeamLikeChangeAmount.collect { count ->
+            count?.let {
+                // 1. 이모지 애니메이션 큐에 추가
+                val myTeamEmoji = teams?.myTeamEmoji ?: return@collect
+                scheduleEmojiAnimations(myTeamEmoji, count, this) {
+                    generateEmojiAnimation(myTeamEmoji)
+                }
+                // 2. 우리 팀의 변화량인 경우에만 UI 카운트 증가 (상대 팀은 카운트 텍스트가 없으므로 제외 가능)
+                likeCountStateHolder.increaseMyTeamShowingCount(count)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        likeCountStateHolder.otherTeamLikeChangeAmount.collect { count ->
+            count?.let {
+                // 1. 이모지 애니메이션 큐에 추가
+                val otherTeamEmoji = teams?.otherTeamEmoji ?: return@collect
+                scheduleEmojiAnimations(otherTeamEmoji, count, this) {
+                    generateEmojiAnimation(otherTeamEmoji)
+                }
             }
         }
     }
@@ -235,3 +264,39 @@ fun LivetalkChatScreen(
         }
     }
 }
+
+private fun scheduleEmojiAnimations(
+    emoji: String,
+    count: Long,
+    scope: CoroutineScope,
+    triggerAnimation: () -> Unit,
+) {
+    if (count <= 0) return
+    val animationCount: Int = minOf(MAX_ANIMATION_COUNT, count.toInt())
+
+    // 각 애니메이션이 담당할 기본 카운트 (몫)
+    val baseIncrement: Long = count / animationCount
+
+    // 기본 카운트를 분배하고 남은 카운트 (나머지)
+    val remainder = count % animationCount
+
+    scope.launch {
+        repeat(animationCount) { index: Int ->
+            launch {
+                // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
+                // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
+                val increment: Long =
+                    if (index < remainder) baseIncrement + 1 else baseIncrement
+
+                val randomDelay = (0L..POLLING_INTERVAL_MILLS).random()
+                delay(randomDelay)
+
+                triggerAnimation()
+                Timber.d("$emoji 이모지 애니메이션 및 $increment 만큼 카운트 증가")
+            }
+        }
+    }
+}
+
+private const val MAX_ANIMATION_COUNT = 50
+private const val POLLING_INTERVAL_MILLS = 10_000L

@@ -96,57 +96,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
             fetchTeams(gameId)
             startPolling()
         }
-
-        // 우리 팀 좋아요 수집
-        viewModelScope.launch {
-            likeCountStateHolder.myTeamLikeChangeAmount.collect { diffCount ->
-                diffCount?.let { scheduleEmojiAnimations(it, isMyTeam = true) }
-            }
-        }
-
-        // 상대 팀 좋아요 수집
-        viewModelScope.launch {
-            likeCountStateHolder.otherTeamLikeChangeAmount.collect { diffCount ->
-                diffCount?.let { scheduleEmojiAnimations(it, isMyTeam = false) }
-            }
-        }
-    }
-
-    private fun scheduleEmojiAnimations(
-        count: Long,
-        isMyTeam: Boolean,
-    ) {
-        if (count <= 0) return
-        val animationCount: Int = minOf(MAX_ANIMATION_COUNT, count.toInt())
-
-        // 각 애니메이션이 담당할 기본 카운트 (몫)
-        val baseIncrement: Long = count / animationCount
-
-        // 기본 카운트를 분배하고 남은 카운트 (나머지)
-        val remainder = count % animationCount
-
-        val emoji =
-            when {
-                isMyTeam -> teams.value?.myTeamEmoji ?: return
-                else -> teams.value?.otherTeamEmoji ?: return
-            }
-
-        viewModelScope.launch {
-            repeat(animationCount) { index: Int ->
-                launch {
-                    // 남은 카운트(remainder)가 현재 인덱스보다 크면 1을 더해준다.
-                    // 처음 'remainder' 개의 애니메이션이 1씩 더 담당
-                    val increment: Long =
-                        if (index < remainder) baseIncrement + 1 else baseIncrement
-
-                    val randomDelay = (0L..POLLING_INTERVAL_MILLS).random()
-                    delay(randomDelay)
-
-                    _emojiAnimationSignal.emit(LikeDeltaItem(emoji, isMyTeam, increment))
-                    Timber.d("$emoji 이모지 애니메이션 및 $increment 만큼 카운트 증가")
-                }
-            }
-        }
     }
 
     fun fetchBeforeTalks() {
