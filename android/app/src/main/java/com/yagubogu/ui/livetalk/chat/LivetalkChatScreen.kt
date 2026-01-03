@@ -23,21 +23,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.yagubogu.R
-import com.yagubogu.presentation.dialog.DefaultDialogUiModel
-import com.yagubogu.ui.common.component.DefaultDialog
-import com.yagubogu.ui.common.component.profile.ProfileDialog
 import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
 import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleListShimmer
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatCheeringBar
+import com.yagubogu.ui.livetalk.chat.component.LivetalkChatDialogs
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
 import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
@@ -250,54 +246,6 @@ fun LivetalkChatScreenContent(
                     }
                 }
             }
-
-            // 삭제 다이얼로그 레이어
-            state.pendingDeleteChat?.let { chat ->
-                DefaultDialog(
-                    dialogUiModel =
-                        DefaultDialogUiModel(
-                            title = stringResource(R.string.livetalk_trash_btn),
-                            message = stringResource(R.string.livetalk_trash_dialog_message),
-                            positiveText = stringResource(R.string.livetalk_trash_btn),
-                            negativeText = stringResource(R.string.all_cancel),
-                        ),
-                    onConfirm = {
-                        actions.onDeleteMessage(chat.chatId)
-                    },
-                    onCancel = actions.onDismissDeleteDialog,
-                )
-            }
-
-            // 신고 다이얼로그 레이어
-            state.pendingReportChat?.let { chat ->
-                DefaultDialog(
-                    dialogUiModel =
-                        DefaultDialogUiModel(
-                            title = stringResource(R.string.livetalk_user_report_btn),
-                            message =
-                                stringResource(
-                                    R.string.livetalk_user_report_dialog_message,
-                                    chat.nickname ?: stringResource(R.string.all_null_nick_name),
-                                ),
-                            positiveText = stringResource(R.string.livetalk_user_report_btn),
-                            negativeText = stringResource(R.string.all_cancel),
-                        ),
-                    onConfirm = {
-                        actions.onReportMessage(chat.chatId)
-                    },
-                    onCancel = actions.onDismissReportDialog,
-                )
-            }
-
-            // 프로필 다이얼로그 레이어
-            state.clickedProfile?.let { profile ->
-                ProfileDialog(
-                    onDismissRequest = { actions.onDismissProfile() },
-                    memberProfile = profile,
-                    modifier = modifier,
-                )
-            }
-
             // 이모지 애니메이션 레이어
             state.emojiQueue.forEach { item: EmojiAnimationItem ->
                 key(item.id) {
@@ -313,6 +261,9 @@ fun LivetalkChatScreenContent(
                     )
                 }
             }
+
+            // 다이얼로그 레이어
+            LivetalkChatDialogs(state = state, actions = actions)
         }
     }
 }
