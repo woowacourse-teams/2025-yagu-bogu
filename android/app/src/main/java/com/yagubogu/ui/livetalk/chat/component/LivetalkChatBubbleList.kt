@@ -28,8 +28,8 @@ import java.time.LocalDateTime
 
 @Composable
 fun LivetalkChatBubbleList(
-    modifier: Modifier = Modifier,
     chatItems: List<LivetalkChatBubbleItem>,
+    modifier: Modifier = Modifier,
     fetchBeforeTalks: () -> Unit = {},
     onDeleteClick: (LivetalkChatItem) -> Unit = {},
     onReportClick: (LivetalkChatItem) -> Unit = {},
@@ -112,6 +112,7 @@ val otherChat =
         LocalDateTime.now(),
         false,
     )
+
 
 val otherLongChat =
     otherChat.copy(message = "한화의 김성근 감독님 사랑해 예 예 예 예예예 예 예예예 예 예 예 예예예 예~ 한화의 김성근 감독님 사랑해")

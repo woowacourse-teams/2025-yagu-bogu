@@ -120,8 +120,8 @@ fun LivetalkChatScreen(
                 when (chatUiState) {
                     is LivetalkChatUiState.Success -> {
                         LivetalkChatBubbleList(
-                            modifier = Modifier.weight(1f),
                             chatItems = livetalkChatBubbleItems,
+                            modifier = Modifier.weight(1f),
                             onDeleteClick = viewModel.messageStateHolder::requestDelete,
                             onReportClick = viewModel.messageStateHolder::requestReport,
                             onProfileClick = { viewModel.fetchMemberProfile(it.memberId) },
