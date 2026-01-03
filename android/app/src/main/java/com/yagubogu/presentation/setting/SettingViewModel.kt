@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Clock
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -123,7 +124,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
-                .map { it.toUiModel(clock) }
+                .map { it.toUiModel(LocalDate.now(clock)) }
                 .onSuccess { memberInfoItem: MemberInfoItem ->
                     _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->
