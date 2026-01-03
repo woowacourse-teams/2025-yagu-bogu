@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
 import com.yagubogu.ui.attendance.component.AttendanceCalendarContent
@@ -283,8 +285,10 @@ private fun AttendanceViewToggle(
             modifier
                 .background(color = White, shape = CircleShape)
                 .border(width = 1.dp, color = Gray200, shape = CircleShape)
-                .noRippleClickable(onClick = onChange)
-                .padding(4.dp),
+                .noRippleClickable {
+                    onChange()
+                    Firebase.analytics.logEvent("attendance_history_change_view_type", null)
+                }.padding(4.dp),
     ) {
         Box(
             modifier =
