@@ -100,43 +100,41 @@ fun LivetalkChatBubbleList(
     }
 }
 
-val otherChat =
-    LivetalkChatItem(
-        0L,
-        0L,
-        false,
-        "짧은 텍스트인 것이다",
-        null,
-        "케인",
-        "한화",
-        LocalDateTime.now(),
-        false,
-    )
-
-
-val otherLongChat =
-    otherChat.copy(message = "한화의 김성근 감독님 사랑해 예 예 예 예예예 예 예예예 예 예 예 예예예 예~ 한화의 김성근 감독님 사랑해")
-
-val myChat = otherChat.copy(isMine = true)
-
-val reportedChat = otherChat.copy(reported = true)
-
-val fixtureItems =
-    listOf(
-        otherChat.copy(chatId = 1L),
-        otherLongChat.copy(chatId = 2L),
-        reportedChat.copy(chatId = 3L),
-        myChat.copy(chatId = 4L),
-        otherLongChat.copy(chatId = 5L),
-        myChat.copy(chatId = 6L),
-        otherLongChat.copy(chatId = 7L),
-        otherLongChat.copy(chatId = 8L),
-        myChat.copy(chatId = 9L),
-        otherLongChat.copy(chatId = 10L),
-    ).map { LivetalkChatBubbleItem.of(it) }
-
 @Preview
 @Composable
 private fun LivetalkChatBubbleListPreview() {
+    val otherChat =
+        LivetalkChatItem(
+            0L,
+            0L,
+            false,
+            "짧은 텍스트인 것이다",
+            null,
+            "케인",
+            "한화",
+            LocalDateTime.now(),
+            false,
+        )
+
+    val otherLongChat =
+        otherChat.copy(message = "한화의 김성근 감독님 사랑해 예 예 예 예예예 예 예예예 예 예 예 예예예 예~ 한화의 김성근 감독님 사랑해")
+
+    val myChat = otherChat.copy(isMine = true)
+
+    val reportedChat = otherChat.copy(reported = true)
+
+    val fixtureItems =
+        listOf(
+            otherChat.copy(chatId = 1L),
+            otherLongChat.copy(chatId = 2L),
+            reportedChat.copy(chatId = 3L),
+            myChat.copy(chatId = 4L),
+            otherLongChat.copy(chatId = 5L),
+            myChat.copy(chatId = 6L),
+            otherLongChat.copy(chatId = 7L),
+            otherLongChat.copy(chatId = 8L),
+            myChat.copy(chatId = 9L),
+            otherLongChat.copy(chatId = 10L),
+        ).map { LivetalkChatBubbleItem.of(it) }
     LivetalkChatBubbleList(chatItems = fixtureItems)
 }
