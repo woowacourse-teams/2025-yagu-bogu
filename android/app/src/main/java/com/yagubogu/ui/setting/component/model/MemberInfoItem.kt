@@ -1,7 +1,6 @@
 package com.yagubogu.ui.setting.component.model
 
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 data class MemberInfoItem(
     val nickName: String = "",
