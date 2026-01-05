@@ -58,7 +58,7 @@ class SseClient(
         }
 
     companion object {
-        private const val EVENT_STREAM_ENDPOINT = "api/v1/event-stream"
+        private const val EVENT_STREAM_ENDPOINT = "/api/v1/event-stream"
 
         private const val EVENT_CHECK_IN_CREATED = "check-in-created"
         private const val EVENT_CONNECT = "connect"
