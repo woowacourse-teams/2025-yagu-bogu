@@ -19,47 +19,47 @@ import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 
 interface MemberApiService {
-    @GET("api/v1/members/me")
+    @GET("/api/v1/members/me")
     suspend fun getMemberInfo(): MemberInfoResponse
 
-    @GET("api/v1/members/me/nickname")
+    @GET("/api/v1/members/me/nickname")
     suspend fun getNickname(): MemberNicknameResponse
 
-    @PATCH("api/v1/members/me/nickname")
+    @PATCH("/api/v1/members/me/nickname")
     suspend fun patchNickname(
         @Body body: MemberNicknameRequest,
     ): MemberNicknameResponse
 
-    @GET("api/v1/members/favorites")
+    @GET("/api/v1/members/favorites")
     suspend fun getFavoriteTeam(): MemberFavoriteResponse
 
-    @PATCH("api/v1/members/favorites")
+    @PATCH("/api/v1/members/favorites")
     suspend fun patchFavoriteTeam(
         @Body body: MemberFavoriteRequest,
     ): MemberFavoriteResponse
 
-    @DELETE("api/v1/members/me")
+    @DELETE("/api/v1/members/me")
     suspend fun deleteMember()
 
-    @GET("api/v1/members/me/badges")
+    @GET("/api/v1/members/me/badges")
     suspend fun getBadges(): BadgeResponse
 
-    @PATCH("api/v1/members/me/badges/{badgeId}/representative")
+    @PATCH("/api/v1/members/me/badges/{badgeId}/representative")
     suspend fun patchRepresentativeBadge(
         @Path("badgeId") badgeId: Long,
     )
 
-    @POST("api/v1/members/me/profile-image/pre-signed")
+    @POST("/api/v1/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
         @Body request: PresignedUrlStartRequest,
     ): PresignedUrlStartResponse
 
-    @POST("api/v1/members/me/profile-image/update")
+    @POST("/api/v1/members/me/profile-image/update")
     suspend fun postCompleteUpload(
         @Body request: PresignedUrlCompleteRequest,
     ): PresignedUrlCompleteResponse
 
-    @GET("api/v1/members/{memberId}")
+    @GET("/api/v1/members/{memberId}")
     suspend fun getMemberProfile(
         @Path("memberId") memberId: Long,
     ): MemberProfileResponse

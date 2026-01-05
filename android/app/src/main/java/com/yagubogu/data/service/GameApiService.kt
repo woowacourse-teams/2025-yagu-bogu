@@ -10,18 +10,18 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface GameApiService {
-    @GET("api/v1/games")
+    @GET("/api/v1/games")
     suspend fun getGames(
         @Query("date") date: String,
     ): GameResponse
 
-    @POST("api/v1/games/{gameId}/like-batches")
+    @POST("/api/v1/games/{gameId}/like-batches")
     suspend fun postLikeBatches(
         @Path("gameId") gameId: Long,
         @Body body: LikeBatchRequest,
     )
 
-    @GET("api/v1/games/{gameId}/likes/counts")
+    @GET("/api/v1/games/{gameId}/likes/counts")
     suspend fun getLikeCounts(
         @Path("gameId") gameId: Long,
     ): LikeCountsResponse

@@ -2,7 +2,6 @@ package com.yagubogu.di
 
 import com.yagubogu.BuildConfig
 import com.yagubogu.data.dto.request.token.TokenRequest
-import com.yagubogu.data.dto.response.token.TokenResponse
 import com.yagubogu.data.network.SseClient
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.service.AuthApiService
@@ -139,7 +138,7 @@ object NetworkModule {
     ): Ktorfit =
         Ktorfit
             .Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(url = baseUrl, checkUrl = false)
             .httpClient(client)
             .build()
 
@@ -242,7 +241,7 @@ object NetworkModule {
 
                         // RefreshToken을 사용해 AccessToken 재발급
                         val (newAccessToken: String, newRefreshToken: String) =
-                            safeApiCall<TokenResponse> {
+                            safeApiCall {
                                 val tokenRequest = TokenRequest(refreshToken)
                                 authApiService.postRefresh(tokenRequest)
                             }.getOrElse {
