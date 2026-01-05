@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class StatsDetailViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val checkInRepository: CheckInRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _isVsTeamStatsExpanded = MutableStateFlow(false)
     val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
@@ -55,7 +57,7 @@ class StatsDetailViewModel @Inject constructor(
         _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
     }
 
-    private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
+    private fun fetchVsTeamStats(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
                 statsRepository
@@ -72,7 +74,7 @@ class StatsDetailViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
+    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
             val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
                 checkInRepository.getStadiumCheckInCounts(year).mapList { it.toUiModel() }

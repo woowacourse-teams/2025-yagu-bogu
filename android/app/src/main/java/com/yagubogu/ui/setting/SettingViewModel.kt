@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +30,7 @@ class SettingViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
+    private val clock: Clock,
 ) : ViewModel() {
     private val _myMemberInfoItem = MutableStateFlow(MemberInfoItem())
     val myMemberInfoItem: StateFlow<MemberInfoItem> = _myMemberInfoItem.asStateFlow()
@@ -131,7 +134,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()
-                .map { it.toUiModel() }
+                .map { it.toUiModel(LocalDate.now(clock)) }
                 .onSuccess { memberInfoItem: MemberInfoItem ->
                     _myMemberInfoItem.value = memberInfoItem
                 }.onFailure { exception: Throwable ->
