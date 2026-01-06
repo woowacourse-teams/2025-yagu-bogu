@@ -6,7 +6,7 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class BaseUrl
 
-// --- HttpClient ---
+// ========== HttpClient ==========
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class GlobalClient

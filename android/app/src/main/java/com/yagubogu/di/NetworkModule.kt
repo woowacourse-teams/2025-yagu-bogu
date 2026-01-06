@@ -73,6 +73,7 @@ object NetworkModule {
         Json {
             ignoreUnknownKeys = true
             isLenient = true
+            encodeDefaults = true
             prettyPrint = true
         }
 
@@ -90,9 +91,9 @@ object NetworkModule {
             configureAuth(tokenManager, authApiServiceProvider)
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 30_000
-                connectTimeoutMillis = 10_000
-                socketTimeoutMillis = 10_000
+                requestTimeoutMillis = 30_000 // 요청을 보내고 응답을 받을 때까지 전체 시간
+                connectTimeoutMillis = 10_000 // 서버와 연결을 맺는 데 걸리는 시간
+                socketTimeoutMillis = 30_000 // 데이터를 패킷 단위로 받아올 때, 패킷 사이의 대기 시간
             }
         }
 
@@ -112,6 +113,7 @@ object NetworkModule {
             install(SSE) {
                 showCommentEvents()
                 showRetryEvents()
+                maxReconnectionAttempts = 5
             }
 
             install(HttpTimeout) {
@@ -182,7 +184,7 @@ object NetworkModule {
         // - 5xx: ServerResponseException
         expectSuccess = true
 
-        // 기본 헤더 설정
+        // 기본 요청 헤더 설정
         defaultRequest {
             contentType(ContentType.Application.Json)
         }
