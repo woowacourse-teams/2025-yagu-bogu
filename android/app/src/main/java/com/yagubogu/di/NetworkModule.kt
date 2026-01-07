@@ -5,21 +5,6 @@ import com.yagubogu.data.dto.request.token.TokenRequest
 import com.yagubogu.data.network.SseClient
 import com.yagubogu.data.network.TokenManager
 import com.yagubogu.data.service.AuthApiService
-import com.yagubogu.data.service.CheckInApiService
-import com.yagubogu.data.service.GameApiService
-import com.yagubogu.data.service.MemberApiService
-import com.yagubogu.data.service.StadiumApiService
-import com.yagubogu.data.service.StatsApiService
-import com.yagubogu.data.service.TalkApiService
-import com.yagubogu.data.service.ThirdPartyApiService
-import com.yagubogu.data.service.createAuthApiService
-import com.yagubogu.data.service.createCheckInApiService
-import com.yagubogu.data.service.createGameApiService
-import com.yagubogu.data.service.createMemberApiService
-import com.yagubogu.data.service.createStadiumApiService
-import com.yagubogu.data.service.createStatsApiService
-import com.yagubogu.data.service.createTalkApiService
-import com.yagubogu.data.service.createThirdPartyApiService
 import com.yagubogu.data.util.safeApiCall
 import dagger.Module
 import dagger.Provides
@@ -144,39 +129,6 @@ object NetworkModule {
             .httpClient(client)
             .build()
 
-    // ========== API Services ==========
-    @Provides
-    @Singleton
-    fun provideAuthApiService(ktorfit: Ktorfit): AuthApiService = ktorfit.createAuthApiService()
-
-    @Provides
-    @Singleton
-    fun provideThirdPartyApiService(ktorfit: Ktorfit): ThirdPartyApiService = ktorfit.createThirdPartyApiService()
-
-    @Provides
-    @Singleton
-    fun provideMemberApiService(ktorfit: Ktorfit): MemberApiService = ktorfit.createMemberApiService()
-
-    @Provides
-    @Singleton
-    fun provideStadiumApiService(ktorfit: Ktorfit): StadiumApiService = ktorfit.createStadiumApiService()
-
-    @Provides
-    @Singleton
-    fun provideCheckInApiService(ktorfit: Ktorfit): CheckInApiService = ktorfit.createCheckInApiService()
-
-    @Provides
-    @Singleton
-    fun provideStatsApiService(ktorfit: Ktorfit): StatsApiService = ktorfit.createStatsApiService()
-
-    @Provides
-    @Singleton
-    fun provideGameApiService(ktorfit: Ktorfit): GameApiService = ktorfit.createGameApiService()
-
-    @Provides
-    @Singleton
-    fun provideTalkApiService(ktorfit: Ktorfit): TalkApiService = ktorfit.createTalkApiService()
-
     private fun HttpClientConfig<*>.configureBase(json: Json) {
         // 응답 코드가 2xx가 아니면 예외 발생
         // - 3xx: RedirectResponseException
@@ -206,7 +158,7 @@ object NetworkModule {
     ) {
         install(Auth) {
             bearer {
-                // 요청 시 헤더에 Access Token 추가
+                // 토큰 불러오기
                 loadTokens {
                     val accessToken: String? = tokenManager.getAccessToken()
                     val refreshToken: String? = tokenManager.getRefreshToken()
@@ -223,7 +175,7 @@ object NetworkModule {
                 // - null을 반환하면 재시도를 중단
                 refreshTokens {
                     // [동시성 문제 해결 (Mutex)]
-                    // 여러 API가 동시에 401을 받더라도, 토큰 갱신 요청은 한 번만 순차적으로 실행되도록 잠금을 겁니다.
+                    // 여러 API가 동시에 401을 받더라도, 토큰 갱신 요청은 한 번만 순차적으로 실행되도록 락을 겁니다.
                     mutex.withLock {
                         val refreshToken: String =
                             tokenManager.getRefreshToken() ?: return@refreshTokens null
@@ -256,8 +208,9 @@ object NetworkModule {
                     }
                 }
 
-                // [토큰 포함 조건 설정]
-                // true를 반환하면 Authorization 헤더를 포함하고, false면 포함하지 않습니다.
+                // 토큰 포함 조건 설정
+                // - true를 반환하면 Authorization 헤더를 포함
+                // - false을 반환하면 토큰 없이 요청을 보냄
                 sendWithoutRequest { request: HttpRequestBuilder ->
                     val host: String = request.url.host
                     val path: String = request.url.encodedPath
