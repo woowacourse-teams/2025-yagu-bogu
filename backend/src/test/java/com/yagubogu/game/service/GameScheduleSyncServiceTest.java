@@ -1,7 +1,6 @@
 package com.yagubogu.game.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -17,7 +16,6 @@ import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
 import com.yagubogu.game.service.crawler.KboScheduleCrawler.GameScheduleSyncService;
-import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.TestFixture;
@@ -91,58 +89,103 @@ class GameScheduleSyncServiceTest {
         assertThat(gameRepository.findByGameCode(gameItem.gameCode())).isPresent();
     }
 
-    @DisplayName("예외: 경기장을 찾을 수 없으면 예외가 발생한다")
+//    @DisplayName("예외: 경기장을 찾을 수 없으면 예외가 발생한다")
+//    @Test
+//    void syncGameSchedule_stadiumNotFound() {
+//        // given
+//        LocalDate yesterday = TestFixture.getYesterday();
+//        KboGameParam gameItem = new KboGameParam(
+//                "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
+//                "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
+//        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
+//
+//        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
+//
+//        // when & then
+//        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
+//                .isInstanceOf(NotFoundException.class)
+//                .hasMessage("Stadium name match failed: 존재하지않는경기장");
+//    }
+
+    @DisplayName("경기장을 찾을 수 없으면 해당 경기는 스킵되고 저장되지 않는다")
     @Test
-    void syncGameSchedule_stadiumNotFound() {
+    void syncGameSchedule_stadiumNotFound_skip() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         KboGameParam gameItem = new KboGameParam(
-                "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
+                "20250721SSHH0",
+                TestFixture.getToday(),
+                0,
+                LocalTime.of(18, 30),
+                "존재하지않는경기장",
+                "HH",
+                "SS",
+                GameState.COMPLETED
+        );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
-
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
+        long before = gameRepository.count();
 
-        // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Stadium name match failed: 존재하지않는경기장");
+        // when
+        gameScheduleSyncService.syncGameSchedule(yesterday);
+
+        // then
+        long after = gameRepository.count();
+        assertThat(after).isEqualTo(before);
     }
 
-    @DisplayName("예외 : 홈팀을 찾을 수 없으면 예외가 발생한다")
+    @DisplayName("홈팀을 찾을 수 없으면 해당 경기는 스킵되고 저장되지 않는다")
     @Test
-    void syncGameSchedule_homeTeamNotFound() {
+    void syncGameSchedule_homeTeamNotFound_skip() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         KboGameParam gameItem = new KboGameParam(
-                "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "존재하지않는원정팀", "SS", GameState.COMPLETED);
+                "20250721SSHH0",
+                TestFixture.getToday(),
+                0,
+                LocalTime.of(18, 30),
+                "잠실",
+                "존재하지않는홈팀",
+                "SS",
+                GameState.COMPLETED
+        );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
-
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
+        long before = gameRepository.count();
 
-        // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Team code match failed: 존재하지않는원정팀");
+        // when
+        gameScheduleSyncService.syncGameSchedule(yesterday);
+
+        // then
+        long after = gameRepository.count();
+        assertThat(after).isEqualTo(before);
     }
 
-    @DisplayName("예외 : 원정팀을 찾을 수 없으면 예외가 발생한다")
+    @DisplayName("원정팀을 찾을 수 없으면 해당 경기는 스킵되고 저장되지 않는다")
     @Test
-    void syncGameSchedule_awayTeamNotFound() {
+    void syncGameSchedule_awayTeamNotFound_skip() {
         // given
         LocalDate yesterday = TestFixture.getYesterday();
         KboGameParam gameItem = new KboGameParam(
-                "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "HH", "존재하지않는원정팀", GameState.COMPLETED);
+                "20250721SSHH0",
+                TestFixture.getToday(),
+                0,
+                LocalTime.of(18, 30),
+                "잠실",
+                "HH",
+                "존재하지않는원정팀",
+                GameState.COMPLETED
+        );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
-
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
+        long before = gameRepository.count();
 
-        // when & then
-        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Team code match failed: 존재하지않는원정팀");
+        // when
+        gameScheduleSyncService.syncGameSchedule(yesterday);
+
+        // then
+        long after = gameRepository.count();
+        assertThat(after).isEqualTo(before);
     }
 
     @DisplayName("경기 결과를 성공적으로 가져와서 저장한다")
