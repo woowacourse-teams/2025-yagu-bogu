@@ -28,10 +28,10 @@ public class KboGameResultClient {
     private final ObjectMapper objectMapper;
     private final KboClientExceptionHandler kboClientExceptionHandler;
 
-    public KboGameResultParam fetchGameResult(final Game game) {
+    public KboGameResultParam fetchGameResult(final Game game, final int srId) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("leId", "1");
-        params.add("srId", "0");
+        params.add("srId", Integer.toString(srId));
         params.add("seasonId", Integer.toString(game.getDate().getYear()));
         params.add("gameId", game.getGameCode());
 

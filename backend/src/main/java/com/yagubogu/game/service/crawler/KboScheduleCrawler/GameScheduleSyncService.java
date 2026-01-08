@@ -1,20 +1,18 @@
 package com.yagubogu.game.service.crawler.KboScheduleCrawler;
 
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.KboGameParam;
 import com.yagubogu.game.dto.KboGamesParam;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameSyncClient;
-import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,45 +41,71 @@ public class GameScheduleSyncService {
         List<Game> games = new ArrayList<>();
 
         for (KboGameParam kboGameItem : kboGamesParam.games()) {
-            games.add(buildGameFrom(kboGameItem));
+            buildGameFrom(kboGameItem).ifPresent(games::add);
         }
 
         return games;
     }
 
-    private Game buildGameFrom(final KboGameParam kboGameItem) {
-        Stadium stadium = getStadiumByLocation(kboGameItem.stadiumName());
-        Team homeTeam = getTeamByCode(kboGameItem.homeTeamCode());
-        Team awayTeam = getTeamByCode(kboGameItem.awayTeamCode());
-        LocalDate gameDate = kboGameItem.gameDate();
-        LocalTime startAt = kboGameItem.startAt();
-        String gameCode = kboGameItem.gameCode();
-        GameState gameState = kboGameItem.gameState();
+    private Optional<Game> buildGameFrom(final KboGameParam item) {
+        Optional<Stadium> stadiumOpt = findStadium(item);
+        if (stadiumOpt.isEmpty()) {
+            return Optional.empty();
+        }
 
-        return new Game(
-                stadium,
-                homeTeam,
-                awayTeam,
-                gameDate,
-                startAt,
-                gameCode,
+        Optional<Team> homeTeamOpt = findTeam(item.homeTeamCode(), "HOME", item);
+        Optional<Team> awayTeamOpt = findTeam(item.awayTeamCode(), "AWAY", item);
+        if (homeTeamOpt.isEmpty() || awayTeamOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new Game(
+                stadiumOpt.get(),
+                homeTeamOpt.get(),
+                awayTeamOpt.get(),
+                item.gameDate(),
+                item.startAt(),
+                item.gameCode(),
                 null,
                 null,
                 null,
                 null,
                 null,
                 null,
-                gameState
-        );
+                item.gameState()
+        ));
     }
 
-    private Stadium getStadiumByLocation(final String location) {
-        return stadiumRepository.findByLocation(location)
-                .orElseThrow(() -> new NotFoundException("Stadium name match failed: " + location));
+    private Optional<Stadium> findStadium(final KboGameParam item) {
+        Optional<Stadium> stadiumOpt = stadiumRepository.findByLocation(item.stadiumName());
+
+        if (stadiumOpt.isEmpty()) {
+            log.warn(
+                    "Game schedule skipped - stadium mapping failed: gameCode={}, stadiumName={}",
+                    item.gameCode(),
+                    item.stadiumName()
+            );
+        }
+
+        return stadiumOpt;
     }
 
-    private Team getTeamByCode(final String teamCode) {
-        return teamRepository.findByTeamCode(teamCode)
-                .orElseThrow(() -> new NotFoundException("Team code match failed: " + teamCode));
+    private Optional<Team> findTeam(
+            final String teamCode,
+            final String side,
+            final KboGameParam item
+    ) {
+        Optional<Team> teamOpt = teamRepository.findByTeamCode(teamCode);
+
+        if (teamOpt.isEmpty()) {
+            log.warn(
+                    "Game schedule skipped - team mapping failed: gameCode={}, side={}, teamCode={}",
+                    item.gameCode(),
+                    side,
+                    teamCode
+            );
+        }
+
+        return teamOpt;
     }
 }
