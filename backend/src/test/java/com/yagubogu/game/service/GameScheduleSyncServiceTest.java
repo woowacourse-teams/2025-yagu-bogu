@@ -90,24 +90,6 @@ class GameScheduleSyncServiceTest {
         assertThat(gameRepository.findByGameCode(gameItem.gameCode())).isPresent();
     }
 
-//    @DisplayName("예외: 경기장을 찾을 수 없으면 예외가 발생한다")
-//    @Test
-//    void syncGameSchedule_stadiumNotFound() {
-//        // given
-//        LocalDate yesterday = TestFixture.getYesterday();
-//        KboGameParam gameItem = new KboGameParam(
-//                "20250721SSHH0", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-//                "존재하지않는경기장", "HH", "SS", GameState.COMPLETED);
-//        KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
-//
-//        given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
-//
-//        // when & then
-//        assertThatThrownBy(() -> gameScheduleSyncService.syncGameSchedule(yesterday))
-//                .isInstanceOf(NotFoundException.class)
-//                .hasMessage("Stadium name match failed: 존재하지않는경기장");
-//    }
-
     @DisplayName("경기장을 찾을 수 없으면 해당 경기는 스킵되고 저장되지 않는다")
     @Test
     void syncGameSchedule_stadiumNotFound_skip() {
