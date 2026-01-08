@@ -3,6 +3,7 @@ package com.yagubogu.game.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import com.yagubogu.auth.config.AuthTestConfig;
@@ -77,7 +78,7 @@ class GameScheduleSyncServiceTest {
         LocalDate yesterday = TestFixture.getYesterday();
         KboGameParam gameItem = new KboGameParam(
                 "20250721OBLG3", TestFixture.getToday(), 0, LocalTime.of(18, 30),
-                "잠실", "HT", "OB", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED, 0);
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
 
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
@@ -120,7 +121,8 @@ class GameScheduleSyncServiceTest {
                 "존재하지않는경기장",
                 "HH",
                 "SS",
-                GameState.COMPLETED
+                GameState.COMPLETED,
+                0
         );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
@@ -147,7 +149,8 @@ class GameScheduleSyncServiceTest {
                 "잠실",
                 "존재하지않는홈팀",
                 "SS",
-                GameState.COMPLETED
+                GameState.COMPLETED,
+                0
         );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
@@ -174,7 +177,8 @@ class GameScheduleSyncServiceTest {
                 "잠실",
                 "HH",
                 "존재하지않는원정팀",
-                GameState.COMPLETED
+                GameState.COMPLETED,
+                0
         );
         KboGamesParam response = new KboGamesParam(List.of(gameItem), "100", "success");
         given(kboGameSyncClient.fetchGames(yesterday)).willReturn(response);
@@ -199,7 +203,7 @@ class GameScheduleSyncServiceTest {
         // 1. kboGameSyncClient Mocking (경기 목록 조회)
         KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
-                "잠실", "HT", "OB", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED, 0);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
@@ -217,7 +221,7 @@ class GameScheduleSyncServiceTest {
                 homePitcher,
                 awayPitcher
         );
-        given(kboGameResultClient.fetchGameResult(any(Game.class)))
+        given(kboGameResultClient.fetchGameResult(any(Game.class), eq(0)))
                 .willReturn(mockGameResult);
 
         ScoreBoard homeScoreBoardExpected = mockGameResult.homeScoreBoard();
@@ -246,7 +250,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
-                "잠실", "HT", "OB", GameState.LIVE);
+                "잠실", "HT", "OB", GameState.LIVE, 0);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
@@ -271,7 +275,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameParam kboGameParam = new KboGameParam(
                 gameCode, yesterday, 0, LocalTime.of(18, 30),
-                "잠실", "HT", "OB", GameState.CANCELED);
+                "잠실", "HT", "OB", GameState.CANCELED, 0);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 
@@ -295,7 +299,7 @@ class GameScheduleSyncServiceTest {
 
         KboGameParam kboGameParam = new KboGameParam(
                 unknownGameCode, yesterday, 0, LocalTime.of(18, 30),
-                "잠실", "HT", "OB", GameState.COMPLETED);
+                "잠실", "HT", "OB", GameState.COMPLETED, 0);
         given(kboGameSyncClient.fetchGames(yesterday))
                 .willReturn(new KboGamesParam(List.of(kboGameParam), "100", "success"));
 

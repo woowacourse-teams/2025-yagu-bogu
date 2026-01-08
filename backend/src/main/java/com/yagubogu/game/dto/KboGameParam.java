@@ -16,7 +16,8 @@ public record KboGameParam(
         String stadiumName,
         String awayTeamCode,
         String homeTeamCode,
-        GameState gameState
+        GameState gameState,
+        Integer srId
 ) {
 
     @JsonCreator
@@ -28,7 +29,8 @@ public record KboGameParam(
             @JsonProperty("S_NM") String stadiumName,
             @JsonProperty("AWAY_ID") String awayTeamCode,
             @JsonProperty("HOME_ID") String homeTeamCode,
-            @JsonProperty("GAME_STATE_SC") String gameState
+            @JsonProperty("GAME_STATE_SC") String gameState,
+            @JsonProperty("SR_ID") String srId
     ) {
         return new KboGameParam(
                 gameCode,
@@ -38,7 +40,8 @@ public record KboGameParam(
                 stadiumName,
                 awayTeamCode,
                 homeTeamCode,
-                GameState.from(Integer.valueOf(gameState))
+                GameState.from(Integer.valueOf(gameState)),
+                Integer.valueOf(srId)
         );
     }
 }
