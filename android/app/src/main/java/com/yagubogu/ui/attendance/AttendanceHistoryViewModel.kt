@@ -40,4 +40,9 @@ class AttendanceHistoryViewModel @Inject constructor(
                 }
         }
     }
+
+    companion object {
+        val START_MONTH: YearMonth = YearMonth.of(2021, 1)
+        val END_MONTH: YearMonth = YearMonth.now()
+    }
 }
