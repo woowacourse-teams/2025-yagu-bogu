@@ -70,7 +70,7 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
-    var currentMonth: YearMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+    val currentMonth: YearMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
     val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
     val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
 
@@ -89,7 +89,7 @@ fun AttendanceHistoryScreen(
         startMonth = startMonth,
         endMonth = endMonth,
         currentMonth = currentMonth,
-        onMonthChange = { month: YearMonth -> currentMonth = month },
+        onMonthChange = viewModel::updateCurrentMonth,
         viewType = viewType,
         onViewTypeChange = { viewType = viewType.toggle() },
         items = attendanceItems,
