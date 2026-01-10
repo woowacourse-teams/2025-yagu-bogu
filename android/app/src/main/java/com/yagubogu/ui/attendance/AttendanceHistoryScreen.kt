@@ -1,12 +1,14 @@
 package com.yagubogu.ui.attendance
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -28,40 +25,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
-import com.yagubogu.ui.attendance.component.AttendanceItem
+import com.yagubogu.ui.attendance.component.AttendanceCalendarContent
+import com.yagubogu.ui.attendance.component.AttendanceListContent
+import com.yagubogu.ui.attendance.component.YearMonthPickerDialog
 import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
+import com.yagubogu.ui.attendance.model.AttendanceHistoryViewType
+import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
-import com.yagubogu.ui.theme.Gray300
+import com.yagubogu.ui.theme.Gray200
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.PretendardMedium
-import com.yagubogu.ui.theme.PretendardRegular
+import com.yagubogu.ui.theme.PretendardSemiBold20
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.BackPressHandler
-import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import java.time.YearMonth
 
 @Composable
 fun AttendanceHistoryScreen(
@@ -71,243 +70,262 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
-    val filter: AttendanceHistoryFilter by viewModel.attendanceFilter.collectAsStateWithLifecycle()
-    val sort: AttendanceHistorySort by viewModel.attendanceSort.collectAsStateWithLifecycle()
-    val detailItemPosition: Int? by viewModel.detailItemPosition.collectAsStateWithLifecycle()
+    val currentMonth: YearMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
+    val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
+    val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
 
+    var viewType: AttendanceHistoryViewType by rememberSaveable {
+        mutableStateOf(AttendanceHistoryViewType.CALENDAR)
+    }
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAttendanceHistoryItems()
+    LaunchedEffect(viewType) {
+        viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth)
     }
 
     BackPressHandler(snackbarHostState, coroutineScope)
 
-    when (attendanceItems.isNotEmpty()) {
-        true ->
-            AttendanceHistoryScreen(
-                items = attendanceItems,
-                detailItemPosition = detailItemPosition,
-                onItemClick = viewModel::onItemClick,
+    AttendanceHistoryScreen(
+        startMonth = startMonth,
+        endMonth = endMonth,
+        currentMonth = currentMonth,
+        onMonthChange = viewModel::updateCurrentMonth,
+        viewType = viewType,
+        onViewTypeChange = { viewType = viewType.toggle() },
+        items = attendanceItems,
+        updateItems = { filter: AttendanceHistoryFilter, sort: AttendanceHistorySort ->
+            viewModel.fetchAttendanceHistoryItems(
+                yearMonth = currentMonth,
                 filter = filter,
-                onFilterClick = viewModel::updateAttendanceFilter,
                 sort = sort,
-                onSortClick = viewModel::switchAttendanceSort,
-                modifier = modifier,
-                scrollToTopEvent = scrollToTopEvent,
             )
-
-        false -> EmptyAttendanceHistoryScreen()
-    }
+        },
+        modifier = modifier,
+        scrollToTopEvent = scrollToTopEvent,
+    )
 }
 
 @Composable
 private fun AttendanceHistoryScreen(
+    startMonth: YearMonth,
+    endMonth: YearMonth,
+    currentMonth: YearMonth,
+    onMonthChange: (YearMonth) -> Unit,
+    viewType: AttendanceHistoryViewType,
+    onViewTypeChange: () -> Unit,
     items: List<AttendanceHistoryItem>,
-    detailItemPosition: Int?,
-    onItemClick: (AttendanceHistoryItem) -> Unit,
-    filter: AttendanceHistoryFilter,
-    onFilterClick: (AttendanceHistoryFilter) -> Unit,
-    sort: AttendanceHistorySort,
-    onSortClick: () -> Unit,
+    updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    val lazyListState: LazyListState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        scrollToTopEvent.collect {
-            lazyListState.animateScrollToItem(0)
-        }
-    }
-
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(horizontal = 20.dp)
                 .padding(top = 8.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AttendanceHistoryFilterDropdown(filter = filter, onClick = onFilterClick)
-            AttendanceHistorySortSwitch(sort = sort, onClick = onSortClick)
-        }
+        AttendanceHistoryHeader(
+            startMonth = startMonth,
+            endMonth = endMonth,
+            currentMonth = currentMonth,
+            onMonthChange = onMonthChange,
+            viewType = viewType,
+            onViewTypeChange = onViewTypeChange,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn(
-            state = lazyListState,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(top = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(
-                count = items.size,
-                key = { index: Int -> items[index].summary.id },
-            ) { index: Int ->
-                val item: AttendanceHistoryItem = items[index]
-                AttendanceItem(
-                    item = item,
-                    isExpanded = index == detailItemPosition,
-                    onItemClick = onItemClick,
+        when (viewType) {
+            AttendanceHistoryViewType.CALENDAR ->
+                AttendanceCalendarContent(
+                    items = items,
+                    startMonth = startMonth,
+                    endMonth = endMonth,
+                    currentMonth = currentMonth,
+                    onMonthChange = onMonthChange,
+                    scrollToTopEvent = scrollToTopEvent,
                 )
-            }
-            item { Spacer(modifier = Modifier.height(4.dp)) }
+
+            AttendanceHistoryViewType.LIST ->
+                AttendanceListContent(
+                    items = items,
+                    updateItems = updateItems,
+                    scrollToTopEvent = scrollToTopEvent,
+                )
         }
     }
 }
 
 @Composable
-private fun EmptyAttendanceHistoryScreen(modifier: Modifier = Modifier) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(Gray050),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.img_baseball_scoreboard),
-            contentDescription = stringResource(R.string.attendance_history_empty_scoreboard_illustration_description),
-            modifier =
-                Modifier
-                    .height(140.dp)
-                    .fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(30.dp))
-        Text(
-            text = stringResource(R.string.attendance_history_empty_description),
-            style = PretendardMedium.copy(fontSize = 18.sp, color = Gray400),
-        )
-    }
-}
-
-@Composable
-private fun AttendanceHistoryFilterDropdown(
-    filter: AttendanceHistoryFilter,
-    onClick: (AttendanceHistoryFilter) -> Unit,
+private fun AttendanceHistoryHeader(
+    startMonth: YearMonth,
+    endMonth: YearMonth,
+    currentMonth: YearMonth,
+    onMonthChange: (YearMonth) -> Unit,
+    viewType: AttendanceHistoryViewType,
+    onViewTypeChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        Row(
-            modifier = Modifier.noRippleClickable { isExpanded = !isExpanded },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text =
-                    stringResource(
-                        when (filter) {
-                            AttendanceHistoryFilter.ALL -> R.string.attendance_history_all
-                            AttendanceHistoryFilter.WIN -> R.string.attendance_history_win
-                        },
-                    ),
-                style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                modifier = Modifier.size(20.dp),
-                painter = painterResource(id = R.drawable.ic_arrow_down),
-                contentDescription = null,
-                tint = Gray500,
-            )
-        }
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            offset = DpOffset(0.dp, 4.dp),
-            containerColor = White,
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(0.4.dp, Gray300),
-            modifier =
-                Modifier
-                    .crop(vertical = 8.dp)
-                    .padding(vertical = 4.dp),
-        ) {
-            AttendanceHistoryFilter.entries.forEach { filter: AttendanceHistoryFilter ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text =
-                                stringResource(
-                                    when (filter) {
-                                        AttendanceHistoryFilter.ALL -> R.string.attendance_history_all
-                                        AttendanceHistoryFilter.WIN -> R.string.attendance_history_win
-                                    },
-                                ),
-                            style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
-                        )
-                    },
-                    onClick = {
-                        onClick(filter)
-                        isExpanded = false
-                        Firebase.analytics.logEvent("attendance_history_change_filter", null)
-                    },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                    modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
-                )
-            }
-        }
-    }
-}
+    val isStartMonth: Boolean = currentMonth == startMonth
+    val isEndMonth: Boolean = currentMonth == endMonth
 
-@Composable
-private fun AttendanceHistorySortSwitch(
-    sort: AttendanceHistorySort,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+    var showDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+    if (showDialog) {
+        YearMonthPickerDialog(
+            startMonth = startMonth,
+            endMonth = endMonth,
+            currentMonth = currentMonth,
+            onConfirm = { newMonth: YearMonth ->
+                onMonthChange(newMonth)
+                showDialog = false
+            },
+            onCancel = { showDialog = false },
+        )
+    }
+
     Row(
         modifier =
             modifier
-                .noRippleClickable {
-                    onClick()
-                    Firebase.analytics.logEvent("attendance_history_change_sort", null)
-                },
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            text =
-                stringResource(
-                    when (sort) {
-                        AttendanceHistorySort.LATEST -> R.string.attendance_history_latest
-                        AttendanceHistorySort.OLDEST -> R.string.attendance_history_oldest
-                    },
-                ),
-            style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Icon(
-            modifier = Modifier.size(16.dp),
-            painter = painterResource(id = R.drawable.ic_switch),
-            contentDescription = null,
-            tint = Gray500,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_left),
+                contentDescription = null,
+                tint = if (isStartMonth) Gray400 else Black,
+                modifier =
+                    Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .clickable(
+                            enabled = !isStartMonth,
+                            onClick = { onMonthChange(currentMonth.minusMonths(1)) },
+                        ),
+            )
+            Text(
+                text =
+                    stringResource(
+                        R.string.attendance_history_year_month,
+                        currentMonth.year,
+                        currentMonth.monthValue,
+                    ),
+                style = PretendardSemiBold20,
+                modifier =
+                    Modifier
+                        .width(140.dp)
+                        .noRippleClickable { showDialog = true },
+                textAlign = TextAlign.Center,
+            )
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                tint = if (isEndMonth) Gray400 else Black,
+                modifier =
+                    Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .clickable(
+                            enabled = !isEndMonth,
+                            onClick = { onMonthChange(currentMonth.plusMonths(1)) },
+                        ),
+            )
+        }
+        AttendanceViewToggle(
+            viewType = viewType,
+            onChange = onViewTypeChange,
         )
     }
 }
 
-@Preview("직관내역 화면")
 @Composable
-private fun AttendanceHistoryScreenPreview() {
+private fun AttendanceViewToggle(
+    viewType: AttendanceHistoryViewType,
+    onChange: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // -1f: 왼쪽 끝, 1f: 오른쪽 끝
+    val alignBias: Float by animateFloatAsState(
+        targetValue =
+            when (viewType) {
+                AttendanceHistoryViewType.CALENDAR -> -1f
+                AttendanceHistoryViewType.LIST -> 1f
+            },
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+    )
+
+    Box(
+        modifier =
+            modifier
+                .background(color = White, shape = CircleShape)
+                .border(width = 1.dp, color = Gray200, shape = CircleShape)
+                .noRippleClickable(onClick = onChange)
+                .padding(4.dp),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .size(28.dp)
+                    .align(BiasAlignment(horizontalBias = alignBias, verticalBias = 0f))
+                    .background(color = Gray500, shape = CircleShape),
+        )
+
+        Row(
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_calendar),
+                contentDescription = null,
+                tint = if (viewType == AttendanceHistoryViewType.CALENDAR) White else Gray500,
+                modifier = Modifier.size(16.dp),
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Icon(
+                painter = painterResource(R.drawable.ic_list),
+                contentDescription = null,
+                tint = if (viewType == AttendanceHistoryViewType.LIST) White else Gray500,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
+}
+
+@Preview("캘린더 화면")
+@Composable
+private fun AttendanceCalenderScreenPreview() {
     AttendanceHistoryScreen(
+        startMonth = AttendanceHistoryViewModel.START_MONTH,
+        endMonth = AttendanceHistoryViewModel.END_MONTH,
+        currentMonth = YearMonth.now(),
+        onMonthChange = {},
+        viewType = AttendanceHistoryViewType.CALENDAR,
+        onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
-        detailItemPosition = 0,
-        onItemClick = {},
-        filter = AttendanceHistoryFilter.ALL,
-        onFilterClick = {},
-        sort = AttendanceHistorySort.LATEST,
-        onSortClick = {},
+        updateItems = { _, _ -> },
     )
 }
 
-@Preview("빈 직관내역 화면")
+@Preview("리스트 화면")
 @Composable
-private fun EmptyAttendanceHistoryScreenPreview() {
-    EmptyAttendanceHistoryScreen()
+private fun AttendanceListScreenPreview() {
+    AttendanceHistoryScreen(
+        startMonth = AttendanceHistoryViewModel.START_MONTH,
+        endMonth = AttendanceHistoryViewModel.END_MONTH,
+        currentMonth = YearMonth.now(),
+        onMonthChange = {},
+        viewType = AttendanceHistoryViewType.LIST,
+        onViewTypeChange = {},
+        items = ATTENDANCE_HISTORY_ITEMS,
+        updateItems = { _, _ -> },
+    )
 }

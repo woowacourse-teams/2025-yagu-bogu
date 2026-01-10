@@ -1,4 +1,4 @@
-package com.yagubogu.ui.common.component.shape
+package com.yagubogu.ui.common.component
 
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.ui.geometry.Offset
@@ -76,6 +76,12 @@ class ParallelogramShape(
             }
         return Outline.Generic(path)
     }
+}
+
+enum class CornerStyle {
+    ROUNDED,
+    INNER_ROUNDED,
+    CUT,
 }
 
 private fun drawRoundedParallelogramShape(

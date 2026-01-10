@@ -56,7 +56,7 @@ val ATTENDANCE_HISTORY_ITEM_CANCELED =
         summary =
             AttendanceHistoryItem.Summary(
                 id = 1L,
-                attendanceDate = LocalDate.now(),
+                attendanceDate = LocalDate.now().minusDays(2L),
                 stadiumName = "잠실 야구장",
                 awayTeam =
                     GameTeam(
@@ -81,6 +81,18 @@ val ATTENDANCE_HISTORY_ITEMS =
     listOf(
         ATTENDANCE_HISTORY_ITEM_PLAYED,
         ATTENDANCE_HISTORY_ITEM_CANCELED,
-        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(summary = ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(id = 2L)),
-        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(summary = ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(id = 3L)),
+        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
+            summary =
+                ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
+                    id = 2L,
+                    attendanceDate = LocalDate.now().minusDays(15L),
+                ),
+        ),
+        ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
+            summary =
+                ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
+                    id = 3L,
+                    attendanceDate = LocalDate.now().minusDays(5L),
+                ),
+        ),
     )

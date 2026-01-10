@@ -58,7 +58,7 @@ fun VsTeamWinRates(
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.noRippleClickable(onShowMoreClick),
+            modifier = Modifier.noRippleClickable(onClick = onShowMoreClick),
         ) {
             vsTeamStatItems.forEach { vsTeamStatItem: VsTeamStatItem ->
                 VsTeamStatItem(vsTeamStatItem = vsTeamStatItem)

@@ -32,7 +32,7 @@ fun Badge(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.noRippleClickable(onClick),
+        modifier = modifier.noRippleClickable(onClick = onClick),
     ) {
         var isLoading by rememberSaveable { mutableStateOf(true) }
 

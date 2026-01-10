@@ -40,7 +40,7 @@ fun ShowMoreButton(
         modifier =
             modifier
                 .fillMaxWidth()
-                .noRippleClickable(onClick)
+                .noRippleClickable(onClick = onClick)
                 .border((0.6).dp, Gray300, RoundedCornerShape(12.dp))
                 .background(color = White, shape = RoundedCornerShape(12.dp))
                 .padding(vertical = 8.dp),

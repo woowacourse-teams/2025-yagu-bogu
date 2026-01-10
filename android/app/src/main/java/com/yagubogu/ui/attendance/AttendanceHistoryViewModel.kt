@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,60 +24,32 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
-    private val _detailItemPosition = MutableStateFlow<Int?>(null)
-    val detailItemPosition: StateFlow<Int?> = _detailItemPosition.asStateFlow()
+    private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
 
-    private val _attendanceFilter = MutableStateFlow(AttendanceHistoryFilter.ALL)
-    val attendanceFilter: StateFlow<AttendanceHistoryFilter> = _attendanceFilter.asStateFlow()
-
-    private val _attendanceSort = MutableStateFlow(AttendanceHistorySort.LATEST)
-    val attendanceSort: StateFlow<AttendanceHistorySort> = _attendanceSort.asStateFlow()
-
-    fun fetchAttendanceHistoryItems(year: Int = LocalDate.now().year) {
+    fun fetchAttendanceHistoryItems(
+        yearMonth: YearMonth = YearMonth.now(),
+        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
+        sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
+    ) {
         viewModelScope.launch {
-            val filter: AttendanceHistoryFilter = attendanceFilter.value
-            val sort: AttendanceHistorySort = attendanceSort.value
             checkInRepository
-                .getCheckInHistories(year, filter.name, sort.name)
+                .getCheckInHistories(yearMonth.year, filter.name, sort.name)
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
-                    _detailItemPosition.value =
-                        if (attendanceItems.isNotEmpty()) FIRST_INDEX else null
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
         }
     }
 
-    fun updateAttendanceFilter(filter: AttendanceHistoryFilter) {
-        if (attendanceFilter.value != filter) {
-            _attendanceFilter.value = filter
-            fetchAttendanceHistoryItems()
-        }
-    }
-
-    fun switchAttendanceSort() {
-        _attendanceSort.value =
-            when (attendanceSort.value) {
-                AttendanceHistorySort.LATEST -> AttendanceHistorySort.OLDEST
-                AttendanceHistorySort.OLDEST -> AttendanceHistorySort.LATEST
-            }
-        fetchAttendanceHistoryItems()
-    }
-
-    fun onItemClick(item: AttendanceHistoryItem) {
-        val position: Int = items.value.indexOf(item)
-        if (position < FIRST_INDEX) return
-
-        if (position == detailItemPosition.value) {
-            _detailItemPosition.value = null
-        } else {
-            _detailItemPosition.value = position
-        }
+    fun updateCurrentMonth(yearMonth: YearMonth) {
+        _currentMonth.value = yearMonth
     }
 
     companion object {
-        private const val FIRST_INDEX = 0
+        val START_MONTH: YearMonth = YearMonth.of(2021, 1)
+        val END_MONTH: YearMonth = YearMonth.now()
     }
 }
