@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameWithCheckInDto(
     @SerialName("gameId")
-    val gameId: Long, // 경기 (톡방) 아이디
+    val gameId: Long, // 경기 아이디
     @SerialName("totalCheckIns")
-    val totalCheckIns: Int, // 경기장에 인증한 사람 수
+    val totalCheckIns: Long, // 경기장에 인증한 사람 수
     @SerialName("isMyCheckIn")
     val isMyCheckIn: Boolean, // 인증 여부
     @SerialName("stadium")
