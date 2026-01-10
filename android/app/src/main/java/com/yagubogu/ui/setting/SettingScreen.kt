@@ -30,6 +30,8 @@ import com.yagubogu.ui.theme.White
 fun SettingScreen(
     navigateToParent: () -> Unit,
     navigateToBottom: () -> Unit,
+    navigateToFavoriteTeam: () -> Unit,
+    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -73,18 +75,29 @@ fun SettingScreen(
                     entry<SettingNavKey.SettingMain> {
                         SettingMainScreen(
                             onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                            onFavoriteTeamEditClick = { navigateToFavoriteTeam() },
                         )
                     }
                     entry<SettingNavKey.SettingAccount> {
                         SettingAccountScreen(
                             onClickDeleteAccount = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                            navigateToLogin = {
+                                navigator.clearStack()
+                                navigateToLogin()
+                            },
                         )
                     }
                     entry<SettingNavKey.SettingDeleteAccount> {
-                        SettingDeleteAccountScreen(navigateToHome = {
-                            navigator.clearStack()
-                            navigateToBottom()
-                        })
+                        SettingDeleteAccountScreen(
+                            navigateToHome = {
+                                navigator.clearStack()
+                                navigateToBottom()
+                            },
+                            navigateToLogin = {
+                                navigator.clearStack()
+                                navigateToLogin()
+                            },
+                        )
                     }
                 }
 

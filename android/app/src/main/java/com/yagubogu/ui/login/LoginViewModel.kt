@@ -1,17 +1,24 @@
-package com.yagubogu.presentation.login
+package com.yagubogu.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.token.TokenRepository
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
-import com.yagubogu.presentation.login.auth.GoogleCredentialResult
-import com.yagubogu.presentation.login.model.LoginResult
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.auth.GoogleCredentialResult
+import com.yagubogu.ui.login.model.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,8 +29,11 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-    private val _loginResult = MutableLiveData<LoginResult>()
-    val loginResult: LiveData<LoginResult> get() = _loginResult
+    private val _loginResult = MutableSharedFlow<LoginResult>()
+    val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
+
+    private val _canAutoLogin = MutableStateFlow<Boolean?>(null)
+    val canAutoLogin: StateFlow<Boolean?> = _canAutoLogin.asStateFlow()
 
     suspend fun isTokenValid(): Boolean = tokenRepository.refreshTokens().isSuccess
 
@@ -54,18 +64,46 @@ class LoginViewModel @Inject constructor(
                             )
                     }
 
-                    is GoogleCredentialResult.Failure -> LoginResult.Failure(googleCredentialResult.exception)
-                    GoogleCredentialResult.Suspending -> LoginResult.Failure(null)
-                    GoogleCredentialResult.Cancel -> LoginResult.Cancel
+                    is GoogleCredentialResult.Failure -> {
+                        LoginResult.Failure(googleCredentialResult.exception)
+                    }
+
+                    GoogleCredentialResult.Suspending -> {
+                        LoginResult.Failure(null)
+                    }
+
+                    GoogleCredentialResult.Cancel -> {
+                        LoginResult.Cancel
+                    }
                 }
 
-            _loginResult.value = loginResult
+            _loginResult.emit(loginResult)
         }
     }
 
     fun signOutWithGoogle(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
             googleCredentialManager.signOut()
+        }
+    }
+
+    fun handleAutoLogin(onAppInitialized: () -> Unit) {
+        viewModelScope.launch {
+            if (!isTokenValid()) {
+                _canAutoLogin.emit(false)
+                onAppInitialized()
+                return@launch
+            }
+            Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+
+            val loginResult =
+                when (isNewUser()) {
+                    true -> LoginResult.SignUp
+                    false -> LoginResult.SignIn
+                }
+            _loginResult.emit(loginResult)
+            _canAutoLogin.emit(true)
+            onAppInitialized()
         }
     }
 }

@@ -28,6 +28,7 @@ class BadgeViewModelTest :
                 // given & when
                 memberRepository = MemberFakeRepository(isFailureMode = false)
                 badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel.fetchBadges()
 
                 advanceUntilIdle()
 
@@ -41,6 +42,7 @@ class BadgeViewModelTest :
                 // given & when
                 memberRepository = MemberFakeRepository(isFailureMode = true)
                 badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel.fetchBadges()
 
                 advanceUntilIdle()
 
@@ -59,6 +61,7 @@ class BadgeViewModelTest :
                             listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
                 badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel.fetchBadges()
                 badgeViewModel.updateRepresentativeBadge(0)
 
                 // when - 대표 배지 1번으로 설정 요청
@@ -84,6 +87,7 @@ class BadgeViewModelTest :
                             listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
                 badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel.fetchBadges()
                 advanceUntilIdle()
 
                 // when - 대표 배지 1번으로 설정 요청, 실패

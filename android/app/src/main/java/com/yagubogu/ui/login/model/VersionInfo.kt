@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login.model
+package com.yagubogu.ui.login.model
 
 data class VersionInfo private constructor(
     val major: Int,

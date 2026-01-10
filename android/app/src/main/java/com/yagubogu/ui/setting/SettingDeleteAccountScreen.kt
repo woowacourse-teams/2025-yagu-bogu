@@ -48,6 +48,7 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun SettingDeleteAccountScreen(
     navigateToHome: () -> Unit,
+    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -68,6 +69,7 @@ fun SettingDeleteAccountScreen(
     SettingEventHandler(
         settingEvent = settingEvent.value,
         navigateToHome = navigateToHome,
+        navigateToLogin = navigateToLogin,
     )
 }
 
