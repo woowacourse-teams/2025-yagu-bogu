@@ -20,6 +20,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -51,6 +52,10 @@ fun BadgeScreen(
     modifier: Modifier = Modifier,
     viewModel: BadgeViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.fetchBadges()
+    }
+
     BadgeScreen(
         badgeUiState = viewModel.badgeUiState.value,
         onBackClick = navigateToMain,
