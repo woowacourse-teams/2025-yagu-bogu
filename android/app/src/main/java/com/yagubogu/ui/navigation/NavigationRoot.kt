@@ -24,7 +24,13 @@ fun NavigationRoot(
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = startRoute,
-            topLevelRoutes = setOf(Route.BottomRoute, Route.LoginRoute, Route.SettingRoute),
+            topLevelRoutes =
+                setOf(
+                    Route.BottomRoute,
+                    Route.LoginRoute,
+                    Route.SettingRoute,
+                    Route.FavoriteTeamRoute,
+                ),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
 
@@ -48,12 +54,14 @@ fun NavigationRoot(
                     navigateToParent = { navigator.goBack() },
                     navigateToBottom = { navigator.navigate(Route.BottomRoute) },
                     navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeamRoute) },
-                    navigateToLogin = { navigator.navigate(Route.LoginRoute) },
+                    navigateToLogin = { navigator.clearStackAndNavigate(Route.LoginRoute) },
                 )
             }
             entry<Route.FavoriteTeamRoute> {
                 FavoriteTeamScreen(
-                    navigateToMain = { navigator.navigate(Route.BottomRoute) },
+                    navigateToMain = {
+                        navigator.navigate(Route.BottomRoute)
+                    },
                 )
             }
             entry<Route.BadgeRoute> {
