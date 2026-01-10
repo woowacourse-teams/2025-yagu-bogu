@@ -19,10 +19,6 @@
         android:theme="@style/Theme.YaguBogu"
         tools:targetApi="31">
         <activity
-            android:name=".ui.badge.BadgeActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".presentation.setting.SettingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -35,8 +31,7 @@
             android:name=".presentation.login.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.App.Starting">
-        </activity>
+            android:theme="@style/Theme.App.Starting" />
         <activity
             android:name=".presentation.favorite.FavoriteTeamActivity"
             android:exported="false"
@@ -44,7 +39,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

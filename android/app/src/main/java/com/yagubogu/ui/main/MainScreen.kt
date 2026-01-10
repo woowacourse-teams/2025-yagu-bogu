@@ -40,6 +40,7 @@ import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.BottomNavKey
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
+import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.stats.StatsScreen
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
+    parentNavigator: Navigator,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -88,7 +90,7 @@ fun MainScreen(
                                 selectedItem.label
                             },
                         ),
-                    onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                    onBadgeClick = { parentNavigator.navigate(Route.BadgeRoute) },
                     onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
                 )
             },

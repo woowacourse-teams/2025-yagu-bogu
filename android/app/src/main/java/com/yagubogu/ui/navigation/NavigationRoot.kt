@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.favorite.FavoriteTeamScreen
 import com.yagubogu.ui.login.LoginScreen
 import com.yagubogu.ui.main.MainScreen
@@ -35,10 +36,15 @@ fun NavigationRoot(
                 )
             }
             entry<Route.BottomRoute> {
-                MainScreen()
+                MainScreen(parentNavigator = navigator)
             }
             entry<Route.FavoriteTeamRoute> {
                 FavoriteTeamScreen(
+                    navigateToMain = { navigator.navigate(Route.BottomRoute) },
+                )
+            }
+            entry<Route.BadgeRoute> {
+                BadgeScreen(
                     navigateToMain = { navigator.navigate(Route.BottomRoute) },
                 )
             }

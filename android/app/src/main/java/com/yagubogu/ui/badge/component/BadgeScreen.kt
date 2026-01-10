@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.R
 import com.yagubogu.ui.badge.BadgeUiState
 import com.yagubogu.ui.badge.BadgeViewModel
@@ -45,13 +46,13 @@ private const val COLUMN_SIZE = 2
 
 @Composable
 fun BadgeScreen(
-    viewModel: BadgeViewModel,
-    onBackClick: () -> Unit,
+    navigateToMain: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: BadgeViewModel = hiltViewModel(),
 ) {
     BadgeScreen(
         badgeUiState = viewModel.badgeUiState.value,
-        onBackClick = onBackClick,
+        onBackClick = navigateToMain,
         onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
         modifier = modifier,
     )

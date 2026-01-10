@@ -15,4 +15,7 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object FavoriteTeamRoute : Route
+
+    @Serializable
+    data object BadgeRoute : Route
 }
