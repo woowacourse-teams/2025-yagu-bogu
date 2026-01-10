@@ -12,7 +12,7 @@ import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenStates
 @Composable
 fun LivetalkChatDialogs(
     state: LivetalkChatScreenStates,
-    actions: LivetalkChatScreenActions,
+    actions: LivetalkChatScreenActions.Dialog,
 ) {
     // 삭제 다이얼로그
     state.pendingDeleteChat?.let { chat ->

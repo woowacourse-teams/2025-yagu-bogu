@@ -95,26 +95,41 @@ fun LivetalkChatScreen(
         )
 
     val actions =
-        remember(viewModel, onBackClick) {
+        remember {
             LivetalkChatScreenActions(
-                onMessageTextChange = messageStateHolder::updateMessageText,
-                onRequestDelete = messageStateHolder::requestDelete,
-                onRequestReport = messageStateHolder::requestReport,
-                onDismissDeleteDialog = messageStateHolder::dismissDeleteDialog,
-                onDismissReportDialog = messageStateHolder::dismissReportDialog,
-                onBackClick = onBackClick,
-                onEmojiButtonPositioned = { pos -> emojiButtonPos = pos },
-                onCheeringClick = { emoji ->
-                    generateEmojiAnimation(emoji)
-                    viewModel.addLikeToBatch()
-                },
-                onAnimationFinished = { item -> emojiQueue.remove(item) },
-                onSendMessage = viewModel::sendMessage,
-                onFetchMemberProfile = viewModel::fetchMemberProfile,
-                onFetchBeforeTalks = viewModel::fetchBeforeTalks,
-                onDeleteMessage = viewModel::deleteMessage,
-                onReportMessage = viewModel::reportMessage,
-                onDismissProfile = viewModel::dismissProfile,
+                chatToolbar = LivetalkChatScreenActions.ChatToolbar(onBackClick = onBackClick),
+                chatInputBar =
+                    LivetalkChatScreenActions.ChatInputBar(
+                        onMessageTextChange = messageStateHolder::updateMessageText,
+                        onSendMessage = viewModel::sendMessage,
+                    ),
+                chatBubbleItems =
+                    LivetalkChatScreenActions.ChatBubbleItems(
+                        onRequestDelete = messageStateHolder::requestDelete,
+                        onRequestReport = messageStateHolder::requestReport,
+                        onFetchMemberProfile = viewModel::fetchMemberProfile,
+                        onFetchBeforeTalks = viewModel::fetchBeforeTalks,
+                    ),
+                chatCheering =
+                    LivetalkChatScreenActions.ChatCheering(
+                        onCheeringClick = { emoji ->
+                            generateEmojiAnimation(emoji)
+                            viewModel.addLikeToBatch()
+                        },
+                        onEmojiButtonPositioned = { pos -> emojiButtonPos = pos },
+                    ),
+                floatingEmojiItem =
+                    LivetalkChatScreenActions.FloatingEmojiItem(
+                        onAnimationFinished = { item -> emojiQueue.remove(item) },
+                    ),
+                dialog =
+                    LivetalkChatScreenActions.Dialog(
+                        onDeleteMessage = viewModel::deleteMessage,
+                        onReportMessage = viewModel::reportMessage,
+                        onDismissProfile = viewModel::dismissProfile,
+                        onDismissDeleteDialog = messageStateHolder::dismissDeleteDialog,
+                        onDismissReportDialog = messageStateHolder::dismissReportDialog,
+                    ),
             )
         }
 
@@ -171,7 +186,7 @@ fun LivetalkChatScreenContent(
         topBar = {
             LivetalkChatToolbar(
                 teams = state.teams,
-                onBackClick = actions.onBackClick,
+                onBackClick = actions.chatToolbar.onBackClick,
             )
         },
         bottomBar = {
@@ -179,8 +194,8 @@ fun LivetalkChatScreenContent(
                 messageFormText = state.messageText,
                 stadiumName = state.teams?.stadiumName,
                 isVerified = state.isVerified,
-                onTextChange = actions.onMessageTextChange,
-                onSendMessage = actions.onSendMessage,
+                onTextChange = actions.chatInputBar.onMessageTextChange,
+                onSendMessage = actions.chatInputBar.onSendMessage,
             )
         },
         containerColor = Gray050,
@@ -205,10 +220,10 @@ fun LivetalkChatScreenContent(
                         LivetalkChatBubbleList(
                             chatItems = state.livetalkChatBubbleItems,
                             modifier = Modifier.weight(1f),
-                            onDeleteClick = actions.onRequestDelete,
-                            onReportClick = actions.onRequestReport,
-                            onProfileClick = { actions.onFetchMemberProfile(it.memberId) },
-                            fetchBeforeTalks = { actions.onFetchBeforeTalks() },
+                            onDeleteClick = actions.chatBubbleItems.onRequestDelete,
+                            onReportClick = actions.chatBubbleItems.onRequestReport,
+                            onProfileClick = { actions.chatBubbleItems.onFetchMemberProfile(it.memberId) },
+                            fetchBeforeTalks = { actions.chatBubbleItems.onFetchBeforeTalks() },
                         )
                     }
 
@@ -232,9 +247,9 @@ fun LivetalkChatScreenContent(
                             team = myTeam,
                             cheeringCount = state.showingLikeCount,
                             onCheeringClick = {
-                                actions.onCheeringClick(myTeam.emoji)
+                                actions.chatCheering.onCheeringClick(myTeam.emoji)
                             },
-                            onPositioned = actions.onEmojiButtonPositioned,
+                            onPositioned = actions.chatCheering.onEmojiButtonPositioned,
                         )
                     }
 
@@ -253,14 +268,14 @@ fun LivetalkChatScreenContent(
                         emoji = item.emoji,
                         startOffset = item.startOffset,
                         onAnimationFinished = {
-                            actions.onAnimationFinished(item)
+                            actions.floatingEmojiItem.onAnimationFinished(item)
                         },
                     )
                 }
             }
 
             // 다이얼로그 레이어
-            LivetalkChatDialogs(state = state, actions = actions)
+            LivetalkChatDialogs(state = state, actions = actions.dialog)
         }
     }
 }
