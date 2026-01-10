@@ -13,6 +13,7 @@ import com.yagubogu.ui.favorite.FavoriteTeamScreen
 import com.yagubogu.ui.login.LoginScreen
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.main.MainScreen
+import com.yagubogu.ui.setting.SettingScreen
 
 @Composable
 fun NavigationRoot(
@@ -38,6 +39,9 @@ fun NavigationRoot(
             }
             entry<Route.BottomRoute> {
                 MainScreen(parentNavigator = navigator)
+            }
+            entry<Route.SettingRoute> {
+                SettingScreen(parentNavigator = navigator)
             }
             entry<Route.FavoriteTeamRoute> {
                 FavoriteTeamScreen(

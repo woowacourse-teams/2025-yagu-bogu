@@ -69,7 +69,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
-        Timber.d("$isAppInitialized")
         setContent {
             YaguBoguTheme {
                 val canAutoLogin: Boolean? by loginViewModel.canAutoLogin.collectAsStateWithLifecycle()
