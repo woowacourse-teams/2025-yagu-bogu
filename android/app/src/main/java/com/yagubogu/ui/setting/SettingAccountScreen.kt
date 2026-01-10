@@ -27,6 +27,7 @@ import com.yagubogu.ui.theme.Gray050
 @Composable
 fun SettingAccountScreen(
     onClickDeleteAccount: () -> Unit,
+    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -36,6 +37,7 @@ fun SettingAccountScreen(
     SettingAccountScreen(
         onClickLogout = { viewModel.emitDialogEvent(SettingDialogEvent.LogoutDialog) },
         onClickDeleteAccount = onClickDeleteAccount,
+        navigateToLogin = navigateToLogin,
         settingEvent = settingEvent.value,
         modifier = modifier,
     )
@@ -47,6 +49,7 @@ fun SettingAccountScreen(
 private fun SettingAccountScreen(
     onClickLogout: () -> Unit,
     onClickDeleteAccount: () -> Unit,
+    navigateToLogin: () -> Unit,
     settingEvent: SettingEvent?,
     modifier: Modifier = Modifier,
 ) {
@@ -70,7 +73,7 @@ private fun SettingAccountScreen(
             )
         }
 
-        SettingEventHandler(settingEvent = settingEvent)
+        SettingEventHandler(settingEvent = settingEvent, navigateToLogin = navigateToLogin)
     }
 }
 
@@ -80,6 +83,7 @@ private fun SettingAccountScreenPreview() {
     SettingAccountScreen(
         onClickLogout = {},
         onClickDeleteAccount = {},
+        navigateToLogin = {},
         settingEvent = null,
     )
 }

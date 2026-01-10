@@ -73,18 +73,29 @@ fun SettingScreen(
                     entry<SettingNavKey.SettingMain> {
                         SettingMainScreen(
                             onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                            onFavoriteTeamEditClick = { parentNavigator.navigate(Route.FavoriteTeamRoute) },
                         )
                     }
                     entry<SettingNavKey.SettingAccount> {
                         SettingAccountScreen(
                             onClickDeleteAccount = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                            navigateToLogin = {
+                                navigator.clearStack()
+                                parentNavigator.clearStackAndNavigate(Route.LoginRoute)
+                            },
                         )
                     }
                     entry<SettingNavKey.SettingDeleteAccount> {
-                        SettingDeleteAccountScreen(navigateToHome = {
-                            navigator.clearStack()
-                            parentNavigator.navigate(Route.BottomRoute)
-                        })
+                        SettingDeleteAccountScreen(
+                            navigateToHome = {
+                                navigator.clearStack()
+                                parentNavigator.navigate(Route.BottomRoute)
+                            },
+                            navigateToLogin = {
+                                navigator.clearStack()
+                                parentNavigator.clearStackAndNavigate(Route.LoginRoute)
+                            },
+                        )
                     }
                 }
 

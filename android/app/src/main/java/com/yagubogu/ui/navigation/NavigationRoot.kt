@@ -24,7 +24,7 @@ fun NavigationRoot(
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = startRoute,
-            topLevelRoutes = setOf(Route.BottomRoute, Route.LoginRoute),
+            topLevelRoutes = setOf(Route.BottomRoute, Route.LoginRoute, Route.SettingRoute),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
 
