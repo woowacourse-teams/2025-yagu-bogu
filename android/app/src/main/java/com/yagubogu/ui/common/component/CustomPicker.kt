@@ -46,6 +46,8 @@ fun <T> Picker(
     textAlign: TextAlign = TextAlign.Center,
     label: (T) -> String = { it.toString() },
 ) {
+    require(visibleCount % 2 == 1) { "visibleCount must be odd, but was $visibleCount" }
+
     val listState: LazyListState = rememberLazyListState(initialFirstVisibleItemIndex = startIndex)
     val flingBehavior: FlingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
     val currentScrollIndex: Int by remember { derivedStateOf { listState.firstVisibleItemIndex } }

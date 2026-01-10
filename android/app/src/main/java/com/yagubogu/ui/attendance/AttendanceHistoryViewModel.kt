@@ -34,6 +34,9 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
+    private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
+
     private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
     val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
 
@@ -91,5 +94,14 @@ class AttendanceHistoryViewModel @Inject constructor(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    fun updateCurrentMonth(yearMonth: YearMonth) {
+        _currentMonth.value = yearMonth
+    }
+
+    companion object {
+        val START_MONTH: YearMonth = YearMonth.of(2021, 1)
+        val END_MONTH: YearMonth = YearMonth.now()
     }
 }

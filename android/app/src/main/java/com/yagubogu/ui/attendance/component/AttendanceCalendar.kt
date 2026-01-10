@@ -2,6 +2,7 @@ package com.yagubogu.ui.attendance.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -154,7 +155,7 @@ private fun Day(
 
         if (hasAttendance) {
             Spacer(modifier = Modifier.height(6.dp))
-            Spacer(
+            Box(
                 modifier =
                     Modifier
                         .size(6.dp)

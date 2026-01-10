@@ -66,9 +66,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import java.time.LocalDate
 import java.time.YearMonth
 
-private val START_MONTH: YearMonth = YearMonth.of(2021, 1)
-private val END_MONTH: YearMonth = YearMonth.now()
-
 @Composable
 fun AttendanceHistoryScreen(
     snackbarHostState: SnackbarHostState,
@@ -78,7 +75,10 @@ fun AttendanceHistoryScreen(
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
     val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
-    var currentMonth: YearMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+    val currentMonth: YearMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
+    val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
+    val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
+
     var viewType: AttendanceHistoryViewType by rememberSaveable {
         mutableStateOf(AttendanceHistoryViewType.CALENDAR)
     }
@@ -99,8 +99,10 @@ fun AttendanceHistoryScreen(
     BackPressHandler(snackbarHostState, coroutineScope)
 
     AttendanceHistoryScreen(
+        startMonth = startMonth,
+        endMonth = endMonth,
         currentMonth = currentMonth,
-        onMonthChange = { month: YearMonth -> currentMonth = month },
+        onMonthChange = viewModel::updateCurrentMonth,
         viewType = viewType,
         onViewTypeChange = { viewType = viewType.toggle() },
         items = attendanceItems,
@@ -121,6 +123,8 @@ fun AttendanceHistoryScreen(
 
 @Composable
 private fun AttendanceHistoryScreen(
+    startMonth: YearMonth,
+    endMonth: YearMonth,
     currentMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
     viewType: AttendanceHistoryViewType,
@@ -133,9 +137,6 @@ private fun AttendanceHistoryScreen(
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    val startMonth: YearMonth = START_MONTH
-    val endMonth: YearMonth = END_MONTH
-
     Column(
         modifier =
             modifier
@@ -327,6 +328,8 @@ private fun AttendanceViewToggle(
 @Composable
 private fun AttendanceCalenderScreenPreview() {
     AttendanceHistoryScreen(
+        startMonth = AttendanceHistoryViewModel.START_MONTH,
+        endMonth = AttendanceHistoryViewModel.END_MONTH,
         currentMonth = YearMonth.now(),
         onMonthChange = {},
         viewType = AttendanceHistoryViewType.CALENDAR,
@@ -343,6 +346,8 @@ private fun AttendanceCalenderScreenPreview() {
 @Composable
 private fun AttendanceListScreenPreview() {
     AttendanceHistoryScreen(
+        startMonth = AttendanceHistoryViewModel.START_MONTH,
+        endMonth = AttendanceHistoryViewModel.END_MONTH,
         currentMonth = YearMonth.now(),
         onMonthChange = {},
         viewType = AttendanceHistoryViewType.LIST,
