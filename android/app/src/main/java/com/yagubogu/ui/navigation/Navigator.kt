@@ -27,6 +27,8 @@ class Navigator(
         }
     }
 
+    fun canGoBack(): Boolean = currentStack.size > 1
+
     fun goBack() {
         // If we're at the base of the current route, go back to the start route stack.
         if (currentRoute == state.topLevelRoute) {
@@ -36,10 +38,14 @@ class Navigator(
         }
     }
 
-    fun clearStackAndNavigate(route: NavKey) {
-        while (currentStack.size > 1) {
+    fun clearStack() {
+        while (canGoBack()) {
             goBack()
         }
+    }
+
+    fun clearStackAndNavigate(route: NavKey) {
+        clearStack()
         navigate(route)
     }
 }

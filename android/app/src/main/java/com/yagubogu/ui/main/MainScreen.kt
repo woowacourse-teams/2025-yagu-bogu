@@ -31,7 +31,6 @@ import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import com.yagubogu.ui.badge.BadgeActivity
-import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
@@ -40,14 +39,9 @@ import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.BottomNavKey
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.TopNavKey
+import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.navigation.rememberNavigationState
-import com.yagubogu.ui.navigation.slideInTransition
-import com.yagubogu.ui.navigation.slideOutTransition
 import com.yagubogu.ui.navigation.toEntries
-import com.yagubogu.ui.setting.SettingAccountScreen
-import com.yagubogu.ui.setting.SettingDeleteAccountScreen
-import com.yagubogu.ui.setting.SettingMainScreen
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
@@ -55,6 +49,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
+    parentNavigator: Navigator,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -84,44 +79,31 @@ fun MainScreen(
         Scaffold(
             containerColor = Gray050,
             topBar = {
-                when (navigator.currentRoute) {
-                    is BottomNavKey -> {
-                        MainToolbar(
-                            modifier = Modifier.padding(horizontal = 10.dp),
-                            title =
-                                stringResource(
-                                    if (selectedItem == BottomNavKey.Home) {
-                                        R.string.app_name
-                                    } else {
-                                        selectedItem.label
-                                    },
-                                ),
-                            onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
-                            onSettingsClick = { navigator.navigate(TopNavKey.SettingMain) },
-                        )
-                    }
-
-                    is TopNavKey -> {
-                        DefaultToolbar(
-                            onBackClick = { navigator.goBack() },
-                            title = stringResource((navigator.currentRoute as TopNavKey).label),
-                        )
-                    }
-                }
+                MainToolbar(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    title =
+                        stringResource(
+                            if (selectedItem == BottomNavKey.Home) {
+                                R.string.app_name
+                            } else {
+                                selectedItem.label
+                            },
+                        ),
+                    onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
+                    onSettingsClick = { parentNavigator.navigate(Route.SettingRoute) },
+                )
             },
             bottomBar = {
-                if (navigator.currentRoute is BottomNavKey) {
-                    MainNavigationBar(
-                        selectedItem = selectedItem,
-                        onItemClick = { item: BottomNavKey ->
-                            viewModel.selectBottomNavKey(item)
-                            navigator.navigate(item)
-                        },
-                        onItemReselect = { item: BottomNavKey ->
-                            scrollToTopEvent.tryEmit(Unit)
-                        },
-                    )
-                }
+                MainNavigationBar(
+                    selectedItem = selectedItem,
+                    onItemClick = { item: BottomNavKey ->
+                        viewModel.selectBottomNavKey(item)
+                        navigator.navigate(item)
+                    },
+                    onItemReselect = { item: BottomNavKey ->
+                        scrollToTopEvent.tryEmit(Unit)
+                    },
+                )
             },
             snackbarHost = {
                 SnackbarHost(
@@ -162,25 +144,6 @@ fun MainScreen(
                             snackbarHostState = snackbarHostState,
                             scrollToTopEvent = scrollToTopEvent,
                         )
-                    }
-                    entry<TopNavKey.SettingMain>(
-                        metadata = slideInTransition + slideOutTransition,
-                    ) {
-                        SettingMainScreen(
-                            onClickSettingAccount = { navigator.navigate(TopNavKey.SettingAccount) },
-                        )
-                    }
-                    entry<TopNavKey.SettingAccount> {
-                        SettingAccountScreen(
-                            onClickDeleteAccount = { navigator.navigate(TopNavKey.SettingDeleteAccount) },
-                        )
-                    }
-                    entry<TopNavKey.SettingDeleteAccount>(
-                        metadata = slideOutTransition,
-                    ) {
-                        SettingDeleteAccountScreen(navigateToHome = {
-                            navigator.clearStackAndNavigate(BottomNavKey.Home)
-                        })
                     }
                 }
 
