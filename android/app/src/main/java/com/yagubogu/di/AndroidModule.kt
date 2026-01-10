@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.yagubogu.data.network.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +15,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AndroidModule {
+    @Provides
+    @Singleton
+    fun provideTokenManager(
+        @ApplicationContext context: Context,
+    ): TokenManager = TokenManager(context)
+
     @Provides
     @Singleton
     fun provideContentResolver(
