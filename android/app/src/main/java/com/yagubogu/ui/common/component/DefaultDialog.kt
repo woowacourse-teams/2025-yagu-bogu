@@ -42,6 +42,49 @@ fun DefaultDialog(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    DefaultDialog(
+        negativeText = dialogUiModel.negativeText,
+        positiveText = dialogUiModel.positiveText,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        modifier = modifier,
+    ) {
+        dialogUiModel.emoji?.let { emoji: String ->
+            Text(
+                text = emoji,
+                style = TextStyle(fontSize = 48.sp),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = dialogUiModel.title,
+            style = EsamanruMedium20,
+            textAlign = TextAlign.Center,
+        )
+
+        dialogUiModel.message?.let { message: String ->
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = message,
+                style = PretendardMedium.copy(fontSize = 14.sp),
+                textAlign = TextAlign.Center,
+                color = Gray700,
+            )
+        }
+    }
+}
+
+@Composable
+fun DefaultDialog(
+    negativeText: String?,
+    positiveText: String?,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     Dialog(
         onDismissRequest = onCancel,
         properties = DialogProperties(dismissOnClickOutside = false),
@@ -56,37 +99,13 @@ fun DefaultDialog(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                dialogUiModel.emoji?.let { emoji: String ->
-                    Text(
-                        text = emoji,
-                        style = TextStyle(fontSize = 48.sp),
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = dialogUiModel.title,
-                    style = EsamanruMedium20,
-                    textAlign = TextAlign.Center,
-                )
-
-                dialogUiModel.message?.let { message: String ->
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        text = message,
-                        style = PretendardMedium.copy(fontSize = 14.sp),
-                        textAlign = TextAlign.Center,
-                        color = Gray700,
-                    )
-                }
-
+                content()
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    dialogUiModel.negativeText?.let { negativeText: String ->
+                    negativeText?.let { negativeText: String ->
                         Button(
                             onClick = onCancel,
                             modifier = Modifier.weight(1f),
@@ -116,7 +135,7 @@ fun DefaultDialog(
                     ) {
                         Text(
                             text =
-                                dialogUiModel.positiveText
+                                positiveText
                                     ?: stringResource(R.string.all_confirm),
                             style = PretendardSemiBold.copy(fontSize = 14.sp),
                         )
