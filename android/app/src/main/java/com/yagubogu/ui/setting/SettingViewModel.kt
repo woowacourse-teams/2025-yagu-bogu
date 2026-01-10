@@ -41,10 +41,6 @@ class SettingViewModel @Inject constructor(
     private val _settingEvent = MutableSharedFlow<SettingEvent>()
     val settingEvent: SharedFlow<SettingEvent> = _settingEvent.asSharedFlow()
 
-    init {
-        fetchMemberInfo()
-    }
-
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
             memberRepository
@@ -130,7 +126,7 @@ class SettingViewModel @Inject constructor(
             Timber.e(exception, "프로필 이미지 업로드 실패")
         }
 
-    private fun fetchMemberInfo() {
+    fun fetchMemberInfo() {
         viewModelScope.launch {
             memberRepository
                 .getMemberInfo()

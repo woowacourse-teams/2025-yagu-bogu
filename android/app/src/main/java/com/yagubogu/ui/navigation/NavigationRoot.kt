@@ -27,7 +27,7 @@ fun NavigationRoot(modifier: Modifier = Modifier) {
             }
             entry<Route.SettingRoute> {
                 SettingScreen(
-                    navigateToParent = { navigator.goBack() },
+                    navigateToParent = { navigator.clearStackAndNavigate(Route.BottomRoute) },
                     navigateToBottom = { navigator.navigate(Route.BottomRoute) },
                 )
             }
