@@ -220,3 +220,12 @@ private fun EmptyAttendanceAdditionBottomSheetPreview() {
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
     )
 }
+
+@Preview
+@Composable
+private fun PastAttendanceItemPreview() {
+    PastAttendanceItem(
+        item = PAST_GAME_UI_MODELS[0],
+        onPastCheckIn = { },
+    )
+}
