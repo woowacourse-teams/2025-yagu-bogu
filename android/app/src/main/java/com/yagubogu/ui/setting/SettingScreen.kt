@@ -20,7 +20,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.navigation.SettingNavKey
 import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
@@ -30,6 +29,8 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun SettingScreen(
     parentNavigator: Navigator,
+    navigateToParent: () -> Unit,
+    navigateToBottom: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -49,7 +50,7 @@ fun SettingScreen(
                     onBackClick = {
                         when (navigator.canGoBack()) {
                             true -> navigator.goBack()
-                            false -> parentNavigator.goBack()
+                            false -> navigateToParent()
                         }
                     },
                     title = stringResource((navigator.currentRoute as SettingNavKey).label),
@@ -89,7 +90,7 @@ fun SettingScreen(
                         SettingDeleteAccountScreen(
                             navigateToHome = {
                                 navigator.clearStack()
-                                parentNavigator.navigate(Route.BottomRoute)
+                                navigateToBottom()
                             },
                             navigateToLogin = {
                                 navigator.clearStack()

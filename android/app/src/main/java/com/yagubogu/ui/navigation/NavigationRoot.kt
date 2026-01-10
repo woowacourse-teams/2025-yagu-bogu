@@ -38,10 +38,13 @@ fun NavigationRoot(
                 )
             }
             entry<Route.BottomRoute> {
-                MainScreen(parentNavigator = navigator)
+                MainScreen(navigateToSetting = { navigator.navigate(Route.SettingRoute) })
             }
             entry<Route.SettingRoute> {
-                SettingScreen(parentNavigator = navigator)
+                SettingScreen(
+                    navigateToParent = { navigator.goBack() },
+                    navigateToBottom = { navigator.navigate(Route.BottomRoute) },
+                )
             }
             entry<Route.FavoriteTeamRoute> {
                 FavoriteTeamScreen(
