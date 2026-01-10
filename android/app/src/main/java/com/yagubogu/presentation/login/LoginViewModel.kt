@@ -14,8 +14,11 @@ import com.yagubogu.presentation.login.auth.GoogleCredentialResult
 import com.yagubogu.presentation.login.model.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,6 +31,9 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     private val _loginResult = MutableSharedFlow<LoginResult>()
     val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
+
+    private val _canAutoLogin = MutableStateFlow<Boolean?>(null)
+    val canAutoLogin: StateFlow<Boolean?> = _canAutoLogin.asStateFlow()
 
     suspend fun isTokenValid(): Boolean = tokenRepository.refreshTokens().isSuccess
 
@@ -82,9 +88,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun handleAutoLogin(onAppInitialized: () -> Unit) {
-        Timber.d("handleAutoLogin 호출")
         viewModelScope.launch {
             if (!isTokenValid()) {
+                _canAutoLogin.emit(false)
                 onAppInitialized()
                 return@launch
             }
@@ -96,8 +102,8 @@ class LoginViewModel @Inject constructor(
                     false -> LoginResult.SignIn
                 }
             _loginResult.emit(loginResult)
+            _canAutoLogin.emit(true)
             onAppInitialized()
-            Timber.d("앱 초기화 호출")
         }
     }
 }

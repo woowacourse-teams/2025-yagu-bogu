@@ -17,11 +17,12 @@ import com.yagubogu.ui.main.MainScreen
 @Composable
 fun NavigationRoot(
     googleCredentialManager: GoogleCredentialManager,
+    startRoute: Route,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
         rememberNavigationState(
-            startRoute = Route.LoginRoute,
+            startRoute = startRoute,
             topLevelRoutes = setOf(Route.BottomRoute, Route.LoginRoute),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }

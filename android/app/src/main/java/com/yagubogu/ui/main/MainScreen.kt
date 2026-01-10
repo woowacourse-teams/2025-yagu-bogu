@@ -31,7 +31,6 @@ import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
 import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
-import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay

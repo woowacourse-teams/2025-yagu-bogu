@@ -11,9 +11,11 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -30,6 +32,7 @@ import com.yagubogu.presentation.login.model.InAppUpdateType
 import com.yagubogu.presentation.login.model.VersionInfo
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.navigation.NavigationRoot
+import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -69,7 +72,14 @@ class MainActivity : AppCompatActivity() {
         Timber.d("$isAppInitialized")
         setContent {
             YaguBoguTheme {
-                NavigationRoot(googleCredentialManager)
+                val canAutoLogin: Boolean? by loginViewModel.canAutoLogin.collectAsStateWithLifecycle()
+
+                canAutoLogin?.let { canAutoLogin ->
+                    NavigationRoot(
+                        googleCredentialManager = googleCredentialManager,
+                        startRoute = if (canAutoLogin) Route.BottomRoute else Route.LoginRoute,
+                    )
+                }
             }
         }
     }
