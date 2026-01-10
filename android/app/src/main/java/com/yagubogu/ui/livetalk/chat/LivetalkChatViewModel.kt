@@ -12,7 +12,6 @@ import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
-import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
@@ -25,11 +24,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -71,9 +68,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private val _selectedProfile = MutableStateFlow<MemberProfile?>(null)
     val selectedProfile: StateFlow<MemberProfile?> = _selectedProfile.asStateFlow()
-
-    private val _emojiAnimationSignal = MutableSharedFlow<LikeDeltaItem>()
-    val emojiAnimationSignal = _emojiAnimationSignal.asSharedFlow()
 
     val chatUiState: StateFlow<LivetalkChatUiState> =
         combine(
@@ -336,8 +330,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
-
-        private const val MAX_ANIMATION_COUNT = 50
 
         fun provideFactory(
             assistedFactory: Factory,

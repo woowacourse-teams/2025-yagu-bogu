@@ -37,7 +37,6 @@ import com.yagubogu.ui.livetalk.chat.component.LivetalkChatDialogs
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
 import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
-import com.yagubogu.ui.livetalk.chat.model.LikeDeltaItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenActions
@@ -119,37 +118,35 @@ fun LivetalkChatScreen(
             )
         }
 
-    LaunchedEffect(Unit) {
-        viewModel.emojiAnimationSignal.collect { deltaItem: LikeDeltaItem ->
-            // 1. 이모지 애니메이션 큐에 추가
-            generateEmojiAnimation(deltaItem.emoji)
-
-            // 2. 우리 팀의 변화량인 경우에만 UI 카운트 증가 (상대 팀은 카운트 텍스트가 없으므로 제외 가능)
-            if (deltaItem.isMyTeam) {
-                likeCountStateHolder.increaseMyTeamShowingCount(deltaItem.amount)
-            }
-        }
-    }
+    // 내 팀 (카운트 증가 + 이모지 애니메이션)
     LaunchedEffect(Unit) {
         likeCountStateHolder.myTeamLikeChangeAmount.collect { count ->
             count?.let {
-                // 1. 이모지 애니메이션 큐에 추가
                 val myTeamEmoji = teams?.myTeamEmoji ?: return@collect
-                scheduleEmojiAnimations(myTeamEmoji, count, this) {
+                scheduleEmojiWithCounter(
+                    emoji = myTeamEmoji,
+                    count = count,
+                    scope = this,
+                    increaseCountText = { increment ->
+                        likeCountStateHolder.increaseMyTeamShowingCount(increment)
+                    },
+                ) {
                     generateEmojiAnimation(myTeamEmoji)
                 }
-                // 2. 우리 팀의 변화량인 경우에만 UI 카운트 증가 (상대 팀은 카운트 텍스트가 없으므로 제외 가능)
-                likeCountStateHolder.increaseMyTeamShowingCount(count)
             }
         }
     }
 
+    // 상대 팀 (이모지 애니메이션만)
     LaunchedEffect(Unit) {
         likeCountStateHolder.otherTeamLikeChangeAmount.collect { count ->
             count?.let {
-                // 1. 이모지 애니메이션 큐에 추가
                 val otherTeamEmoji = teams?.otherTeamEmoji ?: return@collect
-                scheduleEmojiAnimations(otherTeamEmoji, count, this) {
+                scheduleEmojiWithCounter(
+                    emoji = otherTeamEmoji,
+                    count = count,
+                    scope = this,
+                ) {
                     generateEmojiAnimation(otherTeamEmoji)
                 }
             }
@@ -268,10 +265,11 @@ fun LivetalkChatScreenContent(
     }
 }
 
-private fun scheduleEmojiAnimations(
+private fun scheduleEmojiWithCounter(
     emoji: String,
     count: Long,
     scope: CoroutineScope,
+    increaseCountText: (suspend (Long) -> Unit)? = null,
     triggerAnimation: () -> Unit,
 ) {
     if (count <= 0) return
@@ -293,7 +291,7 @@ private fun scheduleEmojiAnimations(
 
                 val randomDelay = (0L..POLLING_INTERVAL_MILLS).random()
                 delay(randomDelay)
-
+                increaseCountText?.invoke(increment)
                 triggerAnimation()
                 Timber.d("$emoji 이모지 애니메이션 및 $increment 만큼 카운트 증가")
             }
