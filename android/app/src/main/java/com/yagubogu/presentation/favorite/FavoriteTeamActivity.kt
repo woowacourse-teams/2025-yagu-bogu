@@ -24,7 +24,7 @@ class FavoriteTeamActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupView()
         setupRecyclerView()
-        setupObservers()
+        // setupObservers()
         setupFragmentResultListener()
     }
 
@@ -55,11 +55,11 @@ class FavoriteTeamActivity : AppCompatActivity() {
         adapter.submitList(favoriteTeamItems)
     }
 
-    private fun setupObservers() {
-        viewModel.favoriteTeamUpdateEvent.observe(this) {
-            navigateToMain()
-        }
-    }
+//    private fun setupObservers() {
+//        viewModel.favoriteTeamUpdateEvent.observe(this) {
+//            navigateToMain()
+//        }
+//    }
 
     private fun setupFragmentResultListener() {
         supportFragmentManager.setFragmentResultListener(

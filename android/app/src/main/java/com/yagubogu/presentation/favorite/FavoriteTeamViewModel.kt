@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.util.livedata.MutableSingleLiveData
-import com.yagubogu.presentation.util.livedata.SingleLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -17,8 +17,8 @@ class FavoriteTeamViewModel @Inject constructor(
 ) : ViewModel() {
     private var selectedTeam: Team? = null
 
-    private val _favoriteTeamUpdateEvent = MutableSingleLiveData<Unit>()
-    val favoriteTeamUpdateEvent: SingleLiveData<Unit> get() = _favoriteTeamUpdateEvent
+    private val _favoriteTeamUpdateEvent = MutableSharedFlow<Unit>()
+    val favoriteTeamUpdateEvent: SharedFlow<Unit> = _favoriteTeamUpdateEvent
 
     fun saveFavoriteTeam() {
         viewModelScope.launch {
@@ -26,7 +26,7 @@ class FavoriteTeamViewModel @Inject constructor(
                 memberRepository
                     .updateFavoriteTeam(team.name)
                     .onSuccess {
-                        _favoriteTeamUpdateEvent.setValue(Unit)
+                        _favoriteTeamUpdateEvent.emit(Unit)
                     }.onFailure { exception: Throwable ->
                         Timber.w(exception, "API 호출 실패")
                     }
