@@ -1,6 +1,5 @@
 package com.yagubogu.ui.login
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,8 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -27,30 +30,48 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.login.LoginActivity
 import com.yagubogu.presentation.login.LoginViewModel
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.presentation.login.model.LoginResult
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.EsamanruLight
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.dpToSp
+import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.noRippleClickable
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
+    googleCredentialManager: GoogleCredentialManager,
+    navigateToMain: () -> Unit,
+    navigateToFavoriteTeam: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val googleCredentialManager: GoogleCredentialManager =
-        (LocalActivity.current as LoginActivity).googleCredentialManager
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LoginScreen(
         onGoogleLoginClick = { viewModel.signInWithGoogle(googleCredentialManager) },
         modifier = modifier,
     )
+
+    LoginResultHandler(
+        snackbarHostState = snackbarHostState,
+        loginResultFlow = viewModel.loginResult,
+        onSignIn = navigateToMain,
+        onSignUp = navigateToFavoriteTeam,
+    )
+
+    BackPressHandler(snackbarHostState, coroutineScope)
 }
 
 @Composable
@@ -113,7 +134,7 @@ private fun LoginButton(
                 .fillMaxWidth()
                 .background(Color.White, RoundedCornerShape(4.dp))
                 .border(1.dp, Gray300, RoundedCornerShape(4.dp))
-                .noRippleClickable(onClick),
+                .noRippleClickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         Row(
@@ -131,6 +152,42 @@ private fun LoginButton(
                 style = PretendardSemiBold,
                 fontSize = 18.dpToSp,
             )
+        }
+    }
+}
+
+@Composable
+fun LoginResultHandler(
+    snackbarHostState: SnackbarHostState,
+    loginResultFlow: SharedFlow<LoginResult>,
+    onSignIn: () -> Unit,
+    onSignUp: () -> Unit,
+) {
+    val loginFailedMessage = stringResource(R.string.login_failed_message)
+
+    LaunchedEffect(Unit) {
+        loginResultFlow.collect { loginResult ->
+            when (loginResult) {
+                is LoginResult.Failure -> {
+                    snackbarHostState.showSnackbar(loginFailedMessage)
+                    val bundle = bundleOf("reason" to "${loginResult.exception}")
+                    Firebase.analytics.logEvent("login_failure", bundle)
+                }
+
+                LoginResult.SignIn -> {
+                    onSignIn()
+                    Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+                }
+
+                LoginResult.SignUp -> {
+                    onSignUp()
+                    Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+                }
+
+                LoginResult.Cancel -> {
+                    Unit
+                }
+            }
         }
     }
 }

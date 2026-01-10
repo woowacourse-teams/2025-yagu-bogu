@@ -43,6 +43,8 @@ fun Context.showToast(
 
 fun Context.showToast(
     @StringRes message: Int,
+    isLong: Boolean = false,
 ) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    val duration = if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+    Toast.makeText(this, message, duration).show()
 }
