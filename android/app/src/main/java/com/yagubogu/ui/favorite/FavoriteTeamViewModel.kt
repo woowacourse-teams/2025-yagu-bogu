@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.favorite
+package com.yagubogu.ui.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

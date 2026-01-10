@@ -3,6 +3,7 @@ package com.yagubogu.presentation.favorite
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.yagubogu.ui.favorite.FavoriteTeamItem
 
 class FavoriteTeamAdapter(
     private val handler: FavoriteTeamViewHolder.Handler,

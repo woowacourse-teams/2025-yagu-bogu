@@ -8,10 +8,10 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.badge.component.BadgeScreen
 import com.yagubogu.ui.favorite.FavoriteTeamScreen
 import com.yagubogu.ui.login.LoginScreen
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.main.MainScreen
 
 @Composable

@@ -36,9 +36,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.presentation.login.LoginViewModel
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
-import com.yagubogu.presentation.login.model.LoginResult
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.model.LoginResult
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.EsamanruLight
 import com.yagubogu.ui.theme.Gray300

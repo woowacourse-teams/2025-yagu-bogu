@@ -9,6 +9,7 @@ import androidx.fragment.app.setFragmentResult
 import com.yagubogu.R
 import com.yagubogu.databinding.FragmentFavoriteTeamConfirmBinding
 import com.yagubogu.presentation.util.getParcelableCompat
+import com.yagubogu.ui.favorite.FavoriteTeamItem
 
 class FavoriteTeamConfirmFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

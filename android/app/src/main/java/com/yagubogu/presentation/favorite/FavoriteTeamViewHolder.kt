@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yagubogu.databinding.ItemFavoriteTeamBinding
+import com.yagubogu.ui.favorite.FavoriteTeamItem
 
 class FavoriteTeamViewHolder private constructor(
     private val binding: ItemFavoriteTeamBinding,

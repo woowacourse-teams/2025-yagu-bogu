@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login.auth
+package com.yagubogu.ui.login.auth
 
 import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest
@@ -134,8 +134,10 @@ class GoogleCredentialManager(
         when (exception) {
             // 사용자가 로그인 UI를 취소한 경우 (진행 중단)
             is GetCredentialCancellationException -> GoogleCredentialResult.Cancel
+
             // 로그인 정보가 없는 경우 (계속 진행)
             is GetCredentialException -> GoogleCredentialResult.Suspending
+
             else -> GoogleCredentialResult.Failure(exception)
         }
 
@@ -156,7 +158,8 @@ class GoogleCredentialManager(
     private suspend fun getCredentialResponseResult(request: GetCredentialRequest): Result<GetCredentialResponse> =
         withContext(Dispatchers.IO) {
             return@withContext try {
-                val response: GetCredentialResponse = credentialManager.getCredential(context, request)
+                val response: GetCredentialResponse =
+                    credentialManager.getCredential(context, request)
                 Result.success(response)
             } catch (e: GetCredentialException) {
                 Result.failure(e)

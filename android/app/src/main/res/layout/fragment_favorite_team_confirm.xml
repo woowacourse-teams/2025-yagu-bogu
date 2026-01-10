@@ -7,7 +7,7 @@
 
         <variable
             name="favoriteTeamItem"
-            type="com.yagubogu.presentation.favorite.FavoriteTeamItem" />
+            type="com.yagubogu.ui.favorite.FavoriteTeamItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

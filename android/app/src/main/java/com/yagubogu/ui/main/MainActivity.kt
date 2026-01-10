@@ -26,11 +26,11 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
-import com.yagubogu.presentation.login.LoginViewModel
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
-import com.yagubogu.presentation.login.model.InAppUpdateType
-import com.yagubogu.presentation.login.model.VersionInfo
 import com.yagubogu.presentation.util.showToast
+import com.yagubogu.ui.login.LoginViewModel
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.model.InAppUpdateType
+import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.navigation.NavigationRoot
 import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.theme.YaguBoguTheme

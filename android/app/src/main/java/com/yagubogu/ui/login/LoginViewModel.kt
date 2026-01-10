@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login
+package com.yagubogu.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,9 +9,9 @@ import com.yagubogu.data.dto.response.auth.LoginResultResponse
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.token.TokenRepository
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
-import com.yagubogu.presentation.login.auth.GoogleCredentialResult
-import com.yagubogu.presentation.login.model.LoginResult
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.auth.GoogleCredentialResult
+import com.yagubogu.ui.login.model.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

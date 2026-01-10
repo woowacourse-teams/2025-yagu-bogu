@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.R
 import com.yagubogu.domain.model.Team
-import com.yagubogu.presentation.favorite.FavoriteTeamItem
-import com.yagubogu.presentation.favorite.FavoriteTeamViewModel
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.EsamanruMedium20

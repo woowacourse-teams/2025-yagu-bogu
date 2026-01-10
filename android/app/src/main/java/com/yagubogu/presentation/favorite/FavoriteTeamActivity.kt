@@ -9,6 +9,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.yagubogu.databinding.ActivityFavoriteTeamBinding
 import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.favorite.FavoriteTeamItem
+import com.yagubogu.ui.favorite.FavoriteTeamViewModel
 import com.yagubogu.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
