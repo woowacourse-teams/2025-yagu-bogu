@@ -9,7 +9,6 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
@@ -33,9 +32,7 @@ import com.yagubogu.databinding.ActivityLoginBinding
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.presentation.login.model.InAppUpdateType
-import com.yagubogu.presentation.login.model.LoginResult
 import com.yagubogu.presentation.login.model.VersionInfo
-import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,8 +74,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         handleInAppUpdate(onSuccess = { handleAutoLogin() })
         setupView()
-        setupObservers()
-        setupListeners()
+//        setupObservers()
+//        setupListeners()
     }
 
     private fun setupSplash() {
@@ -114,35 +111,35 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupObservers() {
-        viewModel.loginResult.observe(this) { value: LoginResult ->
-            when (value) {
-                LoginResult.SignUp -> {
-                    navigateToFavoriteTeam()
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
-                }
+//    private fun setupObservers() {
+//        viewModel.loginResult.observe(this) { value: LoginResult ->
+//            when (value) {
+//                LoginResult.SignUp -> {
+//                    navigateToFavoriteTeam()
+//                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+//                }
+//
+//                LoginResult.SignIn -> {
+//                    navigateToMain()
+//                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
+//                }
+//
+//                is LoginResult.Failure -> {
+//                    binding.root.showSnackbar(R.string.login_failed_message)
+//                    val bundle = bundleOf("reason" to "${value.exception}")
+//                    firebaseAnalytics.logEvent("login_failure", bundle)
+//                }
+//
+//                LoginResult.Cancel -> Unit
+//            }
+//        }
+//    }
 
-                LoginResult.SignIn -> {
-                    navigateToMain()
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
-                }
-
-                is LoginResult.Failure -> {
-                    binding.root.showSnackbar(R.string.login_failed_message)
-                    val bundle = bundleOf("reason" to "${value.exception}")
-                    firebaseAnalytics.logEvent("login_failure", bundle)
-                }
-
-                LoginResult.Cancel -> Unit
-            }
-        }
-    }
-
-    private fun setupListeners() {
-        binding.constraintBtnGoogle.setOnClickListener {
-            viewModel.signInWithGoogle(googleCredentialManager)
-        }
-    }
+//    private fun setupListeners() {
+//        binding.constraintBtnGoogle.setOnClickListener {
+//            viewModel.signInWithGoogle(googleCredentialManager)
+//        }
+//    }
 
     private fun navigateToFavoriteTeam() {
         startActivity(Intent(this, FavoriteTeamActivity::class.java))
@@ -185,7 +182,9 @@ class LoginActivity : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    UpdateAvailability.UPDATE_AVAILABLE -> Unit
+                    UpdateAvailability.UPDATE_AVAILABLE -> {
+                        Unit
+                    }
                 }
 
                 // 스토어에서 제공되는 최신 앱 버전 코드
