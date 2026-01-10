@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
 import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
@@ -81,19 +82,50 @@ fun LivetalkChatScreen(
     }
 
     val uiContentState =
-        LivetalkChatScreenStates(
-            messageText = messageText,
-            showingLikeCount = showingLikeCount,
-            livetalkChatBubbleItems = livetalkChatBubbleItems,
-            pendingDeleteChat = pendingDeleteChat,
-            pendingReportChat = pendingReportChat,
-            emojiQueue = emojiQueue.toList(),
-            teams = teams,
-            clickedProfile = clickedProfile,
-            chatUiState = chatUiState,
-            isVerified = messageStateHolder.isVerified,
-        )
-
+        remember(
+            teams,
+            chatUiState,
+            livetalkChatBubbleItems,
+            messageText,
+            showingLikeCount,
+            emojiQueue.toList(),
+            clickedProfile,
+            pendingDeleteChat,
+            pendingReportChat,
+        ) {
+            LivetalkChatScreenStates(
+                toolbar =
+                    LivetalkChatScreenStates.Toolbar(
+                        teams = teams,
+                    ),
+                chatList =
+                    LivetalkChatScreenStates.ChatList(
+                        uiState = chatUiState,
+                        items = livetalkChatBubbleItems,
+                    ),
+                inputBar =
+                    LivetalkChatScreenStates.InputBar(
+                        text = messageText,
+                        stadiumName = teams?.stadiumName,
+                    ),
+                cheering =
+                    LivetalkChatScreenStates.Cheering(
+                        myTeam = teams?.myTeam,
+                        showingCount = showingLikeCount,
+                    ),
+                dialog =
+                    LivetalkChatScreenStates.Dialog(
+                        clickedProfile = clickedProfile,
+                        pendingDeleteChat = pendingDeleteChat,
+                        pendingReportChat = pendingReportChat,
+                    ),
+                emojiLayer =
+                    LivetalkChatScreenStates.EmojiLayer(
+                        emojiQueue = emojiQueue.toList(),
+                    ),
+                isVerified = messageStateHolder.isVerified,
+            )
+        }
     val actions =
         remember {
             LivetalkChatScreenActions(
@@ -185,14 +217,14 @@ fun LivetalkChatScreenContent(
     Scaffold(
         topBar = {
             LivetalkChatToolbar(
-                teams = state.teams,
+                teams = state.toolbar.teams,
                 onBackClick = actions.chatToolbar.onBackClick,
             )
         },
         bottomBar = {
             LivetalkChatInputBar(
-                messageFormText = state.messageText,
-                stadiumName = state.teams?.stadiumName,
+                messageFormText = state.inputBar.text,
+                stadiumName = state.inputBar.stadiumName,
                 isVerified = state.isVerified,
                 onTextChange = actions.chatInputBar.onMessageTextChange,
                 onSendMessage = actions.chatInputBar.onSendMessage,
@@ -215,10 +247,10 @@ fun LivetalkChatScreenContent(
                         .fillMaxWidth(),
             ) {
                 // 채팅 버블
-                when (state.chatUiState) {
+                when (state.chatList.uiState) {
                     is LivetalkChatUiState.Success -> {
                         LivetalkChatBubbleList(
-                            chatItems = state.livetalkChatBubbleItems,
+                            chatItems = state.chatList.items,
                             modifier = Modifier.weight(1f),
                             onDeleteClick = actions.chatBubbleItems.onRequestDelete,
                             onReportClick = actions.chatBubbleItems.onRequestReport,
@@ -240,12 +272,13 @@ fun LivetalkChatScreenContent(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
-                val myTeam = state.teams?.myTeam
+                val cheeringState = state.cheering
+                val myTeam = cheeringState.myTeam
                 when {
-                    myTeam != null && state.teams.myTeamType != null -> {
+                    myTeam != null && state.toolbar.teams?.myTeamType != null -> {
                         LivetalkChatCheeringBar(
                             team = myTeam,
-                            cheeringCount = state.showingLikeCount,
+                            cheeringCount = cheeringState.showingCount,
                             onCheeringClick = {
                                 actions.chatCheering.onCheeringClick(myTeam.emoji)
                             },
@@ -259,7 +292,7 @@ fun LivetalkChatScreenContent(
                 }
             }
             // 이모지 애니메이션 레이어
-            state.emojiQueue.forEach { item: EmojiAnimationItem ->
+            state.emojiLayer.emojiQueue.forEach { item: EmojiAnimationItem ->
                 key(item.id) {
                     LaunchedEffect(Unit) {
                         Timber.d("이모지 애니메이션 시작 좌표 : ${item.startOffset}")
@@ -275,7 +308,7 @@ fun LivetalkChatScreenContent(
             }
 
             // 다이얼로그 레이어
-            LivetalkChatDialogs(state = state, actions = actions.dialog)
+            LivetalkChatDialogs(state = state.dialog, actions = actions.dialog)
         }
     }
 }
@@ -365,11 +398,25 @@ fun LivetalkChatPreviewSuccess() {
 
     val mockState =
         LivetalkChatScreenStates(
-            messageText = "오늘 경기 직관 중인데 분위기 최고예요!",
-            showingLikeCount = 1250L,
-            livetalkChatBubbleItems = mockChatBubbleItems,
-            teams = mockTeams,
-            chatUiState = LivetalkChatUiState.Success(chatItems = mockChatBubbleItems),
+            toolbar =
+                LivetalkChatScreenStates.Toolbar(
+                    teams = mockTeams,
+                ),
+            chatList =
+                LivetalkChatScreenStates.ChatList(
+                    uiState = LivetalkChatUiState.Success(chatItems = mockChatBubbleItems),
+                    items = mockChatBubbleItems,
+                ),
+            inputBar =
+                LivetalkChatScreenStates.InputBar(
+                    text = "오늘 경기 직관 중인데 분위기 최고예요!",
+                    stadiumName = mockTeams.stadiumName,
+                ),
+            cheering =
+                LivetalkChatScreenStates.Cheering(
+                    myTeam = mockTeams.myTeam,
+                    showingCount = 1250L,
+                ),
             isVerified = true,
         )
 
@@ -388,7 +435,10 @@ fun LivetalkChatPreviewSuccess() {
 fun LivetalkChatPreviewLoading() {
     val mockState =
         LivetalkChatScreenStates(
-            chatUiState = LivetalkChatUiState.Loading,
+            chatList =
+                LivetalkChatScreenStates.ChatList(
+                    uiState = LivetalkChatUiState.Loading,
+                ),
         )
 
     YaguBoguTheme {
@@ -413,10 +463,20 @@ fun LivetalkChatPreviewEmpty() {
 
     val mockState =
         LivetalkChatScreenStates(
-            chatUiState = LivetalkChatUiState.Empty,
-            teams = neutralTeams,
-            isVerified = false, // 인증되지 않은 상태
-            messageText = "", // 입력창 비움
+            toolbar =
+                LivetalkChatScreenStates.Toolbar(
+                    teams = neutralTeams,
+                ),
+            chatList =
+                LivetalkChatScreenStates.ChatList(
+                    uiState = LivetalkChatUiState.Empty,
+                ),
+            inputBar =
+                LivetalkChatScreenStates.InputBar(
+                    text = "",
+                    stadiumName = neutralTeams.stadiumName,
+                ),
+            isVerified = false,
         )
 
     YaguBoguTheme {
