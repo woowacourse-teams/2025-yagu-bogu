@@ -58,7 +58,7 @@ fun NavigationRoot(
             }
             entry<Route.BadgeRoute> {
                 BadgeScreen(
-                    navigateToMain = { navigator.navigate(Route.BottomRoute) },
+                    navigateToMain = { navigator.goBack() },
                 )
             }
         }
