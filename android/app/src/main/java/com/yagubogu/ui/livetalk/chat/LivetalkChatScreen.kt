@@ -63,18 +63,18 @@ fun LivetalkChatScreen(
 ) {
     val messageStateHolder = viewModel.messageStateHolder
     val likeCountStateHolder = viewModel.likeCountStateHolder
-    val teams by viewModel.teams.collectAsStateWithLifecycle()
-    val clickedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
-    val chatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
+    val teams: LivetalkTeams? by viewModel.teams.collectAsStateWithLifecycle()
+    val clickedProfile: MemberProfile? by viewModel.selectedProfile.collectAsStateWithLifecycle()
+    val chatUiState: LivetalkChatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
-    val messageText by messageStateHolder.messageText.collectAsStateWithLifecycle()
-    val showingLikeCount by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
-    val livetalkChatBubbleItems by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
-    val pendingDeleteChat by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
-    val pendingReportChat by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
+    val messageText: String by messageStateHolder.messageText.collectAsStateWithLifecycle()
+    val showingLikeCount: Long? by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val livetalkChatBubbleItems: List<LivetalkChatBubbleItem> by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
+    val pendingDeleteChat: LivetalkChatItem? by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
+    val pendingReportChat: LivetalkChatItem? by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
 
     val emojiQueue = remember { mutableStateListOf<EmojiAnimationItem>() }
-    var emojiButtonPos by remember { mutableStateOf(Offset.Zero) }
+    var emojiButtonPos: Offset by remember { mutableStateOf(Offset.Zero) }
 
     fun generateEmojiAnimation(emoji: String) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
