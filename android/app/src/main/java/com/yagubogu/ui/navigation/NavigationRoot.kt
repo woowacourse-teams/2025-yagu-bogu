@@ -51,7 +51,7 @@ fun NavigationRoot(
             }
             entry<Route.SettingRoute> {
                 SettingScreen(
-                    navigateToParent = { navigator.goBack() },
+                    navigateToParent = { navigator.clearStackAndNavigate(Route.BottomRoute) },
                     navigateToBottom = { navigator.navigate(Route.BottomRoute) },
                     navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeamRoute) },
                     navigateToLogin = { navigator.clearStackAndNavigate(Route.LoginRoute) },

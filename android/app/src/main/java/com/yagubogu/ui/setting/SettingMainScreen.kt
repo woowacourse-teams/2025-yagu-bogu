@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -113,6 +114,10 @@ fun SettingMainScreen(
                 )
             }
         }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchMemberInfo()
+    }
 
     SettingMainScreen(
         onClickSettingAccount = onClickSettingAccount,
