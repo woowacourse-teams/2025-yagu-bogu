@@ -28,9 +28,10 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingScreen(
-    parentNavigator: Navigator,
     navigateToParent: () -> Unit,
     navigateToBottom: () -> Unit,
+    navigateToFavoriteTeam: () -> Unit,
+    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -74,7 +75,7 @@ fun SettingScreen(
                     entry<SettingNavKey.SettingMain> {
                         SettingMainScreen(
                             onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
-                            onFavoriteTeamEditClick = { parentNavigator.navigate(Route.FavoriteTeamRoute) },
+                            onFavoriteTeamEditClick = { navigateToFavoriteTeam() },
                         )
                     }
                     entry<SettingNavKey.SettingAccount> {
@@ -82,7 +83,7 @@ fun SettingScreen(
                             onClickDeleteAccount = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
                             navigateToLogin = {
                                 navigator.clearStack()
-                                parentNavigator.clearStackAndNavigate(Route.LoginRoute)
+                                navigateToLogin()
                             },
                         )
                     }
@@ -94,7 +95,7 @@ fun SettingScreen(
                             },
                             navigateToLogin = {
                                 navigator.clearStack()
-                                parentNavigator.clearStackAndNavigate(Route.LoginRoute)
+                                navigateToLogin()
                             },
                         )
                     }

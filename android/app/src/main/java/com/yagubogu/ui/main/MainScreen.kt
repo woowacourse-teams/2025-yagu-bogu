@@ -47,8 +47,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
-    parentNavigator: Navigator,
     navigateToSetting: () -> Unit,
+    navigateToBadge: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -88,7 +88,7 @@ fun MainScreen(
                                 selectedItem.label
                             },
                         ),
-                    onBadgeClick = { parentNavigator.navigate(Route.BadgeRoute) },
+                    onBadgeClick = { navigateToBadge() },
                     onSettingsClick = { navigateToSetting() },
                 )
             },
