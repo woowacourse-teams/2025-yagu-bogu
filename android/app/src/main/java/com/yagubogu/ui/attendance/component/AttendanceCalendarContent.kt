@@ -122,7 +122,10 @@ fun AttendanceCalendarContent(
 
         if (currentItems != null) {
             SmallFloatingActionButton(
-                onClick = { },
+                onClick = {
+                    onRequestGames(currentDate)
+                    showBottomSheet = true
+                },
                 containerColor = Primary500,
                 contentColor = White,
                 shape = CircleShape,
