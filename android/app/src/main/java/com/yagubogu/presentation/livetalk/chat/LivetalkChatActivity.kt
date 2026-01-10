@@ -23,7 +23,6 @@ import com.yagubogu.R
 import com.yagubogu.databinding.ActivityLivetalkChatBinding
 import com.yagubogu.presentation.dialog.DefaultDialogFragment
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
-import com.yagubogu.presentation.favorite.FavoriteTeamConfirmFragment
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatEvent
 import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
@@ -127,7 +126,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             KEY_TALK_DELETE_DIALOG,
             this,
         ) { _, bundle ->
-            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            val isConfirmed: Boolean = bundle.getBoolean(KEY_CONFIRM)
             if (isConfirmed) {
                 viewModel.deleteMessage(pendingDeleteMessageId ?: return@setFragmentResultListener)
             }
@@ -137,7 +136,7 @@ class LivetalkChatActivity : AppCompatActivity() {
             KEY_TALK_REPORT_DIALOG,
             this,
         ) { _, bundle ->
-            val isConfirmed: Boolean = bundle.getBoolean(FavoriteTeamConfirmFragment.KEY_CONFIRM)
+            val isConfirmed: Boolean = bundle.getBoolean(KEY_CONFIRM)
             if (isConfirmed) {
                 viewModel.reportMessage(pendingReportMessageId ?: return@setFragmentResultListener)
             }
@@ -292,17 +291,19 @@ class LivetalkChatActivity : AppCompatActivity() {
 
     private fun handleLivetalkReportEvent(livetalkReportEvent: LivetalkReportEvent) {
         when (livetalkReportEvent) {
-            LivetalkReportEvent.DuplicatedReport ->
+            LivetalkReportEvent.DuplicatedReport -> {
                 binding.root.showSnackbar(
                     R.string.livetalk_already_reported,
                     R.id.divider,
                 )
+            }
 
-            LivetalkReportEvent.Success ->
+            LivetalkReportEvent.Success -> {
                 binding.root.showSnackbar(
                     R.string.livetalk_report_succeed,
                     R.id.divider,
                 )
+            }
         }
     }
 
@@ -365,6 +366,7 @@ class LivetalkChatActivity : AppCompatActivity() {
         private const val KEY_TALK_DELETE_DIALOG = "talkDeleteDialog"
         private const val KEY_TALK_REPORT_DIALOG = "talkReportDialog"
         private const val MAX_ANIMATION_COUNT = 50
+        private const val KEY_CONFIRM = "confirm"
 
         fun newIntent(
             context: Context,
