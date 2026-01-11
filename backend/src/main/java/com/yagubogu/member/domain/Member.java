@@ -18,11 +18,9 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE members SET deleted_at = now() WHERE member_id = ?")
 @Table(name = "members")
 @Entity
 public class Member extends BaseEntity {

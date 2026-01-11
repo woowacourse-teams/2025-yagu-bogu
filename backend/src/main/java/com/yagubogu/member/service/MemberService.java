@@ -60,7 +60,7 @@ public class MemberService {
     public void removeMember(final Long memberId) {
         Member member = getMember(memberId);
 
-        memberRepository.delete(member);
+        member.delete();
     }
 
     public MemberNicknameResponse findNickname(final long memberId) {
@@ -112,10 +112,23 @@ public class MemberService {
         long totalMembers = memberRepository.countByDeletedAtIsNull();
         List<BadgeResponseWithRates> badgeResponses = badgeRepository.findAllBadgesWithAchievedCount(memberId)
                 .stream()
-                .map(raw -> BadgeResponseWithRates.from(raw, totalMembers))
+                .map(raw -> {
+                    double progressRate = calculateRate(raw.progress(), raw.threshold());
+                    double achievedRate = calculateRate(raw.achievedCount(), totalMembers);
+
+                    return BadgeResponseWithRates.of(raw, progressRate, achievedRate);
+                })
                 .toList();
 
         return BadgeListResponse.from(representativeBadge, badgeResponses);
+    }
+
+    private double calculateRate(final long part, final long total) {
+        if (total == 0) {
+            return 0.0;
+        }
+
+        return (part * 100.0) / total;
     }
 
     public MemberInfoResponse findMember(final Long memberId) {

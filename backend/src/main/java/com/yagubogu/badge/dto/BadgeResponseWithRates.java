@@ -14,11 +14,12 @@ public record BadgeResponseWithRates(
         double achievedRate,
         String badgeImageUrl
 ) {
-    
-    public static BadgeResponseWithRates from(final BadgeRawResponse raw, final long totalMembers) {
-        double progressRate = raw.progress() == 0 ? 0.0 : (raw.progress() * 100.0) / raw.threshold();
-        double achievedRate = totalMembers == 0 ? 0.0 : (raw.achievedCount() * 100.0) / totalMembers;
 
+    public static BadgeResponseWithRates of(
+            final BadgeRawResponse raw,
+            final double progressRate,
+            final double achievedRate
+    ) {
         return new BadgeResponseWithRates(
                 raw.id(),
                 raw.name(),
