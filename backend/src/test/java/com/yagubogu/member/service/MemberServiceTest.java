@@ -30,9 +30,11 @@ import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,6 +83,9 @@ public class MemberServiceTest {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
@@ -202,21 +207,10 @@ public class MemberServiceTest {
         memberService.removeMember(memberId);
 
         // then
-        assertThat(memberRepository.findById(memberId)).isEmpty();
-    }
-
-    @DisplayName("회원을 탈퇴한다 - 소프트 딜리트")
-    @Test
-    void removeMember_softDelete() {
-        // given
-        Member member = memberFactory.save(MemberBuilder::build);
-        Long memberId = member.getId();
-
-        // when
-        memberService.removeMember(memberId);
-
-        // then
-        assertThat(memberRepository.findById(memberId)).isEmpty();
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(member.isDeleted()).isTrue();
+            softAssertions.assertThat(member.getDeletedAt()).isNotNull();
+        });
     }
 
     @DisplayName("팀을 등록한다")
@@ -382,6 +376,56 @@ public class MemberServiceTest {
             softAssertions.assertThat(actual.badges())
                     .usingRecursiveFieldByFieldElementComparatorIgnoringFields("achievedAt")
                     .containsExactlyInAnyOrderElementsOf(expected.badges());
+        });
+    }
+
+    @DisplayName("탈퇴한 회원은 배지 획득률 계산에서 제외된다")
+    @Test
+    void findBadges_excludes_delete_members() {
+        // given
+        Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
+
+        // 일반 회원 3명 생성 (뱃지 획득)
+        Member activeMember1 = memberFactory.save(builder -> builder.nickname("활성회원1"));
+        Member activeMember2 = memberFactory.save(builder -> builder.nickname("활성회원2"));
+        Member activeMember3 = memberFactory.save(builder -> builder.nickname("활성회원3"));
+
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(activeMember1).isAchieved(true));
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(activeMember2).isAchieved(true));
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(activeMember3).isAchieved(true));
+
+        // 탈퇴한 회원 2명 생성 (뱃지 획득 후 탈퇴)
+        Member deletedMember1 = memberFactory.save(builder -> builder.nickname("탈퇴회원1"));
+        Member deletedMember2 = memberFactory.save(builder -> builder.nickname("탈퇴회원2"));
+
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(deletedMember1).isAchieved(true));
+        memberBadgeFactory.save(builder -> builder.badge(badge).member(deletedMember2).isAchieved(true));
+
+        // 회원 탈퇴
+        deletedMember1.delete();
+        deletedMember2.delete();
+
+        long memberId = activeMember1.getId();
+
+        // when
+        BadgeListResponse actual = memberService.findBadges(memberId);
+
+        // then
+        assertSoftly(softAssertions -> {
+            BadgeResponseWithRates signUpBadge = actual.badges().stream()
+                    .filter(b -> b.policy() == Policy.SIGN_UP)
+                    .findFirst()
+                    .orElseThrow();
+
+            // 탈퇴한 회원을 제외하고 계산되어야 함
+            // 활성 회원 3명 중 3명이 획득했으므로 100%
+            softAssertions.assertThat(signUpBadge.achievedRate()).isEqualTo(100.0);
+
+            // 획득률이 100%를 초과하지 않아야 함
+            actual.badges().forEach(b -> {
+                softAssertions.assertThat(b.achievedRate()).isLessThanOrEqualTo(100.0);
+                softAssertions.assertThat(b.progressRate()).isLessThanOrEqualTo(100.0);
+            });
         });
     }
 
