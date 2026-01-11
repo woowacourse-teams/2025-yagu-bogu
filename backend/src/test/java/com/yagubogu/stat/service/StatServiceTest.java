@@ -1209,7 +1209,6 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(HT));
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
-        int year = 2025;
         LocalDate today = LocalDate.now();
 
         // 1. 과거 경기 (COMPLETED, 승) - 집계 포함 대상
@@ -1229,7 +1228,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(todayScheduledGame));
 
         // when
-        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), today.getYear());
 
         // then
         assertSoftly(s -> {
