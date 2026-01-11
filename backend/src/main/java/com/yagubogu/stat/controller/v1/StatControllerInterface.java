@@ -77,7 +77,10 @@ public interface StatControllerInterface {
             @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
     })
     @GetMapping("/me")
-    ResponseEntity<AverageStatisticResponse> findAverageStatistic(@Parameter(hidden = true) MemberClaims memberClaims);
+    ResponseEntity<AverageStatisticResponse> findAverageStatistic(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam final Integer year
+    );
 
     @Operation(summary = "상대 팀별 승률 조회", description = "상대 팀별 승률 정보 및 전적 정보를 조회합니다.")
     @ApiResponses({

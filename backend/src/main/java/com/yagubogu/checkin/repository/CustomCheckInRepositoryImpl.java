@@ -305,7 +305,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     // 현재 내가 응원하는 팀만 통계에 집계한다
     // 내가 응원하는 팀 o, 경기 완료된 것 o(경기 완료된 것만 통계에 집계)
-    public AverageStatisticParam findAverageStatistic(Member member) {
+    public AverageStatisticParam findAverageStatistic(Member member, Integer year) {
         NumberExpression<Integer> myRuns = new CaseBuilder()
                 .when(GAME.homeTeam.eq(CHECK_IN.team)).then(GAME.homeScoreBoard.runs)
                 .when(GAME.awayTeam.eq(CHECK_IN.team)).then(GAME.awayScoreBoard.runs)
@@ -345,7 +345,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         CHECK_IN.member.eq(member),
                         isCompleteOrCanceled(),
                         isMyCurrentFavorite(member, CHECK_IN),
-                        GAME.gameState.eq(GameState.COMPLETED)
+                        GAME.gameState.eq(GameState.COMPLETED),
+                        isBetweenYear(year)
                 ).fetchOne();
     }
 
@@ -467,7 +468,11 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return GAME.gameState.eq(GameState.COMPLETED).or(GAME.gameState.eq(GameState.CANCELED));
     }
 
-    private BooleanExpression isBetweenYear(final int year) {
+    private BooleanExpression isBetweenYear(final Integer year) {
+        if (year == null) {
+            return null;
+        }
+
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
