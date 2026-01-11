@@ -1,5 +1,9 @@
 package com.yagubogu.stat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -42,10 +46,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -480,7 +480,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.game(g3).member(member).team(HT));
 
         // when
-        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), 2025);
 
         // then
         assertSoftly(softly -> {
@@ -500,7 +500,7 @@ class StatServiceTest {
         Member member = memberFactory.save(b -> b.team(HT));
 
         // when
-        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), 2025);
 
         // then
         assertThat(actual)
@@ -981,7 +981,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.game(g2).member(member).team(HT).checkInType(CheckInType.NON_LOCATION_CHECK_IN));
 
         // when
-        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId());
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), 2025);
 
         // then: 평균 득점 = (6+8)/2 = 7.0, 평균 실점 = (4+5)/2 = 4.5, 평균 실책 = (1+1)/2 = 1.0, 평균 안타 = (10+12)/2 = 11.0, 평균 피안타 = (8+9)/2 = 8.5
         assertSoftly(softly -> {

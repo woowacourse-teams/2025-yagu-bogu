@@ -60,9 +60,11 @@ public class StatController implements StatControllerInterface {
     }
 
     public ResponseEntity<AverageStatisticResponse> findAverageStatistic(
-            final MemberClaims memberClaims
+            final MemberClaims memberClaims,
+            @RequestParam(required = false) final Integer year
     ) {
-        AverageStatisticResponse response = statService.findAverageStatistic(memberClaims.id());
+        AverageStatisticResponse response = statService.findAverageStatistic(memberClaims.id(), year);
+
         return ResponseEntity.ok(response);
     }
 
