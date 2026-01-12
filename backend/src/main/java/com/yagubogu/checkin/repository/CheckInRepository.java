@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomCheckInRepository {
 
-    boolean existsByMemberAndGameDate(Member member, LocalDate date);
+    boolean existsByMemberAndGame(Member member, Game game);
 
     boolean existsByMemberAndGameDateAndCheckInType(Member member, LocalDate date, CheckInType checkInType);
 

@@ -95,7 +95,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(201);
 
-        boolean exists = checkInRepository.existsByMemberAndGameDate(mint, date);
+        boolean exists = checkInRepository.existsByMemberAndGame(mint, game);
         assertThat(exists).isTrue();
     }
 

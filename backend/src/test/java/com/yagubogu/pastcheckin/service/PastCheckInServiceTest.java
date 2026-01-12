@@ -99,7 +99,7 @@ class PastCheckInServiceTest {
         pastCheckInService.createPastCheckIn(member.getId(), request);
 
         // then
-        boolean exists = checkInRepository.existsByMemberAndGameDate(member, date);
+        boolean exists = checkInRepository.existsByMemberAndGame(member, game);
         assertThat(exists).isTrue();
     }
 
