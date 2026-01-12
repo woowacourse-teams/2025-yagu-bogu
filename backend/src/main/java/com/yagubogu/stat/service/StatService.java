@@ -103,9 +103,9 @@ public class StatService {
         return new LuckyStadiumResponse(luckyStadiumName);
     }
 
-    public AverageStatisticResponse findAverageStatistic(final long memberId) {
+    public AverageStatisticResponse findAverageStatistic(final long memberId, final Integer year) {
         Member member = getMember(memberId);
-        AverageStatisticParam averageStatisticParam = checkInRepository.findAverageStatistic(member);
+        AverageStatisticParam averageStatisticParam = checkInRepository.findAverageStatistic(member, year);
 
         return AverageStatisticResponse.from(averageStatisticParam);
     }

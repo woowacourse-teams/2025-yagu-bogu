@@ -37,7 +37,7 @@ public class PastCheckInService {
     }
 
     private void validateCheckInNotExists(final Member member, final Game game) {
-        boolean hasCheckIn = checkInRepository.existsByMemberAndGameDate(member, game.getDate());
+        boolean hasCheckIn = checkInRepository.existsByMemberAndGame(member, game);
         if (hasCheckIn) {
             throw new ConflictException("CheckIn already exists");
         }
