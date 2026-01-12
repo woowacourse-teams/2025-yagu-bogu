@@ -32,7 +32,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run Tests
-        run: ./gradlew test
+        run: ./gradlew :app:test
 
       - name: Build
-        run: ./gradlew build -x test
+        run: ./gradlew :app:build -x test
