@@ -34,13 +34,14 @@ public interface CustomCheckInRepository {
             Member member,
             Team team,
             int year,
+            Integer month,
             CheckInResultFilter resultFilter,
             CheckInOrderFilter orderFilter
     );
 
     List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date);
 
-    AverageStatisticParam findAverageStatistic(Member member);
+    AverageStatisticParam findAverageStatistic(Member member, Integer year);
 
     List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,

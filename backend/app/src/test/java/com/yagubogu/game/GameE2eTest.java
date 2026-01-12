@@ -1,5 +1,7 @@
 package com.yagubogu.game;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
@@ -12,9 +14,9 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
-import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.auth.AuthFactory;
+import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.checkin.CheckInFactory;
 import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberFactory;
@@ -32,8 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 public class GameE2eTest extends E2eTestBase {
@@ -179,7 +179,8 @@ public class GameE2eTest extends E2eTestBase {
                 new TeamByGameParam(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
                         game.getHomeTeam().getTeamCode()),
                 new TeamByGameParam(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
-                        game.getAwayTeam().getTeamCode())
+                        game.getAwayTeam().getTeamCode()),
+                game.getStartAt()
         );
     }
 }

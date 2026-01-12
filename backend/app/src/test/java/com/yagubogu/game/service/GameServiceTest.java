@@ -244,7 +244,8 @@ class GameServiceTest {
                 new TeamByGameParam(game.getHomeTeam().getId(), game.getHomeTeam().getShortName(),
                         game.getHomeTeam().getTeamCode()),
                 new TeamByGameParam(game.getAwayTeam().getId(), game.getAwayTeam().getShortName(),
-                        game.getAwayTeam().getTeamCode())
+                        game.getAwayTeam().getTeamCode()),
+                game.getStartAt()
         );
     }
 }

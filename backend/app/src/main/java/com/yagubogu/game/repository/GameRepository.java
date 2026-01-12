@@ -45,7 +45,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
                     g.awayTeam.id,
                     g.awayTeam.shortName,
                     g.awayTeam.teamCode
-                )
+                ),
+                g.startAt
             )
             FROM Game g
             LEFT JOIN CheckIn c ON c.game = g
