@@ -1,5 +1,9 @@
 package com.yagubogu.stat.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.repository.CheckInRepository;
@@ -42,10 +46,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -1209,7 +1209,8 @@ class StatServiceTest {
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
         Member member = memberFactory.save(b -> b.team(HT));
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
-        LocalDate today = LocalDate.now();
+        int year = 2025;
+        LocalDate today = LocalDate.of(2025, 12, 31);
 
         // 1. 과거 경기 (COMPLETED, 승) - 집계 포함 대상
         Game pastCompletedGame = gameFactory.save(b -> b.stadium(kia)
@@ -1228,7 +1229,7 @@ class StatServiceTest {
         checkInFactory.save(b -> b.member(member).team(HT).game(todayScheduledGame));
 
         // when
-        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), today.getYear());
+        CheckInSummaryParam actual = statService.findCheckInSummary(member.getId(), year);
 
         // then
         assertSoftly(s -> {
