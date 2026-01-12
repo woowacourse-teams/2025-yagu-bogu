@@ -91,11 +91,11 @@ public class PastCheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreatePastCheckInRequest(game.getId()))
-                .when().post("/api/past-check-ins")
+                .when().post("/api/v1/past-check-ins")
                 .then().log().all()
                 .statusCode(201);
 
-        boolean exists = checkInRepository.existsByMemberAndGameDate(mint, date);
+        boolean exists = checkInRepository.existsByMemberAndGame(mint, game);
         assertThat(exists).isTrue();
     }
 
@@ -124,7 +124,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreatePastCheckInRequest(game.getId()))
-                .when().post("/api/past-check-ins")
+                .when().post("/api/v1/past-check-ins")
                 .then().log().all()
                 .statusCode(409);
     }
@@ -153,7 +153,7 @@ public class PastCheckInE2eTest extends E2eTestBase {
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body(new CreatePastCheckInRequest(game.getId()))
-                .when().post("/api/past-check-ins")
+                .when().post("/api/v1/past-check-ins")
                 .then().log().all()
                 .statusCode(409);
     }

@@ -1,4 +1,4 @@
-package com.yagubogu.checkin.controller;
+package com.yagubogu.checkin.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;

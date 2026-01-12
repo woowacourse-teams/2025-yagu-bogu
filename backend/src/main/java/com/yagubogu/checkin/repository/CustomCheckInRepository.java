@@ -41,7 +41,7 @@ public interface CustomCheckInRepository {
 
     List<GameWithFanCountsParam> findGamesWithFanCountsByDate(LocalDate date);
 
-    AverageStatisticParam findAverageStatistic(Member member);
+    AverageStatisticParam findAverageStatistic(Member member, Integer year);
 
     List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
