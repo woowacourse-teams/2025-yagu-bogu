@@ -217,7 +217,7 @@ object NetworkModule {
 
                     // 우리 서버(yagubogu.com)로 보내는 요청이면서,
                     // 로그인이나 토큰 갱신 요청이 '아닌' 경우에만 토큰을 붙입니다.
-                    host == YAGUBOGU_HOSTNAME &&
+                    host.contains(YAGUBOGU_HOSTNAME) &&
                         !path.endsWith(AUTH_LOGIN_ENDPOINT) &&
                         !path.endsWith(AUTH_REFRESH_ENDPOINT)
                 }
@@ -225,7 +225,7 @@ object NetworkModule {
         }
     }
 
-    private const val YAGUBOGU_HOSTNAME = "yagubogu.com"
+    private const val YAGUBOGU_HOSTNAME = "yagubogu"
     private const val AUTH_LOGIN_ENDPOINT = "/auth/login"
     private const val AUTH_REFRESH_ENDPOINT = "/auth/refresh"
 }
