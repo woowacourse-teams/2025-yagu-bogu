@@ -3,6 +3,7 @@ package com.yagubogu.checkin.repository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -30,6 +31,7 @@ import com.yagubogu.team.domain.QTeam;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.domain.TeamStatus;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
@@ -235,9 +237,10 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     // 내 직관 내역 조회
     // 내 응원 팀 여부 관계 o, 게임 완료 여부 관계 x(취소된 경기도 보여줌)
     public List<CheckInGameParam> findCheckInHistory(
-            Member member,
-            Team team,
-            int year,
+            final Member member,
+            final Team team,
+            final int year,
+            final Integer month,
             final CheckInResultFilter resultFilter,
             final CheckInOrderFilter orderFilter
     ) {
@@ -266,7 +269,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .leftJoin(GAME.awayScoreBoard, awayScoreBoard)
                 .where(
                         CHECK_IN.member.eq(member),
-                        isBetweenYear(GAME, year),
+                        dateFilter(GAME, year, month),
                         isCompleteOrCanceled(),
                         myTeamWinFilter
                 ).orderBy(order)
@@ -349,9 +352,9 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                         isBetweenYear(year)
                 ).fetchOne();
     }
-
     // 구장별 인증 횟수
     // 내가 응원하는 팀 o, 완료된 경기만 x
+
     public List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
             int year
@@ -373,7 +376,6 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .groupBy(STADIUM.id, STADIUM.location)
                 .fetch();
     }
-
     public List<OpponentWinRateRowParam> findOpponentWinRates(
             Member member,
             Team team,
@@ -624,9 +626,24 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return checkIn.team.eq(member.getTeam());
     }
 
-    private BooleanExpression isBetweenYear(QGame game, final int year) {
+    private Predicate dateFilter(final QGame game, final int year, final Integer month) {
+        if (month == null) {
+            return isBetweenYear(game, year);
+        }
+        return isBetweenYearMonth(game, year, month);
+    }
+
+    private BooleanExpression isBetweenYear(final QGame game, final int year) {
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
+
+        return game.date.between(start, end);
+    }
+
+    private BooleanExpression isBetweenYearMonth(final QGame game, final int year, final int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
 
         return game.date.between(start, end);
     }
