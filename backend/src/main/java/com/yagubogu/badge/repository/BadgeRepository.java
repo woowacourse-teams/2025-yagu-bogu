@@ -32,7 +32,9 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
                     LEFT JOIN MemberBadge currentUserMb
                         ON b.id = currentUserMb.badge.id AND currentUserMb.member.id = :memberId
                     LEFT JOIN MemberBadge achievedMb
-                        ON b.id = achievedMb.badge.id AND achievedMb.isAchieved = true
+                        ON b.id = achievedMb.badge.id
+                        AND achievedMb.isAchieved = true
+                        AND achievedMb.member.deletedAt IS NULL
                     GROUP BY b.id, currentUserMb.progress, currentUserMb.isAchieved, currentUserMb.achievedAt
             """)
     List<BadgeRawResponse> findAllBadgesWithAchievedCount(@Param("memberId") Long memberId);

@@ -2,9 +2,9 @@ package com.yagubogu.game.service;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.ScoreBoard;
+import com.yagubogu.game.dto.GameCompletedEvent;
 import com.yagubogu.game.dto.KboGameParam;
 import com.yagubogu.game.dto.KboGameResultParam;
-import com.yagubogu.game.dto.GameCompletedEvent;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.client.KboGameResultClient;
 import com.yagubogu.game.service.client.KboGameSyncClient;
@@ -49,7 +49,7 @@ public class GameResultSyncService {
             applicationEventPublisher.publishEvent(new GameCompletedEvent(game.getId()));
         }
 
-        KboGameResultParam gameResult = kboGameResultClient.fetchGameResult(game);
+        KboGameResultParam gameResult = kboGameResultClient.fetchGameResult(game, response.srId());
         ScoreBoard homeScoreBoard = gameResult.homeScoreBoard();
         ScoreBoard awayScoreBoard = gameResult.awayScoreBoard();
         String homePitcher = gameResult.homePitcher();
