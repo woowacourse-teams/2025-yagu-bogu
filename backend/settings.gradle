@@ -1,0 +1,4 @@
+rootProject.name = 'yagubogu-backend'
+
+include 'app'
+include 'crawling'

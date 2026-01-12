@@ -1,4 +1,0 @@
-rootProject.name = '2025-yagu-bogu'
-
-include 'backend'
-include 'crawling'
