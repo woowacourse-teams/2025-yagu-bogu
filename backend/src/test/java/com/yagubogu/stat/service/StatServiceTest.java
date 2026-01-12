@@ -435,9 +435,9 @@ class StatServiceTest {
         assertThat(actual.shortName()).isNull();
     }
 
-    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회한다")
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회한다 - 년도가 주어지면 해당 년도의 게임만 조회한다")
     @Test
-    void findAverageStatistic() {
+    void findAverageStatistic_noGameInYear() {
         // given
         Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
         Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
@@ -480,7 +480,64 @@ class StatServiceTest {
         checkInFactory.save(b -> b.game(g3).member(member).team(HT));
 
         // when
-        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), 2025);
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), 2026);
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(actual.averageRun()).isNull();
+            softly.assertThat(actual.concededRuns()).isNull();
+            softly.assertThat(actual.averageErrors()).isNull();
+            softly.assertThat(actual.averageHits()).isNull();
+            softly.assertThat(actual.concededHits()).isNull();
+        });
+    }
+
+    @DisplayName("평균 득, 실, 실책, 안타, 피안타를 조회한다 - 년도가 null일 때 전체를 조회한다")
+    @Test
+    void findAverageStatistic_yearNull() {
+        // given
+        Team HT = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team LT = teamRepository.findByTeamCode("LT").orElseThrow();
+
+        Member member = memberFactory.save(b -> b.team(HT));
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
+
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(8).awayScore(5)
+                .homeScoreBoard(new ScoreBoard(8, 12, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(5, 9, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(LT).awayTeam(HT)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(4).awayScore(10)
+                .homeScoreBoard(new ScoreBoard(4, 8, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(10, 13, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2026, 7, 12))
+                .homeScore(5).awayScore(7)
+                .homeScoreBoard(new ScoreBoard(5, 11, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(7, 10, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g2).member(member).team(HT));
+        checkInFactory.save(b -> b.game(g3).member(member).team(HT));
+
+        // when
+        AverageStatisticResponse actual = statService.findAverageStatistic(member.getId(), null);
 
         // then
         assertSoftly(softly -> {
@@ -1210,7 +1267,7 @@ class StatServiceTest {
         Member member = memberFactory.save(b -> b.team(HT));
         Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
         int year = 2025;
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.of(2025, 10, 5);
 
         // 1. 과거 경기 (COMPLETED, 승) - 집계 포함 대상
         Game pastCompletedGame = gameFactory.save(b -> b.stadium(kia)
