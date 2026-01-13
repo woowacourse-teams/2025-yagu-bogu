@@ -106,14 +106,14 @@ fun SettingMainScreen(
                 UCrop.RESULT_ERROR -> {
                     val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
                     Timber.e(cropError, "uCrop Error")
-                    context.showToast(context.getString(R.string.setting_edit_profile_image_crop_failed))
+                    context.showToast(R.string.setting_edit_profile_image_crop_failed)
                 }
             }
         }
     val pickImageLauncher: ManagedActivityResultLauncher<String, Uri?> =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                createUCropIntent(
+                launchUCropIntent(
                     context = context,
                     sourceUri = it,
                     onCropIntentReady = uCropLauncher::launch,
@@ -258,7 +258,7 @@ private fun Context.getAppVersion(): String =
         DEFAULT_VERSION_NAME
     }
 
-private fun createUCropIntent(
+private fun launchUCropIntent(
     context: Context,
     sourceUri: Uri,
     onCropIntentReady: (Intent) -> Unit,
