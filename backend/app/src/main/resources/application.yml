@@ -1,0 +1,96 @@
+spring:
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration/mysql
+    validate-on-migrate: true
+
+  datasource:
+    hikari:
+      maximumPoolSize: 18
+      minimumIdle: 18
+      connectionTimeout: 5000
+      idleTimeout: 0
+      maxLifetime: 1500000
+      validationTimeout: 1000
+      poolName: main-hikari-pool
+
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 4
+        queue-capacity: 200
+      thread-name-prefix: app-async-
+
+server:
+  tomcat:
+    threads:
+      max: 80
+      min-spare: 16
+    accept-count: 200
+
+oauth:
+  google:
+    base-uri: 'https://oauth2.googleapis.com'
+    token-info-uri: '/tokeninfo'
+    client-id: ${GOOGLE_CLIENT_ID}
+    connect-timeout: 180s
+    read-timeout: 180s
+
+security:
+  token:
+    access-token:
+      secret-key: ${ACCESS_TOKEN_SECRET_KEY}
+      expires-in: 900      # 15분 (초)
+    refresh-token:
+      secret-key: ${REFRESH_TOKEN_SECRET_KEY}
+      expires-in: 1209600  # 14일 (초)
+
+api:
+  kbo:
+    base-url: https://www.koreabaseball.com/ws
+    connect-timeout: 5s
+    read-timeout: 30s
+    content-type: application/x-www-form-urlencoded; charset=UTF-8
+
+sse:
+  heartbeat:
+    enabled: true
+    interval-ms: 25000
+
+app:
+  s3:
+    bucket: yagubogu
+    presign-expiration: 5m
+  clock:
+    fixed-date: 2024-08-15
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod

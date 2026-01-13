@@ -1,1 +1,4 @@
-rootProject.name = 'yagubogu'
+rootProject.name = 'yagubogu-backend'
+
+include 'app'
+include 'crawling'
