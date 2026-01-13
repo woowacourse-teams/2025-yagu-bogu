@@ -77,7 +77,7 @@ fun SettingScreen(
                     }
                     entry<SettingNavKey.SettingAccount> {
                         SettingAccountScreen(
-                            onClickDeleteAccount = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                            onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
                         )
                     }
                     entry<SettingNavKey.SettingDeleteAccount> {
