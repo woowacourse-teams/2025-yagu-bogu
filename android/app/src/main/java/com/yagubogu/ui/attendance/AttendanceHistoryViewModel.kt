@@ -37,6 +37,12 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
     val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
 
+    private val _filter = MutableStateFlow(AttendanceHistoryFilter.ALL)
+    val filter: StateFlow<AttendanceHistoryFilter> = _filter.asStateFlow()
+
+    private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
+    val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
+
     private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
     val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
 
@@ -48,15 +54,16 @@ class AttendanceHistoryViewModel @Inject constructor(
         )
     val pastCheckInUiEvent: SharedFlow<Unit> = _pastCheckInUiEvent.asSharedFlow()
 
-    fun fetchAttendanceHistoryItems(
-        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
-        sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
-    ) {
+    fun fetchAttendanceHistoryItems() {
         viewModelScope.launch {
             val yearMonth: YearMonth = currentMonth.value
             checkInRepository
-                .getCheckInHistories(yearMonth.year, yearMonth.monthValue, filter.name, sort.name)
-                .mapList { it.toUiModel() }
+                .getCheckInHistories(
+                    yearMonth.year,
+                    yearMonth.monthValue,
+                    filter.value.name,
+                    sort.value.name,
+                ).mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
                 }.onFailure { exception: Throwable ->
@@ -65,7 +72,7 @@ class AttendanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun fetchPastGames(date: LocalDate = LocalDate.now()) {
+    fun fetchPastGames(date: LocalDate) {
         viewModelScope.launch {
             val gamesResult: Result<List<PastGameUiModel>> =
                 gameRepository
@@ -98,6 +105,14 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun updateCurrentMonth(yearMonth: YearMonth) {
         _currentMonth.value = yearMonth
+    }
+
+    fun updateFilter(filter: AttendanceHistoryFilter) {
+        _filter.value = filter
+    }
+
+    fun updateSort(sort: AttendanceHistorySort) {
+        _sort.value = sort
     }
 
     companion object {
