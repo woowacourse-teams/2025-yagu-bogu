@@ -90,3 +90,6 @@ $RECYCLE.BIN/
 *.lnk
 
 /src/main/generated
+
+# Log directory
+log/

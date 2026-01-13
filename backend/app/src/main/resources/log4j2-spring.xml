@@ -33,8 +33,8 @@
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
 
-        <RollingFile name="LocalFile" fileName="log/local.log"
-                     filePattern="log/local-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="LocalFile" fileName="backend/log/local.log"
+                     filePattern="backend/log/local-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
                     disableAnsi="false"
                     pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{params}] - %msg%n"/>
