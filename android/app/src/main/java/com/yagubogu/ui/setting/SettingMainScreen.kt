@@ -29,7 +29,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,9 +56,8 @@ import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
-import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
-import com.yagubogu.ui.setting.model.SettingDialogEvent
 import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
@@ -79,6 +83,8 @@ fun SettingMainScreen(
     val scope: CoroutineScope = rememberCoroutineScope()
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
+
+    var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
@@ -121,14 +127,26 @@ fun SettingMainScreen(
 
     SettingMainScreen(
         onClickSettingAccount = onClickSettingAccount,
-        onNicknameEdit = { viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog) },
+        onNicknameEdit = { showNicknameEditDialog = true },
         onProfileImageUpload = { pickImageLauncher.launch("image/*") },
         memberInfoItem = memberInfoItem.value,
         appVersion = context.getAppVersion(),
         modifier = modifier,
     )
 
-    SettingDialog(viewModel = viewModel)
+    if (showNicknameEditDialog) {
+        NicknameEditDialog(
+            nickname =
+                viewModel.myMemberInfoItem
+                    .collectAsState()
+                    .value.nickName,
+            onConfirm = { nickname ->
+                viewModel.updateNickname(nickname)
+                showNicknameEditDialog = false
+            },
+            onCancel = { showNicknameEditDialog = false },
+        )
+    }
 
     SettingEventHandler(settingEvent = settingEvent.value)
 }

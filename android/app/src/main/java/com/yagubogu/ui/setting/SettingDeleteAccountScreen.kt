@@ -18,6 +18,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,9 +35,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.setting.component.SettingEventHandler
-import com.yagubogu.ui.setting.component.dialog.SettingDialog
+import com.yagubogu.ui.setting.component.dialog.DeleteAccountDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
-import com.yagubogu.ui.setting.model.SettingDialogEvent
 import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
@@ -56,14 +59,27 @@ fun SettingDeleteAccountScreen(
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
+    var showDeleteAccountDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+
     SettingDeleteAccountScreen(
-        onCancelDeleteAccount = viewModel::cancelDeleteAccount,
-        onConfirmDeleteAccount = { viewModel.emitDialogEvent(SettingDialogEvent.DeleteAccountDialog) },
+        onCancelDeleteAccount = {
+            viewModel.cancelDeleteAccount()
+            showDeleteAccountDialog = false
+        },
+        onConfirmDeleteAccount = { showDeleteAccountDialog = true },
         memberInfoItem = memberInfoItem.value,
         modifier = modifier,
     )
 
-    SettingDialog(viewModel = viewModel)
+    if (showDeleteAccountDialog) {
+        DeleteAccountDialog(
+            onConfirm = {
+                viewModel.deleteAccount()
+                showDeleteAccountDialog = false
+            },
+            onCancel = { showDeleteAccountDialog = false },
+        )
+    }
 
     SettingEventHandler(
         settingEvent = settingEvent.value,
