@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,25 +23,18 @@ import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.noRippleClickable
 
-@Preview(showBackground = true)
 @Composable
 fun SettingButton(
+    text: String,
     modifier: Modifier = Modifier,
-    text: String = "",
     onClick: () -> Unit = {},
 ) {
-    Box(
+    Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .noRippleClickable { onClick() },
     ) {
-        Spacer(
-            modifier =
-                Modifier
-                    .height(10.dp)
-                    .fillMaxWidth(),
-        )
         Row(
             modifier =
                 Modifier
@@ -60,12 +51,6 @@ fun SettingButton(
                 tint = Gray500,
             )
         }
-        Spacer(
-            modifier =
-                Modifier
-                    .height(10.dp)
-                    .fillMaxWidth(),
-        )
     }
 }
 
@@ -81,10 +66,29 @@ fun SettingButtonGroup(
                 .background(White, RoundedCornerShape(12.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.padding(vertical = 20.dp),
+        ) {
             content()
         }
-        Spacer(modifier = Modifier.height(20.dp))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingButtonPreview() {
+    SettingButton("응원팀 수정")
+}
+
+@Preview
+@Composable
+private fun SettingButtonGroupPreview() {
+    Column {
+        SettingButtonGroup {
+            SettingButton("1")
+            SettingButton("2")
+            SettingButton("3")
+        }
     }
 }
