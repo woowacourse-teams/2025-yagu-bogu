@@ -7,12 +7,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
 import com.yagubogu.presentation.util.DateFormatter
-import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.common.component.DefaultDialog
+import java.time.LocalDate
 
 @Composable
 fun PastCheckInDialog(
-    pastGameUiModel: PastGameUiModel,
+    date: LocalDate,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -22,7 +22,7 @@ fun PastCheckInDialog(
             title =
                 stringResource(
                     R.string.attendance_history_add_attendance_confirm,
-                    pastGameUiModel.date.format(DateFormatter.yyyyMMdd),
+                    date.format(DateFormatter.yyyyMMdd),
                 ),
             message = stringResource(R.string.attendance_history_add_attendance_message),
             negativeText = stringResource(R.string.all_cancel),
@@ -40,7 +40,7 @@ fun PastCheckInDialog(
 @Composable
 private fun PastCheckInDialogPreview() {
     PastCheckInDialog(
-        pastGameUiModel = PAST_GAME_UI_MODEL,
+        date = LocalDate.now(),
         onConfirm = {},
         onCancel = {},
     )

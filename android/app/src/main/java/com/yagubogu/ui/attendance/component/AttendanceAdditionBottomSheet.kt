@@ -49,11 +49,13 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.color
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceAdditionBottomSheet(
     items: List<PastGameUiModel>,
+    date: LocalDate,
     onPastCheckIn: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,6 +71,7 @@ fun AttendanceAdditionBottomSheet(
             true ->
                 PastGamesContent(
                     items = items,
+                    date = date,
                     onPastCheckIn = onPastCheckIn,
                 )
 
@@ -80,6 +83,7 @@ fun AttendanceAdditionBottomSheet(
 @Composable
 private fun PastGamesContent(
     items: List<PastGameUiModel>,
+    date: LocalDate,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -105,6 +109,7 @@ private fun PastGamesContent(
         ) { item: PastGameUiModel ->
             PastAttendanceItem(
                 item = item,
+                date = date,
                 onPastCheckIn = onPastCheckIn,
             )
         }
@@ -136,13 +141,14 @@ private fun EmptyPastGameContent(modifier: Modifier = Modifier) {
 @Composable
 private fun PastAttendanceItem(
     item: PastGameUiModel,
+    date: LocalDate,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showDialog: Boolean by rememberSaveable { mutableStateOf(false) }
     if (showDialog) {
         PastCheckInDialog(
-            pastGameUiModel = item,
+            date = date,
             onConfirm = {
                 onPastCheckIn(item.gameId)
                 showDialog = false
@@ -184,7 +190,7 @@ private fun PastAttendanceItem(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = item.date.format(DateFormatter.yyyyMMdd),
+            text = "${date.format(DateFormatter.yyyyMMdd)} ${item.startAt.format(DateFormatter.hhmm)}",
             style = PretendardRegular12.copy(color = Gray500),
         )
         Text(
@@ -200,6 +206,7 @@ private fun PastAttendanceItem(
 private fun AttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
         items = PAST_GAME_UI_MODELS,
+        date = LocalDate.now(),
         onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
@@ -212,6 +219,7 @@ private fun AttendanceAdditionBottomSheetPreview() {
 private fun EmptyAttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
         items = emptyList(),
+        date = LocalDate.now(),
         onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
@@ -223,6 +231,7 @@ private fun EmptyAttendanceAdditionBottomSheetPreview() {
 private fun PastAttendanceItemPreview() {
     PastAttendanceItem(
         item = PAST_GAME_UI_MODELS[0],
+        date = LocalDate.now(),
         onPastCheckIn = { },
     )
 }
