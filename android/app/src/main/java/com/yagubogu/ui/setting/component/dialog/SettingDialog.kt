@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.setting.SettingViewModel
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
+import com.yagubogu.ui.setting.model.SettingDialogEvent
 
 @Composable
 fun SettingDialog(

@@ -1,4 +1,4 @@
-package com.yagubogu.ui.setting.component.model
+package com.yagubogu.ui.setting.model
 
 data class PresignedUrlItem(
     val key: String,

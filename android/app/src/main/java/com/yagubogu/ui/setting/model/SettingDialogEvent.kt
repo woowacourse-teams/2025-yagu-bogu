@@ -1,4 +1,4 @@
-package com.yagubogu.ui.setting.component.model
+package com.yagubogu.ui.setting.model
 
 sealed interface SettingDialogEvent {
     data object DeleteAccountDialog : SettingDialogEvent

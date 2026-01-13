@@ -7,11 +7,11 @@ import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.presentation.mapper.toUiModel
-import com.yagubogu.ui.setting.component.model.MemberInfoItem
-import com.yagubogu.ui.setting.component.model.PresignedUrlCompleteItem
-import com.yagubogu.ui.setting.component.model.PresignedUrlItem
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.model.MemberInfoItem
+import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
+import com.yagubogu.ui.setting.model.PresignedUrlItem
+import com.yagubogu.ui.setting.model.SettingDialogEvent
+import com.yagubogu.ui.setting.model.SettingEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

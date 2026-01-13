@@ -20,8 +20,8 @@ import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.SettingDialog
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.model.SettingDialogEvent
+import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 
 @Composable
