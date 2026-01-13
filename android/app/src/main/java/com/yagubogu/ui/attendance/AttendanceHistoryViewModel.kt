@@ -37,6 +37,9 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
     val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
 
+    private val _currentDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val currentDate: StateFlow<LocalDate> = _currentDate.asStateFlow()
+
     private val _filter = MutableStateFlow(AttendanceHistoryFilter.ALL)
     val filter: StateFlow<AttendanceHistoryFilter> = _filter.asStateFlow()
 
@@ -105,6 +108,10 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun updateCurrentMonth(yearMonth: YearMonth) {
         _currentMonth.value = yearMonth
+    }
+
+    fun updateCurrentDate(date: LocalDate) {
+        _currentDate.value = date
     }
 
     fun updateFilter(filter: AttendanceHistoryFilter) {

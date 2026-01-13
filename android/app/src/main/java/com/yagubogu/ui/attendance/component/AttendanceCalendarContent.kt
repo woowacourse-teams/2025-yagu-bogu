@@ -54,13 +54,14 @@ fun AttendanceCalendarContent(
     endMonth: YearMonth,
     currentMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
+    currentDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
     pastGames: List<PastGameUiModel>,
     onRequestGames: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var currentDate: LocalDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     val itemsByDate: Map<LocalDate, List<AttendanceHistoryItem>> =
         items.groupBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
     val currentItems: List<AttendanceHistoryItem>? = itemsByDate[currentDate]
@@ -102,7 +103,7 @@ fun AttendanceCalendarContent(
                 currentMonth = currentMonth,
                 onMonthChange = onMonthChange,
                 currentDate = currentDate,
-                onDateChange = { date: LocalDate -> currentDate = date },
+                onDateChange = onDateChange,
                 attendanceDates = itemsByDate.keys,
             )
 
@@ -183,6 +184,8 @@ private fun AttendanceCalendarContentPreview() {
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onMonthChange = {},
+        currentDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
         onRequestGames = {},
         onPastCheckIn = {},
@@ -198,6 +201,8 @@ private fun AttendanceCalendarContentNoItemPreview() {
         endMonth = YearMonth.now(),
         currentMonth = YearMonth.now(),
         onMonthChange = {},
+        currentDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
         onRequestGames = {},
         onPastCheckIn = {},
