@@ -49,13 +49,13 @@ class AttendanceHistoryViewModel @Inject constructor(
     val pastCheckInUiEvent: SharedFlow<Unit> = _pastCheckInUiEvent.asSharedFlow()
 
     fun fetchAttendanceHistoryItems(
-        yearMonth: YearMonth = YearMonth.now(),
         filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
         sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
     ) {
         viewModelScope.launch {
+            val yearMonth: YearMonth = currentMonth.value
             checkInRepository
-                .getCheckInHistories(yearMonth.year, filter.name, sort.name)
+                .getCheckInHistories(yearMonth.year, yearMonth.monthValue, filter.name, sort.name)
                 .mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems

@@ -84,8 +84,8 @@ fun AttendanceHistoryScreen(
     }
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(viewType) {
-        viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth)
+    LaunchedEffect(currentMonth, viewType) {
+        viewModel.fetchAttendanceHistoryItems()
     }
 
     val checkInSuccessMessage: String =
@@ -108,7 +108,6 @@ fun AttendanceHistoryScreen(
         items = attendanceItems,
         updateItems = { filter: AttendanceHistoryFilter, sort: AttendanceHistorySort ->
             viewModel.fetchAttendanceHistoryItems(
-                yearMonth = currentMonth,
                 filter = filter,
                 sort = sort,
             )

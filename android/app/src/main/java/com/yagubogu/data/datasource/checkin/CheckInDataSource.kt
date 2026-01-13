@@ -16,6 +16,7 @@ interface CheckInDataSource {
 
     suspend fun getCheckInHistories(
         year: Int,
+        month: Int,
         filter: String,
         sort: String,
     ): Result<CheckInHistoryResponse>

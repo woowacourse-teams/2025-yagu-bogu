@@ -33,11 +33,12 @@ class CheckInDefaultRepository @Inject constructor(
 
     override suspend fun getCheckInHistories(
         year: Int,
+        month: Int,
         filter: String,
         sort: String,
     ): Result<List<CheckInGameDto>> =
         checkInDataSource
-            .getCheckInHistories(year, filter, sort)
+            .getCheckInHistories(year, month, filter, sort)
             .map { checkInHistoryResponse: CheckInHistoryResponse ->
                 checkInHistoryResponse.checkInHistory
             }
