@@ -5,7 +5,7 @@ services:
     env_file:
       - .env
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     container_name: yagubogu-backend
     ports:

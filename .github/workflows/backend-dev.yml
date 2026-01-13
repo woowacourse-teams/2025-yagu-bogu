@@ -59,11 +59,11 @@ jobs:
       - name: Docker Image Build & Push (arm64-arch)
         run: |
           TAG_LATEST="dev-latest"
-          # Dockerfile 경로: backend/app/Dockerfile
+          # Dockerfile 경로: backend/Dockerfile
           docker buildx build \
           --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max \
           --cache-from=type=registry,ref=$IMAGE:build-cache \
-          -f app/Dockerfile \
+          -f Dockerfile \
           --platform linux/arm64 \
           -t $IMAGE:$TAG_LATEST \
           --push \
