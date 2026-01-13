@@ -36,8 +36,8 @@
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
 
-        <RollingFile name="LocalFile" fileName="log/local.log"
-                     filePattern="log/local-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="LocalFile" fileName="backend/log/local.log"
+                     filePattern="backend/log/local-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout
                     timezone="Asia/Seoul"
                     disableAnsi="false"
