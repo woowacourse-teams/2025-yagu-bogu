@@ -1,6 +1,5 @@
 package com.yagubogu.ui.setting
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -41,61 +40,60 @@ fun SettingScreen(
 
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Scaffold(
-            containerColor = Gray050,
-            topBar = {
-                DefaultToolbar(
-                    onBackClick = {
-                        when (navigator.canGoBack()) {
-                            true -> navigator.goBack()
-                            false -> navigateToParent()
-                        }
-                    },
-                    title = stringResource((navigator.currentRoute as SettingNavKey).label),
-                )
-            },
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    snackbar = {
-                        Snackbar(
-                            snackbarData = it,
-                            containerColor = Color.DarkGray,
-                            contentColor = White,
-                        )
-                    },
-                )
-            },
-        ) { innerPadding: PaddingValues ->
-            val entryProvider: (NavKey) -> NavEntry<NavKey> =
-                entryProvider {
-                    entry<SettingNavKey.SettingMain> {
-                        SettingMainScreen(
-                            onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
-                        )
+    Scaffold(
+        containerColor = Gray050,
+        topBar = {
+            DefaultToolbar(
+                onBackClick = {
+                    when (navigator.canGoBack()) {
+                        true -> navigator.goBack()
+                        false -> navigateToParent()
                     }
-                    entry<SettingNavKey.SettingAccount> {
-                        SettingAccountScreen(
-                            onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
-                        )
-                    }
-                    entry<SettingNavKey.SettingDeleteAccount> {
-                        SettingDeleteAccountScreen(navigateToHome = {
-                            navigator.clearStack()
-                            navigateToBottom()
-                        })
-                    }
-                }
-
-            NavDisplay(
-                modifier =
-                    Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                entries = navigationState.toEntries(entryProvider),
-                onBack = { navigator.goBack() },
+                },
+                title = stringResource((navigator.currentRoute as SettingNavKey).label),
             )
-        }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = {
+                    Snackbar(
+                        snackbarData = it,
+                        containerColor = Color.DarkGray,
+                        contentColor = White,
+                    )
+                },
+            )
+        },
+        modifier = modifier,
+    ) { innerPadding: PaddingValues ->
+        val entryProvider: (NavKey) -> NavEntry<NavKey> =
+            entryProvider {
+                entry<SettingNavKey.SettingMain> {
+                    SettingMainScreen(
+                        onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                    )
+                }
+                entry<SettingNavKey.SettingAccount> {
+                    SettingAccountScreen(
+                        onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                    )
+                }
+                entry<SettingNavKey.SettingDeleteAccount> {
+                    SettingDeleteAccountScreen(navigateToHome = {
+                        navigator.clearStack()
+                        navigateToBottom()
+                    })
+                }
+            }
+
+        NavDisplay(
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+            entries = navigationState.toEntries(entryProvider),
+            onBack = { navigator.goBack() },
+        )
     }
 }
