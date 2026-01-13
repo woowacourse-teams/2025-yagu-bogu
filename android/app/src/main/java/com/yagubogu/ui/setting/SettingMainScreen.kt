@@ -167,7 +167,7 @@ private fun SettingMainScreen(
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(20.dp)
+                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
                 .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
@@ -231,10 +231,10 @@ private fun MyProfile(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(30.dp))
-        ProfileImage(memberInfoItem.profileImageUrl, modifier = Modifier.size(80.dp))
-        Spacer(modifier = Modifier.height(30.dp))
-        Text(text = memberInfoItem.nickName, style = PretendardSemiBold, fontSize = 24.sp)
+        ProfileImage(memberInfoItem.profileImageUrl, modifier = Modifier.size(100.dp))
         Spacer(modifier = Modifier.height(16.dp))
+        Text(text = memberInfoItem.nickName, style = PretendardSemiBold, fontSize = 24.sp)
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text =
                 stringResource(

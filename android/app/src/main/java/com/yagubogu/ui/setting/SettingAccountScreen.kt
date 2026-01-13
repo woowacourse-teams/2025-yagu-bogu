@@ -67,7 +67,7 @@ private fun SettingAccountScreen(
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(20.dp)
+                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
                 .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
