@@ -56,5 +56,5 @@ private fun navigateToLogin(context: Context) {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         },
     )
-    (context as MainActivity).finish()
+    (context as? MainActivity)?.finish()
 }
