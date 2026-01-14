@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
@@ -58,6 +59,7 @@ import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @Composable
 fun StatsScreen(
@@ -66,6 +68,7 @@ fun StatsScreen(
     modifier: Modifier = Modifier,
     statsViewModel: StatsViewModel = hiltViewModel(),
 ) {
+    val year: Int by statsViewModel.year.collectAsStateWithLifecycle()
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
@@ -74,14 +77,19 @@ fun StatsScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        StatsHeader(pagerState, coroutineScope)
+        StatsHeader(
+            year = year,
+            onYearChange = statsViewModel::updateYear,
+            pagerState = pagerState,
+            coroutineScope = coroutineScope,
+        )
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
             when (StatsTab.entries[page]) {
-                StatsTab.MY_STATS -> StatsMyScreen(scrollToTopEvent)
-                StatsTab.DETAIL_STATS -> StatsDetailScreen(scrollToTopEvent)
+                StatsTab.MY_STATS -> StatsMyScreen(year, scrollToTopEvent)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(year, scrollToTopEvent)
             }
         }
     }
@@ -89,6 +97,8 @@ fun StatsScreen(
 
 @Composable
 private fun StatsHeader(
+    year: Int,
+    onYearChange: (Int) -> Unit,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     modifier: Modifier = Modifier,
@@ -107,8 +117,8 @@ private fun StatsHeader(
         )
 
         StatsYearDropdown(
-            year = StatsViewModel.YEAR_RANGE.last,
-            onClick = {},
+            year = year,
+            onYearChange = onYearChange,
         )
     }
 }
@@ -159,14 +169,15 @@ private fun StatsTab(
                     width = 1.dp,
                     color = if (isSelected) Primary500 else Gray200,
                     shape = CircleShape,
-                ).padding(horizontal = 20.dp, vertical = 12.dp),
+                )
+                .padding(horizontal = 20.dp, vertical = 12.dp),
     )
 }
 
 @Composable
 private fun StatsYearDropdown(
     year: Int,
-    onClick: (Int) -> Unit,
+    onYearChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -208,7 +219,7 @@ private fun StatsYearDropdown(
                         )
                     },
                     onClick = {
-                        onClick(year)
+                        onYearChange(year)
                         isExpanded = false
                         Firebase.analytics.logEvent("stats_change_year", null)
                     },
@@ -224,6 +235,8 @@ private fun StatsYearDropdown(
 @Composable
 private fun StatsHeaderPreview() {
     StatsHeader(
+        year = LocalDate.now().year,
+        onYearChange = {},
         pagerState = rememberPagerState(pageCount = { StatsTab.entries.size }),
         coroutineScope = rememberCoroutineScope(),
     )

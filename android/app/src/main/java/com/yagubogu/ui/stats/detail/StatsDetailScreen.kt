@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsDetailScreen(
+    year: Int,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = hiltViewModel(),
@@ -35,7 +36,7 @@ fun StatsDetailScreen(
     val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(year) {
         viewModel.fetchDetailStats()
     }
 

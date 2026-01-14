@@ -27,7 +27,9 @@ interface StatsApiService {
     ): Response<StatsLuckyStadiumsResponse>
 
     @GET("/api/v1/stats/me")
-    suspend fun getAverageStats(): Response<AverageStatisticResponse>
+    suspend fun getAverageStats(
+        @Query("year") year: Int,
+    ): Response<AverageStatisticResponse>
 
     @GET("/api/v1/stats/win-rate/opponents")
     suspend fun getVsTeamStats(

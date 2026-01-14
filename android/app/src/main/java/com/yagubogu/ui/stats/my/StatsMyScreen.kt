@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsMyScreen(
+    year: Int,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = hiltViewModel(),
@@ -34,7 +35,7 @@ fun StatsMyScreen(
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
     val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(year) {
         viewModel.fetchMyStats()
     }
 

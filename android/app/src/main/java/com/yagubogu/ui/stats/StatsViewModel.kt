@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.Year
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -36,6 +35,9 @@ class StatsViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
+    private val _year = MutableStateFlow(LocalDate.now().year)
+    val year: StateFlow<Int> = _year.asStateFlow()
+
     private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
     val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
 
@@ -71,12 +73,17 @@ class StatsViewModel @Inject constructor(
         fetchStadiumVisitCounts()
     }
 
+    fun updateYear(year: Int) {
+        _year.value = year
+    }
+
     fun toggleVsTeamStats() {
         _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
     }
 
-    private fun fetchMyAttendanceStats(year: Int = LocalDate.now().year) {
+    private fun fetchMyAttendanceStats() {
         viewModelScope.launch {
+            val year: Int = year.value
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                 async { statsRepository.getStatsCounts(year).map { it.toUiModel() } }
             val winRateDeferred: Deferred<Result<Double>> =
@@ -120,8 +127,9 @@ class StatsViewModel @Inject constructor(
 
     private fun fetchMyAverageStats() {
         viewModelScope.launch {
+            val year: Int = year.value
             statsRepository
-                .getAverageStats()
+                .getAverageStats(year)
                 .map { it.toUiModel() }
                 .onSuccess { averageStats: AverageStats ->
                     _averageStats.value = averageStats
@@ -131,8 +139,9 @@ class StatsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
+    private fun fetchVsTeamStats() {
         viewModelScope.launch {
+            val year: Int = year.value
             val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
                 statsRepository
                     .getVsTeamStats(year)
@@ -148,8 +157,9 @@ class StatsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
+    private fun fetchStadiumVisitCounts() {
         viewModelScope.launch {
+            val year: Int = year.value
             val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
                 checkInRepository.getStadiumCheckInCounts(year).mapList { it.toUiModel() }
             stadiumVisitCountsResult
@@ -163,7 +173,7 @@ class StatsViewModel @Inject constructor(
     }
 
     companion object {
-        val YEAR_RANGE: IntRange = 2021..Year.now().value
+        val YEAR_RANGE: IntRange = 2021..LocalDate.now().year
 
         private const val DEFAULT_TEAM_STATS_COUNT = 5
     }
