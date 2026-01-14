@@ -1,10 +1,16 @@
-package com.yagubogu.ui.stats.my
+package com.yagubogu.ui.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
+import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
+import com.yagubogu.presentation.util.mapList
+import com.yagubogu.presentation.util.mapListIndexed
+import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
+import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
 import com.yagubogu.ui.stats.my.model.AverageStats
 import com.yagubogu.ui.stats.my.model.StatsCounts
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
@@ -12,20 +18,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.Clock
 import java.time.LocalDate
+import java.time.Year
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @HiltViewModel
-class StatsMyViewModel @Inject constructor(
+class StatsViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
-    private val clock: Clock,
+    private val checkInRepository: CheckInRepository,
 ) : ViewModel() {
     private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
     val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
@@ -33,12 +42,40 @@ class StatsMyViewModel @Inject constructor(
     private val _averageStats = MutableStateFlow(AverageStats())
     val averageStats: StateFlow<AverageStats> = _averageStats.asStateFlow()
 
-    fun fetchAll() {
-        fetchMyStats()
+    private val _isVsTeamStatsExpanded = MutableStateFlow(false)
+    val isVsTeamStatsExpanded: StateFlow<Boolean> = _isVsTeamStatsExpanded.asStateFlow()
+
+    private val _vsTeamStatItems = MutableStateFlow<List<VsTeamStatItem>>(emptyList())
+    val vsTeamStatItems: StateFlow<List<VsTeamStatItem>> =
+        combine(
+            isVsTeamStatsExpanded,
+            _vsTeamStatItems,
+        ) { isExpanded: Boolean, vsTeamStats: List<VsTeamStatItem> ->
+            if (!isExpanded) vsTeamStats.take(DEFAULT_TEAM_STATS_COUNT) else vsTeamStats
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
+
+    private val _stadiumVisitCounts = MutableStateFlow<List<StadiumVisitCount>>(emptyList())
+    val stadiumVisitCounts: StateFlow<List<StadiumVisitCount>> = _stadiumVisitCounts.asStateFlow()
+
+    fun fetchMyStats() {
+        fetchMyAttendanceStats()
         fetchMyAverageStats()
     }
 
-    private fun fetchMyStats(year: Int = LocalDate.now(clock).year) {
+    fun fetchDetailStats() {
+        fetchVsTeamStats()
+        fetchStadiumVisitCounts()
+    }
+
+    fun toggleVsTeamStats() {
+        _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
+    }
+
+    private fun fetchMyAttendanceStats(year: Int = LocalDate.now().year) {
         viewModelScope.launch {
             val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                 async { statsRepository.getStatsCounts(year).map { it.toUiModel() } }
@@ -92,5 +129,43 @@ class StatsMyViewModel @Inject constructor(
                     Timber.w(exception, "API 호출 실패")
                 }
         }
+    }
+
+    private fun fetchVsTeamStats(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
+                statsRepository
+                    .getVsTeamStats(year)
+                    .mapListIndexed { index: Int, item: OpponentWinRateTeamDto ->
+                        item.toUiModel(rank = index + 1)
+                    }
+            vsTeamStatsResult
+                .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
+                    _vsTeamStatItems.value = updatedVsTeamStats
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    private fun fetchStadiumVisitCounts(year: Int = LocalDate.now().year) {
+        viewModelScope.launch {
+            val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
+                checkInRepository.getStadiumCheckInCounts(year).mapList { it.toUiModel() }
+            stadiumVisitCountsResult
+                .onSuccess { stadiumVisitCounts: List<StadiumVisitCount> ->
+                    _stadiumVisitCounts.value =
+                        stadiumVisitCounts.sortedByDescending { it.visitCounts }
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
+    }
+
+    companion object {
+        val START_YEAR: Int = 2021
+        val END_YEAR: Int = Year.now().value
+
+        private const val DEFAULT_TEAM_STATS_COUNT = 5
     }
 }

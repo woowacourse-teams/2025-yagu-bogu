@@ -22,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.ui.stats.detail.StatsDetailScreen
-import com.yagubogu.ui.stats.detail.StatsDetailViewModel
 import com.yagubogu.ui.stats.my.StatsMyScreen
-import com.yagubogu.ui.stats.my.StatsMyViewModel
 import com.yagubogu.ui.theme.Gray200
 import com.yagubogu.ui.theme.Gray700
 import com.yagubogu.ui.theme.PretendardSemiBold
@@ -41,8 +39,7 @@ fun StatsScreen(
     snackbarHostState: SnackbarHostState,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
-    statsMyViewModel: StatsMyViewModel = hiltViewModel(),
-    statsDetailViewModel: StatsDetailViewModel = hiltViewModel(),
+    statsViewModel: StatsViewModel = hiltViewModel(),
 ) {
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
@@ -52,14 +49,14 @@ fun StatsScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        StatsTabRow(pagerState, coroutineScope)
+        StatsHeader(pagerState, coroutineScope)
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page: Int ->
             when (StatsTab.entries[page]) {
-                StatsTab.MY_STATS -> StatsMyScreen(statsMyViewModel, scrollToTopEvent)
-                StatsTab.DETAIL_STATS -> StatsDetailScreen(statsDetailViewModel, scrollToTopEvent)
+                StatsTab.MY_STATS -> StatsMyScreen(scrollToTopEvent)
+                StatsTab.DETAIL_STATS -> StatsDetailScreen(scrollToTopEvent)
             }
         }
     }
@@ -72,10 +69,7 @@ private fun StatsHeader(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier =
-            modifier
-                .padding(top = 8.dp)
-                .padding(horizontal = 20.dp),
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         StatsTabRow(
