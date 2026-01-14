@@ -250,7 +250,7 @@ private fun AttendanceHistoryHeader(
             Text(
                 text =
                     stringResource(
-                        R.string.attendance_history_year_month,
+                        R.string.all_year_month,
                         currentMonth.year,
                         currentMonth.monthValue,
                     ),

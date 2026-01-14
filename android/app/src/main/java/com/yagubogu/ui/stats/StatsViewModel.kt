@@ -163,8 +163,7 @@ class StatsViewModel @Inject constructor(
     }
 
     companion object {
-        val START_YEAR: Int = 2021
-        val END_YEAR: Int = Year.now().value
+        val YEAR_RANGE: IntRange = 2021..Year.now().value
 
         private const val DEFAULT_TEAM_STATS_COUNT = 5
     }
