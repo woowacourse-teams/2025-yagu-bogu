@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    disableAnsi="false"
+                    noConsoleNoAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] - %msg%n"/>
+        </Console>
+
+        <RollingFile name="ProdFile" fileName="/var/log/yagubogu/prod.log"
+                     filePattern="/var/log/yagubogu/prod-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green}] [%t] [%X{traceId}] [%X{params}] [%X{clientIp}] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
+
+        <RollingFile name="DevFile" fileName="/var/log/yagubogu/dev.log"
+                     filePattern="/var/log/yagubogu/dev-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%t] [%X{traceId}] [%X{params}] [%X{clientIp}] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <RollingFile name="LocalFile" fileName="backend/log/local.log"
+                     filePattern="backend/log/local-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [%X{method} %X{uri}] [%X{controller}.%X{action}] [%highlight{%level}{FATAL=red blink, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}] [%X{params}] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- ✅ prod 환경 -->
+        <SpringProfile name="prod">
+            <Root level="info">
+                <AppenderRef ref="ProdFile"/>
+                <AppenderRef ref="Console"/>
+            </Root>
+
+            <Logger name="org.springframework" level="warn"/>
+        </SpringProfile>
+
+        <!-- ✅ dev 환경 -->
+        <SpringProfile name="dev">
+            <Root level="info">
+                <AppenderRef ref="DevFile"/>
+                <AppenderRef ref="Console"/>
+            </Root>
+
+            <Logger name="org.springframework" level="warn"/>
+            <Logger name="com.yagubogu" level="debug"/>
+        </SpringProfile>
+
+        <!-- ✅ local 환경 -->
+        <SpringProfile name="local">
+            <Root level="info">
+                <AppenderRef ref="LocalFile"/>
+                <AppenderRef ref="Console"/>
+            </Root>
+
+            <Logger name="org.springframework" level="warn"/>
+            <Logger name="com.yagubogu" level="debug"/>
+        </SpringProfile>
+    </Loggers>
+</Configuration>

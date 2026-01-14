@@ -6,14 +6,15 @@ WORKDIR /workspace
 COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle settings.gradle ./
+COPY app/build.gradle app/
 # 소스는 마지막에 복사 (캐시 활용)
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 RUN ./gradlew --no-daemon dependencies || true
 
-COPY src src
+COPY app/src app/src
 
 # 빌드
-RUN ./gradlew --no-daemon --build-cache bootJar -x test
+RUN ./gradlew :app:bootJar --no-daemon --build-cache -x test
 
 # --- Run stage ---
 FROM amazoncorretto:21-alpine
@@ -26,7 +27,7 @@ ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
 WORKDIR /app
 
 # 빌드 결과 복사
-COPY --from=build /workspace/build/libs/*SNAPSHOT.jar /app/app.jar
+COPY --from=build /workspace/app/build/libs/*SNAPSHOT.jar /app/app.jar
 
 # 실행
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
