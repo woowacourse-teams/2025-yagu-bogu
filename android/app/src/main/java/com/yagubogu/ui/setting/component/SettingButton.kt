@@ -62,15 +62,12 @@ fun SettingButtonGroup(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(White, RoundedCornerShape(12.dp)),
+                .background(White, RoundedCornerShape(12.dp))
+                .padding(vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.padding(vertical = 20.dp),
-        ) {
-            content()
-        }
+        content()
     }
 }
 
