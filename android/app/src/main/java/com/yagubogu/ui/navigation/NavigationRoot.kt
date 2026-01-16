@@ -23,20 +23,20 @@ import com.yagubogu.ui.setting.SettingScreen
 fun NavigationRoot(modifier: Modifier = Modifier) {
     val navigationState: NavigationState =
         rememberNavigationState(
-            startRoute = Route.BottomRoute,
-            topLevelRoutes = setOf(Route.BottomRoute, Route.SettingRoute),
+            startRoute = Route.Bottom,
+            topLevelRoutes = setOf(Route.Bottom, Route.Setting),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
 
     val entryProvider: (NavKey) -> NavEntry<NavKey> =
         entryProvider {
-            entry<Route.BottomRoute> {
-                MainScreen(navigateToSetting = { navigator.navigate(Route.SettingRoute) })
+            entry<Route.Bottom> {
+                MainScreen(navigateToSetting = { navigator.navigate(Route.Setting) })
             }
-            entry<Route.SettingRoute> {
+            entry<Route.Setting> {
                 SettingScreen(
-                    navigateToParent = { navigator.clearStackAndNavigate(Route.BottomRoute) },
-                    navigateToBottom = { navigator.navigate(Route.BottomRoute) },
+                    navigateToParent = { navigator.clearStackAndNavigate(Route.Bottom) },
+                    navigateToBottom = { navigator.navigate(Route.Bottom) },
                 )
             }
         }
