@@ -1,10 +1,7 @@
-package com.yagubogu.presentation.livetalk.chat
+package com.yagubogu.ui.livetalk.chat
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
@@ -13,13 +10,13 @@ import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkChatItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkReportEvent
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkResponseItem
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkTeams
-import com.yagubogu.presentation.livetalk.chat.model.LivetalkUiState
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
+import com.yagubogu.ui.livetalk.chat.model.LivetalkResponseItem
+import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,14 +24,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Instant
+import java.time.LocalDateTime
 
 class LivetalkChatViewModel @AssistedInject constructor(
     @Assisted private val gameId: Long,
@@ -54,15 +55,8 @@ class LivetalkChatViewModel @AssistedInject constructor(
     val messageStateHolder = MessageStateHolder(isVerified)
     val likeCountStateHolder = LikeCountStateHolder()
 
-    private val _livetalkUiState =
-        MutableLiveData<LivetalkUiState>(LivetalkUiState.Loading)
-    val livetalkUiState: LiveData<LivetalkUiState> get() = _livetalkUiState
-
-    val isStadiumLoading: LiveData<Boolean> =
-        livetalkUiState.map { it !is LivetalkUiState.Success }
-
-    private val _livetalkTeams = MutableLiveData<LivetalkTeams>()
-    val livetalkTeams: LiveData<LivetalkTeams> get() = _livetalkTeams
+    private val _teams = MutableStateFlow<LivetalkTeams?>(null)
+    val teams: StateFlow<LivetalkTeams?> = _teams.asStateFlow()
 
     lateinit var cachedLivetalkTeams: LivetalkTeams
         private set
@@ -72,8 +66,24 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     private var likeBatchingJob: Job? = null
 
-    private val _profileInfoClickEvent = MutableSharedFlow<MemberProfile>()
-    val profileInfoClickEvent: SharedFlow<MemberProfile> = _profileInfoClickEvent.asSharedFlow()
+    private val _selectedProfile = MutableStateFlow<MemberProfile?>(null)
+    val selectedProfile: StateFlow<MemberProfile?> = _selectedProfile.asStateFlow()
+
+    val chatUiState: StateFlow<LivetalkChatUiState> =
+        combine(
+            messageStateHolder.livetalkChatBubbleItems,
+            messageStateHolder.isInitialLoadCompleted,
+        ) { items, isInitialLoadCompleted ->
+            when {
+                !isInitialLoadCompleted -> LivetalkChatUiState.Loading
+                items.isEmpty() -> LivetalkChatUiState.Empty
+                else -> LivetalkChatUiState.Success(items)
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = LivetalkChatUiState.Loading,
+        )
 
     init {
         viewModelScope.launch {
@@ -116,8 +126,27 @@ class LivetalkChatViewModel @AssistedInject constructor(
     }
 
     fun sendMessage() {
-        val message = messageStateHolder.messageFormText.value ?: ""
+        val message = messageStateHolder.messageText.value
         if (message.isBlank()) return
+
+        viewModelScope.launch {
+            messageStateHolder.updateMessageText("")
+            messageStateHolder.addPendingWriteChat(
+                LivetalkChatBubbleItem.MyPendingBubbleItem(
+                    LivetalkChatItem(
+                        System.currentTimeMillis(),
+                        0L,
+                        true,
+                        message,
+                        null,
+                        null,
+                        null,
+                        LocalDateTime.now(),
+                        false,
+                    ),
+                ),
+            )
+        }
 
         viewModelScope.launch {
             val talksResult: Result<LivetalkChatItem> =
@@ -126,7 +155,6 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess {
                     stopPolling()
                     startPolling()
-                    messageStateHolder.messageFormText.value = ""
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
                 }
@@ -157,12 +185,10 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .reportTalks(chatId)
                 .onSuccess {
                     messageStateHolder.reportChat(chatId)
-                    messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.Success)
                     Timber.d("현장톡 정상 신고")
                 }.onFailure { exception: Throwable ->
                     when (exception) {
                         is ApiException.BadRequest -> {
-                            messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.DuplicatedReport)
                             Timber.d("스스로 신고하거나 중복 신고인 경우")
                         }
 
@@ -180,6 +206,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
 
     fun addLikeToBatch() {
         viewModelScope.launch {
+            likeCountStateHolder.increaseMyTeamShowingCount()
             likeCountStateHolder.increaseLikeCount()
             if (likeBatchingJob?.isActive != true) {
                 likeBatchingJob =
@@ -232,12 +259,11 @@ class LivetalkChatViewModel @AssistedInject constructor(
         val result: Result<LivetalkTeams> = talkRepository.getInitial(gameId).map { it.toUiModel() }
         result
             .onSuccess { livetalkTeams: LivetalkTeams ->
-                _livetalkTeams.value = livetalkTeams
+                _teams.value = livetalkTeams
+
                 cachedLivetalkTeams = livetalkTeams
-                _livetalkUiState.value = LivetalkUiState.Success
             }.onFailure { exception ->
                 Timber.w(exception, "최초 팀 정보 가져오기 실패")
-                _livetalkUiState.value = LivetalkUiState.Error
             }
     }
 
@@ -247,10 +273,16 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 memberRepository.getMemberProfile(memberId).map { it.toUiModel() }
             memberProfileResult
                 .onSuccess { memberProfile: MemberProfile ->
-                    _profileInfoClickEvent.emit(memberProfile)
+                    _selectedProfile.emit(memberProfile)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
                 }
+        }
+    }
+
+    fun dismissProfile() {
+        viewModelScope.launch {
+            _selectedProfile.emit(null)
         }
     }
 

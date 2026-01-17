@@ -92,3 +92,10 @@ fun Modifier.shimmerLoading(): Modifier =
             drawRect(brush = brush)
         }
     }
+
+fun Modifier.shimmerIf(condition: Boolean): Modifier =
+    if (condition) {
+        this.shimmerLoading()
+    } else {
+        this
+    }
