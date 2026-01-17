@@ -9,4 +9,13 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object Setting : Route
+
+    @Serializable
+    data object Login : Route
+
+    @Serializable
+    data object FavoriteTeam : Route
+
+    @Serializable
+    data object Badge : Route
 }

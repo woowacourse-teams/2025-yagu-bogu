@@ -16,6 +16,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.yagubogu.R
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
@@ -29,6 +30,8 @@ import com.yagubogu.ui.theme.White
 fun SettingScreen(
     navigateToParent: () -> Unit,
     navigateToBottom: () -> Unit,
+    navigateToFavoriteTeam: () -> Unit,
+    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -50,7 +53,7 @@ fun SettingScreen(
                         false -> navigateToParent()
                     }
                 },
-                title = stringResource((navigator.currentRoute as SettingNavKey).label),
+                title = stringResource((navigator.currentRoute as? SettingNavKey)?.label ?: R.string.setting_main_title),
             )
         },
         snackbarHost = {
@@ -72,6 +75,7 @@ fun SettingScreen(
                 entry<SettingNavKey.SettingMain> {
                     SettingMainScreen(
                         onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                        onFavoriteTeamEditClick = { navigateToFavoriteTeam() },
                     )
                 }
                 entry<SettingNavKey.SettingAccount> {
@@ -80,10 +84,16 @@ fun SettingScreen(
                     )
                 }
                 entry<SettingNavKey.SettingDeleteAccount> {
-                    SettingDeleteAccountScreen(navigateToHome = {
-                        navigator.clearStack()
-                        navigateToBottom()
-                    })
+                    SettingDeleteAccountScreen(
+                        navigateToHome = {
+                            navigator.clearStack()
+                            navigateToBottom()
+                        },
+                        navigateToLogin = {
+                            navigator.clearStack()
+                            navigateToLogin()
+                        },
+                    )
                 }
             }
 

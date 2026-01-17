@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login.model
+package com.yagubogu.ui.login.model
 
 enum class InAppUpdateType {
     IMMEDIATE, // 업데이트 강제
