@@ -6,12 +6,12 @@ import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.member.RepresentativeBadgeDto
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import com.yagubogu.presentation.setting.MemberInfoItem
-import com.yagubogu.presentation.setting.PresignedUrlCompleteItem
-import com.yagubogu.presentation.setting.PresignedUrlItem
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.setting.model.MemberInfoItem
+import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
+import com.yagubogu.ui.setting.model.PresignedUrlItem
 import kotlinx.datetime.toJavaLocalDate
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

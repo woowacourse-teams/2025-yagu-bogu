@@ -29,7 +29,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.yagubogu.R
-import com.yagubogu.presentation.setting.SettingActivity
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
 import com.yagubogu.ui.badge.BadgeActivity
 import com.yagubogu.ui.home.HomeScreen
@@ -49,6 +48,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
+    navigateToSetting: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -89,7 +89,7 @@ fun MainScreen(
                             },
                         ),
                     onBadgeClick = { context.startActivity(BadgeActivity.newIntent(context)) },
-                    onSettingsClick = { context.startActivity(SettingActivity.newIntent(context)) },
+                    onSettingsClick = { navigateToSetting() },
                 )
             },
             bottomBar = {

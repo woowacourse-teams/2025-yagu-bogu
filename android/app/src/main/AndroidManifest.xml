@@ -23,10 +23,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".presentation.setting.SettingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".presentation.livetalk.chat.LivetalkChatActivity"
             android:exported="false"
             android:screenOrientation="portrait"

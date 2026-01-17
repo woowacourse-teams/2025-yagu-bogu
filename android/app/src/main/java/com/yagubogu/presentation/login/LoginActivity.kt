@@ -1,5 +1,6 @@
 package com.yagubogu.presentation.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -133,7 +134,9 @@ class LoginActivity : AppCompatActivity() {
                     firebaseAnalytics.logEvent("login_failure", bundle)
                 }
 
-                LoginResult.Cancel -> Unit
+                LoginResult.Cancel -> {
+                    Unit
+                }
             }
         }
     }
@@ -185,7 +188,9 @@ class LoginActivity : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    UpdateAvailability.UPDATE_AVAILABLE -> Unit
+                    UpdateAvailability.UPDATE_AVAILABLE -> {
+                        Unit
+                    }
                 }
 
                 // 스토어에서 제공되는 최신 앱 버전 코드
@@ -242,5 +247,9 @@ class LoginActivity : AppCompatActivity() {
                 onSuccess()
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
             }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, LoginActivity::class.java)
     }
 }
