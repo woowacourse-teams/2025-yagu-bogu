@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,11 +59,15 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LoginScreen(
-        onGoogleLoginClick = { viewModel.signInWithGoogle(googleCredentialManager) },
-        modifier = modifier,
-    )
-
+    Box(modifier = modifier) {
+        LoginScreen(
+            onGoogleLoginClick = { viewModel.signInWithGoogle(googleCredentialManager) },
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
     LoginResultHandler(
         snackbarHostState = snackbarHostState,
         loginResultFlow = viewModel.loginResult,
