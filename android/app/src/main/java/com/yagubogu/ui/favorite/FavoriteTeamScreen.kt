@@ -164,6 +164,7 @@ private fun FavoriteTeamDialog(
         positiveText = stringResource(R.string.all_confirm),
         onConfirm = onConfirm,
         onCancel = onCancel,
+        modifier = modifier,
     ) {
         Text(
             text = stringResource(R.string.favorite_team_selection_confirm),
