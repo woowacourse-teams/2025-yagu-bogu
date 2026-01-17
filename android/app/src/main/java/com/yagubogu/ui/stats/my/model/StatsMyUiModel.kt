@@ -5,13 +5,13 @@ data class StatsMyUiModel(
     val drawCount: Int = 0,
     val loseCount: Int = 0,
     val totalCount: Int = 0,
-    val winningPercentage: Int = 0,
+    val winningPercentage: Float = 0f,
     val myTeam: String? = null,
     val luckyStadium: String? = null,
 ) {
-    val etcPercentage: Int get() = FULL_PERCENTAGE - winningPercentage
+    val etcPercentage: Float get() = FULL_PERCENTAGE - winningPercentage
 
     companion object {
-        private const val FULL_PERCENTAGE = 100
+        private const val FULL_PERCENTAGE = 100f
     }
 }
