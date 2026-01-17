@@ -28,28 +28,23 @@ fun SettingButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    Column(
+
+    Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .noRippleClickable { onClick() },
+                .noRippleClickable { onClick() }
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(text = text, style = PretendardSemiBold16)
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = Gray500,
-            )
-        }
+        Text(text = text, style = PretendardSemiBold16)
+        Icon(
+            painter = painterResource(id = R.drawable.ic_arrow_right),
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = Gray500,
+        )
     }
 }
 
