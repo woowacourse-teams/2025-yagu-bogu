@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
-import com.yagubogu.data.repository.token.TokenRepository
 import com.yagubogu.presentation.login.auth.GoogleCredentialManager
 import com.yagubogu.presentation.login.auth.GoogleCredentialResult
 import com.yagubogu.presentation.login.model.LoginResult
@@ -18,14 +17,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository,
     private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> get() = _loginResult
 
-    suspend fun isTokenValid(): Boolean = tokenRepository.refreshTokens().isSuccess
+    suspend fun isTokenValid(): Boolean = authRepository.refreshToken().isSuccess
 
     suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
 
