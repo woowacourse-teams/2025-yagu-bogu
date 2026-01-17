@@ -16,6 +16,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.yagubogu.R
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
@@ -52,7 +53,7 @@ fun SettingScreen(
                         false -> navigateToParent()
                     }
                 },
-                title = stringResource((navigator.currentRoute as SettingNavKey).label),
+                title = stringResource((navigator.currentRoute as? SettingNavKey)?.label ?: R.string.setting_main_title),
             )
         },
         snackbarHost = {
