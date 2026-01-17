@@ -65,14 +65,14 @@ class AttendanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun fetchPastGames(date: LocalDate = LocalDate.now()) {
+    fun fetchPastGames(date: LocalDate) {
         viewModelScope.launch {
             val gamesResult: Result<List<PastGameUiModel>> =
                 gameRepository
                     .getGames(date)
                     .map { list: List<GameWithCheckInDto> ->
                         list.filter { !it.isMyCheckIn }
-                    }.mapList { it.toAttendanceUiModel() }
+                    }.mapList { it.toAttendanceUiModel(date) }
             gamesResult
                 .onSuccess { pastGameUiModels: List<PastGameUiModel> ->
                     _pastGames.value = pastGameUiModels
