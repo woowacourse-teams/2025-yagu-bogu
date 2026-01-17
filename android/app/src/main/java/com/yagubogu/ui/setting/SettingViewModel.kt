@@ -7,11 +7,10 @@ import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.presentation.mapper.toUiModel
-import com.yagubogu.ui.setting.component.model.MemberInfoItem
-import com.yagubogu.ui.setting.component.model.PresignedUrlCompleteItem
-import com.yagubogu.ui.setting.component.model.PresignedUrlItem
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.model.MemberInfoItem
+import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
+import com.yagubogu.ui.setting.model.PresignedUrlItem
+import com.yagubogu.ui.setting.model.SettingEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,9 +34,6 @@ class SettingViewModel @Inject constructor(
     private val _myMemberInfoItem = MutableStateFlow(MemberInfoItem())
     val myMemberInfoItem: StateFlow<MemberInfoItem> = _myMemberInfoItem.asStateFlow()
 
-    private val _dialogEvent = MutableSharedFlow<SettingDialogEvent>()
-    val dialogEvent: SharedFlow<SettingDialogEvent> = _dialogEvent.asSharedFlow()
-
     private val _settingEvent = MutableSharedFlow<SettingEvent>()
     val settingEvent: SharedFlow<SettingEvent> = _settingEvent.asSharedFlow()
 
@@ -47,7 +43,6 @@ class SettingViewModel @Inject constructor(
                 .updateNickname(newNickname)
                 .onSuccess {
                     _myMemberInfoItem.value = myMemberInfoItem.value.copy(nickName = newNickname)
-                    _dialogEvent.emit(SettingDialogEvent.HideDialog)
                     _settingEvent.emit(SettingEvent.NicknameEdit(newNickname))
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
@@ -82,20 +77,7 @@ class SettingViewModel @Inject constructor(
 
     fun cancelDeleteAccount() {
         viewModelScope.launch {
-            _dialogEvent.emit(SettingDialogEvent.HideDialog)
             _settingEvent.emit(SettingEvent.DeleteAccountCancel)
-        }
-    }
-
-    fun emitDialogEvent(event: SettingDialogEvent) {
-        viewModelScope.launch {
-            _dialogEvent.emit(event)
-        }
-    }
-
-    fun hideDialog() {
-        viewModelScope.launch {
-            _dialogEvent.emit(SettingDialogEvent.HideDialog)
         }
     }
 

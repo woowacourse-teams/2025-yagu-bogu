@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.yagubogu.R
 import com.yagubogu.presentation.util.showToast
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.model.SettingEvent
 
 @Composable
 fun SettingEventHandler(

@@ -15,6 +15,14 @@ import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.main.MainScreen
 import com.yagubogu.ui.setting.SettingScreen
 
+/**
+ * 앱의 최상위 네비게이션 구조를 정의하는 루트 컴포저블.
+ *
+ * 각 경로([Route])에 따른 화면 컴포저블을 매핑하여 화면 전환을 관리합니다.
+ * 자식 컴포저블과 분리된 독립적인 [Navigator]를 사용합니다.
+ *
+ * @param modifier 레이아웃 수정을 위한 [Modifier]
+ */
 @Composable
 fun NavigationRoot(
     googleCredentialManager: GoogleCredentialManager,
@@ -26,45 +34,45 @@ fun NavigationRoot(
             startRoute = startRoute,
             topLevelRoutes =
                 setOf(
-                    Route.BottomRoute,
-                    Route.LoginRoute,
-                    Route.SettingRoute,
-                    Route.FavoriteTeamRoute,
+                    Route.Bottom,
+                    Route.Login,
+                    Route.Setting,
+                    Route.FavoriteTeam,
                 ),
         )
     val navigator: Navigator = remember { Navigator(navigationState) }
 
     val entryProvider: (NavKey) -> NavEntry<NavKey> =
         entryProvider {
-            entry<Route.LoginRoute> {
+            entry<Route.Login> {
                 LoginScreen(
                     googleCredentialManager = googleCredentialManager,
-                    navigateToMain = { navigator.navigate(Route.BottomRoute) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeamRoute) },
+                    navigateToMain = { navigator.navigate(Route.Bottom) },
+                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
                 )
             }
-            entry<Route.BottomRoute> {
+            entry<Route.Bottom> {
                 MainScreen(
-                    navigateToSetting = { navigator.navigate(Route.SettingRoute) },
-                    navigateToBadge = { navigator.navigate(Route.BadgeRoute) },
+                    navigateToSetting = { navigator.navigate(Route.Setting) },
+                    navigateToBadge = { navigator.navigate(Route.Badge) },
                 )
             }
-            entry<Route.SettingRoute> {
+            entry<Route.Setting> {
                 SettingScreen(
-                    navigateToParent = { navigator.clearStackAndNavigate(Route.BottomRoute) },
-                    navigateToBottom = { navigator.navigate(Route.BottomRoute) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeamRoute) },
-                    navigateToLogin = { navigator.clearStackAndNavigate(Route.LoginRoute) },
+                    navigateToParent = { navigator.clearStackAndNavigate(Route.Bottom) },
+                    navigateToBottom = { navigator.navigate(Route.Bottom) },
+                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
+                    navigateToLogin = { navigator.clearStackAndNavigate(Route.Login) },
                 )
             }
-            entry<Route.FavoriteTeamRoute> {
+            entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
                     navigateToMain = {
-                        navigator.navigate(Route.BottomRoute)
+                        navigator.navigate(Route.Bottom)
                     },
                 )
             }
-            entry<Route.BadgeRoute> {
+            entry<Route.Badge> {
                 BadgeScreen(
                     navigateToMain = { navigator.goBack() },
                 )

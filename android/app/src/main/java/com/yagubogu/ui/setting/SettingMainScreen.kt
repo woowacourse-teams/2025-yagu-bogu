@@ -29,7 +29,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,10 +55,9 @@ import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
-import com.yagubogu.ui.setting.component.dialog.SettingDialog
-import com.yagubogu.ui.setting.component.model.MemberInfoItem
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
+import com.yagubogu.ui.setting.model.MemberInfoItem
+import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
@@ -80,6 +84,8 @@ fun SettingMainScreen(
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
+    var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
@@ -100,14 +106,14 @@ fun SettingMainScreen(
                 UCrop.RESULT_ERROR -> {
                     val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
                     Timber.e(cropError, "uCrop Error")
-                    context.showToast(context.getString(R.string.setting_edit_profile_image_crop_failed))
+                    context.showToast(R.string.setting_edit_profile_image_crop_failed)
                 }
             }
         }
     val pickImageLauncher: ManagedActivityResultLauncher<String, Uri?> =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                createUCropIntent(
+                launchUCropIntent(
                     context = context,
                     sourceUri = it,
                     onCropIntentReady = uCropLauncher::launch,
@@ -121,7 +127,7 @@ fun SettingMainScreen(
 
     SettingMainScreen(
         onClickSettingAccount = onClickSettingAccount,
-        onNicknameEdit = { viewModel.emitDialogEvent(SettingDialogEvent.NicknameEditDialog) },
+        onNicknameEdit = { showNicknameEditDialog = true },
         onProfileImageUpload = { pickImageLauncher.launch("image/*") },
         onFavoriteTeamEditClick = onFavoriteTeamEditClick,
         memberInfoItem = memberInfoItem.value,
@@ -129,7 +135,19 @@ fun SettingMainScreen(
         modifier = modifier,
     )
 
-    SettingDialog(viewModel = viewModel)
+    if (showNicknameEditDialog) {
+        NicknameEditDialog(
+            nickname =
+                viewModel.myMemberInfoItem
+                    .collectAsState()
+                    .value.nickName,
+            onConfirm = { nickname ->
+                viewModel.updateNickname(nickname)
+                showNicknameEditDialog = false
+            },
+            onCancel = { showNicknameEditDialog = false },
+        )
+    }
 
     SettingEventHandler(settingEvent = settingEvent.value)
 }
@@ -151,7 +169,7 @@ private fun SettingMainScreen(
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(20.dp)
+                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
                 .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
@@ -216,10 +234,10 @@ private fun MyProfile(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(30.dp))
-        ProfileImage(memberInfoItem.profileImageUrl, modifier = Modifier.size(80.dp))
-        Spacer(modifier = Modifier.height(30.dp))
-        Text(text = memberInfoItem.nickName, style = PretendardSemiBold, fontSize = 24.sp)
+        ProfileImage(memberInfoItem.profileImageUrl, modifier = Modifier.size(100.dp))
         Spacer(modifier = Modifier.height(16.dp))
+        Text(text = memberInfoItem.nickName, style = PretendardSemiBold, fontSize = 24.sp)
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text =
                 stringResource(
@@ -243,7 +261,7 @@ private fun Context.getAppVersion(): String =
         DEFAULT_VERSION_NAME
     }
 
-private fun createUCropIntent(
+private fun launchUCropIntent(
     context: Context,
     sourceUri: Uri,
     onCropIntentReady: (Intent) -> Unit,

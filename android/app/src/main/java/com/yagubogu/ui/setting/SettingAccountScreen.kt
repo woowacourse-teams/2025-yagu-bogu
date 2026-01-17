@@ -9,6 +9,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,37 +23,42 @@ import com.yagubogu.R
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingEventHandler
-import com.yagubogu.ui.setting.component.dialog.SettingDialog
-import com.yagubogu.ui.setting.component.model.SettingDialogEvent
-import com.yagubogu.ui.setting.component.model.SettingEvent
+import com.yagubogu.ui.setting.component.dialog.LogoutDialog
+import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 
 @Composable
 fun SettingAccountScreen(
-    onClickDeleteAccount: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
+    var showLogoutDialog: Boolean by rememberSaveable { mutableStateOf(false) }
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     SettingAccountScreen(
-        onClickLogout = { viewModel.emitDialogEvent(SettingDialogEvent.LogoutDialog) },
-        onClickDeleteAccount = onClickDeleteAccount,
-        navigateToLogin = navigateToLogin,
+        onLogoutClick = { showLogoutDialog = true },
+        onDeleteAccountClick = onDeleteAccountClick,
         settingEvent = settingEvent.value,
         modifier = modifier,
     )
 
-    SettingDialog(viewModel = viewModel)
+    if (showLogoutDialog) {
+        LogoutDialog(
+            onConfirm = {
+                viewModel.logout()
+                showLogoutDialog = false
+            },
+            onCancel = { showLogoutDialog = false },
+        )
+    }
 }
 
 @Composable
 private fun SettingAccountScreen(
-    onClickLogout: () -> Unit,
-    onClickDeleteAccount: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
     settingEvent: SettingEvent?,
     modifier: Modifier = Modifier,
 ) {
@@ -58,22 +67,22 @@ private fun SettingAccountScreen(
             modifier
                 .fillMaxSize()
                 .background(Gray050)
-                .padding(20.dp)
+                .padding(top = 8.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
                 .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(R.string.setting_logout),
-                onClick = onClickLogout,
+                onClick = onLogoutClick,
             )
             SettingButton(
                 text = stringResource(R.string.setting_delete_account),
-                onClick = onClickDeleteAccount,
+                onClick = onDeleteAccountClick,
             )
         }
 
-        SettingEventHandler(settingEvent = settingEvent, navigateToLogin = navigateToLogin)
+        SettingEventHandler(settingEvent = settingEvent)
     }
 }
 
@@ -81,9 +90,8 @@ private fun SettingAccountScreen(
 @Composable
 private fun SettingAccountScreenPreview() {
     SettingAccountScreen(
-        onClickLogout = {},
-        onClickDeleteAccount = {},
-        navigateToLogin = {},
+        onLogoutClick = {},
+        onDeleteAccountClick = {},
         settingEvent = null,
     )
 }

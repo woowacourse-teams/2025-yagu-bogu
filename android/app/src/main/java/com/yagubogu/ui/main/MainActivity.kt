@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 canAutoLogin?.let { canAutoLogin ->
                     NavigationRoot(
                         googleCredentialManager = googleCredentialManager,
-                        startRoute = if (canAutoLogin) Route.BottomRoute else Route.LoginRoute,
+                        startRoute = if (canAutoLogin) Route.Bottom else Route.Login,
                     )
                 }
             }
