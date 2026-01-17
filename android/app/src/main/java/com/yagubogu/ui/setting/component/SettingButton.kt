@@ -28,7 +28,6 @@ fun SettingButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-
     Row(
         modifier =
             modifier
