@@ -77,7 +77,6 @@ fun AttendanceCalendarContent(
     if (showBottomSheet) {
         AttendanceAdditionBottomSheet(
             pastGameUiState = pastGameUiState,
-            date = currentDate,
             onPastCheckIn = { gameId: Long ->
                 onPastCheckIn(gameId)
                 showBottomSheet = false
