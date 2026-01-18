@@ -82,7 +82,7 @@ class AttendanceHistoryViewModel @Inject constructor(
                     .getGames(date)
                     .map { list: List<GameWithCheckInDto> ->
                         list.filter { !it.isMyCheckIn }
-                    }.mapList { it.toAttendanceUiModel() }
+                    }.mapList { it.toAttendanceUiModel(date) }
             gamesResult
                 .onSuccess { pastGameUiModels: List<PastGameUiModel> ->
                     _pastGames.value = pastGameUiModels
