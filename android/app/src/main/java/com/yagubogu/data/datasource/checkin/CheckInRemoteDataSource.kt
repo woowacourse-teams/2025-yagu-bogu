@@ -34,11 +34,12 @@ class CheckInRemoteDataSource @Inject constructor(
 
     override suspend fun getCheckInHistories(
         year: Int,
+        month: Int,
         filter: String,
         sort: String,
     ): Result<CheckInHistoryResponse> =
         safeApiCall {
-            checkInApiService.getCheckInHistories(year, filter, sort)
+            checkInApiService.getCheckInHistories(year, month, filter, sort)
         }
 
     override suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse> =

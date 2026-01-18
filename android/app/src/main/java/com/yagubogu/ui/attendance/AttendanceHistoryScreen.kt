@@ -74,8 +74,12 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
-    val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
     val currentMonth: YearMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
+    val currentDate: LocalDate by viewModel.currentDate.collectAsStateWithLifecycle()
+    val filter: AttendanceHistoryFilter by viewModel.filter.collectAsStateWithLifecycle()
+    val sort: AttendanceHistorySort by viewModel.sort.collectAsStateWithLifecycle()
+    val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
+
     val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
     val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
 
@@ -84,8 +88,12 @@ fun AttendanceHistoryScreen(
     }
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(viewType) {
-        viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth)
+    LaunchedEffect(currentMonth, viewType, filter, sort) {
+        viewModel.fetchAttendanceHistoryItems()
+    }
+
+    LaunchedEffect(currentMonth) {
+        viewModel.updateCurrentDate(currentMonth.atDay(1))
     }
 
     val checkInSuccessMessage: String =
@@ -101,18 +109,17 @@ fun AttendanceHistoryScreen(
     AttendanceHistoryScreen(
         startMonth = startMonth,
         endMonth = endMonth,
-        currentMonth = currentMonth,
-        onMonthChange = viewModel::updateCurrentMonth,
         viewType = viewType,
         onViewTypeChange = { viewType = viewType.toggle() },
+        currentMonth = currentMonth,
+        onMonthChange = viewModel::updateCurrentMonth,
+        currentDate = currentDate,
+        onDateChange = viewModel::updateCurrentDate,
         items = attendanceItems,
-        updateItems = { filter: AttendanceHistoryFilter, sort: AttendanceHistorySort ->
-            viewModel.fetchAttendanceHistoryItems(
-                yearMonth = currentMonth,
-                filter = filter,
-                sort = sort,
-            )
-        },
+        filter = filter,
+        updateFilter = viewModel::updateFilter,
+        sort = sort,
+        updateSort = viewModel::updateSort,
         pastGames = pastGames,
         onRequestGames = viewModel::fetchPastGames,
         onPastCheckIn = viewModel::addPastCheckIn,
@@ -125,12 +132,17 @@ fun AttendanceHistoryScreen(
 private fun AttendanceHistoryScreen(
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentMonth: YearMonth,
-    onMonthChange: (YearMonth) -> Unit,
     viewType: AttendanceHistoryViewType,
     onViewTypeChange: () -> Unit,
+    currentMonth: YearMonth,
+    onMonthChange: (YearMonth) -> Unit,
+    currentDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
     items: List<AttendanceHistoryItem>,
-    updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
+    filter: AttendanceHistoryFilter,
+    updateFilter: (AttendanceHistoryFilter) -> Unit,
+    sort: AttendanceHistorySort,
+    updateSort: (AttendanceHistorySort) -> Unit,
     pastGames: List<PastGameUiModel>,
     onRequestGames: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
@@ -162,6 +174,8 @@ private fun AttendanceHistoryScreen(
                     endMonth = endMonth,
                     currentMonth = currentMonth,
                     onMonthChange = onMonthChange,
+                    currentDate = currentDate,
+                    onDateChange = onDateChange,
                     pastGames = pastGames,
                     onRequestGames = onRequestGames,
                     onPastCheckIn = onPastCheckIn,
@@ -171,7 +185,10 @@ private fun AttendanceHistoryScreen(
             AttendanceHistoryViewType.LIST ->
                 AttendanceListContent(
                     items = items,
-                    updateItems = updateItems,
+                    filter = filter,
+                    updateFilter = updateFilter,
+                    sort = sort,
+                    updateSort = updateSort,
                     scrollToTopEvent = scrollToTopEvent,
                 )
         }
@@ -330,15 +347,20 @@ private fun AttendanceCalenderScreenPreview() {
     AttendanceHistoryScreen(
         startMonth = AttendanceHistoryViewModel.START_MONTH,
         endMonth = AttendanceHistoryViewModel.END_MONTH,
-        currentMonth = YearMonth.now(),
-        onMonthChange = {},
         viewType = AttendanceHistoryViewType.CALENDAR,
         onViewTypeChange = {},
+        currentMonth = YearMonth.now(),
+        onMonthChange = {},
+        currentDate = LocalDate.now(),
+        onDateChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        filter = AttendanceHistoryFilter.ALL,
+        updateFilter = {},
+        sort = AttendanceHistorySort.LATEST,
+        updateSort = {},
         pastGames = listOf(),
         onRequestGames = {},
         onPastCheckIn = {},
-        updateItems = { _, _ -> },
     )
 }
 
@@ -348,14 +370,19 @@ private fun AttendanceListScreenPreview() {
     AttendanceHistoryScreen(
         startMonth = AttendanceHistoryViewModel.START_MONTH,
         endMonth = AttendanceHistoryViewModel.END_MONTH,
-        currentMonth = YearMonth.now(),
-        onMonthChange = {},
         viewType = AttendanceHistoryViewType.LIST,
         onViewTypeChange = {},
+        currentMonth = YearMonth.now(),
+        onMonthChange = {},
+        currentDate = LocalDate.now(),
+        onDateChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        filter = AttendanceHistoryFilter.ALL,
+        updateFilter = {},
+        sort = AttendanceHistorySort.LATEST,
+        updateSort = {},
         pastGames = listOf(),
         onRequestGames = {},
         onPastCheckIn = {},
-        updateItems = { _, _ -> },
     )
 }

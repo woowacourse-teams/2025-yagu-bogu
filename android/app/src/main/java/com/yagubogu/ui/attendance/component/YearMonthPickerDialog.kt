@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,9 @@ import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary500
 import java.time.YearMonth
 
+private const val FIRST_MONTH = 1
+private const val LAST_MONTH = 12
+
 @Composable
 fun YearMonthPickerDialog(
     startMonth: YearMonth,
@@ -54,7 +58,20 @@ fun YearMonthPickerDialog(
         remember(startMonth, endMonth) {
             (startMonth.year..endMonth.year).toList()
         }
-    val months: List<Int> = remember { (1..12).toList() }
+    val months: List<Int> =
+        remember(year, startMonth, endMonth) {
+            when (year) {
+                startMonth.year -> (startMonth.monthValue..LAST_MONTH).toList()
+                endMonth.year -> (FIRST_MONTH..endMonth.monthValue).toList()
+                else -> (FIRST_MONTH..LAST_MONTH).toList()
+            }
+        }
+
+    LaunchedEffect(months) {
+        if (month !in months) {
+            month = months.first()
+        }
+    }
 
     val yearFormat: String = stringResource(R.string.attendance_history_year)
     val monthFormat: String = stringResource(R.string.attendance_history_month)

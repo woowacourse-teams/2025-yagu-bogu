@@ -37,6 +37,15 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
     val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
 
+    private val _currentDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val currentDate: StateFlow<LocalDate> = _currentDate.asStateFlow()
+
+    private val _filter = MutableStateFlow(AttendanceHistoryFilter.ALL)
+    val filter: StateFlow<AttendanceHistoryFilter> = _filter.asStateFlow()
+
+    private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
+    val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
+
     private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
     val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
 
@@ -48,15 +57,16 @@ class AttendanceHistoryViewModel @Inject constructor(
         )
     val pastCheckInUiEvent: SharedFlow<Unit> = _pastCheckInUiEvent.asSharedFlow()
 
-    fun fetchAttendanceHistoryItems(
-        yearMonth: YearMonth = YearMonth.now(),
-        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
-        sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
-    ) {
+    fun fetchAttendanceHistoryItems() {
         viewModelScope.launch {
+            val yearMonth: YearMonth = currentMonth.value
             checkInRepository
-                .getCheckInHistories(yearMonth.year, filter.name, sort.name)
-                .mapList { it.toUiModel() }
+                .getCheckInHistories(
+                    yearMonth.year,
+                    yearMonth.monthValue,
+                    filter.value.name,
+                    sort.value.name,
+                ).mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
                 }.onFailure { exception: Throwable ->
@@ -100,8 +110,20 @@ class AttendanceHistoryViewModel @Inject constructor(
         _currentMonth.value = yearMonth
     }
 
+    fun updateCurrentDate(date: LocalDate) {
+        _currentDate.value = date
+    }
+
+    fun updateFilter(filter: AttendanceHistoryFilter) {
+        _filter.value = filter
+    }
+
+    fun updateSort(sort: AttendanceHistorySort) {
+        _sort.value = sort
+    }
+
     companion object {
-        val START_MONTH: YearMonth = YearMonth.of(2021, 1)
+        val START_MONTH: YearMonth = YearMonth.of(2021, 3)
         val END_MONTH: YearMonth = YearMonth.now()
     }
 }
