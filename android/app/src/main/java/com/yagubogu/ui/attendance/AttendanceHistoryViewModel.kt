@@ -12,6 +12,7 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.PastGameUiModel
+import com.yagubogu.ui.attendance.model.PastGameUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,8 +47,8 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
     val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
 
-    private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
-    val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
+    private val _pastGameUiState = MutableStateFlow<PastGameUiState>(PastGameUiState.Loading)
+    val pastGameUiState: StateFlow<PastGameUiState> = _pastGameUiState.asStateFlow()
 
     private val _pastCheckInUiEvent =
         MutableSharedFlow<Unit>(
@@ -77,6 +78,7 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun fetchPastGames(date: LocalDate) {
         viewModelScope.launch {
+            _pastGameUiState.value = PastGameUiState.Loading
             val gamesResult: Result<List<PastGameUiModel>> =
                 gameRepository
                     .getGames(date)
@@ -85,10 +87,9 @@ class AttendanceHistoryViewModel @Inject constructor(
                     }.mapList { it.toAttendanceUiModel() }
             gamesResult
                 .onSuccess { pastGameUiModels: List<PastGameUiModel> ->
-                    _pastGames.value = pastGameUiModels
+                    _pastGameUiState.value = PastGameUiState.Success(pastGameUiModels)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "API 호출 실패")
-                    _pastGames.value = emptyList()
                 }
         }
     }
