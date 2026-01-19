@@ -13,7 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.ui.stats.StatsViewModel
 import com.yagubogu.ui.stats.my.component.AttendanceStats
 import com.yagubogu.ui.stats.my.component.MyStats
 import com.yagubogu.ui.stats.my.component.WinRates
@@ -25,15 +27,16 @@ import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsMyScreen(
-    viewModel: StatsMyViewModel,
+    year: Int,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
+    viewModel: StatsViewModel = hiltViewModel(),
 ) {
     val statsMyUiModel: StatsMyUiModel by viewModel.statsMyUiModel.collectAsStateWithLifecycle()
     val averageStats: AverageStats by viewModel.averageStats.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAll()
+    LaunchedEffect(year) {
+        viewModel.fetchMyStats()
     }
 
     StatsMyScreen(
@@ -65,7 +68,8 @@ private fun StatsMyScreen(
             modifier
                 .background(Gray050)
                 .verticalScroll(scrollState)
-                .padding(20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(top = 12.dp, bottom = 20.dp),
     ) {
         WinRates(statsMyUiModel)
         MyStats(statsMyUiModel)

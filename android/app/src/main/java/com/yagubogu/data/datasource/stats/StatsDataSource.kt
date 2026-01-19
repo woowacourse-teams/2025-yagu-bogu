@@ -14,7 +14,7 @@ interface StatsDataSource {
 
     suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse>
 
-    suspend fun getAverageStats(): Result<AverageStatisticResponse>
+    suspend fun getAverageStats(year: Int): Result<AverageStatisticResponse>
 
     suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse>
 

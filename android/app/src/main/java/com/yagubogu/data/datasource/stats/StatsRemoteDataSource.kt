@@ -28,9 +28,9 @@ class StatsRemoteDataSource @Inject constructor(
             statsApiService.getLuckyStadiums(year)
         }
 
-    override suspend fun getAverageStats(): Result<AverageStatisticResponse> =
+    override suspend fun getAverageStats(year: Int): Result<AverageStatisticResponse> =
         safeApiCall {
-            statsApiService.getAverageStats()
+            statsApiService.getAverageStats(year)
         }
 
     override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =

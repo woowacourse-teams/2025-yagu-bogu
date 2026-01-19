@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.stats.StatsViewModel
 import com.yagubogu.ui.stats.detail.component.StadiumVisitCounts
 import com.yagubogu.ui.stats.detail.component.VsTeamWinRates
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
@@ -25,16 +27,17 @@ import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StatsDetailScreen(
-    viewModel: StatsDetailViewModel,
+    year: Int,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
+    viewModel: StatsViewModel = hiltViewModel(),
 ) {
     val vsTeamStatItems: List<VsTeamStatItem> by viewModel.vsTeamStatItems.collectAsStateWithLifecycle()
     val stadiumVisitCounts: List<StadiumVisitCount> by viewModel.stadiumVisitCounts.collectAsStateWithLifecycle()
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAll()
+    LaunchedEffect(year) {
+        viewModel.fetchDetailStats()
     }
 
     StatsDetailScreen(
@@ -70,7 +73,8 @@ private fun StatsDetailScreen(
             modifier
                 .background(Gray050)
                 .verticalScroll(scrollState)
-                .padding(20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(top = 12.dp, bottom = 20.dp),
     ) {
         VsTeamWinRates(
             onShowMoreClick = onShowMoreClick,
