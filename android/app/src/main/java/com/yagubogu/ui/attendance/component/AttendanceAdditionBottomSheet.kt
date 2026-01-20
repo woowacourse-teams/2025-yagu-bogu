@@ -150,7 +150,7 @@ private fun PastGamesContent(
 @Composable
 private fun EmptyPastGameContent(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.padding(20.dp),
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
