@@ -122,7 +122,6 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.viewpager2)
     implementation(libs.play.services.location)
-    implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
     implementation(libs.androidx.datastore.preferences)

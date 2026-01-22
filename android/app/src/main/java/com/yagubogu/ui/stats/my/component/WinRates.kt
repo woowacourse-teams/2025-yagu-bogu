@@ -1,6 +1,5 @@
 package com.yagubogu.ui.stats.my.component
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -27,14 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.github.mikephil.charting.charts.PieChart
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.skydoves.balloon.compose.Balloon
 import com.skydoves.balloon.compose.BalloonWindow
 import com.yagubogu.R
-import com.yagubogu.ui.stats.my.PieChartManager
+import com.yagubogu.ui.common.component.AnimatedPieChart
+import com.yagubogu.ui.common.model.PieChartItemValue
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
@@ -95,8 +89,6 @@ private fun WinRatePieChart(
     statsMyUiModel: StatsMyUiModel,
     modifier: Modifier = Modifier,
 ) {
-    var pieChartManager by remember { mutableStateOf<PieChartManager?>(null) }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth(),
@@ -106,7 +98,7 @@ private fun WinRatePieChart(
                 text =
                     stringResource(
                         R.string.all_rounded_win_rate,
-                        statsMyUiModel.winningPercentage,
+                        statsMyUiModel.winningPercentage.toInt(),
                     ),
                 style = PretendardBold,
                 fontSize = 40.sp,
@@ -122,23 +114,19 @@ private fun WinRatePieChart(
                 color = Gray500,
             )
         }
-        @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
-        (
-            AndroidView(
-                modifier = Modifier.size(200.dp),
-                factory = { context: Context ->
-                    val pieChart = PieChart(context)
-                    pieChartManager = PieChartManager(context, pieChart)
-                    pieChartManager?.setupChart()
-                    pieChart
-                },
-                update = {
-                    pieChartManager?.loadData(
-                        statsMyUiModel.winningPercentage,
-                        statsMyUiModel.etcPercentage,
-                    )
-                },
-            )
+        AnimatedPieChart(
+            modifier = Modifier.size(200.dp),
+            items =
+                listOf(
+                    PieChartItemValue(
+                        strokeColor = Primary500,
+                        percentage = statsMyUiModel.winningPercentage,
+                    ),
+                    PieChartItemValue(
+                        strokeColor = Gray300,
+                        percentage = statsMyUiModel.etcPercentage,
+                    ),
+                ),
         )
     }
 }
@@ -200,5 +188,13 @@ private fun WinDrawLoseCounts(
 @Preview
 @Composable
 private fun WinRatesPreview() {
-    WinRates(StatsMyUiModel())
+    WinRates(
+        StatsMyUiModel(
+            winCount = 10,
+            drawCount = 20,
+            loseCount = 30,
+            totalCount = 60,
+            winningPercentage = 33.333f,
+        ),
+    )
 }
