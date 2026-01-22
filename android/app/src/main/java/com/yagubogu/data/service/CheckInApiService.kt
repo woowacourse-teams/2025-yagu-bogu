@@ -32,6 +32,7 @@ interface CheckInApiService {
     @GET("/api/v1/check-ins/members")
     suspend fun getCheckInHistories(
         @Query("year") year: Int,
+        @Query("month") month: Int,
         @Query("result") result: String,
         @Query("order") order: String,
     ): Response<CheckInHistoryResponse>

@@ -52,18 +52,19 @@ fun AttendanceCalendarContent(
     items: List<AttendanceHistoryItem>,
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentMonth: YearMonth,
+    currentVisibleMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
+    currentSelectedDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
     pastGames: List<PastGameUiModel>,
-    onRequestGames: (LocalDate) -> Unit,
+    onRequestPastGames: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var currentDate: LocalDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     val itemsByDate: Map<LocalDate, List<AttendanceHistoryItem>> =
         items.groupBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
-    val currentItems: List<AttendanceHistoryItem>? = itemsByDate[currentDate]
+    val currentItems: List<AttendanceHistoryItem>? = itemsByDate[currentSelectedDate]
     val scrollState: ScrollState = rememberScrollState()
     var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
 
@@ -98,10 +99,10 @@ fun AttendanceCalendarContent(
             AttendanceCalendar(
                 startMonth = startMonth,
                 endMonth = endMonth,
-                currentMonth = currentMonth,
+                currentVisibleMonth = currentVisibleMonth,
                 onMonthChange = onMonthChange,
-                currentDate = currentDate,
-                onDateChange = { date: LocalDate -> currentDate = date },
+                currentSelectedDate = currentSelectedDate,
+                onDateChange = onDateChange,
                 attendanceDates = itemsByDate.keys,
             )
 
@@ -112,7 +113,7 @@ fun AttendanceCalendarContent(
             } else {
                 AttendanceAdditionButton(
                     onClick = {
-                        onRequestGames(currentDate)
+                        onRequestPastGames(currentSelectedDate)
                         showBottomSheet = true
                     },
                     modifier = Modifier.padding(vertical = 30.dp),
@@ -123,7 +124,7 @@ fun AttendanceCalendarContent(
         if (currentItems != null) {
             SmallFloatingActionButton(
                 onClick = {
-                    onRequestGames(currentDate)
+                    onRequestPastGames(currentSelectedDate)
                     showBottomSheet = true
                 },
                 containerColor = Primary500,
@@ -180,10 +181,12 @@ private fun AttendanceCalendarContentPreview() {
         items = ATTENDANCE_HISTORY_ITEMS,
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        currentVisibleMonth = YearMonth.now(),
         onMonthChange = {},
+        currentSelectedDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
-        onRequestGames = {},
+        onRequestPastGames = {},
         onPastCheckIn = {},
     )
 }
@@ -195,10 +198,12 @@ private fun AttendanceCalendarContentNoItemPreview() {
         items = emptyList(),
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        currentVisibleMonth = YearMonth.now(),
         onMonthChange = {},
+        currentSelectedDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
-        onRequestGames = {},
+        onRequestPastGames = {},
         onPastCheckIn = {},
     )
 }
