@@ -5,7 +5,9 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.GameScoreBoard
 import com.yagubogu.ui.attendance.model.GameTeam
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import java.time.LocalDate
+import java.time.LocalTime
 
 val ATTENDANCE_HISTORY_ITEM_PLAYED =
     AttendanceHistoryItem.Played(
@@ -95,4 +97,24 @@ val ATTENDANCE_HISTORY_ITEMS =
                     attendanceDate = LocalDate.now().minusDays(5L),
                 ),
         ),
+    )
+
+val PAST_GAME_UI_MODEL =
+    PastGameUiModel(
+        gameId = 0L,
+        date = LocalDate.now(),
+        startAt = LocalTime.now(),
+        stadiumName = "광주 KIA 챔피언스필드",
+        awayTeam = Team.LT,
+        awayTeamName = "롯데",
+        homeTeam = Team.HT,
+        homeTeamName = "KIA",
+    )
+
+val PAST_GAME_UI_MODELS =
+    listOf(
+        PAST_GAME_UI_MODEL,
+        PAST_GAME_UI_MODEL.copy(gameId = 1L),
+        PAST_GAME_UI_MODEL.copy(gameId = 2L),
+        PAST_GAME_UI_MODEL.copy(gameId = 3L),
     )

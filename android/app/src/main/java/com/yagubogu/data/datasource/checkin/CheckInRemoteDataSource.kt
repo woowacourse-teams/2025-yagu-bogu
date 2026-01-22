@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource.checkin
 
 import com.yagubogu.data.dto.request.checkin.CheckInRequest
+import com.yagubogu.data.dto.request.checkin.PastCheckInRequest
 import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
@@ -49,4 +50,11 @@ class CheckInRemoteDataSource @Inject constructor(
         safeApiCall {
             checkInApiService.getStadiumCheckInCounts(year)
         }
+
+    override suspend fun addPastCheckIn(gameId: Long): Result<Unit> {
+        val checkInRequest = PastCheckInRequest(gameId = gameId)
+        return safeApiCall {
+            checkInApiService.postPastCheckIn(checkInRequest)
+        }
+    }
 }
