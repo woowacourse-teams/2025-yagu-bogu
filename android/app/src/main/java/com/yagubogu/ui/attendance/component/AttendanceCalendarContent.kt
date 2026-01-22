@@ -37,7 +37,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
-import com.yagubogu.ui.attendance.model.PastGameUiModel
+import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
@@ -56,7 +56,7 @@ fun AttendanceCalendarContent(
     onMonthChange: (YearMonth) -> Unit,
     currentSelectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
-    pastGames: List<PastGameUiModel>,
+    pastGameUiState: PastGameUiState,
     onRequestPastGames: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -76,7 +76,7 @@ fun AttendanceCalendarContent(
 
     if (showBottomSheet) {
         AttendanceAdditionBottomSheet(
-            items = pastGames,
+            pastGameUiState = pastGameUiState,
             onPastCheckIn = { gameId: Long ->
                 onPastCheckIn(gameId)
                 showBottomSheet = false
@@ -185,7 +185,7 @@ private fun AttendanceCalendarContentPreview() {
         onMonthChange = {},
         currentSelectedDate = LocalDate.now(),
         onDateChange = {},
-        pastGames = listOf(),
+        pastGameUiState = PastGameUiState.Loading,
         onRequestPastGames = {},
         onPastCheckIn = {},
     )
@@ -202,7 +202,7 @@ private fun AttendanceCalendarContentNoItemPreview() {
         onMonthChange = {},
         currentSelectedDate = LocalDate.now(),
         onDateChange = {},
-        pastGames = listOf(),
+        pastGameUiState = PastGameUiState.Loading,
         onRequestPastGames = {},
         onPastCheckIn = {},
     )
