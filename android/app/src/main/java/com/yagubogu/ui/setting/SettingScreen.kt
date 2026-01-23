@@ -81,6 +81,7 @@ fun SettingScreen(
                 entry<SettingNavKey.SettingAccount> {
                     SettingAccountScreen(
                         onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                        navigateToLogin = navigateToLogin,
                     )
                 }
                 entry<SettingNavKey.SettingDeleteAccount> {
