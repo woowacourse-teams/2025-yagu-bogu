@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(
+class YaguBoguViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {

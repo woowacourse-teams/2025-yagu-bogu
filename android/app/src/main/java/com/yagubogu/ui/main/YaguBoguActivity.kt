@@ -37,8 +37,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    private val viewModel: MainActivityViewModel by viewModels()
+class YaguBoguActivity : AppCompatActivity() {
+    private val viewModel: YaguBoguViewModel by viewModels()
 
     @Inject
     lateinit var googleCredentialManager: GoogleCredentialManager
