@@ -1,7 +1,5 @@
 package com.yagubogu.ui.main
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,11 +25,10 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
 import com.yagubogu.presentation.util.showToast
-import com.yagubogu.ui.login.LoginViewModel
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.login.model.InAppUpdateType
-import com.yagubogu.ui.login.model.LoginResult
 import com.yagubogu.ui.login.model.VersionInfo
+import com.yagubogu.ui.main.model.AutoLoginState
 import com.yagubogu.ui.navigation.NavigationRoot
 import com.yagubogu.ui.navigation.Route
 import com.yagubogu.ui.theme.YaguBoguTheme
@@ -41,7 +38,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val loginViewModel: LoginViewModel by viewModels()
+    private val viewModel: MainActivityViewModel by viewModels()
 
     @Inject
     lateinit var googleCredentialManager: GoogleCredentialManager
@@ -58,28 +55,26 @@ class MainActivity : AppCompatActivity() {
                 showToast(R.string.login_should_immediate_update_message, true)
                 finish()
             } else if (!shouldImmediateUpdate) {
-                loginViewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
+                viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         handleInAppUpdate(onSuccess = {
-            loginViewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
+            viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
         })
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
         setContent {
             YaguBoguTheme {
-                val canAutoLogin: Boolean? by loginViewModel.canAutoLogin.collectAsStateWithLifecycle()
-                val loginResult: LoginResult?
-                    by loginViewModel.loginResult.collectAsStateWithLifecycle(null)
+                val autoLoginState: AutoLoginState by viewModel.autoLoginState.collectAsStateWithLifecycle()
 
-                canAutoLogin?.let {
+                if (autoLoginState !is AutoLoginState.Loading) {
                     NavigationRoot(
                         googleCredentialManager = googleCredentialManager,
-                        startRoute = setStartRoute(loginResult),
+                        startRoute = setStartRoute(autoLoginState),
                     )
                 }
             }
@@ -91,11 +86,13 @@ class MainActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { shouldImmediateUpdate || !isAppInitialized }
     }
 
-    private fun setStartRoute(loginResult: LoginResult?): Route =
-        when (loginResult) {
-            LoginResult.SignIn -> Route.Bottom
-            LoginResult.SignUp -> Route.FavoriteTeam
-            LoginResult.Cancel, is LoginResult.Failure, null -> Route.Login
+    private fun setStartRoute(autoLoginState: AutoLoginState): Route =
+        when (autoLoginState) {
+            AutoLoginState.SignIn -> Route.Bottom
+            AutoLoginState.SignUp -> Route.FavoriteTeam
+            AutoLoginState.Failure,
+            AutoLoginState.Loading,
+            -> Route.Login
         }
 
     private fun handleInAppUpdate(onSuccess: () -> Unit) {
@@ -187,13 +184,6 @@ class MainActivity : AppCompatActivity() {
                 shouldImmediateUpdate = false
                 onSuccess()
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
-            }
-    }
-
-    companion object {
-        fun newIntent(context: Context): Intent =
-            Intent(context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             }
     }
 }
