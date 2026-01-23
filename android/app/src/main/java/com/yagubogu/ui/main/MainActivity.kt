@@ -73,9 +73,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             YaguBoguTheme {
                 val canAutoLogin: Boolean? by loginViewModel.canAutoLogin.collectAsStateWithLifecycle()
-                val loginResult: LoginResult? by loginViewModel.loginResult.collectAsStateWithLifecycle(
-                    null
-                )
+                val loginResult: LoginResult?
+                    by loginViewModel.loginResult.collectAsStateWithLifecycle(null)
 
                 canAutoLogin?.let {
                     NavigationRoot(
