@@ -36,7 +36,6 @@ fun NavigationRoot(
                 setOf(
                     Route.Bottom,
                     Route.Login,
-                    Route.Setting,
                     Route.FavoriteTeam,
                 ),
         )

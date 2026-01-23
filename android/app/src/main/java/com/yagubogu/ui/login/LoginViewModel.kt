@@ -41,6 +41,8 @@ class LoginViewModel @Inject constructor(
 
     fun signInWithGoogle(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
+            val hasNotFavoriteTeam: Boolean = isNewUser()
+
             val googleCredentialResult: GoogleCredentialResult =
                 googleCredentialManager.getGoogleCredentialResult()
 
@@ -54,7 +56,12 @@ class LoginViewModel @Inject constructor(
                                 onSuccess = { result: LoginResultResponse ->
                                     when (result) {
                                         LoginResultResponse.SignUp -> LoginResult.SignUp
-                                        LoginResultResponse.SignIn -> LoginResult.SignIn
+                                        LoginResultResponse.SignIn ->
+                                            if (hasNotFavoriteTeam) {
+                                                LoginResult.SignUp
+                                            } else {
+                                                LoginResult.SignIn
+                                            }
                                     }
                                 },
                                 onFailure = { exception: Throwable ->

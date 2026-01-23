@@ -30,6 +30,7 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.login.LoginViewModel
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.login.model.InAppUpdateType
+import com.yagubogu.ui.login.model.LoginResult
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.navigation.NavigationRoot
 import com.yagubogu.ui.navigation.Route
@@ -72,11 +73,14 @@ class MainActivity : AppCompatActivity() {
         setContent {
             YaguBoguTheme {
                 val canAutoLogin: Boolean? by loginViewModel.canAutoLogin.collectAsStateWithLifecycle()
+                val loginResult: LoginResult? by loginViewModel.loginResult.collectAsStateWithLifecycle(
+                    null
+                )
 
-                canAutoLogin?.let { canAutoLogin ->
+                canAutoLogin?.let {
                     NavigationRoot(
                         googleCredentialManager = googleCredentialManager,
-                        startRoute = if (canAutoLogin) Route.Bottom else Route.Login,
+                        startRoute = setStartRoute(loginResult),
                     )
                 }
             }
@@ -87,6 +91,13 @@ class MainActivity : AppCompatActivity() {
         val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { shouldImmediateUpdate || !isAppInitialized }
     }
+
+    private fun setStartRoute(loginResult: LoginResult?): Route =
+        when (loginResult) {
+            LoginResult.SignIn -> Route.Bottom
+            LoginResult.SignUp -> Route.FavoriteTeam
+            LoginResult.Cancel, is LoginResult.Failure, null -> Route.Login
+        }
 
     private fun handleInAppUpdate(onSuccess: () -> Unit) {
         val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
