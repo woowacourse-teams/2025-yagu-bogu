@@ -1,6 +1,5 @@
 package com.yagubogu.ui.main
 
-import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -36,9 +34,7 @@ import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.BottomNavKey
-import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
@@ -47,22 +43,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun MainScreen(
+    navigator: Navigator,
     navigateToSetting: () -> Unit,
     navigateToBadge: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val context: Context = LocalContext.current
-
     val selectedItem: BottomNavKey by viewModel.selectedBottomNavKey.collectAsStateWithLifecycle()
     val isLoading: Boolean by viewModel.isLoading.collectAsStateWithLifecycle()
 
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = BottomNavKey.Home,
-            topLevelRoutes = BottomNavKey.items.toSet(),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
     val scrollToTopEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
@@ -72,6 +61,10 @@ fun MainScreen(
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.selectBottomNavKey(navigator.currentRoute as? BottomNavKey ?: BottomNavKey.Home)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -151,7 +144,7 @@ fun MainScreen(
                     Modifier
                         .padding(innerPadding)
                         .fillMaxSize(),
-                entries = navigationState.toEntries(entryProvider),
+                entries = navigator.state.toEntries(entryProvider),
                 onBack = { navigator.goBack() },
             )
         }

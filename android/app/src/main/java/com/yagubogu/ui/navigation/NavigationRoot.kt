@@ -2,7 +2,6 @@ package com.yagubogu.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -26,61 +25,58 @@ import com.yagubogu.ui.setting.SettingScreen
 @Composable
 fun NavigationRoot(
     googleCredentialManager: GoogleCredentialManager,
-    startRoute: Route,
+    rootNavigator: Navigator,
+    mainNavigator: Navigator,
+    settingNavigator: Navigator,
     modifier: Modifier = Modifier,
 ) {
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = startRoute,
-            topLevelRoutes =
-                setOf(
-                    Route.Bottom,
-                    Route.Login,
-                    Route.FavoriteTeam,
-                ),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
-
     val entryProvider: (NavKey) -> NavEntry<NavKey> =
         entryProvider {
             entry<Route.Login> {
                 LoginScreen(
                     googleCredentialManager = googleCredentialManager,
-                    navigateToMain = { navigator.navigate(Route.Bottom) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
+                    navigateToMain = { rootNavigator.navigate(Route.Bottom) },
+                    navigateToFavoriteTeam = { rootNavigator.navigate(Route.FavoriteTeam) },
                 )
             }
             entry<Route.Bottom> {
                 MainScreen(
-                    navigateToSetting = { navigator.navigate(Route.Setting) },
-                    navigateToBadge = { navigator.navigate(Route.Badge) },
+                    navigator = mainNavigator,
+                    navigateToSetting = { rootNavigator.navigate(Route.Setting) },
+                    navigateToBadge = { rootNavigator.navigate(Route.Badge) },
                 )
             }
             entry<Route.Setting> {
                 SettingScreen(
-                    navigateToParent = { navigator.clearStackAndNavigate(Route.Bottom) },
-                    navigateToBottom = { navigator.navigate(Route.Bottom) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
-                    navigateToLogin = { navigator.clearStackAndNavigate(Route.Login) },
+                    navigator = settingNavigator,
+                    navigateToParent = { rootNavigator.goBack() },
+                    navigateToBottom = {
+                        settingNavigator.clearStack()
+                        rootNavigator.clearStackAndNavigate(Route.Bottom)
+                    },
+                    navigateToFavoriteTeam = { rootNavigator.navigate(Route.FavoriteTeam) },
+                    navigateToLogin = {
+                        mainNavigator.navigate(BottomNavKey.Home)
+                        settingNavigator.clearStack()
+                        rootNavigator.clearStackAndNavigate(Route.Login)
+                    },
                 )
             }
             entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
-                    navigateToMain = {
-                        navigator.navigate(Route.Bottom)
-                    },
+                    navigateToMain = { rootNavigator.goBack() },
                 )
             }
             entry<Route.Badge> {
                 BadgeScreen(
-                    navigateToMain = { navigator.goBack() },
+                    navigateToMain = { rootNavigator.goBack() },
                 )
             }
         }
 
     NavDisplay(
         modifier = modifier.fillMaxSize(),
-        entries = navigationState.toEntries(entryProvider),
-        onBack = { navigator.goBack() },
+        entries = rootNavigator.state.toEntries(entryProvider),
+        onBack = { rootNavigator.goBack() },
     )
 }
