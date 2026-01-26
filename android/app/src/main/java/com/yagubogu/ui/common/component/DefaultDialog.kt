@@ -90,10 +90,11 @@ fun DefaultDialog(
     BasicAlertDialog(
         onDismissRequest = onCancel,
         modifier = modifier.fillMaxWidth(0.9f),
-        properties = DialogProperties(
-            dismissOnClickOutside = false,
-            usePlatformDefaultWidth = false
-        )
+        properties =
+            DialogProperties(
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false,
+            ),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),

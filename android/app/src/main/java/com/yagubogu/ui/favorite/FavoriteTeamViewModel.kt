@@ -16,7 +16,6 @@ import javax.inject.Inject
 class FavoriteTeamViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-
     private val _favoriteTeamUpdateEvent = MutableSharedFlow<Unit>()
     val favoriteTeamUpdateEvent: SharedFlow<Unit> = _favoriteTeamUpdateEvent.asSharedFlow()
 

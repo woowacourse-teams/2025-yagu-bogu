@@ -125,7 +125,7 @@ private fun LoginScreen(
             Spacer(modifier = Modifier.weight(1f))
             LoginButton(
                 onClick = onGoogleLoginClick,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
             )
             Spacer(modifier = Modifier.height(180.dp))
         }
