@@ -68,7 +68,10 @@ fun FavoriteTeamScreen(
         FavoriteTeamDialog(
             emoji = team.team.emoji,
             teamName = team.team.shortname,
-            onConfirm = { viewModel.saveFavoriteTeam(team.team) },
+            onConfirm = {
+                viewModel.saveFavoriteTeam(team.team)
+                selectedTeam = null
+            },
             onCancel = { selectedTeam = null },
         )
     }
