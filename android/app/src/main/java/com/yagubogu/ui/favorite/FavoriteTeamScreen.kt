@@ -2,7 +2,7 @@ package com.yagubogu.ui.favorite
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -93,12 +93,14 @@ private fun FavoriteTeamScreen(
             modifier =
                 Modifier
                     .padding(horizontal = 30.dp)
-                    .padding(top = 20.dp, bottom = 14.dp),
+                    .padding(top = 20.dp),
         )
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 14.dp),
+            contentPadding = PaddingValues(all = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
             items(teams) { item: FavoriteTeamItem ->
@@ -117,33 +119,26 @@ private fun FavoriteTeamItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             modifier
-                .padding(6.dp)
                 .fillMaxWidth()
                 .background(White, RoundedCornerShape(12.dp))
                 .border(1.dp, Gray100, RoundedCornerShape(12.dp))
+                .padding(vertical = 24.dp)
                 .noRippleClickable { onClick() },
-        contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier
-                    .padding(vertical = 24.dp),
-        ) {
-            Text(
-                text = item.emoji,
-                fontSize = 32.sp,
-            )
+        Text(
+            text = item.emoji,
+            fontSize = 32.sp,
+        )
 
-            Text(
-                text = item.team.shortname,
-                style = PretendardSemiBold16,
-                modifier = Modifier.padding(top = 8.dp),
-            )
-        }
+        Text(
+            text = item.team.shortname,
+            style = PretendardSemiBold16,
+            modifier = Modifier.padding(top = 8.dp),
+        )
     }
 }
 
@@ -171,7 +166,7 @@ private fun FavoriteTeamDialog(
             text = emoji,
             fontSize = 32.sp,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = teamName,
             style = PretendardSemiBold16,
