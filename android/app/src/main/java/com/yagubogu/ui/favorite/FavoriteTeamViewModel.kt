@@ -16,26 +16,19 @@ import javax.inject.Inject
 class FavoriteTeamViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-    private var selectedTeam: Team? = null
 
     private val _favoriteTeamUpdateEvent = MutableSharedFlow<Unit>()
     val favoriteTeamUpdateEvent: SharedFlow<Unit> = _favoriteTeamUpdateEvent.asSharedFlow()
 
-    fun saveFavoriteTeam() {
+    fun saveFavoriteTeam(team: Team) {
         viewModelScope.launch {
-            selectedTeam?.let { team: Team ->
-                memberRepository
-                    .updateFavoriteTeam(team.name)
-                    .onSuccess {
-                        _favoriteTeamUpdateEvent.emit(Unit)
-                    }.onFailure { exception: Throwable ->
-                        Timber.w(exception, "API 호출 실패")
-                    }
-            }
+            memberRepository
+                .updateFavoriteTeam(team.name)
+                .onSuccess {
+                    _favoriteTeamUpdateEvent.emit(Unit)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
         }
-    }
-
-    fun selectTeam(team: Team) {
-        selectedTeam = team
     }
 }

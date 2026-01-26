@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +48,13 @@ fun FavoriteTeamScreen(
     viewModel: FavoriteTeamViewModel = hiltViewModel(),
 ) {
     val teams: List<FavoriteTeamItem> = Team.entries.map { FavoriteTeamItem.of(it) }
-    var selectedTeam: FavoriteTeamItem? by remember { mutableStateOf(null) }
+    var selectedTeam: FavoriteTeamItem? by rememberSaveable { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.favoriteTeamUpdateEvent.collect {
+            navigateToMain()
+        }
+    }
 
     Scaffold { innerPadding ->
         FavoriteTeamScreen(
@@ -58,23 +64,13 @@ fun FavoriteTeamScreen(
         )
     }
 
-    selectedTeam?.let { team ->
+    selectedTeam?.let { team: FavoriteTeamItem ->
         FavoriteTeamDialog(
             emoji = team.team.emoji,
             teamName = team.team.shortname,
-            onConfirm = {
-                viewModel.selectTeam(team.team)
-                viewModel.saveFavoriteTeam()
-                selectedTeam = null
-            },
+            onConfirm = { viewModel.saveFavoriteTeam(team.team) },
             onCancel = { selectedTeam = null },
         )
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.favoriteTeamUpdateEvent.collect {
-            navigateToMain()
-        }
     }
 }
 
