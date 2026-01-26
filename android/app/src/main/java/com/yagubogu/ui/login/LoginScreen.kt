@@ -39,6 +39,8 @@ import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.login.model.LoginResult
+import com.yagubogu.ui.theme.Dimming025
+import com.yagubogu.ui.theme.Dimming050
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.EsamanruLight
 import com.yagubogu.ui.theme.Gray300
@@ -95,7 +97,7 @@ private fun LoginScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Dimming050)
                     .padding(horizontal = 40.dp),
         ) {
             Spacer(modifier = Modifier.height(120.dp))
@@ -105,7 +107,7 @@ private fun LoginScreen(
                     EsamanruBold.copy(
                         shadow =
                             Shadow(
-                                color = Color.Black.copy(alpha = 0.25f),
+                                color = Dimming025,
                                 offset = Offset(x = 2f, y = 12f),
                                 blurRadius = 8f,
                             ),
@@ -121,7 +123,10 @@ private fun LoginScreen(
                 color = Color.White,
             )
             Spacer(modifier = Modifier.weight(1f))
-            LoginButton(onClick = onGoogleLoginClick)
+            LoginButton(
+                onClick = onGoogleLoginClick,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
             Spacer(modifier = Modifier.height(180.dp))
         }
     }
@@ -129,8 +134,8 @@ private fun LoginScreen(
 
 @Composable
 private fun LoginButton(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
 ) {
     Box(
         modifier =
