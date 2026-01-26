@@ -61,12 +61,12 @@ class YaguBoguActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
-        handleInAppUpdate(onSuccess = {
-            viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
-        })
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+        handleInAppUpdate(onSuccess = {
+            viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
+        })
         setContent {
             YaguBoguTheme {
                 val autoLoginState: AutoLoginState by viewModel.autoLoginState.collectAsStateWithLifecycle()
@@ -92,7 +92,7 @@ class YaguBoguActivity : AppCompatActivity() {
             AutoLoginState.SignUp -> Route.FavoriteTeam
             AutoLoginState.Failure,
             AutoLoginState.Loading,
-            -> Route.Login
+                -> Route.Login
         }
 
     private fun handleInAppUpdate(onSuccess: () -> Unit) {
