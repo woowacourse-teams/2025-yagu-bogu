@@ -28,10 +28,10 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingScreen(
-    navigateToParent: () -> Unit,
-    navigateToBottom: () -> Unit,
-    navigateToFavoriteTeam: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onBackClick: () -> Unit,
+    onDeleteAccountCancel: () -> Unit,
+    onFavoriteTeamEditClick: () -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -50,7 +50,7 @@ fun SettingScreen(
                 onBackClick = {
                     when (navigator.canGoBack()) {
                         true -> navigator.goBack()
-                        false -> navigateToParent()
+                        false -> onBackClick()
                     }
                 },
                 title = stringResource((navigator.currentRoute as? SettingNavKey)?.label ?: R.string.setting_main_title),
@@ -75,24 +75,24 @@ fun SettingScreen(
                 entry<SettingNavKey.SettingMain> {
                     SettingMainScreen(
                         onSettingAccountClick = { navigator.navigate(SettingNavKey.SettingAccount) },
-                        onFavoriteTeamEditClick = { navigateToFavoriteTeam() },
+                        onFavoriteTeamEditClick = { onFavoriteTeamEditClick() },
                     )
                 }
                 entry<SettingNavKey.SettingAccount> {
                     SettingAccountScreen(
                         onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
-                        navigateToLogin = navigateToLogin,
+                        onLogout = onLogout,
                     )
                 }
                 entry<SettingNavKey.SettingDeleteAccount> {
                     SettingDeleteAccountScreen(
-                        navigateToHome = {
+                        onDeleteAccountCancel = {
                             navigator.clearStack()
-                            navigateToBottom()
+                            onDeleteAccountCancel()
                         },
-                        navigateToLogin = {
+                        onDeleteAccount = {
                             navigator.clearStack()
-                            navigateToLogin()
+                            onLogout()
                         },
                     )
                 }

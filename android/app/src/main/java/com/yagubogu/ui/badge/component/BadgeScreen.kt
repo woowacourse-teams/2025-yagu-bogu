@@ -48,7 +48,7 @@ private const val COLUMN_SIZE = 2
 
 @Composable
 fun BadgeScreen(
-    navigateToMain: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: BadgeViewModel = hiltViewModel(),
 ) {
@@ -58,7 +58,7 @@ fun BadgeScreen(
 
     BadgeScreen(
         badgeUiState = viewModel.badgeUiState.value,
-        onBackClick = navigateToMain,
+        onBackClick = onBackClick,
         onRegisterClick = { badgeId: Long -> viewModel.updateRepresentativeBadge(badgeId) },
         modifier = modifier,
     )

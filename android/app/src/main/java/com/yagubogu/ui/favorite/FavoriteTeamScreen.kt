@@ -43,7 +43,7 @@ import com.yagubogu.ui.util.noRippleClickable
 
 @Composable
 fun FavoriteTeamScreen(
-    navigateToMain: () -> Unit,
+    onFavoriteTeamUpdate: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoriteTeamViewModel = hiltViewModel(),
 ) {
@@ -52,7 +52,7 @@ fun FavoriteTeamScreen(
 
     LaunchedEffect(Unit) {
         viewModel.favoriteTeamUpdateEvent.collect {
-            navigateToMain()
+            onFavoriteTeamUpdate()
         }
     }
 

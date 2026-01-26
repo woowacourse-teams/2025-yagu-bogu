@@ -51,8 +51,8 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingDeleteAccountScreen(
-    navigateToHome: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onDeleteAccount: () -> Unit,
+    onDeleteAccountCancel: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -66,12 +66,12 @@ fun SettingDeleteAccountScreen(
     LaunchedEffect(settingEvent) {
         when (settingEvent) {
             SettingEvent.DeleteAccount -> {
-                navigateToLogin()
+                onDeleteAccount()
                 context.showToast(R.string.setting_delete_account_confirm_select_alert)
             }
 
             SettingEvent.DeleteAccountCancel -> {
-                navigateToHome()
+                onDeleteAccountCancel()
                 context.showToast(R.string.setting_delete_account_cancel_select_alert)
             }
 

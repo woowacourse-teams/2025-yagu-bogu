@@ -46,34 +46,34 @@ fun NavigationRoot(
             entry<Route.Login> {
                 LoginScreen(
                     googleCredentialManager = googleCredentialManager,
-                    navigateToMain = { navigator.navigate(Route.Bottom) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
+                    onSignIn = { navigator.navigate(Route.Bottom) },
+                    onSignUp = { navigator.navigate(Route.FavoriteTeam) },
                 )
             }
             entry<Route.Bottom> {
                 MainScreen(
-                    navigateToSetting = { navigator.navigate(Route.Setting) },
-                    navigateToBadge = { navigator.navigate(Route.Badge) },
+                    onSettingsClick = { navigator.navigate(Route.Setting) },
+                    onBadgeClick = { navigator.navigate(Route.Badge) },
                 )
             }
             entry<Route.Setting> {
                 SettingScreen(
-                    navigateToParent = { navigator.clearStackAndNavigate(Route.Bottom) },
-                    navigateToBottom = { navigator.navigate(Route.Bottom) },
-                    navigateToFavoriteTeam = { navigator.navigate(Route.FavoriteTeam) },
-                    navigateToLogin = { navigator.clearStackAndNavigate(Route.Login) },
+                    onBackClick = { navigator.clearStackAndNavigate(Route.Bottom) },
+                    onDeleteAccountCancel = { navigator.navigate(Route.Bottom) },
+                    onFavoriteTeamEditClick = { navigator.navigate(Route.FavoriteTeam) },
+                    onLogout = { navigator.clearStackAndNavigate(Route.Login) },
                 )
             }
             entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
-                    navigateToMain = {
+                    onFavoriteTeamUpdate = {
                         navigator.navigate(Route.Bottom)
                     },
                 )
             }
             entry<Route.Badge> {
                 BadgeScreen(
-                    navigateToMain = { navigator.goBack() },
+                    onBackClick = { navigator.goBack() },
                 )
             }
         }

@@ -53,8 +53,8 @@ import kotlinx.coroutines.flow.SharedFlow
 @Composable
 fun LoginScreen(
     googleCredentialManager: GoogleCredentialManager,
-    navigateToMain: () -> Unit,
-    navigateToFavoriteTeam: () -> Unit,
+    onSignIn: () -> Unit,
+    onSignUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -73,8 +73,8 @@ fun LoginScreen(
     LoginResultHandler(
         snackbarHostState = snackbarHostState,
         loginResultFlow = viewModel.loginResult,
-        onSignIn = navigateToMain,
-        onSignUp = navigateToFavoriteTeam,
+        onSignIn = onSignIn,
+        onSignUp = onSignUp,
     )
 
     BackPressHandler(snackbarHostState, coroutineScope)

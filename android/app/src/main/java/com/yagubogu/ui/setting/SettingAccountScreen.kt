@@ -31,7 +31,7 @@ import com.yagubogu.ui.theme.Gray050
 @Composable
 fun SettingAccountScreen(
     onDeleteAccountClick: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -42,7 +42,7 @@ fun SettingAccountScreen(
 
     LaunchedEffect(settingEvent) {
         if (settingEvent is SettingEvent.Logout) {
-            navigateToLogin()
+            onLogout()
             context.showToast(R.string.setting_logout_alert)
         }
     }
