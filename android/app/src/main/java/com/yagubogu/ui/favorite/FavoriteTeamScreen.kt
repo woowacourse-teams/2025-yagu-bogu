@@ -56,7 +56,7 @@ fun FavoriteTeamScreen(
         }
     }
 
-    Scaffold { innerPadding ->
+    Scaffold(containerColor = Gray050) { innerPadding ->
         FavoriteTeamScreen(
             teams = teams,
             onTeamClick = { item -> selectedTeam = item },
