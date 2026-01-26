@@ -54,7 +54,6 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
-import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.SettingEvent
@@ -86,8 +85,7 @@ fun SettingMainScreen(
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
-    val settingEvent: State<SettingEvent?> =
-        viewModel.settingEvent.collectAsStateWithLifecycle(null)
+    val settingEvent: SettingEvent? by viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     val uCropLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
@@ -125,6 +123,17 @@ fun SettingMainScreen(
         viewModel.fetchMemberInfo()
     }
 
+    LaunchedEffect(settingEvent) {
+        if (settingEvent is SettingEvent.NicknameEdit) {
+            val message =
+                context.getString(
+                    R.string.setting_edited_nickname_alert,
+                    (settingEvent as SettingEvent.NicknameEdit).newNickname,
+                )
+            context.showToast(message)
+        }
+    }
+
     SettingMainScreen(
         onClickSettingAccount = onSettingAccountClick,
         onNicknameEdit = { showNicknameEditDialog = true },
@@ -148,8 +157,6 @@ fun SettingMainScreen(
             onCancel = { showNicknameEditDialog = false },
         )
     }
-
-    SettingEventHandler(settingEvent = settingEvent.value)
 }
 
 @Composable

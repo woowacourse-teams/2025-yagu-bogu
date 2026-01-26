@@ -17,12 +17,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.ui.setting.component.SettingEventHandler
+import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.setting.component.dialog.DeleteAccountDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.SettingEvent
@@ -55,12 +56,28 @@ fun SettingDeleteAccountScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
-    val memberInfoItem: State<MemberInfoItem> =
-        viewModel.myMemberInfoItem.collectAsStateWithLifecycle()
-    val settingEvent: State<SettingEvent?> =
-        viewModel.settingEvent.collectAsStateWithLifecycle(null)
+    val context = LocalContext.current
+
+    val memberInfoItem: MemberInfoItem by viewModel.myMemberInfoItem.collectAsStateWithLifecycle()
+    val settingEvent: SettingEvent? by viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     var showDeleteAccountDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(settingEvent) {
+        when (settingEvent) {
+            SettingEvent.DeleteAccount -> {
+                navigateToLogin()
+                context.showToast(R.string.setting_delete_account_confirm_select_alert)
+            }
+
+            SettingEvent.DeleteAccountCancel -> {
+                navigateToHome()
+                context.showToast(R.string.setting_delete_account_cancel_select_alert)
+            }
+
+            else -> Unit
+        }
+    }
 
     SettingDeleteAccountScreen(
         onCancelDeleteAccount = {
@@ -68,7 +85,7 @@ fun SettingDeleteAccountScreen(
             showDeleteAccountDialog = false
         },
         onConfirmDeleteAccount = { showDeleteAccountDialog = true },
-        memberInfoItem = memberInfoItem.value,
+        memberInfoItem = memberInfoItem,
         modifier = modifier,
     )
 
@@ -81,12 +98,6 @@ fun SettingDeleteAccountScreen(
             onCancel = { showDeleteAccountDialog = false },
         )
     }
-
-    SettingEventHandler(
-        settingEvent = settingEvent.value,
-        navigateToHome = navigateToHome,
-        navigateToLogin = navigateToLogin,
-    )
 }
 
 @Composable
