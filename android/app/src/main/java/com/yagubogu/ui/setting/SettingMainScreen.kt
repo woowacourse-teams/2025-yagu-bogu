@@ -74,7 +74,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
 fun SettingMainScreen(
-    onClickSettingAccount: () -> Unit,
+    onSettingAccountClick: () -> Unit,
     onFavoriteTeamEditClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
@@ -126,7 +126,7 @@ fun SettingMainScreen(
     }
 
     SettingMainScreen(
-        onClickSettingAccount = onClickSettingAccount,
+        onClickSettingAccount = onSettingAccountClick,
         onNicknameEdit = { showNicknameEditDialog = true },
         onProfileImageUpload = { pickImageLauncher.launch("image/*") },
         onFavoriteTeamEditClick = onFavoriteTeamEditClick,

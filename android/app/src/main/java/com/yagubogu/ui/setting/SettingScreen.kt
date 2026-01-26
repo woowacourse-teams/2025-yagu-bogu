@@ -74,7 +74,7 @@ fun SettingScreen(
             entryProvider {
                 entry<SettingNavKey.SettingMain> {
                     SettingMainScreen(
-                        onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                        onSettingAccountClick = { navigator.navigate(SettingNavKey.SettingAccount) },
                         onFavoriteTeamEditClick = { navigateToFavoriteTeam() },
                     )
                 }
