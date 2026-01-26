@@ -23,20 +23,18 @@ class YaguBoguViewModel @Inject constructor(
     private val _autoLoginState = MutableStateFlow<AutoLoginState>(AutoLoginState.Loading)
     val autoLoginState: StateFlow<AutoLoginState> = _autoLoginState.asStateFlow()
 
-    suspend fun isTokenValid(): Boolean = tokenRepository.refreshTokens().isSuccess
-
-    suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
-
     fun handleAutoLogin(onAppInitialized: () -> Unit) {
         viewModelScope.launch {
-            if (!isTokenValid()) {
+            val isTokenValid: Boolean = tokenRepository.refreshTokens().isSuccess
+            if (!isTokenValid) {
                 _autoLoginState.emit(AutoLoginState.Failure)
                 onAppInitialized()
                 return@launch
             }
             Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
 
-            when (isNewUser()) {
+            val isNewUser: Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
+            when (isNewUser) {
                 true -> _autoLoginState.emit(AutoLoginState.SignUp)
                 false -> _autoLoginState.emit(AutoLoginState.SignIn)
             }

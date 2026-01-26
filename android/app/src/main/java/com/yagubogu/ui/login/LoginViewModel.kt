@@ -24,8 +24,6 @@ class LoginViewModel @Inject constructor(
     private val _loginResult = MutableSharedFlow<LoginResult>()
     val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
 
-    suspend fun isNewUser(): Boolean = memberRepository.getFavoriteTeam().getOrNull() == null
-
     fun signInWithGoogle(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
             val googleCredentialResult: GoogleCredentialResult =
@@ -39,12 +37,13 @@ class LoginViewModel @Inject constructor(
                             .login(idToken)
                             .fold(
                                 onSuccess = { result: LoginResultResponse ->
-                                    val hasNotFavoriteTeam: Boolean = isNewUser()
+                                    val isNewUser: Boolean =
+                                        memberRepository.getFavoriteTeam().getOrNull() == null
 
                                     when (result) {
                                         LoginResultResponse.SignUp -> LoginResult.SignUp
                                         LoginResultResponse.SignIn ->
-                                            if (hasNotFavoriteTeam) {
+                                            if (isNewUser) {
                                                 LoginResult.SignUp
                                             } else {
                                                 LoginResult.SignIn
