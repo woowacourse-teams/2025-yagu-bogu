@@ -73,6 +73,7 @@ fun FavoriteTeamScreen(
                 selectedTeam = null
             },
             onCancel = { selectedTeam = null },
+            modifier = modifier,
         )
     }
 }
