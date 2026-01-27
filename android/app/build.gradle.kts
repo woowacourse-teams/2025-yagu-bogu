@@ -125,6 +125,8 @@ dependencies {
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
+    implementation(libs.kermit)
+    implementation(libs.kermit.crashlytics)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.glide)
     implementation(libs.play.services.oss.licenses)
