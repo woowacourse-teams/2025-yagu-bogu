@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.request.game.LikeDeltaDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import timber.log.Timber
 import java.time.Instant
 
 class LivetalkChatViewModel @AssistedInject constructor(
@@ -42,7 +42,10 @@ class LivetalkChatViewModel @AssistedInject constructor(
     private val talkRepository: TalkRepository,
     private val gameRepository: GameRepository,
     private val memberRepository: MemberRepository,
+    kermitLogger: Logger,
 ) : ViewModel() {
+    val logger = kermitLogger.withTag("LivetalkChatViewModel")
+
     @AssistedFactory
     interface Factory {
         fun create(
@@ -94,7 +97,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess { response: LivetalkResponseItem ->
                     messageStateHolder.addBeforeChats(response)
                 }.onFailure { exception ->
-                    Timber.w(exception, "과거 메시지 API 호출 실패")
+                    logger.w(exception) { "과거 메시지 API 호출 실패" }
                 }
         }
     }
@@ -111,7 +114,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
             .onSuccess { response: LivetalkResponseItem ->
                 messageStateHolder.addAfterChats(response)
             }.onFailure { exception ->
-                Timber.w(exception, "최신 메시지 API 호출 실패")
+                logger.w(exception) { "최신 메시지 API 호출 실패" }
             }
     }
 
@@ -128,7 +131,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
                     startPolling()
                     messageStateHolder.messageFormText.value = ""
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
@@ -139,13 +142,13 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .deleteTalks(gameId, chatId)
                 .onSuccess {
                     messageStateHolder.deleteChat(chatId)
-                    Timber.d("현장톡 정상 삭제")
+                    logger.d { "현장톡 정상 삭제" }
                 }.onFailure { exception: Throwable ->
                     when (exception) {
-                        is ApiException.BadRequest -> Timber.d("해당 경기에 존재하지 않는 현장톡 삭제 시도")
-                        is ApiException.Forbidden -> Timber.d("타인의 현장톡 삭제 시도")
-                        is ApiException.NotFound -> Timber.d("존재하지 않는 현장톡 삭제 시도")
-                        else -> Timber.d(exception)
+                        is ApiException.BadRequest -> logger.d { "해당 경기에 존재하지 않는 현장톡 삭제 시도" }
+                        is ApiException.Forbidden -> logger.d { "타인의 현장톡 삭제 시도" }
+                        is ApiException.NotFound -> logger.d { "존재하지 않는 현장톡 삭제 시도" }
+                        else -> logger.d(exception) { "알 수 없는 현장톡 삭제 예외" }
                     }
                 }
         }
@@ -158,20 +161,20 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess {
                     messageStateHolder.reportChat(chatId)
                     messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.Success)
-                    Timber.d("현장톡 정상 신고")
+                    logger.d { "현장톡 정상 신고" }
                 }.onFailure { exception: Throwable ->
                     when (exception) {
                         is ApiException.BadRequest -> {
                             messageStateHolder.updateLivetalkReportEvent(LivetalkReportEvent.DuplicatedReport)
-                            Timber.d("스스로 신고하거나 중복 신고인 경우")
+                            logger.d { "스스로 신고하거나 중복 신고인 경우" }
                         }
 
                         is ApiException.Forbidden -> {
-                            Timber.d("회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도")
+                            logger.d { "회원이 존재하지 않거나 존재하지 않는 현장톡 신고 시도" }
                         }
 
                         else -> {
-                            Timber.d(exception)
+                            logger.d(exception) { "알 수 없는 현장톡 신고 예외" }
                         }
                     }
                 }
@@ -201,7 +204,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
             .onSuccess { likeCountsResponse: LikeCountsResponse ->
                 likeCountStateHolder.updateLikeCount(cachedLivetalkTeams, likeCountsResponse)
             }.onFailure { exception ->
-                Timber.w(exception, "응원수 로드 실패")
+                logger.w(exception) { "응원수 로드 실패" }
             }
     }
 
@@ -221,9 +224,9 @@ class LivetalkChatViewModel @AssistedInject constructor(
             gameRepository
                 .addLikeBatches(gameId, request)
                 .onSuccess {
-                    Timber.d("응원 배치 전송 성공: $countToSend 건")
+                    logger.d { "응원 배치 전송 성공: $countToSend 건" }
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "응원 배치 전송 실패")
+                    logger.w(exception) { "응원 배치 전송 실패" }
                 }
         }
     }
@@ -236,7 +239,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 cachedLivetalkTeams = livetalkTeams
                 _livetalkUiState.value = LivetalkUiState.Success
             }.onFailure { exception ->
-                Timber.w(exception, "최초 팀 정보 가져오기 실패")
+                logger.w(exception) { "최초 팀 정보 가져오기 실패" }
                 _livetalkUiState.value = LivetalkUiState.Error
             }
     }
@@ -249,7 +252,7 @@ class LivetalkChatViewModel @AssistedInject constructor(
                 .onSuccess { memberProfile: MemberProfile ->
                     _profileInfoClickEvent.emit(memberProfile)
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+                    logger.w(exception) { "사용자 프로필 조회 API 호출 실패" }
                 }
         }
     }

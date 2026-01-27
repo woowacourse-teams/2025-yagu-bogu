@@ -2,6 +2,7 @@ package com.yagubogu.ui.livetalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.presentation.util.mapList
@@ -11,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
@@ -20,7 +20,10 @@ import javax.inject.Inject
 class LivetalkViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val clock: Clock,
+    kermitLogger: Logger,
 ) : ViewModel() {
+    val logger = kermitLogger.withTag("LivetalkViewModel")
+
     private val _stadiumItems = MutableStateFlow<List<LivetalkStadiumItem>>(emptyList())
     val stadiumItems: StateFlow<List<LivetalkStadiumItem>> = _stadiumItems.asStateFlow()
 
@@ -32,7 +35,7 @@ class LivetalkViewModel @Inject constructor(
                 .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
                     _stadiumItems.value = sortStadiumsByVerification(livetalkStadiumItems)
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
