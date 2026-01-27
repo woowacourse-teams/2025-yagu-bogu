@@ -2,6 +2,7 @@ package com.yagubogu.ui.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import timber.log.Timber
 
 /**
  * Handles navigation events (forward and back) by updating the navigation state.
@@ -25,6 +26,7 @@ class Navigator(
         } else {
             currentStack.add(route)
         }
+        showBackStack()
     }
 
     fun canGoBack(): Boolean = currentRoute != state.topLevelRoute
@@ -36,6 +38,7 @@ class Navigator(
         } else {
             currentStack.removeLastOrNull()
         }
+        showBackStack()
     }
 
     fun clearStack() {
@@ -45,7 +48,13 @@ class Navigator(
     }
 
     fun clearStackAndNavigate(route: NavKey) {
+        Timber.d("clearAndNavigateTo $route called.")
         clearStack()
         navigate(route)
+    }
+
+    private fun showBackStack() {
+        Timber.d("backStacks: ${state.backStacks.keys}")
+        Timber.d("currentStack: ${currentStack.joinToString()}")
     }
 }

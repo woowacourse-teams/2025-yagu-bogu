@@ -34,48 +34,35 @@ import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.BottomNavKey
-import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun MainScreen(
+    navigator: Navigator,
     onSettingsClick: () -> Unit,
     onBadgeClick: () -> Unit,
-    initEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val selectedItem: BottomNavKey by viewModel.selectedBottomNavKey.collectAsStateWithLifecycle()
     val isLoading: Boolean by viewModel.isLoading.collectAsStateWithLifecycle()
 
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = BottomNavKey.Home,
-            topLevelRoutes = BottomNavKey.items.toSet(),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
-
     val scrollToTopEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
+
+    LaunchedEffect(Unit) {
+        viewModel.selectBottomNavKey(navigator.currentRoute as? BottomNavKey ?: BottomNavKey.Home)
+    }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
     LaunchedEffect(selectedItem) {
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        initEvent.collect {
-            viewModel.selectBottomNavKey(BottomNavKey.Home)
-            navigator.navigate(BottomNavKey.Home)
         }
     }
 
@@ -156,7 +143,7 @@ fun MainScreen(
                     Modifier
                         .padding(innerPadding)
                         .fillMaxSize(),
-                entries = navigationState.toEntries(entryProvider),
+                entries = navigator.state.toEntries(entryProvider),
                 onBack = { navigator.goBack() },
             )
         }

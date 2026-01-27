@@ -18,29 +18,21 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.R
 import com.yagubogu.ui.common.component.DefaultToolbar
-import com.yagubogu.ui.navigation.NavigationState
 import com.yagubogu.ui.navigation.Navigator
 import com.yagubogu.ui.navigation.SettingNavKey
-import com.yagubogu.ui.navigation.rememberNavigationState
 import com.yagubogu.ui.navigation.toEntries
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingScreen(
+    navigator: Navigator,
     onBackClick: () -> Unit,
     onDeleteAccountCancel: () -> Unit,
     onFavoriteTeamEditClick: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = SettingNavKey.SettingMain,
-            topLevelRoutes = setOf(SettingNavKey.SettingMain),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
-
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -103,7 +95,7 @@ fun SettingScreen(
                 Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
-            entries = navigationState.toEntries(entryProvider),
+            entries = navigator.state.toEntries(entryProvider),
             onBack = { navigator.goBack() },
         )
     }

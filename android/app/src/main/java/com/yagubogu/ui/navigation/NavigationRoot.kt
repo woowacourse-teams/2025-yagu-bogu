@@ -2,7 +2,6 @@ package com.yagubogu.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -14,81 +13,73 @@ import com.yagubogu.ui.login.LoginScreen
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.main.MainScreen
 import com.yagubogu.ui.setting.SettingScreen
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 앱의 최상위 네비게이션 구조를 정의하는 루트 컴포저블.
  *
  * 각 경로([Route])에 따른 화면 컴포저블을 매핑하여 화면 전환을 관리합니다.
- * 자식 컴포저블과 분리된 독립적인 [Navigator]를 사용합니다.
  *
+ * @param googleCredentialManager 구글 인증 관리자
+ * @param rootNavigator 최상위 라우팅 관리 Navigator
+ * @param mainNavigator 하단 탭 네비게이션 Navigator
+ * @param settingNavigator 설정 화면 네비게이션 Navigator
  * @param modifier 레이아웃 수정을 위한 [Modifier]
  */
 @Composable
 fun NavigationRoot(
     googleCredentialManager: GoogleCredentialManager,
-    startRoute: Route,
+    rootNavigator: Navigator,
+    mainNavigator: Navigator,
+    settingNavigator: Navigator,
     modifier: Modifier = Modifier,
 ) {
-    val mainInitEvent = remember { MutableSharedFlow<Unit>(replay = 1) }
-
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = startRoute,
-            topLevelRoutes =
-                setOf(
-                    Route.Main,
-                    Route.Login,
-                    Route.FavoriteTeam,
-                ),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
-
     val entryProvider: (NavKey) -> NavEntry<NavKey> =
         entryProvider {
             entry<Route.Login> {
                 LoginScreen(
                     googleCredentialManager = googleCredentialManager,
-                    onSignIn = { navigator.navigate(Route.Main) },
-                    onSignUp = { navigator.navigate(Route.FavoriteTeam) },
+                    onSignIn = { rootNavigator.navigate(Route.Main) },
+                    onSignUp = { rootNavigator.navigate(Route.FavoriteTeam) },
                 )
             }
             entry<Route.Main> {
                 MainScreen(
-                    onSettingsClick = { navigator.navigate(Route.Setting) },
-                    onBadgeClick = { navigator.navigate(Route.Badge) },
-                    initEvent = mainInitEvent.asSharedFlow(),
+                    navigator = mainNavigator,
+                    onSettingsClick = { rootNavigator.navigate(Route.Setting) },
+                    onBadgeClick = { rootNavigator.navigate(Route.Badge) },
                 )
             }
             entry<Route.Setting> {
                 SettingScreen(
-                    onBackClick = { navigator.clearStackAndNavigate(Route.Main) },
-                    onDeleteAccountCancel = { navigator.navigate(Route.Main) },
-                    onFavoriteTeamEditClick = { navigator.navigate(Route.FavoriteTeam) },
+                    navigator = settingNavigator,
+                    onBackClick = { rootNavigator.navigate(Route.Main) },
+                    onDeleteAccountCancel = { rootNavigator.navigate(Route.Main) },
+                    onFavoriteTeamEditClick = { rootNavigator.navigate(Route.FavoriteTeam) },
                     onLogout = {
-                        navigator.clearStackAndNavigate(Route.Login)
-                        mainInitEvent.tryEmit(Unit)
+                        mainNavigator.navigate(BottomNavKey.Home)
+                        settingNavigator.clearStack()
+                        rootNavigator.navigate(Route.Login)
                     },
                 )
             }
             entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
                     onFavoriteTeamUpdate = {
-                        navigator.navigate(Route.Main)
-                    },
+                        rootNavigator.navigate(Route.Main)
+                        mainNavigator.navigate(BottomNavKey.Home)
+                    }
                 )
             }
             entry<Route.Badge> {
                 BadgeScreen(
-                    onBackClick = { navigator.goBack() },
+                    onBackClick = { rootNavigator.goBack() },
                 )
             }
         }
 
     NavDisplay(
         modifier = modifier.fillMaxSize(),
-        entries = navigationState.toEntries(entryProvider),
-        onBack = { navigator.goBack() },
+        entries = rootNavigator.state.toEntries(entryProvider),
+        onBack = { rootNavigator.goBack() },
     )
 }
