@@ -24,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -45,6 +44,7 @@ import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.EsamanruLight
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardSemiBold
+import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.noRippleClickable
@@ -113,14 +113,14 @@ private fun LoginScreen(
                             ),
                     ),
                 fontSize = 56.dpToSp,
-                color = Color.White,
+                color = White,
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.login_app_description),
                 style = EsamanruLight,
                 fontSize = 20.dpToSp,
-                color = Color.White,
+                color = White,
             )
             Spacer(modifier = Modifier.weight(1f))
             LoginButton(
@@ -141,7 +141,7 @@ private fun LoginButton(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(4.dp))
+                .background(White, RoundedCornerShape(4.dp))
                 .border(1.dp, Gray300, RoundedCornerShape(4.dp))
                 .noRippleClickable { onClick() },
         contentAlignment = Alignment.Center,

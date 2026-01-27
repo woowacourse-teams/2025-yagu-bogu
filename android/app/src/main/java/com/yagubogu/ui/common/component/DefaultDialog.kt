@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +34,7 @@ import com.yagubogu.ui.theme.Gray700
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.Primary500
+import com.yagubogu.ui.theme.White
 
 @Composable
 fun DefaultDialog(
@@ -99,7 +99,7 @@ fun DefaultDialog(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column(
@@ -136,7 +136,7 @@ fun DefaultDialog(
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = Primary500,
-                                contentColor = Color.White,
+                                contentColor = White,
                             ),
                         shape = RoundedCornerShape(12.dp),
                     ) {
