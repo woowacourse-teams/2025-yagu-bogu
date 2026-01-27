@@ -124,7 +124,6 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.timber)
     implementation(libs.kermit)
     implementation(libs.kermit.crashlytics)
     implementation(libs.androidx.datastore.preferences)
