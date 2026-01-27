@@ -1,4 +1,4 @@
-package com.yagubogu.ui.navigation
+package com.yagubogu.ui.navigation.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState

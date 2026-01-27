@@ -18,9 +18,9 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.R
 import com.yagubogu.ui.common.component.DefaultToolbar
-import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.SettingNavKey
-import com.yagubogu.ui.navigation.toEntries
+import com.yagubogu.ui.navigation.model.Navigator
+import com.yagubogu.ui.navigation.model.SettingNavKey
+import com.yagubogu.ui.navigation.model.toEntries
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
 

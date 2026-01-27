@@ -33,9 +33,9 @@ import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
 import com.yagubogu.ui.main.component.MainNavigationBar
 import com.yagubogu.ui.main.component.MainToolbar
-import com.yagubogu.ui.navigation.BottomNavKey
-import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.toEntries
+import com.yagubogu.ui.navigation.model.BottomNavKey
+import com.yagubogu.ui.navigation.model.Navigator
+import com.yagubogu.ui.navigation.model.toEntries
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
