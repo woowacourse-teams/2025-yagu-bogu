@@ -2,7 +2,7 @@ package com.yagubogu.di
 
 import android.content.Context
 import com.yagubogu.BuildConfig
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

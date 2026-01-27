@@ -16,28 +16,23 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.yagubogu.R
 import com.yagubogu.ui.common.component.DefaultToolbar
-import com.yagubogu.ui.navigation.NavigationState
-import com.yagubogu.ui.navigation.Navigator
-import com.yagubogu.ui.navigation.SettingNavKey
-import com.yagubogu.ui.navigation.rememberNavigationState
-import com.yagubogu.ui.navigation.toEntries
+import com.yagubogu.ui.navigation.model.Navigator
+import com.yagubogu.ui.navigation.model.SettingNavKey
+import com.yagubogu.ui.navigation.model.toEntries
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingScreen(
-    navigateToParent: () -> Unit,
-    navigateToBottom: () -> Unit,
+    navigator: Navigator,
+    onBackClick: () -> Unit,
+    onDeleteAccountCancel: () -> Unit,
+    onFavoriteTeamEditClick: () -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navigationState: NavigationState =
-        rememberNavigationState(
-            startRoute = SettingNavKey.SettingMain,
-            topLevelRoutes = setOf(SettingNavKey.SettingMain),
-        )
-    val navigator: Navigator = remember { Navigator(navigationState) }
-
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -47,10 +42,10 @@ fun SettingScreen(
                 onBackClick = {
                     when (navigator.canGoBack()) {
                         true -> navigator.goBack()
-                        false -> navigateToParent()
+                        false -> onBackClick()
                     }
                 },
-                title = stringResource((navigator.currentRoute as SettingNavKey).label),
+                title = stringResource((navigator.currentRoute as? SettingNavKey)?.label ?: R.string.setting_main_title),
             )
         },
         snackbarHost = {
@@ -71,19 +66,27 @@ fun SettingScreen(
             entryProvider {
                 entry<SettingNavKey.SettingMain> {
                     SettingMainScreen(
-                        onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                        onSettingAccountClick = { navigator.navigate(SettingNavKey.SettingAccount) },
+                        onFavoriteTeamEditClick = { onFavoriteTeamEditClick() },
                     )
                 }
                 entry<SettingNavKey.SettingAccount> {
                     SettingAccountScreen(
                         onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                        onLogout = onLogout,
                     )
                 }
                 entry<SettingNavKey.SettingDeleteAccount> {
-                    SettingDeleteAccountScreen(navigateToHome = {
-                        navigator.clearStack()
-                        navigateToBottom()
-                    })
+                    SettingDeleteAccountScreen(
+                        onDeleteAccountCancel = {
+                            navigator.clearStack()
+                            onDeleteAccountCancel()
+                        },
+                        onDeleteAccount = {
+                            navigator.clearStack()
+                            onLogout()
+                        },
+                    )
                 }
             }
 
@@ -92,7 +95,7 @@ fun SettingScreen(
                 Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
-            entries = navigationState.toEntries(entryProvider),
+            entries = navigator.state.toEntries(entryProvider),
             onBack = { navigator.goBack() },
         )
     }

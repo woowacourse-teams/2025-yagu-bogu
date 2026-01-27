@@ -8,22 +8,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
@@ -34,6 +34,7 @@ import com.yagubogu.ui.theme.Gray700
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.Primary500
+import com.yagubogu.ui.theme.White
 
 @Composable
 fun DefaultDialog(
@@ -42,51 +43,76 @@ fun DefaultDialog(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Dialog(
+    DefaultDialog(
+        negativeText = dialogUiModel.negativeText,
+        positiveText = dialogUiModel.positiveText,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        modifier = modifier,
+    ) {
+        dialogUiModel.emoji?.let { emoji: String ->
+            Text(
+                text = emoji,
+                style = TextStyle(fontSize = 48.sp),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = dialogUiModel.title,
+            style = EsamanruMedium20,
+            textAlign = TextAlign.Center,
+        )
+
+        dialogUiModel.message?.let { message: String ->
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = message,
+                style = PretendardMedium.copy(fontSize = 14.sp),
+                textAlign = TextAlign.Center,
+                color = Gray700,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DefaultDialog(
+    negativeText: String?,
+    positiveText: String?,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    BasicAlertDialog(
         onDismissRequest = onCancel,
-        properties = DialogProperties(dismissOnClickOutside = false),
+        modifier = modifier.fillMaxWidth(0.9f),
+        properties =
+            DialogProperties(
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false,
+            ),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                dialogUiModel.emoji?.let { emoji: String ->
-                    Text(
-                        text = emoji,
-                        style = TextStyle(fontSize = 48.sp),
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = dialogUiModel.title,
-                    style = EsamanruMedium20,
-                    textAlign = TextAlign.Center,
-                )
-
-                dialogUiModel.message?.let { message: String ->
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        text = message,
-                        style = PretendardMedium.copy(fontSize = 14.sp),
-                        textAlign = TextAlign.Center,
-                        color = Gray700,
-                    )
-                }
-
+                content()
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    dialogUiModel.negativeText?.let { negativeText: String ->
+                    negativeText?.let { negativeText: String ->
                         Button(
                             onClick = onCancel,
                             modifier = Modifier.weight(1f),
@@ -110,13 +136,13 @@ fun DefaultDialog(
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = Primary500,
-                                contentColor = Color.White,
+                                contentColor = White,
                             ),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(
                             text =
-                                dialogUiModel.positiveText
+                                positiveText
                                     ?: stringResource(R.string.all_confirm),
                             style = PretendardSemiBold.copy(fontSize = 14.sp),
                         )

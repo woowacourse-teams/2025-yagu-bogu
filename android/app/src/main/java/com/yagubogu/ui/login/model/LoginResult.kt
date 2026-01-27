@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login.model
+package com.yagubogu.ui.login.model
 
 sealed class LoginResult {
     data object SignUp : LoginResult()

@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.login.auth
+package com.yagubogu.ui.login.auth
 
 /**
  * Google Credential 로그인 결과를 나타내는 sealed class.

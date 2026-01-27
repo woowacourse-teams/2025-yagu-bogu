@@ -1,8 +1,7 @@
-package com.yagubogu.presentation.login
+package com.yagubogu.ui.main
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -10,13 +9,11 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -25,32 +22,23 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
 import com.yagubogu.BuildConfig
 import com.yagubogu.R
-import com.yagubogu.databinding.ActivityLoginBinding
-import com.yagubogu.presentation.favorite.FavoriteTeamActivity
-import com.yagubogu.presentation.login.auth.GoogleCredentialManager
-import com.yagubogu.presentation.login.model.InAppUpdateType
-import com.yagubogu.presentation.login.model.LoginResult
-import com.yagubogu.presentation.login.model.VersionInfo
-import com.yagubogu.presentation.util.showSnackbar
 import com.yagubogu.presentation.util.showToast
-import com.yagubogu.ui.main.MainActivity
+import com.yagubogu.ui.login.auth.GoogleCredentialManager
+import com.yagubogu.ui.login.model.InAppUpdateType
+import com.yagubogu.ui.login.model.VersionInfo
+import com.yagubogu.ui.main.model.AutoLoginState
+import com.yagubogu.ui.navigation.YaguBoguRoute
+import com.yagubogu.ui.navigation.model.Route
+import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
-    private val binding: ActivityLoginBinding by lazy {
-        ActivityLoginBinding.inflate(layoutInflater)
-    }
-
-    private val viewModel: LoginViewModel by viewModels()
+class YaguBoguActivity : AppCompatActivity() {
+    private val viewModel: YaguBoguViewModel by viewModels()
 
     @Inject
     lateinit var googleCredentialManager: GoogleCredentialManager
@@ -58,28 +46,39 @@ class LoginActivity : AppCompatActivity() {
     private var shouldImmediateUpdate: Boolean = true
     private var isAppInitialized: Boolean = false
 
-    private val firebaseAnalytics: FirebaseAnalytics by lazy { Firebase.analytics }
-
     // 인앱 업데이트 요청 후 결과를 처리하기 위한 ActivityResultLauncher
     // - StartIntentSenderForResult() : 인앱 업데이트 플로우 실행 후 결과를 콜백으로 받음
     // - shouldImmediateUpdate = true 인 경우, 업데이트를 완료하지 않으면 앱을 종료하도록 처리
     private val appUpdateResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
             if (shouldImmediateUpdate && result.resultCode != RESULT_OK) {
-                showToast(getString(R.string.login_should_immediate_update_message), true)
+                showToast(R.string.login_should_immediate_update_message, true)
                 finish()
             } else if (!shouldImmediateUpdate) {
-                handleAutoLogin()
+                viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSplash()
         super.onCreate(savedInstanceState)
-        handleInAppUpdate(onSuccess = { handleAutoLogin() })
-        setupView()
-        setupObservers()
-        setupListeners()
+        enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+        handleInAppUpdate(onSuccess = {
+            viewModel.handleAutoLogin(onAppInitialized = { isAppInitialized = true })
+        })
+        setContent {
+            YaguBoguTheme {
+                val autoLoginState: AutoLoginState by viewModel.autoLoginState.collectAsStateWithLifecycle()
+
+                if (autoLoginState !is AutoLoginState.Loading) {
+                    YaguBoguRoute(
+                        googleCredentialManager = googleCredentialManager,
+                        startRoute = setStartRoute(autoLoginState),
+                    )
+                }
+            }
+        }
     }
 
     private fun setupSplash() {
@@ -87,75 +86,14 @@ class LoginActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { shouldImmediateUpdate || !isAppInitialized }
     }
 
-    private fun handleAutoLogin() {
-        lifecycleScope.launch {
-            if (!viewModel.isTokenValid()) {
-                isAppInitialized = true
-                return@launch
-            }
-            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
-
-            if (viewModel.isNewUser()) {
-                navigateToFavoriteTeam()
-            } else {
-                navigateToMain()
-            }
-            isAppInitialized = true
+    private fun setStartRoute(autoLoginState: AutoLoginState): Route =
+        when (autoLoginState) {
+            AutoLoginState.SignIn -> Route.Main
+            AutoLoginState.SignUp -> Route.FavoriteTeam
+            AutoLoginState.Failure,
+            AutoLoginState.Loading,
+            -> Route.Login
         }
-    }
-
-    private fun setupView() {
-        enableEdgeToEdge()
-        WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintActivityLoginRoot) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
-    }
-
-    private fun setupObservers() {
-        viewModel.loginResult.observe(this) { value: LoginResult ->
-            when (value) {
-                LoginResult.SignUp -> {
-                    navigateToFavoriteTeam()
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
-                }
-
-                LoginResult.SignIn -> {
-                    navigateToMain()
-                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
-                }
-
-                is LoginResult.Failure -> {
-                    binding.root.showSnackbar(R.string.login_failed_message)
-                    val bundle = bundleOf("reason" to "${value.exception}")
-                    firebaseAnalytics.logEvent("login_failure", bundle)
-                }
-
-                LoginResult.Cancel -> {
-                    Unit
-                }
-            }
-        }
-    }
-
-    private fun setupListeners() {
-        binding.constraintBtnGoogle.setOnClickListener {
-            viewModel.signInWithGoogle(googleCredentialManager)
-        }
-    }
-
-    private fun navigateToFavoriteTeam() {
-        startActivity(Intent(this, FavoriteTeamActivity::class.java))
-        finish()
-    }
-
-    private fun navigateToMain() {
-        startActivity(MainActivity.newIntent(this))
-        finish()
-    }
 
     private fun handleInAppUpdate(onSuccess: () -> Unit) {
         val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
@@ -247,9 +185,5 @@ class LoginActivity : AppCompatActivity() {
                 onSuccess()
                 Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
             }
-    }
-
-    companion object {
-        fun newIntent(context: Context): Intent = Intent(context, LoginActivity::class.java)
     }
 }
