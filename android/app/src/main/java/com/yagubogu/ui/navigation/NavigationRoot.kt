@@ -67,7 +67,7 @@ fun NavigationRoot(
                     onFavoriteTeamUpdate = {
                         rootNavigator.navigate(Route.Main)
                         mainNavigator.navigate(BottomNavKey.Home)
-                    }
+                    },
                 )
             }
             entry<Route.Badge> {

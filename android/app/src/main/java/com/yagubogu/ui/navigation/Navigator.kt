@@ -47,12 +47,6 @@ class Navigator(
         }
     }
 
-    fun clearStackAndNavigate(route: NavKey) {
-        Timber.d("clearAndNavigateTo $route called.")
-        clearStack()
-        navigate(route)
-    }
-
     private fun showBackStack() {
         Timber.d("backStacks: ${state.backStacks.keys}")
         Timber.d("currentStack: ${currentStack.joinToString()}")
