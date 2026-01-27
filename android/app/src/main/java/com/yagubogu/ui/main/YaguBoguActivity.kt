@@ -88,11 +88,11 @@ class YaguBoguActivity : AppCompatActivity() {
 
     private fun setStartRoute(autoLoginState: AutoLoginState): Route =
         when (autoLoginState) {
-            AutoLoginState.SignIn -> Route.Bottom
+            AutoLoginState.SignIn -> Route.Main
             AutoLoginState.SignUp -> Route.FavoriteTeam
             AutoLoginState.Failure,
             AutoLoginState.Loading,
-                -> Route.Login
+            -> Route.Login
         }
 
     private fun handleInAppUpdate(onSuccess: () -> Unit) {
