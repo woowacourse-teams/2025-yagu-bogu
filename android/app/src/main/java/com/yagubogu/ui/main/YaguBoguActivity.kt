@@ -29,8 +29,8 @@ import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.login.model.InAppUpdateType
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.main.model.AutoLoginState
-import com.yagubogu.ui.navigation.model.Route
 import com.yagubogu.ui.navigation.YaguBoguRoute
+import com.yagubogu.ui.navigation.model.Route
 import com.yagubogu.ui.theme.YaguBoguTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
