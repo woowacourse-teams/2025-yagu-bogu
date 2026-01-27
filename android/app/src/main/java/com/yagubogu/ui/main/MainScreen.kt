@@ -42,11 +42,13 @@ import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.White
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun MainScreen(
     onSettingsClick: () -> Unit,
     onBadgeClick: () -> Unit,
+    initEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -67,6 +69,13 @@ fun MainScreen(
     LaunchedEffect(selectedItem) {
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "$selectedItemLabel Screen")
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        initEvent.collect {
+            viewModel.selectBottomNavKey(BottomNavKey.Home)
+            navigator.navigate(BottomNavKey.Home)
         }
     }
 

@@ -14,6 +14,8 @@ import com.yagubogu.ui.login.LoginScreen
 import com.yagubogu.ui.login.auth.GoogleCredentialManager
 import com.yagubogu.ui.main.MainScreen
 import com.yagubogu.ui.setting.SettingScreen
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 앱의 최상위 네비게이션 구조를 정의하는 루트 컴포저블.
@@ -29,12 +31,14 @@ fun NavigationRoot(
     startRoute: Route,
     modifier: Modifier = Modifier,
 ) {
+    val mainInitEvent = remember { MutableSharedFlow<Unit>(replay = 1) }
+
     val navigationState: NavigationState =
         rememberNavigationState(
             startRoute = startRoute,
             topLevelRoutes =
                 setOf(
-                    Route.Bottom,
+                    Route.Main,
                     Route.Login,
                     Route.FavoriteTeam,
                 ),
@@ -46,28 +50,32 @@ fun NavigationRoot(
             entry<Route.Login> {
                 LoginScreen(
                     googleCredentialManager = googleCredentialManager,
-                    onSignIn = { navigator.navigate(Route.Bottom) },
+                    onSignIn = { navigator.navigate(Route.Main) },
                     onSignUp = { navigator.navigate(Route.FavoriteTeam) },
                 )
             }
-            entry<Route.Bottom> {
+            entry<Route.Main> {
                 MainScreen(
                     onSettingsClick = { navigator.navigate(Route.Setting) },
                     onBadgeClick = { navigator.navigate(Route.Badge) },
+                    initEvent = mainInitEvent.asSharedFlow(),
                 )
             }
             entry<Route.Setting> {
                 SettingScreen(
-                    onBackClick = { navigator.clearStackAndNavigate(Route.Bottom) },
-                    onDeleteAccountCancel = { navigator.navigate(Route.Bottom) },
+                    onBackClick = { navigator.clearStackAndNavigate(Route.Main) },
+                    onDeleteAccountCancel = { navigator.navigate(Route.Main) },
                     onFavoriteTeamEditClick = { navigator.navigate(Route.FavoriteTeam) },
-                    onLogout = { navigator.clearStackAndNavigate(Route.Login) },
+                    onLogout = {
+                        navigator.clearStackAndNavigate(Route.Login)
+                        mainInitEvent.tryEmit(Unit)
+                    },
                 )
             }
             entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
                     onFavoriteTeamUpdate = {
-                        navigator.navigate(Route.Bottom)
+                        navigator.navigate(Route.Main)
                     },
                 )
             }
