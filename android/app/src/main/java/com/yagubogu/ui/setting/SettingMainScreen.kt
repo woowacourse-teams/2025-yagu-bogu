@@ -47,6 +47,7 @@ import androidx.core.database.getLongOrNull
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.yagubogu.R
 import com.yagubogu.presentation.favorite.FavoriteTeamActivity
@@ -69,9 +70,10 @@ import com.yagubogu.ui.theme.White
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
+
+private val logger = Logger.withTag("SettingMainScreen")
 
 @Composable
 fun SettingMainScreen(
@@ -105,7 +107,7 @@ fun SettingMainScreen(
 
                 UCrop.RESULT_ERROR -> {
                     val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
-                    Timber.e(cropError, "uCrop Error")
+                    logger.e(cropError) { "uCrop Error" }
                     context.showToast(R.string.setting_edit_profile_image_crop_failed)
                 }
             }
@@ -254,7 +256,7 @@ private fun Context.getAppVersion(): String =
             packageManager.getPackageInfo(packageName, 0)
         packageInfo.versionName ?: DEFAULT_VERSION_NAME
     } catch (e: PackageManager.NameNotFoundException) {
-        Timber.d("앱 버전 로드 실패 ${e.message}")
+        logger.e(e) { "앱 버전 로드 실패" }
         DEFAULT_VERSION_NAME
     }
 
@@ -314,7 +316,7 @@ private suspend fun handleCroppedImage(
         },
         onFailure = { e: Throwable ->
             if (e is CancellationException) throw e
-            Timber.e(e, "프로필 이미지 전처리 실패")
+            logger.e(e) { "프로필 이미지 전처리 실패" }
             context.showToast(context.getString(R.string.setting_edit_profile_image_processing_failed))
         },
     )

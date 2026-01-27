@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import co.touchlab.kermit.Logger
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -41,11 +42,14 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
+    @Inject
+    lateinit var kermitLogger: Logger
+    private val logger by lazy { kermitLogger.withTag("LoginActivity") }
+
     private val binding: ActivityLoginBinding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
@@ -90,9 +94,11 @@ class LoginActivity : AppCompatActivity() {
     private fun handleAutoLogin() {
         lifecycleScope.launch {
             if (!viewModel.isTokenValid()) {
+                logger.i { "자동 로그인 실패: 토큰 만료 또는 없음" }
                 isAppInitialized = true
                 return@launch
             }
+            logger.i { "자동 로그인 성공" }
             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
 
             if (viewModel.isNewUser()) {
@@ -245,7 +251,7 @@ class LoginActivity : AppCompatActivity() {
             }.addOnFailureListener {
                 shouldImmediateUpdate = false
                 onSuccess()
-                Timber.w("AppUpdateInfo를 가져오지 못했습니다.")
+                logger.w { "AppUpdateInfo를 가져오지 못했습니다." }
             }
     }
 

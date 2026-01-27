@@ -2,6 +2,7 @@ package com.yagubogu.ui.stats.my
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stats.StatsRepository
 import com.yagubogu.presentation.mapper.toUiModel
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
@@ -26,7 +26,10 @@ class StatsMyViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val memberRepository: MemberRepository,
     private val clock: Clock,
+    kermitLogger: Logger,
 ) : ViewModel() {
+    val logger = kermitLogger.withTag("StatsMyViewModel")
+
     private val _statsMyUiModel = MutableStateFlow(StatsMyUiModel())
     val statsMyUiModel: StateFlow<StatsMyUiModel> = _statsMyUiModel.asStateFlow()
 
@@ -76,7 +79,7 @@ class StatsMyViewModel @Inject constructor(
                     listOf(statsCountsResult, winRateResult, myTeamResult, luckyStadiumResult)
                         .filter { it.isFailure }
                         .mapNotNull { it.exceptionOrNull()?.message }
-                Timber.w("API 호출 실패: ${errors.joinToString()}")
+                logger.w { "API 호출 실패: ${errors.joinToString()}" }
             }
         }
     }
@@ -89,7 +92,7 @@ class StatsMyViewModel @Inject constructor(
                 .onSuccess { averageStats: AverageStats ->
                     _averageStats.value = averageStats
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }

@@ -3,6 +3,7 @@ package com.yagubogu.ui.badge
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.member.BadgeResponse
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.presentation.mapper.toUiModel
@@ -10,13 +11,14 @@ import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class BadgeViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
+    kermitLogger: Logger,
 ) : ViewModel() {
+    val logger = kermitLogger.withTag("BadgeViewModel")
     var badgeUiState = mutableStateOf<BadgeUiState>(BadgeUiState.Loading)
         private set
 
@@ -32,7 +34,7 @@ class BadgeViewModel @Inject constructor(
                 .onSuccess {
                     updateBadgeUiState(badgeId)
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
@@ -60,7 +62,7 @@ class BadgeViewModel @Inject constructor(
                     val badges: List<BadgeInfoUiModel> = badgeResponse.badges.map { it.toUiModel() }
                     badgeUiState.value = BadgeUiState.Success(representativeBadge, badges)
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }

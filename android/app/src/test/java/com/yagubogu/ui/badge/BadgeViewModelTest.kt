@@ -1,5 +1,6 @@
 package com.yagubogu.ui.badge
 
+import co.touchlab.kermit.Logger
 import com.yagubogu.fixture.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.fixture.BADGE_ID_1_ACQUIRED_FIXTURE
 import com.yagubogu.fixture.MemberFakeRepository
@@ -19,6 +20,7 @@ class BadgeViewModelTest :
     StringSpec({
         lateinit var memberRepository: MemberFakeRepository
         lateinit var badgeViewModel: BadgeViewModel
+        val testLogger = Logger
 
         beforeTest { Dispatchers.setMain(StandardTestDispatcher()) }
         afterTest { Dispatchers.resetMain() }
@@ -27,7 +29,7 @@ class BadgeViewModelTest :
             runTest {
                 // given & when
                 memberRepository = MemberFakeRepository(isFailureMode = false)
-                badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel = BadgeViewModel(memberRepository, testLogger)
 
                 advanceUntilIdle()
 
@@ -40,7 +42,7 @@ class BadgeViewModelTest :
             runTest {
                 // given & when
                 memberRepository = MemberFakeRepository(isFailureMode = true)
-                badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel = BadgeViewModel(memberRepository, testLogger)
 
                 advanceUntilIdle()
 
@@ -58,7 +60,7 @@ class BadgeViewModelTest :
                         badgeList =
                             listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
-                badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel = BadgeViewModel(memberRepository, testLogger)
                 badgeViewModel.updateRepresentativeBadge(0)
 
                 // when - 대표 배지 1번으로 설정 요청
@@ -83,7 +85,7 @@ class BadgeViewModelTest :
                         badgeList =
                             listOf(BADGE_ID_0_ACQUIRED_FIXTURE, BADGE_ID_1_ACQUIRED_FIXTURE),
                     )
-                badgeViewModel = BadgeViewModel(memberRepository)
+                badgeViewModel = BadgeViewModel(memberRepository, testLogger)
                 advanceUntilIdle()
 
                 // when - 대표 배지 1번으로 설정 요청, 실패

@@ -2,6 +2,7 @@ package com.yagubogu.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.location.CoordinateDto
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.location.LocationRepository
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -53,7 +53,10 @@ class HomeViewModel @Inject constructor(
     private val stadiumRepository: StadiumRepository,
     private val streamRepository: StreamRepository,
     private val clock: Clock,
+    kermitLogger: Logger,
 ) : ViewModel() {
+    val logger = kermitLogger.withTag("HomeViewModel")
+
     private val _checkInUiEvent =
         MutableSharedFlow<CheckInUiEvent>(
             replay = 0,
@@ -112,7 +115,9 @@ class HomeViewModel @Inject constructor(
                         CheckInSseEvent.Connect,
                         CheckInSseEvent.Timeout,
                         CheckInSseEvent.Unknown,
-                        -> Unit
+                        -> {
+                            Unit
+                        }
                     }
                 }
         }
@@ -135,7 +140,7 @@ class HomeViewModel @Inject constructor(
                         fetchCheckInStatus(date)
                     }
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                     _checkInUiEvent.emit(CheckInUiEvent.NetworkFailed)
                 }
         }
@@ -150,7 +155,7 @@ class HomeViewModel @Inject constructor(
                 _isCheckInLoading.value = false
             },
             onFailure = { exception: Exception ->
-                Timber.w(exception, "위치 불러오기 실패")
+                logger.w(exception) { "위치 불러오기 실패" }
                 _checkInUiEvent.tryEmit(CheckInUiEvent.LocationFetchFailed)
                 _isCheckInLoading.value = false
             },
@@ -177,7 +182,7 @@ class HomeViewModel @Inject constructor(
                         else -> _checkInUiEvent.emit(CheckInUiEvent.NetworkFailed)
                     }
                     _isCheckInLoading.value = false
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
@@ -204,7 +209,7 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { memberProfile: MemberProfile ->
                     _dialogEvent.emit(HomeDialogEvent.ProfileDialog(memberProfile))
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "사용자 프로필 조회 API 호출 실패")
+                    logger.w(exception) { "사용자 프로필 조회 API 호출 실패" }
                 }
         }
     }
@@ -239,7 +244,7 @@ class HomeViewModel @Inject constructor(
                     listOf(myTeamResult, attendanceCountResult, winRateResult)
                         .filter { it.isFailure }
                         .mapNotNull { it.exceptionOrNull()?.message }
-                Timber.w("API 호출 실패: ${errors.joinToString()}")
+                logger.w { "API 호출 실패: ${errors.joinToString()}" }
             }
         }
     }
@@ -257,7 +262,7 @@ class HomeViewModel @Inject constructor(
                     _stadiumStatsUiModel.value =
                         StadiumStatsUiModel(stadiumFanRates = stadiumFanRates)
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
@@ -270,7 +275,7 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { ranking: VictoryFairyRanking ->
                     _victoryFairyRanking.value = ranking
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
@@ -286,7 +291,7 @@ class HomeViewModel @Inject constructor(
                         fetchCurrentLocationThenCheckIn()
                     }
                 }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
+                    logger.w(exception) { "API 호출 실패" }
                 }
         }
     }
