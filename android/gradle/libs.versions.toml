@@ -12,6 +12,7 @@ firebaseBom = "34.0.0"
 fragmentKtx = "1.8.8"
 hiltAndroid = "2.57.2"
 hiltNavigationCompose = "1.3.0"
+imagepickerkmp = "1.0.31"
 kotestAssertionsCore = "6.0.3"
 kotestRunnerJunit5 = "6.0.3"
 kotlin = "2.1.0"
@@ -84,6 +85,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+imagepickerkmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
