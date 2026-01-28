@@ -1,20 +1,16 @@
 package com.yagubogu.ui.setting
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +28,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -66,7 +63,11 @@ import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
-import com.yalantis.ucrop.UCrop
+import io.github.ismoy.imagepickerkmp.domain.config.CameraCaptureConfig
+import io.github.ismoy.imagepickerkmp.domain.config.CropConfig
+import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
+import io.github.ismoy.imagepickerkmp.domain.models.MimeType.Companion.ALL_SUPPORTED_TYPES
+import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -85,54 +86,90 @@ fun SettingMainScreen(
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
-    val uCropLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result: ActivityResult ->
-            when (result.resultCode) {
-                Activity.RESULT_OK -> {
-                    val intent: Intent = result.data ?: return@rememberLauncherForActivityResult
-                    val resultUri: Uri =
-                        UCrop.getOutput(intent) ?: return@rememberLauncherForActivityResult
-                    scope.launch {
-                        handleCroppedImage(context, resultUri, viewModel::uploadProfileImage)
-                    }
-                }
-
-                UCrop.RESULT_ERROR -> {
-                    val cropError: Throwable? = result.data?.let { UCrop.getError(it) }
-                    Timber.e(cropError, "uCrop Error")
-                    context.showToast(R.string.setting_edit_profile_image_crop_failed)
-                }
-            }
-        }
-    val pickImageLauncher: ManagedActivityResultLauncher<String, Uri?> =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                launchUCropIntent(
-                    context = context,
-                    sourceUri = it,
-                    onCropIntentReady = uCropLauncher::launch,
-                )
-            }
-        }
+    var showGallery by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMemberInfo()
     }
 
-    SettingMainScreen(
-        onClickSettingAccount = onClickSettingAccount,
-        onNicknameEdit = { showNicknameEditDialog = true },
-        onProfileImageUpload = { pickImageLauncher.launch("image/*") },
-        memberInfoItem = memberInfoItem.value,
-        appVersion = context.getAppVersion(),
-        modifier = modifier,
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        SettingMainScreen(
+            onClickSettingAccount = onClickSettingAccount,
+            onNicknameEdit = { showNicknameEditDialog = true },
+            onProfileImageUpload = {
+                showGallery = true
+            },
+            memberInfoItem = memberInfoItem.value,
+            appVersion = context.getAppVersion(),
+            modifier = modifier,
+        )
+
+        if (showGallery) {
+            val activity = context as? ComponentActivity
+            when (activity is ComponentActivity) {
+                true -> {
+                    GalleryPickerLauncher(
+                        allowMultiple = false,
+                        mimeTypes = ALL_SUPPORTED_TYPES,
+                        onPhotosSelected = { photos: List<GalleryPhotoResult> ->
+                            Timber.d("onPhotosSelected, 사진 개수: ${photos.size}")
+                            showGallery = false
+
+                            val photo = photos.firstOrNull()
+                            if (photo == null) {
+                                Timber.w("선택된 사진이 없습니다")
+                                return@GalleryPickerLauncher
+                            }
+                            scope.launch {
+                                try {
+                                    handleCroppedImage(
+                                        context = context,
+                                        uri = File(photo.uri).toUri(),
+                                        onProfileImageUpload = viewModel::uploadProfileImage,
+                                    )
+                                } catch (e: Exception) {
+                                    Timber.e(e, "이미지 처리 중 예외 발생")
+                                    context.showToast(R.string.setting_edit_profile_image_processing_failed)
+                                }
+                            }
+                        },
+                        onError = { throwable ->
+                            Timber.e(throwable, "GalleryPicker 에러 발생")
+                            context.showToast("이미지 선택 중 오류")
+                            showGallery = false
+                        },
+                        onDismiss = {
+                            Timber.d("GalleryPicker 닫힘")
+                            showGallery = false
+                        },
+                        enableCrop = true,
+                        cameraCaptureConfig =
+                            CameraCaptureConfig(
+                                cropConfig =
+                                    CropConfig(
+                                        enabled = true,
+                                        aspectRatioLocked = true,
+                                        circularCrop = true,
+                                        squareCrop = false,
+                                        freeformCrop = false,
+                                    ),
+                            ),
+                    )
+                }
+
+                else -> {
+                    Timber.e("Context가 ComponentActivity가 아닙니다: ${context.javaClass.name}")
+                    LaunchedEffect(Unit) {
+                        context.showToast("이미지 선택 중 오류가 발생했습니다")
+                        showGallery = false
+                    }
+                }
+            }
+        }
+    }
 
     if (showNicknameEditDialog) {
         NicknameEditDialog(
@@ -257,35 +294,6 @@ private fun Context.getAppVersion(): String =
         Timber.d("앱 버전 로드 실패 ${e.message}")
         DEFAULT_VERSION_NAME
     }
-
-private fun launchUCropIntent(
-    context: Context,
-    sourceUri: Uri,
-    onCropIntentReady: (Intent) -> Unit,
-) {
-    val fileName = "cropped_image_${System.currentTimeMillis()}"
-    val destinationUri = Uri.fromFile(File(context.cacheDir, fileName))
-
-    val options: UCrop.Options =
-        UCrop.Options().apply {
-            setFreeStyleCropEnabled(false)
-            setHideBottomControls(false)
-            setCircleDimmedLayer(true)
-            setToolbarColor(context.getColor(R.color.gray050))
-            setCompressionFormat(Bitmap.CompressFormat.JPEG)
-            setCompressionQuality(85)
-        }
-
-    val uCropIntent: Intent? =
-        UCrop
-            .of(sourceUri, destinationUri)
-            .withAspectRatio(1f, 1f)
-            .withMaxResultSize(500, 500)
-            .withOptions(options)
-            .getIntent(context)
-
-    uCropIntent?.let { onCropIntentReady(it) }
-}
 
 private suspend fun handleCroppedImage(
     context: Context,
