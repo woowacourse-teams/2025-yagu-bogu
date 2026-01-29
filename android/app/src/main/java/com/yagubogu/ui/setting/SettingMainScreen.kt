@@ -65,6 +65,7 @@ import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
 import io.github.ismoy.imagepickerkmp.domain.config.CameraCaptureConfig
 import io.github.ismoy.imagepickerkmp.domain.config.CropConfig
+import io.github.ismoy.imagepickerkmp.domain.models.CompressionLevel
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import io.github.ismoy.imagepickerkmp.domain.models.MimeType.Companion.ALL_SUPPORTED_TYPES
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
@@ -124,21 +125,21 @@ fun SettingMainScreen(
                                 return@GalleryPickerLauncher
                             }
                             scope.launch {
-                                try {
+                                runCatching {
                                     handleCroppedImage(
                                         context = context,
                                         uri = File(photo.uri).toUri(),
                                         onProfileImageUpload = viewModel::uploadProfileImage,
                                     )
-                                } catch (e: Exception) {
-                                    Timber.e(e, "이미지 처리 중 예외 발생")
+                                }.getOrElse { exception: Throwable ->
+                                    Timber.e(exception, "이미지 처리 중 예외 발생")
                                     context.showToast(R.string.setting_edit_profile_image_processing_failed)
                                 }
                             }
                         },
-                        onError = { throwable ->
-                            Timber.e(throwable, "GalleryPicker 에러 발생")
-                            context.showToast("이미지 선택 중 오류")
+                        onError = { exception: Exception ->
+                            Timber.e(exception, "GalleryPicker 에러 발생")
+                            context.showToast(context.getString(R.string.setting_edit_profile_image_selection_failed))
                             showGallery = false
                         },
                         onDismiss = {
@@ -148,6 +149,7 @@ fun SettingMainScreen(
                         enableCrop = true,
                         cameraCaptureConfig =
                             CameraCaptureConfig(
+                                compressionLevel = CompressionLevel.HIGH,
                                 cropConfig =
                                     CropConfig(
                                         enabled = true,
@@ -163,7 +165,7 @@ fun SettingMainScreen(
                 else -> {
                     Timber.e("Context가 ComponentActivity가 아닙니다: ${context.javaClass.name}")
                     LaunchedEffect(Unit) {
-                        context.showToast("이미지 선택 중 오류가 발생했습니다")
+                        context.showToast(context.getString(R.string.setting_edit_profile_image_selection_failed))
                         showGallery = false
                     }
                 }

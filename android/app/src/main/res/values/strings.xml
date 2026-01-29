@@ -160,6 +160,7 @@
     <string name="setting_edit_profile_image_processing_failed">이미지 처리에 실패했습니다\n다른 이미지를 선택해보세요</string>
     <string name="setting_edit_profile_image_upload_failed">이미지 업로드에 실패했습니다\n나중에 다시 시도하세요</string>
     <string name="setting_edit_profile_get_image_size_failed">이미지 파일 크기를 확인할 수 없습니다</string>
+    <string name="setting_edit_profile_image_selection_failed">이미지 선택 중 오류가 발생했습니다</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
