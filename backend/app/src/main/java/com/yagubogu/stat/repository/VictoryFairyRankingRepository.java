@@ -93,4 +93,42 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
             @Param("limit") int limit,
             @Param("gameYear") int gameYear
     );
+
+    @Query(value = """
+            SELECT
+                RANK() OVER (ORDER BY T.score ASC) AS `rank`,
+                T.memberId,
+                T.score,
+                T.nickname,
+                T.imageUrl,
+                T.shortName
+            FROM (
+                SELECT STRAIGHT_JOIN
+                    m.member_id AS memberId,
+                    vfr.score,
+                    m.nickname,
+                    m.image_url AS imageUrl,
+                    t.short_name AS shortName
+                FROM
+                    victory_fairy_rankings vfr
+                JOIN
+                    members m ON m.member_id = vfr.member_id
+                JOIN
+                    teams t ON t.team_id = m.team_id
+                WHERE
+                    vfr.game_year = :gameYear
+                    AND m.deleted_at IS NULL
+                    AND m.team_id IS NOT NULL
+                    AND (:#{#teamFilter.name()} = 'ALL' OR t.team_code = :#{#teamFilter.name()})
+                ORDER BY
+                    vfr.score ASC
+                LIMIT :limit
+            ) AS T
+            ORDER BY T.score ASC
+            """, nativeQuery = true)
+    List<VictoryFairyRankParam> findBottomRankingByTeamFilterAndYear(
+            @Param("teamFilter") TeamFilter teamFilter,
+            @Param("limit") int limit,
+            @Param("gameYear") int gameYear
+    );
 }
