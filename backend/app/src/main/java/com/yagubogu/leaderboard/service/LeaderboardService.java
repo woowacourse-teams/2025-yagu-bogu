@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 public class LeaderboardService {
 
     private final Map<LeaderboardType, LeaderboardQuery> map = new EnumMap<>(LeaderboardType.class);
+    private final List<LeaderboardQuery> queries;
 
     @PostConstruct
-    void init(List<LeaderboardQuery> queries) {
+    void init() {
         for (LeaderboardQuery query : queries) {
             map.put(query.supports(), query);
         }
