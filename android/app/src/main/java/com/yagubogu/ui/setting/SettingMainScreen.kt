@@ -28,7 +28,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -78,6 +77,7 @@ import kotlin.coroutines.cancellation.CancellationException
 @Composable
 fun SettingMainScreen(
     onClickSettingAccount: () -> Unit,
+    onFullScreenMode: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -90,7 +90,11 @@ fun SettingMainScreen(
     val settingEvent: State<SettingEvent?> =
         viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
-    var showGallery by remember { mutableStateOf(false) }
+    var showGallery by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(showGallery) {
+        onFullScreenMode(showGallery)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMemberInfo()
