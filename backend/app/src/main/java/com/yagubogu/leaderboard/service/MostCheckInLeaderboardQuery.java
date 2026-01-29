@@ -2,7 +2,7 @@ package com.yagubogu.leaderboard.service;
 
 import com.yagubogu.checkin.repository.CheckInRepository;
 import com.yagubogu.leaderboard.domain.LeaderboardType;
-import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class MostCheckInLeaderboardQuery implements LeaderboardQuery {
     }
 
     @Override
-    public List<LeaderboardItemResponse> findTop(final int limit) {
+    public List<LeaderboardRow> findTop(final int limit) {
         return checkInRepository.findMostCheckInWinner(limit);
     }
 }

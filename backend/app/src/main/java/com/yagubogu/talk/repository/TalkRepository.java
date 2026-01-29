@@ -1,6 +1,6 @@
 package com.yagubogu.talk.repository;
 
-import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.talk.domain.Talk;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +91,8 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             ranked AS (
               SELECT
                 DENSE_RANK() OVER (ORDER BY talkCount DESC) AS `rank`,
-                memberId
+                memberId,
+                talkCount
               FROM member_counts
             )
             SELECT
@@ -99,12 +100,13 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
               m.member_id AS memberId,
               m.nickname AS nickname,
               t.short_name AS favoriteTeam,
-              m.image_url AS profileImageUrl
+              m.image_url AS profileImageUrl,
+              r.talkCount AS score
             FROM ranked r
             JOIN members m ON m.member_id = r.memberId
             JOIN teams t   ON t.team_id = m.team_id
             WHERE r.`rank` <= :limit
             ORDER BY r.`rank` ASC, m.member_id ASC
             """, nativeQuery = true)
-    List<LeaderboardItemResponse> findChattiestWinner(@Param("limit") int limit);
+    List<LeaderboardRow> findChattiestWinner(@Param("limit") int limit);
 }

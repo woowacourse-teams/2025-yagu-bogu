@@ -1,7 +1,9 @@
 package com.yagubogu.leaderboard.service;
 
 import com.yagubogu.leaderboard.domain.LeaderboardType;
+import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
 import com.yagubogu.leaderboard.dto.LeaderboardResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
 import java.util.List;
@@ -25,7 +27,28 @@ public class LeaderboardService {
 
     public LeaderboardResponse findTop(LeaderboardType type, int limit) {
         LeaderboardQuery query = map.get(type);
+        if (query == null) {
+            // throw new
+        }
 
-        return LeaderboardResponse.of(type, query.findTop(limit));
+        String label = type.getScoreLabel();
+
+        List<LeaderboardItemResponse> responses = query.findTop(limit).stream()
+                .map(r -> toItem(r, label))
+                .toList();
+
+        return LeaderboardResponse.of(type, responses);
+    }
+
+    private LeaderboardItemResponse toItem(LeaderboardRow row, String label) {
+        return new LeaderboardItemResponse(
+                Math.toIntExact(row.rank()),
+                row.memberId(),
+                row.nickname(),
+                row.favoriteTeam(),
+                row.profileImageUrl(),
+                row.score(),
+                label
+        );
     }
 }

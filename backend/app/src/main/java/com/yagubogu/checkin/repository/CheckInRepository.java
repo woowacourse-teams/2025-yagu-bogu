@@ -3,7 +3,7 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
-import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
@@ -72,31 +72,35 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
 
     @Query(value = """
             WITH member_counts AS (
-              SELECT
-                m.member_id AS memberId,
-                m.nickname AS nickname,
-                t.short_name AS favoriteTeam,
-                m.image_url AS profileImageUrl,
-                COUNT(*) AS checkInCount
-              FROM check_ins ci
-              JOIN games g   ON g.game_id = ci.game_id
-              JOIN members m ON m.member_id = ci.member_id
-              JOIN teams t   ON t.team_id = m.team_id
-              WHERE g.date >= '2025-01-01' AND g.date < '2026-01-01'
-                AND m.deleted_at IS NULL
-                AND m.team_id IS NOT NULL
-              GROUP BY m.member_id, m.nickname, t.short_name, m.image_url
-            ),
-            ranked AS (
-              SELECT
-                DENSE_RANK() OVER (ORDER BY checkInCount DESC) AS `rank`,
-                memberId, nickname, favoriteTeam, profileImageUrl, checkInCount
-              FROM member_counts
-            )
-            SELECT `rank`, memberId, nickname, favoriteTeam, profileImageUrl
-            FROM ranked
-            WHERE `rank` <= :limit
-            ORDER BY `rank` ASC, memberId ASC
+               SELECT
+                 ci.member_id AS memberId,
+                 COUNT(*) AS checkInCount
+               FROM check_ins ci
+               JOIN games g ON g.game_id = ci.game_id
+               WHERE g.date >= '2025-01-01' AND g.date < '2026-01-01'
+               GROUP BY ci.member_id
+             ),
+             ranked AS (
+               SELECT
+                 DENSE_RANK() OVER (ORDER BY mc.checkInCount DESC) AS `rank`,
+                 mc.memberId,
+                 mc.checkInCount
+               FROM member_counts mc
+             )
+             SELECT
+               r.`rank` AS `rank`,
+               m.member_id AS memberId,
+               m.nickname AS nickname,
+               t.short_name AS favoriteTeam,
+               m.image_url AS profileImageUrl,
+               r.checkInCount AS score
+             FROM ranked r
+             JOIN members m ON m.member_id = r.memberId
+             JOIN teams t ON t.team_id = m.team_id
+             WHERE r.`rank` <= :limit
+               AND m.deleted_at IS NULL
+               AND m.team_id IS NOT NULL
+             ORDER BY r.`rank` ASC, m.member_id ASC
             """, nativeQuery = true)
-    List<LeaderboardItemResponse> findMostCheckInWinner(@Param("limit") int limit);
+    List<LeaderboardRow> findMostCheckInWinner(@Param("limit") int limit);
 }

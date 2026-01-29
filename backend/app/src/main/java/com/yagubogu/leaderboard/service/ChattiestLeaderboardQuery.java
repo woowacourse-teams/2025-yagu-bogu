@@ -1,7 +1,7 @@
 package com.yagubogu.leaderboard.service;
 
 import com.yagubogu.leaderboard.domain.LeaderboardType;
-import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.talk.repository.TalkRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +15,11 @@ public class ChattiestLeaderboardQuery implements LeaderboardQuery {
 
     @Override
     public LeaderboardType supports() {
-        return LeaderboardType.LOSE_FAIRY;
+        return LeaderboardType.CHATTIEST;
     }
 
     @Override
-    public List<LeaderboardItemResponse> findTop(final int limit) {
+    public List<LeaderboardRow> findTop(final int limit) {
         return talkRepository.findChattiestWinner(limit);
     }
 }
