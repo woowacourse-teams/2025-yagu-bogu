@@ -36,7 +36,6 @@ playServicesOssLicenses = "17.2.2"
 retrofit = "3.0.0"
 shimmer = "0.5.0"
 timber = "5.0.1"
-ucrop = "2.2.11"
 viewpager2 = "1.1.0"
 playServicesLocation = "21.3.0"
 mpandroidchart = "v3.1.0"
@@ -112,7 +111,6 @@ glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
-ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

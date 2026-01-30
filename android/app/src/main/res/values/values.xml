@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!--    uCrop의 컬러 리소스 오버라이딩-->
-    <color name="ucrop_color_blaze_orange" tools:ignore="PrivateResource">@color/primary500</color>
-</resources>
