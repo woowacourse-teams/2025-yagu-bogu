@@ -41,7 +41,9 @@ class ThirdPartyRemoteDataSource @Inject constructor(
                 val inputStream: InputStream =
                     contentResolver.openInputStream(uri)
                         ?: throw IllegalStateException("Failed to open input stream for $uri")
-                return inputStream.toByteReadChannel()
+                return inputStream.use { stream: InputStream ->
+                    stream.toByteReadChannel()
+                }
             }
         }
 }
