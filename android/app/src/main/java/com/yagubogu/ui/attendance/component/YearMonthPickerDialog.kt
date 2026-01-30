@@ -61,10 +61,10 @@ fun YearMonthPickerDialog(
     val months: List<Int> =
         remember(year, startMonth, endMonth) {
             when (year) {
-                startMonth.year -> (startMonth.monthValue..LAST_MONTH).toList()
-                endMonth.year -> (FIRST_MONTH..endMonth.monthValue).toList()
-                else -> (FIRST_MONTH..LAST_MONTH).toList()
-            }
+                startMonth.year -> (startMonth.monthValue..LAST_MONTH)
+                endMonth.year -> (FIRST_MONTH..endMonth.monthValue)
+                else -> (FIRST_MONTH..LAST_MONTH)
+            }.toList()
         }
 
     LaunchedEffect(months) {
