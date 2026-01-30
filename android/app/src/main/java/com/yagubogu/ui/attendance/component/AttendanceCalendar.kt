@@ -46,9 +46,9 @@ import java.util.Locale
 fun AttendanceCalendar(
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentVisibleMonth: YearMonth,
+    selectedMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
-    currentSelectedDate: LocalDate,
+    selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     attendanceDates: Set<LocalDate>,
     modifier: Modifier = Modifier,
@@ -59,18 +59,18 @@ fun AttendanceCalendar(
         rememberCalendarState(
             startMonth = startMonth,
             endMonth = endMonth,
-            firstVisibleMonth = currentVisibleMonth,
+            firstVisibleMonth = selectedMonth,
             firstDayOfWeek = daysOfWeek.first(),
         )
 
-    LaunchedEffect(currentVisibleMonth) {
-        if (state.firstVisibleMonth.yearMonth != currentVisibleMonth) {
-            state.animateScrollToMonth(currentVisibleMonth)
+    LaunchedEffect(selectedMonth) {
+        if (state.firstVisibleMonth.yearMonth != selectedMonth) {
+            state.animateScrollToMonth(selectedMonth)
         }
     }
 
     LaunchedEffect(state.firstVisibleMonth) {
-        if (state.firstVisibleMonth.yearMonth != currentVisibleMonth) {
+        if (state.firstVisibleMonth.yearMonth != selectedMonth) {
             onMonthChange(state.firstVisibleMonth.yearMonth)
         }
     }
@@ -88,7 +88,7 @@ fun AttendanceCalendar(
             dayContent = { day: CalendarDay ->
                 Day(
                     day = day,
-                    isSelected = currentSelectedDate == day.date,
+                    isSelected = selectedDate == day.date,
                     hasAttendance = day.date in attendanceDates,
                     onClick = { day: CalendarDay -> onDateChange(day.date) },
                 )
@@ -171,9 +171,9 @@ private fun AttendanceCalendarPreview() {
     AttendanceCalendar(
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentVisibleMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onMonthChange = {},
-        currentSelectedDate = LocalDate.now(),
+        selectedDate = LocalDate.now(),
         onDateChange = {},
         attendanceDates = ATTENDANCE_HISTORY_ITEMS.map { it.summary.attendanceDate }.toSet(),
     )

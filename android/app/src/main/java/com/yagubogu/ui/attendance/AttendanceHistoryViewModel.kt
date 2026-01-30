@@ -34,11 +34,11 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
-    private val _currentVisibleMonth = MutableStateFlow<YearMonth>(YearMonth.now())
-    val currentVisibleMonth: StateFlow<YearMonth> = _currentVisibleMonth.asStateFlow()
+    private val _selectedMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    val selectedMonth: StateFlow<YearMonth> = _selectedMonth.asStateFlow()
 
-    private val _currentSelectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
-    val currentSelectedDate: StateFlow<LocalDate> = _currentSelectedDate.asStateFlow()
+    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     private val _filter = MutableStateFlow(AttendanceHistoryFilter.ALL)
     val filter: StateFlow<AttendanceHistoryFilter> = _filter.asStateFlow()
@@ -59,7 +59,7 @@ class AttendanceHistoryViewModel @Inject constructor(
 
     fun fetchAttendanceHistoryItems() {
         viewModelScope.launch {
-            val yearMonth: YearMonth = currentVisibleMonth.value
+            val yearMonth: YearMonth = selectedMonth.value
             checkInRepository
                 .getCheckInHistories(
                     yearMonth.year,
@@ -106,12 +106,12 @@ class AttendanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentVisibleMonth(yearMonth: YearMonth) {
-        _currentVisibleMonth.value = yearMonth
+    fun updateSelectedMonth(yearMonth: YearMonth) {
+        _selectedMonth.value = yearMonth
     }
 
-    fun updateCurrentSelectedDate(date: LocalDate) {
-        _currentSelectedDate.value = date
+    fun updateSelectedDate(date: LocalDate) {
+        _selectedDate.value = date
     }
 
     fun updateFilter(filter: AttendanceHistoryFilter) {
