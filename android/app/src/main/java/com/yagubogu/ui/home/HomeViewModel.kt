@@ -129,7 +129,7 @@ class HomeViewModel @Inject constructor(
         fetchVictoryFairyRanking()
     }
 
-    fun fetchStadiums(date: LocalDate = LocalDate.now()) {
+    fun fetchStadiums(date: LocalDate = LocalDate.now(clock)) {
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
