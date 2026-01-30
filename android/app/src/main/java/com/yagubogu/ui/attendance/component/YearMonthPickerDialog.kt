@@ -46,13 +46,13 @@ private const val LAST_MONTH = 12
 fun YearMonthPickerDialog(
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentMonth: YearMonth,
+    selectedMonth: YearMonth,
     onConfirm: (YearMonth) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var year: Int by rememberSaveable { mutableIntStateOf(currentMonth.year) }
-    var month: Int by rememberSaveable { mutableIntStateOf(currentMonth.monthValue) }
+    var year: Int by rememberSaveable { mutableIntStateOf(selectedMonth.year) }
+    var month: Int by rememberSaveable { mutableIntStateOf(selectedMonth.monthValue) }
 
     val years: List<Int> =
         remember(startMonth, endMonth) {
@@ -61,10 +61,10 @@ fun YearMonthPickerDialog(
     val months: List<Int> =
         remember(year, startMonth, endMonth) {
             when (year) {
-                startMonth.year -> (startMonth.monthValue..LAST_MONTH).toList()
-                endMonth.year -> (FIRST_MONTH..endMonth.monthValue).toList()
-                else -> (FIRST_MONTH..LAST_MONTH).toList()
-            }
+                startMonth.year -> (startMonth.monthValue..LAST_MONTH)
+                endMonth.year -> (FIRST_MONTH..endMonth.monthValue)
+                else -> (FIRST_MONTH..LAST_MONTH)
+            }.toList()
         }
 
     LaunchedEffect(months) {
@@ -175,7 +175,7 @@ private fun YearMonthPickerDialogPreview() {
     YearMonthPickerDialog(
         startMonth = YearMonth.now().minusYears(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onConfirm = {},
         onCancel = {},
     )
