@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEMS
 import com.yagubogu.ui.attendance.component.AttendanceCalendarContent
@@ -48,6 +50,7 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.AttendanceHistoryViewType
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray200
@@ -60,6 +63,7 @@ import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
@@ -70,6 +74,7 @@ fun AttendanceHistoryScreen(
     viewModel: AttendanceHistoryViewModel = hiltViewModel(),
 ) {
     val attendanceItems: List<AttendanceHistoryItem> by viewModel.items.collectAsStateWithLifecycle()
+    val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
     val currentMonth: YearMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
     val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
     val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
@@ -81,6 +86,14 @@ fun AttendanceHistoryScreen(
 
     LaunchedEffect(viewType) {
         viewModel.fetchAttendanceHistoryItems(yearMonth = currentMonth)
+    }
+
+    val checkInSuccessMessage: String =
+        stringResource(R.string.attendance_history_check_in_success_message)
+    LaunchedEffect(Unit) {
+        viewModel.pastCheckInUiEvent.collect {
+            snackbarHostState.showSnackbar(checkInSuccessMessage)
+        }
     }
 
     BackPressHandler(snackbarHostState, coroutineScope)
@@ -100,6 +113,9 @@ fun AttendanceHistoryScreen(
                 sort = sort,
             )
         },
+        pastGames = pastGames,
+        onRequestGames = viewModel::fetchPastGames,
+        onPastCheckIn = viewModel::addPastCheckIn,
         modifier = modifier,
         scrollToTopEvent = scrollToTopEvent,
     )
@@ -115,6 +131,9 @@ private fun AttendanceHistoryScreen(
     onViewTypeChange: () -> Unit,
     items: List<AttendanceHistoryItem>,
     updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
+    pastGames: List<PastGameUiModel>,
+    onRequestGames: (LocalDate) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -143,6 +162,9 @@ private fun AttendanceHistoryScreen(
                     endMonth = endMonth,
                     currentMonth = currentMonth,
                     onMonthChange = onMonthChange,
+                    pastGames = pastGames,
+                    onRequestGames = onRequestGames,
+                    onPastCheckIn = onPastCheckIn,
                     scrollToTopEvent = scrollToTopEvent,
                 )
 
@@ -264,8 +286,10 @@ private fun AttendanceViewToggle(
             modifier
                 .background(color = White, shape = CircleShape)
                 .border(width = 1.dp, color = Gray200, shape = CircleShape)
-                .noRippleClickable(onClick = onChange)
-                .padding(4.dp),
+                .noRippleClickable {
+                    onChange()
+                    Firebase.analytics.logEvent("attendance_history_change_view_type", null)
+                }.padding(4.dp),
     ) {
         Box(
             modifier =
@@ -311,6 +335,9 @@ private fun AttendanceCalenderScreenPreview() {
         viewType = AttendanceHistoryViewType.CALENDAR,
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        pastGames = listOf(),
+        onRequestGames = {},
+        onPastCheckIn = {},
         updateItems = { _, _ -> },
     )
 }
@@ -326,6 +353,9 @@ private fun AttendanceListScreenPreview() {
         viewType = AttendanceHistoryViewType.LIST,
         onViewTypeChange = {},
         items = ATTENDANCE_HISTORY_ITEMS,
+        pastGames = listOf(),
+        onRequestGames = {},
+        onPastCheckIn = {},
         updateItems = { _, _ -> },
     )
 }

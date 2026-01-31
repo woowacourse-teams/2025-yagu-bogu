@@ -55,4 +55,6 @@ class CheckInDefaultRepository @Inject constructor(
             .map { stadiumCheckInCountsResponse: StadiumCheckInCountsResponse ->
                 stadiumCheckInCountsResponse.stadiums
             }
+
+    override suspend fun addPastCheckIn(gameId: Long): Result<Unit> = checkInDataSource.addPastCheckIn(gameId)
 }
