@@ -43,8 +43,10 @@ class MemberDefaultRepository @Inject constructor(
         memberDataSource
             .updateNickname(nickname)
             .map { memberNicknameResponse: MemberNicknameResponse ->
-                val newNickname: String = memberNicknameResponse.nickname
-                cachedNickname = newNickname
+                cachedNickname = memberNicknameResponse.nickname
+            }.onFailure { exception ->
+                val domainError = mapToNicknameUpdateError(exception)
+                return Result.failure(NicknameUpdateException(domainError, exception))
             }
 
     override suspend fun getFavoriteTeam(): Result<String?> {
@@ -92,4 +94,43 @@ class MemberDefaultRepository @Inject constructor(
         memberDataSource.completeUploadProfileImage(key)
 
     override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> = memberDataSource.getMemberProfile(memberId)
+
+    private fun mapToNicknameUpdateError(exception: Throwable): NicknameUpdateError {
+        val message = exception.message.orEmpty()
+        val exceptionString = exception.toString()
+        return when {
+            // 409 Conflict - 중복된 닉네임
+            message.contains("409") || exceptionString.contains("Conflict") ->
+                NicknameUpdateError.DuplicateNickname
+
+            // 400 Bad Request, 422 Unprocessable Entity - 잘못된 형식
+            message.contains("400") ||
+                message.contains("422") ||
+                exceptionString.contains("Bad Request") ||
+                exceptionString.contains("Unprocessable") ->
+                NicknameUpdateError.InvalidNickname
+
+            // 403 Forbidden - 권한 없음
+            message.contains("403") || exceptionString.contains("Forbidden") ->
+                NicknameUpdateError.NoPermission
+
+            // 404 Not Found - 회원 정보 없음
+            message.contains("404") || exceptionString.contains("Not Found") ->
+                NicknameUpdateError.MemberNotFound
+
+            // 413 Payload Too Large - 데이터 크기 초과
+            message.contains("413") || exceptionString.contains("Payload Too Large") ->
+                NicknameUpdateError.PayloadTooLarge
+
+            // 500 Internal Server Error, 502 Bad Gateway - 서버 에러
+            message.contains("500") ||
+                message.contains("502") ||
+                exceptionString.contains("Internal Server Error") ||
+                exceptionString.contains("Bad Gateway") ->
+                NicknameUpdateError.ServerError
+
+            // 기타 에러
+            else -> NicknameUpdateError.Unknown(exception.message)
+        }
+    }
 }

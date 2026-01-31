@@ -55,10 +55,8 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
-import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
-import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
@@ -85,9 +83,6 @@ fun SettingMainScreen(
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-
-    val settingEvent: State<SettingEvent?> =
-        viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     val uCropLauncher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
@@ -147,8 +142,6 @@ fun SettingMainScreen(
             onCancel = { showNicknameEditDialog = false },
         )
     }
-
-    SettingEventHandler(settingEvent = settingEvent.value)
 }
 
 @Composable
