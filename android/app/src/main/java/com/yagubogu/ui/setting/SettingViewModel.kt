@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.member.NicknameUpdateError
+import com.yagubogu.data.repository.member.NicknameUpdateException
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.presentation.mapper.toUiModel
 import com.yagubogu.ui.setting.model.MemberInfoItem
@@ -43,8 +45,13 @@ class SettingViewModel @Inject constructor(
                 .updateNickname(newNickname)
                 .onSuccess {
                     _myMemberInfoItem.value = myMemberInfoItem.value.copy(nickName = newNickname)
-                    _settingEvent.emit(SettingEvent.NicknameEdit(newNickname))
+                    _settingEvent.emit(SettingEvent.NicknameEditSuccess(newNickname))
                 }.onFailure { exception: Throwable ->
+                    val updateError =
+                        (exception as? NicknameUpdateException)?.error
+                            ?: NicknameUpdateError.Unknown(exception.message)
+
+                    _settingEvent.emit(SettingEvent.NicknameEditFailure(updateError))
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
                 }
         }

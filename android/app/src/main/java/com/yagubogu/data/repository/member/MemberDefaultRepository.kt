@@ -43,8 +43,10 @@ class MemberDefaultRepository @Inject constructor(
         memberDataSource
             .updateNickname(nickname)
             .map { memberNicknameResponse: MemberNicknameResponse ->
-                val newNickname: String = memberNicknameResponse.nickname
-                cachedNickname = newNickname
+                cachedNickname = memberNicknameResponse.nickname
+            }.onFailure { exception ->
+                val domainError = mapToNicknameUpdateError(exception)
+                return Result.failure(NicknameUpdateException(domainError, exception))
             }
 
     override suspend fun getFavoriteTeam(): Result<String?> {
@@ -92,4 +94,15 @@ class MemberDefaultRepository @Inject constructor(
         memberDataSource.completeUploadProfileImage(key)
 
     override suspend fun getMemberProfile(memberId: Long): Result<MemberProfileResponse> = memberDataSource.getMemberProfile(memberId)
+
+    private fun mapToNicknameUpdateError(exception: Throwable): NicknameUpdateError =
+        when {
+            exception.message?.contains("409") == true || exception.toString().contains("Conflict") ->
+                NicknameUpdateError.DuplicateNickname
+            exception.message?.contains("404") == true ->
+                NicknameUpdateError.MemberNotFound
+            exception.message?.contains("400") == true ->
+                NicknameUpdateError.InvalidNickname
+            else -> NicknameUpdateError.Unknown(exception.message)
+        }
 }
