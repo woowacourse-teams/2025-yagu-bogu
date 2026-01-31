@@ -37,7 +37,6 @@ import com.yagubogu.R
 import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.DeleteAccountDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
-import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400
@@ -56,8 +55,6 @@ fun SettingDeleteAccountScreen(
 ) {
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle()
-    val settingEvent: State<SettingEvent?> =
-        viewModel.settingEvent.collectAsStateWithLifecycle(null)
 
     var showDeleteAccountDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
@@ -82,7 +79,7 @@ fun SettingDeleteAccountScreen(
     }
 
     SettingEventHandler(
-        settingEvent = settingEvent.value,
+        settingEvent = viewModel.settingEvent,
         navigateToHome = navigateToHome,
     )
 }

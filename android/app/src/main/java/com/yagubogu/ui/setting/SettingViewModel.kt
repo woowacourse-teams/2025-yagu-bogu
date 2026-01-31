@@ -14,12 +14,11 @@ import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
 import com.yagubogu.ui.setting.model.PresignedUrlItem
 import com.yagubogu.ui.setting.model.SettingEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Clock
@@ -36,8 +35,8 @@ class SettingViewModel @Inject constructor(
     private val _myMemberInfoItem = MutableStateFlow(MemberInfoItem())
     val myMemberInfoItem: StateFlow<MemberInfoItem> = _myMemberInfoItem.asStateFlow()
 
-    private val _settingEvent = MutableSharedFlow<SettingEvent>()
-    val settingEvent: SharedFlow<SettingEvent> = _settingEvent.asSharedFlow()
+    private val _settingEvent = Channel<SettingEvent>(Channel.UNLIMITED)
+    val settingEvent = _settingEvent.receiveAsFlow()
 
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
@@ -45,13 +44,13 @@ class SettingViewModel @Inject constructor(
                 .updateNickname(newNickname)
                 .onSuccess {
                     _myMemberInfoItem.value = myMemberInfoItem.value.copy(nickName = newNickname)
-                    _settingEvent.emit(SettingEvent.NicknameEditSuccess(newNickname))
+                    _settingEvent.send(SettingEvent.NicknameEditSuccess(newNickname))
                 }.onFailure { exception: Throwable ->
                     val updateError =
                         (exception as? NicknameUpdateException)?.error
                             ?: NicknameUpdateError.Unknown(exception.message)
 
-                    _settingEvent.emit(SettingEvent.NicknameEditFailure(updateError))
+                    _settingEvent.send(SettingEvent.NicknameEditFailure(updateError))
                     Timber.w(exception, "닉네임 변경 API 호출 실패")
                 }
         }
@@ -63,7 +62,7 @@ class SettingViewModel @Inject constructor(
                 .logout()
                 .onSuccess {
                     memberRepository.invalidateCache()
-                    _settingEvent.emit(SettingEvent.Logout)
+                    _settingEvent.send(SettingEvent.Logout)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "로그아웃 API 호출 실패")
                 }
@@ -75,7 +74,7 @@ class SettingViewModel @Inject constructor(
             memberRepository
                 .deleteMember()
                 .onSuccess {
-                    _settingEvent.emit(SettingEvent.DeleteAccount)
+                    _settingEvent.send(SettingEvent.DeleteAccount)
                 }.onFailure { exception: Throwable ->
                     Timber.w(exception, "계정 삭제 API 호출 실패")
                 }
@@ -84,7 +83,7 @@ class SettingViewModel @Inject constructor(
 
     fun cancelDeleteAccount() {
         viewModelScope.launch {
-            _settingEvent.emit(SettingEvent.DeleteAccountCancel)
+            _settingEvent.send(SettingEvent.DeleteAccountCancel)
         }
     }
 

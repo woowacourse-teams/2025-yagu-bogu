@@ -11,47 +11,48 @@ import com.yagubogu.presentation.login.LoginActivity
 import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.main.MainActivity
 import com.yagubogu.ui.setting.model.SettingEvent
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun SettingEventHandler(
-    settingEvent: SettingEvent?,
+    settingEvent: Flow<SettingEvent>,
     navigateToHome: () -> Unit = {},
 ) {
     val context: Context = LocalContext.current
 
-    LaunchedEffect(settingEvent) {
-        if (settingEvent == null) return@LaunchedEffect
+    LaunchedEffect(Unit) {
+        settingEvent.collect { event ->
+            val message: String? =
+                when (event) {
+                    SettingEvent.DeleteAccount -> {
+                        navigateToLogin(context)
+                        context.getString(R.string.setting_delete_account_confirm_select_alert)
+                    }
 
-        val message: String? =
-            when (settingEvent) {
-                SettingEvent.DeleteAccount -> {
-                    navigateToLogin(context)
-                    context.getString(R.string.setting_delete_account_confirm_select_alert)
+                    SettingEvent.DeleteAccountCancel -> {
+                        navigateToHome()
+                        context.getString(R.string.setting_delete_account_cancel_select_alert)
+                    }
+
+                    SettingEvent.Logout -> {
+                        navigateToLogin(context)
+                        context.getString(R.string.setting_logout_alert)
+                    }
+
+                    is SettingEvent.NicknameEditSuccess -> {
+                        context.getString(
+                            R.string.setting_edited_nickname_alert,
+                            event.newNickname,
+                        )
+                    }
+
+                    is SettingEvent.NicknameEditFailure -> {
+                        event.error.asString(context)
+                    }
                 }
 
-                SettingEvent.DeleteAccountCancel -> {
-                    navigateToHome()
-                    context.getString(R.string.setting_delete_account_cancel_select_alert)
-                }
-
-                SettingEvent.Logout -> {
-                    navigateToLogin(context)
-                    context.getString(R.string.setting_logout_alert)
-                }
-
-                is SettingEvent.NicknameEditSuccess -> {
-                    context.getString(
-                        R.string.setting_edited_nickname_alert,
-                        settingEvent.newNickname,
-                    )
-                }
-
-                is SettingEvent.NicknameEditFailure -> {
-                    settingEvent.error.asString(context)
-                }
-            }
-
-        message?.let { context.showToast(it) }
+            message?.let { context.showToast(it) }
+        }
     }
 }
 
