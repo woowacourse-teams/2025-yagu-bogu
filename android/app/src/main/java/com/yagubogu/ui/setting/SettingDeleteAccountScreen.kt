@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.yagubogu.R
-import com.yagubogu.ui.setting.component.SettingEventHandler
+import com.yagubogu.ui.navigation.Navigator
 import com.yagubogu.ui.setting.component.dialog.DeleteAccountDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.theme.Gray050
@@ -49,7 +49,7 @@ import com.yagubogu.ui.theme.White
 
 @Composable
 fun SettingDeleteAccountScreen(
-    navigateToHome: () -> Unit,
+    settingNavigator: Navigator,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -60,10 +60,14 @@ fun SettingDeleteAccountScreen(
 
     SettingDeleteAccountScreen(
         onCancelDeleteAccount = {
+            settingNavigator.clearStack()
             viewModel.cancelDeleteAccount()
             showDeleteAccountDialog = false
         },
-        onConfirmDeleteAccount = { showDeleteAccountDialog = true },
+        onConfirmDeleteAccount = {
+            settingNavigator.clearStack()
+            showDeleteAccountDialog = true
+        },
         memberInfoItem = memberInfoItem.value,
         modifier = modifier,
     )
@@ -77,11 +81,6 @@ fun SettingDeleteAccountScreen(
             onCancel = { showDeleteAccountDialog = false },
         )
     }
-
-    SettingEventHandler(
-        settingEvent = viewModel.settingEvent,
-        navigateToHome = navigateToHome,
-    )
 }
 
 @Composable

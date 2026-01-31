@@ -28,7 +28,6 @@ import com.yagubogu.ui.theme.White
 @Composable
 fun SettingScreen(
     navigateToParent: () -> Unit,
-    navigateToBottom: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navigationState: NavigationState =
@@ -36,7 +35,7 @@ fun SettingScreen(
             startRoute = SettingNavKey.SettingMain,
             topLevelRoutes = setOf(SettingNavKey.SettingMain),
         )
-    val navigator: Navigator = remember { Navigator(navigationState) }
+    val settingNavigator: Navigator = remember { Navigator(navigationState) }
 
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
@@ -45,12 +44,12 @@ fun SettingScreen(
         topBar = {
             DefaultToolbar(
                 onBackClick = {
-                    when (navigator.canGoBack()) {
-                        true -> navigator.goBack()
+                    when (settingNavigator.canGoBack()) {
+                        true -> settingNavigator.goBack()
                         false -> navigateToParent()
                     }
                 },
-                title = stringResource((navigator.currentRoute as SettingNavKey).label),
+                title = stringResource((settingNavigator.currentRoute as SettingNavKey).label),
             )
         },
         snackbarHost = {
@@ -71,19 +70,16 @@ fun SettingScreen(
             entryProvider {
                 entry<SettingNavKey.SettingMain> {
                     SettingMainScreen(
-                        onClickSettingAccount = { navigator.navigate(SettingNavKey.SettingAccount) },
+                        onClickSettingAccount = { settingNavigator.navigate(SettingNavKey.SettingAccount) },
                     )
                 }
                 entry<SettingNavKey.SettingAccount> {
                     SettingAccountScreen(
-                        onDeleteAccountClick = { navigator.navigate(SettingNavKey.SettingDeleteAccount) },
+                        onDeleteAccountClick = { settingNavigator.navigate(SettingNavKey.SettingDeleteAccount) },
                     )
                 }
                 entry<SettingNavKey.SettingDeleteAccount> {
-                    SettingDeleteAccountScreen(navigateToHome = {
-                        navigator.clearStack()
-                        navigateToBottom()
-                    })
+                    SettingDeleteAccountScreen(settingNavigator = settingNavigator)
                 }
             }
 
@@ -93,7 +89,7 @@ fun SettingScreen(
                     .padding(innerPadding)
                     .fillMaxSize(),
             entries = navigationState.toEntries(entryProvider),
-            onBack = { navigator.goBack() },
+            onBack = { settingNavigator.goBack() },
         )
     }
 }

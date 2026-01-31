@@ -2,6 +2,7 @@ package com.yagubogu.ui.setting.component
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -16,42 +17,42 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun SettingEventHandler(
     settingEvent: Flow<SettingEvent>,
+    snackbarHostState: SnackbarHostState,
     navigateToHome: () -> Unit = {},
 ) {
     val context: Context = LocalContext.current
 
     LaunchedEffect(Unit) {
         settingEvent.collect { event ->
-            val message: String? =
-                when (event) {
-                    SettingEvent.DeleteAccount -> {
-                        navigateToLogin(context)
+            when (event) {
+                SettingEvent.DeleteAccount -> {
+                    val message =
                         context.getString(R.string.setting_delete_account_confirm_select_alert)
-                    }
-
-                    SettingEvent.DeleteAccountCancel -> {
-                        navigateToHome()
-                        context.getString(R.string.setting_delete_account_cancel_select_alert)
-                    }
-
-                    SettingEvent.Logout -> {
-                        navigateToLogin(context)
-                        context.getString(R.string.setting_logout_alert)
-                    }
-
-                    is SettingEvent.NicknameEditSuccess -> {
-                        context.getString(
-                            R.string.setting_edited_nickname_alert,
-                            event.newNickname,
-                        )
-                    }
-
-                    is SettingEvent.NicknameEditFailure -> {
-                        event.error.asString(context)
-                    }
+                    context.showToast(message) // Todo : 로그인 액티비티가 nav3으로 전환될 시 스낵바로
+                    navigateToLogin(context)
                 }
 
-            message?.let { context.showToast(it) }
+                SettingEvent.DeleteAccountCancel -> {
+                    navigateToHome()
+                    snackbarHostState.showSnackbar(context.getString(R.string.setting_delete_account_cancel_select_alert))
+                }
+
+                SettingEvent.Logout -> {
+                    val message = context.getString(R.string.setting_logout_alert)
+                    context.showToast(message) // Todo : 로그인 액티비티가 nav3으로 전환될 시 스낵바로
+                    navigateToLogin(context)
+                }
+
+                is SettingEvent.NicknameEditSuccess -> {
+                    val message =
+                        context.getString(R.string.setting_edited_nickname_alert, event.newNickname)
+                    snackbarHostState.showSnackbar(message)
+                }
+
+                is SettingEvent.NicknameEditFailure -> {
+                    snackbarHostState.showSnackbar(event.error.asString(context))
+                }
+            }
         }
     }
 }

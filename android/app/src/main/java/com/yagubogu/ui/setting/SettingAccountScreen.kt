@@ -20,12 +20,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.yagubogu.R
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
-import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.LogoutDialog
-import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun SettingAccountScreen(
@@ -38,7 +34,6 @@ fun SettingAccountScreen(
     SettingAccountScreen(
         onLogoutClick = { showLogoutDialog = true },
         onDeleteAccountClick = onDeleteAccountClick,
-        settingEvent = viewModel.settingEvent,
         modifier = modifier,
     )
 
@@ -57,7 +52,6 @@ fun SettingAccountScreen(
 private fun SettingAccountScreen(
     onLogoutClick: () -> Unit,
     onDeleteAccountClick: () -> Unit,
-    settingEvent: Flow<SettingEvent>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -79,8 +73,6 @@ private fun SettingAccountScreen(
                 onClick = onDeleteAccountClick,
             )
         }
-
-        SettingEventHandler(settingEvent = settingEvent)
     }
 }
 
@@ -90,6 +82,5 @@ private fun SettingAccountScreenPreview() {
     SettingAccountScreen(
         onLogoutClick = {},
         onDeleteAccountClick = {},
-        settingEvent = emptyFlow(),
     )
 }

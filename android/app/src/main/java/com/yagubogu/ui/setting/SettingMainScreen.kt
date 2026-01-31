@@ -55,7 +55,6 @@ import com.yagubogu.presentation.util.showToast
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
-import com.yagubogu.ui.setting.component.SettingEventHandler
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.theme.Gray050
@@ -143,8 +142,6 @@ fun SettingMainScreen(
             onCancel = { showNicknameEditDialog = false },
         )
     }
-
-    SettingEventHandler(settingEvent = viewModel.settingEvent)
 }
 
 @Composable
