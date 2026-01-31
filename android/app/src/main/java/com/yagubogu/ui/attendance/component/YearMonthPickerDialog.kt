@@ -73,8 +73,8 @@ fun YearMonthPickerDialog(
         }
     }
 
-    val yearFormat: String = stringResource(R.string.attendance_history_year)
-    val monthFormat: String = stringResource(R.string.attendance_history_month)
+    val yearFormat: String = stringResource(R.string.all_year)
+    val monthFormat: String = stringResource(R.string.all_month)
 
     Dialog(
         onDismissRequest = onCancel,
@@ -89,7 +89,7 @@ fun YearMonthPickerDialog(
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Text(
-                text = stringResource(R.string.attendance_history_year_month, year, month),
+                text = stringResource(R.string.all_year_month, year, month),
                 style = PretendardBold20,
                 textAlign = TextAlign.Center,
             )
