@@ -34,8 +34,17 @@ class AttendanceHistoryViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<AttendanceHistoryItem>>(emptyList())
     val items: StateFlow<List<AttendanceHistoryItem>> = _items.asStateFlow()
 
-    private val _currentMonth = MutableStateFlow<YearMonth>(YearMonth.now())
-    val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
+    private val _selectedMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    val selectedMonth: StateFlow<YearMonth> = _selectedMonth.asStateFlow()
+
+    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+
+    private val _filter = MutableStateFlow(AttendanceHistoryFilter.ALL)
+    val filter: StateFlow<AttendanceHistoryFilter> = _filter.asStateFlow()
+
+    private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
+    val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
 
     private val _pastGames = MutableStateFlow<List<PastGameUiModel>>(emptyList())
     val pastGames: StateFlow<List<PastGameUiModel>> = _pastGames.asStateFlow()
@@ -48,15 +57,16 @@ class AttendanceHistoryViewModel @Inject constructor(
         )
     val pastCheckInUiEvent: SharedFlow<Unit> = _pastCheckInUiEvent.asSharedFlow()
 
-    fun fetchAttendanceHistoryItems(
-        yearMonth: YearMonth = YearMonth.now(),
-        filter: AttendanceHistoryFilter = AttendanceHistoryFilter.ALL,
-        sort: AttendanceHistorySort = AttendanceHistorySort.LATEST,
-    ) {
+    fun fetchAttendanceHistoryItems() {
         viewModelScope.launch {
+            val yearMonth: YearMonth = selectedMonth.value
             checkInRepository
-                .getCheckInHistories(yearMonth.year, filter.name, sort.name)
-                .mapList { it.toUiModel() }
+                .getCheckInHistories(
+                    yearMonth.year,
+                    yearMonth.monthValue,
+                    filter.value.name,
+                    sort.value.name,
+                ).mapList { it.toUiModel() }
                 .onSuccess { attendanceItems: List<AttendanceHistoryItem> ->
                     _items.value = attendanceItems
                 }.onFailure { exception: Throwable ->
@@ -96,12 +106,24 @@ class AttendanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentMonth(yearMonth: YearMonth) {
-        _currentMonth.value = yearMonth
+    fun updateSelectedMonth(yearMonth: YearMonth) {
+        _selectedMonth.value = yearMonth
+    }
+
+    fun updateSelectedDate(date: LocalDate) {
+        _selectedDate.value = date
+    }
+
+    fun updateFilter(filter: AttendanceHistoryFilter) {
+        _filter.value = filter
+    }
+
+    fun updateSort(sort: AttendanceHistorySort) {
+        _sort.value = sort
     }
 
     companion object {
-        val START_MONTH: YearMonth = YearMonth.of(2021, 1)
+        val START_MONTH: YearMonth = YearMonth.of(2021, 3)
         val END_MONTH: YearMonth = YearMonth.now()
     }
 }
