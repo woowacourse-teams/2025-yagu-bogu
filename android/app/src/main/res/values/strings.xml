@@ -164,7 +164,7 @@
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 \'%1$s\'(으)로 변경되었습니다.</string>
     <string name="setting_edit_nickname_duplicate">중복된 닉네임이 존재합니다</string>
-    <string name="setting_edit_nickname_invalid_format">닉네임 형식에 올바르지 않습니다</string>
+    <string name="setting_edit_nickname_invalid_format">닉네임 형식이 올바르지 않습니다</string>
     <string name="setting_edit_nickname_member_not_found">회원 정보를 찾을 수 없습니다</string>
     <string name="setting_edit_nickname_no_permission">닉네임 수정 권한이 없습니다</string>
     <string name="setting_edit_nickname_too_long">너무 긴 닉네임입니다</string>
