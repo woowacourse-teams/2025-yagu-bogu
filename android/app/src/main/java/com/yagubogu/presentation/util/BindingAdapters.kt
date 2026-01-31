@@ -8,16 +8,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.yagubogu.R
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-
-@BindingAdapter("signUpDateFormat")
-fun TextView.setSignUpDateFormat(date: LocalDate?) {
-    date ?: return
-    val dateText = date.format(DateFormatter.yyyyMMdd)
-    text = context.getString(R.string.setting_main_sign_up_date, dateText)
-}
 
 @BindingAdapter("timeStamp")
 fun setTimeStamp(

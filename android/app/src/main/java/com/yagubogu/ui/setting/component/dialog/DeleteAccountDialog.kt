@@ -1,4 +1,4 @@
-package com.yagubogu.ui.attendance.component
+package com.yagubogu.ui.setting.component.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -6,26 +6,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.yagubogu.R
 import com.yagubogu.presentation.dialog.DefaultDialogUiModel
-import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.common.component.DefaultDialog
-import java.time.LocalDate
 
 @Composable
-fun PastCheckInDialog(
-    date: LocalDate,
+fun DeleteAccountDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dialogUiModel =
         DefaultDialogUiModel(
-            title =
-                stringResource(
-                    R.string.attendance_history_add_attendance_confirm,
-                    date.format(DateFormatter.yyyyMMdd),
-                ),
-            message = stringResource(R.string.attendance_history_add_attendance_message),
+            title = stringResource(R.string.setting_delete_account_dialog_title),
+            emoji = null,
+            message = stringResource(R.string.setting_delete_account_dialog_message),
             negativeText = stringResource(R.string.all_cancel),
+            positiveText = stringResource(R.string.setting_delete_account),
         )
 
     DefaultDialog(
@@ -38,9 +33,8 @@ fun PastCheckInDialog(
 
 @Preview
 @Composable
-private fun PastCheckInDialogPreview() {
-    PastCheckInDialog(
-        date = LocalDate.now(),
+private fun DeleteAccountDialogPreview() {
+    DeleteAccountDialog(
         onConfirm = {},
         onCancel = {},
     )

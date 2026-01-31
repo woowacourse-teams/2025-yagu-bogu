@@ -2,6 +2,7 @@ package com.yagubogu.ui.attendance.component
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,17 +52,19 @@ fun AttendanceCalendarContent(
     items: List<AttendanceHistoryItem>,
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentMonth: YearMonth,
+    selectedMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
+    selectedDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
     pastGames: List<PastGameUiModel>,
-    onRequestGames: (LocalDate) -> Unit,
+    onPastGamesRequest: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var currentDate: LocalDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
-    val itemsByDate: Map<LocalDate, AttendanceHistoryItem> =
-        items.associateBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
+    val itemsByDate: Map<LocalDate, List<AttendanceHistoryItem>> =
+        items.groupBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
+    val currentItems: List<AttendanceHistoryItem>? = itemsByDate[selectedDate]
     val scrollState: ScrollState = rememberScrollState()
     var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
 
@@ -80,37 +85,58 @@ fun AttendanceCalendarContent(
         )
     }
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-    ) {
-        AttendanceCalendar(
-            startMonth = startMonth,
-            endMonth = endMonth,
-            currentMonth = currentMonth,
-            onMonthChange = onMonthChange,
-            currentDate = currentDate,
-            onDateChange = { date: LocalDate -> currentDate = date },
-            attendanceDates = itemsByDate.keys,
-        )
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            AttendanceCalendar(
+                startMonth = startMonth,
+                endMonth = endMonth,
+                selectedMonth = selectedMonth,
+                onMonthChange = onMonthChange,
+                selectedDate = selectedDate,
+                onDateChange = onDateChange,
+                attendanceDates = itemsByDate.keys,
+            )
 
-        val item: AttendanceHistoryItem? = itemsByDate[currentDate]
-        if (item != null) {
-            AttendanceItem(item = item, isExpanded = true)
-        } else {
-            AttendanceAdditionButton(
+            if (currentItems != null) {
+                currentItems.forEach { item: AttendanceHistoryItem ->
+                    AttendanceItem(item = item, isExpanded = true)
+                }
+            } else {
+                AttendanceAdditionButton(
+                    onClick = {
+                        onPastGamesRequest(selectedDate)
+                        showBottomSheet = true
+                    },
+                    modifier = Modifier.padding(vertical = 30.dp),
+                )
+            }
+        }
+
+        if (currentItems != null) {
+            SmallFloatingActionButton(
                 onClick = {
-                    onRequestGames(currentDate)
+                    onPastGamesRequest(selectedDate)
                     showBottomSheet = true
                 },
-                modifier = Modifier.padding(vertical = 30.dp),
-            )
+                containerColor = Primary500,
+                contentColor = White,
+                shape = CircleShape,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(20.dp),
+            ) {
+                Icon(Icons.Rounded.Add, null)
+            }
         }
     }
 }
@@ -136,7 +162,7 @@ private fun AttendanceAdditionButton(
         modifier = modifier,
     ) {
         Icon(
-            imageVector = Icons.Rounded.Add,
+            painter = painterResource(R.drawable.ic_calendar_plus),
             contentDescription = null,
             modifier = Modifier.size(20.dp),
         )
@@ -155,10 +181,12 @@ private fun AttendanceCalendarContentPreview() {
         items = ATTENDANCE_HISTORY_ITEMS,
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onMonthChange = {},
+        selectedDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
-        onRequestGames = {},
+        onPastGamesRequest = {},
         onPastCheckIn = {},
     )
 }
@@ -170,10 +198,12 @@ private fun AttendanceCalendarContentNoItemPreview() {
         items = emptyList(),
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onMonthChange = {},
+        selectedDate = LocalDate.now(),
+        onDateChange = {},
         pastGames = listOf(),
-        onRequestGames = {},
+        onPastGamesRequest = {},
         onPastCheckIn = {},
     )
 }

@@ -29,7 +29,7 @@ class StatsDefaultRepository @Inject constructor(
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getAverageStats(): Result<AverageStatisticResponse> = statsDataSource.getAverageStats()
+    override suspend fun getAverageStats(year: Int): Result<AverageStatisticResponse> = statsDataSource.getAverageStats(year)
 
     override suspend fun getVsTeamStats(year: Int): Result<List<OpponentWinRateTeamDto>> =
         statsDataSource

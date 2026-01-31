@@ -59,7 +59,10 @@ private const val FIRST_INDEX = 0
 @Composable
 fun AttendanceListContent(
     items: List<AttendanceHistoryItem>,
-    updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
+    filter: AttendanceHistoryFilter,
+    updateFilter: (AttendanceHistoryFilter) -> Unit,
+    sort: AttendanceHistorySort,
+    updateSort: (AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
@@ -67,7 +70,10 @@ fun AttendanceListContent(
         true ->
             AttendanceList(
                 items = items,
-                updateItems = updateItems,
+                filter = filter,
+                updateFilter = updateFilter,
+                sort = sort,
+                updateSort = updateSort,
                 modifier = modifier,
                 scrollToTopEvent = scrollToTopEvent,
             )
@@ -79,12 +85,13 @@ fun AttendanceListContent(
 @Composable
 private fun AttendanceList(
     items: List<AttendanceHistoryItem>,
-    updateItems: (AttendanceHistoryFilter, AttendanceHistorySort) -> Unit,
+    filter: AttendanceHistoryFilter,
+    updateFilter: (AttendanceHistoryFilter) -> Unit,
+    sort: AttendanceHistorySort,
+    updateSort: (AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var filter: AttendanceHistoryFilter by rememberSaveable { mutableStateOf(AttendanceHistoryFilter.ALL) }
-    var sort: AttendanceHistorySort by rememberSaveable { mutableStateOf(AttendanceHistorySort.LATEST) }
     var detailItemPosition: Int? by rememberSaveable { mutableStateOf(if (items.isNotEmpty()) FIRST_INDEX else null) }
 
     val lazyListState: LazyListState = rememberLazyListState()
@@ -114,8 +121,7 @@ private fun AttendanceList(
                 filter = filter,
                 onClick = { newFilter: AttendanceHistoryFilter ->
                     if (filter != newFilter) {
-                        filter = newFilter
-                        updateItems(newFilter, sort)
+                        updateFilter(newFilter)
                         detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
                     }
                 },
@@ -123,12 +129,8 @@ private fun AttendanceList(
             AttendanceHistorySortSwitch(
                 sort = sort,
                 onClick = {
-                    sort =
-                        when (sort) {
-                            AttendanceHistorySort.LATEST -> AttendanceHistorySort.OLDEST
-                            AttendanceHistorySort.OLDEST -> AttendanceHistorySort.LATEST
-                        }
-                    updateItems(filter, sort)
+                    val newSort: AttendanceHistorySort = sort.toggle()
+                    updateSort(newSort)
                     detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
                 },
             )
@@ -306,7 +308,10 @@ private fun AttendanceHistorySortSwitch(
 private fun AttendanceListPreview() {
     AttendanceList(
         items = ATTENDANCE_HISTORY_ITEMS,
-        updateItems = { _, _ -> },
+        filter = AttendanceHistoryFilter.ALL,
+        updateFilter = {},
+        sort = AttendanceHistorySort.LATEST,
+        updateSort = {},
     )
 }
 

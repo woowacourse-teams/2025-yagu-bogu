@@ -1,5 +1,6 @@
 package com.yagubogu.data.dto.response.game
 
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,4 +18,6 @@ data class GameWithCheckInDto(
     val homeTeam: TeamByGameDto,
     @SerialName("awayTeam")
     val awayTeam: TeamByGameDto,
+    @SerialName("startAt")
+    val startAt: LocalTime, // 경기 시작 시간
 )

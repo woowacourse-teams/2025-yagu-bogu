@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,32 +85,28 @@ private fun PastGamesContent(
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(R.string.attendance_history_add_attendance_description),
-            style = PretendardSemiBold16,
-        )
+        item {
+            Text(
+                text = stringResource(R.string.attendance_history_add_attendance_description),
+                style = PretendardSemiBold16,
+            )
+        }
 
-        LazyColumn(
-            state = lazyListState,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            items(
-                items = items,
-                key = { item: PastGameUiModel -> item.gameId },
-            ) { item: PastGameUiModel ->
-                PastAttendanceItem(
-                    item = item,
-                    onPastCheckIn = onPastCheckIn,
-                )
-            }
+        items(
+            items = items,
+            key = { item: PastGameUiModel -> item.gameId },
+        ) { item: PastGameUiModel ->
+            PastAttendanceItem(
+                item = item,
+                onPastCheckIn = onPastCheckIn,
+            )
         }
     }
 }
@@ -145,7 +142,7 @@ private fun PastAttendanceItem(
     var showDialog: Boolean by rememberSaveable { mutableStateOf(false) }
     if (showDialog) {
         PastCheckInDialog(
-            pastGameUiModel = item,
+            date = item.date,
             onConfirm = {
                 onPastCheckIn(item.gameId)
                 showDialog = false
@@ -187,7 +184,7 @@ private fun PastAttendanceItem(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = item.date.format(DateFormatter.yyyyMMdd),
+            text = "${item.date.format(DateFormatter.yyyyMMdd)} ${item.startAt.format(DateFormatter.hhmm)}",
             style = PretendardRegular12.copy(color = Gray500),
         )
         Text(
@@ -218,5 +215,14 @@ private fun EmptyAttendanceAdditionBottomSheetPreview() {
         onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
+    )
+}
+
+@Preview
+@Composable
+private fun PastAttendanceItemPreview() {
+    PastAttendanceItem(
+        item = PAST_GAME_UI_MODELS[0],
+        onPastCheckIn = { },
     )
 }

@@ -35,6 +35,7 @@ import com.yagubogu.ui.badge.model.BADGE_ID_0_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_0_NOT_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BADGE_ID_1_ACQUIRED_FIXTURE
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
+import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.PretendardBold20
@@ -66,7 +67,12 @@ private fun BadgeScreen(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { BadgeToolbar(onBackClick = onBackClick) },
+        topBar = {
+            DefaultToolbar(
+                onBackClick = onBackClick,
+                title = stringResource(R.string.badge_title),
+            )
+        },
         containerColor = Gray050,
         modifier = modifier.background(Gray300),
     ) { innerPadding: PaddingValues ->
