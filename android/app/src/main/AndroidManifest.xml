@@ -56,10 +56,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.YaguBogu.OssLicenseTheme"
             tools:replace="android:theme" />
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

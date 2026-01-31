@@ -12,6 +12,7 @@ firebaseBom = "34.0.0"
 fragmentKtx = "1.8.8"
 hiltAndroid = "2.57.2"
 hiltNavigationCompose = "1.3.0"
+imagepickerkmp = "1.0.31"
 kotestAssertionsCore = "6.0.3"
 kotestRunnerJunit5 = "6.0.3"
 kotlin = "2.1.0"
@@ -35,7 +36,6 @@ playServicesOssLicenses = "17.2.2"
 retrofit = "3.0.0"
 shimmer = "0.5.0"
 timber = "5.0.1"
-ucrop = "2.2.11"
 viewpager2 = "1.1.0"
 playServicesLocation = "21.3.0"
 mpandroidchart = "v3.1.0"
@@ -84,6 +84,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+imagepickerkmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -110,7 +111,6 @@ glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
-ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
