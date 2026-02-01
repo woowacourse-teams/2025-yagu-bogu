@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.yagubogu.R
 import com.yagubogu.presentation.util.DateFormatter
 import com.yagubogu.ui.attendance.model.PastGameUiModel
+import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.theme.EsamanruBold32
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
@@ -49,11 +52,12 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.color
+import com.yagubogu.ui.util.shimmerLoading
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceAdditionBottomSheet(
-    items: List<PastGameUiModel>,
+    pastGameUiState: PastGameUiState,
     onPastCheckIn: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -65,14 +69,46 @@ fun AttendanceAdditionBottomSheet(
         containerColor = Gray050,
         modifier = modifier,
     ) {
-        when (items.isNotEmpty()) {
-            true ->
-                PastGamesContent(
-                    items = items,
-                    onPastCheckIn = onPastCheckIn,
-                )
+        when (pastGameUiState) {
+            PastGameUiState.Loading -> PastGameLoadingContent()
+            is PastGameUiState.Success -> {
+                when (pastGameUiState.pastGames.isNotEmpty()) {
+                    true ->
+                        PastGamesContent(
+                            items = pastGameUiState.pastGames,
+                            onPastCheckIn = onPastCheckIn,
+                        )
 
-            false -> EmptyPastGameContent()
+                    false -> EmptyPastGameContent()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PastGameLoadingContent(modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        item {
+            Text(
+                text = stringResource(R.string.attendance_history_add_attendance_description),
+                style = PretendardSemiBold16,
+            )
+        }
+        items(3) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .shimmerLoading(),
+            )
         }
     }
 }
@@ -114,7 +150,7 @@ private fun PastGamesContent(
 @Composable
 private fun EmptyPastGameContent(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.padding(20.dp),
+        modifier = modifier.padding(horizontal = 20.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -197,9 +233,21 @@ private fun PastAttendanceItem(
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun LoadingAttendanceAdditionBottomSheetPreview() {
+    AttendanceAdditionBottomSheet(
+        pastGameUiState = PastGameUiState.Loading,
+        onPastCheckIn = {},
+        onDismiss = {},
+        sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
+    )
+}
+
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun AttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
-        items = PAST_GAME_UI_MODELS,
+        pastGameUiState = PastGameUiState.Success(PAST_GAME_UI_MODELS),
         onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),
@@ -211,7 +259,7 @@ private fun AttendanceAdditionBottomSheetPreview() {
 @Composable
 private fun EmptyAttendanceAdditionBottomSheetPreview() {
     AttendanceAdditionBottomSheet(
-        items = emptyList(),
+        pastGameUiState = PastGameUiState.Success(emptyList()),
         onPastCheckIn = {},
         onDismiss = {},
         sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded),

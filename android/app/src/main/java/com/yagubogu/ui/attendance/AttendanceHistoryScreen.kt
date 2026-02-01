@@ -50,7 +50,7 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.AttendanceHistoryViewType
-import com.yagubogu.ui.attendance.model.PastGameUiModel
+import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray200
@@ -78,7 +78,7 @@ fun AttendanceHistoryScreen(
     val selectedDate: LocalDate by viewModel.selectedDate.collectAsStateWithLifecycle()
     val filter: AttendanceHistoryFilter by viewModel.filter.collectAsStateWithLifecycle()
     val sort: AttendanceHistorySort by viewModel.sort.collectAsStateWithLifecycle()
-    val pastGames: List<PastGameUiModel> by viewModel.pastGames.collectAsStateWithLifecycle()
+    val pastGameUiState: PastGameUiState by viewModel.pastGameUiState.collectAsStateWithLifecycle()
 
     val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
     val endMonth: YearMonth = AttendanceHistoryViewModel.END_MONTH
@@ -120,7 +120,7 @@ fun AttendanceHistoryScreen(
         updateFilter = viewModel::updateFilter,
         sort = sort,
         updateSort = viewModel::updateSort,
-        pastGames = pastGames,
+        pastGameUiState = pastGameUiState,
         onPastGamesRequest = viewModel::fetchPastGames,
         onPastCheckIn = viewModel::addPastCheckIn,
         modifier = modifier,
@@ -143,7 +143,7 @@ private fun AttendanceHistoryScreen(
     updateFilter: (AttendanceHistoryFilter) -> Unit,
     sort: AttendanceHistorySort,
     updateSort: (AttendanceHistorySort) -> Unit,
-    pastGames: List<PastGameUiModel>,
+    pastGameUiState: PastGameUiState,
     onPastGamesRequest: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -176,7 +176,7 @@ private fun AttendanceHistoryScreen(
                     onMonthChange = onMonthChange,
                     selectedDate = selectedDate,
                     onDateChange = onDateChange,
-                    pastGames = pastGames,
+                    pastGameUiState = pastGameUiState,
                     onPastGamesRequest = onPastGamesRequest,
                     onPastCheckIn = onPastCheckIn,
                     scrollToTopEvent = scrollToTopEvent,
@@ -358,7 +358,7 @@ private fun AttendanceCalenderScreenPreview() {
         updateFilter = {},
         sort = AttendanceHistorySort.LATEST,
         updateSort = {},
-        pastGames = listOf(),
+        pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
     )
@@ -381,7 +381,7 @@ private fun AttendanceListScreenPreview() {
         updateFilter = {},
         sort = AttendanceHistorySort.LATEST,
         updateSort = {},
-        pastGames = listOf(),
+        pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
     )
