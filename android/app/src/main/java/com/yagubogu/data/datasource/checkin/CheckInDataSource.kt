@@ -16,6 +16,7 @@ interface CheckInDataSource {
 
     suspend fun getCheckInHistories(
         year: Int,
+        month: Int,
         filter: String,
         sort: String,
     ): Result<CheckInHistoryResponse>
@@ -23,4 +24,6 @@ interface CheckInDataSource {
     suspend fun getCheckInStatus(date: LocalDate): Result<CheckInStatusResponse>
 
     suspend fun getStadiumCheckInCounts(year: Int): Result<StadiumCheckInCountsResponse>
+
+    suspend fun addPastCheckIn(gameId: Long): Result<Unit>
 }

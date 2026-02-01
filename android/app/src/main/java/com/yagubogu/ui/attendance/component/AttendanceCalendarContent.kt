@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -32,8 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.yagubogu.R
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
+import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
@@ -42,26 +46,43 @@ import kotlinx.coroutines.flow.SharedFlow
 import java.time.LocalDate
 import java.time.YearMonth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceCalendarContent(
     items: List<AttendanceHistoryItem>,
     startMonth: YearMonth,
     endMonth: YearMonth,
-    currentMonth: YearMonth,
+    selectedMonth: YearMonth,
     onMonthChange: (YearMonth) -> Unit,
+    selectedDate: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
+    pastGames: List<PastGameUiModel>,
+    onPastGamesRequest: (LocalDate) -> Unit,
+    onPastCheckIn: (Long) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
-    var currentDate: LocalDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     val itemsByDate: Map<LocalDate, List<AttendanceHistoryItem>> =
         items.groupBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
-    val currentItems: List<AttendanceHistoryItem>? = itemsByDate[currentDate]
+    val currentItems: List<AttendanceHistoryItem>? = itemsByDate[selectedDate]
     val scrollState: ScrollState = rememberScrollState()
+    var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
             scrollState.animateScrollTo(0)
         }
+    }
+
+    if (showBottomSheet) {
+        AttendanceAdditionBottomSheet(
+            items = pastGames,
+            onPastCheckIn = { gameId: Long ->
+                onPastCheckIn(gameId)
+                showBottomSheet = false
+            },
+            onDismiss = { showBottomSheet = false },
+        )
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -78,10 +99,10 @@ fun AttendanceCalendarContent(
             AttendanceCalendar(
                 startMonth = startMonth,
                 endMonth = endMonth,
-                currentMonth = currentMonth,
+                selectedMonth = selectedMonth,
                 onMonthChange = onMonthChange,
-                currentDate = currentDate,
-                onDateChange = { date: LocalDate -> currentDate = date },
+                selectedDate = selectedDate,
+                onDateChange = onDateChange,
                 attendanceDates = itemsByDate.keys,
             )
 
@@ -91,7 +112,10 @@ fun AttendanceCalendarContent(
                 }
             } else {
                 AttendanceAdditionButton(
-                    onClick = { },
+                    onClick = {
+                        onPastGamesRequest(selectedDate)
+                        showBottomSheet = true
+                    },
                     modifier = Modifier.padding(vertical = 30.dp),
                 )
             }
@@ -99,7 +123,10 @@ fun AttendanceCalendarContent(
 
         if (currentItems != null) {
             SmallFloatingActionButton(
-                onClick = { },
+                onClick = {
+                    onPastGamesRequest(selectedDate)
+                    showBottomSheet = true
+                },
                 containerColor = Primary500,
                 contentColor = White,
                 shape = CircleShape,
@@ -120,7 +147,10 @@ private fun AttendanceAdditionButton(
     modifier: Modifier = Modifier,
 ) {
     Button(
-        onClick = onClick,
+        onClick = {
+            onClick()
+            Firebase.analytics.logEvent("past_attendance_addition", null)
+        },
         shape = CircleShape,
         colors =
             ButtonDefaults.buttonColors(
@@ -151,8 +181,13 @@ private fun AttendanceCalendarContentPreview() {
         items = ATTENDANCE_HISTORY_ITEMS,
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onMonthChange = {},
+        selectedDate = LocalDate.now(),
+        onDateChange = {},
+        pastGames = listOf(),
+        onPastGamesRequest = {},
+        onPastCheckIn = {},
     )
 }
 
@@ -163,7 +198,12 @@ private fun AttendanceCalendarContentNoItemPreview() {
         items = emptyList(),
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
-        currentMonth = YearMonth.now(),
+        selectedMonth = YearMonth.now(),
         onMonthChange = {},
+        selectedDate = LocalDate.now(),
+        onDateChange = {},
+        pastGames = listOf(),
+        onPastGamesRequest = {},
+        onPastCheckIn = {},
     )
 }

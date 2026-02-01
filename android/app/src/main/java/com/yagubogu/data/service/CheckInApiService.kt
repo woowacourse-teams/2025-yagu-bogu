@@ -1,6 +1,7 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.checkin.CheckInRequest
+import com.yagubogu.data.dto.request.checkin.PastCheckInRequest
 import com.yagubogu.data.dto.response.checkin.CheckInCountsResponse
 import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
@@ -31,6 +32,7 @@ interface CheckInApiService {
     @GET("/api/v1/check-ins/members")
     suspend fun getCheckInHistories(
         @Query("year") year: Int,
+        @Query("month") month: Int,
         @Query("result") result: String,
         @Query("order") order: String,
     ): Response<CheckInHistoryResponse>
@@ -44,4 +46,9 @@ interface CheckInApiService {
     suspend fun getStadiumCheckInCounts(
         @Query("year") year: Int,
     ): Response<StadiumCheckInCountsResponse>
+
+    @POST("/api/v1/past-check-ins")
+    suspend fun postPastCheckIn(
+        @Body body: PastCheckInRequest,
+    ): Response<Unit>
 }
