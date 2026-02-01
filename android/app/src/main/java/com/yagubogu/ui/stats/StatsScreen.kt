@@ -169,8 +169,7 @@ private fun StatsTab(
                     width = 1.dp,
                     color = if (isSelected) Primary500 else Gray200,
                     shape = CircleShape,
-                )
-                .padding(horizontal = 20.dp, vertical = 12.dp),
+                ).padding(horizontal = 20.dp, vertical = 12.dp),
     )
 }
 

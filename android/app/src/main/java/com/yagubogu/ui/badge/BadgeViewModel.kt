@@ -20,8 +20,19 @@ class BadgeViewModel @Inject constructor(
     var badgeUiState = mutableStateOf<BadgeUiState>(BadgeUiState.Loading)
         private set
 
-    init {
-        fetchBadges()
+    fun fetchBadges() {
+        viewModelScope.launch {
+            val badgeResult: Result<BadgeResponse> = memberRepository.getBadges()
+            badgeResult
+                .onSuccess { badgeResponse: BadgeResponse ->
+                    val representativeBadge: BadgeUiModel? =
+                        badgeResponse.representativeBadge?.toUiModel()
+                    val badges: List<BadgeInfoUiModel> = badgeResponse.badges.map { it.toUiModel() }
+                    badgeUiState.value = BadgeUiState.Success(representativeBadge, badges)
+                }.onFailure { exception: Throwable ->
+                    Timber.w(exception, "API 호출 실패")
+                }
+        }
     }
 
     fun updateRepresentativeBadge(badgeId: Long) {
@@ -47,21 +58,6 @@ class BadgeViewModel @Inject constructor(
                 badgeUiState.value =
                     currentBadgeUiState.copy(representativeBadge = badgeInfo.badge)
             }
-        }
-    }
-
-    private fun fetchBadges() {
-        viewModelScope.launch {
-            val badgeResult: Result<BadgeResponse> = memberRepository.getBadges()
-            badgeResult
-                .onSuccess { badgeResponse: BadgeResponse ->
-                    val representativeBadge: BadgeUiModel? =
-                        badgeResponse.representativeBadge?.toUiModel()
-                    val badges: List<BadgeInfoUiModel> = badgeResponse.badges.map { it.toUiModel() }
-                    badgeUiState.value = BadgeUiState.Success(representativeBadge, badges)
-                }.onFailure { exception: Throwable ->
-                    Timber.w(exception, "API 호출 실패")
-                }
         }
     }
 }
