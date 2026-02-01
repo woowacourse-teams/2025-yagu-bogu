@@ -1,4 +1,4 @@
-package com.yagubogu.presentation.favorite
+package com.yagubogu.ui.favorite
 
 import android.os.Parcelable
 import com.yagubogu.domain.model.Team

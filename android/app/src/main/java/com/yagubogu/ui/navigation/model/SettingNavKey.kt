@@ -1,4 +1,4 @@
-package com.yagubogu.ui.navigation
+package com.yagubogu.ui.navigation.model
 
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
