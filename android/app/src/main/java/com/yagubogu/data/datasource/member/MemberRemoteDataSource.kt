@@ -65,11 +65,7 @@ class MemberRemoteDataSource @Inject constructor(
         contentLength: Long,
     ): Result<PresignedUrlStartResponse> =
         safeApiCall {
-            val request =
-                PresignedUrlStartRequest(
-                    contentType,
-                    contentLength,
-                )
+            val request = PresignedUrlStartRequest(contentType, contentLength)
             memberApiService.postPresignedUrl(request)
         }
 

@@ -20,8 +20,6 @@ import com.yagubogu.data.repository.talk.TalkDefaultRepository
 import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyDefaultRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
-import com.yagubogu.data.repository.token.TokenDefaultRepository
-import com.yagubogu.data.repository.token.TokenRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,10 +29,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    @Binds
-    @Singleton
-    abstract fun bindTokenRepository(impl: TokenDefaultRepository): TokenRepository
-
     @Binds
     @Singleton
     abstract fun bindAuthRepository(impl: AuthDefaultRepository): AuthRepository

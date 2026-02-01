@@ -7,27 +7,26 @@ import com.yagubogu.data.dto.response.checkin.CheckInHistoryResponse
 import com.yagubogu.data.dto.response.checkin.CheckInStatusResponse
 import com.yagubogu.data.dto.response.checkin.FanRateResponse
 import com.yagubogu.data.dto.response.checkin.StadiumCheckInCountsResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Query
 
 interface CheckInApiService {
     @POST("/api/v1/check-ins")
     suspend fun postCheckIn(
         @Body body: CheckInRequest,
-    ): Response<Unit>
+    )
 
     @GET("/api/v1/check-ins/counts")
     suspend fun getCheckInCounts(
         @Query("year") year: Int,
-    ): Response<CheckInCountsResponse>
+    ): CheckInCountsResponse
 
     @GET("/api/v1/check-ins/stadiums/fan-rates")
     suspend fun getStadiumFanRates(
         @Query("date") date: String,
-    ): Response<FanRateResponse>
+    ): FanRateResponse
 
     @GET("/api/v1/check-ins/members")
     suspend fun getCheckInHistories(
@@ -35,20 +34,20 @@ interface CheckInApiService {
         @Query("month") month: Int,
         @Query("result") result: String,
         @Query("order") order: String,
-    ): Response<CheckInHistoryResponse>
+    ): CheckInHistoryResponse
 
     @GET("/api/v1/check-ins/status")
     suspend fun getCheckInStatus(
         @Query("date") date: String,
-    ): Response<CheckInStatusResponse>
+    ): CheckInStatusResponse
 
     @GET("/api/v1/check-ins/stadiums/counts")
     suspend fun getStadiumCheckInCounts(
         @Query("year") year: Int,
-    ): Response<StadiumCheckInCountsResponse>
+    ): StadiumCheckInCountsResponse
 
     @POST("/api/v1/past-check-ins")
     suspend fun postPastCheckIn(
         @Body body: PastCheckInRequest,
-    ): Response<Unit>
+    )
 }

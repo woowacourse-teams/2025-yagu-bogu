@@ -4,11 +4,10 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.yagubogu.data.service.ThirdPartyApiService
 import com.yagubogu.data.util.safeApiCall
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okio.BufferedSink
-import okio.source
+import io.ktor.http.ContentType
+import io.ktor.http.content.OutgoingContent
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -23,7 +22,7 @@ class ThirdPartyRemoteDataSource @Inject constructor(
         contentLength: Long,
     ): Result<Unit> =
         safeApiCall {
-            val requestBody: RequestBody =
+            val requestBody: OutgoingContent =
                 createRequestBody(imageFileUri, contentType, contentLength)
             thirdPartyApiService.putImageToS3(url, requestBody)
         }
@@ -32,15 +31,18 @@ class ThirdPartyRemoteDataSource @Inject constructor(
         uri: Uri,
         contentType: String,
         contentLength: Long,
-    ): RequestBody =
-        object : RequestBody() {
-            override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
+    ): OutgoingContent =
+        object : OutgoingContent.ReadChannelContent() {
+            override val contentType: ContentType = ContentType.parse(contentType)
 
-            override fun contentLength(): Long = contentLength
+            override val contentLength: Long = contentLength
 
-            override fun writeTo(sink: BufferedSink) {
-                contentResolver.openInputStream(uri)?.use { inputStream: InputStream ->
-                    sink.writeAll(inputStream.source())
+            override fun readFrom(): ByteReadChannel {
+                val inputStream: InputStream =
+                    contentResolver.openInputStream(uri)
+                        ?: throw IllegalStateException("Failed to open input stream for $uri")
+                return inputStream.use { stream: InputStream ->
+                    stream.toByteReadChannel()
                 }
             }
         }

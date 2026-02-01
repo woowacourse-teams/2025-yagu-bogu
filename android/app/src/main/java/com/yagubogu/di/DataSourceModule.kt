@@ -20,8 +20,6 @@ import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.datasource.thirdparty.ThirdPartyDataSource
 import com.yagubogu.data.datasource.thirdparty.ThirdPartyRemoteDataSource
-import com.yagubogu.data.datasource.token.TokenDataSource
-import com.yagubogu.data.datasource.token.TokenRemoteDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,10 +29,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataSourceModule {
-    @Binds
-    @Singleton
-    abstract fun bindTokenDataSource(impl: TokenRemoteDataSource): TokenDataSource
-
     @Binds
     @Singleton
     abstract fun bindAuthDataSource(impl: AuthRemoteDataSource): AuthDataSource

@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.internal.dsl.SigningConfig
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -12,9 +13,10 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.oss.licenses.plugin)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ktorfit)
 }
 
 android {
@@ -98,13 +100,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
     buildFeatures {
         dataBinding = true
         buildConfig = true
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
@@ -115,11 +120,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.logging.interceptor)
     implementation(libs.androidx.viewpager2)
     implementation(libs.play.services.location)
     implementation(libs.mpandroidchart)
@@ -133,6 +135,15 @@ dependencies {
     implementation(libs.balloon.compose)
     implementation(libs.ucrop)
     implementation(libs.calendar.compose)
+
+    // Ktor & Ktorfit
+    implementation(libs.ktorfit.lib)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.auth)
+    implementation(libs.ktor.client.logging)
 
     // firebase
     implementation(platform(libs.firebase.bom))
@@ -168,10 +179,6 @@ dependencies {
     // coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-
-    // sse
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.eventsource)
 
     // kotest
     testImplementation(libs.kotest.runner.junit5)

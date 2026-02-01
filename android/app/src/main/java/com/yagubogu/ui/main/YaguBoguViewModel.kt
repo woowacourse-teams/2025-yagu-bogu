@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
+import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
-import com.yagubogu.data.repository.token.TokenRepository
 import com.yagubogu.ui.main.model.AutoLoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class YaguBoguViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
     private val _autoLoginState = MutableStateFlow<AutoLoginState>(AutoLoginState.Loading)
@@ -25,7 +25,7 @@ class YaguBoguViewModel @Inject constructor(
 
     fun handleAutoLogin(onAppInitialized: () -> Unit) {
         viewModelScope.launch {
-            val isTokenValid: Boolean = tokenRepository.refreshTokens().isSuccess
+            val isTokenValid: Boolean = authRepository.refreshToken().isSuccess
             if (!isTokenValid) {
                 _autoLoginState.emit(AutoLoginState.Failure)
                 onAppInitialized()

@@ -11,57 +11,56 @@ import com.yagubogu.data.dto.response.member.MemberNicknameResponse
 import com.yagubogu.data.dto.response.member.MemberProfileResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlCompleteResponse
 import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.PATCH
-import retrofit2.http.POST
-import retrofit2.http.Path
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.PATCH
+import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Path
 
 interface MemberApiService {
     @GET("/api/v1/members/me")
-    suspend fun getMemberInfo(): Response<MemberInfoResponse>
+    suspend fun getMemberInfo(): MemberInfoResponse
 
     @GET("/api/v1/members/me/nickname")
-    suspend fun getNickname(): Response<MemberNicknameResponse>
+    suspend fun getNickname(): MemberNicknameResponse
 
     @PATCH("/api/v1/members/me/nickname")
     suspend fun patchNickname(
         @Body body: MemberNicknameRequest,
-    ): Response<MemberNicknameResponse>
+    ): MemberNicknameResponse
 
     @GET("/api/v1/members/favorites")
-    suspend fun getFavoriteTeam(): Response<MemberFavoriteResponse>
+    suspend fun getFavoriteTeam(): MemberFavoriteResponse
 
     @PATCH("/api/v1/members/favorites")
     suspend fun patchFavoriteTeam(
         @Body body: MemberFavoriteRequest,
-    ): Response<MemberFavoriteResponse>
+    ): MemberFavoriteResponse
 
     @DELETE("/api/v1/members/me")
-    suspend fun deleteMember(): Response<Unit>
+    suspend fun deleteMember()
 
     @GET("/api/v1/members/me/badges")
-    suspend fun getBadges(): Response<BadgeResponse>
+    suspend fun getBadges(): BadgeResponse
 
     @PATCH("/api/v1/members/me/badges/{badgeId}/representative")
     suspend fun patchRepresentativeBadge(
         @Path("badgeId") badgeId: Long,
-    ): Response<Unit>
+    )
 
     @POST("/api/v1/members/me/profile-image/pre-signed")
     suspend fun postPresignedUrl(
         @Body request: PresignedUrlStartRequest,
-    ): Response<PresignedUrlStartResponse>
+    ): PresignedUrlStartResponse
 
     @POST("/api/v1/members/me/profile-image/update")
     suspend fun postCompleteUpload(
         @Body request: PresignedUrlCompleteRequest,
-    ): Response<PresignedUrlCompleteResponse>
+    ): PresignedUrlCompleteResponse
 
     @GET("/api/v1/members/{memberId}")
     suspend fun getMemberProfile(
         @Path("memberId") memberId: Long,
-    ): Response<MemberProfileResponse>
+    ): MemberProfileResponse
 }

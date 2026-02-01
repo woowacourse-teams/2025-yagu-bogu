@@ -1,15 +1,14 @@
 package com.yagubogu.data.service
 
-import okhttp3.RequestBody
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.PUT
-import retrofit2.http.Url
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.PUT
+import de.jensklingenberg.ktorfit.http.Url
+import io.ktor.http.content.OutgoingContent
 
 interface ThirdPartyApiService {
     @PUT
     suspend fun putImageToS3(
         @Url url: String,
-        @Body requestBody: RequestBody,
-    ): Response<Unit>
+        @Body body: OutgoingContent,
+    )
 }

@@ -1,83 +1,67 @@
 package com.yagubogu.data.network
 
-import com.launchdarkly.eventsource.ConnectStrategy
-import com.launchdarkly.eventsource.EventSource
-import com.launchdarkly.eventsource.MessageEvent
-import com.launchdarkly.eventsource.background.BackgroundEventHandler
-import com.launchdarkly.eventsource.background.BackgroundEventSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import java.net.URI
+import com.yagubogu.data.dto.response.checkin.FanRateByGameDto
+import com.yagubogu.data.dto.response.stream.SseStreamResponse
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.sse.sse
+import io.ktor.sse.ServerSentEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
 
 class SseClient(
     private val baseUrl: String,
-    private val httpClient: OkHttpClient,
+    private val httpClient: HttpClient,
+    private val json: Json,
 ) {
-    private var eventSource: BackgroundEventSource? = null
+    fun connect(): Flow<SseStreamResponse> =
+        flow {
+            try {
+                httpClient.sse("$baseUrl$EVENT_STREAM_ENDPOINT") {
+                    Timber.d("SSE: Connection Opened")
+                    emit(SseStreamResponse.ConnectionOpened)
 
-    fun connect(sseHandler: SseHandler) {
-        if (eventSource == null) {
-            val eventHandler: BackgroundEventHandler = SseEventHandler(sseHandler)
-            eventSource =
-                BackgroundEventSource.Builder(eventHandler, getEventSource()).build()
-            eventSource?.start()
-        }
-    }
+                    incoming.collect { serverSentEvent: ServerSentEvent ->
+                        val eventType: String? = serverSentEvent.event
+                        val rawData: String = serverSentEvent.data ?: ""
 
-    fun disconnect() {
-        eventSource?.let { source ->
-            eventSource = null
-            CoroutineScope(Dispatchers.IO).launch {
-                source.close()
+                        val response: SseStreamResponse =
+                            when (eventType) {
+                                EVENT_CHECK_IN_CREATED -> parseCheckInCreated(rawData)
+                                EVENT_CONNECT -> SseStreamResponse.Connect(rawData)
+                                EVENT_TIMEOUT -> SseStreamResponse.Timeout(rawData)
+                                else -> SseStreamResponse.Comment(serverSentEvent.comments ?: "")
+                            }
+                        Timber.d("SSE: $response")
+                        emit(response)
+                    }
+                }
+            } catch (e: Exception) {
+                if (e !is CancellationException) {
+                    Timber.e("SSE error: $e")
+                    emit(SseStreamResponse.Error(e))
+                }
+            } finally {
+                Timber.d("SSE: Connection Closed")
+                emit(SseStreamResponse.ConnectionClosed)
             }
         }
-    }
 
-    private fun getEventSource(): EventSource.Builder =
-        EventSource
-            .Builder(
-                ConnectStrategy
-                    .http(URI.create("$baseUrl$EVENT_STREAM_ENDPOINT"))
-                    .httpClient(httpClient)
-                    .header(HEADER_ACCEPT, HEADER_ACCEPT_EVENT_STREAM),
-            )
-
-    private class SseEventHandler(
-        private val sseHandler: SseHandler,
-    ) : BackgroundEventHandler {
-        // SSE 연결 성공
-        override fun onOpen() {
-            sseHandler.onConnectionOpened()
+    private fun parseCheckInCreated(data: String): SseStreamResponse =
+        try {
+            val items: List<FanRateByGameDto> = json.decodeFromString(data)
+            SseStreamResponse.CheckInCreated(items)
+        } catch (e: Exception) {
+            SseStreamResponse.Error(e)
         }
-
-        // SSE 연결 종료
-        override fun onClosed() {
-            sseHandler.onConnectionClosed()
-        }
-
-        // SSE 이벤트 도착
-        override fun onMessage(
-            event: String,
-            messageEvent: MessageEvent,
-        ) {
-            sseHandler.onEventReceived(event, messageEvent.data)
-        }
-
-        // SSE 연결 오류 발생
-        override fun onError(t: Throwable) {
-            sseHandler.onError(t)
-        }
-
-        override fun onComment(comment: String) {
-            sseHandler.onComment(comment)
-        }
-    }
 
     companion object {
         private const val EVENT_STREAM_ENDPOINT = "/api/v1/event-stream"
-        private const val HEADER_ACCEPT = "Accept"
-        private const val HEADER_ACCEPT_EVENT_STREAM = "text/event-stream"
+
+        private const val EVENT_CHECK_IN_CREATED = "check-in-created"
+        private const val EVENT_CONNECT = "connect"
+        private const val EVENT_TIMEOUT = "timeout"
     }
 }
