@@ -69,8 +69,9 @@ fun NavigationRoot(
             entry<Route.FavoriteTeam> {
                 FavoriteTeamScreen(
                     onFavoriteTeamUpdate = {
-                        rootNavigator.navigate(Route.Main)
                         mainNavigator.navigate(BottomNavKey.Home)
+                        rootNavigator.navigate(Route.Main)
+                        rootNavigator.clearStack()
                     },
                 )
             }

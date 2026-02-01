@@ -37,7 +37,6 @@ fun YaguBoguRoute(
                     Route.Main,
                     Route.Login,
                     Route.FavoriteTeam,
-                    Route.Setting,
                 ),
         )
     val rootNavigator: Navigator = remember { Navigator(rootNavigationState) }
