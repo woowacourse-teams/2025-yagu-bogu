@@ -62,6 +62,7 @@ fun NavigationRoot(
                     onLogout = {
                         mainNavigator.navigate(BottomNavKey.Home)
                         settingNavigator.clearStack()
+                        rootNavigator.clearStack()
                         rootNavigator.navigate(Route.Login)
                     },
                 )
