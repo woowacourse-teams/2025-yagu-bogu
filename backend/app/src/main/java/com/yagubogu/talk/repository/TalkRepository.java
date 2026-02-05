@@ -90,13 +90,13 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             ),
             ranked AS (
               SELECT
-                DENSE_RANK() OVER (ORDER BY talkCount DESC) AS `rank`,
+                DENSE_RANK() OVER (ORDER BY talkCount DESC) AS rnk,
                 memberId,
                 talkCount
               FROM member_counts
             )
             SELECT
-              r.`rank` AS `rank`,
+              r.rnk AS rank_no,
               m.member_id AS memberId,
               m.nickname AS nickname,
               t.short_name AS favoriteTeam,
@@ -105,8 +105,8 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             FROM ranked r
             JOIN members m ON m.member_id = r.memberId
             JOIN teams t   ON t.team_id = m.team_id
-            WHERE r.`rank` <= :limit
-            ORDER BY r.`rank` ASC, m.member_id ASC
+            WHERE r.rnk <= :limit
+            ORDER BY r.rnk ASC, m.member_id ASC
             """, nativeQuery = true)
     List<LeaderboardRow> findChattiestWinner(@Param("limit") int limit);
 }
