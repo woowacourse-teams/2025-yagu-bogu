@@ -57,23 +57,17 @@ class ChattiestLeaderboardQueryTest {
     @Autowired
     private TalkReportFactory talkReportFactory;
 
-    private Team kia, kt, lg, samsung, doosan, lotte;
-    private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
+    private Team kia, lg;
+    private Stadium stadiumJamsil;
 
     @BeforeEach
     void setUp() {
         chattiestLeaderboardQuery = new ChattiestLeaderboardQuery(talkRepository);
 
         kia = teamRepository.findByTeamCode("HT").orElseThrow();
-        kt = teamRepository.findByTeamCode("KT").orElseThrow();
         lg = teamRepository.findByTeamCode("LG").orElseThrow();
-        samsung = teamRepository.findByTeamCode("SS").orElseThrow();
-        doosan = teamRepository.findByTeamCode("OB").orElseThrow();
-        lotte = teamRepository.findByTeamCode("LT").orElseThrow();
 
         stadiumJamsil = stadiumRepository.findById(2L).orElseThrow();
-        stadiumGocheok = stadiumRepository.findById(3L).orElseThrow();
-        stadiumIncheon = stadiumRepository.findById(7L).orElseThrow();
     }
 
     @DisplayName("2025년 수다쟁이: 신고된 톡은 제외하고, 공동 1등이면 모두 rank=1로 반환한다.")
