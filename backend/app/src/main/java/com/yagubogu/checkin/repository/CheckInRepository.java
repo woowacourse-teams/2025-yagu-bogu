@@ -7,6 +7,7 @@ import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -77,7 +78,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                  COUNT(*) AS checkInCount
                FROM check_ins ci
                JOIN games g ON g.game_id = ci.game_id
-               WHERE g.date >= '2025-01-01' AND g.date < '2026-01-01'
+               WHERE g.date >= :startAt AND g.date < :endAt
                GROUP BY ci.member_id
              ),
              ranked AS (
@@ -93,7 +94,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                m.nickname AS nickname,
                t.short_name AS favoriteTeam,
                m.image_url AS profileImageUrl,
-               r.checkInCount AS score
+               CAST(r.checkInCount AS DOUBLE) AS score
              FROM ranked r
              JOIN members m ON m.member_id = r.memberId
              JOIN teams t ON t.team_id = m.team_id
@@ -102,5 +103,9 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                AND m.team_id IS NOT NULL
              ORDER BY r.rnk ASC, m.member_id ASC
             """, nativeQuery = true)
-    List<LeaderboardRow> findMostCheckInWinner(@Param("limit") int limit);
+    List<LeaderboardRow> findMostCheckInWinner(
+            @Param("limit") int limit,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
+    );
 }

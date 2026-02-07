@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,19 +26,21 @@ public class LeaderboardService {
         }
     }
 
-    public LeaderboardResponse findTop(LeaderboardType type, int limit) {
-        LeaderboardQuery query = map.get(type);
-        if (query == null) {
-            // throw new
-        }
-
-        String label = type.getScoreLabel();
-
-        List<LeaderboardItemResponse> responses = query.findTop(limit).stream()
-                .map(r -> toItem(r, label))
+    public List<LeaderboardResponse> findAllTop(int limit) {
+        return java.util.Arrays.stream(LeaderboardType.values())
+                .map(type -> {
+                    LeaderboardQuery query = map.get(type);
+                    if (query == null) {
+                        return null; // todo throw new
+                    }
+                    String label = type.getScoreLabel();
+                    List<LeaderboardItemResponse> items = query.findTop(limit).stream()
+                            .map(r -> toItem(r, label))
+                            .toList();
+                    return LeaderboardResponse.of(type, items);
+                })
+                .filter(Objects::nonNull)
                 .toList();
-
-        return LeaderboardResponse.of(type, responses);
     }
 
     private LeaderboardItemResponse toItem(LeaderboardRow row, String label) {

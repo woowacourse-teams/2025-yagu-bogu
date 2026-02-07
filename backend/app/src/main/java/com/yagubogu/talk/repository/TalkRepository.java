@@ -78,7 +78,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
               FROM talks tk
               JOIN members m ON m.member_id = tk.member_id
               WHERE
-                tk.created_at >= '2025-01-01' AND tk.created_at < '2026-01-01'
+                tk.created_at >= :startAt AND tk.created_at < :endAt
                 AND m.deleted_at IS NULL
                 AND m.team_id IS NOT NULL
                 AND NOT EXISTS (
@@ -101,12 +101,16 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
               m.nickname AS nickname,
               t.short_name AS favoriteTeam,
               m.image_url AS profileImageUrl,
-              r.talkCount AS score
+              CAST(r.talkCount AS DOUBLE) AS score
             FROM ranked r
             JOIN members m ON m.member_id = r.memberId
             JOIN teams t   ON t.team_id = m.team_id
             WHERE r.rnk <= :limit
             ORDER BY r.rnk ASC, m.member_id ASC
             """, nativeQuery = true)
-    List<LeaderboardRow> findChattiestWinner(@Param("limit") int limit);
+    List<LeaderboardRow> findChattiestWinner(
+            @Param("limit") int limit,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
+    );
 }
