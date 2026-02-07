@@ -1,7 +1,9 @@
 package com.yagubogu.talk.repository;
 
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.talk.domain.Talk;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -66,5 +68,49 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
             @Param("memberId") long memberId,
             @Param("content") String content,
             @Param("threshold") LocalDateTime threshold
+    );
+
+    @Query(value = """
+            WITH member_counts AS (
+              SELECT
+                tk.member_id AS memberId,
+                COUNT(*) AS talkCount
+              FROM talks tk
+              JOIN members m ON m.member_id = tk.member_id
+              WHERE
+                tk.created_at >= :startAt AND tk.created_at < :endAt
+                AND m.deleted_at IS NULL
+                AND m.team_id IS NOT NULL
+                AND NOT EXISTS (
+                  SELECT 1
+                  FROM talk_reports tr
+                  WHERE tr.talk_id = tk.talk_id
+                )
+              GROUP BY tk.member_id
+            ),
+            ranked AS (
+              SELECT
+                DENSE_RANK() OVER (ORDER BY talkCount DESC) AS rnk,
+                memberId,
+                talkCount
+              FROM member_counts
+            )
+            SELECT
+              r.rnk AS rank_no,
+              m.member_id AS memberId,
+              m.nickname AS nickname,
+              t.short_name AS favoriteTeam,
+              m.image_url AS profileImageUrl,
+              CAST(r.talkCount AS DOUBLE) AS score
+            FROM ranked r
+            JOIN members m ON m.member_id = r.memberId
+            JOIN teams t   ON t.team_id = m.team_id
+            WHERE r.rnk <= :limit
+            ORDER BY r.rnk ASC, m.member_id ASC
+            """, nativeQuery = true)
+    List<LeaderboardRow> findChattiestWinner(
+            @Param("limit") int limit,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
     );
 }

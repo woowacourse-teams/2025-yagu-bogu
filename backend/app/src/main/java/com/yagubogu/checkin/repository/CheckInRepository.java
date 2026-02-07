@@ -3,9 +3,11 @@ package com.yagubogu.checkin.repository;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.leaderboard.dto.LeaderboardRow;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -68,4 +70,42 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
     );
 
     boolean existsByGameAndMember(Game game, Member member);
+
+    @Query(value = """
+            WITH member_counts AS (
+               SELECT
+                 ci.member_id AS memberId,
+                 COUNT(*) AS checkInCount
+               FROM check_ins ci
+               JOIN games g ON g.game_id = ci.game_id
+               WHERE g.date >= :startAt AND g.date < :endAt
+               GROUP BY ci.member_id
+             ),
+             ranked AS (
+               SELECT
+                 DENSE_RANK() OVER (ORDER BY mc.checkInCount DESC) AS rnk,
+                 mc.memberId,
+                 mc.checkInCount
+               FROM member_counts mc
+             )
+             SELECT
+               r.rnk AS rank_no,
+               m.member_id AS memberId,
+               m.nickname AS nickname,
+               t.short_name AS favoriteTeam,
+               m.image_url AS profileImageUrl,
+               CAST(r.checkInCount AS DOUBLE) AS score
+             FROM ranked r
+             JOIN members m ON m.member_id = r.memberId
+             JOIN teams t ON t.team_id = m.team_id
+             WHERE r.rnk <= :limit
+               AND m.deleted_at IS NULL
+               AND m.team_id IS NOT NULL
+             ORDER BY r.rnk ASC, m.member_id ASC
+            """, nativeQuery = true)
+    List<LeaderboardRow> findMostCheckInWinner(
+            @Param("limit") int limit,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
+    );
 }
