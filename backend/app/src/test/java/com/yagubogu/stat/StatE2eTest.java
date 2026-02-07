@@ -904,7 +904,7 @@ public class StatE2eTest extends E2eTestBase {
                 .date(LocalDate.of(2024, 5, 16))
                 .homeScore(6).awayScore(3)
                 .gameState(GameState.COMPLETED));
-        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
 
         // 2025년: 챔피언스필드 1승, 사직구장 2승
         Game g3 = gameFactory.save(b -> b.stadium(kia)
@@ -923,9 +923,9 @@ public class StatE2eTest extends E2eTestBase {
                 .homeScore(3).awayScore(6)
                 .gameState(GameState.COMPLETED));
 
-        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
         checkInFactory.save(b -> b.game(g3).member(member).team(ht));
         checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
 
         // when: year 파라미터 없이 요청
         LuckyStadiumResponse actual = RestAssured.given().log().all()
