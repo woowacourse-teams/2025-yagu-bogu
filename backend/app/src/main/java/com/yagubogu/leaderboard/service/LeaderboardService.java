@@ -1,5 +1,7 @@
 package com.yagubogu.leaderboard.service;
 
+import static java.util.Arrays.stream;
+
 import com.yagubogu.leaderboard.domain.LeaderboardType;
 import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
 import com.yagubogu.leaderboard.dto.LeaderboardResponse;
@@ -8,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +28,17 @@ public class LeaderboardService {
     }
 
     public List<LeaderboardResponse> findAllTop(int limit) {
-        return java.util.Arrays.stream(LeaderboardType.values())
+        return stream(LeaderboardType.values())
                 .map(type -> {
                     LeaderboardQuery query = map.get(type);
                     if (query == null) {
-                        return null; // todo throw new
+                        throw new IllegalStateException("No LeaderboardQuery registered for type:" + type);
                     }
                     List<LeaderboardItemResponse> items = query.findTop(limit).stream()
                             .map(this::toItem)
                             .toList();
                     return LeaderboardResponse.of(type, items);
                 })
-                .filter(Objects::nonNull)
                 .toList();
     }
 
