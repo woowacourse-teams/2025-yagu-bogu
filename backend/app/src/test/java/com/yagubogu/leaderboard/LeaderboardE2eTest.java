@@ -10,6 +10,7 @@ import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.leaderboard.domain.LeaderboardType;
 import com.yagubogu.leaderboard.dto.LeaderboardItemResponse;
 import com.yagubogu.leaderboard.dto.LeaderboardResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardsResponse;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
 import com.yagubogu.stadium.domain.Stadium;
@@ -112,7 +113,7 @@ public class LeaderboardE2eTest extends E2eTestBase {
         String token = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
 
         // when
-        LeaderboardResponse[] array = RestAssured.given().log().all()
+        LeaderboardsResponse wrapper = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .queryParam("limit", 1)
@@ -120,9 +121,9 @@ public class LeaderboardE2eTest extends E2eTestBase {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(LeaderboardResponse[].class);
+                .as(LeaderboardsResponse.class);
 
-        List<LeaderboardResponse> responses = Arrays.asList(array);
+        List<LeaderboardResponse> responses = wrapper.leaderboards();
 
         // then: 모든 타입이 포함되어 있고, MOST_CHECK_IN 1위는 fora
         assertThat(responses).hasSize(LeaderboardType.values().length);

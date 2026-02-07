@@ -1,13 +1,12 @@
 package com.yagubogu.leaderboard.controller.v1;
 
-import com.yagubogu.leaderboard.dto.LeaderboardResponse;
+import com.yagubogu.leaderboard.dto.LeaderboardsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,7 @@ public interface LeaderboardControllerInterface {
             @ApiResponse(responseCode = "204", description = "데이터 없음")
     })
     @GetMapping
-    ResponseEntity<List<LeaderboardResponse>> findAllTop(
+    ResponseEntity<LeaderboardsResponse> findAllTop(
             @RequestParam(name = "limit", defaultValue = "1") @Positive @Max(10) int limit
     );
 }
