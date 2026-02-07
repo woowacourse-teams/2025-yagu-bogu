@@ -33,9 +33,8 @@ public class LeaderboardService {
                     if (query == null) {
                         return null; // todo throw new
                     }
-                    String label = type.getScoreLabel();
                     List<LeaderboardItemResponse> items = query.findTop(limit).stream()
-                            .map(r -> toItem(r, label))
+                            .map(this::toItem)
                             .toList();
                     return LeaderboardResponse.of(type, items);
                 })
@@ -43,15 +42,14 @@ public class LeaderboardService {
                 .toList();
     }
 
-    private LeaderboardItemResponse toItem(LeaderboardRow row, String label) {
+    private LeaderboardItemResponse toItem(LeaderboardRow row) {
         return new LeaderboardItemResponse(
                 Math.toIntExact(row.rank()),
                 row.memberId(),
                 row.nickname(),
                 row.favoriteTeam(),
                 row.profileImageUrl(),
-                row.score(),
-                label
+                row.score()
         );
     }
 }

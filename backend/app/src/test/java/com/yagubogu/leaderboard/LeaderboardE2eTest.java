@@ -141,6 +141,5 @@ public class LeaderboardE2eTest extends E2eTestBase {
         assertThat(top.favoriteTeam()).isEqualTo(lotte.getShortName());
         assertThat(top.profileImageUrl()).isEqualTo(fora.getImageUrl());
         assertThat(top.score()).isEqualTo(2.0);
-        assertThat(top.scoreLabel()).isEqualTo(LeaderboardType.MOST_CHECK_IN.getScoreLabel());
     }
 }

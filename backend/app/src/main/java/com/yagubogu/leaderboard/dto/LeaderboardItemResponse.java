@@ -6,7 +6,6 @@ public record LeaderboardItemResponse(
         String nickname,
         String favoriteTeam,
         String profileImageUrl,
-        double score,
-        String scoreLabel
+        double score
 ) {
 }
