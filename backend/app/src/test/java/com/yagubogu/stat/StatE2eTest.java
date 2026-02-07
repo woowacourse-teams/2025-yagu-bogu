@@ -18,6 +18,7 @@ import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
+import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
 import com.yagubogu.stat.dto.v1.StatCountsResponse;
 import com.yagubogu.stat.dto.v1.WinRateResponse;
 import com.yagubogu.support.auth.AuthFactory;
@@ -756,5 +757,423 @@ public class StatE2eTest extends E2eTestBase {
             s.assertThat(ltRes.losses()).isEqualTo(1);
             s.assertThat(ltRes.winRate()).isEqualTo(50.0);
         });
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 승패무 횟수를 조회한다")
+    @Test
+    void findStatCounts_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년 경기 (2승 1무)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 10))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2024, 5, 11))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2024, 5, 12))
+                .homeScore(3).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 무
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+
+        // 2025년 경기 (2승 1패)
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(7).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g5 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(2).awayScore(5)
+                .gameState(GameState.COMPLETED));
+        Game g6 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(8).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
+
+        // when: year 파라미터 없이 요청
+        StatCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StatCountsResponse.class);
+
+        // then: 2024년(2승 0패 1무) + 2025년(2승 1패 0무) = 4승 1패 1무, 총 6경기
+        assertThat(actual).isEqualTo(new StatCountsResponse(4, 1, 1, 6));
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 직관 승률을 조회한다")
+    @Test
+    void findWinRate_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년 경기 (2승 1패)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 6, 10))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2024, 6, 11))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2024, 6, 12))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+
+        // 2025년 경기 (3승)
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(8).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g5 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(3).awayScore(6)
+                .gameState(GameState.COMPLETED));
+        Game g6 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(7).awayScore(5)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
+
+        // when: year 파라미터 없이 요청
+        WinRateResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/win-rate")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(WinRateResponse.class);
+
+        // then: 총 5승 1패 = 83.3%
+        assertThat(actual).isEqualTo(new WinRateResponse(83.3));
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 행운의 구장을 조회한다")
+    @Test
+    void findLuckyStadium_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년: 챔피언스필드 2승
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 15))
+                .homeScore(6).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 16))
+                .homeScore(6).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+
+        // 2025년: 챔피언스필드 1승, 사직구장 2승
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(5).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(7).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g5 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 12))
+                .homeScore(3).awayScore(6)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+
+        // when: year 파라미터 없이 요청
+        LuckyStadiumResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/lucky-stadiums")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LuckyStadiumResponse.class);
+
+        // then
+        assertThat(actual).isEqualTo(new LuckyStadiumResponse("챔피언스필드"));
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 평균 통계를 조회한다")
+    @Test
+    void findAverageStatistic_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년 경기
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 10))
+                .homeScore(6).awayScore(4)
+                .homeScoreBoard(new ScoreBoard(6, 10, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(4, 8, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2024, 5, 11))
+                .homeScore(5).awayScore(8)
+                .homeScoreBoard(new ScoreBoard(5, 9, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(8, 12, 1, 0,
+                        List.of("1", "0", "0", "2", "0", "0", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+
+        // 2025년 경기
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(10).awayScore(6)
+                .homeScoreBoard(new ScoreBoard(10, 14, 0, 0,
+                        List.of("2", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(6, 10, 2, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(4).awayScore(3)
+                .homeScoreBoard(new ScoreBoard(4, 8, 1, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .awayScoreBoard(new ScoreBoard(3, 7, 0, 0,
+                        List.of("0", "1", "2", "0", "0", "2", "0", "0", "0", "-", "-", "-")))
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+
+        // when: year 파라미터 없이 요청
+        AverageStatisticResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/me")
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(AverageStatisticResponse.class);
+
+        // then: 평균 득점 = (6+8+10+4)/4 = 7.0, 평균 실점 = (4+5+6+3)/4 = 4.5, 평균 실책 =
+        // (1+1+0+1)/4 = 0.75 → 0.8, 평균 안타 = (10+12+14+8)/4 = 11.0, 평균 피안타 =
+        // (8+9+10+7)/4 = 8.5
+        assertThat(actual).isEqualTo(new AverageStatisticResponse(7.0, 4.5, 0.8, 11.0, 8.5));
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 상대팀별 승률을 조회한다")
+    @Test
+    void findOpponentWinRate_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년: SS와 2승
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2024, 5, 10))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(sam)
+                .homeTeam(ss).awayTeam(ht)
+                .date(LocalDate.of(2024, 5, 11))
+                .homeScore(2).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+
+        // 2025년: LT와 1승 1패
+        Game g3 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 10))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g4 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 11))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+
+        // when
+        OpponentWinRateResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/win-rate/opponents")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(OpponentWinRateResponse.class);
+
+        // then
+        assertSoftly(s -> {
+            s.assertThat(actual.opponents()).hasSize(9);
+
+            // SS: 2승 0패 = 100%
+            OpponentWinRateTeamParam ssRes = actual.opponents().stream()
+                    .filter(r -> r.teamCode().equals("SS"))
+                    .findFirst().orElseThrow();
+            s.assertThat(ssRes.wins()).isEqualTo(2);
+            s.assertThat(ssRes.losses()).isEqualTo(0);
+            s.assertThat(ssRes.winRate()).isEqualTo(100.0);
+
+            // LT: 1승 1패 = 50%
+            OpponentWinRateTeamParam ltRes = actual.opponents().stream()
+                    .filter(r -> r.teamCode().equals("LT"))
+                    .findFirst().orElseThrow();
+            s.assertThat(ltRes.wins()).isEqualTo(1);
+            s.assertThat(ltRes.losses()).isEqualTo(1);
+            s.assertThat(ltRes.winRate()).isEqualTo(50.0);
+        });
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 최근 10경기 승률을 조회한다")
+    @Test
+    void findRecentTenGamesWinRate_withoutYear() {
+        // given
+        Member member = memberFactory.save(b -> b.team(ht));
+        accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년 경기 (3승 2패)
+        Game g1 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g2 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2024, 5, 2))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g3 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2024, 5, 3))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+        Game g4 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 4))
+                .homeScore(5).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g5 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2024, 5, 5))
+                .homeScore(6).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+
+        checkInFactory.save(b -> b.game(g1).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g2).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g3).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g4).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g5).member(member).team(ht));
+
+        // 2025년 경기 (4승 3패) - 최근 10경기에 포함
+        Game g6 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 1))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game g7 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2025, 7, 2))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g8 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 3))
+                .homeScore(7).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+        Game g9 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2025, 7, 4))
+                .homeScore(5).awayScore(4)
+                .gameState(GameState.COMPLETED));
+        Game g10 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 5))
+                .homeScore(8).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+        Game g11 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(ss)
+                .date(LocalDate.of(2025, 7, 6))
+                .homeScore(6).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        Game g12 = gameFactory.save(b -> b.stadium(lot)
+                .homeTeam(lt).awayTeam(ht)
+                .date(LocalDate.of(2025, 7, 7))
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED)); // 패
+
+        checkInFactory.save(b -> b.game(g6).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g7).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g8).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g9).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g10).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g11).member(member).team(ht));
+        checkInFactory.save(b -> b.game(g12).member(member).team(ht));
+
+        // when: year 파라미터 없이 요청
+        RecentGamesWinRateResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/stats/win-rate/recent")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(RecentGamesWinRateResponse.class);
+
+        // then: 최근 10경기(g3-g12) 중 5승 5패 = 50.0%
+        assertThat(actual.winRate()).isEqualTo(50.0);
     }
 }
