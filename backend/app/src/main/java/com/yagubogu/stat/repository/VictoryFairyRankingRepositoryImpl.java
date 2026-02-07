@@ -32,7 +32,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     public Optional<VictoryFairyRankParam> findByMemberAndTeamFilterAndYear(
             final Member member,
             final TeamFilter teamFilter,
-            final int year
+            final Integer year
     ) {
         QVictoryFairyRanking V2 = new QVictoryFairyRanking("v2");
         QMember M2 = new QMember("m2");
@@ -63,7 +63,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 .join(VICTORY_FAIRY_RANKING.member, MEMBER)
                 .join(MEMBER.team, TEAM)
                 .where(
-                        VICTORY_FAIRY_RANKING.gameYear.eq(year),
+                        filterByYear(VICTORY_FAIRY_RANKING, year),
                         VICTORY_FAIRY_RANKING.member.eq(member),
                         filterByTeam(teamFilter, TEAM)
                 )
@@ -116,7 +116,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
     }
 
     @Override
-    public Optional<Long> findRankWithinTeamByMemberAndYear(final Member member, final int year) {
+    public Optional<Long> findRankWithinTeamByMemberAndYear(final Member member, final Integer year) {
         // 1. 멤버에게 응원팀이 없으면 랭킹 계산 불가
         if (member.getTeam() == null) {
             return Optional.empty();
@@ -128,7 +128,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 .from(VICTORY_FAIRY_RANKING)
                 .where(
                         VICTORY_FAIRY_RANKING.member.eq(member),
-                        VICTORY_FAIRY_RANKING.gameYear.eq(year)
+                        filterByYear(VICTORY_FAIRY_RANKING, year)
                 )
                 .fetchOne();
 
@@ -148,7 +148,7 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
                 .join(ranking.member, qMember)
                 .where(
                         qMember.team.eq(member.getTeam()),
-                        ranking.gameYear.eq(year),
+                        filterByYear(ranking, year),
                         ranking.score.gt(memberScore)
                 )
                 .fetchOne()).orElse(0L);
@@ -164,5 +164,12 @@ public class VictoryFairyRankingRepositoryImpl implements VictoryFairyRankingRep
         }
 
         return team.teamCode.eq(teamFilter.name());
+    }
+
+    private BooleanExpression filterByYear(final QVictoryFairyRanking victoryFairyRanking, final Integer year) {
+        if (year == null) {
+            return null;
+        }
+        return victoryFairyRanking.gameYear.eq(year);
     }
 }

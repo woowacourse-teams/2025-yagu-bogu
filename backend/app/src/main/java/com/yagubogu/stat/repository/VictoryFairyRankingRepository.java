@@ -78,7 +78,7 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
                 JOIN
                     teams t ON t.team_id = m.team_id
                 WHERE
-                    vfr.game_year = :gameYear
+                    (:gameYear IS NULL OR vfr.game_year = :gameYear)
                     AND m.deleted_at IS NULL
                     AND m.team_id IS NOT NULL
                     AND (:#{#teamFilter.name()} = 'ALL' OR t.team_code = :#{#teamFilter.name()})
@@ -91,6 +91,6 @@ public interface VictoryFairyRankingRepository extends JpaRepository<VictoryFair
     List<VictoryFairyRankParam> findTopRankingByTeamFilterAndYear(
             @Param("teamFilter") TeamFilter teamFilter,
             @Param("limit") int limit,
-            @Param("gameYear") int gameYear
+            @Param("gameYear") Integer gameYear
     );
 }

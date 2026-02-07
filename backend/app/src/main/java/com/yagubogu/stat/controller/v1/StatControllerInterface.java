@@ -32,7 +32,7 @@ public interface StatControllerInterface {
     @GetMapping("/counts")
     ResponseEntity<StatCountsResponse> findStatCounts(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     );
 
     @Operation(summary = "내 팀 인증 승률 조회", description = "내 팀의 해당 연도 인증 승률을 조회합니다.")
@@ -44,7 +44,7 @@ public interface StatControllerInterface {
     @GetMapping("/win-rate")
     ResponseEntity<WinRateResponse> findWinRate(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     );
 
     @Operation(summary = "내 팀 최근 10경기 인증 승률 조회", description = "내 팀의 최근 10경기 인증 승률을 조회합니다.")
@@ -56,7 +56,7 @@ public interface StatControllerInterface {
     @GetMapping("/win-rate/recent")
     ResponseEntity<RecentGamesWinRateResponse> findRecentTenGamesWinRate(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     );
 
     @Operation(summary = "행운의 야구장 조회", description = "해당 연도에서 승률이 가장 높은 야구장을 조회합니다.")
@@ -68,7 +68,7 @@ public interface StatControllerInterface {
     @GetMapping("/lucky-stadiums")
     ResponseEntity<LuckyStadiumResponse> findLuckyStadiums(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     );
 
     @Operation(summary = "평균 득, 실, 안타, 피안타, 실책 조회", description = "멤버의 전체 경기의 평균 통계 정보를 조회합니다.")
@@ -79,7 +79,7 @@ public interface StatControllerInterface {
     @GetMapping("/me")
     ResponseEntity<AverageStatisticResponse> findAverageStatistic(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam final Integer year
+            @RequestParam(required = false) final Integer year
     );
 
     @Operation(summary = "상대 팀별 승률 조회", description = "상대 팀별 승률 정보 및 전적 정보를 조회합니다.")
@@ -90,7 +90,7 @@ public interface StatControllerInterface {
     @GetMapping("/win-rate/opponents")
     ResponseEntity<OpponentWinRateResponse> findOpponentWinRate(
             @Parameter(hidden = true) MemberClaims memberClaim,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     );
 
     @Operation(summary = "승리 요정 랭킹 조회", description = "전체 유저 중 상위 승리 요정을 조회합니다.")

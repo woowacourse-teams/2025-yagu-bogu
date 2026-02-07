@@ -2,7 +2,7 @@ package com.yagubogu.stat.dto;
 
 public record StadiumStatsParam(
         String stadiumName,
-        long winCounts,
-        long totalCountsWithoutDraw
+        int winCounts,
+        int totalCountsWithoutDraw
 ) {
 }

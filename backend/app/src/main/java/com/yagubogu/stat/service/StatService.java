@@ -51,7 +51,7 @@ public class StatService {
     private final MemberRepository memberRepository;
     private final VictoryFairyRankingRepository victoryFairyRankingRepository;
 
-    public StatCountsResponse findStatCounts(final long memberId, final int year) {
+    public StatCountsResponse findStatCounts(final long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
 
@@ -67,7 +67,7 @@ public class StatService {
         );
     }
 
-    public WinRateResponse findWinRate(final long memberId, final int year) {
+    public WinRateResponse findWinRate(final long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
 
@@ -78,7 +78,7 @@ public class StatService {
         return new WinRateResponse(calculateWinRate(winCounts, favoriteCheckInCounts));
     }
 
-    public RecentGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final int year) {
+    public RecentGamesWinRateResponse findRecentTenGamesWinRate(final Long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
 
@@ -89,14 +89,13 @@ public class StatService {
         return new RecentGamesWinRateResponse(calculateWinRate(recentWinCounts, recentCounts));
     }
 
-    public LuckyStadiumResponse findLuckyStadium(final long memberId, final int year) {
+    public LuckyStadiumResponse findLuckyStadium(final long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
 
         List<StadiumStatsParam> stadiumStats = checkInRepository.findWinAndNonDrawCountByStadium(
                 memberId,
-                LocalDate.of(year, 1, 1),
-                LocalDate.of(year, 12, 31)
+                year
         );
         String luckyStadiumName = getLuckyStadiumName(stadiumStats);
 
@@ -110,7 +109,7 @@ public class StatService {
         return AverageStatisticResponse.from(averageStatisticParam);
     }
 
-    public OpponentWinRateResponse findOpponentWinRate(final Long memberId, final int year) {
+    public OpponentWinRateResponse findOpponentWinRate(final Long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
         Team team = member.getTeam();
@@ -162,9 +161,6 @@ public class StatService {
             final TeamFilter teamFilter,
             Integer year
     ) {
-        if (year == null) {
-            year = LocalDate.now().getYear();
-        }
         Member member = getMember(memberId);
         List<VictoryFairyRankingParam> topRankingResponses = findTopVictoryRanking(teamFilter, year);
 
@@ -182,7 +178,7 @@ public class StatService {
 
     private List<VictoryFairyRankingParam> findTopVictoryRanking(
             final TeamFilter teamFilter,
-            final int year
+            final Integer year
     ) {
         List<VictoryFairyRankParam> victoryFairyRankings = victoryFairyRankingRepository.findTopRankingByTeamFilterAndYear(
                 teamFilter,

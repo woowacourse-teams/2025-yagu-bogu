@@ -25,7 +25,7 @@ public class StatController implements StatControllerInterface {
 
     public ResponseEntity<StatCountsResponse> findStatCounts(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         StatCountsResponse response = statService.findStatCounts(memberClaims.id(), year);
 
@@ -34,7 +34,7 @@ public class StatController implements StatControllerInterface {
 
     public ResponseEntity<WinRateResponse> findWinRate(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         WinRateResponse response = statService.findWinRate(memberClaims.id(), year);
 
@@ -43,7 +43,7 @@ public class StatController implements StatControllerInterface {
 
     public ResponseEntity<RecentGamesWinRateResponse> findRecentTenGamesWinRate(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         RecentGamesWinRateResponse response = statService.findRecentTenGamesWinRate(memberClaims.id(), year);
 
@@ -52,7 +52,7 @@ public class StatController implements StatControllerInterface {
 
     public ResponseEntity<LuckyStadiumResponse> findLuckyStadiums(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         LuckyStadiumResponse response = statService.findLuckyStadium(memberClaims.id(), year);
 
@@ -70,7 +70,7 @@ public class StatController implements StatControllerInterface {
 
     public ResponseEntity<OpponentWinRateResponse> findOpponentWinRate(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         OpponentWinRateResponse response = statService.findOpponentWinRate(memberClaims.id(), year);
 
