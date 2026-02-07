@@ -56,7 +56,7 @@ public interface CheckInControllerInterface {
     @GetMapping("/members")
     ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam final int year,
+            @RequestParam(required = false) final Integer year,
             @RequestParam(required = false) final Integer month,
             @RequestParam(name = "result", defaultValue = "ALL") CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") CheckInOrderFilter orderFilter
@@ -92,6 +92,6 @@ public interface CheckInControllerInterface {
     @GetMapping("/stadiums/counts")
     ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
             @Parameter(hidden = true) MemberClaims memberClaims,
-            @RequestParam int year
+            @RequestParam(required = false) Integer year
     );
 }

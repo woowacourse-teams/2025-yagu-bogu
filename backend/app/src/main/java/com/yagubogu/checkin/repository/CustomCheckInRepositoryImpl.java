@@ -237,7 +237,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     public List<CheckInGameParam> findCheckInHistory(
             final Member member,
             final Team team,
-            final int year,
+            final Integer year,
             final Integer month,
             final CheckInResultFilter resultFilter,
             final CheckInOrderFilter orderFilter
@@ -355,7 +355,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
     public List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
-            int year
+            Integer year
     ) {
         return jpaQueryFactory
                 .select(
@@ -656,21 +656,27 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return checkIn.team.eq(member.getTeam());
     }
 
-    private Predicate dateFilter(final QGame game, final int year, final Integer month) {
+    private Predicate dateFilter(final QGame game, final Integer year, final Integer month) {
         if (month == null) {
             return isBetweenYear(game, year);
         }
         return isBetweenYearMonth(game, year, month);
     }
 
-    private BooleanExpression isBetweenYear(final QGame game, final int year) {
+    private BooleanExpression isBetweenYear(final QGame game, final Integer year) {
+        if (year == null) {
+            return null;
+        }
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
         return game.date.between(start, end);
     }
 
-    private BooleanExpression isBetweenYearMonth(final QGame game, final int year, final int month) {
+    private BooleanExpression isBetweenYearMonth(final QGame game, final Integer year, final int month) {
+        if (year == null) {
+            return null;
+        }
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = yearMonth.atEndOfMonth();

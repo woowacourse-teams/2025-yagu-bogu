@@ -28,7 +28,6 @@ import com.yagubogu.sse.dto.GameWithFanRateParam;
 import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -94,7 +93,7 @@ public class CheckInService {
 
     public CheckInHistoryResponse findCheckInHistory(
             final long memberId,
-            final int year,
+            final Integer year,
             final Integer month,
             final CheckInResultFilter resultFilter,
             final CheckInOrderFilter orderFilter
@@ -114,7 +113,7 @@ public class CheckInService {
     }
 
 
-    public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final int year) {
+    public StadiumCheckInCountsResponse findStadiumCheckInCounts(final long memberId, final Integer year) {
         Member member = getMember(memberId);
         List<StadiumCheckInCountParam> stadiumCheckInCounts = checkInRepository.findStadiumCheckInCounts(member,
                 year);

@@ -47,7 +47,7 @@ public class CheckInController implements CheckInControllerInterface {
     @Override
     public ResponseEntity<CheckInHistoryResponse> findCheckInHistory(
             final MemberClaims memberClaims,
-            @RequestParam final int year,
+            @RequestParam(required = false) final Integer year,
             @RequestParam(required = false) final Integer month,
             @RequestParam(name = "result", defaultValue = "ALL") final CheckInResultFilter resultFilter,
             @RequestParam(name = "order", defaultValue = "LATEST") final CheckInOrderFilter orderFilter
@@ -83,7 +83,7 @@ public class CheckInController implements CheckInControllerInterface {
 
     public ResponseEntity<StadiumCheckInCountsResponse> findStadiumCheckInCount(
             final MemberClaims memberClaims,
-            @RequestParam final int year
+            @RequestParam(required = false) final Integer year
     ) {
         StadiumCheckInCountsResponse response = checkInService.findStadiumCheckInCounts(memberClaims.id(), year);
 

@@ -34,7 +34,7 @@ public interface CustomCheckInRepository {
     List<CheckInGameParam> findCheckInHistory(
             Member member,
             Team team,
-            int year,
+            Integer year,
             Integer month,
             CheckInResultFilter resultFilter,
             CheckInOrderFilter orderFilter
@@ -46,7 +46,7 @@ public interface CustomCheckInRepository {
 
     List<StadiumCheckInCountParam> findStadiumCheckInCounts(
             Member member,
-            int year
+            Integer year
     );
 
     List<OpponentWinRateRowParam> findOpponentWinRates(
