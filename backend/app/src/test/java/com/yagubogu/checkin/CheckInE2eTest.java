@@ -32,7 +32,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -590,5 +589,119 @@ public class CheckInE2eTest extends E2eTestBase {
             Member member = memberFactory.save(b -> b.team(team));
             checkInFactory.save(b -> b.member(member).team(team).game(game));
         }
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 구장별 방문 횟수를 조회한다")
+    @Test
+    void findStadiumCheckInCounts_withoutYear() {
+        // given
+        Member member = memberFactory.save(MemberBuilder::build);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // 2024년: 잠실 1회
+        Game game2024 = gameFactory.save(builder -> builder
+                .date(LocalDate.of(2024, 7, 10))
+                .stadium(stadiumJamsil)
+                .homeTeam(samsung)
+                .awayTeam(doosan));
+        checkInFactory.save(builder -> builder.game(game2024).member(member).team(samsung));
+
+        // 2025년: 잠실 1회, 고척 1회
+        Game game2025Jamsil = gameFactory.save(builder -> builder
+                .date(LocalDate.of(2025, 7, 20))
+                .stadium(stadiumJamsil)
+                .homeTeam(samsung)
+                .awayTeam(doosan));
+        Game game2025Gocheok = gameFactory.save(builder -> builder
+                .date(LocalDate.of(2025, 7, 21))
+                .stadium(stadiumGocheok)
+                .homeTeam(kia)
+                .awayTeam(kt));
+        checkInFactory.save(builder -> builder.game(game2025Jamsil).member(member).team(samsung));
+        checkInFactory.save(builder -> builder.game(game2025Gocheok).member(member).team(kia));
+
+        StadiumCheckInCountsResponse expected = new StadiumCheckInCountsResponse(
+                List.of(
+                        new StadiumCheckInCountParam(1L, "광주", 0L),
+                        new StadiumCheckInCountParam(2L, "잠실", 2L), // 2024년 1회 + 2025년 1회
+                        new StadiumCheckInCountParam(3L, "고척", 1L), // 2025년 1회
+                        new StadiumCheckInCountParam(4L, "수원", 0L),
+                        new StadiumCheckInCountParam(5L, "대구", 0L),
+                        new StadiumCheckInCountParam(6L, "사직", 0L),
+                        new StadiumCheckInCountParam(7L, "문학", 0L),
+                        new StadiumCheckInCountParam(8L, "창원", 0L),
+                        new StadiumCheckInCountParam(9L, "대전", 0L)));
+
+        // when: year 파라미터 없이 요청
+        StadiumCheckInCountsResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/check-ins/stadiums/counts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(StadiumCheckInCountsResponse.class);
+
+        // then: 전체 기간 집계 확인
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("year가 주어지지 않으면 전체 기간의 직관 내역을 조회한다")
+    @Test
+    void findCheckInHistory_withoutYear() {
+        // given
+        Member fora = memberFactory.save(b -> b.team(kia));
+        String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
+
+        // 2024년 경기
+        Game game2024_1 = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
+                .date(LocalDate.of(2024, 6, 15))
+                .gameState(GameState.COMPLETED)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2024_2 = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
+                .date(LocalDate.of(2024, 7, 25))
+                .gameState(GameState.COMPLETED)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game2024_1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2024_2).team(kia).member(fora));
+
+        // 2025년 경기
+        Game game2025_1 = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
+                .date(LocalDate.of(2025, 6, 10))
+                .gameState(GameState.COMPLETED)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2025_2 = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
+                .date(LocalDate.of(2025, 7, 15))
+                .gameState(GameState.COMPLETED)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+        Game game2025_3 = gameFactory.save(builder -> builder.stadium(stadiumJamsil)
+                .date(LocalDate.of(2025, 8, 5))
+                .gameState(GameState.COMPLETED)
+                .homeTeam(kt).homeScore(10).homeScoreBoard(TestFixture.getHomeScoreBoard())
+                .awayTeam(kia).awayScore(1).awayScoreBoard(TestFixture.getAwayScoreBoard()));
+
+        checkInFactory.save(b -> b.game(game2025_1).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2025_2).team(kia).member(fora));
+        checkInFactory.save(b -> b.game(game2025_3).team(kia).member(fora));
+
+        // when: year 파라미터 없이 요청
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("result", CheckInResultFilter.ALL)
+                .queryParam("order", CheckInOrderFilter.LATEST)
+                .when().get("/api/v1/check-ins/members")
+                .then().log().all()
+                .statusCode(200)
+                .extract();
+
+        // then: 전체 기간(5경기) 조회 확인
+        CheckInHistoryResponse result = response.as(CheckInHistoryResponse.class);
+        assertThat(result.checkInHistory()).hasSize(5);
     }
 }
