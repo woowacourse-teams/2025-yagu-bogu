@@ -3,6 +3,7 @@ package com.yagubogu.game.service;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.SeasonStatusResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
@@ -40,6 +41,23 @@ public class GameService {
         validateScoreBoard(game);
 
         return GameResultParam.from(game);
+    }
+
+    public SeasonStatusResponse getSeasonStatus(final Integer requestedYear) {
+        LocalDate now = LocalDate.now();
+        int year = (requestedYear != null) ? requestedYear : now.getYear();
+
+        LocalDate lastGameDate = findLastAvailableGameDate(year);
+        if (lastGameDate == null) {
+            return new SeasonStatusResponse(false, year - 1);
+        }
+
+        return new SeasonStatusResponse(true, year);
+    }
+
+    private LocalDate findLastAvailableGameDate(final int year) {
+        return gameRepository.findLastGameDateByYear(year)
+                .orElse(null);
     }
 
     private static void validateScoreBoard(final Game game) {
