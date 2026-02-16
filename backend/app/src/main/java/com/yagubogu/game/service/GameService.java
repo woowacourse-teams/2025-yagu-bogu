@@ -52,7 +52,8 @@ public class GameService {
             return new SeasonStatusResponse(false, year - 1);
         }
 
-        return new SeasonStatusResponse(true, year);
+        boolean isOpened = !now.isAfter(lastGameDate.plusDays(7));
+        return new SeasonStatusResponse(isOpened, year);
     }
 
     private LocalDate findLastAvailableGameDate(final int year) {

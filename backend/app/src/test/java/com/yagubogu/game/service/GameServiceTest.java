@@ -208,6 +208,41 @@ class GameServiceTest {
         });
     }
 
+    @DisplayName("Season status: within 7 days after last game, still opened")
+    @Test
+    void getSeasonStatus_WhenWithinGracePeriod() {
+        // given
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+                makeGame(now.minusDays(3), "SS", "HH", "잠실구장");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(year);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isTrue();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(year);
+        });
+    }
+
+    @DisplayName("Season status: if the season already ended, isOpened is false")
+    @Test
+    void getSeasonStatus_WhenSeasonEnded() {
+        // given
+        int lastYear = LocalDate.now().getYear() - 1;
+                makeGame(LocalDate.of(lastYear, 10, 1), "SS", "HH", "잠실구장");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(lastYear);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isFalse();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(lastYear);
+        });
+    }
+
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
         Team homeTeam = getTeamByCode(homeCode);
         Team awayTeam = getTeamByCode(awayCode);
