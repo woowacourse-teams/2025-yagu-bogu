@@ -59,10 +59,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
-    public StatCountsParam findStatCounts(final Member member, final int year) {
-        LocalDate start = LocalDate.of(year, 1, 1);
-        LocalDate end = LocalDate.of(year, 12, 31);
-
+    public StatCountsParam findStatCounts(final Member member, final Integer year) {
         NumberExpression<Integer> winExpr = new CaseBuilder().when(winCondition(CHECK_IN, GAME)).then(1).otherwise(0);
         NumberExpression<Integer> drawExpr = new CaseBuilder().when(drawCondition(CHECK_IN, GAME)).then(1).otherwise(0);
         NumberExpression<Integer> loseExpr = new CaseBuilder().when(loseCondition(CHECK_IN, GAME)).then(1).otherwise(0);
@@ -70,14 +67,14 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.select(
                         Projections.constructor(
                                 StatCountsParam.class,
-                                winExpr.sum(),
-                                drawExpr.sum(),
-                                loseExpr.sum()
+                                winExpr.sum().coalesce(0),
+                                drawExpr.sum().coalesce(0),
+                                loseExpr.sum().coalesce(0)
                         )).from(CHECK_IN)
                 .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
                 .where(
                         CHECK_IN.member.eq(member),
-                        GAME.date.between(start, end),
+                        isBetweenYear(year),
                         isMyCurrentFavorite(member, CHECK_IN)
                 ).fetchOne();
     }

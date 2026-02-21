@@ -18,7 +18,7 @@ public interface CustomCheckInRepository {
 
     LocalDate findRecentCheckInGameDate(Member member);
 
-    StatCountsParam findStatCounts(Member member, int year);
+    StatCountsParam findStatCounts(Member member, Integer year);
 
     int findWinCounts(Member member, int year);
 

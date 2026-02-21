@@ -193,7 +193,7 @@ public class StatService {
         return VictoryFairyRankingParam.from(victoryFairyRankings);
     }
 
-    public CheckInSummaryParam findCheckInSummary(final long memberId, final int year) {
+    public CheckInSummaryParam findCheckInSummary(final long memberId, final Integer year) {
         Member member = getMember(memberId);
         validateUser(member);
 

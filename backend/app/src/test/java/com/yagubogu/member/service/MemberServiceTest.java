@@ -49,6 +49,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -474,7 +475,7 @@ public class MemberServiceTest {
                 .build()
         );
         CheckInSummaryParam fakeSummary = new CheckInSummaryParam(14, 75.0, 9, 0, 4, LocalDate.of(2025, 7, 24));
-        when(statService.findCheckInSummary(anyLong(), anyInt())).thenReturn(fakeSummary);
+        when(statService.findCheckInSummary(anyLong(), any())).thenReturn(fakeSummary);
         VictoryFairySummaryParam fakeVictorySummary = new VictoryFairySummaryParam(5L, 1L, 90.0);
         when(statService.findVictoryFairySummary(anyLong(), anyInt())).thenReturn(fakeVictorySummary);
         MemberProfileBadgeResponse expectedBadgeResponse = MemberProfileBadgeResponse.from(

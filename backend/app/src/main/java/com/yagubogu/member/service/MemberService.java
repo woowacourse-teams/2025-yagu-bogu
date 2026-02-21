@@ -168,11 +168,10 @@ public class MemberService {
 
     public MemberProfileResponse findMemberProfile(final Long profileOwnerId) {
         Member profileOwnerMember = getMember(profileOwnerId);
-        int currentYear = LocalDate.now().getYear();
-
+        int year = LocalDate.now().getYear();
         MemberProfileBadgeResponse badgeResponse = createBadgeResponse(profileOwnerMember);
-        VictoryFairyProfileResponse victoryFairyResponse = createVictoryFairyResponse(profileOwnerId, currentYear);
-        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, currentYear);
+        VictoryFairyProfileResponse victoryFairyResponse = createVictoryFairyResponse(profileOwnerId, year);
+        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, null);
 
         return MemberProfileResponse.from(
                 profileOwnerMember,
@@ -186,11 +185,11 @@ public class MemberService {
         return MemberProfileBadgeResponse.from(member.getRepresentativeBadge());
     }
 
-    private VictoryFairyProfileResponse createVictoryFairyResponse(final Long memberId, final int year) {
+    private VictoryFairyProfileResponse createVictoryFairyResponse(final Long memberId, final Integer year) {
         return VictoryFairyProfileResponse.from(statService.findVictoryFairySummary(memberId, year));
     }
 
-    private MemberCheckInResponse createCheckInResponse(final Long memberId, final int year) {
+    private MemberCheckInResponse createCheckInResponse(final Long memberId, final Integer year) {
         return MemberCheckInResponse.from(statService.findCheckInSummary(memberId, year));
     }
 

@@ -4,6 +4,8 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.badge.domain.Badge;
 import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.badge.repository.BadgeRepository;
+import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -12,15 +14,21 @@ import com.yagubogu.member.dto.v1.MemberFavoriteResponse;
 import com.yagubogu.member.dto.v1.MemberInfoResponse;
 import com.yagubogu.member.dto.v1.MemberNicknameRequest;
 import com.yagubogu.member.dto.v1.MemberNicknameResponse;
+import com.yagubogu.member.dto.v1.MemberProfileResponse;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
 import com.yagubogu.support.auth.AuthFactory;
 import com.yagubogu.support.badge.MemberBadgeFactory;
 import com.yagubogu.support.base.E2eTestBase;
+import com.yagubogu.support.checkin.CheckInFactory;
+import com.yagubogu.support.game.GameFactory;
 import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,10 +53,19 @@ public class MemberE2eTest extends E2eTestBase {
     private AuthFactory authFactory;
 
     @Autowired
+    private GameFactory gameFactory;
+
+    @Autowired
+    private CheckInFactory checkInFactory;
+
+    @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
     private BadgeRepository badgeRepository;
+
+    @Autowired
+    private StadiumRepository stadiumRepository;
 
     @Autowired
     private MemberBadgeFactory memberBadgeFactory;
@@ -297,31 +314,69 @@ public class MemberE2eTest extends E2eTestBase {
                 .statusCode(404);
     }
 
-    @DisplayName("사용자의 프로필 정보를 조회한다")
+    @DisplayName("사용자의 프로필 정보를 조회할 때, 연도와 상관없이 전체 직관 통계를 합산하여 보여준다")
     @Test
-    void findProfileInformation() {
-        // given
-        Team team = teamRepository.findByTeamCode("HT").orElseThrow();
+    void findProfileInformationWithAllYears() {
+        // 1. Given: 기본 환경 설정 (팀, 경기장, 멤버)
+        Team ht = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team lt = teamRepository.findByTeamCode("LT").orElseThrow();
+        Stadium kia = stadiumRepository.findByShortName("챔피언스필드").orElseThrow();
         Badge badge = badgeRepository.findByPolicy(Policy.SIGN_UP).getFirst();
-        Member me = memberFactory.save(builder ->
-                builder.nickname("우가")
-                        .team(team)
-        );
-        Member profileOwneredMember = memberFactory.save(builder -> builder.nickname("가짜우가")
-                .team(team)
-                .representativeBadge(badge)
-                .build()
-        );
+
+        Member me = memberFactory.save(b -> b.nickname("우가").team(ht));
+        Member profileOwner = memberFactory.save(b -> b.nickname("가짜우가")
+                .team(ht)
+                .representativeBadge(badge));
+
         String accessToken = authFactory.getAccessTokenByMemberId(me.getId(), Role.USER);
 
-        // when
-        RestAssured.given().log().all()
+        // 2. Given: 직관 데이터 생성 (과거 연도와 현재 연도 섞기)
+        // 2024년 데이터 (1승)
+        Game g2024 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2024, 5, 20))
+                .homeScore(5).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2024).member(profileOwner).team(ht));
+
+        // 2026년 데이터 (1승 1패)
+        Game g2026_win = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2026, 2, 10))
+                .homeScore(3).awayScore(1)
+                .gameState(GameState.COMPLETED));
+        Game g2026_lose = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(ht).awayTeam(lt)
+                .date(LocalDate.of(2026, 2, 15)) // 가장 최근 경기
+                .homeScore(1).awayScore(4)
+                .gameState(GameState.COMPLETED));
+
+        checkInFactory.save(b -> b.game(g2026_win).member(profileOwner).team(ht));
+        checkInFactory.save(b -> b.game(g2026_lose).member(profileOwner).team(ht));
+
+        // 3. When: 프로필 조회 API 호출
+        var response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParam("memberId", profileOwneredMember.getId())
+                .pathParam("memberId", profileOwner.getId())
                 .when().get("/api/v1/members/{memberId}")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract().as(MemberProfileResponse.class);
+
+        // 4. Then: 데이터 검증 (2024년 + 2026년 통계가 합산되었는지 확인)
+        assertSoftly(softly -> {
+            softly.assertThat(response.nickname()).isEqualTo("가짜우가");
+            // 전체 직관 횟수: 3 (2024년 1건 + 2026년 2건)
+            softly.assertThat(response.checkIn().counts()).isEqualTo(3);
+            // 전체 승리 횟수: 2 (2024년 1승 + 2026년 1승)
+            softly.assertThat(response.checkIn().winCounts()).isEqualTo(2);
+            softly.assertThat(response.checkIn().loseCounts()).isEqualTo(1);
+            // 최근 직관 날짜: 2026-02-15
+            softly.assertThat(response.checkIn().recentCheckInDate()).isEqualTo(LocalDate.of(2026, 2, 15));
+            // 승률 계산: (2승 / 3경기) * 100 = 66.7 (소수점 첫째자리 반올림 가정)
+            softly.assertThat(response.checkIn().winRate()).isEqualTo(66.7);
+        });
     }
 
     @DisplayName("예외: 프로필 소유자의 회원을 찾을 수 없으면 예외가 발생한다")
