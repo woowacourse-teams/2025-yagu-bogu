@@ -17,6 +17,7 @@ public class LeaderboardController implements LeaderboardControllerInterface {
     @Override
     public ResponseEntity<LeaderboardsResponse> findAllTop(final int limit) {
         var responses = leaderboardService.findAllTop(limit);
+        
         return ResponseEntity.ok(LeaderboardsResponse.of(responses));
     }
 }
