@@ -78,7 +78,10 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
                  COUNT(*) AS checkInCount
                FROM check_ins ci
                JOIN games g ON g.game_id = ci.game_id
+               JOIN members m ON m.member_id = ci.member_id
                WHERE g.date >= :startAt AND g.date < :endAt
+                    AND m.deleted_at IS NULL
+                    AND m.team_id IS NOT NULL
                GROUP BY ci.member_id
              ),
              ranked AS (
@@ -99,8 +102,6 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
              JOIN members m ON m.member_id = r.memberId
              JOIN teams t ON t.team_id = m.team_id
              WHERE r.rnk <= :limit
-               AND m.deleted_at IS NULL
-               AND m.team_id IS NOT NULL
              ORDER BY r.rnk ASC, m.member_id ASC
             """, nativeQuery = true)
     List<LeaderboardRow> findMostCheckInWinner(
