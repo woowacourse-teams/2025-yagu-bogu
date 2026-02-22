@@ -38,7 +38,7 @@ ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
 WORKDIR /app
 
 # 빌드 결과 복사 (멀티모듈이므로 app/build/libs/ 경로)
-COPY --from=build /workspace/app/build/libs/app-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /workspace/app/build/libs/app.jar app.jar
 
 # 실행
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
