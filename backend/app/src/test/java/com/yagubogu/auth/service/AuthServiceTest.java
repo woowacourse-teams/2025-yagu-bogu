@@ -16,6 +16,7 @@ import com.yagubogu.auth.support.GoogleAuthValidator;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.UnAuthorizedException;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.dto.MemberFindResultParam;
 import com.yagubogu.member.service.MemberService;
 import com.yagubogu.support.TestFixture;
@@ -80,7 +81,7 @@ class AuthServiceTest {
     @Test
     void login_register() {
         // given
-        LoginParam loginParam = new LoginParam("ID_TOKEN");
+        LoginParam loginParam = new LoginParam("ID_TOKEN", OAuthProvider.GOOGLE);
         Member fakeMember = memberFactory.save(builder -> builder.nickname("우가")
                 .build()
         );
@@ -102,7 +103,7 @@ class AuthServiceTest {
     @Test
     void login() {
         // given
-        LoginParam loginParam = new LoginParam("ID_TOKEN");
+        LoginParam loginParam = new LoginParam("ID_TOKEN", OAuthProvider.GOOGLE);
         Member fakeExistingMember = memberFactory.save(builder -> builder.nickname("우가")
                 .build()
         );

@@ -25,6 +25,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
 @TestConfiguration
 @EnableConfigurationProperties({AuthTokenProperties.class, GoogleAuthProperties.class})
@@ -42,6 +43,7 @@ public class AuthTestConfig {
     }
 
     @Bean
+    @Primary
     public AuthGateway authGateway() {
         return new FakeAuthGateway();
     }

@@ -1,9 +1,12 @@
 package com.yagubogu.auth.gateway;
 
+import com.yagubogu.auth.config.AppleAuthProperties;
 import com.yagubogu.auth.config.GoogleAuthProperties;
+import com.yagubogu.auth.dto.AppleAuthParam;
 import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.dto.LoginParam;
+import com.yagubogu.member.domain.OAuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -14,9 +17,24 @@ import org.springframework.stereotype.Component;
 public class LocalAuthGateway implements AuthGateway {
 
     private final GoogleAuthProperties googleAuthProperties;
+    private final AppleAuthProperties appleAuthProperties;
 
     @Override
     public AuthParam validateToken(final LoginParam loginParam) {
+        OAuthProvider provider = loginParam.provider();
+        if (provider != null && provider.isApple()) {
+            return new AppleAuthParam(
+                    appleAuthProperties.issuer(),
+                    "local-apple-sub-id",
+                    appleAuthProperties.clientId(),
+                    111L,
+                    9999999999L,
+                    "local-apple@example.com",
+                    true,
+                    false
+            );
+        }
+
         return new GoogleAuthParam(
                 "accounts.google.com",
                 "local-sub-id",
@@ -26,10 +44,10 @@ public class LocalAuthGateway implements AuthGateway {
                 9999999999L,
                 "local@example.com",
                 true,
-                "초코송이쿠키사탕별에서춤추고노래하는행복개발자밍트",
+                "local-user",
                 "https://example.com/profile.png",
-                "이름",
-                "성",
+                "givenName",
+                "familyName",
                 "ko"
         );
     }

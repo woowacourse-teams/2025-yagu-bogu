@@ -11,6 +11,10 @@ oauth:
     client-id: 'this-is-client-id'
     connect-timeout: 180s # 3분
     read-timeout: 180s
+  apple:
+    issuer: 'https://appleid.apple.com'
+    jwks-uri: 'https://appleid.apple.com/auth/keys'
+    client-id: 'com.example.app'
 
 security:
   token:

@@ -47,4 +47,3 @@ public interface AuthControllerInterface {
             @RequestBody LogoutParam request
     );
 }
-

@@ -1,5 +1,6 @@
 package com.yagubogu.auth.gateway;
 
+import com.yagubogu.auth.dto.AppleAuthParam;
 import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.dto.LoginParam;
@@ -10,6 +11,19 @@ public class FakeAuthGateway implements AuthGateway {
 
     @Override
     public AuthParam validateToken(final LoginParam loginParam) {
+        if (loginParam.provider() != null && loginParam.provider().isApple()) {
+            return new AppleAuthParam(
+                    "https://appleid.apple.com",
+                    "apple-sub-test-01",
+                    "com.example.app",
+                    111L,
+                    Instant.now().plusSeconds(3000).getEpochSecond(),
+                    "apple@example.com",
+                    true,
+                    false
+            );
+        }
+
         return new GoogleAuthParam(
                 "accounts.google.com",
                 "sub-test-unique-01",

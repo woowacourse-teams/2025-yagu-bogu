@@ -9,6 +9,7 @@ import com.yagubogu.auth.dto.v1.LoginResponse;
 import com.yagubogu.auth.dto.v1.TokenResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
+import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.support.base.E2eTestBase;
 import com.yagubogu.support.TestFixture;
 import com.yagubogu.support.TestSupport;
@@ -60,7 +61,7 @@ public class AuthE2eTest extends E2eTestBase {
         // given & when
         LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginParam(ID_TOKEN))
+                .body(new LoginParam(ID_TOKEN, OAuthProvider.GOOGLE))
                 .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
@@ -81,7 +82,7 @@ public class AuthE2eTest extends E2eTestBase {
         // given
         LoginResponse registerResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginParam(ID_TOKEN))
+                .body(new LoginParam(ID_TOKEN, OAuthProvider.GOOGLE))
                 .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
@@ -92,7 +93,7 @@ public class AuthE2eTest extends E2eTestBase {
         // when
         LoginResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new LoginParam(ID_TOKEN))
+                .body(new LoginParam(ID_TOKEN, OAuthProvider.GOOGLE))
                 .when().post("/api/v1/auth/login")
                 .then().log().all()
                 .statusCode(200)
@@ -105,6 +106,42 @@ public class AuthE2eTest extends E2eTestBase {
             softAssertions.assertThat(actual.refreshToken()).isNotNull();
             softAssertions.assertThat(actual.isNew()).isFalse();
             softAssertions.assertThat(actual.member().nickname()).isEqualTo(expectedStringName);
+        });
+    }
+
+    @DisplayName("애플 로그인을 수행한다")
+    @Test
+    void login_apple() {
+        // given & when
+        LoginResponse first = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LoginParam(ID_TOKEN, OAuthProvider.APPLE))
+                .when().post("/api/v1/auth/login")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LoginResponse.class);
+
+        LoginResponse second = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new LoginParam(ID_TOKEN, OAuthProvider.APPLE))
+                .when().post("/api/v1/auth/login")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LoginResponse.class);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(first.accessToken()).isNotNull();
+            softAssertions.assertThat(first.refreshToken()).isNotNull();
+            softAssertions.assertThat(first.isNew()).isTrue();
+            softAssertions.assertThat(first.member().nickname()).startsWith("apple_");
+
+            softAssertions.assertThat(second.accessToken()).isNotNull();
+            softAssertions.assertThat(second.refreshToken()).isNotNull();
+            softAssertions.assertThat(second.isNew()).isFalse();
+            softAssertions.assertThat(second.member().nickname()).isEqualTo(first.member().nickname());
         });
     }
 

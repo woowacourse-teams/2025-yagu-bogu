@@ -13,6 +13,7 @@ import com.yagubogu.auth.repository.RefreshTokenRepository;
 import com.yagubogu.auth.support.AuthTokenProvider;
 import com.yagubogu.auth.support.AuthValidator;
 import com.yagubogu.global.exception.UnAuthorizedException;
+import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
@@ -38,8 +39,11 @@ public class AuthService {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public LoginResponse login(final LoginParam request) {
+        if (request.provider() == null) {
+            throw new BadRequestException("OAuth provider is required");
+        }
         AuthParam response = authGateway.validateToken(request);
-        validateToken(response, OAuthProvider.GOOGLE);
+        validateToken(response, request.provider());
 
         MemberFindResultParam memberFindResultParam = memberService.findMember(response);
         Member member = memberFindResultParam.member();

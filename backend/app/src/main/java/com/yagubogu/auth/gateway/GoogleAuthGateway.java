@@ -5,6 +5,7 @@ import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.dto.LoginParam;
 import com.yagubogu.auth.exception.GoogleAuthExceptionHandler;
+import com.yagubogu.member.domain.OAuthProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestClient;
 
 @Profile("!local")
 @Component
-public class GoogleAuthGateway implements AuthGateway {
+public class GoogleAuthGateway implements ProviderAuthGateway {
 
     private static final String ID_TOKEN = "id_token";
 
@@ -28,6 +29,11 @@ public class GoogleAuthGateway implements AuthGateway {
         this.googleRestClient = googleRestClient;
         this.googleAuthExceptionHandler = googleAuthExceptionHandler;
         this.googleAuthProperties = googleAuthProperties;
+    }
+
+    @Override
+    public boolean supports(final OAuthProvider provider) {
+        return provider.isGoogle();
     }
 
     @Override

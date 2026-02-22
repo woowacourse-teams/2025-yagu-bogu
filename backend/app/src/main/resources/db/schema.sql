@@ -30,10 +30,11 @@ CREATE TABLE members
     email      VARCHAR(255)          NOT NULL,
     nickname   VARCHAR(255)          NOT NULL,
     oauth_id   VARCHAR(255)          NOT NULL,
-    provider   ENUM ('GOOGLE')       NOT NULL,
+    provider   ENUM ('GOOGLE','APPLE')       NOT NULL,
     role       ENUM ('ADMIN','USER') NOT NULL,
     is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
     PRIMARY KEY (member_id),
+    UNIQUE (provider, oauth_id),
     FOREIGN KEY (team_id) REFERENCES teams (team_id)
 ) ENGINE = InnoDB;
 

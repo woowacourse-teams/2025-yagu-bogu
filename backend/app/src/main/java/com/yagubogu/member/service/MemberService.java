@@ -139,10 +139,14 @@ public class MemberService {
 
     @Transactional
     public MemberFindResultParam findMember(final AuthParam response) {
-        return memberRepository.findByOauthIdAndDeletedAtIsNull(response.oauthId())
+        Member draftMember = response.toMember();
+        return memberRepository.findByOauthIdAndProviderAndDeletedAtIsNull(
+                        response.oauthId(),
+                        draftMember.getProvider()
+                )
                 .map(m -> new MemberFindResultParam(m, false))
                 .orElseGet(() -> {
-                    Member savedMember = memberRepository.save(response.toMember());
+                    Member savedMember = memberRepository.save(draftMember);
                     publisher.publishEvent(new SignUpEvent(savedMember));
                     return new MemberFindResultParam(savedMember, true);
                 });
