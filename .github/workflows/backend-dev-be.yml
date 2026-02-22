@@ -4,12 +4,12 @@ name: YaguBogu Backend dev-be
 on:
   push:
     branches: [ "dev-be" ]
-    path:
-      - 'backend/**'
+    paths:
+      - 'backend/app/**'
   pull_request:
     branches: [ "dev-be" ]
-    path:
-      - 'backend/**'
+    paths:
+      - 'backend/app/**'
   workflow_dispatch:
 
 jobs:
@@ -32,7 +32,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run Tests
-        run: ./gradlew :app:test
+        run: ./gradlew :app:test --no-daemon
 
       - name: Build
-        run: ./gradlew :app:build -x test
+        run: ./gradlew :app:build --no-daemon -x test
