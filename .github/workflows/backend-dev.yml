@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "dev" ]
     paths:
-      - "backend/**"
+      - "backend/app/**"
   workflow_dispatch:
 
 env:
@@ -33,7 +33,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run Tests
-        run: ./gradlew :app:test
+        run: ./gradlew :app:test --no-daemon
 
   build:
     needs: ci
@@ -59,11 +59,11 @@ jobs:
       - name: Docker Image Build & Push (arm64-arch)
         run: |
           TAG_LATEST="dev-latest"
-          # Dockerfile 경로: backend/Dockerfile
+          # 빌드 컨텍스트: backend/ (Gradle 루트), Dockerfile: app/Dockerfile
           docker buildx build \
           --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max \
           --cache-from=type=registry,ref=$IMAGE:build-cache \
-          -f Dockerfile \
+          -f app/Dockerfile \
           --platform linux/arm64 \
           -t $IMAGE:$TAG_LATEST \
           --push \
