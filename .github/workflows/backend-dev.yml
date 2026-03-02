@@ -91,7 +91,7 @@ jobs:
       - name: Stop & Remove existing container (by name)
         run: |
           set -e
-          NAME="yagubogu-backend"
+          NAME="yagubogu-backend-dev"
           if [ "$(docker ps -q -f name=^/${NAME}$)" ]; then
             echo "실행중 컨테이너 중지: $NAME"
             docker stop $NAME
@@ -100,19 +100,19 @@ jobs:
             echo "기존 컨테이너 제거: $NAME"
             docker rm $NAME
           fi
-          echo "포트 80 점유 프로세스 확인 및 정리"
-          sudo fuser -k -n tcp 80 || true
+          echo "포트 8080 점유 프로세스 확인 및 정리"
+          sudo fuser -k -n tcp 8080 || true
 
       - name: Run docker container
         run: |
           set -e
-          NAME="yagubogu-backend"
+          NAME="yagubogu-backend-dev"
           echo "새 Docker 컨테이너 실행..."
           docker run -d \
             --name $NAME \
             --restart unless-stopped \
             --network yagubogu-net \
-            -p 80:8080 \
+            -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e DB_URL="${{ secrets.DB_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
