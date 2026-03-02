@@ -2,7 +2,7 @@ name: YaguBogu Crawling Dev
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev-be" ]
     paths:
       - "backend/crawling/**"
       - "backend/app/**"
