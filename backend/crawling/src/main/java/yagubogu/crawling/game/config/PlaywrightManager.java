@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaywrightManager {
 
+    private static final boolean DEFAULT_HEADLESS = true;
+    private static final int DEFAULT_SLOW_MO = 0;
+
     private Playwright pw;
     private Browser browser;
 
@@ -33,16 +36,39 @@ public class PlaywrightManager {
 
         this.pw = Playwright.create();
 
-        // ✅ Chromium → Firefox로 변경
+        boolean headless = parseBooleanEnv("PLAYWRIGHT_HEADLESS", DEFAULT_HEADLESS);
+        int slowMo = parseIntEnv("PLAYWRIGHT_SLOW_MO", DEFAULT_SLOW_MO);
+
         this.browser = pw.firefox().launch(new BrowserType.LaunchOptions()
-                .setHeadless(false)  // 디버깅용
-                .setSlowMo(100)      // 안정성 증가
+                .setHeadless(headless)
+                .setSlowMo(slowMo)
                 .setArgs(List.of(
                         "--disable-gpu",
                         "--no-sandbox"
                 )));
 
-        log.info("Firefox 브라우저 초기화 완료");
+        log.info("Firefox 브라우저 초기화 완료 (headless={}, slowMo={})", headless, slowMo);
+    }
+
+    private boolean parseBooleanEnv(String key, boolean defaultValue) {
+        String value = System.getenv(key);
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        return Boolean.parseBoolean(value);
+    }
+
+    private int parseIntEnv(String key, int defaultValue) {
+        String value = System.getenv(key);
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            log.warn("환경 변수 {} 값이 숫자가 아닙니다. 기본값({})을 사용합니다.", key, defaultValue);
+            return defaultValue;
+        }
     }
 
     private synchronized void ensureBrowserConnected() {
