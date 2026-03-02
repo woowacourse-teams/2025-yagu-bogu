@@ -23,7 +23,6 @@ public class PlaywrightManager {
     private Browser browser;
 
     public PlaywrightManager() {
-        initializeBrowser();
     }
 
     private synchronized void initializeBrowser() {
