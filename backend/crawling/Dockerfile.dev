@@ -25,9 +25,15 @@ RUN ./gradlew :crawling:bootJar --no-daemon --build-cache -x test
 # --- Run stage ---
 FROM mcr.microsoft.com/playwright/java:v1.40.0-jammy
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-21-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV TZ=Asia/Seoul
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64
+ENV PATH="$JAVA_HOME/bin:$PATH"
 ENV SPRING_PROFILES_ACTIVE=dev
 ENV PLAYWRIGHT_HEADLESS=true
 ENV PLAYWRIGHT_SLOW_MO=0
