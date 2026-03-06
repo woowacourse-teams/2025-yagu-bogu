@@ -12,6 +12,8 @@ import com.yagubogu.game.dto.GameResultParam.ScoreBoardParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
+import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.dto.v1.GameCalendarResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -29,6 +31,7 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -154,6 +157,91 @@ class GameServiceTest {
 
         // then
         assertThat(scoreBoard).isEqualTo(expected);
+    }
+
+    @DisplayName("해당 월에 취소되지 않은 경기가 있는 날짜(일)를 중복 없이 오름차순으로 반환한다")
+    @Test
+    void findGameDaysByMonth() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 5);
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        LocalDate day5 = LocalDate.of(2025, 5, 5);
+        LocalDate day10 = LocalDate.of(2025, 5, 10);
+        LocalDate day10Again = LocalDate.of(2025, 5, 10); // 중복 날짜
+        LocalDate day20 = LocalDate.of(2025, 5, 20);
+
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day5));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day10));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day10Again));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day20));
+
+        // when
+        GameCalendarResponse response = gameService.findGameDaysByMonth(yearMonth);
+
+        // then
+        assertThat(response.gameDays()).containsExactly(5, 10, 20);
+    }
+
+    @DisplayName("취소된 경기는 날짜 목록에서 제외된다")
+    @Test
+    void findGameDaysByMonth_excludesCanceledGames() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 6);
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        LocalDate day1 = LocalDate.of(2025, 6, 1);
+        LocalDate day15 = LocalDate.of(2025, 6, 15);
+
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day1));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium).date(day15)
+                .gameState(GameState.CANCELED));
+
+        // when
+        GameCalendarResponse response = gameService.findGameDaysByMonth(yearMonth);
+
+        // then
+        assertThat(response.gameDays()).containsExactly(1);
+    }
+
+    @DisplayName("해당 월에 경기가 없으면 빈 목록을 반환한다")
+    @Test
+    void findGameDaysByMonth_noGames() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+
+        // when
+        GameCalendarResponse response = gameService.findGameDaysByMonth(yearMonth);
+
+        // then
+        assertThat(response.gameDays()).isEmpty();
+    }
+
+    @DisplayName("다른 달의 경기는 포함되지 않는다")
+    @Test
+    void findGameDaysByMonth_excludesOtherMonths() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 8);
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 7, 31)));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 8, 15)));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 9, 1)));
+
+        // when
+        GameCalendarResponse response = gameService.findGameDaysByMonth(yearMonth);
+
+        // then
+        assertThat(response.gameDays()).containsExactly(15);
     }
 
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {

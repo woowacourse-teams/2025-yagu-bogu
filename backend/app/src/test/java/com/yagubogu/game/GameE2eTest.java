@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
+import com.yagubogu.game.dto.v1.GameCalendarResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -126,6 +128,42 @@ public class GameE2eTest extends E2eTestBase {
                 .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(422);
+    }
+
+    @DisplayName("월별 경기가 있는 날짜(일) 목록을 조회한다")
+    @Test
+    void findGameDaysByMonth() {
+        // given
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 5, 3)));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 5, 3)));  // 중복 날짜
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 5, 17)));
+        gameFactory.save(b -> b.homeTeam(homeTeam).awayTeam(awayTeam).stadium(stadium)
+                .date(LocalDate.of(2025, 5, 31))
+                .gameState(GameState.CANCELED));  // 취소 경기 제외
+
+        Member member = makeMember(homeTeam);
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when
+        GameCalendarResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("yearMonth", "2025-05")
+                .when().get("/api/v1/games/calendar")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(GameCalendarResponse.class);
+
+        // then
+        assertThat(actual.gameDays()).containsExactly(3, 17);
     }
 
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {

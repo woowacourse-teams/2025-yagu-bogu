@@ -2,10 +2,13 @@ package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.game.dto.v1.GameCalendarResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +25,16 @@ public class GameController implements GameControllerInterface {
             @RequestParam final LocalDate date
     ) {
         GameResponse response = gameService.findGamesByDate(date, memberClaims.id());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @RequireRole
+    public ResponseEntity<GameCalendarResponse> findGameDaysByMonth(
+            final MemberClaims memberClaims,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") final YearMonth yearMonth
+    ) {
+        GameCalendarResponse response = gameService.findGameDaysByMonth(yearMonth);
 
         return ResponseEntity.ok(response);
     }

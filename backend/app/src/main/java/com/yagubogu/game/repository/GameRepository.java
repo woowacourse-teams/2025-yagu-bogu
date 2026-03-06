@@ -65,4 +65,13 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findAllByDate(LocalDate date);
 
     boolean existsByDateAndGameStateIn(LocalDate date, List<GameState> states);
+
+    @Query("SELECT DISTINCT g.date FROM Game g " +
+            "WHERE g.date >= :startDate AND g.date <= :endDate " +
+            "AND g.gameState <> :canceledState")
+    List<LocalDate> findDistinctGameDatesByMonthRange(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("canceledState") GameState canceledState
+    );
 }
