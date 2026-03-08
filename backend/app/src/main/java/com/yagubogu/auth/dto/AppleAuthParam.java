@@ -17,8 +17,7 @@ public record AppleAuthParam(
         Long exp,
         String email,
         boolean emailVerified,
-        boolean isPrivateEmail
-) implements AuthParam {
+        boolean isPrivateEmail) implements AuthParam {
 
     private static final int NICKNAME_MAX_LENGTH = 25;
     private static final int OAUTH_SUFFIX_LENGTH = 8;
@@ -38,13 +37,12 @@ public record AppleAuthParam(
                 expiresAt == null ? null : expiresAt.getEpochSecond(),
                 jwt.getClaim("email").asString(),
                 "true".equalsIgnoreCase(emailVerified),
-                "true".equalsIgnoreCase(isPrivateEmail)
-        );
+                "true".equalsIgnoreCase(isPrivateEmail));
     }
 
     @Override
     public String picture() {
-        return null;
+        return "";
     }
 
     @Override
@@ -54,11 +52,12 @@ public record AppleAuthParam(
                 : email;
         String nickname = generateNickname(oauthId);
 
-        return new Member(null, new Nickname(nickname), safeEmail, OAuthProvider.APPLE, oauthId, Role.USER, null, null);
+        return new Member(null, new Nickname(nickname), safeEmail, OAuthProvider.APPLE, oauthId, Role.USER, "", null);
     }
 
     private static String generateNickname(final String oauthId) {
-        String suffix = oauthId == null ? "user" : oauthId.substring(0, Math.min(OAUTH_SUFFIX_LENGTH, oauthId.length()));
+        String suffix = oauthId == null ? "user"
+                : oauthId.substring(0, Math.min(OAUTH_SUFFIX_LENGTH, oauthId.length()));
         String nickname = "apple_" + suffix.toLowerCase(Locale.ROOT);
         if (nickname.length() > NICKNAME_MAX_LENGTH) {
             return nickname.substring(0, NICKNAME_MAX_LENGTH);
