@@ -34,7 +34,6 @@ CREATE TABLE members
     role       ENUM ('ADMIN','USER') NOT NULL,
     is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
     PRIMARY KEY (member_id),
-    UNIQUE (provider, oauth_id),
     FOREIGN KEY (team_id) REFERENCES teams (team_id)
 ) ENGINE = InnoDB;
 

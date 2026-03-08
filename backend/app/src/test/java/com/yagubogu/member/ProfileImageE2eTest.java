@@ -32,7 +32,7 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.Mockito.doReturn;
 
-@Import({AuthTestConfig.class, JpaAuditingConfig.class})
+@Import({ AuthTestConfig.class, JpaAuditingConfig.class })
 public class ProfileImageE2eTest extends E2eTestBase {
 
     @LocalServerPort
@@ -90,7 +90,7 @@ public class ProfileImageE2eTest extends E2eTestBase {
 
         // then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(response.key()).startsWith("yagubogu/images/profiles/");
+            softAssertions.assertThat(response.key()).startsWith("images/profiles/");
             softAssertions.assertThat(response.url()).contains(s3Properties.bucket());
             softAssertions.assertThat(response.url()).contains(response.key());
         });
@@ -102,7 +102,7 @@ public class ProfileImageE2eTest extends E2eTestBase {
         // given
         Member member = memberFactory.save(MemberBuilder::build);
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
-        String key = "yagubogu/images/profiles/abc-123";
+        String key = "images/profiles/abc-123";
 
         String expectedUrl = s3Properties.endpoint() + "/" + s3Properties.bucket() + "/" + key;
 

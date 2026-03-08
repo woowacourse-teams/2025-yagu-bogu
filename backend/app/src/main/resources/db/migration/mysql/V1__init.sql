@@ -30,7 +30,7 @@ CREATE TABLE members
     email      VARCHAR(255)          NOT NULL,
     nickname   VARCHAR(255)          NOT NULL,
     oauth_id   VARCHAR(255)          NOT NULL,
-    provider   ENUM ('GOOGLE','APPLE')       NOT NULL,
+    provider   ENUM ('GOOGLE')       NOT NULL,
     role       ENUM ('ADMIN','USER') NOT NULL,
     is_deleted BOOLEAN                        DEFAULT FALSE NOT NULL,
     image_url  VARCHAR(512)          NULL,
@@ -38,7 +38,6 @@ CREATE TABLE members
     updated_at DATETIME(6)           NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     deleted_at DATETIME(6)           NULL,
     PRIMARY KEY (member_id),
-    UNIQUE KEY uq_members_provider_oauth (provider, oauth_id),
     CONSTRAINT fk_members_team FOREIGN KEY (team_id) REFERENCES teams (team_id)
 ) ENGINE = InnoDB;
 
