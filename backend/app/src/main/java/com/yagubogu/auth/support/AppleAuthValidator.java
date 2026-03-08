@@ -38,7 +38,7 @@ public class AppleAuthValidator implements AuthValidator<AppleAuthParam> {
 
         if (response.aud() == null || response.aud().isEmpty() ||
                 expectedAudiences.stream().noneMatch(expected -> response.aud().contains(expected))) {
-            log.info("Validating Apple token audience. expectedClientIds={}, actualAud={}",
+            log.warn("Validating Apple token audience. expectedClientIds={}, actualAud={}",
                     expectedAudiences, response.aud());
             throw new InvalidTokenException("Invalid audience");
         }

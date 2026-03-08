@@ -5,6 +5,8 @@ import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.exception.InvalidTokenException;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,12 +35,14 @@ public class GoogleAuthValidator implements AuthValidator<GoogleAuthParam> {
             throw new InvalidTokenException("Invalid issuer");
         }
 
-        if (!googleAuthProperties.clientId().equals(response.aud())) {
-            String expectedClientId = googleAuthProperties.clientId();
-            String actualAud = response.aud();
+        List<String> expectedAudiences = Arrays.stream(googleAuthProperties.clientId().split(","))
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .toList();
 
-            log.info("Validating Google token audience. expectedClientId={}, actualAud={}",
-                    expectedClientId, actualAud);
+        if (response.aud() == null || expectedAudiences.stream().noneMatch(expected -> expected.equals(response.aud()))) {
+            log.warn("Validating Google token audience. expectedClientIds={}, actualAud={}",
+                    expectedAudiences, response.aud());
 
             throw new InvalidTokenException("Invalid audience");
         }
