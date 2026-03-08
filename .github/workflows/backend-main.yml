@@ -169,6 +169,11 @@ jobs:
             -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
             -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY }}" \
             -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e OCI_S3_ENDPOINT="${{ secrets.OCI_S3_ENDPOINT }}" \
+            -e OCI_REGION="${{ secrets.OCI_REGION }}" \
+            -e OCI_S3_BUCKET="${{ secrets.OCI_S3_BUCKET }}" \
             -l app=yagubogu-backend \
             -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \
