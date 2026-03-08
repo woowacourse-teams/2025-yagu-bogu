@@ -1,14 +1,19 @@
-name: YaguBogu Backend Dev
+name: YaguBogu Crawling Dev
 
 on:
   push:
     branches: [ "dev" ]
     paths:
+      - "backend/crawling/**"
       - "backend/app/**"
+      - "backend/build.gradle"
+      - "backend/settings.gradle"
+      - "backend/gradle/**"
+      - "backend/gradlew"
   workflow_dispatch:
 
 env:
-  IMAGE: yagubogu/yagubogu-backend
+  IMAGE: yagubogu/yagubogu-crawling
 
 jobs:
   ci:
@@ -32,8 +37,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Tests
-        run: ./gradlew :app:test --no-daemon
+      - name: Run Crawling Tests
+        run: ./gradlew :crawling:test --no-daemon
 
   build:
     needs: ci
@@ -45,7 +50,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4  # ✅ 이게 있어야 ./backend 가 생김
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -59,11 +64,10 @@ jobs:
       - name: Docker Image Build & Push (arm64-arch)
         run: |
           TAG_LATEST="dev-latest"
-          # 빌드 컨텍스트: backend/ (Gradle 루트), Dockerfile: app/Dockerfile
           docker buildx build \
           --cache-to=type=registry,ref=$IMAGE:build-cache,mode=max \
           --cache-from=type=registry,ref=$IMAGE:build-cache \
-          -f app/Dockerfile \
+          -f crawling/Dockerfile.dev \
           --platform linux/arm64 \
           -t $IMAGE:$TAG_LATEST \
           --push \
@@ -73,7 +77,7 @@ jobs:
     needs: build
     runs-on: [ self-hosted, develop ]
     env:
-      IMAGE: yagubogu/yagubogu-backend
+      IMAGE: yagubogu/yagubogu-crawling
       TAG: "dev-latest"
     steps:
       - name: Login to Docker Hub
@@ -88,10 +92,13 @@ jobs:
           docker pull $IMAGE:$TAG
           echo "Docker 이미지 pull 완료"
 
-      - name: Stop & Remove existing container (by name)
+      - name: Ensure network
+        run: docker network create yagubogu-net 2>/dev/null || true
+
+      - name: Stop & Remove existing container
         run: |
           set -e
-          NAME="yagubogu-backend-dev"
+          NAME="yagubogu-crawling-dev"
           if [ "$(docker ps -q -f name=^/${NAME}$)" ]; then
             echo "실행중 컨테이너 중지: $NAME"
             docker stop $NAME
@@ -100,34 +107,25 @@ jobs:
             echo "기존 컨테이너 제거: $NAME"
             docker rm $NAME
           fi
-          echo "포트 8080 점유 프로세스 확인 및 정리"
-          sudo fuser -k -n tcp 8080 || true
 
       - name: Run docker container
         run: |
           set -e
-          NAME="yagubogu-backend-dev"
+          NAME="yagubogu-crawling-dev"
           echo "새 Docker 컨테이너 실행..."
           docker run -d \
             --name $NAME \
             --restart unless-stopped \
             --network yagubogu-net \
-            -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e DB_URL="${{ secrets.DB_URL }}" \
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
-            -e ACCESS_TOKEN_SECRET_KEY="${{ secrets.ACCESS_TOKEN_SECRET_KEY_DEV }}" \
-            -e REFRESH_TOKEN_SECRET_KEY="${{ secrets.REFRESH_TOKEN_SECRET_KEY }}" \
-            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e OCI_S3_ENDPOINT="${{ secrets.OCI_S3_ENDPOINT }}" \
-            -e OCI_REGION="${{ secrets.OCI_REGION }}" \
-            -e OCI_S3_BUCKET="${{ secrets.OCI_S3_BUCKET }}" \
+            -e PLAYWRIGHT_HEADLESS=true \
+            -e PLAYWRIGHT_SLOW_MO=0 \
             $IMAGE:$TAG
-          
-          echo "컨테이너 실행 완료."  
+
+          echo "컨테이너 실행 완료."
 
       - name: Docker image Prune
         run: |
