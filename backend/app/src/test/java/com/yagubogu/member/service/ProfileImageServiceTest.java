@@ -44,7 +44,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Import({AuthTestConfig.class, JpaAuditingConfig.class})
+@Import({ AuthTestConfig.class, JpaAuditingConfig.class })
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
 class ProfileImageServiceTest {
@@ -75,13 +75,12 @@ class ProfileImageServiceTest {
         profileImageService = new ProfileImageService(s3Presigner, s3Client, s3Properties, memberService);
     }
 
-
     @DisplayName("pre-signed url을 발급한다")
     @Test
     void issuePreSignedUrl_success() throws MalformedURLException {
         // given
         PreSignedUrlStartRequest request = new PreSignedUrlStartRequest("image/jpeg", 1_000_000L);
-        String fakeKeyPrefix = "yagubogu/images/profiles/";
+        String fakeKeyPrefix = "images/profiles/";
         String fakeUrl = "https://test-bucket.s3.ap-northeast-2.amazonaws.com/" + fakeKeyPrefix + "some-uuid";
         when(presignedPutObjectRequest.url()).thenReturn(new URL(fakeUrl));
         when(s3Presigner.presignPutObject(any(Consumer.class))).thenReturn(
@@ -107,7 +106,6 @@ class ProfileImageServiceTest {
         });
     }
 
-
     @DisplayName("예외: contentLength가 최대 길이를 초과하면 예외를 던진다")
     @Test
     void issuePreSignedUrl_tooLarge() {
@@ -127,7 +125,7 @@ class ProfileImageServiceTest {
     @Test
     void completeUpload_success() {
         // given
-        String key = "yagubogu/images/profiles/abc-123";
+        String key = "images/profiles/abc-123";
         PreSignedUrlCompleteRequest request = new PreSignedUrlCompleteRequest(key);
         Member member = memberFactory.save(builder -> builder.build());
 
@@ -137,7 +135,8 @@ class ProfileImageServiceTest {
         // 1. s3Client.headObject가 정상 응답을 반환하도록 설정
         when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(HeadObjectResponse.builder().build());
 
-        // 2. memberService.updateProfileImageUrl이 호출되었을 때, member 객체의 imageUrl을 직접 수정하도록 설정
+        // 2. memberService.updateProfileImageUrl이 호출되었을 때, member 객체의 imageUrl을 직접
+        // 수정하도록 설정
         doAnswer(invocation -> {
             Long memberId = invocation.getArgument(0);
             String imageUrl = invocation.getArgument(1);
