@@ -7,6 +7,7 @@ import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.dto.LoginParam;
 import com.yagubogu.member.domain.OAuthProvider;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class LocalAuthGateway implements AuthGateway {
             return new AppleAuthParam(
                     appleAuthProperties.issuer(),
                     "local-apple-sub-id",
-                    appleAuthProperties.clientId(),
+                    List.of(appleAuthProperties.clientId()),
                     111L,
                     9999999999L,
                     "local-apple@example.com",

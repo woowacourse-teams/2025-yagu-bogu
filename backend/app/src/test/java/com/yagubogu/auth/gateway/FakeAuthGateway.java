@@ -5,6 +5,7 @@ import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.GoogleAuthParam;
 import com.yagubogu.auth.dto.LoginParam;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class FakeAuthGateway implements AuthGateway {
@@ -15,7 +16,7 @@ public class FakeAuthGateway implements AuthGateway {
             return new AppleAuthParam(
                     "https://appleid.apple.com",
                     "apple-sub-test-01",
-                    "com.example.app",
+                    List.of("com.example.app"),
                     111L,
                     Instant.now().plusSeconds(3000).getEpochSecond(),
                     "apple@example.com",

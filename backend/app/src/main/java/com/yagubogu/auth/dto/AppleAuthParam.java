@@ -6,12 +6,13 @@ import com.yagubogu.member.domain.Nickname;
 import com.yagubogu.member.domain.OAuthProvider;
 import com.yagubogu.member.domain.Role;
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 
 public record AppleAuthParam(
         String iss,
         String oauthId,
-        String aud,
+        List<String> aud,
         Long iat,
         Long exp,
         String email,
@@ -32,7 +33,7 @@ public record AppleAuthParam(
         return new AppleAuthParam(
                 jwt.getIssuer(),
                 jwt.getSubject(),
-                jwt.getAudience().isEmpty() ? null : jwt.getAudience().getFirst(),
+                jwt.getAudience(),
                 issuedAt == null ? null : issuedAt.getEpochSecond(),
                 expiresAt == null ? null : expiresAt.getEpochSecond(),
                 jwt.getClaim("email").asString(),

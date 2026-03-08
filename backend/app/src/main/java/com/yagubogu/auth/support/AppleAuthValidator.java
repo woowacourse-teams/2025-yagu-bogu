@@ -5,8 +5,12 @@ import com.yagubogu.auth.dto.AppleAuthParam;
 import com.yagubogu.auth.exception.InvalidTokenException;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class AppleAuthValidator implements AuthValidator<AppleAuthParam> {
 
@@ -27,7 +31,15 @@ public class AppleAuthValidator implements AuthValidator<AppleAuthParam> {
             throw new InvalidTokenException("Invalid issuer");
         }
 
-        if (response.aud() == null || !appleAuthProperties.clientId().equals(response.aud())) {
+        List<String> expectedAudiences = Arrays.stream(appleAuthProperties.clientId().split(","))
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .toList();
+
+        if (response.aud() == null || response.aud().isEmpty() ||
+                expectedAudiences.stream().noneMatch(expected -> response.aud().contains(expected))) {
+            log.info("Validating Apple token audience. expectedClientIds={}, actualAud={}",
+                    expectedAudiences, response.aud());
             throw new InvalidTokenException("Invalid audience");
         }
 
