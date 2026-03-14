@@ -76,8 +76,6 @@ app:
     presign-expiration: 5m
     endpoint: ${OCI_S3_ENDPOINT}
     region: ${OCI_REGION}
-  clock:
-    fixed-date: 2024-08-15
 
 ---
 spring:

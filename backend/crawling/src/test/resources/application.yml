@@ -103,3 +103,7 @@ kbo:
     pitcherLabel: "^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$"
     dateFormat: "yyyy.MM.dd"
     timeFormat: "HH:mm"
+
+app:
+  clock:
+    fixed-date: 2024-08-15

@@ -61,6 +61,8 @@ app:
     presign-expiration: 10m
     endpoint: https://test-namespace.compat.objectstorage.ap-chuncheon-1.oraclecloud.com
     region: ap-chuncheon-1
+  clock:
+    fixed-date: 2024-08-15
 
 ---
 spring:
