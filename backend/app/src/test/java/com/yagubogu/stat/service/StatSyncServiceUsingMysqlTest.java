@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.yagubogu.auth.config.AuthTestConfig;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -160,6 +161,86 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
 
         // then
         assertThat(victoryFairyRankingRepository.findAll()).isEmpty();
+    }
+
+    @DisplayName("과거 직관(NON_LOCATION_CHECK_IN)은 승리요정 랭킹 점수 계산에 포함되지 않는다")
+    @Test
+    void updateRankings_excludesPastCheckIn() {
+        // given
+        LocalDate date = LocalDate.of(2025, 7, 21);
+        int year = date.getYear();
+
+        Member member = memberFactory.save(b -> b.team(HT));
+
+        // 일반 직관: HT 승 (랭킹에 포함되어야 함)
+        Game normalGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(date)
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(normalGame).member(member).team(HT));
+
+        // 과거 직관: HT 승 (랭킹에 포함되면 안 됨)
+        Game pastGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 1))
+                .homeScore(7).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(pastGame).member(member).team(HT)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        // when
+        statSyncService.updateRankings(date);
+
+        // then: 과거 직관 제외, 일반 직관 1회만 반영 (checkInCount=1, winCount=1)
+        List<VictoryFairyRanking> results = victoryFairyRankingRepository
+                .findByMemberIdsAndYear(List.of(member.getId()), year);
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(results).hasSize(1);
+            softAssertions.assertThat(results.get(0).getCheckInCount()).isEqualTo(1);
+            softAssertions.assertThat(results.get(0).getWinCount()).isEqualTo(1);
+        });
+    }
+
+    @DisplayName("과거 직관(NON_LOCATION_CHECK_IN)만 있는 회원은 승리요정 랭킹에 등록되지 않는다")
+    @Test
+    void updateRankings_memberWithOnlyPastCheckIn_isNotRanked() {
+        // given
+        LocalDate date = LocalDate.of(2025, 7, 21);
+        int year = date.getYear();
+
+        Member normalMember = memberFactory.save(b -> b.team(HT));
+        Member pastOnlyMember = memberFactory.save(b -> b.team(HT));
+
+        // normalMember: 일반 직관
+        Game normalGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(date)
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(normalGame).member(normalMember).team(HT));
+
+        // pastOnlyMember: 과거 직관만 존재
+        Game pastGame = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT)
+                .date(LocalDate.of(2025, 6, 1))
+                .homeScore(7).awayScore(2)
+                .gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(pastGame).member(pastOnlyMember).team(HT)
+                .checkInType(CheckInType.NON_LOCATION_CHECK_IN));
+
+        // when
+        statSyncService.updateRankings(date);
+
+        // then: normalMember만 랭킹에 등록, pastOnlyMember는 등록되지 않음
+        List<VictoryFairyRanking> results = victoryFairyRankingRepository
+                .findByMemberIdsAndYear(List.of(normalMember.getId(), pastOnlyMember.getId()), year);
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(results).hasSize(1);
+            softAssertions.assertThat(results.get(0).getMember().getId()).isEqualTo(normalMember.getId());
+        });
     }
 }
 

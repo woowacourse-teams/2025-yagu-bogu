@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
+import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.domain.QCheckIn;
 import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.CheckInGameTeamParam;
@@ -121,7 +122,8 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .where(
                         CHECK_IN.member.id.in(memberIds),
                         isBetweenYear(year),
-                        isComplete()
+                        isComplete(),
+                        isLocationCheckIn()
                 )
                 .groupBy(CHECK_IN.member.id)
                 .fetch();
@@ -137,7 +139,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.select(CHECK_IN.member.id)
                 .from(CHECK_IN)
                 .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
-                .where(winCondition(CHECK_IN, GAME))
+                .where(winCondition(CHECK_IN, GAME), isLocationCheckIn())
                 .fetch();
     }
 
@@ -146,7 +148,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.select(CHECK_IN.member.id)
                 .from(CHECK_IN)
                 .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
-                .where(loseCondition(CHECK_IN, GAME))
+                .where(loseCondition(CHECK_IN, GAME), isLocationCheckIn())
                 .fetch();
     }
 
@@ -155,7 +157,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
         return jpaQueryFactory.select(CHECK_IN.member.id)
                 .from(CHECK_IN)
                 .join(GAME).on(CHECK_IN.game.eq(GAME).and(GAME.id.eq(gameId)))
-                .where(drawCondition(CHECK_IN, GAME))
+                .where(drawCondition(CHECK_IN, GAME), isLocationCheckIn())
                 .fetch();
     }
 
@@ -184,7 +186,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
 
         Tuple tuple = jpaQueryFactory.select(w, n)
                 .from(MEMBER)
-                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam())
+                .leftJoin(CHECK_IN).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isLocationCheckIn())
                 .leftJoin(GAME).on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year))
                 .where(isMemberNotDeleted()).fetchOne();
 
@@ -520,6 +522,7 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(GAME)
                 .on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
+                .where(isLocationCheckIn())
                 .fetchOne();
     }
 
@@ -541,11 +544,16 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 .join(GAME)
                 .on(CHECK_IN.game.eq(GAME), isComplete(), isBetweenYear(year), GAME.homeScore.ne(GAME.awayScore))
                 .join(MEMBER).on(CHECK_IN.member.eq(MEMBER), isFavoriteTeam(), isMemberNotDeleted())
+                .where(isLocationCheckIn())
                 .fetchOne();
     }
 
     private BooleanExpression isFavoriteTeam() {
         return CHECK_IN.team.eq(MEMBER.team);
+    }
+
+    private BooleanExpression isLocationCheckIn() {
+        return CHECK_IN.checkInType.eq(CheckInType.LOCATION_CHECK_IN);
     }
 
     private int conditionCountOnRecentGames(
