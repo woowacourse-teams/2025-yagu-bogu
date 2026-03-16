@@ -46,13 +46,13 @@ public record AppleAuthParam(
     }
 
     @Override
-    public Member toMember() {
+    public Member toMember(String defaultImageUrl) {
         String safeEmail = email == null || email.isBlank()
                 ? oauthId + "@appleid.apple"
                 : email;
         String nickname = generateNickname(oauthId);
 
-        return new Member(null, new Nickname(nickname), safeEmail, OAuthProvider.APPLE, oauthId, Role.USER, "", null);
+        return new Member(null, new Nickname(nickname), safeEmail, OAuthProvider.APPLE, oauthId, Role.USER, defaultImageUrl, null);
     }
 
     private static String generateNickname(final String oauthId) {

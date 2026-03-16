@@ -10,5 +10,5 @@ public interface AuthParam {
 
     String picture();
 
-    Member toMember();
+    Member toMember(String defaultImageUrl);
 }

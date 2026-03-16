@@ -8,6 +8,7 @@ public record S3Properties(
         String bucket,
         Duration presignExpiration,
         String endpoint,
-        String region
+        String region,
+        String defaultProfileImageUrl
 ) {
 }

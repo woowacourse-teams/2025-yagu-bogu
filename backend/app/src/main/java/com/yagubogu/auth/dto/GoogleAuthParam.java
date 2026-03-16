@@ -57,7 +57,7 @@ public record GoogleAuthParam(
     }
 
     @Override
-    public Member toMember() {
+    public Member toMember(String defaultImageUrl) {
         return new Member(null, new Nickname(name), email, OAuthProvider.GOOGLE, oauthId, Role.USER, picture, null);
     }
 }

@@ -1,5 +1,16 @@
 package com.yagubogu.member.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.config.S3Properties;
@@ -33,18 +44,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest.Builder;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@Import({ AuthTestConfig.class, JpaAuditingConfig.class })
+@Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
 class ProfileImageServiceTest {
@@ -53,6 +53,7 @@ class ProfileImageServiceTest {
     private static final Duration TEST_PRESIGN_EXPIRATION = Duration.ofMinutes(10);
     private static final String TEST_ENDPOINT = "https://test-namespace.compat.objectstorage.ap-chuncheon-1.oraclecloud.com";
     private static final String TEST_REGION = "ap-chuncheon-1";
+    private static final String TEST_DEFAULT_PROFILE_IMAGE_URL = "https://test-namespace.compat.objectstorage.ap-chuncheon-1.oraclecloud.com/yagubogu/images/defaults/profile.png";
 
     @Mock
     private MemberService memberService;
@@ -71,7 +72,8 @@ class ProfileImageServiceTest {
 
     @BeforeEach
     void setUp() {
-        s3Properties = new S3Properties(TEST_BUCKET, TEST_PRESIGN_EXPIRATION, TEST_ENDPOINT, TEST_REGION);
+        s3Properties = new S3Properties(TEST_BUCKET, TEST_PRESIGN_EXPIRATION, TEST_ENDPOINT, TEST_REGION,
+                TEST_DEFAULT_PROFILE_IMAGE_URL);
         profileImageService = new ProfileImageService(s3Presigner, s3Client, s3Properties, memberService);
     }
 
