@@ -2,7 +2,6 @@ package com.yagubogu.auth.gateway;
 
 import com.yagubogu.auth.dto.AuthParam;
 import com.yagubogu.auth.dto.LoginParam;
-import com.yagubogu.global.exception.BadRequestException;
 import com.yagubogu.member.domain.OAuthProvider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,7 @@ public class RoutingAuthGateway implements AuthGateway {
 
     @Override
     public AuthParam validateToken(final LoginParam loginParam) {
-        OAuthProvider provider = loginParam.provider();
-        if (provider == null) {
-            throw new BadRequestException("OAuth provider is required");
-        }
+        OAuthProvider provider = loginParam.provider() != null ? loginParam.provider() : OAuthProvider.GOOGLE;
 
         return providerAuthGateways.stream()
                 .filter(gateway -> gateway.supports(provider))
