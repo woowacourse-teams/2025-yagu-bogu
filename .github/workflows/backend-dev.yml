@@ -126,6 +126,7 @@ jobs:
             -e OCI_S3_ENDPOINT="${{ secrets.OCI_S3_ENDPOINT }}" \
             -e OCI_REGION="${{ secrets.OCI_REGION }}" \
             -e OCI_S3_BUCKET="${{ secrets.OCI_S3_BUCKET }}" \
+            -e DEFAULT_PROFILE_IMAGE_URL="${{ secrets.DEFAULT_PROFILE_IMAGE_URL }}" \
             $IMAGE:$TAG
           
           echo "컨테이너 실행 완료."  
