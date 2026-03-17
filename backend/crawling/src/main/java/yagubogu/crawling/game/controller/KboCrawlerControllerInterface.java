@@ -10,11 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import yagubogu.crawling.game.dto.GamesFromGameCenter;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
 
 @Tag(name = "KboCrawler", description = "KBO 크롤링 관련 API")
@@ -37,5 +35,5 @@ public interface KboCrawlerControllerInterface {
     })
     @PostMapping("/game-center")
     ResponseEntity<Integer> fetchGameCenter(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
 }

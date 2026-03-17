@@ -66,6 +66,8 @@ app:
     endpoint: https://test-namespace.compat.objectstorage.ap-chuncheon-1.oraclecloud.com
     region: ap-chuncheon-1
     default-profile-image-url: https://test.oraclecloud.com/test/defaults/profile.png
+  clock:
+    fixed-date: 2024-08-15
 
 ---
 spring:
