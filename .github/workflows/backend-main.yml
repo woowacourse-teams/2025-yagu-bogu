@@ -161,6 +161,7 @@ jobs:
             -p "$PORT:8080" \
             --stop-signal=SIGTERM \
             --stop-timeout=30 \
+            --network yagubogu-net \
             -v /var/log/yagubogu:/var/log/yagubogu \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e DB_URL="${{ secrets.DB_PROD_URL }}" \
