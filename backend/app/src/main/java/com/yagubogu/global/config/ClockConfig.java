@@ -15,15 +15,20 @@ public class ClockConfig {
     private String fixedDate;
 
     @Bean
-    @Profile("!prod")
     public Clock clock() {
-        if (fixedDate != null && !fixedDate.isEmpty()) {
-            LocalDate date = LocalDate.parse(fixedDate);
-            return Clock.fixed(
-                    date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant(),
-                    ZoneId.of("Asia/Seoul")
-            );
-        }
         return Clock.system(ZoneId.of("Asia/Seoul"));
     }
+//
+//    @Bean
+//    @Profile("test")
+//    public Clock clock() {
+//        if (fixedDate != null && !fixedDate.isEmpty()) {
+//            LocalDate date = LocalDate.parse(fixedDate);
+//            return Clock.fixed(
+//                    date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant(),
+//                    ZoneId.of("Asia/Seoul")
+//            );
+//        }
+//        return Clock.system(ZoneId.of("Asia/Seoul"));
+//    }
 }
