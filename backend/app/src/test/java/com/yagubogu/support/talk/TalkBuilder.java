@@ -4,7 +4,6 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.talk.domain.Talk;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class TalkBuilder {
 
@@ -38,6 +37,6 @@ public class TalkBuilder {
     }
 
     public Talk build() {
-        return new Talk(UUID.randomUUID().toString(), game, member, content, createdAt);
+        return new Talk(game, member, content, createdAt);
     }
 }

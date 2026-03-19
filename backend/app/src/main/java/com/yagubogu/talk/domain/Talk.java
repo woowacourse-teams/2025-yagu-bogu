@@ -28,9 +28,7 @@ import org.hibernate.annotations.SQLRestriction;
         name = "talks",
         indexes = {
                 @Index(name = "idx_game_member_content_created",
-                        columnList = "game_id, member_id, content, created_at"),
-                @Index(name = "idx_client_message_id",
-                        columnList = "client_message_id")
+                        columnList = "game_id, member_id, content, created_at")
         }
 )
 @Entity
@@ -40,9 +38,6 @@ public class Talk extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "talk_id")
     private Long id;
-
-    @Column(name = "client_message_id", unique = true, nullable = false)
-    private String clientMessageId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
@@ -59,13 +54,11 @@ public class Talk extends BaseEntity {
     private LocalDateTime createdAt;
 
     public Talk(
-            final String clientMessageId,
             final Game game,
             final Member member,
             final String content,
             final LocalDateTime createdAt
     ) {
-        this.clientMessageId = clientMessageId;
         this.game = game;
         this.member = member;
         this.content = content;

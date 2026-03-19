@@ -3,11 +3,8 @@ package com.yagubogu.talk.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.yagubogu.auth.config.AuthTestConfig;
-import com.yagubogu.badge.domain.Policy;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
@@ -23,7 +20,6 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.support.talk.TalkFactory;
 import com.yagubogu.support.talk.TalkReportFactory;
 import com.yagubogu.talk.domain.Talk;
-import com.yagubogu.talk.dto.event.TalkEvent;
 import com.yagubogu.talk.dto.v1.TalkCursorResultResponse;
 import com.yagubogu.talk.dto.v1.TalkRequest;
 import com.yagubogu.talk.dto.v1.TalkResponse;
@@ -33,23 +29,17 @@ import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -405,9 +395,8 @@ class TalkServiceTest {
                 .awayTeam(awayTeam)
                 .stadium(stadium));
 
-        String clientId = UUID.randomUUID().toString();
         String content = "오늘 야구 재밌겠당";
-        TalkRequest request = new TalkRequest(clientId, content);
+        TalkRequest request = new TalkRequest(content);
 
         // when
         TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());
@@ -421,37 +410,10 @@ class TalkServiceTest {
     }
 
     @Test
-    @DisplayName("같은 clientMessageId로 2번 요청하면 중복 생성되지 않는다")
-    void duplicateClientMessageId() {
-        // given
-        String clientMessageId = UUID.randomUUID().toString();
-        TalkRequest request = new TalkRequest(clientMessageId, "테스트");
-        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
-        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
-        Member member = memberFactory.save(builder -> builder.team(homeTeam));
-        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
-        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
-                .awayTeam(awayTeam)
-                .stadium(stadium));
-        Long gameId = game.getId();
-        Long memberId = member.getId();
-
-        // when
-        TalkResponse response1 = talkService.createTalk(gameId, request, memberId);
-        TalkResponse response2 = talkService.createTalk(gameId, request, memberId);
-
-        // then
-        assertThat(response1.id()).isEqualTo(response2.id());
-        assertThat(talkRepository.findAll()).hasSize(1);
-    }
-
-    @Test
     @DisplayName("예외: 3초 이내 같은 내용 전송 시 예외가 발생한다.")
     void duplicateContent() {
         // given
-        String clientId1 = UUID.randomUUID().toString();
-        String clientId2 = UUID.randomUUID().toString();
-        TalkRequest request1 = new TalkRequest(clientId1, "안녕하세요");
+        TalkRequest request1 = new TalkRequest("안녕하세요");
         Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
         Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
         Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
@@ -465,48 +427,9 @@ class TalkServiceTest {
         talkService.createTalk(gameId, request1, memberId);
 
         // when & then
-        TalkRequest request2 = new TalkRequest(clientId2, "안녕하세요");
+        TalkRequest request2 = new TalkRequest("안녕하세요");
         assertThatThrownBy(() -> talkService.createTalk(1L, request2, memberId))
                 .isInstanceOf(ConflictException.class);
-    }
-
-    @Test
-    @DisplayName("예외: 동시에 같은 clientMessageId로 저장 시 DuplicateRequestException 발생")
-    void throwDuplicateRequestExceptionWhenConcurrentInsert() {
-        // given
-        String clientMessageId = UUID.randomUUID().toString();
-        String message = "테스트";
-        TalkRequest request = new TalkRequest(clientMessageId, message);
-
-        Stadium stadium = stadiumRepository.findByShortName("사직구장").orElseThrow();
-        Team homeTeam = teamRepository.findByTeamCode("LT").orElseThrow();
-        Team awayTeam = teamRepository.findByTeamCode("HH").orElseThrow();
-        Member member = memberFactory.save(builder -> builder.team(homeTeam));
-        Game game = gameFactory.save(builder -> builder.homeTeam(homeTeam)
-                .awayTeam(awayTeam)
-                .stadium(stadium));
-
-        // 먼저 하나 저장 (DB에 clientMessageId 존재)
-        talkService.createTalk(game.getId(), request, member.getId());
-
-        // 트랜잭션 커밋 강제
-        entityManager.flush();
-        entityManager.clear();
-
-        // when: 같은 clientMessageId를 직접 DB에 INSERT 시도 (Service 로직 우회)
-        Talk duplicateTalk = new Talk(
-                clientMessageId,
-                game,
-                member,
-                message,
-                LocalDateTime.now()
-        );
-
-        // then: DB Unique 제약 위반으로 예외 발생
-        assertThatThrownBy(() -> {
-            talkRepository.save(duplicateTalk);
-            entityManager.flush();  // 실제 DB INSERT 실행
-        }).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @DisplayName("예외: 특정 횟수 이상 신고를 당했다면 새로운 톡을 생성할 때 예외가 발생한다")
@@ -580,9 +503,8 @@ class TalkServiceTest {
                 .reporter(kindMember10)
         );
 
-        String clientMessageId = UUID.randomUUID().toString();
         String content = "오늘 야구 재밌겠당";
-        TalkRequest request = new TalkRequest(clientMessageId, content);
+        TalkRequest request = new TalkRequest(content);
 
         // when & then
         assertThatThrownBy(() -> talkService.createTalk(game.getId(), request, blockedMember.getId()))
@@ -681,9 +603,8 @@ class TalkServiceTest {
                 .awayTeam(awayTeam)
                 .stadium(stadium));
 
-        String clientMessageId = UUID.randomUUID().toString();
         String content = "오늘 야구 재밌겠당";
-        TalkRequest request = new TalkRequest(clientMessageId, content);
+        TalkRequest request = new TalkRequest(content);
 
         // when
         TalkResponse response = talkService.createTalk(game.getId(), request, me.getId());

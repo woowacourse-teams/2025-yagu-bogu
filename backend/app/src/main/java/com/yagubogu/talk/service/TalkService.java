@@ -22,7 +22,6 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -104,15 +102,6 @@ public class TalkService {
             final TalkRequest request,
             final long memberId
     ) {
-        // 1. 중복 체크
-        Optional<Talk> existingTalk = talkRepository.findByClientMessageId(request.clientMessageId());
-        if (existingTalk.isPresent()) {
-            log.info("중복 요청 감지 (Client Message ID) - clientMessageId: {}, talkId: {}",
-                    request.clientMessageId(), existingTalk.get().getId());
-            return TalkResponse.from(existingTalk.get(), memberId);
-        }
-
-        // 2~4. 검증
         Game game = getGame(gameId);
         Member member = getMember(memberId);
         validateBlockedFromGame(gameId, memberId);
@@ -122,7 +111,6 @@ public class TalkService {
 
         try {
             Talk talk = talkRepository.save(new Talk(
-                    request.clientMessageId(),
                     game,
                     member,
                     request.content(),
