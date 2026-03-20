@@ -99,7 +99,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         });
     }
 
-    @DisplayName("기존 연도 데이터가 있을 때, 같은 날짜로 갱신 시 누적 값으로 업데이트된다")
+    @DisplayName("기존 연도 데이터가 있을 때, 배치가 돌면 전체 평균 변동에 따라 직관을 안 간 회원의 점수도 재계산된다") // DisplayName 변경
     @Test
     void updateRankings_updateExisting() {
         // given
@@ -128,7 +128,7 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .gameState(GameState.COMPLETED));
         checkInFactory.save(b -> b.game(g2).member(m1).team(HT));
 
-        // when
+        // when (8월 1일자로 배치 실행 -> 2025년도 전체 업데이트)
         statSyncService.updateRankings(later);
 
         // then
@@ -141,12 +141,15 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
                 .orElseThrow();
 
         assertSoftly(softAssertions -> {
+            // m1 검증
             softAssertions.assertThat(r1.getWinCount()).isEqualTo(1);
             softAssertions.assertThat(r1.getCheckInCount()).isEqualTo(2);
             softAssertions.assertThat(r1.getScore()).isEqualTo(57.14);
+
+            // m2 검증 (주석 해제 및 올바른 보정 점수 기입)
             softAssertions.assertThat(r2.getWinCount()).isEqualTo(1);
             softAssertions.assertThat(r2.getCheckInCount()).isEqualTo(1);
-            softAssertions.assertThat(r2.getScore()).isEqualTo(100.0);
+            softAssertions.assertThat(r2.getScore()).isEqualTo(80.0); // 100점에서 전체 평균 하락으로 인해 80점으로 보정됨
         });
     }
 
@@ -242,5 +245,50 @@ class StatSyncServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
             softAssertions.assertThat(results.get(0).getMember().getId()).isEqualTo(normalMember.getId());
         });
     }
-}
 
+    @DisplayName("다른 연도의 직관 기록은 당해 연도 랭킹 업데이트에 영향을 주지 않는다")
+    @Test
+    void updateRankings_separatesYears() {
+        // given
+        Member m1 = memberFactory.save(b -> b.team(HT));
+
+        // 2024년 직관 (HT 승)
+        LocalDate date2024 = LocalDate.of(2024, 5, 5);
+        Game g2024 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT).date(date2024)
+                .homeScore(5).awayScore(3).gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2024).member(m1).team(HT));
+        statSyncService.updateRankings(date2024); // 2024년 배치 1회 실행
+
+        // 2025년 직관 (HT 승, 다른 멤버)
+        Member m2 = memberFactory.save(b -> b.team(HT));
+        LocalDate date2025 = LocalDate.of(2025, 5, 5);
+        Game g2025 = gameFactory.save(b -> b.stadium(kia)
+                .homeTeam(HT).awayTeam(LT).date(date2025)
+                .homeScore(5).awayScore(3).gameState(GameState.COMPLETED));
+        checkInFactory.save(b -> b.game(g2025).member(m2).team(HT));
+
+        // when (2025년 기준으로 배치 실행)
+        statSyncService.updateRankings(date2025);
+
+        // then
+        // 1. 2025년 랭킹에는 2025년에 직관한 m2만 등록되어야 함
+        List<VictoryFairyRanking> results2025 = victoryFairyRankingRepository
+                .findByMemberIdsAndYear(List.of(m1.getId(), m2.getId()), 2025);
+
+        // 2. 2024년 랭킹의 m1 점수는 2025년 데이터에 영향을 받지 않고 그대로 있어야 함
+        List<VictoryFairyRanking> results2024 = victoryFairyRankingRepository
+                .findByMemberIdsAndYear(List.of(m1.getId()), 2024);
+
+        assertSoftly(softAssertions -> {
+            // 2025년 검증
+            softAssertions.assertThat(results2025).hasSize(1);
+            softAssertions.assertThat(results2025.get(0).getMember().getId()).isEqualTo(m2.getId());
+            softAssertions.assertThat(results2025.get(0).getScore()).isEqualTo(100.0);
+
+            // 2024년 검증
+            softAssertions.assertThat(results2024).hasSize(1);
+            softAssertions.assertThat(results2024.get(0).getScore()).isEqualTo(100.0);
+        });
+    }
+}

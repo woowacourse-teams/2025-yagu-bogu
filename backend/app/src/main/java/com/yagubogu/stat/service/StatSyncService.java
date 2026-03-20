@@ -36,7 +36,7 @@ public class StatSyncService {
             Slice<Long> slice;
             do {
                 Pageable pageable = PageRequest.of(page, CHUNK_SIZE);
-                slice = checkInRepository.findDistinctMemberIdsByDate(date, pageable);
+                slice = checkInRepository.findDistinctMemberIdsByYear(currentYear, pageable);
 
                 if (slice.hasContent()) {
                     List<Long> memberIds = slice.getContent();

@@ -57,11 +57,12 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long>, CustomC
             SELECT DISTINCT c.member.id
             FROM CheckIn c
             JOIN c.game g
-            WHERE g.date = :date
+            WHERE YEAR(g.date) = :year
+            AND c.checkInType = 'LOCATION_CHECK_IN'
             ORDER BY c.member.id
             """)
-    Slice<Long> findDistinctMemberIdsByDate(
-            @Param("date") LocalDate date,
+    Slice<Long> findDistinctMemberIdsByYear(
+            @Param("year") int year,
             Pageable pageable
     );
 
