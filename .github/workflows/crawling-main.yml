@@ -11,6 +11,7 @@ on:
       - "backend/settings.gradle"
       - "backend/gradle/**"
       - "backend/gradlew"
+    workflow_dispatch:
 
 env:
   IMAGE: yagubogu/yagubogu-crawling
