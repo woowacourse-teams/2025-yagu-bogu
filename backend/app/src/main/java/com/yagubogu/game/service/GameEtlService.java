@@ -270,8 +270,7 @@ public class GameEtlService {
         // 올바른 더블헤더 순서로 게임 코드 생성
         final String gameCode = generateGameCode(date, homeTeam, awayTeam, doubleHeaderOrder);
 
-        final GameState payloadState = GameState.fromName(status);
-        final GameState gameState = Optional.ofNullable(bronzeGame.getState()).orElse(payloadState);
+        final GameState gameState = GameState.fromName(status);
 
         PitcherResult result = assignPitchers(homeScore, awayScore, winningPitcher, losingPitcher);
         final String homePitcher = result.home();
