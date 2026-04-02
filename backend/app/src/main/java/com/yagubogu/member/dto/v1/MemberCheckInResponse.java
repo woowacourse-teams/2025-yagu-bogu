@@ -13,8 +13,12 @@ public record MemberCheckInResponse(
 ) {
 
     public static MemberCheckInResponse from(final CheckInSummaryParam summary) {
-        if (summary == null || summary.totalCount() == 0) {
+        if (summary == null) {
             return empty();
+        }
+
+        if (summary.totalCount() == 0) {
+            return new MemberCheckInResponse(null, 0.0, null, null, null, summary.recentCheckInDate());
         }
 
         return new MemberCheckInResponse(

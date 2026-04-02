@@ -179,7 +179,7 @@ public class MemberService {
         int year = LocalDate.now().getYear();
         MemberProfileBadgeResponse badgeResponse = createBadgeResponse(profileOwnerMember);
         VictoryFairyProfileResponse victoryFairyResponse = createVictoryFairyResponse(profileOwnerId, year);
-        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, null);
+        MemberCheckInResponse checkInResponse = createCheckInResponse(profileOwnerId, year);
 
         return MemberProfileResponse.from(
                 profileOwnerMember,
