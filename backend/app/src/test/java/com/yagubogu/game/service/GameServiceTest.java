@@ -10,6 +10,7 @@ import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameResultParam.ScoreBoardParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
+import com.yagubogu.game.dto.SeasonStatusResponse;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
 import com.yagubogu.game.dto.v1.GameResponse;
@@ -31,6 +32,7 @@ import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -154,6 +156,91 @@ class GameServiceTest {
 
         // then
         assertThat(scoreBoard).isEqualTo(expected);
+    }
+
+    @DisplayName("시즌 상태 조회: 해당 연도에 경기 데이터가 있으면 isOpened는 true이다")
+    @Test
+    void getSeasonStatus_WhenDataExists() {
+        // given
+        int year = 2026;
+        makeGame(LocalDate.of(year, 5, 1), "HT", "LT", "잠실구장");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(year);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isTrue();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(year);
+        });
+    }
+
+    @DisplayName("시즌 상태 조회: 해당 연도에 데이터가 없으면 isOpened는 false이고 전년도를 반환한다")
+    @Test
+    void getSeasonStatus_WhenNoDataExists() {
+        // given
+        int year = 2026;
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(year);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isFalse();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(year - 1);
+        });
+    }
+
+    @DisplayName("시즌 상태 조회: 파라미터가 null이면 현재 연도를 기준으로 조회한다")
+    @Test
+    void getSeasonStatus_WhenYearIsNull() {
+        // given
+        int currentYear = LocalDate.now().getYear();
+        makeGame(LocalDate.of(currentYear, 6, 1), "SS", "HH", "랜더스필드");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(null);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isTrue();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(currentYear);
+        });
+    }
+
+    @DisplayName("Season status: within 7 days after last game, still opened")
+    @Test
+    void getSeasonStatus_WhenWithinGracePeriod() {
+        // given
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+                makeGame(now.minusDays(3), "SS", "HH", "잠실구장");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(year);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isTrue();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(year);
+        });
+    }
+
+    @DisplayName("Season status: if the season already ended, isOpened is false")
+    @Test
+    void getSeasonStatus_WhenSeasonEnded() {
+        // given
+        int lastYear = LocalDate.now().getYear() - 1;
+                makeGame(LocalDate.of(lastYear, 10, 1), "SS", "HH", "잠실구장");
+
+        // when
+        SeasonStatusResponse response = gameService.getSeasonStatus(lastYear);
+
+        // then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response.isOpened()).isFalse();
+            softAssertions.assertThat(response.seasonYear()).isEqualTo(lastYear);
+        });
     }
 
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {

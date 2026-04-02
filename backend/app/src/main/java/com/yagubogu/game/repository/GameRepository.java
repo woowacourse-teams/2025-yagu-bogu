@@ -65,4 +65,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findAllByDate(LocalDate date);
 
     boolean existsByDateAndGameStateIn(LocalDate date, List<GameState> states);
+
+    @Query("SELECT MAX(g.date) FROM Game g WHERE YEAR(g.date) = :year")
+    Optional<LocalDate> findLastGameDateByYear(@Param("year") int year);
 }

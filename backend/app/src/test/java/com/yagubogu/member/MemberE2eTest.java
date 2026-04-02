@@ -391,7 +391,7 @@ public class MemberE2eTest extends E2eTestBase {
         long invalidProfileOwnerMemberId = 9999999L;
         String accessToken = authFactory.getAccessTokenByMemberId(me.getId(), Role.USER);
 
-        // when
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)

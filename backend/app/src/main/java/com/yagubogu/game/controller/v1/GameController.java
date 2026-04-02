@@ -2,6 +2,7 @@ package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.game.dto.SeasonStatusResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
@@ -22,6 +23,15 @@ public class GameController implements GameControllerInterface {
             @RequestParam final LocalDate date
     ) {
         GameResponse response = gameService.findGamesByDate(date, memberClaims.id());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SeasonStatusResponse> getSeasonStatus(
+            final Integer year
+    ) {
+        SeasonStatusResponse response = gameService.getSeasonStatus(year);
 
         return ResponseEntity.ok(response);
     }

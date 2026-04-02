@@ -27,6 +27,7 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -126,6 +127,40 @@ public class GameE2eTest extends E2eTestBase {
                 .when().get("/api/v1/games")
                 .then().log().all()
                 .statusCode(422);
+    }
+
+    @DisplayName("시즌 상태 조회 성공: 데이터가 존재하면 200을 반환한다")
+    @Test
+    void getSeasonStatus_Success() {
+        // given: 현재 시점의 경기 데이터 생성
+        LocalDate now = LocalDate.now();
+        makeGame(now, "HT", "LT", "잠실구장");
+
+        // when & then
+        RestAssured.given()
+                .when().get("/api/v1/games/season/status")
+                .then()
+                .statusCode(200)
+                .body("isOpened", Matchers.is(true))
+                .body("seasonYear", Matchers.is(now.getYear()));
+    }
+
+    @DisplayName("시즌 상태 조회: 올해 데이터가 없으면 전년도 데이터를 찾아 '시즌 종료' 상태를 반환한다")
+    @Test
+    void getSeasonStatus_WhenNoDataInCurrentYear_ReturnsLastYear() {
+        // given: 작년 데이터 있음
+        LocalDate now = LocalDate.now();
+        int lastYear = now.getYear() - 1;
+        makeGame(LocalDate.of(lastYear, 10, 1), "SS", "HH", "랜더스필드");
+
+        // when & then
+        RestAssured.given()
+                .queryParam("year", now.getYear())
+                .when().get("/api/v1/games/season/status")
+                .then()
+                .statusCode(200)
+                .body("isOpened", Matchers.is(false))
+                .body("seasonYear", Matchers.is(lastYear));
     }
 
     private Game makeGame(LocalDate date, String homeCode, String awayCode, String stadiumShortName) {
