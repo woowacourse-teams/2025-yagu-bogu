@@ -314,7 +314,7 @@ public class MemberE2eTest extends E2eTestBase {
                 .statusCode(404);
     }
 
-    @DisplayName("사용자의 프로필 정보를 조회할 때, 연도와 상관없이 전체 직관 통계를 합산하여 보여준다")
+    @DisplayName("사용자의 프로필 정보를 조회할 때, 직관 통계는 현재 연도 기준으로, 최신 직관 날짜는 전체 연도 기준으로 보여준다")
     @Test
     void findProfileInformationWithAllYears() {
         // 1. Given: 기본 환경 설정 (팀, 경기장, 멤버)
@@ -364,18 +364,18 @@ public class MemberE2eTest extends E2eTestBase {
                 .statusCode(200)
                 .extract().as(MemberProfileResponse.class);
 
-        // 4. Then: 데이터 검증 (2024년 + 2026년 통계가 합산되었는지 확인)
+        // 4. Then: 데이터 검증 (현재 연도(2026년) 기준 통계, 최신 직관 날짜는 전체 연도 기준)
         assertSoftly(softly -> {
             softly.assertThat(response.nickname()).isEqualTo("가짜우가");
-            // 전체 직관 횟수: 3 (2024년 1건 + 2026년 2건)
-            softly.assertThat(response.checkIn().counts()).isEqualTo(3);
-            // 전체 승리 횟수: 2 (2024년 1승 + 2026년 1승)
-            softly.assertThat(response.checkIn().winCounts()).isEqualTo(2);
+            // 현재 연도(2026년) 직관 횟수: 2
+            softly.assertThat(response.checkIn().counts()).isEqualTo(2);
+            // 현재 연도(2026년) 승리 횟수: 1
+            softly.assertThat(response.checkIn().winCounts()).isEqualTo(1);
             softly.assertThat(response.checkIn().loseCounts()).isEqualTo(1);
-            // 최근 직관 날짜: 2026-02-15
+            // 최근 직관 날짜: 전체 연도 기준 2026-02-15
             softly.assertThat(response.checkIn().recentCheckInDate()).isEqualTo(LocalDate.of(2026, 2, 15));
-            // 승률 계산: (2승 / 3경기) * 100 = 66.7 (소수점 첫째자리 반올림 가정)
-            softly.assertThat(response.checkIn().winRate()).isEqualTo(66.7);
+            // 승률 계산: (1승 / 2경기) * 100 = 50.0 (현재 연도 기준)
+            softly.assertThat(response.checkIn().winRate()).isEqualTo(50.0);
         });
     }
 
