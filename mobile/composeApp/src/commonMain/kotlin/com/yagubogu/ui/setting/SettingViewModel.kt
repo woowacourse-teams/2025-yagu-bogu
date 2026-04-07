@@ -55,6 +55,9 @@ class SettingViewModel(
         )
     val settingEvent = _settingEvent.asSharedFlow()
 
+    private val _geofenceNotification = MutableStateFlow(false)
+    val geofenceNotification = _geofenceNotification.asStateFlow()
+
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
             memberRepository
@@ -169,6 +172,12 @@ class SettingViewModel(
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "회원 정보 조회 API 호출 실패" }
                 }
+        }
+    }
+
+    fun updateGeofenceNotification(geofenceNotification: Boolean) {
+        viewModelScope.launch {
+            _geofenceNotification.value = geofenceNotification
         }
     }
 

@@ -34,6 +34,7 @@ import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
+import com.yagubogu.ui.setting.component.SettingToggleButton
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.SettingEvent
@@ -57,6 +58,8 @@ import yagubogu.composeapp.generated.resources.setting_edit_my_team
 import yagubogu.composeapp.generated.resources.setting_edit_nickname
 import yagubogu.composeapp.generated.resources.setting_edit_profile_image
 import yagubogu.composeapp.generated.resources.setting_edited_nickname_alert
+import yagubogu.composeapp.generated.resources.setting_geofencing_notification
+import yagubogu.composeapp.generated.resources.setting_geofencing_notification_tooltip
 import yagubogu.composeapp.generated.resources.setting_main_sign_up_date
 import yagubogu.composeapp.generated.resources.setting_manage_account
 import yagubogu.composeapp.generated.resources.setting_notice
@@ -77,6 +80,8 @@ fun SettingMainScreen(
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+
+    val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchMemberInfo()
@@ -118,6 +123,8 @@ fun SettingMainScreen(
         onOssLicenseClick = onOssLicenseClick,
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
+        geofenceNotification = geofenceNotification.value,
+        updateGeofenceNotification = viewModel::updateGeofenceNotification,
         modifier = modifier,
     )
 
@@ -145,6 +152,8 @@ private fun SettingMainScreen(
     onOssLicenseClick: () -> Unit,
     memberInfoItem: MemberInfoItem,
     appVersion: String,
+    geofenceNotification: Boolean,
+    updateGeofenceNotification: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -161,6 +170,12 @@ private fun SettingMainScreen(
         MyProfile(memberInfoItem = memberInfoItem)
 
         SettingButtonGroup {
+            SettingToggleButton(
+                text = stringResource(Res.string.setting_geofencing_notification),
+                toolTipText = stringResource(Res.string.setting_geofencing_notification_tooltip),
+                checked = geofenceNotification,
+                onCheckedChange = { updateGeofenceNotification(!geofenceNotification) },
+            )
             SettingButton(
                 text = stringResource(Res.string.setting_edit_profile_image),
                 onClick = onProfileImageUpload,
@@ -276,5 +291,7 @@ private fun SettingMainScreenPreview() {
         onOssLicenseClick = {},
         memberInfoItem = MemberInfoItem(nickName = "야구보구"),
         appVersion = "1.0.0",
+        geofenceNotification = false,
+        updateGeofenceNotification = {},
     )
 }
