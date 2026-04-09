@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.ComposeUIViewController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.di.authModule
+import com.yagubogu.di.commonLocalModule
 import com.yagubogu.di.commonModule
 import com.yagubogu.di.datasourceModule
 import com.yagubogu.di.localModule
@@ -44,6 +45,7 @@ fun MainViewController(
                         commonModule,
                         datasourceModule,
                         localModule,
+                        commonLocalModule,
                         networkModule,
                         repositoryModule,
                         serviceModule,

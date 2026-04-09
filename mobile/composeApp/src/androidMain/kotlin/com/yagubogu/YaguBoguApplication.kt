@@ -15,6 +15,7 @@ import com.kmp.geofence.TransitionType
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.analytics.FirebaseAnalyticsLogger
 import com.yagubogu.di.authModule
+import com.yagubogu.di.commonLocalModule
 import com.yagubogu.di.commonModule
 import com.yagubogu.di.datasourceModule
 import com.yagubogu.di.localModule
@@ -69,6 +70,7 @@ class YaguBoguApplication : Application() {
                 timeModule,
                 viewModelModule,
                 localModule,
+                commonLocalModule,
             )
         }
     }

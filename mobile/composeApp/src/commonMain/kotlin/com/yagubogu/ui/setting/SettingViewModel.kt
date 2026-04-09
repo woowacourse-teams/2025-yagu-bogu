@@ -3,6 +3,7 @@ package com.yagubogu.ui.setting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.yagubogu.data.local.CommonPreferences
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
@@ -41,6 +42,7 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
+    private val commonPreferences: CommonPreferences,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -55,7 +57,10 @@ class SettingViewModel(
         )
     val settingEvent = _settingEvent.asSharedFlow()
 
-    private val _geofenceNotification = MutableStateFlow(false)
+    private val _geofenceNotification =
+        MutableStateFlow(
+            commonPreferences.geofenceEnabled,
+        )
     val geofenceNotification = _geofenceNotification.asStateFlow()
 
     fun updateNickname(newNickname: String) {
@@ -175,9 +180,15 @@ class SettingViewModel(
         }
     }
 
-    fun updateGeofenceNotification(geofenceNotification: Boolean) {
+    fun updateGeofenceNotification(enabled: Boolean) {
         viewModelScope.launch {
-            _geofenceNotification.value = geofenceNotification
+            if (enabled) {
+                commonPreferences.geofenceEnabled = true
+                _geofenceNotification.value = true
+            } else {
+                commonPreferences.geofenceEnabled = false
+                _geofenceNotification.value = false
+            }
         }
     }
 

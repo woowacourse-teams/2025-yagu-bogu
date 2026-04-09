@@ -237,6 +237,9 @@ kotlin {
             api(libs.permissions.compose)
             implementation(libs.permissions.location)
             implementation(libs.permissions.notifications)
+
+            // Settings
+            implementation(libs.multiplatform.settings)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
