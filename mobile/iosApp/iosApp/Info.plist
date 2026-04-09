@@ -16,6 +16,12 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>직관 인증을 위해 사용자의 위치 정보가 필요합니다.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>구장 근처 방문시 직관 인증 리마인더를 위해 백그라운드 위치 정보가 필요합니다.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

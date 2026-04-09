@@ -54,6 +54,15 @@ kotlinxCoroutinesTest = "1.10.2"
 # Firebase
 firebaseBom = "34.0.0"
 
+# Geofence
+geofence = "1.0.2"
+
+# Notification
+alarmee = "2.6.0"
+
+# Permission
+moko = "0.20.1"
+
 # Google Services
 googleidVersion = "1.1.1"
 playServicesLocation = "21.3.0"
@@ -147,6 +156,18 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
+
+# Geofence
+geofence = { module = "io.github.mallikarjunpatelsh:geofence", version.ref = "geofence" }
+
+# Notificaion
+alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
+
+# Permission
+permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
+permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
+permissions-location = { module = "dev.icerock.moko:permissions-location", version.ref = "moko" }
+permissions-notifications = { module = "dev.icerock.moko:permissions-notifications", version.ref = "moko" }
 
 # Google Services
 google-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleidVersion" }
