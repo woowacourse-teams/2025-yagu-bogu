@@ -18,12 +18,16 @@ import com.yagubogu.di.authModule
 import com.yagubogu.di.commonLocalModule
 import com.yagubogu.di.commonModule
 import com.yagubogu.di.datasourceModule
+import com.yagubogu.di.geofenceModule
 import com.yagubogu.di.localModule
 import com.yagubogu.di.networkModule
 import com.yagubogu.di.repositoryModule
 import com.yagubogu.di.serviceModule
 import com.yagubogu.di.timeModule
 import com.yagubogu.di.viewModelModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -71,6 +75,7 @@ class YaguBoguApplication : Application() {
                 viewModelModule,
                 localModule,
                 commonLocalModule,
+                geofenceModule,
             )
         }
     }
@@ -83,11 +88,14 @@ class YaguBoguApplication : Application() {
         GeofenceBroadcastReceiver.setEventListener { event: GeofenceEvent ->
             when (event.transitionType) {
                 TransitionType.ENTER -> {
-                    println("✅ 지오펜스 입장: ${event.geofenceId}")
-                    // handle enter — call API, save to DB, send notification, etc.
+                    println("안드로이드 지오펜스 입장: ${event.geofenceId}")
+                    val stadiumId = event.geofenceId.toIntOrNull() ?: return@setEventListener
+                    CoroutineScope(Dispatchers.IO).launch {
+//                        checkGameAndNotify(this@YaguBoguApplication, stadiumId)
+                    }
                 }
                 TransitionType.EXIT -> {
-                    println("✅ 지오펜스 퇴장: ${event.geofenceId}")
+                    println("안드로이드 지오펜스 퇴장: ${event.geofenceId}")
                     // handle exit
                 }
             }

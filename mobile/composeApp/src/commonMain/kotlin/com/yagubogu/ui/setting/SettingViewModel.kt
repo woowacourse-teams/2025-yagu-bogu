@@ -9,6 +9,7 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.domain.geofence.GeofenceController
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
@@ -43,6 +44,7 @@ class SettingViewModel(
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
     private val commonPreferences: CommonPreferences,
+    private val geofenceController: GeofenceController,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -183,9 +185,14 @@ class SettingViewModel(
     fun updateGeofenceNotification(enabled: Boolean) {
         viewModelScope.launch {
             if (enabled) {
-                commonPreferences.geofenceEnabled = true
-                _geofenceNotification.value = true
+                geofenceController
+                    .registerAll()
+                    .onSuccess {
+                        commonPreferences.geofenceEnabled = true
+                        _geofenceNotification.value = true
+                    }.onFailure { logger.e(it) { "지오펜스 등록 실패" } }
             } else {
+                geofenceController.unregisterAll()
                 commonPreferences.geofenceEnabled = false
                 _geofenceNotification.value = false
             }
