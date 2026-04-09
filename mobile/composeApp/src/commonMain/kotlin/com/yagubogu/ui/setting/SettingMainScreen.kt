@@ -19,6 +19,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,14 +30,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.BuildKonfig
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.common.platform.PlatformType
+import com.yagubogu.ui.common.platform.androidVersion
+import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
 import com.yagubogu.ui.setting.component.SettingToggleButton
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
+import com.yagubogu.ui.setting.component.dialog.PermissionSettingsDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
@@ -46,8 +54,19 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.LocalSnackbarHostState
+import com.yagubogu.ui.util.rememberOpenNotificationSettings
 import com.yagubogu.ui.util.showSingleSnackbar
 import com.yagubogu.ui.util.yyyyMMddFormatter
+import dev.icerock.moko.permissions.DeniedAlwaysException
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import dev.icerock.moko.permissions.location.BACKGROUND_LOCATION
+import dev.icerock.moko.permissions.location.LOCATION
+import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -64,6 +83,11 @@ import yagubogu.composeapp.generated.resources.setting_main_sign_up_date
 import yagubogu.composeapp.generated.resources.setting_manage_account
 import yagubogu.composeapp.generated.resources.setting_notice
 import yagubogu.composeapp.generated.resources.setting_open_source_license
+import yagubogu.composeapp.generated.resources.setting_permission_location_message_android
+import yagubogu.composeapp.generated.resources.setting_permission_location_message_ios
+import yagubogu.composeapp.generated.resources.setting_permission_location_title
+import yagubogu.composeapp.generated.resources.setting_permission_notification_message
+import yagubogu.composeapp.generated.resources.setting_permission_notification_title
 
 @Composable
 fun SettingMainScreen(
@@ -74,21 +98,102 @@ fun SettingMainScreen(
     onOssLicenseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val factory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
+    val controller = remember(factory) { factory.createPermissionsController() }
+    val openNotificationSettings =
+        rememberOpenNotificationSettings {
+            controller.openAppSettings()
+        }
+
+    BindEffect(controller)
+
     val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
 
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+    var showLocationPermissionDialog by rememberSaveable { mutableStateOf(false) }
+    var showNotificationPermissionDialog by rememberSaveable { mutableStateOf(false) }
 
     val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchMemberInfo()
+    val handleGeofenceToggle: (Boolean) -> Unit = { enable ->
+        if (!enable) {
+            viewModel.updateGeofenceNotification(false)
+        } else {
+            coroutineScope.launch {
+                // 알림 권한 상태 체크
+                val isNotificationGranted = controller.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
+
+                if (!isNotificationGranted) {
+                    // 알림 권한 런타임 요청 지원 여부 (Android 13+ 또는 iOS)
+                    val supportsRuntimePopup =
+                        if (currentPlatform == PlatformType.ANDROID) {
+                            androidVersion >= 33
+                        } else {
+                            true
+                        }
+
+                    if (supportsRuntimePopup) {
+                        try {
+                            controller.providePermission(Permission.REMOTE_NOTIFICATION)
+                        } catch (e: DeniedAlwaysException) {
+                            // 사용자가 '다시 묻지 않음'을 눌렀거나 이미 거부된 경우
+                            showNotificationPermissionDialog = true
+                            return@launch
+                        } catch (e: Exception) {
+                            return@launch
+                        }
+                    } else {
+                        showNotificationPermissionDialog = true
+                        return@launch
+                    }
+                }
+
+                val isBackgroundLocationGranted = controller.isPermissionGranted(Permission.BACKGROUND_LOCATION)
+
+                if (isBackgroundLocationGranted) {
+                    viewModel.updateGeofenceNotification(true)
+                } else {
+                    when (currentPlatform) {
+                        PlatformType.IOS -> {
+                            try {
+                                // iOS: 설정에 위치 권한 항목을 만들기 위한 포그라운드 위치 권한 요청
+                                if (!controller.isPermissionGranted(Permission.LOCATION)) {
+                                    controller.providePermission(Permission.LOCATION)
+                                    delay(500L)
+                                }
+                            } catch (e: Exception) {
+                            }
+                            showLocationPermissionDialog = true
+                        }
+
+                        PlatformType.ANDROID -> {
+                            if (androidVersion == 29) {
+                                // Android 10: 인앱에서 직접 백그라운드 요청 가능
+                                try {
+                                    controller.providePermission(Permission.BACKGROUND_LOCATION)
+                                    viewModel.updateGeofenceNotification(true)
+                                } catch (e: Exception) {
+                                    showLocationPermissionDialog = true
+                                }
+                            } else {
+                                // Android 11+: 무조건 설정 이동 다이얼로그
+                                showLocationPermissionDialog = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
+    LaunchedEffect(Unit) { viewModel.fetchMemberInfo() }
+
     LaunchedEffect(Unit) {
-        viewModel.settingEvent.collect { settingEvent: SettingEvent ->
+        viewModel.settingEvent.collect { settingEvent ->
             when (settingEvent) {
                 is SettingEvent.NicknameEditSuccess -> {
                     val message =
@@ -96,21 +201,26 @@ fun SettingMainScreen(
                             Res.string.setting_edited_nickname_alert,
                             settingEvent.newNickname,
                         )
-                    snackbarHostState.showSingleSnackbar(
-                        scope = this,
-                        message = message,
-                    )
+                    snackbarHostState.showSingleSnackbar(scope = this, message = message)
                 }
-
                 is SettingEvent.NicknameEditFailure -> {
-                    val errorMessage = settingEvent.uiText.asString()
                     snackbarHostState.showSingleSnackbar(
                         scope = this,
-                        message = errorMessage,
+                        message = settingEvent.uiText.asString(),
                     )
                 }
-
                 else -> Unit
+            }
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        coroutineScope.launch {
+            val hasNotification = controller.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
+            val hasBackgroundLocation = controller.isPermissionGranted(Permission.BACKGROUND_LOCATION)
+
+            if (geofenceNotification.value && (!hasNotification || !hasBackgroundLocation)) {
+                viewModel.updateGeofenceNotification(false)
             }
         }
     }
@@ -124,7 +234,7 @@ fun SettingMainScreen(
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
         geofenceNotification = geofenceNotification.value,
-        updateGeofenceNotification = viewModel::updateGeofenceNotification,
+        updateGeofenceNotification = handleGeofenceToggle,
         modifier = modifier,
     )
 
@@ -139,6 +249,36 @@ fun SettingMainScreen(
                 showNicknameEditDialog = false
             },
             onCancel = { showNicknameEditDialog = false },
+        )
+    }
+
+    if (showLocationPermissionDialog) {
+        PermissionSettingsDialog(
+            title = stringResource(Res.string.setting_permission_location_title),
+            message =
+                when (currentPlatform) {
+                    PlatformType.IOS -> stringResource(Res.string.setting_permission_location_message_ios)
+                    PlatformType.ANDROID -> stringResource(Res.string.setting_permission_location_message_android)
+                },
+            onConfirm = {
+                showLocationPermissionDialog = false
+                coroutineScope.launch {
+                    delay(300L) // iOS가 설정 앱 항목 등록할 시간 확보
+                    controller.openAppSettings()
+                }
+            },
+            onCancel = { showLocationPermissionDialog = false },
+        )
+    }
+    if (showNotificationPermissionDialog) {
+        PermissionSettingsDialog(
+            title = stringResource(Res.string.setting_permission_notification_title),
+            message = stringResource(Res.string.setting_permission_notification_message),
+            onConfirm = {
+                showNotificationPermissionDialog = false
+                openNotificationSettings() // Android: 알림 설정 직접 / iOS: 앱 설정
+            },
+            onCancel = { showNotificationPermissionDialog = false },
         )
     }
 }

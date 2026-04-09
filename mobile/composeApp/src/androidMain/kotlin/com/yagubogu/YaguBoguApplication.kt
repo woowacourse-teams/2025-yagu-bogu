@@ -8,6 +8,10 @@ import co.touchlab.kermit.crashlytics.CrashlyticsLogWriter
 import co.touchlab.kermit.platformLogWriter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.kmp.geofence.GeofenceBroadcastReceiver
+import com.kmp.geofence.GeofenceContext
+import com.kmp.geofence.GeofenceEvent
+import com.kmp.geofence.TransitionType
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.analytics.FirebaseAnalyticsLogger
 import com.yagubogu.di.authModule
@@ -29,6 +33,7 @@ class YaguBoguApplication : Application() {
         setupLogging()
         setupAnalytics()
         setupKoin()
+        setupGeofence()
     }
 
     private fun setupAnalytics() {
@@ -65,6 +70,25 @@ class YaguBoguApplication : Application() {
                 viewModelModule,
                 localModule,
             )
+        }
+    }
+
+    private fun setupGeofence() {
+        // Initialize context
+        GeofenceContext.init(this)
+
+        // Set listener here — Application is always alive
+        GeofenceBroadcastReceiver.setEventListener { event: GeofenceEvent ->
+            when (event.transitionType) {
+                TransitionType.ENTER -> {
+                    println("✅ 지오펜스 입장: ${event.geofenceId}")
+                    // handle enter — call API, save to DB, send notification, etc.
+                }
+                TransitionType.EXIT -> {
+                    println("✅ 지오펜스 퇴장: ${event.geofenceId}")
+                    // handle exit
+                }
+            }
         }
     }
 }
