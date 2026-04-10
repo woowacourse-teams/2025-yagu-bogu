@@ -27,7 +27,7 @@ class GeofenceControllerImpl(
                 override fun onGeofenceEnter(event: GeofenceEvent) {
                     val stadiumId = event.geofenceId.toIntOrNull() ?: return
                     CoroutineScope(Dispatchers.Default).launch {
-                        logger.i { "지오펜스 이벤트 수신: $stadiumId" }
+                        logger.i { "IOS 지오펜스 입장 이벤트 리스너 수신: $stadiumId" }
                         sendGeofenceNotificationUseCase(stadiumId)
                     }
                 }

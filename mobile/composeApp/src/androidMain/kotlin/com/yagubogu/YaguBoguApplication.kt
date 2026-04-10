@@ -70,12 +70,12 @@ class YaguBoguApplication : Application() {
             when (event.transitionType) {
                 TransitionType.ENTER -> {
                     val stadiumId = event.geofenceId.toIntOrNull() ?: return@setEventListener
-                    logger.i { "안드로이드 지오펜스 입장: $stadiumId" }
+                    logger.i { "안드로이드 지오펜스 입장 브로드캐스트 리스너 수신: $stadiumId" }
                     CoroutineScope(Dispatchers.IO).launch {
                         sendGeofenceNotificationUseCase(stadiumId)
                     }
                 }
-                TransitionType.EXIT -> logger.i { "안드로이드 지오펜스 퇴장: ${event.geofenceId}" }
+                TransitionType.EXIT -> logger.i { "안드로이드 지오펜스 퇴장 브로드캐스트 리스너 수신: ${event.geofenceId}" }
             }
         }
     }
