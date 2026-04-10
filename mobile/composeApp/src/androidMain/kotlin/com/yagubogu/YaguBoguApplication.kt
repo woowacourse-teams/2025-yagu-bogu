@@ -14,19 +14,7 @@ import com.kmp.geofence.GeofenceEvent
 import com.kmp.geofence.TransitionType
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.analytics.FirebaseAnalyticsLogger
-import com.yagubogu.di.alarmeeModule
-import com.yagubogu.di.authModule
-import com.yagubogu.di.commonLocalModule
-import com.yagubogu.di.commonModule
-import com.yagubogu.di.datasourceModule
-import com.yagubogu.di.geofenceModule
-import com.yagubogu.di.geofenceUseCaseModule
-import com.yagubogu.di.localModule
-import com.yagubogu.di.networkModule
-import com.yagubogu.di.repositoryModule
-import com.yagubogu.di.serviceModule
-import com.yagubogu.di.timeModule
-import com.yagubogu.di.viewModelModule
+import com.yagubogu.di.sharedModules
 import com.yagubogu.domain.geofence.SendGeofenceNotificationUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,21 +56,7 @@ class YaguBoguApplication : Application() {
         startKoin {
             androidContext(androidContext = this@YaguBoguApplication)
 
-            modules(
-                authModule,
-                commonModule,
-                datasourceModule,
-                networkModule,
-                repositoryModule,
-                serviceModule,
-                timeModule,
-                viewModelModule,
-                localModule,
-                commonLocalModule,
-                geofenceModule,
-                geofenceUseCaseModule,
-                alarmeeModule,
-            )
+            modules(sharedModules)
         }
     }
 

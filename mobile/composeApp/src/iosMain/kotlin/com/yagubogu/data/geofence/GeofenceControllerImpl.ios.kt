@@ -20,22 +20,25 @@ class GeofenceControllerImpl(
     private val manager = createGeofenceManager()
     private val logger = Logger.withTag("GeofenceControllerImpl")
 
+    init {
+        manager.checkLocationPermissions()
+        manager.setGeofenceEventListener(
+            object : GeofenceEventListener {
+                override fun onGeofenceEnter(event: GeofenceEvent) {
+                    val stadiumId = event.geofenceId.toIntOrNull() ?: return
+                    CoroutineScope(Dispatchers.Default).launch {
+                        logger.i { "지오펜스 이벤트 수신: $stadiumId" }
+                        sendGeofenceNotificationUseCase(stadiumId)
+                    }
+                }
+
+                override fun onGeofenceExit(event: GeofenceEvent) = Unit
+            },
+        )
+    }
+
     override suspend fun registerAll(): Result<Unit> =
         runCatching {
-            manager.setGeofenceEventListener(
-                object : GeofenceEventListener {
-                    override fun onGeofenceEnter(event: GeofenceEvent) {
-                        val stadiumId = event.geofenceId.toIntOrNull() ?: return
-                        CoroutineScope(Dispatchers.Default).launch {
-                            logger.i { "ios 지오펜스 입장: $stadiumId" }
-                            sendGeofenceNotificationUseCase(stadiumId)
-                        }
-                    }
-
-                    override fun onGeofenceExit(event: GeofenceEvent) = Unit
-                },
-            )
-
             Stadium.ALL_LIST.forEach { stadium ->
                 suspendCancellableCoroutine { cont ->
                     manager.addGeofence(

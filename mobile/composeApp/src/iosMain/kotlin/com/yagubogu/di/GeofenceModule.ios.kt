@@ -6,7 +6,7 @@ import org.koin.dsl.module
 
 actual val geofenceModule =
     module {
-        single<GeofenceController> {
+        single<GeofenceController>(createdAtStart = true) {
             GeofenceControllerImpl(
                 sendGeofenceNotificationUseCase = get(),
             )
