@@ -5,18 +5,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.ComposeUIViewController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.data.local.CommonPreferences
 import com.yagubogu.di.alarmeeModule
 import com.yagubogu.di.authModule
 import com.yagubogu.di.commonLocalModule
 import com.yagubogu.di.commonModule
 import com.yagubogu.di.datasourceModule
 import com.yagubogu.di.geofenceModule
+import com.yagubogu.di.geofenceUseCaseModule
 import com.yagubogu.di.localModule
 import com.yagubogu.di.networkModule
 import com.yagubogu.di.repositoryModule
 import com.yagubogu.di.serviceModule
 import com.yagubogu.di.timeModule
 import com.yagubogu.di.viewModelModule
+import com.yagubogu.domain.geofence.GeofenceController
 import com.yagubogu.ui.login.AppleSignInDelegate
 import com.yagubogu.ui.login.GoogleSignInDelegate
 import com.yagubogu.ui.main.YaguBoguViewModel
@@ -25,6 +28,7 @@ import com.yagubogu.ui.navigation.YaguBoguRoute
 import com.yagubogu.ui.navigation.model.Route
 import com.yagubogu.ui.theme.YaguBoguTheme
 import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.koinConfiguration
 import org.koin.dsl.module
@@ -49,6 +53,7 @@ fun MainViewController(
                         localModule,
                         commonLocalModule,
                         geofenceModule,
+                        geofenceUseCaseModule,
                         alarmeeModule,
                         networkModule,
                         repositoryModule,
@@ -68,9 +73,14 @@ fun MainViewController(
 private fun YaguBoguIosApp() {
     val viewModel: YaguBoguViewModel = koinViewModel()
     val autoLoginState: AutoLoginState by viewModel.autoLoginState.collectAsStateWithLifecycle()
+    val geofenceController: GeofenceController = koinInject()
+    val preferences: CommonPreferences = koinInject()
 
     LaunchedEffect(Unit) {
         viewModel.handleAutoLogin(onAppInitialized = {})
+        if (preferences.geofenceEnabled) {
+            geofenceController.registerAll()
+        }
     }
 
     YaguBoguTheme {

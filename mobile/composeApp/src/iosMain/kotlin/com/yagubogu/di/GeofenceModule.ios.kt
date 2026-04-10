@@ -8,7 +8,7 @@ actual val geofenceModule =
     module {
         single<GeofenceController> {
             GeofenceControllerImpl(
-                alarmeeService = get(),
+                sendGeofenceNotificationUseCase = get(),
             )
         }
     }

@@ -211,7 +211,7 @@
     <string name="setting_delete_account_cancel">잔류하기</string>
     <string name="setting_delete_account_cancel_select_alert">앞으로도 잘 부탁드립니다!</string>
     <string name="setting_geofencing_notification">직관인증 리마인드 알림 받기</string>
-    <string name="setting_geofencing_notification_tooltip">경기장 주변에 방문했을때 직관 인증을 까먹지 않도록 알려드려요\n위치 권한을 항상 허용 해야 작동해요</string>
+    <string name="setting_geofencing_notification_tooltip">경기장 주변에 방문했을때 직관 인증을 까먹지 않도록 알려드려요\n위치 권한 항상 허용과 인터넷 연결이 필요해요</string>
     <string name="setting_permission_location_title">위치 권한 항상 허용 안내</string>
     <string name="setting_permission_location_message_android">앱을 켜지 않고 야구장 방문시 리마인더 알림을 받으려면 위치 권한을 '항상 허용'으로 설정해 주세요.\n\n설정 이동 후:\n권한 → 위치 → 항상 허용</string>
     <string name="setting_permission_location_message_ios">야구장 방문시 리마인더 알림을 받으려면 위치 권한을 '항상 허용'으로 설정해 주세요.\n\n설정 이동 후:\n앱 → 야구보구 → 위치 → 항상</string>
