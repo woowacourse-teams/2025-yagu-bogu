@@ -12,6 +12,7 @@ import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
+import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadium.Companion.getStadiumById
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.now
@@ -43,7 +44,7 @@ class SendGeofenceNotificationUseCase(
                 return
             }
 
-            val stadium = getStadiumById(stadiumId) ?: return
+            val geofenceTriggeredStadium: Stadium = getStadiumById(stadiumId) ?: return
 
             val stadiumsWithGames =
                 stadiumRepository
@@ -56,15 +57,19 @@ class SendGeofenceNotificationUseCase(
 
             if (stadiumsWithGames.isEmpty()) return
 
-            stadiumsWithGames.findNearestTo(
-                coordinate =
-                    Coordinate(
-                        latitude = Latitude(stadium.latitude),
-                        longitude = Longitude(stadium.longitude),
-                    ),
-                threshold = Distance(GEOFENCE_NOTIFICATION_THRESHOLD_METERS),
-                getDistance = ::calculateDistance,
-            ) ?: return
+            val todayGameStadium =
+                stadiumsWithGames.findNearestTo(
+                    coordinate =
+                        Coordinate(
+                            latitude = Latitude(geofenceTriggeredStadium.latitude),
+                            longitude = Longitude(geofenceTriggeredStadium.longitude),
+                        ),
+                    threshold = Distance(GEOFENCE_NOTIFICATION_THRESHOLD_METERS),
+                    getDistance = ::calculateDistance,
+                ) ?: return
+
+            logger.i { "지오펜스된 야구장과 가장 가까운 오늘 경기 하는 야구장 사이의 거리: ${todayGameStadium.second} " }
+            if (todayGameStadium.second.value > SAME_STADIUM_CHECK_THRESHOLD_METERS) return
 
             alarmeeService.local.immediate(
                 alarmee =
@@ -73,7 +78,7 @@ class SendGeofenceNotificationUseCase(
                         notificationTitle =
                             getString(
                                 Res.string.notification_geofence_title,
-                                stadium.name,
+                                geofenceTriggeredStadium.name,
                             ),
                         notificationBody = getString(Res.string.notification_geofence_body),
                         androidNotificationConfiguration =
@@ -92,5 +97,6 @@ class SendGeofenceNotificationUseCase(
 
     companion object {
         private const val GEOFENCE_NOTIFICATION_THRESHOLD_METERS = 1000.0
+        private const val SAME_STADIUM_CHECK_THRESHOLD_METERS = 5.0
     }
 }
