@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.ComposeUIViewController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.di.alarmeeModule
 import com.yagubogu.di.authModule
 import com.yagubogu.di.commonLocalModule
 import com.yagubogu.di.commonModule
@@ -48,6 +49,7 @@ fun MainViewController(
                         localModule,
                         commonLocalModule,
                         geofenceModule,
+                        alarmeeModule,
                         networkModule,
                         repositoryModule,
                         serviceModule,

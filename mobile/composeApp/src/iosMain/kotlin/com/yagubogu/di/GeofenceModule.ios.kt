@@ -5,4 +5,10 @@ import com.yagubogu.domain.geofence.GeofenceController
 import org.koin.dsl.module
 
 actual val geofenceModule =
-    module { single<GeofenceController> { GeofenceControllerImpl() } }
+    module {
+        single<GeofenceController> {
+            GeofenceControllerImpl(
+                alarmeeService = get(),
+            )
+        }
+    }

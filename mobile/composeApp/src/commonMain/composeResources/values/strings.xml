@@ -238,4 +238,7 @@
     <string name="profile_representative_badge_content_description">대표 배지 이미지</string>
     <string name="profile_victory_fairy_ranking_emoji">🎖️</string>
     <string name="profile_victory_fairy_score_emoji">🧚</string>
+
+    <string name="notification_geofence_title">⚾ %1$s 직관 오셨나요?</string>
+    <string name="notification_geofence_body">지금 야구보구에서 직관 인증을 해보세요!</string>
 </resources>

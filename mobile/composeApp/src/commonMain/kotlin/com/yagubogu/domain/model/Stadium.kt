@@ -30,6 +30,8 @@ data class Stadium(
                 Stadium(19, "삼성 라이온즈 볼파크", 35.864844, 128.805667),
             )
 
+        fun getStadiumById(id: Int): Stadium? = ALL_LIST.find { it.id == id }
+
         const val GEOFENCE_RADIUS_METERS = 600f
     }
 }
