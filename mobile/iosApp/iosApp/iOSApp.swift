@@ -6,7 +6,7 @@ import GoogleSignIn
 struct iOSApp: App {
     init() {
         // 앱이 켜지는 순간(백그라운드 포함) ios Koin 주입 시작
-        KoinHelperKt.doInitKoinIos(
+        KoinInitializerKt.setup(
             googleSignInDelegate: SwiftGoogleSignInDelegate(),
             appleSignInDelegate: SwiftAppleSignInDelegate()
         )
