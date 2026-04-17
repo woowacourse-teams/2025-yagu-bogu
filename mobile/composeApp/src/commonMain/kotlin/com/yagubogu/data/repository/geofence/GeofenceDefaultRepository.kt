@@ -2,12 +2,12 @@ package com.yagubogu.data.repository.geofence
 
 import com.kmp.geofence.GeofenceEvent
 import com.yagubogu.data.datasource.geofence.GeofenceDataSource
-import com.yagubogu.data.datasource.preferences.LocalPreferenceDataSource
+import com.yagubogu.data.datasource.preferences.PreferenceDataSource
 import com.yagubogu.domain.model.Stadium
 import kotlinx.coroutines.flow.Flow
 
 class GeofenceDefaultRepository(
-    private val preferenceDataSource: LocalPreferenceDataSource,
+    private val preferenceDataSource: PreferenceDataSource,
     private val geofenceDataSource: GeofenceDataSource,
 ) : GeofenceRepository {
     override val geofenceEvents: Flow<GeofenceEvent> = geofenceDataSource.geofenceEvents

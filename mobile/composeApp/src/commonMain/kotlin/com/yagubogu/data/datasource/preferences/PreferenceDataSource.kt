@@ -1,31 +1,23 @@
 package com.yagubogu.data.datasource.preferences
 
-import com.russhwolf.settings.Settings
-
-class PreferenceDataSource(
-    private val settings: Settings,
-) : LocalPreferenceDataSource {
-    override fun getString(
+interface PreferenceDataSource {
+    fun getString(
         key: String,
         defaultValue: String?,
-    ) = settings.getStringOrNull(key) ?: defaultValue
+    ): String?
 
-    override fun putString(
+    fun putString(
         key: String,
         value: String,
-    ) {
-        settings.putString(key, value)
-    }
+    )
 
-    override fun getBoolean(
+    fun getBoolean(
         key: String,
         defaultValue: Boolean,
-    ) = settings.getBoolean(key, defaultValue)
+    ): Boolean
 
-    override fun putBoolean(
+    fun putBoolean(
         key: String,
         value: Boolean,
-    ) {
-        settings.putBoolean(key, value)
-    }
+    )
 }
