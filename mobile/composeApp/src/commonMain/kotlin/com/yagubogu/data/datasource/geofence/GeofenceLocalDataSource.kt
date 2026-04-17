@@ -1,47 +1,46 @@
-package com.yagubogu.data.geofence
+package com.yagubogu.data.datasource.geofence
 
 import co.touchlab.kermit.Logger
 import com.kmp.geofence.GeofenceEvent
 import com.kmp.geofence.GeofenceEventListener
-import com.kmp.geofence.createGeofenceManager
-import com.yagubogu.domain.geofence.GeofenceController
-import com.yagubogu.domain.geofence.SendGeofenceNotificationUseCase
+import com.kmp.geofence.GeofenceManager
 import com.yagubogu.domain.model.Stadium
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class GeofenceControllerImpl(
-    private val sendGeofenceNotificationUseCase: SendGeofenceNotificationUseCase,
-) : GeofenceController {
-    private val manager = createGeofenceManager()
-    private val logger = Logger.withTag("GeofenceControllerImpl")
+class GeofenceLocalDataSource(
+    private val geofenceManager: GeofenceManager,
+) : GeofenceDataSource {
+    private val logger = Logger.withTag("GeofenceLocalDataSource")
+
+    private val _geofenceEvents = MutableSharedFlow<GeofenceEvent>(replay = 1, extraBufferCapacity = 64)
+    override val geofenceEvents: Flow<GeofenceEvent> = _geofenceEvents.asSharedFlow()
 
     init {
-        manager.checkLocationPermissions()
-        manager.setGeofenceEventListener(
+        geofenceManager.setGeofenceEventListener(
             object : GeofenceEventListener {
                 override fun onGeofenceEnter(event: GeofenceEvent) {
-                    val stadiumId = event.geofenceId.toIntOrNull() ?: return
-                    CoroutineScope(Dispatchers.Default).launch {
-                        logger.i { "IOS 지오펜스 입장 이벤트 리스너 수신: $stadiumId" }
-                        sendGeofenceNotificationUseCase(stadiumId)
-                    }
+                    logger.i { "지오펜스 입장 감지: ${event.geofenceId}" }
+                    _geofenceEvents.tryEmit(event)
                 }
 
-                override fun onGeofenceExit(event: GeofenceEvent) = Unit
+                override fun onGeofenceExit(event: GeofenceEvent) {
+                    _geofenceEvents.tryEmit(event)
+                }
             },
         )
+        geofenceManager.checkLocationPermissions()
     }
 
-    override suspend fun registerAll(): Result<Unit> =
+    override suspend fun addAllGeofences(stadiums: List<Stadium>): Result<Unit> =
         runCatching {
-            Stadium.ALL_LIST.forEach { stadium ->
+            stadiums.forEach { stadium ->
                 suspendCancellableCoroutine { cont ->
-                    manager.addGeofence(
+                    geofenceManager.addGeofence(
                         id = stadium.id.toString(),
                         latitude = stadium.latitude,
                         longitude = stadium.longitude,
@@ -56,10 +55,10 @@ class GeofenceControllerImpl(
             }
         }
 
-    override suspend fun unregisterAll(): Result<Unit> =
+    override suspend fun removeAllGeofences(ids: List<String>): Result<Unit> =
         runCatching {
             suspendCancellableCoroutine { cont ->
-                manager.removeGeofences(
+                geofenceManager.removeGeofences(
                     ids = Stadium.ALL_LIST.map { it.id.toString() },
                     onSuccess = {
                         logger.i { "지오펜스 등록 해제 성공: ${Stadium.ALL_LIST.map { it.id }}" }

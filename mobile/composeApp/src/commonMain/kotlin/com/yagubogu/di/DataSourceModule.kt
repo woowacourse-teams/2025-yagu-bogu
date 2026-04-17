@@ -1,5 +1,6 @@
 package com.yagubogu.di
 
+import com.kmp.geofence.createGeofenceManager
 import com.russhwolf.settings.Settings
 import com.yagubogu.data.datasource.auth.AuthDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
@@ -7,6 +8,8 @@ import com.yagubogu.data.datasource.checkin.CheckInDataSource
 import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
 import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.datasource.game.GameRemoteDataSource
+import com.yagubogu.data.datasource.geofence.GeofenceDataSource
+import com.yagubogu.data.datasource.geofence.GeofenceLocalDataSource
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
 import com.yagubogu.data.datasource.preferences.LocalPreferenceDataSource
@@ -46,6 +49,9 @@ val datasourceModule =
 
         singleOf(::PreferenceDataSource) { bind<LocalPreferenceDataSource>() }
         single { Settings() }
+
+        singleOf(::GeofenceLocalDataSource) { bind<GeofenceDataSource>() }
+        single { createGeofenceManager() }
 
         registerPlatformDataSources()
     }

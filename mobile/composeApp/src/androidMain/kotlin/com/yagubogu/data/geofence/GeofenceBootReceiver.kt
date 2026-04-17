@@ -28,7 +28,7 @@ class GeofenceBootReceiver :
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 GeofenceContext.init(context)
-                GeofenceControllerImpl().registerAll()
+                geofenceRepository.registerAll()
             } finally {
                 pendingResult.finish()
             }

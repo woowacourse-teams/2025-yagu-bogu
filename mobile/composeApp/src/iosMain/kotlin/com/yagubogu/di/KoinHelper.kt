@@ -11,7 +11,7 @@ fun initKoinIos(
 ) {
     startKoin {
         modules(
-            sharedModules +
+            sharedModules + GeofenceObserverModule +
                 module {
                     single<GoogleSignInDelegate> { googleSignInDelegate }
                     single<AppleSignInDelegate> { appleSignInDelegate }
