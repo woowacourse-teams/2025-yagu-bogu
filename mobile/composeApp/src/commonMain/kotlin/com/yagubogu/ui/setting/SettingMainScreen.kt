@@ -34,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.BuildKonfig
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.common.platform.PlatformType
 import com.yagubogu.ui.common.platform.androidVersion
@@ -314,7 +315,10 @@ private fun SettingMainScreen(
                 text = stringResource(Res.string.setting_geofencing_notification),
                 toolTipText = stringResource(Res.string.setting_geofencing_notification_tooltip),
                 checked = geofenceNotification,
-                onCheckedChange = { updateGeofenceNotification(!geofenceNotification) },
+                onCheckedChange = {
+                    AnalyticsLogger.logEvent("Geofence Switch Click ($geofenceNotification -> ${!geofenceNotification})")
+                    updateGeofenceNotification(!geofenceNotification)
+                },
             )
             SettingButton(
                 text = stringResource(Res.string.setting_edit_profile_image),

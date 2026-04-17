@@ -66,7 +66,7 @@ fun SettingToggleButton(
                                 .padding(horizontal = 8.dp)
                                 .noRippleClickable {
                                     showTooltip()
-                                    AnalyticsLogger.logEvent("tooltip_victory_fairy_ranking")
+                                    AnalyticsLogger.logEvent("tooltip_geofence_switch")
                                 },
                     )
                 }
