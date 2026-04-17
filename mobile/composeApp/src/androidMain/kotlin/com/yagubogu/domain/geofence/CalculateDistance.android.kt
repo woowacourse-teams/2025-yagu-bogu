@@ -1,5 +1,6 @@
 package com.yagubogu.domain.geofence
 
+import android.location.Location.distanceBetween
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 
@@ -8,7 +9,7 @@ actual fun calculateDistance(
     y: Coordinate,
 ): Distance {
     val result = FloatArray(1)
-    android.location.Location.distanceBetween(
+    distanceBetween(
         x.latitude.value,
         x.longitude.value,
         y.latitude.value,
