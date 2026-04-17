@@ -1,5 +1,6 @@
 package com.yagubogu.di
 
+import com.russhwolf.settings.Settings
 import com.yagubogu.data.datasource.auth.AuthDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.datasource.checkin.CheckInDataSource
@@ -8,6 +9,8 @@ import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.datasource.game.GameRemoteDataSource
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
+import com.yagubogu.data.datasource.preferences.LocalPreferenceDataSource
+import com.yagubogu.data.datasource.preferences.PreferenceDataSource
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsDataSource
@@ -40,6 +43,9 @@ val datasourceModule =
         singleOf(::GameRemoteDataSource) { bind<GameDataSource>() }
 
         singleOf(::TalkRemoteDataSource) { bind<TalkDataSource>() }
+
+        singleOf(::PreferenceDataSource) { bind<LocalPreferenceDataSource>() }
+        single { Settings() }
 
         registerPlatformDataSources()
     }

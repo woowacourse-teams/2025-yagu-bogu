@@ -4,20 +4,25 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.kmp.geofence.GeofenceContext
-import com.yagubogu.data.local.CommonPreferences
+import com.yagubogu.data.repository.geofence.GeofenceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class GeofenceBootReceiver : BroadcastReceiver() {
+class GeofenceBootReceiver :
+    BroadcastReceiver(),
+    KoinComponent {
     override fun onReceive(
         context: Context,
         intent: Intent,
     ) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
-        val prefs = CommonPreferences()
-        if (!prefs.geofenceEnabled) return
+        val geofenceRepository: GeofenceRepository by inject()
+
+        if (!geofenceRepository.isGeofenceEnabled) return
 
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {

@@ -3,8 +3,8 @@ package com.yagubogu.ui.setting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.local.CommonPreferences
 import com.yagubogu.data.repository.auth.AuthRepository
+import com.yagubogu.data.repository.geofence.GeofenceRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
@@ -43,7 +43,7 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
-    private val commonPreferences: CommonPreferences,
+    private val geofenceRepository: GeofenceRepository,
     private val geofenceController: GeofenceController,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
@@ -61,7 +61,7 @@ class SettingViewModel(
 
     private val _geofenceNotification =
         MutableStateFlow(
-            commonPreferences.geofenceEnabled,
+            geofenceRepository.isGeofenceEnabled,
         )
     val geofenceNotification = _geofenceNotification.asStateFlow()
 
@@ -188,12 +188,12 @@ class SettingViewModel(
                 geofenceController
                     .registerAll()
                     .onSuccess {
-                        commonPreferences.geofenceEnabled = true
+                        geofenceRepository.isGeofenceEnabled = true
                         _geofenceNotification.value = true
                     }.onFailure { logger.e(it) { "지오펜스 등록 실패" } }
             } else {
                 geofenceController.unregisterAll()
-                commonPreferences.geofenceEnabled = false
+                geofenceRepository.isGeofenceEnabled = false
                 _geofenceNotification.value = false
             }
         }

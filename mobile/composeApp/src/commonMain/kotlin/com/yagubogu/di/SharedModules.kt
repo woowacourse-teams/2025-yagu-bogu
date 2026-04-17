@@ -11,7 +11,6 @@ val sharedModules =
         timeModule,
         viewModelModule,
         localModule,
-        commonLocalModule,
         geofenceModule,
         geofenceUseCaseModule,
         alarmeeModule,

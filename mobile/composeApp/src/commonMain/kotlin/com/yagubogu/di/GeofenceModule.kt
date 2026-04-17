@@ -12,7 +12,7 @@ val geofenceUseCaseModule =
             SendGeofenceNotificationUseCase(
                 alarmeeService = get(),
                 stadiumRepository = get(),
-                preferences = get(),
+                geofenceRepository = get(),
                 clock = get(),
             )
         }

@@ -6,7 +6,7 @@ import com.tweener.alarmee.model.Alarmee
 import com.tweener.alarmee.model.AndroidNotificationConfiguration
 import com.tweener.alarmee.model.AndroidNotificationPriority
 import com.tweener.alarmee.model.IosNotificationConfiguration
-import com.yagubogu.data.local.CommonPreferences
+import com.yagubogu.data.repository.geofence.GeofenceRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
@@ -28,7 +28,7 @@ import kotlin.time.Clock
 class SendGeofenceNotificationUseCase(
     private val alarmeeService: AlarmeeService,
     private val stadiumRepository: StadiumRepository,
-    private val preferences: CommonPreferences,
+    private val geofenceRepository: GeofenceRepository,
     private val clock: Clock,
 ) {
     private val logger = Logger.withTag("SendGeofenceNotificationUseCase")
@@ -38,7 +38,7 @@ class SendGeofenceNotificationUseCase(
     suspend operator fun invoke(stadiumId: Int) {
         mutex.withLock {
             val today = LocalDate.now(clock).toString()
-            val lastDate = preferences.getLastNotificationDate(stadiumId)
+            val lastDate = geofenceRepository.getLastNotificationDate(stadiumId)
             if (lastDate == today) {
                 logger.d { "오늘 이미 알림을 보낸 경기장입니다: $stadiumId" }
                 return
@@ -90,7 +90,7 @@ class SendGeofenceNotificationUseCase(
                     ),
             )
 
-            preferences.setLastNotificationDate(stadiumId, today)
+            geofenceRepository.saveLastNotificationDate(stadiumId, today)
             logger.i { "지오펜스 알림 전송 성공: $stadiumId" }
         }
     }
