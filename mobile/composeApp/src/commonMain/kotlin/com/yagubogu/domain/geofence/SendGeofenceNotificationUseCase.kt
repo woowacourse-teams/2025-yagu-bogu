@@ -20,8 +20,8 @@ import kotlin.time.Clock
 class SendGeofenceNotificationUseCase(
     private val stadiumRepository: StadiumRepository,
     private val geofenceRepository: GeofenceRepository,
-    private val clock: Clock,
     private val notificationService: NotificationService,
+    private val clock: Clock,
 ) {
     private val logger = Logger.withTag("SendGeofenceNotificationUseCase")
 

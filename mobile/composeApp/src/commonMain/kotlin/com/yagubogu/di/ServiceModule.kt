@@ -1,5 +1,7 @@
 package com.yagubogu.di
 
+import com.tweener.alarmee.AlarmeeService
+import com.tweener.alarmee.createAlarmeeService
 import com.yagubogu.data.service.AuthApiService
 import com.yagubogu.data.service.CheckInApiService
 import com.yagubogu.data.service.GameApiService
@@ -40,4 +42,12 @@ val serviceModule =
         single<ThirdPartyApiService> { get<Ktorfit>().createThirdPartyApiService() }
 
         single<NotificationService> { NotificationDefaultService(get()) }
+
+        single<AlarmeeService> {
+            createAlarmeeService().also { service ->
+                service.initialize(
+                    platformConfiguration = provideAlarmeeConfig(),
+                )
+            }
+        }
     }
