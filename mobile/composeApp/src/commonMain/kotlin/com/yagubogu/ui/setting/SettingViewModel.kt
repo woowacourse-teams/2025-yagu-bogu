@@ -9,13 +9,13 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
 import com.yagubogu.ui.setting.model.PresignedUrlItem
 import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.util.UiText
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

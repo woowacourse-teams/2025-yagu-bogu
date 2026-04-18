@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.analytics.AnalyticsLogger
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.stats.detail.StatsDetailScreen
 import com.yagubogu.ui.stats.my.StatsMyScreen
 import com.yagubogu.ui.theme.Gray050
@@ -51,7 +52,6 @@ import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch

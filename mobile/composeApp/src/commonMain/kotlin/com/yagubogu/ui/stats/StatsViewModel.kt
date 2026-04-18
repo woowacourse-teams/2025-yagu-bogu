@@ -7,6 +7,7 @@ import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stats.StatsRepository
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.stats.detail.model.StadiumVisitCount
 import com.yagubogu.ui.stats.detail.model.VsTeamStatItem
@@ -15,7 +16,6 @@ import com.yagubogu.ui.stats.my.model.StatsCounts
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.mapListIndexed
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async

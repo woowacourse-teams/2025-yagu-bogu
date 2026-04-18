@@ -2,12 +2,12 @@ package com.yagubogu.ui.attendance.component
 
 import com.yagubogu.domain.model.GameResult
 import com.yagubogu.domain.model.Team
+import com.yagubogu.domain.util.minusDays
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.GameScoreBoard
 import com.yagubogu.ui.attendance.model.GameTeam
 import com.yagubogu.ui.attendance.model.PastGameUiModel
-import com.yagubogu.ui.util.minusDays
-import com.yagubogu.ui.util.now
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 

@@ -1,6 +1,6 @@
 package com.yagubogu.ui.home.model
 
-import com.yagubogu.ui.util.now
+import com.yagubogu.domain.util.now
 import kotlinx.datetime.LocalTime
 
 data class StadiumStatsUiModel(

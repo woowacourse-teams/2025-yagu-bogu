@@ -1,6 +1,6 @@
 package com.yagubogu.ui.setting.model
 
-import com.yagubogu.ui.util.now
+import com.yagubogu.domain.util.now
 import kotlinx.datetime.LocalDate
 
 data class MemberInfoItem(

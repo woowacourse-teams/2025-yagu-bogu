@@ -14,6 +14,8 @@ import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.OpeningDate
+import com.yagubogu.domain.util.now
+import com.yagubogu.domain.util.toInstantKST
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.home.model.CheckInSseEvent
 import com.yagubogu.ui.home.model.CheckInUiEvent
@@ -27,8 +29,6 @@ import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.mapper.toDomain
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
-import com.yagubogu.ui.util.now
-import com.yagubogu.ui.util.toInstantKST
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async

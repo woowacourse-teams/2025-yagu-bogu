@@ -10,8 +10,8 @@ import com.yagubogu.domain.model.Longitude
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadium.Companion.getStadiumById
 import com.yagubogu.domain.service.NotificationService
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.mapper.toUiModel
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
