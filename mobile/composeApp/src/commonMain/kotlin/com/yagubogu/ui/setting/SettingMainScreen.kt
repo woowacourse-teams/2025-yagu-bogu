@@ -37,7 +37,6 @@ import com.yagubogu.BuildKonfig
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.common.platform.PlatformType
-import com.yagubogu.ui.common.platform.androidVersion
 import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.setting.component.SettingButton
@@ -58,13 +57,11 @@ import com.yagubogu.ui.util.LocalSnackbarHostState
 import com.yagubogu.ui.util.rememberOpenNotificationSettings
 import com.yagubogu.ui.util.showSingleSnackbar
 import com.yagubogu.ui.util.yyyyMMddFormatter
-import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import dev.icerock.moko.permissions.location.BACKGROUND_LOCATION
-import dev.icerock.moko.permissions.location.LOCATION
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -120,76 +117,16 @@ fun SettingMainScreen(
 
     val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsState()
 
-    val handleGeofenceToggle: (Boolean) -> Unit = { enable ->
-        if (!enable) {
-            viewModel.updateGeofenceNotification(false)
-        } else {
-            coroutineScope.launch {
-                // 알림 권한 상태 체크
-                val isNotificationGranted = controller.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
-
-                if (!isNotificationGranted) {
-                    // 알림 권한 런타임 요청 지원 여부 (Android 13+ 또는 iOS)
-                    val supportsRuntimePopup =
-                        if (currentPlatform == PlatformType.ANDROID) {
-                            androidVersion >= 33
-                        } else {
-                            true
-                        }
-
-                    if (supportsRuntimePopup) {
-                        try {
-                            controller.providePermission(Permission.REMOTE_NOTIFICATION)
-                        } catch (e: DeniedAlwaysException) {
-                            // 사용자가 '다시 묻지 않음'을 눌렀거나 이미 거부된 경우
-                            showNotificationPermissionDialog = true
-                            return@launch
-                        } catch (e: Exception) {
-                            return@launch
-                        }
-                    } else {
-                        showNotificationPermissionDialog = true
-                        return@launch
-                    }
-                }
-
-                val isBackgroundLocationGranted = controller.isPermissionGranted(Permission.BACKGROUND_LOCATION)
-
-                if (isBackgroundLocationGranted) {
-                    viewModel.updateGeofenceNotification(true)
-                } else {
-                    when (currentPlatform) {
-                        PlatformType.IOS -> {
-                            try {
-                                // iOS: 설정에 위치 권한 항목을 만들기 위한 포그라운드 위치 권한 요청
-                                if (!controller.isPermissionGranted(Permission.LOCATION)) {
-                                    controller.providePermission(Permission.LOCATION)
-                                    delay(500L)
-                                }
-                            } catch (e: Exception) {
-                            }
-                            showLocationPermissionDialog = true
-                        }
-
-                        PlatformType.ANDROID -> {
-                            if (androidVersion == 29) {
-                                // Android 10: 인앱에서 직접 백그라운드 요청 가능
-                                try {
-                                    controller.providePermission(Permission.BACKGROUND_LOCATION)
-                                    viewModel.updateGeofenceNotification(true)
-                                } catch (e: Exception) {
-                                    showLocationPermissionDialog = true
-                                }
-                            } else {
-                                // Android 11+: 무조건 설정 이동 다이얼로그
-                                showLocationPermissionDialog = true
-                            }
-                        }
-                    }
-                }
-            }
+    val permissionHandler =
+        remember(controller, viewModel, coroutineScope) {
+            GeofencePermissionHandler(
+                permissionController = controller,
+                viewModel = viewModel,
+                onShowLocationDialog = { showLocationPermissionDialog = true },
+                onShowNotificationDialog = { showNotificationPermissionDialog = true },
+                scope = coroutineScope,
+            )
         }
-    }
 
     LaunchedEffect(Unit) { viewModel.fetchMemberInfo() }
 
@@ -235,7 +172,9 @@ fun SettingMainScreen(
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
         geofenceNotification = geofenceNotification.value,
-        updateGeofenceNotification = handleGeofenceToggle,
+        onGeofenceNotificationToggle = { enable ->
+            permissionHandler.handleToggle(enable)
+        },
         modifier = modifier,
     )
 
@@ -294,7 +233,7 @@ private fun SettingMainScreen(
     memberInfoItem: MemberInfoItem,
     appVersion: String,
     geofenceNotification: Boolean,
-    updateGeofenceNotification: (Boolean) -> Unit,
+    onGeofenceNotificationToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -317,7 +256,7 @@ private fun SettingMainScreen(
                 checked = geofenceNotification,
                 onCheckedChange = {
                     AnalyticsLogger.logEvent("Geofence Switch Click ($geofenceNotification -> ${!geofenceNotification})")
-                    updateGeofenceNotification(!geofenceNotification)
+                    onGeofenceNotificationToggle(!geofenceNotification)
                 },
             )
             SettingButton(
@@ -436,6 +375,6 @@ private fun SettingMainScreenPreview() {
         memberInfoItem = MemberInfoItem(nickName = "야구보구"),
         appVersion = "1.0.0",
         geofenceNotification = false,
-        updateGeofenceNotification = {},
+        onGeofenceNotificationToggle = {},
     )
 }
