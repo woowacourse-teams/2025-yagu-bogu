@@ -7,7 +7,7 @@ val geofenceUseCaseModule =
     module {
         single<SendGeofenceNotificationUseCase> {
             SendGeofenceNotificationUseCase(
-                alarmeeService = get(),
+                notificationService = get(),
                 stadiumRepository = get(),
                 geofenceRepository = get(),
                 clock = get(),

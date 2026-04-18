@@ -1,11 +1,6 @@
 package com.yagubogu.domain.geofence
 
 import co.touchlab.kermit.Logger
-import com.tweener.alarmee.AlarmeeService
-import com.tweener.alarmee.model.Alarmee
-import com.tweener.alarmee.model.AndroidNotificationConfiguration
-import com.tweener.alarmee.model.AndroidNotificationPriority
-import com.tweener.alarmee.model.IosNotificationConfiguration
 import com.yagubogu.data.repository.geofence.GeofenceRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.domain.model.Coordinate
@@ -14,22 +9,19 @@ import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadium.Companion.getStadiumById
+import com.yagubogu.domain.service.NotificationService
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.now
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
-import org.jetbrains.compose.resources.getString
-import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.notification_geofence_body
-import yagubogu.composeapp.generated.resources.notification_geofence_title
 import kotlin.time.Clock
 
 class SendGeofenceNotificationUseCase(
-    private val alarmeeService: AlarmeeService,
     private val stadiumRepository: StadiumRepository,
     private val geofenceRepository: GeofenceRepository,
     private val clock: Clock,
+    private val notificationService: NotificationService,
 ) {
     private val logger = Logger.withTag("SendGeofenceNotificationUseCase")
 
@@ -71,24 +63,7 @@ class SendGeofenceNotificationUseCase(
             logger.i { "지오펜스된 야구장과 가장 가까운 오늘 경기 하는 야구장 사이의 거리: ${todayGameStadium.second} " }
             if (todayGameStadium.second.value > SAME_STADIUM_CHECK_THRESHOLD_METERS) return
 
-            alarmeeService.local.immediate(
-                alarmee =
-                    Alarmee(
-                        uuid = "enter_$stadiumId",
-                        notificationTitle =
-                            getString(
-                                Res.string.notification_geofence_title,
-                                geofenceTriggeredStadium.name,
-                            ),
-                        notificationBody = getString(Res.string.notification_geofence_body),
-                        androidNotificationConfiguration =
-                            AndroidNotificationConfiguration(
-                                priority = AndroidNotificationPriority.HIGH,
-                                channelId = "geofenceChannelId",
-                            ),
-                        iosNotificationConfiguration = IosNotificationConfiguration(),
-                    ),
-            )
+            notificationService.sendStadiumEntryNotification(geofenceTriggeredStadium.name, stadiumId)
 
             geofenceRepository.saveLastNotificationDate(stadiumId, today)
             logger.i { "지오펜스 알림 전송 성공: $stadiumId" }
