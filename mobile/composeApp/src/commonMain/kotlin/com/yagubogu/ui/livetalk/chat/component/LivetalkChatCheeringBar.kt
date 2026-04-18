@@ -1,5 +1,6 @@
 package com.yagubogu.ui.livetalk.chat.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,14 +23,14 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.PretendardMedium16
-import com.yagubogu.ui.util.emoji
 import com.yagubogu.ui.util.formatWithComma
+import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.shimmerIf
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.livetalk_like_count_message
@@ -93,11 +94,12 @@ fun LivetalkChatCheeringBar(
             modifier = Modifier.size(40.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = team.emoji,
-                fontSize = 28.sp,
+            Image(
+                painter = painterResource(team.mascot),
+                contentDescription = null,
                 modifier =
                     Modifier
+                        .size(32.dp)
                         .shimmerIf(cheeringCount == null)
                         .noRippleClickable(
                             onClick = onCheeringClick,

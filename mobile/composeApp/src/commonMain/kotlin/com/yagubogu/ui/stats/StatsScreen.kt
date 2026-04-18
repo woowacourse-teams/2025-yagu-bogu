@@ -60,8 +60,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.all_all
 import yagubogu.composeapp.generated.resources.all_year
 import yagubogu.composeapp.generated.resources.ic_arrow_down
+import yagubogu.composeapp.generated.resources.stats_all_season
 
 @Composable
 fun StatsScreen(
@@ -69,7 +71,7 @@ fun StatsScreen(
     modifier: Modifier = Modifier,
     statsViewModel: StatsViewModel = koinViewModel(),
 ) {
-    val year: Int by statsViewModel.year.collectAsStateWithLifecycle()
+    val year: Int? by statsViewModel.year.collectAsStateWithLifecycle()
     val pagerState: PagerState = rememberPagerState(pageCount = { StatsTab.entries.size })
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
@@ -99,8 +101,8 @@ fun StatsScreen(
 
 @Composable
 private fun StatsHeader(
-    year: Int,
-    onYearChange: (Int) -> Unit,
+    year: Int?,
+    onYearChange: (Int?) -> Unit,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     modifier: Modifier = Modifier,
@@ -177,8 +179,8 @@ private fun StatsTab(
 
 @Composable
 private fun StatsYearDropdown(
-    year: Int,
-    onYearChange: (Int) -> Unit,
+    year: Int?,
+    onYearChange: (Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -188,7 +190,12 @@ private fun StatsYearDropdown(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(Res.string.all_year, year),
+                text =
+                    if (year == null) {
+                        stringResource(Res.string.stats_all_season)
+                    } else {
+                        stringResource(Res.string.all_year, year)
+                    },
                 style = PretendardRegular16.copy(color = Gray500),
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -211,6 +218,22 @@ private fun StatsYearDropdown(
                     .crop(vertical = 8.dp)
                     .padding(vertical = 4.dp),
         ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(Res.string.all_all),
+                        style = PretendardRegular16.copy(color = Gray500),
+                    )
+                },
+                onClick = {
+                    onYearChange(null)
+                    isExpanded = false
+                    AnalyticsLogger.logEvent("stats_change_year")
+                },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
+            )
+
             StatsViewModel.YEAR_RANGE.reversed().forEach { year: Int ->
                 DropdownMenuItem(
                     text = {

@@ -1,13 +1,14 @@
 package com.yagubogu.ui.livetalk.chat.model
 
 import androidx.compose.ui.geometry.Offset
+import org.jetbrains.compose.resources.DrawableResource
 
 data class LivetalkChatScreenActions(
     val chatToolbar: ChatToolbar = ChatToolbar(),
     val chatInputBar: ChatInputBar = ChatInputBar(),
     val chatBubbleItems: ChatBubbleItems = ChatBubbleItems(),
     val chatCheering: ChatCheering = ChatCheering(),
-    val floatingEmojiItem: FloatingEmojiItem = FloatingEmojiItem(),
+    val floatingMascotItem: FloatingMascotItem = FloatingMascotItem(),
     val dialog: Dialog = Dialog(),
 ) {
     data class ChatToolbar(
@@ -27,12 +28,12 @@ data class LivetalkChatScreenActions(
     )
 
     data class ChatCheering(
-        val onCheeringClick: (String) -> Unit = {},
-        val onEmojiButtonPositioned: (Offset) -> Unit = {},
+        val onCheeringClick: (DrawableResource) -> Unit = {},
+        val onMascotButtonPositioned: (Offset) -> Unit = {},
     )
 
-    data class FloatingEmojiItem(
-        val onAnimationFinished: (EmojiAnimationItem) -> Unit = {},
+    data class FloatingMascotItem(
+        val onAnimationFinished: (MascotAnimationItem) -> Unit = {},
     )
 
     data class Dialog(

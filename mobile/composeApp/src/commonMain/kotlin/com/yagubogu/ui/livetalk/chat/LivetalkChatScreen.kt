@@ -34,28 +34,29 @@ import co.touchlab.kermit.Logger
 import com.yagubogu.domain.util.now
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
-import com.yagubogu.ui.livetalk.chat.component.FloatingEmojiItem
+import com.yagubogu.ui.livetalk.chat.component.FloatingMascotItem
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleList
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatBubbleListShimmer
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatCheeringBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatDialogs
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
-import com.yagubogu.ui.livetalk.chat.model.EmojiAnimationItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenActions
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenStates
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
+import com.yagubogu.ui.livetalk.chat.model.MascotAnimationItem
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.YaguBoguTheme
-import com.yagubogu.ui.util.emoji
+import com.yagubogu.ui.util.mascot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
+import org.jetbrains.compose.resources.DrawableResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Clock
@@ -83,12 +84,18 @@ fun LivetalkChatScreen(
     val pendingDeleteChat: LivetalkChatItem? by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
     val pendingReportChat: LivetalkChatItem? by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
 
-    val emojiQueue = remember { mutableStateListOf<EmojiAnimationItem>() }
-    var emojiButtonPos: Offset by remember { mutableStateOf(Offset.Zero) }
+    val mascotQueue = remember { mutableStateListOf<MascotAnimationItem>() }
+    var mascotButtonPos: Offset by remember { mutableStateOf(Offset.Zero) }
 
-    fun generateEmojiAnimation(emoji: String) {
+    fun generateMascotAnimation(mascot: DrawableResource) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
-        emojiQueue.add(EmojiAnimationItem(Clock.System.now().epochSeconds, emoji, emojiButtonPos))
+        mascotQueue.add(
+            MascotAnimationItem(
+                Clock.System.now().epochSeconds,
+                mascot,
+                mascotButtonPos,
+            ),
+        )
     }
 
     val uiContentState =
@@ -98,7 +105,7 @@ fun LivetalkChatScreen(
             livetalkChatBubbleItems,
             messageText,
             showingLikeCount,
-            emojiQueue.toList(),
+            mascotQueue.toList(),
             clickedProfile,
             pendingDeleteChat,
             pendingReportChat,
@@ -129,9 +136,9 @@ fun LivetalkChatScreen(
                         pendingDeleteChat = pendingDeleteChat,
                         pendingReportChat = pendingReportChat,
                     ),
-                emojiLayer =
-                    LivetalkChatScreenStates.EmojiLayer(
-                        emojiQueue = emojiQueue.toList(),
+                mascotLayer =
+                    LivetalkChatScreenStates.MascotLayer(
+                        mascotQueue = mascotQueue.toList(),
                     ),
                 isVerified = isVerified,
             )
@@ -154,15 +161,15 @@ fun LivetalkChatScreen(
                     ),
                 chatCheering =
                     LivetalkChatScreenActions.ChatCheering(
-                        onCheeringClick = { emoji: String ->
-                            generateEmojiAnimation(emoji)
+                        onCheeringClick = { mascot: DrawableResource ->
+                            generateMascotAnimation(mascot)
                             viewModel.addLikeToBatch()
                         },
-                        onEmojiButtonPositioned = { pos: Offset -> emojiButtonPos = pos },
+                        onMascotButtonPositioned = { pos: Offset -> mascotButtonPos = pos },
                     ),
-                floatingEmojiItem =
-                    LivetalkChatScreenActions.FloatingEmojiItem(
-                        onAnimationFinished = { item: EmojiAnimationItem -> emojiQueue.remove(item) },
+                floatingMascotItem =
+                    LivetalkChatScreenActions.FloatingMascotItem(
+                        onAnimationFinished = { item: MascotAnimationItem -> mascotQueue.remove(item) },
                     ),
                 dialog =
                     LivetalkChatScreenActions.Dialog(
@@ -179,16 +186,15 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.myTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val myTeamEmoji = teams?.myTeamEmoji ?: return@collect
-                scheduleEmojiWithCounter(
-                    emoji = myTeamEmoji,
+                val myTeamMascot = teams?.myTeamMascot ?: return@collect
+                scheduleMascotWithCounter(
                     count = count,
                     scope = this,
                     increaseCountText = { increment ->
                         likeCountStateHolder.increaseMyTeamShowingCount(increment)
                     },
                 ) {
-                    generateEmojiAnimation(myTeamEmoji)
+                    generateMascotAnimation(myTeamMascot)
                 }
             }
         }
@@ -198,13 +204,12 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.otherTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val otherTeamEmoji = teams?.otherTeamEmoji ?: return@collect
-                scheduleEmojiWithCounter(
-                    emoji = otherTeamEmoji,
+                val otherTeamMascot = teams?.otherTeamMascot ?: return@collect
+                scheduleMascotWithCounter(
                     count = count,
                     scope = this,
                 ) {
-                    generateEmojiAnimation(otherTeamEmoji)
+                    generateMascotAnimation(otherTeamMascot)
                 }
             }
         }
@@ -303,9 +308,9 @@ fun LivetalkChatScreenContent(
                             team = myTeam,
                             cheeringCount = cheeringState.showingCount,
                             onCheeringClick = {
-                                actions.chatCheering.onCheeringClick(myTeam.emoji)
+                                actions.chatCheering.onCheeringClick(myTeam.mascot)
                             },
-                            onPositioned = actions.chatCheering.onEmojiButtonPositioned,
+                            onPositioned = actions.chatCheering.onMascotButtonPositioned,
                         )
                     }
 
@@ -315,16 +320,16 @@ fun LivetalkChatScreenContent(
                 }
             }
             // 이모지 애니메이션 레이어
-            state.emojiLayer.emojiQueue.forEach { item: EmojiAnimationItem ->
+            state.mascotLayer.mascotQueue.forEach { item: MascotAnimationItem ->
                 key(item.id) {
                     LaunchedEffect(Unit) {
                         logger.d { "이모지 애니메이션 시작 좌표 : ${item.startOffset}" }
                     }
-                    FloatingEmojiItem(
-                        emoji = item.emoji,
+                    FloatingMascotItem(
+                        mascot = item.mascot,
                         startOffset = item.startOffset,
                         onAnimationFinished = {
-                            actions.floatingEmojiItem.onAnimationFinished(item)
+                            actions.floatingMascotItem.onAnimationFinished(item)
                         },
                     )
                 }
@@ -336,8 +341,7 @@ fun LivetalkChatScreenContent(
     }
 }
 
-private fun scheduleEmojiWithCounter(
-    emoji: String,
+private fun scheduleMascotWithCounter(
     count: Long,
     scope: CoroutineScope,
     increaseCountText: (suspend (Long) -> Unit)? = null,
@@ -364,7 +368,7 @@ private fun scheduleEmojiWithCounter(
                 delay(randomDelay)
                 increaseCountText?.invoke(increment)
                 triggerAnimation()
-                logger.d { "$emoji 이모지 애니메이션 및 $increment 만큼 카운트 증가" }
+                logger.d { "이모지 애니메이션 및 $increment 만큼 카운트 증가" }
             }
         }
     }

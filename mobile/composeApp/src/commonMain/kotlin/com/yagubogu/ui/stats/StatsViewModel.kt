@@ -15,7 +15,6 @@ import com.yagubogu.ui.stats.my.model.AverageStats
 import com.yagubogu.ui.stats.my.model.StatsCounts
 import com.yagubogu.ui.stats.my.model.StatsMyUiModel
 import com.yagubogu.ui.util.mapList
-import com.yagubogu.ui.util.mapListIndexed
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -35,8 +34,8 @@ class StatsViewModel(
 ) : ViewModel() {
     private val logger = Logger.withTag("StatsViewModel")
 
-    private val _year = MutableStateFlow(LocalDate.now().year)
-    val year: StateFlow<Int> = _year.asStateFlow()
+    private val _year = MutableStateFlow<Int?>(LocalDate.now().year)
+    val year: StateFlow<Int?> = _year.asStateFlow()
 
     private val _statsMyUiModel: MutableStateFlow<StatsMyUiModel?> = MutableStateFlow(null)
     val statsMyUiModel: StateFlow<StatsMyUiModel?> = _statsMyUiModel.asStateFlow()
@@ -68,17 +67,17 @@ class StatsViewModel(
     private var vsTeamStatsJob: Job? = null
     private var stadiumVisitCountsJob: Job? = null
 
-    fun fetchMyStats() {
-        fetchMyAttendanceStats()
-        fetchMyAverageStats()
+    fun fetchMyStats(year: Int?) {
+        fetchMyAttendanceStats(year)
+        fetchMyAverageStats(year)
     }
 
-    fun fetchDetailStats() {
-        fetchVsTeamStats()
-        fetchStadiumVisitCounts()
+    fun fetchDetailStats(year: Int?) {
+        fetchVsTeamStats(year)
+        fetchStadiumVisitCounts(year)
     }
 
-    fun updateYear(year: Int) {
+    fun updateYear(year: Int?) {
         if (_year.value == year) return
         _statsMyUiModel.value = null
         _averageStats.value = null
@@ -91,11 +90,10 @@ class StatsViewModel(
         _isVsTeamStatsExpanded.value = !_isVsTeamStatsExpanded.value
     }
 
-    private fun fetchMyAttendanceStats() {
+    private fun fetchMyAttendanceStats(year: Int?) {
         attendanceJob?.cancel()
         attendanceJob =
             viewModelScope.launch {
-                val year: Int = year.value
                 val statsCountsDeferred: Deferred<Result<StatsCounts>> =
                     async { statsRepository.getStatsCounts(year).map { it.toUiModel() } }
                 val winRateDeferred: Deferred<Result<Double>> =
@@ -137,11 +135,10 @@ class StatsViewModel(
             }
     }
 
-    private fun fetchMyAverageStats() {
+    private fun fetchMyAverageStats(year: Int?) {
         averageStatsJob?.cancel()
         averageStatsJob =
             viewModelScope.launch {
-                val year: Int = year.value
                 statsRepository
                     .getAverageStats(year)
                     .map { it.toUiModel() }
@@ -153,16 +150,20 @@ class StatsViewModel(
             }
     }
 
-    private fun fetchVsTeamStats() {
+    private fun fetchVsTeamStats(year: Int?) {
         vsTeamStatsJob?.cancel()
         vsTeamStatsJob =
             viewModelScope.launch {
-                val year: Int = year.value
                 val vsTeamStatsResult: Result<List<VsTeamStatItem>> =
                     statsRepository
                         .getVsTeamStats(year)
-                        .mapListIndexed { index: Int, item: OpponentWinRateTeamDto ->
-                            item.toUiModel(rank = index + 1)
+                        .mapList { item: OpponentWinRateTeamDto ->
+                            item.toUiModel()
+                        }.map { list: List<VsTeamStatItem> ->
+                            list.sortedWith(
+                                compareBy<VsTeamStatItem> { it.rank } // 1순위: rank 오름차순 (작은 숫자가 먼저)
+                                    .thenByDescending { it.totalCounts }, // 2순위: totalCounts 내림차순 (많은 순서로)
+                            )
                         }
                 vsTeamStatsResult
                     .onSuccess { updatedVsTeamStats: List<VsTeamStatItem> ->
@@ -173,11 +174,10 @@ class StatsViewModel(
             }
     }
 
-    private fun fetchStadiumVisitCounts() {
+    private fun fetchStadiumVisitCounts(year: Int?) {
         stadiumVisitCountsJob?.cancel()
         stadiumVisitCountsJob =
             viewModelScope.launch {
-                val year: Int = year.value
                 val stadiumVisitCountsResult: Result<List<StadiumVisitCount>> =
                     checkInRepository.getStadiumCheckInCounts(year).mapList { it.toUiModel() }
                 stadiumVisitCountsResult

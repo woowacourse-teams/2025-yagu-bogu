@@ -12,27 +12,27 @@ import de.jensklingenberg.ktorfit.http.Query
 interface StatsApiService {
     @GET("/api/v1/stats/win-rate")
     suspend fun getStatsWinRate(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): StatsWinRateResponse
 
     @GET("/api/v1/stats/counts")
     suspend fun getStatsCounts(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): StatsCountsResponse
 
     @GET("/api/v1/stats/lucky-stadiums")
     suspend fun getLuckyStadiums(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): StatsLuckyStadiumsResponse
 
     @GET("/api/v1/stats/me")
     suspend fun getAverageStats(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): AverageStatisticResponse
 
     @GET("/api/v1/stats/win-rate/opponents")
     suspend fun getVsTeamStats(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): OpponentWinRateResponse
 
     @GET("/api/v1/stats/victory-fairy/rankings")

@@ -28,7 +28,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun StatsDetailScreen(
-    year: Int,
+    year: Int?,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = koinViewModel(),
@@ -38,7 +38,7 @@ fun StatsDetailScreen(
     val isVsTeamStatsExpanded: Boolean by viewModel.isVsTeamStatsExpanded.collectAsStateWithLifecycle()
 
     LaunchedEffect(year) {
-        viewModel.fetchDetailStats()
+        viewModel.fetchDetailStats(year)
     }
 
     StatsDetailScreen(

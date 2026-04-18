@@ -1,5 +1,6 @@
 package com.yagubogu.ui.favorite
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,17 +36,23 @@ import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.EsamanruMedium20
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
+import com.yagubogu.ui.theme.Gray400
+import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.emoji
+import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.all_cancel
 import yagubogu.composeapp.generated.resources.all_confirm
+import yagubogu.composeapp.generated.resources.favorite_team_random
 import yagubogu.composeapp.generated.resources.favorite_team_selection
 import yagubogu.composeapp.generated.resources.favorite_team_selection_confirm
+import yagubogu.composeapp.generated.resources.img_mascot_ht
 
 @Composable
 fun FavoriteTeamScreen(
@@ -51,8 +60,8 @@ fun FavoriteTeamScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoriteTeamViewModel = koinViewModel(),
 ) {
-    val teams: List<FavoriteTeamItem> = Team.entries.map { FavoriteTeamItem.of(it) }
-    var selectedTeam: FavoriteTeamItem? by rememberSaveable { mutableStateOf(null) }
+    val teams: List<Team> = remember { Team.entries.shuffled() }
+    var selectedTeam: Team? by rememberSaveable { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.favoriteTeamUpdateEvent.collect {
@@ -68,12 +77,12 @@ fun FavoriteTeamScreen(
         )
     }
 
-    selectedTeam?.let { team: FavoriteTeamItem ->
+    selectedTeam?.let { team: Team ->
         FavoriteTeamDialog(
-            emoji = team.team.emoji,
-            teamName = team.team.shortname,
+            mascot = team.mascot,
+            teamName = team.shortname,
             onConfirm = {
-                viewModel.saveFavoriteTeam(team.team)
+                viewModel.saveFavoriteTeam(team)
                 selectedTeam = null
             },
             onCancel = { selectedTeam = null },
@@ -84,8 +93,8 @@ fun FavoriteTeamScreen(
 
 @Composable
 private fun FavoriteTeamScreen(
-    teams: List<FavoriteTeamItem>,
-    onTeamClick: (FavoriteTeamItem) -> Unit,
+    teams: List<Team>,
+    onTeamClick: (Team) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -103,6 +112,14 @@ private fun FavoriteTeamScreen(
                     .padding(horizontal = 30.dp)
                     .padding(top = 20.dp),
         )
+        Text(
+            text = stringResource(Res.string.favorite_team_random),
+            style = PretendardMedium16.copy(color = Gray400),
+            modifier =
+                Modifier
+                    .padding(horizontal = 30.dp)
+                    .padding(top = 4.dp),
+        )
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -111,10 +128,10 @@ private fun FavoriteTeamScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(teams) { item: FavoriteTeamItem ->
+            items(teams) { team: Team ->
                 FavoriteTeamItem(
-                    item = item,
-                    onClick = { onTeamClick(item) },
+                    team = team,
+                    onClick = { onTeamClick(team) },
                 )
             }
         }
@@ -123,7 +140,7 @@ private fun FavoriteTeamScreen(
 
 @Composable
 private fun FavoriteTeamItem(
-    item: FavoriteTeamItem,
+    team: Team,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,16 +151,17 @@ private fun FavoriteTeamItem(
                 .fillMaxWidth()
                 .background(White, RoundedCornerShape(12.dp))
                 .border(1.dp, Gray100, RoundedCornerShape(12.dp))
-                .padding(vertical = 24.dp)
+                .padding(vertical = 16.dp)
                 .noRippleClickable { onClick() },
     ) {
-        Text(
-            text = item.emoji,
-            fontSize = 32.sp,
+        Image(
+            painter = painterResource(team.mascot),
+            contentDescription = null,
+            modifier = Modifier.size(60.dp),
         )
 
         Text(
-            text = item.team.shortname,
+            text = team.shortname,
             style = PretendardSemiBold16,
             modifier = Modifier.padding(top = 8.dp),
         )
@@ -152,7 +170,7 @@ private fun FavoriteTeamItem(
 
 @Composable
 private fun FavoriteTeamDialog(
-    emoji: String,
+    mascot: DrawableResource,
     teamName: String,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
@@ -170,9 +188,10 @@ private fun FavoriteTeamDialog(
             style = EsamanruMedium20,
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = emoji,
-            fontSize = 32.sp,
+        Image(
+            painter = painterResource(mascot),
+            contentDescription = null,
+            modifier = Modifier.size(60.dp),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -186,7 +205,7 @@ private fun FavoriteTeamDialog(
 @Composable
 private fun FavoriteTeamScreenPreview() {
     FavoriteTeamScreen(
-        teams = Team.entries.map { FavoriteTeamItem.of(it) },
+        teams = Team.entries,
         onTeamClick = {},
     )
 }
@@ -195,8 +214,8 @@ private fun FavoriteTeamScreenPreview() {
 @Composable
 private fun FavoriteTeamDialogPreview() {
     FavoriteTeamDialog(
-        emoji = "🐯",
-        teamName = "KIA 타이거즈",
+        mascot = Res.drawable.img_mascot_ht,
+        teamName = "KIA",
         onConfirm = {},
         onCancel = {},
     )

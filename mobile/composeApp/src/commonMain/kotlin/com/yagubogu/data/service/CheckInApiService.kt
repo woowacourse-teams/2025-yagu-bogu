@@ -31,7 +31,7 @@ interface CheckInApiService {
     @GET("/api/v1/check-ins/members")
     suspend fun getCheckInHistories(
         @Query("year") year: Int,
-        @Query("month") month: Int,
+        @Query("month") month: Int?,
         @Query("result") result: String,
         @Query("order") order: String,
     ): CheckInHistoryResponse
@@ -43,7 +43,7 @@ interface CheckInApiService {
 
     @GET("/api/v1/check-ins/stadiums/counts")
     suspend fun getStadiumCheckInCounts(
-        @Query("year") year: Int,
+        @Query("year") year: Int?,
     ): StadiumCheckInCountsResponse
 
     @POST("/api/v1/past-check-ins")

@@ -1,7 +1,6 @@
 package com.yagubogu.ui.stats.detail.model
 
 import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.util.emoji
 
 data class VsTeamStatItem(
     val rank: Int,
@@ -12,5 +11,6 @@ data class VsTeamStatItem(
     val loseCounts: Int,
     val winningPercentage: Double,
 ) {
-    val teamEmoji: String = team.emoji
+    val totalCounts: Int
+        get() = winCounts + drawCounts + loseCounts
 }

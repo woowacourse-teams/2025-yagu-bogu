@@ -9,7 +9,7 @@ data class LivetalkChatScreenStates(
     val inputBar: InputBar = InputBar(),
     val cheering: Cheering = Cheering(),
     val dialog: Dialog = Dialog(),
-    val emojiLayer: EmojiLayer = EmojiLayer(),
+    val mascotLayer: MascotLayer = MascotLayer(),
     val isVerified: Boolean = false,
 ) {
     data class Toolbar(
@@ -37,7 +37,7 @@ data class LivetalkChatScreenStates(
         val pendingReportChat: LivetalkChatItem? = null,
     )
 
-    data class EmojiLayer(
-        val emojiQueue: List<EmojiAnimationItem> = emptyList(),
+    data class MascotLayer(
+        val mascotQueue: List<MascotAnimationItem> = emptyList(),
     )
 }

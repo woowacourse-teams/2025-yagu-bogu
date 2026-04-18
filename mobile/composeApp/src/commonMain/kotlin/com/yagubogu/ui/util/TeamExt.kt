@@ -12,6 +12,18 @@ import com.yagubogu.ui.theme.TeamLotte
 import com.yagubogu.ui.theme.TeamNc
 import com.yagubogu.ui.theme.TeamSamsung
 import com.yagubogu.ui.theme.TeamSsg
+import org.jetbrains.compose.resources.DrawableResource
+import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.img_mascot_hh
+import yagubogu.composeapp.generated.resources.img_mascot_ht
+import yagubogu.composeapp.generated.resources.img_mascot_kt
+import yagubogu.composeapp.generated.resources.img_mascot_lg
+import yagubogu.composeapp.generated.resources.img_mascot_lt
+import yagubogu.composeapp.generated.resources.img_mascot_nc
+import yagubogu.composeapp.generated.resources.img_mascot_ob
+import yagubogu.composeapp.generated.resources.img_mascot_sk
+import yagubogu.composeapp.generated.resources.img_mascot_ss
+import yagubogu.composeapp.generated.resources.img_mascot_wo
 
 val Team.color: Color
     get() =
@@ -28,17 +40,17 @@ val Team.color: Color
             Team.OB -> TeamDoosan
         }
 
-val Team.emoji: String
+val Team.mascot: DrawableResource
     get() =
         when (this) {
-            Team.HT -> "\uD83D\uDC2F"
-            Team.LG -> "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1"
-            Team.WO -> "\uD83E\uDDB8"
-            Team.KT -> "\uD83E\uDDD9"
-            Team.SS -> "\uD83E\uDD81"
-            Team.LT -> "\uD83C\uDF3A"
-            Team.SK -> "\uD83D\uDE80"
-            Team.NC -> "\uD83E\uDD95"
-            Team.HH -> "\uD83E\uDD85"
-            Team.OB -> "\uD83D\uDC3B"
+            Team.HT -> Res.drawable.img_mascot_ht
+            Team.LG -> Res.drawable.img_mascot_lg
+            Team.WO -> Res.drawable.img_mascot_wo
+            Team.KT -> Res.drawable.img_mascot_kt
+            Team.SS -> Res.drawable.img_mascot_ss
+            Team.LT -> Res.drawable.img_mascot_lt
+            Team.SK -> Res.drawable.img_mascot_sk
+            Team.NC -> Res.drawable.img_mascot_nc
+            Team.HH -> Res.drawable.img_mascot_hh
+            Team.OB -> Res.drawable.img_mascot_ob
         }

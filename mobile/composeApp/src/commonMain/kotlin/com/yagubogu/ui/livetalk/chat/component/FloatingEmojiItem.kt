@@ -3,6 +3,7 @@ package com.yagubogu.ui.livetalk.chat.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutQuart
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,13 +29,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.img_mascot_ht
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Clock
 
 @Composable
-fun FloatingEmojiItem(
-    emoji: String,
+fun FloatingMascotItem(
+    mascot: DrawableResource,
     startOffset: Offset,
     modifier: Modifier = Modifier,
     onAnimationFinished: () -> Unit,
@@ -91,15 +96,19 @@ fun FloatingEmojiItem(
                     }.alpha(alphaAnim.value),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = emoji, fontSize = 28.sp)
+            Image(
+                painter = painterResource(mascot),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun FloatingEmojiItemPreview() {
-    val emojiQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
+private fun FloatingMascotItemPreview() {
+    val mascotQueue = remember { mutableStateListOf<Pair<Long, Offset>>() }
 
     Box(
         modifier =
@@ -113,7 +122,7 @@ private fun FloatingEmojiItemPreview() {
                     .size(80.dp)
                     .clickable {
                         val centerPos = Offset(540f, 1000f)
-                        emojiQueue.add(Clock.System.now().epochSeconds to centerPos)
+                        mascotQueue.add(Clock.System.now().epochSeconds to centerPos)
                     },
             contentAlignment = Alignment.Center,
         ) {
@@ -123,13 +132,13 @@ private fun FloatingEmojiItemPreview() {
             )
         }
         Box(modifier = Modifier.fillMaxSize()) {
-            emojiQueue.forEach { (key, startPos) ->
+            mascotQueue.forEach { (key, startPos) ->
                 key(key) {
-                    FloatingEmojiItem(
-                        emoji = "⚾",
+                    FloatingMascotItem(
+                        mascot = Res.drawable.img_mascot_ht,
                         startOffset = startPos,
                         onAnimationFinished = {
-                            emojiQueue.removeAll { it.first == key }
+                            mascotQueue.removeAll { it.first == key }
                         },
                     )
                 }

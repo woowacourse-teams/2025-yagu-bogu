@@ -12,27 +12,27 @@ import com.yagubogu.data.util.safeApiCall
 class StatsRemoteDataSource(
     private val statsApiService: StatsApiService,
 ) : StatsDataSource {
-    override suspend fun getStatsWinRate(year: Int): Result<StatsWinRateResponse> =
+    override suspend fun getStatsWinRate(year: Int?): Result<StatsWinRateResponse> =
         safeApiCall {
             statsApiService.getStatsWinRate(year)
         }
 
-    override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> =
+    override suspend fun getStatsCounts(year: Int?): Result<StatsCountsResponse> =
         safeApiCall {
             statsApiService.getStatsCounts(year)
         }
 
-    override suspend fun getLuckyStadiums(year: Int): Result<StatsLuckyStadiumsResponse> =
+    override suspend fun getLuckyStadiums(year: Int?): Result<StatsLuckyStadiumsResponse> =
         safeApiCall {
             statsApiService.getLuckyStadiums(year)
         }
 
-    override suspend fun getAverageStats(year: Int): Result<AverageStatisticResponse> =
+    override suspend fun getAverageStats(year: Int?): Result<AverageStatisticResponse> =
         safeApiCall {
             statsApiService.getAverageStats(year)
         }
 
-    override suspend fun getVsTeamStats(year: Int): Result<OpponentWinRateResponse> =
+    override suspend fun getVsTeamStats(year: Int?): Result<OpponentWinRateResponse> =
         safeApiCall {
             statsApiService.getVsTeamStats(year)
         }

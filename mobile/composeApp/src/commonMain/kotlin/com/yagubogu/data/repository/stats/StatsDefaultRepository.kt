@@ -12,25 +12,25 @@ import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
 class StatsDefaultRepository(
     private val statsDataSource: StatsDataSource,
 ) : StatsRepository {
-    override suspend fun getStatsWinRate(year: Int): Result<Double> =
+    override suspend fun getStatsWinRate(year: Int?): Result<Double> =
         statsDataSource
             .getStatsWinRate(year)
             .map { statsWinRateResponse: StatsWinRateResponse ->
                 statsWinRateResponse.winPercent
             }
 
-    override suspend fun getStatsCounts(year: Int): Result<StatsCountsResponse> = statsDataSource.getStatsCounts(year)
+    override suspend fun getStatsCounts(year: Int?): Result<StatsCountsResponse> = statsDataSource.getStatsCounts(year)
 
-    override suspend fun getLuckyStadiums(year: Int): Result<String?> =
+    override suspend fun getLuckyStadiums(year: Int?): Result<String?> =
         statsDataSource
             .getLuckyStadiums(year)
             .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
                 statsLuckyStadiumsResponse.shortName
             }
 
-    override suspend fun getAverageStats(year: Int): Result<AverageStatisticResponse> = statsDataSource.getAverageStats(year)
+    override suspend fun getAverageStats(year: Int?): Result<AverageStatisticResponse> = statsDataSource.getAverageStats(year)
 
-    override suspend fun getVsTeamStats(year: Int): Result<List<OpponentWinRateTeamDto>> =
+    override suspend fun getVsTeamStats(year: Int?): Result<List<OpponentWinRateTeamDto>> =
         statsDataSource
             .getVsTeamStats(year)
             .map { opponentWinRateResponse: OpponentWinRateResponse ->

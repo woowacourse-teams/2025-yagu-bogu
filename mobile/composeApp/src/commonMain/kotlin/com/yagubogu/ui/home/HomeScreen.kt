@@ -228,7 +228,8 @@ private fun HomeScreen(
                 .fillMaxSize()
                 .background(Gray050)
                 .verticalScroll(scrollState)
-                .padding(20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(top = 10.dp, bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {

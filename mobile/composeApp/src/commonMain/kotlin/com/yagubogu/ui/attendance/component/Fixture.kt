@@ -101,6 +101,16 @@ val ATTENDANCE_HISTORY_ITEMS =
         ),
     )
 
+val GAME_DATES =
+    setOf(
+        LocalDate.now(),
+        LocalDate.now().minusDays(1),
+        LocalDate.now().minusDays(2),
+        LocalDate.now().minusDays(3),
+        LocalDate.now().minusDays(4),
+        LocalDate.now().minusDays(5),
+    )
+
 val PAST_GAME_UI_MODEL =
     PastGameUiModel(
         gameId = 0L,

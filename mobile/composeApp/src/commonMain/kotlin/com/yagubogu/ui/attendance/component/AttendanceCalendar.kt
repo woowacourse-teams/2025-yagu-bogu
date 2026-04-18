@@ -58,6 +58,7 @@ fun AttendanceCalendar(
     selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     attendanceDates: Set<LocalDate>,
+    gameDates: Set<LocalDate>,
     modifier: Modifier = Modifier,
 ) {
     val daysOfWeek: List<DayOfWeek> = daysOfWeek()
@@ -97,6 +98,7 @@ fun AttendanceCalendar(
                     day = day,
                     isSelected = selectedDate == day.date,
                     hasAttendance = day.date in attendanceDates,
+                    hasGame = day.date in gameDates,
                     onClick = { day: CalendarDay -> onDateChange(day.date) },
                 )
             },
@@ -126,11 +128,13 @@ private fun Day(
     day: CalendarDay,
     isSelected: Boolean,
     hasAttendance: Boolean,
+    hasGame: Boolean,
     onClick: (CalendarDay) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val today: LocalDate = LocalDate.now()
     val isToday: Boolean = day.date == today
+    val isCurrentMonth: Boolean = day.position == DayPosition.MonthDate
 
     Column(
         modifier =
@@ -154,7 +158,7 @@ private fun Day(
                         },
                     shape = RoundedCornerShape(4.dp),
                 ).noRippleClickable(
-                    enabled = day.position == DayPosition.MonthDate && day.date <= today,
+                    enabled = isCurrentMonth && (day.date <= today && (isToday || hasGame)),
                     onClick = { onClick(day) },
                 ),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,7 +170,8 @@ private fun Day(
                 when {
                     isToday -> White
                     isSelected -> Primary700
-                    day.position != DayPosition.MonthDate -> Gray400
+                    !hasGame -> Gray400
+                    !isCurrentMonth -> Gray400
                     day.date > today -> Gray400
                     else -> Black
                 },
@@ -209,5 +214,6 @@ private fun AttendanceCalendarPreview() {
         selectedDate = LocalDate.now().minusDays(1),
         onDateChange = {},
         attendanceDates = ATTENDANCE_HISTORY_ITEMS.map { it.summary.attendanceDate }.toSet(),
+        gameDates = GAME_DATES,
     )
 }

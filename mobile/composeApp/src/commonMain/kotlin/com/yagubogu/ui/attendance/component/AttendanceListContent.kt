@@ -1,9 +1,7 @@
 package com.yagubogu.ui.attendance.component
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,48 +15,41 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.analytics.AnalyticsLogger
-import com.yagubogu.ui.attendance.model.AttendanceHistoryFilter
+import com.yagubogu.domain.util.now
+import com.yagubogu.ui.attendance.model.AttendanceFilterState
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
-import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardRegular
-import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.crop
 import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.datetime.YearMonth
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.attendance_history_all
 import yagubogu.composeapp.generated.resources.attendance_history_empty_description
 import yagubogu.composeapp.generated.resources.attendance_history_empty_scoreboard_illustration_description
 import yagubogu.composeapp.generated.resources.attendance_history_latest
 import yagubogu.composeapp.generated.resources.attendance_history_oldest
-import yagubogu.composeapp.generated.resources.attendance_history_win
-import yagubogu.composeapp.generated.resources.ic_arrow_down
+import yagubogu.composeapp.generated.resources.attendance_history_win_only
+import yagubogu.composeapp.generated.resources.attendance_history_yearly
 import yagubogu.composeapp.generated.resources.ic_switch
 import yagubogu.composeapp.generated.resources.img_baseball_scoreboard
 
@@ -67,34 +58,9 @@ private const val FIRST_INDEX = 0
 @Composable
 fun AttendanceListContent(
     items: List<AttendanceHistoryItem>,
-    filter: AttendanceHistoryFilter,
-    updateFilter: (AttendanceHistoryFilter) -> Unit,
-    sort: AttendanceHistorySort,
-    updateSort: (AttendanceHistorySort) -> Unit,
-    modifier: Modifier = Modifier,
-    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
-) {
-    when (items.isNotEmpty()) {
-        true ->
-            AttendanceList(
-                items = items,
-                filter = filter,
-                updateFilter = updateFilter,
-                sort = sort,
-                updateSort = updateSort,
-                modifier = modifier,
-                scrollToTopEvent = scrollToTopEvent,
-            )
-
-        false -> EmptyAttendanceList()
-    }
-}
-
-@Composable
-private fun AttendanceList(
-    items: List<AttendanceHistoryItem>,
-    filter: AttendanceHistoryFilter,
-    updateFilter: (AttendanceHistoryFilter) -> Unit,
+    filterState: AttendanceFilterState,
+    onWinOnlyFilterToggle: () -> Unit,
+    onYearlyFilterToggle: () -> Unit,
     sort: AttendanceHistorySort,
     updateSort: (AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,6 +68,58 @@ private fun AttendanceList(
 ) {
     var detailItemPosition: Int? by rememberSaveable { mutableStateOf(if (items.isNotEmpty()) FIRST_INDEX else null) }
 
+    Column(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        AttendanceListHeader(
+            filterState = filterState,
+            onWinOnlyFilterToggle = {
+                onWinOnlyFilterToggle()
+                detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
+            },
+            onYearlyFilterToggle = {
+                onYearlyFilterToggle()
+                detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
+            },
+            sort = sort,
+            updateSort = { sort: AttendanceHistorySort ->
+                updateSort(sort)
+                detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
+            },
+        )
+        when (items.isNotEmpty()) {
+            true ->
+                AttendanceList(
+                    items = items,
+                    detailItemPosition = detailItemPosition,
+                    onItemClick = { item: AttendanceHistoryItem ->
+                        val position: Int = items.indexOf(item)
+                        if (position >= FIRST_INDEX) {
+                            detailItemPosition =
+                                if (position == detailItemPosition) {
+                                    null
+                                } else {
+                                    position
+                                }
+                        }
+                    },
+                    modifier = modifier,
+                    scrollToTopEvent = scrollToTopEvent,
+                )
+
+            false -> EmptyAttendanceList()
+        }
+    }
+}
+
+@Composable
+private fun AttendanceList(
+    items: List<AttendanceHistoryItem>,
+    detailItemPosition: Int?,
+    onItemClick: (AttendanceHistoryItem) -> Unit,
+    modifier: Modifier = Modifier,
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
+) {
     val lazyListState: LazyListState = rememberLazyListState()
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
@@ -117,33 +135,6 @@ private fun AttendanceList(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AttendanceHistoryFilterDropdown(
-                filter = filter,
-                onClick = { newFilter: AttendanceHistoryFilter ->
-                    if (filter != newFilter) {
-                        updateFilter(newFilter)
-                        detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
-                    }
-                },
-            )
-            AttendanceHistorySortSwitch(
-                sort = sort,
-                onClick = {
-                    val newSort: AttendanceHistorySort = sort.toggle()
-                    updateSort(newSort)
-                    detailItemPosition = if (items.isNotEmpty()) FIRST_INDEX else null
-                },
-            )
-        }
-
         LazyColumn(
             state = lazyListState,
             modifier =
@@ -167,17 +158,7 @@ private fun AttendanceList(
                 AttendanceItem(
                     item = item,
                     isExpanded = index == detailItemPosition,
-                    onItemClick = { item: AttendanceHistoryItem ->
-                        val position: Int = items.indexOf(item)
-                        if (position >= FIRST_INDEX) {
-                            detailItemPosition =
-                                if (position == detailItemPosition) {
-                                    null
-                                } else {
-                                    position
-                                }
-                        }
-                    },
+                    onItemClick = onItemClick,
                 )
             }
         }
@@ -208,71 +189,61 @@ private fun EmptyAttendanceList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AttendanceHistoryFilterDropdown(
-    filter: AttendanceHistoryFilter,
-    onClick: (AttendanceHistoryFilter) -> Unit,
+private fun AttendanceListHeader(
+    filterState: AttendanceFilterState,
+    onWinOnlyFilterToggle: () -> Unit,
+    onYearlyFilterToggle: () -> Unit,
+    sort: AttendanceHistorySort,
+    updateSort: (AttendanceHistorySort) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box(modifier = modifier) {
-        Row(
-            modifier = Modifier.noRippleClickable { isExpanded = !isExpanded },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text =
-                    stringResource(
-                        when (filter) {
-                            AttendanceHistoryFilter.ALL -> Res.string.attendance_history_all
-                            AttendanceHistoryFilter.WIN -> Res.string.attendance_history_win
-                        },
-                    ),
-                style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                modifier = Modifier.size(20.dp),
-                painter = painterResource(Res.drawable.ic_arrow_down),
-                contentDescription = null,
-                tint = Gray500,
-            )
-        }
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            offset = DpOffset(0.dp, 4.dp),
-            containerColor = White,
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(0.4.dp, Gray300),
-            modifier =
-                Modifier
-                    .crop(vertical = 8.dp)
-                    .padding(vertical = 4.dp),
-        ) {
-            AttendanceHistoryFilter.entries.forEach { filter: AttendanceHistoryFilter ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text =
-                                stringResource(
-                                    when (filter) {
-                                        AttendanceHistoryFilter.ALL -> Res.string.attendance_history_all
-                                        AttendanceHistoryFilter.WIN -> Res.string.attendance_history_win
-                                    },
-                                ),
-                            style = PretendardRegular.copy(fontSize = 14.sp, color = Gray500),
-                        )
-                    },
-                    onClick = {
-                        onClick(filter)
-                        isExpanded = false
-                        AnalyticsLogger.logEvent("attendance_history_change_filter")
-                    },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                    modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
-                )
-            }
-        }
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AttendanceFilterRow(
+            filterState = filterState,
+            onWinOnlyClick = onWinOnlyFilterToggle,
+            onYearlyClick = onYearlyFilterToggle,
+        )
+
+        AttendanceHistorySortSwitch(
+            sort = sort,
+            onClick = {
+                val newSort: AttendanceHistorySort = sort.toggle()
+                updateSort(newSort)
+            },
+        )
+    }
+}
+
+@Composable
+private fun AttendanceFilterRow(
+    filterState: AttendanceFilterState,
+    onWinOnlyClick: () -> Unit,
+    onYearlyClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        FilterCheckbox(
+            text = stringResource(Res.string.attendance_history_win_only),
+            isSelected = filterState.isWinOnly,
+            onClick = onWinOnlyClick,
+        )
+
+        FilterCheckbox(
+            text = stringResource(Res.string.attendance_history_yearly, filterState.yearMonth.year),
+            isSelected = filterState.isYearly,
+            onClick = onYearlyClick,
+        )
     }
 }
 
@@ -313,11 +284,12 @@ private fun AttendanceHistorySortSwitch(
 
 @Preview("리스트 화면", showBackground = true)
 @Composable
-private fun AttendanceListPreview() {
-    AttendanceList(
+private fun AttendanceListContentPreview() {
+    AttendanceListContent(
         items = ATTENDANCE_HISTORY_ITEMS,
-        filter = AttendanceHistoryFilter.ALL,
-        updateFilter = {},
+        filterState = AttendanceFilterState(yearMonth = YearMonth.now()),
+        onWinOnlyFilterToggle = {},
+        onYearlyFilterToggle = {},
         sort = AttendanceHistorySort.LATEST,
         updateSort = {},
     )
@@ -325,6 +297,13 @@ private fun AttendanceListPreview() {
 
 @Preview("빈 리스트 화면", showBackground = true)
 @Composable
-private fun EmptyAttendancePreview() {
-    EmptyAttendanceList()
+private fun EmptyAttendanceListContentPreview() {
+    AttendanceListContent(
+        items = emptyList(),
+        filterState = AttendanceFilterState(yearMonth = YearMonth.now()),
+        onWinOnlyFilterToggle = {},
+        onYearlyFilterToggle = {},
+        sort = AttendanceHistorySort.LATEST,
+        updateSort = {},
+    )
 }

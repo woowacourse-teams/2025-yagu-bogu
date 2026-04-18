@@ -1,6 +1,7 @@
 package com.yagubogu.data.service
 
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
+import com.yagubogu.data.dto.response.game.GameDatesResponse
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
 import de.jensklingenberg.ktorfit.http.Body
@@ -14,6 +15,11 @@ interface GameApiService {
     suspend fun getGames(
         @Query("date") date: String,
     ): GameResponse
+
+    @GET("/api/v1/games/dates")
+    suspend fun getGameDates(
+        @Query("yearMonth") yearMonth: String,
+    ): GameDatesResponse
 
     @POST("/api/v1/games/{gameId}/like-batches")
     suspend fun postLikeBatches(

@@ -28,7 +28,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun StatsMyScreen(
-    year: Int,
+    year: Int?,
     scrollToTopEvent: SharedFlow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = koinViewModel(),
@@ -37,7 +37,7 @@ fun StatsMyScreen(
     val averageStats: AverageStats? by viewModel.averageStats.collectAsStateWithLifecycle()
 
     LaunchedEffect(year) {
-        viewModel.fetchMyStats()
+        viewModel.fetchMyStats(year)
     }
 
     StatsMyScreen(

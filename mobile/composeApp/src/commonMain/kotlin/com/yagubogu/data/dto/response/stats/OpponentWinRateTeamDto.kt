@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpponentWinRateTeamDto(
+    @SerialName("rank")
+    val rank: Int, // 순위
     @SerialName("teamId")
     val teamId: Long, // 팀 id
     @SerialName("name")

@@ -1,5 +1,6 @@
 package com.yagubogu.ui.livetalk.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -33,9 +34,10 @@ import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
-import com.yagubogu.ui.util.emoji
+import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.shimmerLoading
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
@@ -95,14 +97,14 @@ fun LivetalkStadiumItem(
                 modifier = Modifier.size(20.dp),
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TeamItem(
                 name = item.awayTeam.shortname,
-                emoji = item.awayTeam.emoji,
+                mascot = item.awayTeam.mascot,
                 teamColor = item.awayTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
@@ -112,7 +114,7 @@ fun LivetalkStadiumItem(
             )
             TeamItem(
                 name = item.homeTeam.shortname,
-                emoji = item.homeTeam.emoji,
+                mascot = item.homeTeam.mascot,
                 teamColor = item.homeTeam.color,
                 modifier = Modifier.weight(1.0f),
             )
@@ -134,7 +136,7 @@ fun ShimmerStadiumItem(modifier: Modifier = Modifier) {
 @Composable
 private fun TeamItem(
     name: String,
-    emoji: String,
+    mascot: DrawableResource,
     teamColor: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -142,9 +144,10 @@ private fun TeamItem(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = emoji,
-            style = PretendardMedium.copy(fontSize = 28.sp),
+        Image(
+            painter = painterResource(mascot),
+            contentDescription = null,
+            modifier = Modifier.size(40.dp),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
