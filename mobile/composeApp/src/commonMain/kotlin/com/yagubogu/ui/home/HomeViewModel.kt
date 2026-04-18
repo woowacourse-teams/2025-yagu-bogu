@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.location.CoordinateDto
+import com.yagubogu.data.mapper.toDomain
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.location.LocationRepository
 import com.yagubogu.data.repository.member.MemberRepository
@@ -14,6 +15,8 @@ import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Distance
 import com.yagubogu.domain.model.OpeningDate
+import com.yagubogu.domain.model.StadiumWithGame
+import com.yagubogu.domain.model.StadiumsWithGames
 import com.yagubogu.domain.util.now
 import com.yagubogu.domain.util.toInstantKST
 import com.yagubogu.ui.common.model.MemberProfile
@@ -23,8 +26,6 @@ import com.yagubogu.ui.home.model.HomeDialogEvent
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
-import com.yagubogu.ui.home.model.StadiumWithGame
-import com.yagubogu.ui.home.model.StadiumsWithGames
 import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.mapper.toDomain
 import com.yagubogu.ui.mapper.toUiModel
@@ -147,7 +148,7 @@ class HomeViewModel(
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumsWithGames(date)
-                .map { it.toUiModel() }
+                .map { it.toDomain() }
                 .onSuccess { stadiumsWithGames: StadiumsWithGames ->
                     if (stadiumsWithGames.isEmpty()) {
                         _checkInUiEvent.emit(CheckInUiEvent.NoGame)

@@ -1,5 +1,6 @@
 package com.yagubogu.ui.home.model
 
+import com.yagubogu.domain.model.StadiumWithGame
 import com.yagubogu.ui.common.model.MemberProfile
 
 sealed interface HomeDialogEvent {

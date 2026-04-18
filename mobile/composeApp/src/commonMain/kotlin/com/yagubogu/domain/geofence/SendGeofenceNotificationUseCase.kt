@@ -1,6 +1,7 @@
 package com.yagubogu.domain.geofence
 
 import co.touchlab.kermit.Logger
+import com.yagubogu.data.mapper.toDomain
 import com.yagubogu.data.repository.geofence.GeofenceRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.domain.model.Coordinate
@@ -11,7 +12,6 @@ import com.yagubogu.domain.model.Stadium
 import com.yagubogu.domain.model.Stadium.Companion.getStadiumById
 import com.yagubogu.domain.service.NotificationService
 import com.yagubogu.domain.util.now
-import com.yagubogu.ui.mapper.toUiModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
@@ -41,7 +41,7 @@ class SendGeofenceNotificationUseCase(
             val stadiumsWithGames =
                 stadiumRepository
                     .getStadiumsWithGames(LocalDate.now(clock))
-                    .map { it.toUiModel() }
+                    .map { it.toDomain() }
                     .getOrElse { e ->
                         logger.w(e) { "경기 목록 API 호출 실패(geofence)" }
                         return
