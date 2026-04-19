@@ -4,6 +4,7 @@ import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LocationCheckInRankingResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
@@ -101,6 +102,18 @@ public interface StatControllerInterface {
     ResponseEntity<VictoryFairyRankingResponse> findVictoryFairyRankings(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam(name = "team", defaultValue = "ALL") TeamFilter teamFilter,
+            @RequestParam(required = false) Integer year
+    );
+
+    @Operation(summary = "직관 랭킹 조회", description = "LOCATION_CHECK_IN 기준 상위 5명 및 본인의 직관 랭킹을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "직관 랭킹 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "관리자는 사용할 수 없음"),
+            @ApiResponse(responseCode = "404", description = "멤버를 찾을 수 없음")
+    })
+    @GetMapping("/location-check-in/rankings")
+    ResponseEntity<LocationCheckInRankingResponse> findLocationCheckInRankings(
+            @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam(required = false) Integer year
     );
 }

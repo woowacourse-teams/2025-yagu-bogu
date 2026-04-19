@@ -18,6 +18,7 @@ import com.yagubogu.checkin.dto.CheckInGameTeamParam;
 import com.yagubogu.checkin.dto.GameWithFanCountsParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
+import com.yagubogu.checkin.dto.LocationCheckInRankParam;
 import com.yagubogu.checkin.dto.VictoryFairyCountResult;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.QGame;
@@ -470,6 +471,90 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
                 )
                 .groupBy(STADIUM.id, STADIUM.shortName)
                 .fetch();
+    }
+
+    @Override
+    public List<LocationCheckInRankParam> findLocationCheckInRanking(final Integer year, final int limit) {
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        LocationCheckInRankParam.class,
+                        CHECK_IN.member.id,
+                        CHECK_IN.member.nickname.value,
+                        CHECK_IN.member.imageUrl,
+                        CHECK_IN.team.shortName,
+                        CHECK_IN.id.count()
+                ))
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .join(CHECK_IN.member, MEMBER)
+                .where(
+                        isLocationCheckIn(),
+                        isMemberNotDeleted(),
+                        isBetweenYear(GAME, year)
+                )
+                .groupBy(CHECK_IN.member.id, CHECK_IN.member.nickname.value, CHECK_IN.member.imageUrl, CHECK_IN.team.shortName)
+                .orderBy(CHECK_IN.id.count().desc(), CHECK_IN.member.id.asc())
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public long findLocationCheckInRank(final long memberId, final Integer year) {
+        Long myCount = jpaQueryFactory
+                .select(CHECK_IN.id.count())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.id.eq(memberId),
+                        isLocationCheckIn(),
+                        isBetweenYear(GAME, year)
+                )
+                .fetchOne();
+
+        if (myCount == null || myCount == 0) {
+            return 0L;
+        }
+
+        Long rank = jpaQueryFactory
+                .select(CHECK_IN.member.id.countDistinct())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .join(CHECK_IN.member, MEMBER)
+                .where(
+                        isLocationCheckIn(),
+                        isMemberNotDeleted(),
+                        isBetweenYear(GAME, year)
+                )
+                .groupBy(CHECK_IN.member.id)
+                .having(CHECK_IN.id.count().gt(myCount)
+                        .or(CHECK_IN.id.count().eq(myCount).and(CHECK_IN.member.id.lt(memberId))))
+                .fetchCount();
+
+        return rank + 1;
+    }
+
+    @Override
+    public LocationCheckInRankParam findLocationCheckInCountByMember(final Member member, final Integer year) {
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        LocationCheckInRankParam.class,
+                        CHECK_IN.member.id,
+                        CHECK_IN.member.nickname.value,
+                        CHECK_IN.member.imageUrl,
+                        CHECK_IN.team.shortName,
+                        CHECK_IN.id.count()
+                ))
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .join(CHECK_IN.member, MEMBER)
+                .where(
+                        CHECK_IN.member.eq(member),
+                        isLocationCheckIn(),
+                        isMemberNotDeleted(),
+                        isBetweenYear(GAME, year)
+                )
+                .groupBy(CHECK_IN.member.id, CHECK_IN.member.nickname.value, CHECK_IN.member.imageUrl, CHECK_IN.team.shortName)
+                .fetchOne();
     }
 
     private int conditionCount(final Member member, final Integer year, final BooleanExpression condition) {

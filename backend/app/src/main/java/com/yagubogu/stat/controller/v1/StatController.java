@@ -5,6 +5,7 @@ import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
 import com.yagubogu.checkin.dto.v1.VictoryFairyRankingResponse;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LocationCheckInRankingResponse;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
@@ -84,6 +85,15 @@ public class StatController implements StatControllerInterface {
     ) {
         VictoryFairyRankingResponse response = statService.findVictoryFairyRankings(memberClaims.id(), teamFilter,
                 year);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<LocationCheckInRankingResponse> findLocationCheckInRankings(
+            final MemberClaims memberClaims,
+            @RequestParam(required = false) final Integer year
+    ) {
+        LocationCheckInRankingResponse response = statService.findLocationCheckInRankings(memberClaims.id(), year);
 
         return ResponseEntity.ok(response);
     }

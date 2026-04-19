@@ -1,5 +1,6 @@
 package com.yagubogu.stat.service;
 
+import com.yagubogu.checkin.dto.LocationCheckInRankParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
 import com.yagubogu.checkin.dto.VictoryFairyRankParam;
 import com.yagubogu.checkin.dto.v1.TeamFilter;
@@ -18,6 +19,8 @@ import com.yagubogu.stat.dto.OpponentWinRateTeamParam;
 import com.yagubogu.stat.dto.StadiumStatsParam;
 import com.yagubogu.stat.dto.VictoryFairySummaryParam;
 import com.yagubogu.stat.dto.v1.AverageStatisticResponse;
+import com.yagubogu.stat.dto.v1.LocationCheckInRankingResponse;
+import com.yagubogu.stat.dto.v1.LocationCheckInRankingResponse.LocationCheckInRankingEntry;
 import com.yagubogu.stat.dto.v1.LuckyStadiumResponse;
 import com.yagubogu.stat.dto.v1.OpponentWinRateResponse;
 import com.yagubogu.stat.dto.v1.RecentGamesWinRateResponse;
@@ -42,6 +45,7 @@ public class StatService {
 
     private static final int RECENT_LIMIT = 10;
     private static final int VICTORY_RANKING_LIMIT = 5;
+    private static final int LOCATION_RANKING_LIMIT = 5;
     private static final Comparator<OpponentWinRateTeamParam> OPPONENT_WIN_RATE_TEAM_COMPARATOR = Comparator
             .comparingDouble(
                     OpponentWinRateTeamParam::winRate)
@@ -213,6 +217,27 @@ public class StatService {
                     return VictoryFairySummaryParam.from(overallRankInfo, teamRank);
                 })
                 .orElseGet(VictoryFairySummaryParam::empty);
+    }
+
+    public LocationCheckInRankingResponse findLocationCheckInRankings(
+            final long memberId,
+            final Integer year
+    ) {
+        Member member = getMember(memberId);
+        validateUser(member);
+
+        List<LocationCheckInRankParam> topRankings =
+                checkInRepository.findLocationCheckInRanking(year, LOCATION_RANKING_LIMIT);
+
+        long myRank = checkInRepository.findLocationCheckInRank(memberId, year);
+        LocationCheckInRankParam myData =
+                checkInRepository.findLocationCheckInCountByMember(member, year);
+
+        LocationCheckInRankingEntry myRanking = (myData != null)
+                ? LocationCheckInRankingEntry.from(myRank, myData)
+                : LocationCheckInRankingEntry.emptyRanking(member);
+
+        return LocationCheckInRankingResponse.of(topRankings, myRanking);
     }
 
     private double calculateWinRate(final long winCounts, final long favoriteCheckInCounts) {
