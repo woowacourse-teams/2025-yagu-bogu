@@ -4,6 +4,7 @@ import com.yagubogu.checkin.domain.CheckInOrderFilter;
 import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.dto.CheckInGameParam;
 import com.yagubogu.checkin.dto.GameWithFanCountsParam;
+import com.yagubogu.checkin.dto.LocationCheckInRankParam;
 import com.yagubogu.checkin.dto.StadiumCheckInCountParam;
 import com.yagubogu.checkin.dto.StatCountsParam;
 import com.yagubogu.checkin.dto.VictoryFairyCountResult;
@@ -72,4 +73,10 @@ public interface CustomCheckInRepository {
     List<Long> findDrawMemberIdByGameId(long gameId);
 
     List<StadiumStatsParam> findWinAndNonDrawCountByStadium(Long memberId, Integer year);
+
+    List<LocationCheckInRankParam> findLocationCheckInRanking(Integer year, int limit);
+
+    long findLocationCheckInRank(long memberId, Integer year);
+
+    LocationCheckInRankParam findLocationCheckInCountByMember(Member member, Integer year);
 }
