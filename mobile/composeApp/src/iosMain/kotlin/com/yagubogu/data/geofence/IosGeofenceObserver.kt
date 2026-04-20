@@ -16,7 +16,7 @@ class IosGeofenceObserver(
     fun start() {
         if (job != null) return
 
-        scope.launch {
+        job = scope.launch {
             geofenceRepository.geofenceEvents.collect { event ->
                 val stadiumId = event.geofenceId.toIntOrNull() ?: return@collect
                 sendNotificationUseCase(stadiumId)
