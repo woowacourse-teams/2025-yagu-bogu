@@ -3,7 +3,7 @@ package com.yagubogu.di
 val sharedModules =
     listOf(
         authModule,
-        commonModule,
+        platformModule,
         datasourceModule,
         networkModule,
         repositoryModule,
@@ -11,5 +11,5 @@ val sharedModules =
         timeModule,
         viewModelModule,
         localModule,
-        geofenceUseCaseModule,
+        geofenceModule,
     )
