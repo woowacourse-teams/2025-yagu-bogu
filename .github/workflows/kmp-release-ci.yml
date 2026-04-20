@@ -12,6 +12,7 @@ on:
 env:
   GOOGLE_SERVICES_JSON_FULL: ${{ secrets.GOOGLE_SERVICES_JSON_FULL }}
   IOS_CONFIG_XCCONFIG: ${{ secrets.IOS_CONFIG_XCCONFIG }}
+  ORG_GRADLE_PROJECT_buildkonfig.flavor: release
 
 jobs:
   lint-check:
