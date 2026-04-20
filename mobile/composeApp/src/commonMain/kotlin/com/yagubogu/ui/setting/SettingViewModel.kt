@@ -57,10 +57,7 @@ class SettingViewModel(
         )
     val settingEvent = _settingEvent.asSharedFlow()
 
-    private val _geofenceNotification =
-        MutableStateFlow(
-            geofenceRepository.isGeofenceEnabled,
-        )
+    private val _geofenceNotification = MutableStateFlow(geofenceRepository.isGeofenceEnabled)
     val geofenceNotification = _geofenceNotification.asStateFlow()
 
     fun updateNickname(newNickname: String) {
