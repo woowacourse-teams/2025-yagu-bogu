@@ -15,21 +15,21 @@ import kotlinx.coroutines.launch
 
 class GeofencePermissionHandler(
     private val permissionController: PermissionsController,
-    private val viewModel: SettingViewModel,
+    private val updateGeofenceNotification: (Boolean) -> Unit,
     private val onShowLocationDialog: () -> Unit,
     private val onShowNotificationDialog: () -> Unit,
     private val scope: CoroutineScope,
 ) {
     fun handleToggle(enable: Boolean) {
         if (!enable) {
-            viewModel.updateGeofenceNotification(false)
+            updateGeofenceNotification(false)
             return
         }
 
         scope.launch {
             if (!checkNotificationPermission()) return@launch
             if (!checkLocationPermission()) return@launch
-            viewModel.updateGeofenceNotification(true)
+            updateGeofenceNotification(true)
         }
     }
 
@@ -92,7 +92,7 @@ class GeofencePermissionHandler(
                         runCatching {
                             permissionController.providePermission(Permission.BACKGROUND_LOCATION)
                         }.onSuccess {
-                            viewModel.updateGeofenceNotification(true)
+                            updateGeofenceNotification(true)
                         }.onFailure {
                             onShowLocationDialog()
                         }

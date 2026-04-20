@@ -121,7 +121,7 @@ fun SettingMainScreen(
         remember(controller, viewModel, coroutineScope) {
             GeofencePermissionHandler(
                 permissionController = controller,
-                viewModel = viewModel,
+                updateGeofenceNotification = viewModel::updateGeofenceNotification,
                 onShowLocationDialog = { showLocationPermissionDialog = true },
                 onShowNotificationDialog = { showNotificationPermissionDialog = true },
                 scope = coroutineScope,
