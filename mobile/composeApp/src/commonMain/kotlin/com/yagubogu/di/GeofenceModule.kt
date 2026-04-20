@@ -1,7 +1,6 @@
 package com.yagubogu.di
 
 import com.kmp.geofence.createGeofenceManager
-import com.russhwolf.settings.Settings
 import com.yagubogu.domain.geofence.SendGeofenceNotificationUseCase
 import org.koin.dsl.module
 
@@ -15,6 +14,6 @@ val geofenceModule =
                 clock = get(),
             )
         }
-        single { Settings() }
+
         single { createGeofenceManager() }
     }
