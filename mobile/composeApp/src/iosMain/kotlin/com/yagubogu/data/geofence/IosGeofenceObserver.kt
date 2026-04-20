@@ -16,11 +16,12 @@ class IosGeofenceObserver(
     fun start() {
         if (job != null) return
 
-        job = scope.launch {
-            geofenceRepository.geofenceEvents.collect { event ->
-                val stadiumId = event.geofenceId.toIntOrNull() ?: return@collect
-                sendNotificationUseCase(stadiumId)
+        job =
+            scope.launch {
+                geofenceRepository.geofenceEvents.collect { event ->
+                    val stadiumId = event.geofenceId.toIntOrNull() ?: return@collect
+                    sendNotificationUseCase(stadiumId)
+                }
             }
-        }
     }
 }
