@@ -14,13 +14,13 @@ import org.koin.core.component.inject
 class GeofenceBootReceiver :
     BroadcastReceiver(),
     KoinComponent {
+    val geofenceRepository: GeofenceRepository by inject()
+
     override fun onReceive(
         context: Context,
         intent: Intent,
     ) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
-
-        val geofenceRepository: GeofenceRepository by inject()
 
         if (!geofenceRepository.isGeofenceEnabled) return
 
