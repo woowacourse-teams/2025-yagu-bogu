@@ -40,6 +40,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -1015,9 +1016,9 @@ public class CheckInE2eTest extends E2eTestBase {
                 .statusCode(404);
     }
 
-    @DisplayName("직관 내역 조회 시 메모가 포함된다")
+    @DisplayName("직관 내역 조회 시 메모와 이미지 URL 목록이 포함되지 않는다")
     @Test
-    void findCheckInHistory_includesMemo() {
+    void findCheckInHistory_excludesMemoAndImageUrls() {
         // given
         Member fora = memberFactory.save(b -> b.team(kia));
         String accessToken = authFactory.getAccessTokenByMemberId(fora.getId(), Role.USER);
@@ -1035,7 +1036,7 @@ public class CheckInE2eTest extends E2eTestBase {
                 .when().put("/api/v1/check-ins/" + checkIn.getId() + "/memo");
 
         // when
-        CheckInHistoryResponse response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .queryParam("year", 2025)
@@ -1044,11 +1045,13 @@ public class CheckInE2eTest extends E2eTestBase {
                 .when().get("/api/v1/check-ins/members")
                 .then().log().all()
                 .statusCode(200)
-                .extract().as(CheckInHistoryResponse.class);
+                .extract();
 
         // then
-        assertThat(response.checkInHistory()).hasSize(1);
-        assertThat(response.checkInHistory().get(0).memo()).isEqualTo("기록에 남길 메모");
-        assertThat(response.checkInHistory().get(0).imageUrls()).isEmpty();
+        CheckInHistoryResponse historyResponse = response.as(CheckInHistoryResponse.class);
+        assertThat(historyResponse.checkInHistory()).hasSize(1);
+
+        Map<String, Object> historyItem = response.jsonPath().getMap("checkInHistory[0]");
+        assertThat(historyItem).doesNotContainKeys("memo", "imageUrls");
     }
 }

@@ -1423,9 +1423,9 @@ class CheckInServiceTest {
                 .isExactlyInstanceOf(NotFoundException.class);
     }
 
-    @DisplayName("직관 내역 조회 시 메모와 이미지 URL 목록이 포함된다")
+    @DisplayName("직관 내역 조회 시 메모와 이미지 URL 목록이 포함되지 않는다")
     @Test
-    void findCheckInHistory_includesMemoAndImageUrls() {
+    void findCheckInHistory_excludesMemoAndImageUrls() {
         // given
         Member member = memberFactory.save(b -> b.team(kia));
         Game game = gameFactory.save(b -> b.stadium(stadiumJamsil)
@@ -1447,7 +1447,6 @@ class CheckInServiceTest {
         // then
         assertThat(history).hasSize(1);
         CheckInGameParam result = history.get(0);
-        assertThat(result.memo()).isEqualTo("역대급 직관");
-        assertThat(result.imageUrls()).hasSize(2);
+        assertThat(result.gameState()).isEqualTo(GameState.COMPLETED);
     }
 }

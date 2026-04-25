@@ -38,8 +38,6 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -190,23 +188,7 @@ public class CheckInService {
                 orderFilter
         );
 
-        List<Long> checkInIds = checkIns.stream().map(CheckInGameParam::checkInId).toList();
-        Map<Long, List<String>> imageUrlsByCheckInId = checkInImageRepository.findByCheckInIdIn(checkInIds)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        img -> img.getCheckIn().getId(),
-                        Collectors.mapping(CheckInImage::getImageUrl, Collectors.toList())
-                ));
-
-        List<CheckInGameParam> enriched = checkIns.stream()
-                .map(p -> new CheckInGameParam(
-                        p.checkInId(), p.stadiumFullName(), p.homeTeam(), p.awayTeam(),
-                        p.attendanceDate(), p.startAt(), p.homeScoreBoard(), p.awayScoreBoard(),
-                        p.gameState(), p.memo(), imageUrlsByCheckInId.getOrDefault(p.checkInId(), List.of())
-                ))
-                .toList();
-
-        return new CheckInHistoryResponse(enriched);
+        return new CheckInHistoryResponse(checkIns);
     }
 
     public CheckInReviewResponse findCheckInReview(final long memberId, final long checkInId) {
