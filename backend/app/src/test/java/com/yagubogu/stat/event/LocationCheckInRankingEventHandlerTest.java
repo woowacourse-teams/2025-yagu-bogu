@@ -1,5 +1,7 @@
 package com.yagubogu.stat.event;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -28,5 +30,21 @@ class LocationCheckInRankingEventHandlerTest {
 
         // then
         verify(locationCheckInRankingRepository).upsertIncrement(memberId, gameYear);
+    }
+
+    @DisplayName("직관 랭킹 카운트 증가에 실패해도 예외를 전파하지 않는다")
+    @Test
+    void handleLocationCheckInCreated_updateFails() {
+        // given
+        long memberId = 1L;
+        int gameYear = 2025;
+        LocationCheckInCreatedEvent event = new LocationCheckInCreatedEvent(memberId, gameYear);
+        doThrow(new RuntimeException("ranking update failed"))
+                .when(locationCheckInRankingRepository)
+                .upsertIncrement(memberId, gameYear);
+
+        // when & then
+        assertThatCode(() -> handler.handleLocationCheckInCreated(event))
+                .doesNotThrowAnyException();
     }
 }
