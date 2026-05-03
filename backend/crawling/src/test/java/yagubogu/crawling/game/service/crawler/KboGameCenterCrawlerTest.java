@@ -3,8 +3,8 @@ package yagubogu.crawling.game.service.crawler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,16 +19,14 @@ import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.KboGameCenter
 @ExtendWith(MockitoExtension.class)
 class KboGameCenterCrawlerTest {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     @Mock
-    private KboHttpClient kboHttpClient;
+    private KboHtmlClient kboHtmlClient;
 
     private KboGameCenterCrawler crawler;
 
     @BeforeEach
     void setUp() {
-        crawler = new KboGameCenterCrawler(kboHttpClient);
+        crawler = new KboGameCenterCrawler(kboHtmlClient);
     }
 
     @Nested
@@ -36,34 +34,20 @@ class KboGameCenterCrawlerTest {
     class DailyCrawlingTests {
 
         @Test
-        @DisplayName("fetchDailyGameCenter - 정상 크롤링 성공")
-        void fetchDailyGameCenter_Success() throws Exception {
+        @DisplayName("fetchDailyGameCenter - 서버 렌더링 HTML 크롤링 성공")
+        void fetchDailyGameCenter_Success() {
             // Given
             LocalDate date = LocalDate.of(2026, 4, 12);
-            when(kboHttpClient.fetchGameList(date)).thenReturn(OBJECT_MAPPER.readTree("""
-                    {
-                      "game": [
-                        {
-                          "G_ID": "20260412SKLG0",
-                          "G_DT": "20260412",
-                          "GAME_STATE_SC": "3",
-                          "GAME_INN_NO": 9,
-                          "GAME_TB_SC_NM": "초",
-                          "AWAY_ID": "SK",
-                          "HOME_ID": "LG",
-                          "AWAY_NM": "SSG",
-                          "HOME_NM": "LG",
-                          "S_NM": "잠실",
-                          "G_TM": "14:00",
-                          "TV_IF": "SPO-T",
-                          "T_SCORE_CN": "1",
-                          "B_SCORE_CN": "9",
-                          "T_PIT_P_NM": "베니지아노",
-                          "B_PIT_P_NM": "톨허스트"
-                        }
-                      ],
-                      "code": "100"
-                    }
+            when(kboHtmlClient.fetchGameCenter(date)).thenReturn(Jsoup.parse("""
+                    <ul class="game-list-n">
+                      <li class="game-cont end" g_id="20260412SKLG0" g_dt="20260412" game_sc="3"
+                          away_id="SK" home_id="LG" away_nm="SSG" home_nm="LG" s_nm="잠실">
+                        <div class="top"><ul><li>잠실</li><li></li><li>14:00</li></ul></div>
+                        <div class="middle"><span class="broadcasting">SPO-T</span><span class="staus">경기종료</span></div>
+                        <div class="team away"><em class="score">1</em><div class="today-pitcher"><p>베니지아노</p></div></div>
+                        <div class="team home"><em class="score win">9</em><div class="today-pitcher"><p>톨허스트</p></div></div>
+                      </li>
+                    </ul>
                     """));
 
             // When
@@ -79,21 +63,16 @@ class KboGameCenterCrawlerTest {
             assertThat(game.getStatus()).isEqualTo("경기종료");
             assertThat(game.getStadiumName()).isEqualTo("잠실");
             assertThat(game.getWinner()).isEqualTo("home");
-            assertThat(game.getAwayPitchers()).containsExactly("선발 : 베니지아노");
-            assertThat(game.getHomePitchers()).containsExactly("선발 : 톨허스트");
+            assertThat(game.getAwayPitchers()).containsExactly("베니지아노");
+            assertThat(game.getHomePitchers()).containsExactly("톨허스트");
         }
 
         @Test
-        @DisplayName("fetchDailyGameCenter - 경기 없음")
-        void fetchDailyGameCenter_NoGames() throws Exception {
+        @DisplayName("fetchDailyGameCenter - HTML에 경기 목록 없음")
+        void fetchDailyGameCenter_NoGames() {
             // Given
             LocalDate date = LocalDate.of(2026, 4, 13);
-            when(kboHttpClient.fetchGameList(date)).thenReturn(OBJECT_MAPPER.readTree("""
-                    {
-                      "game": [],
-                      "code": "100"
-                    }
-                    """));
+            when(kboHtmlClient.fetchGameCenter(date)).thenReturn(Jsoup.parse("<div class=\"today-game\"></div>"));
 
             // When
             GameCenter result = crawler.fetchDailyGameCenter(date);
@@ -109,7 +88,7 @@ class KboGameCenterCrawlerTest {
         void fetchDailyGameCenter_ExceptionReturnsEmpty() {
             // Given
             LocalDate date = LocalDate.of(2026, 4, 12);
-            when(kboHttpClient.fetchGameList(date)).thenThrow(new RuntimeException("KBO server error"));
+            when(kboHtmlClient.fetchGameCenter(date)).thenThrow(new RuntimeException("KBO server error"));
 
             // When
             GameCenter result = crawler.fetchDailyGameCenter(date);

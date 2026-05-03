@@ -1,46 +1,42 @@
 package yagubogu.crawling.game.service.crawler.KboReviewCrawler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import yagubogu.crawling.game.dto.HitterRecordDto;
 import yagubogu.crawling.game.dto.PitcherRecordDto;
 import yagubogu.crawling.game.dto.ReviewData;
-import yagubogu.crawling.game.service.crawler.KboHttpClient;
-import yagubogu.crawling.game.service.crawler.KboHttpClient.ReviewGameContext;
+import yagubogu.crawling.game.service.crawler.KboHtmlClient;
 
 @Slf4j
 public class KboReviewCrawler {
 
-    private final KboHttpClient kboHttpClient;
-    private final ObjectMapper objectMapper;
+    private final KboHtmlClient kboHtmlClient;
 
-    public KboReviewCrawler(final KboHttpClient kboHttpClient, final ObjectMapper objectMapper) {
-        this.kboHttpClient = kboHttpClient;
-        this.objectMapper = objectMapper;
+    public KboReviewCrawler(final KboHtmlClient kboHtmlClient) {
+        this.kboHtmlClient = kboHtmlClient;
     }
 
     public ReviewData crawlReview(final String gameCode) {
         log.info("[REVIEW] HTTP 크롤링 시작: gameCode={}", gameCode);
 
-        ReviewGameContext context = kboHttpClient.findReviewGameContext(gameCode);
-        JsonNode boxScore = kboHttpClient.fetchBoxScore(context);
+        Document document = kboHtmlClient.fetchReview(gameCode);
 
-        List<HitterRecordDto> awayHitters = extractHitterRecords(boxScore.path("arrHitter").path(0));
-        List<HitterRecordDto> homeHitters = extractHitterRecords(boxScore.path("arrHitter").path(1));
-        List<PitcherRecordDto> awayPitchers = extractPitcherRecords(boxScore.path("arrPitcher").path(0));
-        List<PitcherRecordDto> homePitchers = extractPitcherRecords(boxScore.path("arrPitcher").path(1));
+        List<HitterRecordDto> awayHitters = extractHitterRecords(document, "tblAwayHitter1", "tblAwayHitter3");
+        List<HitterRecordDto> homeHitters = extractHitterRecords(document, "tblHomeHitter1", "tblHomeHitter3");
+        List<PitcherRecordDto> awayPitchers = extractPitcherRecords(document, "tblAwayPitcher");
+        List<PitcherRecordDto> homePitchers = extractPitcherRecords(document, "tblHomePitcher");
 
         log.info("[REVIEW] HTTP 크롤링 완료: gameCode={}", gameCode);
         return new ReviewData(gameCode, awayHitters, homeHitters, awayPitchers, homePitchers);
     }
 
-    private List<HitterRecordDto> extractHitterRecords(final JsonNode hitterTables) {
-        List<JsonNode> table1Rows = rowsOf(hitterTables.path("table1").asText());
-        List<JsonNode> table3Rows = rowsOf(hitterTables.path("table3").asText());
+    private List<HitterRecordDto> extractHitterRecords(final Document document, final String table1Id, final String table3Id) {
+        Elements table1Rows = document.select("#" + table1Id + " tbody tr");
+        Elements table3Rows = document.select("#" + table3Id + " tbody tr");
         List<HitterRecordDto> records = new ArrayList<>();
 
         for (int i = 0; i < table1Rows.size(); i++) {
@@ -70,11 +66,11 @@ public class KboReviewCrawler {
         return records;
     }
 
-    private List<PitcherRecordDto> extractPitcherRecords(final JsonNode pitcherTable) {
-        List<JsonNode> rows = rowsOf(pitcherTable.path("table").asText());
+    private List<PitcherRecordDto> extractPitcherRecords(final Document document, final String tableId) {
+        Elements rows = document.select("#" + tableId + " tbody tr");
         List<PitcherRecordDto> records = new ArrayList<>();
 
-        for (JsonNode row : rows) {
+        for (Element row : rows) {
             List<String> cells = cellTexts(row);
             if (cells.size() < 16) {
                 log.debug("투수 기록 행 구조 불일치, 건너뜀: cells={}", cells.size());
@@ -100,33 +96,10 @@ public class KboReviewCrawler {
         return records;
     }
 
-    private List<JsonNode> rowsOf(final String tableJson) {
-        if (tableJson == null || tableJson.isBlank()) {
-            return List.of();
-        }
-        try {
-            JsonNode rows = objectMapper.readTree(tableJson).path("rows");
-            if (!rows.isArray()) {
-                return List.of();
-            }
-
-            List<JsonNode> result = new ArrayList<>();
-            rows.forEach(result::add);
-            return result;
-        } catch (IOException e) {
-            throw new IllegalStateException("KBO 리뷰 테이블 JSON 파싱 실패", e);
-        }
-    }
-
-    private List<String> cellTexts(final JsonNode row) {
-        JsonNode cells = row.path("row");
-        if (!cells.isArray()) {
-            return List.of();
-        }
-
+    private List<String> cellTexts(final Element row) {
         List<String> texts = new ArrayList<>();
-        for (JsonNode cell : cells) {
-            texts.add(cell.path("Text").asText("").trim());
+        for (Element cell : row.select("th, td")) {
+            texts.add(cell.text().trim());
         }
         return texts;
     }

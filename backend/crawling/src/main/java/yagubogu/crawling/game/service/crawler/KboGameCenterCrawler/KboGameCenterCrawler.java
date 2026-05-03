@@ -1,21 +1,23 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import yagubogu.crawling.game.dto.GameCenter;
 import yagubogu.crawling.game.dto.GameCenterDetail;
-import yagubogu.crawling.game.service.crawler.KboHttpClient;
+import yagubogu.crawling.game.service.crawler.KboHtmlClient;
 
 @Slf4j
 public class KboGameCenterCrawler {
 
-    private final KboHttpClient kboHttpClient;
+    private final KboHtmlClient kboHtmlClient;
 
-    public KboGameCenterCrawler(final KboHttpClient kboHttpClient) {
-        this.kboHttpClient = kboHttpClient;
+    public KboGameCenterCrawler(final KboHtmlClient kboHtmlClient) {
+        this.kboHtmlClient = kboHtmlClient;
     }
 
     /**
@@ -27,15 +29,16 @@ public class KboGameCenterCrawler {
         dailyData.setDate(date.toString());
 
         try {
-            JsonNode games = kboHttpClient.fetchGameList(date).path("game");
-            if (!games.isArray() || games.isEmpty()) {
-                log.info("오늘 경기가 없습니다.");
+            Document document = kboHtmlClient.fetchGameCenter(date);
+            Elements games = document.select(".game-list-n > li.game-cont, .game-list-n > li");
+            if (games.isEmpty()) {
+                log.info("[GAME_CENTER] HTML 내 경기 목록 없음: date={}", date);
                 return dailyData;
             }
 
             log.info("총 {}경기 정보 수집 시작", games.size());
 
-            for (JsonNode game : games) {
+            for (Element game : games) {
                 dailyData.addGameDetail(toGameCenterDetail(game, date));
             }
 
@@ -48,44 +51,49 @@ public class KboGameCenterCrawler {
         return dailyData;
     }
 
-    private GameCenterDetail toGameCenterDetail(final JsonNode game, final LocalDate date) {
+    private GameCenterDetail toGameCenterDetail(final Element game, final LocalDate date) {
         GameCenterDetail detail = new GameCenterDetail();
         detail.setDate(date.toString());
-        detail.setGameCode(text(game, "G_ID"));
-        detail.setGameDate(text(game, "G_DT"));
-        detail.setGameSc(text(game, "GAME_STATE_SC"));
-        detail.setAwayTeamCode(text(game, "AWAY_ID"));
-        detail.setHomeTeamCode(text(game, "HOME_ID"));
-        detail.setAwayTeamName(text(game, "AWAY_NM"));
-        detail.setHomeTeamName(text(game, "HOME_NM"));
-        detail.setStadium(text(game, "S_NM"));
-        detail.setStadiumName(text(game, "S_NM"));
-        detail.setStartTime(text(game, "G_TM"));
-        detail.setGameStatus(toGameStatus(text(game, "GAME_STATE_SC")));
-        detail.setStatus(toStatus(text(game, "GAME_STATE_SC"), text(game, "GAME_INN_NO"), text(game, "GAME_TB_SC_NM")));
-        detail.setBroadcasting(text(game, "TV_IF"));
-        detail.setAwayScore(text(game, "T_SCORE_CN"));
-        detail.setHomeScore(text(game, "B_SCORE_CN"));
+        detail.setGameCode(attr(game, "g_id"));
+        detail.setGameDate(attr(game, "g_dt"));
+        detail.setGameSc(attr(game, "game_sc"));
+        detail.setAwayTeamCode(attr(game, "away_id"));
+        detail.setHomeTeamCode(attr(game, "home_id"));
+        detail.setAwayTeamName(attr(game, "away_nm"));
+        detail.setHomeTeamName(attr(game, "home_nm"));
+        detail.setStadium(attr(game, "s_nm"));
+        detail.setStadiumName(firstText(game.select(".top > ul > li"), 0, attr(game, "s_nm")));
+        detail.setStartTime(resolveStartTime(game));
+        detail.setGameStatus(toGameStatus(attr(game, "game_sc"), game.className()));
+        detail.setStatus(firstText(game.select(".middle .staus"), 0, detail.getGameStatus()));
+        detail.setBroadcasting(firstText(game.select(".middle .broadcasting"), 0, ""));
+        detail.setAwayScore(firstText(game.select(".team.away .score"), 0, ""));
+        detail.setHomeScore(firstText(game.select(".team.home .score"), 0, ""));
         detail.setWinner(resolveWinner(detail.getAwayScore(), detail.getHomeScore()));
         detail.setAwayPitchers(extractPitchers(game, "T"));
         detail.setHomePitchers(extractPitchers(game, "B"));
         return detail;
     }
 
-    private List<String> extractPitchers(final JsonNode game, final String prefix) {
+    private List<String> extractPitchers(final Element game, final String prefix) {
         List<String> pitchers = new ArrayList<>();
-        addPitcher(pitchers, "선발", text(game, prefix + "_PIT_P_NM"));
+        String teamSelector = "T".equals(prefix) ? ".team.away" : ".team.home";
+        for (Element pitcher : game.select(teamSelector + " .today-pitcher p")) {
+            String name = pitcher.text().trim();
+            if (!name.isBlank()) {
+                pitchers.add(name);
+            }
+        }
         return pitchers;
     }
 
-    private void addPitcher(final List<String> pitchers, final String label, final String name) {
-        if (name == null || name.isBlank()) {
-            return;
+    private String toGameStatus(final String gameState, final String className) {
+        if (className != null && className.contains("end")) {
+            return "경기종료";
         }
-        pitchers.add(label + " : " + name.trim());
-    }
-
-    private String toGameStatus(final String gameState) {
+        if (className != null && className.contains("cancel")) {
+            return "경기취소";
+        }
         return switch (gameState) {
             case "3" -> "경기종료";
             case "4" -> "경기취소";
@@ -94,13 +102,12 @@ public class KboGameCenterCrawler {
         };
     }
 
-    private String toStatus(final String gameState, final String inning, final String topBottom) {
-        return switch (gameState) {
-            case "3" -> "경기종료";
-            case "4" -> "경기취소";
-            case "2", "5" -> inning.isBlank() ? "중" : inning + "회" + topBottom;
-            default -> "경기전";
-        };
+    private String resolveStartTime(final Element game) {
+        Elements topItems = game.select(".top > ul > li");
+        if (topItems.size() >= 3) {
+            return topItems.get(topItems.size() - 1).text().trim();
+        }
+        return attr(game, "g_tm");
     }
 
     private String resolveWinner(final String awayScore, final String homeScore) {
@@ -120,11 +127,18 @@ public class KboGameCenterCrawler {
         }
     }
 
-    private String text(final JsonNode node, final String fieldName) {
-        JsonNode value = node.path(fieldName);
-        if (value.isMissingNode() || value.isNull()) {
+    private String attr(final Element element, final String attrName) {
+        String value = element.attr(attrName);
+        if (value == null || value.isBlank()) {
             return "";
         }
-        return value.asText();
+        return value.trim();
+    }
+
+    private String firstText(final Elements elements, final int index, final String defaultValue) {
+        if (elements.size() <= index) {
+            return defaultValue;
+        }
+        return elements.get(index).text().trim();
     }
 }

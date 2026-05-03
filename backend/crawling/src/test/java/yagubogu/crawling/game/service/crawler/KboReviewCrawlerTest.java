@@ -3,10 +3,7 @@ package yagubogu.crawling.game.service.crawler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import yagubogu.crawling.game.dto.HitterRecordDto;
 import yagubogu.crawling.game.dto.PitcherRecordDto;
 import yagubogu.crawling.game.dto.ReviewData;
-import yagubogu.crawling.game.service.crawler.KboHttpClient.ReviewGameContext;
 import yagubogu.crawling.game.service.crawler.KboReviewCrawler.KboReviewCrawler;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,25 +20,32 @@ class KboReviewCrawlerTest {
 
     private static final String GAME_CODE = "20260412SKLG0";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Mock
-    private KboHttpClient kboHttpClient;
+    private KboHtmlClient kboHtmlClient;
 
     private KboReviewCrawler crawler;
 
     @BeforeEach
     void setUp() {
-        crawler = new KboReviewCrawler(kboHttpClient, objectMapper);
+        crawler = new KboReviewCrawler(kboHtmlClient);
     }
 
     @Test
-    @DisplayName("crawlReview - KBO box score JSON 테이블을 기록 DTO로 변환")
-    void crawlReview_ConvertsBoxScoreTables() throws Exception {
+    @DisplayName("crawlReview - 서버 렌더링 HTML 테이블을 기록 DTO로 변환")
+    void crawlReview_ConvertsHtmlTables() {
         // Given
-        ReviewGameContext context = new ReviewGameContext("1", "0", "2026", GAME_CODE);
-        when(kboHttpClient.findReviewGameContext(GAME_CODE)).thenReturn(context);
-        when(kboHttpClient.fetchBoxScore(context)).thenReturn(boxScoreJson());
+        when(kboHtmlClient.fetchReview(GAME_CODE)).thenReturn(Jsoup.parse("""
+                <table id="tblAwayHitter1"><tbody><tr><th>1</th><th>유</th><td>박성한</td></tr></tbody></table>
+                <table id="tblAwayHitter3"><tbody><tr><td>4</td><td>1</td><td>0</td><td>1</td><td>0.250</td></tr></tbody></table>
+                <table id="tblHomeHitter1"><tbody><tr><th>1</th><th>중</th><td>박해민</td></tr></tbody></table>
+                <table id="tblHomeHitter3"><tbody><tr><td>5</td><td>2</td><td>1</td><td>2</td><td>0.400</td></tr></tbody></table>
+                <table id="tblAwayPitcher"><tbody>
+                  <tr><td>베니지아노</td><td></td><td>패</td><td>0</td><td>1</td><td>0</td><td>3</td><td>18</td><td>77</td><td>16</td><td>6</td><td>0</td><td>2</td><td>4</td><td>5</td><td>3</td><td>9.00</td></tr>
+                </tbody></table>
+                <table id="tblHomePitcher"><tbody>
+                  <tr><td>톨허스트</td><td></td><td>승</td><td>1</td><td>0</td><td>0</td><td>6</td><td>23</td><td>91</td><td>21</td><td>4</td><td>0</td><td>1</td><td>7</td><td>1</td><td>1</td><td>1.50</td></tr>
+                </tbody></table>
+                """));
 
         // When
         ReviewData result = crawler.crawlReview(GAME_CODE);
@@ -61,47 +64,5 @@ class KboReviewCrawlerTest {
         assertThat(result.homePitchers()).containsExactly(
                 new PitcherRecordDto("톨허스트", "승", "6", 23, 91, 21, 4, 0, 1, 7, 1, 1)
         );
-    }
-
-    private JsonNode boxScoreJson() throws Exception {
-        ObjectNode root = objectMapper.createObjectNode();
-
-        ArrayNode hitters = root.putArray("arrHitter");
-        hitters.add(hitterTable(new String[]{"1", "유", "박성한"}, new String[]{"4", "1", "0", "1", "0.250"}));
-        hitters.add(hitterTable(new String[]{"1", "중", "박해민"}, new String[]{"5", "2", "1", "2", "0.400"}));
-
-        ArrayNode pitchers = root.putArray("arrPitcher");
-        pitchers.add(pitcherTable(new String[]{
-                "베니지아노", "", "패", "0", "1", "0", "3", "18", "77", "16", "6", "0", "2", "4", "5", "3", "9.00"
-        }));
-        pitchers.add(pitcherTable(new String[]{
-                "톨허스트", "", "승", "1", "0", "0", "6", "23", "91", "21", "4", "0", "1", "7", "1", "1", "1.50"
-        }));
-
-        return root;
-    }
-
-    private ObjectNode hitterTable(final String[] basicCells, final String[] statCells) throws Exception {
-        ObjectNode table = objectMapper.createObjectNode();
-        table.put("table1", tableJson(basicCells));
-        table.put("table3", tableJson(statCells));
-        return table;
-    }
-
-    private ObjectNode pitcherTable(final String[] cells) throws Exception {
-        ObjectNode table = objectMapper.createObjectNode();
-        table.put("table", tableJson(cells));
-        return table;
-    }
-
-    private String tableJson(final String[] cells) throws Exception {
-        ObjectNode table = objectMapper.createObjectNode();
-        ArrayNode rows = table.putArray("rows");
-        ObjectNode row = rows.addObject();
-        ArrayNode rowCells = row.putArray("row");
-        for (String cell : cells) {
-            rowCells.addObject().put("Text", cell);
-        }
-        return objectMapper.writeValueAsString(table);
     }
 }
