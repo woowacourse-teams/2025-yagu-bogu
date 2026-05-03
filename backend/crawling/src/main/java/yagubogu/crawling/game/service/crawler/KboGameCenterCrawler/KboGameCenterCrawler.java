@@ -1,63 +1,45 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
-import com.microsoft.playwright.Locator;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import yagubogu.crawling.game.config.KboCrawlerProperties;
-import yagubogu.crawling.game.config.PlaywrightManager;
 import yagubogu.crawling.game.dto.GameCenter;
 import yagubogu.crawling.game.dto.GameCenterDetail;
-import yagubogu.crawling.game.service.crawler.page.KboGameCenterPage;
+import yagubogu.crawling.game.service.crawler.KboHttpClient;
 
 @Slf4j
 public class KboGameCenterCrawler {
 
-    private final KboCrawlerProperties properties;
-    private final PlaywrightManager playwrightManager;
+    private final KboHttpClient kboHttpClient;
 
-    public KboGameCenterCrawler(KboCrawlerProperties properties, PlaywrightManager playwrightManager) {
-        this.properties = properties;
-        this.playwrightManager = playwrightManager;
+    public KboGameCenterCrawler(final KboHttpClient kboHttpClient) {
+        this.kboHttpClient = kboHttpClient;
     }
 
     /**
      * 일일 경기 상세 정보 크롤링
      */
-    public GameCenter fetchDailyGameCenter(LocalDate date) {
-        return playwrightManager.withPage(page -> {
-            KboGameCenterPage gameCenterPage = new KboGameCenterPage(page, properties);
-            return fetchGameCenterData(gameCenterPage, date);
-        });
-    }
-
-    private GameCenter fetchGameCenterData(KboGameCenterPage gameCenterPage, LocalDate date) {
+    public GameCenter fetchDailyGameCenter(final LocalDate date) {
+        log.info("[GAME_CENTER] HTTP 크롤링 시작: date={}", date);
         GameCenter dailyData = new GameCenter();
+        dailyData.setDate(date.toString());
 
         try {
-            // 페이지 이동
-            gameCenterPage.navigateTo();
-            gameCenterPage.navigateToDate(date);
-
-            // 날짜 정보 추출
-            String dateFormatted = gameCenterPage.getDateText();
-            dailyData.setDate(dateFormatted);
-
-            // 경기 목록 수집
-            int gameCount = gameCenterPage.getGameCount();
-
-            if (gameCount == 0) {
+            JsonNode games = kboHttpClient.fetchGameList(date).path("game");
+            if (!games.isArray() || games.isEmpty()) {
                 log.info("오늘 경기가 없습니다.");
                 return dailyData;
             }
 
-            log.info("총 {}경기 정보 수집 시작", gameCount);
+            log.info("총 {}경기 정보 수집 시작", games.size());
 
-            // 각 경기 처리
-            for (int i = 0; i < gameCount; i++) {
-                processGame(gameCenterPage, dailyData, dateFormatted, i, gameCount);
+            for (JsonNode game : games) {
+                dailyData.addGameDetail(toGameCenterDetail(game, date));
             }
 
-            log.info("일일 경기 정보 수집 완료");
+            log.info("[GAME_CENTER] HTTP 크롤링 완료: date={}, count={}", date, dailyData.getGames().size());
 
         } catch (Exception e) {
             log.error("일일 데이터 크롤링 실패", e);
@@ -66,24 +48,83 @@ public class KboGameCenterCrawler {
         return dailyData;
     }
 
-    private void processGame(
-            KboGameCenterPage gameCenterPage,
-            GameCenter dailyData,
-            String dateFormatted,
-            int index,
-            int totalCount) {
-        try {
-            log.info("경기 {}/{} 처리 중...", index + 1, totalCount);
+    private GameCenterDetail toGameCenterDetail(final JsonNode game, final LocalDate date) {
+        GameCenterDetail detail = new GameCenterDetail();
+        detail.setDate(date.toString());
+        detail.setGameCode(text(game, "G_ID"));
+        detail.setGameDate(text(game, "G_DT"));
+        detail.setGameSc(text(game, "GAME_STATE_SC"));
+        detail.setAwayTeamCode(text(game, "AWAY_ID"));
+        detail.setHomeTeamCode(text(game, "HOME_ID"));
+        detail.setAwayTeamName(text(game, "AWAY_NM"));
+        detail.setHomeTeamName(text(game, "HOME_NM"));
+        detail.setStadium(text(game, "S_NM"));
+        detail.setStadiumName(text(game, "S_NM"));
+        detail.setStartTime(text(game, "G_TM"));
+        detail.setGameStatus(toGameStatus(text(game, "GAME_STATE_SC")));
+        detail.setStatus(toStatus(text(game, "GAME_STATE_SC"), text(game, "GAME_INN_NO"), text(game, "GAME_TB_SC_NM")));
+        detail.setBroadcasting(text(game, "TV_IF"));
+        detail.setAwayScore(text(game, "T_SCORE_CN"));
+        detail.setHomeScore(text(game, "B_SCORE_CN"));
+        detail.setWinner(resolveWinner(detail.getAwayScore(), detail.getHomeScore()));
+        detail.setAwayPitchers(extractPitchers(game, "T"));
+        detail.setHomePitchers(extractPitchers(game, "B"));
+        return detail;
+    }
 
-            Locator gameElement = gameCenterPage.getGameElement(index);
-            GameCenterDetail gameDetail = gameCenterPage.extractGameDetail(gameElement, dateFormatted);
+    private List<String> extractPitchers(final JsonNode game, final String prefix) {
+        List<String> pitchers = new ArrayList<>();
+        addPitcher(pitchers, "선발", text(game, prefix + "_PIT_P_NM"));
+        return pitchers;
+    }
 
-            if (gameDetail != null) {
-                dailyData.addGameDetail(gameDetail);
-            }
-
-        } catch (Exception e) {
-            log.error("경기 {} 처리 실패: {}", index + 1, e.getMessage());
+    private void addPitcher(final List<String> pitchers, final String label, final String name) {
+        if (name == null || name.isBlank()) {
+            return;
         }
+        pitchers.add(label + " : " + name.trim());
+    }
+
+    private String toGameStatus(final String gameState) {
+        return switch (gameState) {
+            case "3" -> "경기종료";
+            case "4" -> "경기취소";
+            case "2", "5" -> "경기중";
+            default -> "경기예정";
+        };
+    }
+
+    private String toStatus(final String gameState, final String inning, final String topBottom) {
+        return switch (gameState) {
+            case "3" -> "경기종료";
+            case "4" -> "경기취소";
+            case "2", "5" -> inning.isBlank() ? "중" : inning + "회" + topBottom;
+            default -> "경기전";
+        };
+    }
+
+    private String resolveWinner(final String awayScore, final String homeScore) {
+        Integer away = parseInt(awayScore);
+        Integer home = parseInt(homeScore);
+        if (away == null || home == null || away.equals(home)) {
+            return null;
+        }
+        return away > home ? "away" : "home";
+    }
+
+    private Integer parseInt(final String value) {
+        try {
+            return value == null || value.isBlank() ? null : Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private String text(final JsonNode node, final String fieldName) {
+        JsonNode value = node.path(fieldName);
+        if (value.isMissingNode() || value.isNull()) {
+            return "";
+        }
+        return value.asText();
     }
 }
