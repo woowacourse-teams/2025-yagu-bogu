@@ -7,6 +7,7 @@ import yagubogu.crawling.game.service.crawler.KboHtmlClient;
 import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.KboGameCenterCrawler;
 import yagubogu.crawling.game.service.crawler.KboReviewCrawler.KboReviewCrawler;
 import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardCrawler;
+import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboardParser;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -18,22 +19,22 @@ import yagubogu.crawling.game.service.crawler.KboScoardboardCrawler.KboScoreboar
 public class KboCrawlerConfig {
 
     @Bean
-    public PlaywrightManager playwrightManager() {
-        return new PlaywrightManager();
-    }
-
-    @Bean
     public KboHtmlClient kboHtmlClient(final KboCrawlerProperties properties) {
         return new KboHtmlClient(properties);
     }
 
     @Bean
+    public KboScoreboardParser kboScoreboardParser(final KboCrawlerProperties properties) {
+        return new KboScoreboardParser(properties);
+    }
+
+    @Bean
     public KboScoreboardCrawler kboScoreboardCrawler(
-            final KboCrawlerProperties properties,
-            final PlaywrightManager playwrightManager) {
+            final KboHtmlClient kboHtmlClient,
+            final KboScoreboardParser kboScoreboardParser) {
         return new KboScoreboardCrawler(
-                properties,
-                playwrightManager
+                kboHtmlClient,
+                kboScoreboardParser
         );
     }
 

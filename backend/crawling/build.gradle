@@ -2,8 +2,6 @@ dependencies {
     // app 모듈 참조
     implementation project(':app')
 
-    // Playwright
-    implementation 'com.microsoft.playwright:playwright:1.40.0'
     implementation 'org.jsoup:jsoup:1.18.3'
 
     // Spring (app 모듈에서 이미 제공되지만 명시)
