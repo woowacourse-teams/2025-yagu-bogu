@@ -14,7 +14,9 @@ struct iOSApp: App {
             googleSignInDelegate: SwiftGoogleSignInDelegate(),
             appleSignInDelegate: SwiftAppleSignInDelegate()
         )
-        FirebaseApp.configure()
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
         setupBannerAdProvider()
         setupInterstitialAdProvider()
     }
