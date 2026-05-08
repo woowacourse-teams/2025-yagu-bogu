@@ -1,5 +1,7 @@
 package com.yagubogu.di
 
+import com.yagubogu.data.datasource.appconfig.AppConfigFirebaseDataSource
+import com.yagubogu.data.datasource.appconfig.AppConfigRemoteDataSource
 import com.yagubogu.data.datasource.auth.AuthDataSource
 import com.yagubogu.data.datasource.auth.AuthRemoteDataSource
 import com.yagubogu.data.datasource.checkin.CheckInDataSource
@@ -44,6 +46,8 @@ val datasourceModule =
         singleOf(::GameRemoteDataSource) { bind<GameDataSource>() }
 
         singleOf(::TalkRemoteDataSource) { bind<TalkDataSource>() }
+
+        singleOf(::AppConfigFirebaseDataSource) { bind<AppConfigRemoteDataSource>() }
 
         singleOf(::PreferenceLocalDataSource) { bind<PreferenceDataSource>() }
 

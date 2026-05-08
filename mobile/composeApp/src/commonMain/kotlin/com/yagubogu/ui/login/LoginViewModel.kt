@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.auth.LoginResultResponse
+import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.ui.login.auth.OAuthCredentialManager
@@ -11,18 +12,35 @@ import com.yagubogu.ui.login.auth.OAuthCredentialResult
 import com.yagubogu.ui.login.model.LoginResult
 import com.yagubogu.ui.login.model.OAuthProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
+    private val appConfigRepository: AppConfigRepository,
 ) : ViewModel() {
     private val logger = Logger.withTag("LoginViewModel")
 
     private val _loginResult = MutableSharedFlow<LoginResult>()
     val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
+
+    private val _isMaintenance = MutableStateFlow(false)
+    val isMaintenance: StateFlow<Boolean> = _isMaintenance.asStateFlow()
+
+    private val _maintenanceMessage = MutableStateFlow("")
+    val maintenanceMessage: StateFlow<String> = _maintenanceMessage.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _isMaintenance.value = appConfigRepository.isMaintenanceMode()
+            _maintenanceMessage.value = appConfigRepository.getMaintenanceMessage()
+        }
+    }
 
     fun signInWithGoogle(credentialManager: OAuthCredentialManager) {
         viewModelScope.launch {

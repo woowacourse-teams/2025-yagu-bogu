@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,8 @@ import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.AttendanceHistoryViewType
 import com.yagubogu.ui.attendance.model.PastGameUiState
+import com.yagubogu.ui.common.AdUnitIds
+import com.yagubogu.ui.common.component.InterstitialAdEffect
 import com.yagubogu.ui.theme.Black
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray200
@@ -60,6 +63,7 @@ import com.yagubogu.ui.util.LocalSnackbarHostState
 import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
@@ -98,6 +102,7 @@ fun AttendanceHistoryScreen(
         mutableStateOf(AttendanceHistoryViewType.CALENDAR)
     }
     val snackbarScope = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectedMonth, viewType, filterState, sort) {
         when (viewType) {
@@ -133,6 +138,16 @@ fun AttendanceHistoryScreen(
             snackbarScope.showSnackbar(checkInSuccessMessage)
         }
     }
+
+    InterstitialAdEffect(
+        triggerFlow = viewModel.showInterstitialAdEvent,
+        adUnitId = AdUnitIds.pastCheckInInterstitial,
+        onAdComplete = {
+            coroutineScope.launch {
+                snackbarScope.showSnackbar(checkInSuccessMessage)
+            }
+        },
+    )
 
     BackPressHandler()
 

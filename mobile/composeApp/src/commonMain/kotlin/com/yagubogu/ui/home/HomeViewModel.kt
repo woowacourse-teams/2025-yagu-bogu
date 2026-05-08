@@ -26,9 +26,10 @@ import com.yagubogu.ui.home.model.HomeDialogEvent
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
-import com.yagubogu.ui.home.model.VictoryFairyRanking
 import com.yagubogu.ui.mapper.toDomain
 import com.yagubogu.ui.mapper.toUiModel
+import com.yagubogu.ui.ranking.model.RankingType
+import com.yagubogu.ui.ranking.model.RankingUiModel
 import com.yagubogu.ui.util.mapList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,8 +84,12 @@ class HomeViewModel(
     private val _isStadiumStatsExpanded = MutableStateFlow(false)
     val isStadiumStatsExpanded: StateFlow<Boolean> = _isStadiumStatsExpanded.asStateFlow()
 
-    private val _victoryFairyRanking = MutableStateFlow(VictoryFairyRanking())
-    val victoryFairyRanking: StateFlow<VictoryFairyRanking> = _victoryFairyRanking.asStateFlow()
+    private val _checkInRanking = MutableStateFlow(RankingUiModel(type = RankingType.CHECK_IN))
+    val checkInRanking: StateFlow<RankingUiModel> = _checkInRanking.asStateFlow()
+
+    private val _victoryFairyRanking =
+        MutableStateFlow(RankingUiModel(type = RankingType.VICTORY_FAIRY))
+    val victoryFairyRanking: StateFlow<RankingUiModel> = _victoryFairyRanking.asStateFlow()
 
     private val _isCheckInLoading = MutableStateFlow(false)
     val isCheckInLoading: StateFlow<Boolean> = _isCheckInLoading.asStateFlow()
@@ -141,6 +146,7 @@ class HomeViewModel(
     fun fetchAll() {
         fetchMemberStats()
         fetchStadiumStats()
+        fetchCheckInRanking()
         fetchVictoryFairyRanking()
     }
 
@@ -285,12 +291,36 @@ class HomeViewModel(
         }
     }
 
+    private fun fetchCheckInRanking(year: Int = LocalDate.now(clock).year) {
+        viewModelScope.launch {
+            val checkInRankingResult: Result<RankingUiModel> =
+                statsRepository
+                    .getCheckInRankings(
+                        year = year,
+                        before = null,
+                        limit = RANKING_LIMIT,
+                    ).map { it.toUiModel() }
+            checkInRankingResult
+                .onSuccess { ranking: RankingUiModel ->
+                    _checkInRanking.value = ranking
+                }.onFailure { exception: Throwable ->
+                    logger.w(exception) { "API 호출 실패 (fetchCheckInRanking)" }
+                }
+        }
+    }
+
     private fun fetchVictoryFairyRanking(year: Int = LocalDate.now(clock).year) {
         viewModelScope.launch {
-            val victoryFairyRankingResult: Result<VictoryFairyRanking> =
-                statsRepository.getVictoryFairyRankings(year, null).map { it.toUiModel() }
+            val victoryFairyRankingResult: Result<RankingUiModel> =
+                statsRepository
+                    .getVictoryFairyRankings(
+                        year = year,
+                        teamCode = null,
+                        before = null,
+                        limit = RANKING_LIMIT,
+                    ).map { it.toUiModel() }
             victoryFairyRankingResult
-                .onSuccess { ranking: VictoryFairyRanking ->
+                .onSuccess { ranking: RankingUiModel ->
                     _victoryFairyRanking.value = ranking
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "API 호출 실패 (fetchVictoryFairyRanking)" }
@@ -377,6 +407,7 @@ class HomeViewModel(
     }
 
     companion object {
-        private const val THRESHOLD_IN_METERS = 2200.0 // TODO: 300.0 으로 변경
+        private const val THRESHOLD_IN_METERS = 1000.0
+        private const val RANKING_LIMIT = 5
     }
 }

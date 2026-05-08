@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VictoryFairyRankingDto(
     @SerialName("ranking")
-    val ranking: Int, // 승리요정 랭킹
+    val ranking: Long, // 승리요정 랭킹
     @SerialName("memberId")
     val memberId: Long, // 멤버 ID
     @SerialName("nickname")

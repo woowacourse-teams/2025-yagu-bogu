@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0298BC4E2F80ABDE0070EA40 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 0298BC4D2F80ABDE0070EA40 /* GoogleMobileAds */; };
+		804293F92FA4F7C00051AF12 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 804293F82FA4F7C00051AF12 /* FirebaseRemoteConfig */; };
+		804293FC2FA4F9AA0051AF12 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 804293FB2FA4F9AA0051AF12 /* FirebaseCore */; };
 		C1D2E3F4A5B6C1D2E3F4A5B6 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B1C2D3E4F5A6B1C2D3E4F5A6 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +48,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				804293F92FA4F7C00051AF12 /* FirebaseRemoteConfig in Frameworks */,
+				0298BC4E2F80ABDE0070EA40 /* GoogleMobileAds in Frameworks */,
+				804293FC2FA4F9AA0051AF12 /* FirebaseCore in Frameworks */,
 				C1D2E3F4A5B6C1D2E3F4A5B6 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -57,8 +63,16 @@
 			children = (
 				EA76ECC8BA9522344A645864 /* Configuration */,
 				845D417FAF810A7A5C98D5D8 /* iosApp */,
+				804293FA2FA4F9AA0051AF12 /* Frameworks */,
 				A805759114D82133E2A63969 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		804293FA2FA4F9AA0051AF12 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A805759114D82133E2A63969 /* Products */ = {
@@ -91,6 +105,9 @@
 			name = iosApp;
 			packageProductDependencies = (
 				B1C2D3E4F5A6B1C2D3E4F5A6 /* GoogleSignIn */,
+				0298BC4D2F80ABDE0070EA40 /* GoogleMobileAds */,
+				804293F82FA4F7C00051AF12 /* FirebaseRemoteConfig */,
+				804293FB2FA4F9AA0051AF12 /* FirebaseCore */,
 			);
 			productName = iosApp;
 			productReference = FFF6CA430C2A4F296D16E945 /* YaguBogu.app */;
@@ -123,6 +140,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A1B2C3D4E5F6A1B2C3D4E5F6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				0298BC4C2F80ABDE0070EA40 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				804293F72FA4F7C00051AF12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A805759114D82133E2A63969 /* Products */;
@@ -162,7 +181,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\nif [ \"$CONFIGURATION\" = \"Release\" ]; then\n  ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode -Pbuildkonfig.flavor=release\nelse\n  ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -188,22 +207,28 @@
 				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "직관 인증을 위해 사용자의 위치 정보가 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 업로드를 위해 갤러리 접근이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = SplashScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 2.3.0;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yagubogu.YaguBogu.debug;
 				PRODUCT_NAME = YaguBogu;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -292,22 +317,28 @@
 				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "직관 인증을 위해 사용자의 위치 정보가 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 업로드를 위해 갤러리 접근이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UILaunchStoryboardName = SplashScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 2.3.0;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yagubogu.YaguBogu;
 				PRODUCT_NAME = YaguBogu;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -402,6 +433,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0298BC4C2F80ABDE0070EA40 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.2.0;
+			};
+		};
+		804293F72FA4F7C00051AF12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
 		A1B2C3D4E5F6A1B2C3D4E5F6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -413,6 +460,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0298BC4D2F80ABDE0070EA40 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0298BC4C2F80ABDE0070EA40 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		804293F82FA4F7C00051AF12 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 804293F72FA4F7C00051AF12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
+		};
+		804293FB2FA4F9AA0051AF12 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 804293F72FA4F7C00051AF12 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
 		B1C2D3E4F5A6B1C2D3E4F5A6 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1B2C3D4E5F6A1B2C3D4E5F6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;

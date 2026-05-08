@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource.stats
 
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.LocationCheckInRankingCursorResponse
 import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
@@ -21,5 +22,13 @@ interface StatsDataSource {
     suspend fun getVictoryFairyRankings(
         year: Int,
         teamCode: String?,
+        before: Long?,
+        limit: Int,
     ): Result<VictoryFairyRankingResponse>
+
+    suspend fun getCheckInRankings(
+        year: Int,
+        before: Long?,
+        limit: Int,
+    ): Result<LocationCheckInRankingCursorResponse>
 }

@@ -1,7 +1,9 @@
 package com.yagubogu.ui.common.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.datetime.LocalDate
 
+@Immutable
 data class MemberProfile(
     val nickname: String, // 회원 닉네임
     val enterDate: LocalDate, // 회원 가입일 (YYYY-MM-DD)

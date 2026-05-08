@@ -5,8 +5,10 @@ import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
 import com.yagubogu.ui.home.model.TeamFanRate
-import com.yagubogu.ui.home.model.VictoryFairyItem
-import com.yagubogu.ui.home.model.VictoryFairyRanking
+import com.yagubogu.ui.ranking.model.RankingProfileItem
+import com.yagubogu.ui.ranking.model.RankingType
+import com.yagubogu.ui.ranking.model.RankingUiModel
+import kotlinx.collections.immutable.toImmutableList
 
 val MEMBER_STATS_UI_MODEL =
     MemberStatsUiModel(
@@ -35,8 +37,31 @@ val STADIUM_FAN_RATE_ITEM =
 val STADIUM_STATS_UI_MODEL =
     StadiumStatsUiModel(stadiumFanRates = List(5) { STADIUM_FAN_RATE_ITEM })
 
+val CHECK_IN_RANKING_ITEM =
+    RankingProfileItem.CheckInRanking(
+        memberId = 0L,
+        rank = 1,
+        nickname = "닉네임",
+        teamName = "KIA",
+        count = 10,
+    )
+
+val CHECK_IN_RANKING =
+    RankingUiModel(
+        type = RankingType.CHECK_IN,
+        topRankings =
+            List(5) { index: Int ->
+                CHECK_IN_RANKING_ITEM.copy(
+                    memberId = (index + 1).toLong(),
+                    rank = (index + 1).toLong(),
+                )
+            }.toImmutableList(),
+        myRanking = CHECK_IN_RANKING_ITEM,
+    )
+
 val VICTORY_FAIRY_RANKING_ITEM =
-    VictoryFairyItem(
+    RankingProfileItem.VictoryFairyRanking(
+        memberId = 0L,
         rank = 1,
         nickname = "닉네임",
         teamName = "KIA",
@@ -44,10 +69,14 @@ val VICTORY_FAIRY_RANKING_ITEM =
     )
 
 val VICTORY_FAIRY_RANKING =
-    VictoryFairyRanking(
+    RankingUiModel(
+        type = RankingType.VICTORY_FAIRY,
         topRankings =
             List(5) { index: Int ->
-                VICTORY_FAIRY_RANKING_ITEM.copy(rank = index + 1)
-            },
+                VICTORY_FAIRY_RANKING_ITEM.copy(
+                    memberId = (index + 1).toLong(),
+                    rank = (index + 1).toLong(),
+                )
+            }.toImmutableList(),
         myRanking = VICTORY_FAIRY_RANKING_ITEM,
     )

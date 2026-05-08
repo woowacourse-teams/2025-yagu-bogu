@@ -21,13 +21,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.analytics.AnalyticsLogger
+import com.yagubogu.ui.common.AdUnitIds
+import com.yagubogu.ui.common.component.BannerAd
+import com.yagubogu.ui.common.component.BannerAdType
+import com.yagubogu.ui.home.component.CHECK_IN_RANKING
 import com.yagubogu.ui.home.component.CheckInButton
 import com.yagubogu.ui.home.component.MemberStats
 import com.yagubogu.ui.home.component.OpeningCountdown
 import com.yagubogu.ui.home.component.STADIUM_STATS_UI_MODEL
 import com.yagubogu.ui.home.component.StadiumFanRate
 import com.yagubogu.ui.home.component.VICTORY_FAIRY_RANKING
-import com.yagubogu.ui.home.component.VictoryFairyRanking
 import com.yagubogu.ui.home.component.dialog.HomeDialog
 import com.yagubogu.ui.home.component.dialog.PermissionDeniedDialog
 import com.yagubogu.ui.home.model.CheckInUiEvent
@@ -35,7 +38,9 @@ import com.yagubogu.ui.home.model.LocationPermissionManager
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.PermissionState
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
-import com.yagubogu.ui.home.model.VictoryFairyRanking
+import com.yagubogu.ui.ranking.component.Ranking
+import com.yagubogu.ui.ranking.model.RankingType
+import com.yagubogu.ui.ranking.model.RankingUiModel
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.util.BackPressHandler
 import com.yagubogu.ui.util.LocalSnackbarHostState
@@ -70,13 +75,15 @@ expect fun rememberAppSettingsOpener(): () -> Unit
 fun HomeScreen(
     scrollToTopEvent: SharedFlow<Unit>,
     onLoading: (Boolean) -> Unit,
+    onRankingShowMoreClick: (RankingType) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val memberStatsUiModel: MemberStatsUiModel by viewModel.memberStatsUiModel.collectAsStateWithLifecycle()
     val stadiumStatsUiModel: StadiumStatsUiModel by viewModel.stadiumStatsUiModel.collectAsStateWithLifecycle()
     val isStadiumStatsExpanded: Boolean by viewModel.isStadiumStatsExpanded.collectAsStateWithLifecycle()
-    val victoryFairyRanking: VictoryFairyRanking by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
+    val checkInRanking: RankingUiModel by viewModel.checkInRanking.collectAsStateWithLifecycle()
+    val victoryFairyRanking: RankingUiModel by viewModel.victoryFairyRanking.collectAsStateWithLifecycle()
     val leftSecondsUntilOpening: StateFlow<Long> = viewModel.leftSecondsUntilOpening
     val openingHour: Int = viewModel.openingHour
 
@@ -170,8 +177,10 @@ fun HomeScreen(
         isStadiumStatsExpanded = isStadiumStatsExpanded,
         onStadiumStatsClick = viewModel::toggleStadiumStats,
         onStadiumStatsRefresh = viewModel::refreshStadiumStats,
+        checkInRanking = checkInRanking,
         victoryFairyRanking = victoryFairyRanking,
-        onVictoryFairyRankingClick = viewModel::fetchMemberProfile,
+        onRankingShowMoreClick = onRankingShowMoreClick,
+        onMemberProfileClick = viewModel::fetchMemberProfile,
         leftSecondsUntilOpening = leftSecondsUntilOpening,
         openingHour = openingHour,
         modifier = modifier,
@@ -201,8 +210,10 @@ private fun HomeScreen(
     isStadiumStatsExpanded: Boolean,
     onStadiumStatsClick: () -> Unit,
     onStadiumStatsRefresh: () -> Unit,
-    victoryFairyRanking: VictoryFairyRanking,
-    onVictoryFairyRankingClick: (Long) -> Unit,
+    checkInRanking: RankingUiModel,
+    victoryFairyRanking: RankingUiModel,
+    onRankingShowMoreClick: (RankingType) -> Unit,
+    onMemberProfileClick: (Long) -> Unit,
     leftSecondsUntilOpening: StateFlow<Long>,
     openingHour: Int,
     modifier: Modifier = Modifier,
@@ -257,10 +268,26 @@ private fun HomeScreen(
                 onRefresh = onStadiumStatsRefresh,
             )
         }
-        VictoryFairyRanking(
-            ranking = victoryFairyRanking,
-            onRankingItemClick = onVictoryFairyRankingClick,
+
+        BannerAd(
+            adUnitId = AdUnitIds.homeBanner,
+            bannerAdType = BannerAdType.BANNER,
         )
+
+        if (checkInRanking.topRankings.isNotEmpty()) {
+            Ranking(
+                ranking = checkInRanking,
+                onRankingShowMoreClick = onRankingShowMoreClick,
+                onMemberProfileClick = onMemberProfileClick,
+            )
+        }
+        if (victoryFairyRanking.topRankings.isNotEmpty()) {
+            Ranking(
+                ranking = victoryFairyRanking,
+                onRankingShowMoreClick = onRankingShowMoreClick,
+                onMemberProfileClick = onMemberProfileClick,
+            )
+        }
     }
 }
 
@@ -300,8 +327,10 @@ private fun HomeScreenPreview() {
         isStadiumStatsExpanded = false,
         onStadiumStatsClick = {},
         onStadiumStatsRefresh = {},
+        checkInRanking = CHECK_IN_RANKING,
         victoryFairyRanking = VICTORY_FAIRY_RANKING,
-        onVictoryFairyRankingClick = {},
+        onRankingShowMoreClick = {},
+        onMemberProfileClick = {},
         leftSecondsUntilOpening = MutableStateFlow(1_000_000L),
         openingHour = 14,
     )

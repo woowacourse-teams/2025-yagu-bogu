@@ -6,6 +6,8 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.crashlytics.CrashlyticsLogWriter
 import co.touchlab.kermit.platformLogWriter
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kmp.geofence.GeofenceBroadcastReceiver
@@ -29,8 +31,18 @@ class YaguBoguApplication : Application() {
         super.onCreate()
         setupLogging()
         setupAnalytics()
+        setupAds()
         setupKoin()
         setupGeofence()
+    }
+
+    private fun setupAds() {
+        CoroutineScope(Dispatchers.IO).launch {
+            MobileAds.initialize(
+                this@YaguBoguApplication,
+                InitializationConfig.Builder(BuildKonfig.ADMOB_ANDROID_APP_ID).build(),
+            )
+        }
     }
 
     private fun setupAnalytics() {

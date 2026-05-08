@@ -1,6 +1,7 @@
 package com.yagubogu.data.datasource.stats
 
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.LocationCheckInRankingCursorResponse
 import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
 import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
@@ -40,8 +41,19 @@ class StatsRemoteDataSource(
     override suspend fun getVictoryFairyRankings(
         year: Int,
         teamCode: String?,
+        before: Long?,
+        limit: Int,
     ): Result<VictoryFairyRankingResponse> =
         safeApiCall {
-            statsApiService.getVictoryFairyRankings(year, teamCode)
+            statsApiService.getVictoryFairyRankings(year, teamCode, before, limit)
+        }
+
+    override suspend fun getCheckInRankings(
+        year: Int,
+        before: Long?,
+        limit: Int,
+    ): Result<LocationCheckInRankingCursorResponse> =
+        safeApiCall {
+            statsApiService.getCheckInRankings(year, before, limit)
         }
 }

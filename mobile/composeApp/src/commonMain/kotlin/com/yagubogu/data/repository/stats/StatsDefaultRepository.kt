@@ -2,6 +2,7 @@ package com.yagubogu.data.repository.stats
 
 import com.yagubogu.data.datasource.stats.StatsDataSource
 import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.LocationCheckInRankingCursorResponse
 import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
 import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
 import com.yagubogu.data.dto.response.stats.StatsCountsResponse
@@ -40,5 +41,13 @@ class StatsDefaultRepository(
     override suspend fun getVictoryFairyRankings(
         year: Int,
         teamCode: String?,
-    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, teamCode)
+        before: Long?,
+        limit: Int,
+    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, teamCode, before, limit)
+
+    override suspend fun getCheckInRankings(
+        year: Int,
+        before: Long?,
+        limit: Int,
+    ): Result<LocationCheckInRankingCursorResponse> = statsDataSource.getCheckInRankings(year, before, limit)
 }

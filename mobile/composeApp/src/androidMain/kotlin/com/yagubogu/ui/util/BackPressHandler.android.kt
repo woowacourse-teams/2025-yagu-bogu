@@ -1,39 +1,26 @@
 package com.yagubogu.ui.util
 
 import android.app.Activity
-import android.content.Context
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
-import com.yagubogu.R
+import com.yagubogu.ui.common.component.ExitConfirmDialog
 
 @Composable
 actual fun BackPressHandler() {
-    val context: Context = LocalContext.current
-    val resources: Resources = LocalResources.current
-    val snackbarHostState = LocalSnackbarHostState.current
-    val snackbarScope = LocalSnackbarScope.current
+    val context = LocalContext.current
+    var showExitDialog: Boolean by remember { mutableStateOf(false) }
 
-    var backPressedTime: Long by remember { mutableLongStateOf(0L) }
+    BackHandler { showExitDialog = true }
 
-    BackHandler {
-        val currentTime: Long = System.currentTimeMillis()
-        if (currentTime - backPressedTime > BACK_PRESS_INTERVAL_MS) {
-            backPressedTime = currentTime
-            snackbarHostState.showSingleSnackbar(
-                scope = snackbarScope,
-                message = resources.getString(R.string.main_back_press_to_exit),
-            )
-        } else {
-            (context as? Activity)?.finish()
-        }
+    if (showExitDialog) {
+        ExitConfirmDialog(
+            onExit = { (context as? Activity)?.finish() },
+            onDismiss = { showExitDialog = false },
+        )
     }
 }
-
-private const val BACK_PRESS_INTERVAL_MS: Long = 1000L

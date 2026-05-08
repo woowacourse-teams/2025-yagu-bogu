@@ -38,6 +38,9 @@ import com.yagubogu.domain.util.minusMonths
 import com.yagubogu.domain.util.now
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.PastGameUiState
+import com.yagubogu.ui.common.AdUnitIds
+import com.yagubogu.ui.common.component.BannerAd
+import com.yagubogu.ui.common.component.BannerAdType
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.PretendardMedium16
@@ -120,23 +123,31 @@ fun AttendanceCalendarContent(
             )
 
             when {
+                // 직관 내역이 있는 경우
                 currentItems != null -> {
                     currentItems.forEach { item: AttendanceHistoryItem ->
                         AttendanceItem(item = item, isExpanded = true)
                     }
                 }
 
-                isToday -> Unit
-
+                // 경기가 없는 날인 경우
                 selectedDate !in gameDates -> NoGameDayView()
 
+                // 직관 내역이 없는 경우
                 else -> {
-                    AttendanceAdditionButton(
-                        onClick = {
-                            onPastGamesRequest(selectedDate)
-                            showBottomSheet = true
-                        },
-                        modifier = Modifier.padding(vertical = 30.dp),
+                    if (!isToday) {
+                        AttendanceAdditionButton(
+                            onClick = {
+                                onPastGamesRequest(selectedDate)
+                                showBottomSheet = true
+                            },
+                            modifier = Modifier.padding(top = 10.dp),
+                        )
+                    }
+
+                    BannerAd(
+                        adUnitId = AdUnitIds.attendanceCalendarBanner,
+                        bannerAdType = BannerAdType.BANNER,
                     )
                 }
             }

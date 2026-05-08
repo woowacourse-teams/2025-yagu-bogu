@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.domain.util.now
 import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.livetalk.chat.component.EmptyLivetalkChat
@@ -213,6 +214,10 @@ fun LivetalkChatScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        AnalyticsLogger.logEvent("screen_view", mapOf("screen_name" to "현장톡 채팅 Screen"))
     }
 
     LivetalkChatScreenContent(

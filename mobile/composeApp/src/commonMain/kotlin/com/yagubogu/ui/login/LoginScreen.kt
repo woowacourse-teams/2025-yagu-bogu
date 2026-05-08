@@ -18,6 +18,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.di.Qualifier
@@ -33,6 +36,7 @@ import com.yagubogu.ui.common.platform.PlatformType
 import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.auth.OAuthCredentialManager
 import com.yagubogu.ui.login.model.LoginResult
+import com.yagubogu.ui.login.model.MaintenanceDialog
 import com.yagubogu.ui.login.model.OAuthProvider
 import com.yagubogu.ui.theme.Dimming025
 import com.yagubogu.ui.theme.Dimming050
@@ -71,6 +75,9 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val isMaintenance by viewModel.isMaintenance.collectAsStateWithLifecycle()
+    val isMaintenanceConfirm = remember { mutableStateOf(false) }
+    val maintenanceMessage by viewModel.maintenanceMessage.collectAsStateWithLifecycle()
 
     Box(modifier = modifier) {
         LoginScreen(
@@ -81,6 +88,14 @@ fun LoginScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+
+        if (isMaintenance && !isMaintenanceConfirm.value) {
+            MaintenanceDialog(
+                onConfirm = { isMaintenanceConfirm.value = true },
+                maintenanceMessage = maintenanceMessage,
+                modifier = Modifier,
+            )
+        }
     }
     LoginResultHandler(
         snackbarHostState = snackbarHostState,

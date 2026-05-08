@@ -39,6 +39,7 @@ private fun YaguBoguIosApp() {
                         AutoLoginState.Failure,
                         AutoLoginState.Loading,
                         -> Route.Login
+                        is AutoLoginState.Maintenance -> Route.Login
                     },
             )
         }

@@ -8,4 +8,6 @@ sealed interface AutoLoginState {
     data object Failure : AutoLoginState
 
     data object Loading : AutoLoginState
+
+    data object Maintenance : AutoLoginState
 }

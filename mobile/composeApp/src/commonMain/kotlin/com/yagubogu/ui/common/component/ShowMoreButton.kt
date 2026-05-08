@@ -27,8 +27,8 @@ import com.yagubogu.ui.util.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.all_show_more
 import yagubogu.composeapp.generated.resources.home_show_less
-import yagubogu.composeapp.generated.resources.home_show_more
 import yagubogu.composeapp.generated.resources.ic_arrow_down
 import yagubogu.composeapp.generated.resources.ic_arrow_up
 
@@ -50,7 +50,7 @@ fun ShowMoreButton(
                 .padding(vertical = 8.dp),
     ) {
         Text(
-            text = stringResource(if (isExpanded) Res.string.home_show_less else Res.string.home_show_more),
+            text = stringResource(if (isExpanded) Res.string.home_show_less else Res.string.all_show_more),
             color = Gray400,
             style = PretendardRegular,
             fontSize = 14.sp,
@@ -58,7 +58,7 @@ fun ShowMoreButton(
         Spacer(modifier = Modifier.width(4.dp))
         Image(
             painter = painterResource(if (isExpanded) Res.drawable.ic_arrow_up else Res.drawable.ic_arrow_down),
-            contentDescription = stringResource(if (isExpanded) Res.string.home_show_less else Res.string.home_show_more),
+            contentDescription = stringResource(if (isExpanded) Res.string.home_show_less else Res.string.all_show_more),
             colorFilter = ColorFilter.tint(Gray400),
             modifier = Modifier.size(20.dp),
         )

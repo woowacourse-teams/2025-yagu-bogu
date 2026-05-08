@@ -9,6 +9,8 @@ import com.yagubogu.ui.livetalk.chat.LivetalkChatViewModel
 import com.yagubogu.ui.login.LoginViewModel
 import com.yagubogu.ui.main.MainViewModel
 import com.yagubogu.ui.main.YaguBoguViewModel
+import com.yagubogu.ui.ranking.RankingViewModel
+import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.setting.SettingViewModel
 import com.yagubogu.ui.stats.StatsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -42,6 +44,15 @@ val viewModelModule =
         viewModelOf(::LoginViewModel)
 
         viewModelOf(::MainViewModel)
+
+        viewModel { (type: RankingType) ->
+            RankingViewModel(
+                type = type,
+                statsRepository = get(),
+                memberRepository = get(),
+                clock = get(),
+            )
+        }
 
         viewModelOf(::SettingViewModel)
 

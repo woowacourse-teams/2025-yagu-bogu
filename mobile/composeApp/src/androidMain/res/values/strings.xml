@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">야구보구</string>
-    <string name="main_back_press_to_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
-
+    
     <string name="login_should_immediate_update_message">앱을 계속 사용하려면\n최신 버전으로 업데이트 해주세요</string>
     <string name="login_complete_update_message">업데이트 중이에요! ⚾</string>
 </resources>

@@ -13,4 +13,5 @@ val sharedModules =
         viewModelModule,
         localModule,
         geofenceModule,
+        configModule,
     )

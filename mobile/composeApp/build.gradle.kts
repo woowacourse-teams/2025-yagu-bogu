@@ -3,12 +3,21 @@ import com.android.build.gradle.internal.dsl.SigningConfig
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
-val appVersionCode = 20206
-val appVersionName = "2.2.6"
+val appVersionCode = 30000
+val appVersionName = "3.0.0"
+
+fun TargetConfigDsl.stringField(
+    name: String,
+    key: String = name,
+) {
+    val value = gradleLocalProperties(rootDir, providers).getProperty(key)
+    buildConfigField(STRING, name, value ?: "")
+}
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -30,50 +39,65 @@ buildkonfig {
     packageName = "com.yagubogu"
 
     defaultConfigs {
+        buildConfigField(BOOLEAN, "IS_DEBUG", "true")
+
+        stringField("BASE_URL", key = "BASE_URL_DEBUG")
+        stringField("WEB_CLIENT_ID")
+        stringField("IOS_CLIENT_ID")
+        stringField("DEBUG_FIXED_DATE")
+        buildConfigField(INT, "VERSION_CODE", "$appVersionCode")
+
+        // AdMob Ids
+        buildConfigField(STRING, "ADMOB_ANDROID_APP_ID", "ca-app-pub-3940256099942544~3347511713")
+        val testAndroidBannerId = "ca-app-pub-3940256099942544/9214589741"
+        buildConfigField(STRING, "ADMOB_ANDROID_HOME_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_RANKING_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_LIVETALK_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_STATS_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_ATTENDANCE_CALENDAR_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_EXIT_DIALOG_BANNER", testAndroidBannerId)
+        buildConfigField(STRING, "ADMOB_ANDROID_PROFILE_DIALOG_BANNER", testAndroidBannerId)
+        val testAndroidInterstitialId = "ca-app-pub-3940256099942544/1033173712"
         buildConfigField(
             STRING,
-            "BASE_URL",
-            "${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_DEBUG")}",
+            "ADMOB_ANDROID_PAST_CHECK_IN_INTERSTITIAL",
+            testAndroidInterstitialId,
         )
-        buildConfigField(
-            type = STRING,
-            "WEB_CLIENT_ID",
-            "${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}",
-        )
-        buildConfigField(
-            type = STRING,
-            "IOS_CLIENT_ID",
-            "${gradleLocalProperties(rootDir, providers).getProperty("IOS_CLIENT_ID")}",
-        )
-
-        val fixedDate = gradleLocalProperties(rootDir, providers).getProperty("DEBUG_FIXED_DATE")
-        if (fixedDate != null) {
-            buildConfigField(STRING, "DEBUG_FIXED_DATE", fixedDate)
-        } else {
-            buildConfigField(STRING, "DEBUG_FIXED_DATE", "null")
-        }
-        buildConfigField(BOOLEAN, "IS_DEBUG", "true")
-        buildConfigField(INT, "VERSION_CODE", "$appVersionCode")
+        val testIosBannerId = "ca-app-pub-3940256099942544/2934735716"
+        buildConfigField(STRING, "ADMOB_IOS_HOME_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_RANKING_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_LIVETALK_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_STATS_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_ATTENDANCE_CALENDAR_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_EXIT_DIALOG_BANNER", testIosBannerId)
+        buildConfigField(STRING, "ADMOB_IOS_PROFILE_DIALOG_BANNER", testIosBannerId)
+        val testIosInterstitialId = "ca-app-pub-3940256099942544/4411468910"
+        buildConfigField(STRING, "ADMOB_IOS_PAST_CHECK_IN_INTERSTITIAL", testIosInterstitialId)
     }
 
     defaultConfigs("release") {
-        buildConfigField(
-            STRING,
-            "BASE_URL",
-            "${gradleLocalProperties(rootDir, providers).getProperty("BASE_URL_RELEASE")}",
-        )
-        buildConfigField(
-            type = STRING,
-            "WEB_CLIENT_ID",
-            "${gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID")}",
-        )
-        buildConfigField(
-            type = STRING,
-            "IOS_CLIENT_ID",
-            "${gradleLocalProperties(rootDir, providers).getProperty("IOS_CLIENT_ID")}",
-        )
-
         buildConfigField(BOOLEAN, "IS_DEBUG", "false")
+
+        stringField("BASE_URL", key = "BASE_URL_RELEASE")
+        stringField("WEB_CLIENT_ID")
+        stringField("IOS_CLIENT_ID")
+        // AdMob Ids
+        stringField("ADMOB_ANDROID_APP_ID", key = "ADMOB_ANDROID_APP_ID")
+        stringField("ADMOB_ANDROID_HOME_BANNER")
+        stringField("ADMOB_ANDROID_RANKING_BANNER")
+        stringField("ADMOB_ANDROID_LIVETALK_BANNER")
+        stringField("ADMOB_ANDROID_STATS_BANNER")
+        stringField("ADMOB_ANDROID_ATTENDANCE_CALENDAR_BANNER")
+        stringField("ADMOB_ANDROID_EXIT_DIALOG_BANNER")
+        stringField("ADMOB_ANDROID_PROFILE_DIALOG_BANNER")
+        stringField("ADMOB_ANDROID_PAST_CHECK_IN_INTERSTITIAL")
+        stringField("ADMOB_IOS_HOME_BANNER")
+        stringField("ADMOB_IOS_RANKING_BANNER")
+        stringField("ADMOB_IOS_LIVETALK_BANNER")
+        stringField("ADMOB_IOS_STATS_BANNER")
+        stringField("ADMOB_IOS_ATTENDANCE_CALENDAR_BANNER")
+        stringField("ADMOB_IOS_PROFILE_DIALOG_BANNER")
+        stringField("ADMOB_IOS_PAST_CHECK_IN_INTERSTITIAL")
     }
 }
 
@@ -86,6 +110,7 @@ kotlin {
 
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
     iosArm64 {
@@ -138,6 +163,9 @@ kotlin {
 
             // Google Services
             implementation(libs.play.services.location)
+
+            // AdMob
+            implementation(libs.ads.mobile.sdk)
 
             // Ktor
             implementation(libs.ktor.client.okhttp)
@@ -222,6 +250,9 @@ kotlin {
             implementation(libs.kermit)
             implementation(libs.kermit.crashlytics)
 
+            // Firebase Gitlive
+            implementation(libs.firebase.config.gitlive)
+
             // Oss-licenses
             implementation(libs.aboutlibraries.core)
             implementation(libs.aboutlibraries.compose.m3)
@@ -268,6 +299,8 @@ android {
         versionName = appVersionName
 
         manifestPlaceholders["appName"] = "@string/app_name"
+        manifestPlaceholders["admobAppId"] =
+            gradleLocalProperties(rootDir, providers).getProperty("ADMOB_ANDROID_APP_ID") ?: ""
     }
     val signingFile = rootProject.file("keystore.properties")
     val releaseSigningConfig: SigningConfig? =
@@ -299,6 +332,8 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = ".debug"
             manifestPlaceholders["appName"] = "야구보구.debug"
+            // AdMob Test App ID
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
         }
 
         release {
