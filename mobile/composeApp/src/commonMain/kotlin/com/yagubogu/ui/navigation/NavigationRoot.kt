@@ -17,7 +17,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.ui.badge.component.BadgeScreen
-import com.yagubogu.ui.favorite.FavoriteTeamScreen
 import com.yagubogu.ui.livetalk.chat.LivetalkChatScreen
 import com.yagubogu.ui.login.LoginScreen
 import com.yagubogu.ui.main.MainScreen
@@ -26,6 +25,8 @@ import com.yagubogu.ui.navigation.model.Navigator
 import com.yagubogu.ui.navigation.model.Route
 import com.yagubogu.ui.navigation.model.SettingNavKey
 import com.yagubogu.ui.navigation.model.toEntries
+import com.yagubogu.ui.onboarding.favorite.FavoriteTeamScreen
+import com.yagubogu.ui.onboarding.nickname.NicknameScreen
 import com.yagubogu.ui.ranking.component.RankingScreen
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.setting.SettingScreen
@@ -35,6 +36,8 @@ import com.yagubogu.ui.util.slidePopTransition
 import com.yagubogu.ui.util.slidePredictivePopTransition
 import com.yagubogu.ui.util.slidePushTransition
 import com.yagubogu.ui.util.snackbarPadding
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * 앱의 최상위 네비게이션 구조를 정의하는 루트 컴포저블.
@@ -65,7 +68,7 @@ fun NavigationRoot(
                 entry<Route.Login> {
                     LoginScreen(
                         onSignIn = { rootNavigator.navigate(Route.Main) },
-                        onSignUp = { rootNavigator.navigate(Route.FavoriteTeam) },
+                        onSignUp = { rootNavigator.navigate(Route.FavoriteTeam(isOnboarding = true)) },
                     )
                 }
                 entry<Route.Main> {
@@ -97,7 +100,7 @@ fun NavigationRoot(
                         onSettingItemClick = { item: SettingNavKey ->
                             settingNavigator.navigate(item)
                         },
-                        onFavoriteTeamEditClick = { rootNavigator.navigate(Route.FavoriteTeam) },
+                        onFavoriteTeamEditClick = { rootNavigator.navigate(Route.FavoriteTeam(isOnboarding = false)) },
                         onLogout = {
                             mainNavigator.navigate(BottomNavKey.Home)
                             settingNavigator.clearStack()
@@ -118,9 +121,29 @@ fun NavigationRoot(
                         },
                     )
                 }
-                entry<Route.FavoriteTeam> {
+                entry<Route.FavoriteTeam> { key: Route.FavoriteTeam ->
                     FavoriteTeamScreen(
-                        onFavoriteTeamUpdate = {
+                        onConfirmClickToNicknameSetup = { teamName: String ->
+                            rootNavigator.navigate(Route.NicknameSetup(teamName))
+                        },
+                        onConfirmClickToNavigateHome = {
+                            mainNavigator.navigate(BottomNavKey.Home)
+                            rootNavigator.clearStack()
+                            rootNavigator.navigate(Route.Main)
+                        },
+                        viewModel =
+                            koinViewModel(
+                                parameters = { parametersOf(key.isOnboarding) },
+                            ),
+                    )
+                }
+                entry<Route.NicknameSetup> { key: Route.NicknameSetup ->
+                    NicknameScreen(
+                        viewModel =
+                            koinViewModel(
+                                parameters = { parametersOf(key.teamName) },
+                            ),
+                        onCompleted = {
                             mainNavigator.navigate(BottomNavKey.Home)
                             rootNavigator.clearStack()
                             rootNavigator.navigate(Route.Main)

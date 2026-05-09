@@ -148,6 +148,15 @@
     <string name="favorite_team_selection_confirm">응원하는 팀으로 선택할까요?</string>
     <string name="favorite_team_random">* 팀 순서는 랜덤입니다.</string>
 
+    <string name="nickname_title">야구보구에서 사용할\n닉네임을 알려주세요!</string>
+    <string name="nickname_subtitle">설정에서 언제든지 변경할 수 있어요</string>
+    <string name="nickname_placeholder">닉네임을 입력해주세요</string>
+    <string name="nickname_check_duplicate">중복 확인</string>
+    <string name="nickname_error_duplicate">이미 사용 중인 닉네임이에요.</string>
+    <string name="nickname_available">사용 가능한 닉네임입니다.</string>
+    <string name="nickname_start_default">기본 닉네임으로 시작하기</string>
+    <string name="nickname_next">다음</string>
+
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
     <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>

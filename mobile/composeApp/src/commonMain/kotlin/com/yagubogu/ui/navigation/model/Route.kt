@@ -16,7 +16,14 @@ sealed interface Route : NavKey {
     data object Login : Route
 
     @Serializable
-    data object FavoriteTeam : Route
+    data class FavoriteTeam(
+        val isOnboarding: Boolean,
+    ) : Route
+
+    @Serializable
+    data class NicknameSetup(
+        val teamName: String,
+    ) : Route
 
     @Serializable
     data object Badge : Route

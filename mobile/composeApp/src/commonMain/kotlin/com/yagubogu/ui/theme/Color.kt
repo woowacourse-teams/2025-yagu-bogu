@@ -48,6 +48,8 @@ val TeamKiwoom = Color(0xFF570514)
 
 // Special Colors
 val Red = Color(0xFFFF2C2C)
+
+val Rose = Color(0xFF8D192B)
 val Gold = Color(0xFFC9B037)
 val Silver = Color(0xFFB4B4B4)
 val Bronze = Color(0xFFAD8A56)

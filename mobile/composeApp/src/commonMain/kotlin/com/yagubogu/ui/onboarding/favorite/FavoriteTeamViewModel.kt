@@ -1,4 +1,4 @@
-package com.yagubogu.ui.favorite
+package com.yagubogu.ui.onboarding.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,18 +12,23 @@ import kotlinx.coroutines.launch
 
 class FavoriteTeamViewModel(
     private val memberRepository: MemberRepository,
+    private val isOnboarding: Boolean,
 ) : ViewModel() {
     private val logger = Logger.withTag("FavoriteTeamViewModel")
 
-    private val _favoriteTeamUpdateEvent = MutableSharedFlow<Unit>()
-    val favoriteTeamUpdateEvent: SharedFlow<Unit> = _favoriteTeamUpdateEvent.asSharedFlow()
+    private val _event = MutableSharedFlow<FavoriteTeamEvent>()
+    val event: SharedFlow<FavoriteTeamEvent> = _event.asSharedFlow()
 
     fun saveFavoriteTeam(team: Team) {
         viewModelScope.launch {
             memberRepository
                 .updateFavoriteTeam(team.name)
                 .onSuccess {
-                    _favoriteTeamUpdateEvent.emit(Unit)
+                    if (isOnboarding) {
+                        _event.emit(FavoriteTeamEvent.NavigateToNicknameSetup(team))
+                    } else {
+                        _event.emit(FavoriteTeamEvent.NavigateToHome)
+                    }
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "API 호출 실패" }
                 }

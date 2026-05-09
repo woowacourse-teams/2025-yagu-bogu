@@ -1,4 +1,4 @@
-package com.yagubogu.ui.favorite
+package com.yagubogu.ui.onboarding.favorite
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,7 +56,8 @@ import yagubogu.composeapp.generated.resources.img_mascot_ht
 
 @Composable
 fun FavoriteTeamScreen(
-    onFavoriteTeamUpdate: () -> Unit,
+    onConfirmClickToNicknameSetup: (String) -> Unit,
+    onConfirmClickToNavigateHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoriteTeamViewModel = koinViewModel(),
 ) {
@@ -64,8 +65,11 @@ fun FavoriteTeamScreen(
     var selectedTeam: Team? by rememberSaveable { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.favoriteTeamUpdateEvent.collect {
-            onFavoriteTeamUpdate()
+        viewModel.event.collect { event ->
+            when (event) {
+                is FavoriteTeamEvent.NavigateToNicknameSetup -> onConfirmClickToNicknameSetup(event.team.shortname)
+                FavoriteTeamEvent.NavigateToHome -> onConfirmClickToNavigateHome()
+            }
         }
     }
 
