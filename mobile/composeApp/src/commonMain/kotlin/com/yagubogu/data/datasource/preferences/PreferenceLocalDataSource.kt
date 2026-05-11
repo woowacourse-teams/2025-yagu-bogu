@@ -1,31 +1,47 @@
 package com.yagubogu.data.datasource.preferences
 
-import com.russhwolf.settings.Settings
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class PreferenceLocalDataSource(
-    private val settings: Settings,
+    private val dataStore: DataStore<Preferences>,
 ) : PreferenceDataSource {
     override fun getString(
         key: String,
         defaultValue: String?,
-    ) = settings.getStringOrNull(key) ?: defaultValue
+    ): Flow<String?> =
+        dataStore.data.map { prefs ->
+            prefs[stringPreferencesKey(key)] ?: defaultValue
+        }
 
-    override fun putString(
+    override suspend fun putString(
         key: String,
         value: String,
     ) {
-        settings.putString(key, value)
+        dataStore.edit { prefs ->
+            prefs[stringPreferencesKey(key)] = value
+        }
     }
 
     override fun getBoolean(
         key: String,
         defaultValue: Boolean,
-    ) = settings.getBoolean(key, defaultValue)
+    ): Flow<Boolean> =
+        dataStore.data.map { prefs ->
+            prefs[booleanPreferencesKey(key)] ?: defaultValue
+        }
 
-    override fun putBoolean(
+    override suspend fun putBoolean(
         key: String,
         value: Boolean,
     ) {
-        settings.putBoolean(key, value)
+        dataStore.edit { prefs ->
+            prefs[booleanPreferencesKey(key)] = value
+        }
     }
 }

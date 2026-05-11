@@ -22,9 +22,11 @@ import com.yagubogu.data.datasource.stream.StreamDataSource
 import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
+import com.yagubogu.data.local.COMMON_PREFS
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 expect fun Module.registerPlatformDataSources()
@@ -49,8 +51,11 @@ val datasourceModule =
 
         singleOf(::AppConfigFirebaseDataSource) { bind<AppConfigRemoteDataSource>() }
 
-        singleOf(::PreferenceLocalDataSource) { bind<PreferenceDataSource>() }
+        single<PreferenceDataSource> {
+            PreferenceLocalDataSource(dataStore = get(named(COMMON_PREFS)))
+        }
 
         singleOf(::GeofenceLocalDataSource) { bind<GeofenceDataSource>() }
+
         registerPlatformDataSources()
     }

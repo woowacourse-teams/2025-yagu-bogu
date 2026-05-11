@@ -5,6 +5,7 @@ import com.yagubogu.data.datasource.geofence.GeofenceDataSource
 import com.yagubogu.data.datasource.preferences.PreferenceDataSource
 import com.yagubogu.domain.model.Stadium
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class GeofenceDefaultRepository(
     private val preferenceDataSource: PreferenceDataSource,
@@ -12,14 +13,16 @@ class GeofenceDefaultRepository(
 ) : GeofenceRepository {
     override val geofenceEvents: Flow<GeofenceEvent> = geofenceDataSource.geofenceEvents
 
-    override var isGeofenceEnabled: Boolean
-        get() = preferenceDataSource.getBoolean(KEY_GEOFENCE_ENABLED, false)
-        set(value) = preferenceDataSource.putBoolean(KEY_GEOFENCE_ENABLED, value)
+    override fun isGeofenceEnabled(): Flow<Boolean> = preferenceDataSource.getBoolean(KEY_GEOFENCE_ENABLED, false)
 
-    override fun getLastNotificationDate(stadiumId: Int): String? =
-        preferenceDataSource.getString("${KEY_LAST_NOTIF_PREFIX}_$stadiumId", null)
+    override suspend fun setGeofenceEnabled(enabled: Boolean) {
+        preferenceDataSource.putBoolean(KEY_GEOFENCE_ENABLED, enabled)
+    }
 
-    override fun saveLastNotificationDate(
+    override suspend fun getLastNotificationDate(stadiumId: Int): String? =
+        preferenceDataSource.getString("${KEY_LAST_NOTIF_PREFIX}_$stadiumId", null).first()
+
+    override suspend fun saveLastNotificationDate(
         stadiumId: Int,
         date: String,
     ) = preferenceDataSource.putString("${KEY_LAST_NOTIF_PREFIX}_$stadiumId", date)

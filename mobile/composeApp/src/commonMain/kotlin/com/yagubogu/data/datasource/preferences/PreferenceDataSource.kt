@@ -1,12 +1,14 @@
 package com.yagubogu.data.datasource.preferences
 
+import kotlinx.coroutines.flow.Flow
+
 interface PreferenceDataSource {
     fun getString(
         key: String,
         defaultValue: String?,
-    ): String?
+    ): Flow<String?>
 
-    fun putString(
+    suspend fun putString(
         key: String,
         value: String,
     )
@@ -14,9 +16,9 @@ interface PreferenceDataSource {
     fun getBoolean(
         key: String,
         defaultValue: Boolean,
-    ): Boolean
+    ): Flow<Boolean>
 
-    fun putBoolean(
+    suspend fun putBoolean(
         key: String,
         value: Boolean,
     )

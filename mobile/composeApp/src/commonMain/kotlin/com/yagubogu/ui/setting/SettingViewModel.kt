@@ -10,7 +10,6 @@ import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.domain.util.now
-import com.yagubogu.ui.mapper.text.toUiText
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
@@ -58,8 +57,12 @@ class SettingViewModel(
         )
     val settingEvent = _settingEvent.asSharedFlow()
 
-    private val _geofenceNotification = MutableStateFlow(geofenceRepository.isGeofenceEnabled)
+    private val _geofenceNotification = MutableStateFlow(false)
     val geofenceNotification = _geofenceNotification.asStateFlow()
+
+    init {
+        observeGeofenceStatus()
+    }
 
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
@@ -185,13 +188,19 @@ class SettingViewModel(
                 geofenceRepository
                     .registerAll()
                     .onSuccess {
-                        geofenceRepository.isGeofenceEnabled = true
-                        _geofenceNotification.value = true
+                        geofenceRepository.setGeofenceEnabled(true)
                     }.onFailure { logger.e(it) { "지오펜스 등록 실패" } }
             } else {
                 geofenceRepository.unregisterAll()
-                geofenceRepository.isGeofenceEnabled = false
-                _geofenceNotification.value = false
+                geofenceRepository.setGeofenceEnabled(false)
+            }
+        }
+    }
+
+    private fun observeGeofenceStatus() {
+        viewModelScope.launch {
+            geofenceRepository.isGeofenceEnabled().collect { enabled ->
+                _geofenceNotification.value = enabled
             }
         }
     }

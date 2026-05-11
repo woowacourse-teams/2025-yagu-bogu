@@ -5,11 +5,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface GeofenceRepository {
     val geofenceEvents: Flow<GeofenceEvent>
-    var isGeofenceEnabled: Boolean
 
-    fun getLastNotificationDate(stadiumId: Int): String?
+    fun isGeofenceEnabled(): Flow<Boolean>
 
-    fun saveLastNotificationDate(
+    suspend fun setGeofenceEnabled(enabled: Boolean)
+
+    suspend fun getLastNotificationDate(stadiumId: Int): String?
+
+    suspend fun saveLastNotificationDate(
         stadiumId: Int,
         date: String,
     )
