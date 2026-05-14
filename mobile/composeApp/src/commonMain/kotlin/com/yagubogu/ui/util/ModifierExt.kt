@@ -105,9 +105,12 @@ fun Modifier.shimmerLoading(roundCorner: Dp = 0.dp): Modifier =
         }
     }
 
-fun Modifier.shimmerIf(condition: Boolean): Modifier =
+fun Modifier.shimmerIf(
+    condition: Boolean,
+    roundCorner: Dp = 12.dp,
+): Modifier =
     if (condition) {
-        this.shimmerLoading()
+        this.shimmerLoading(roundCorner)
     } else {
         this
     }

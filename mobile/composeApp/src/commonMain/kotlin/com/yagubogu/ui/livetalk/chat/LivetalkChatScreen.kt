@@ -80,7 +80,8 @@ fun LivetalkChatScreen(
     val chatUiState: LivetalkChatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
     val messageText: String by messageStateHolder.messageText.collectAsStateWithLifecycle()
-    val showingLikeCount: Long? by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val myTeamShowingLikeCount: Long? by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val otherTeamShowingLikeCount: Long? by likeCountStateHolder.otherTeamLikeShowingCount.collectAsStateWithLifecycle()
     val livetalkChatBubbleItems: List<LivetalkChatBubbleItem> by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
     val pendingDeleteChat: LivetalkChatItem? by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
     val pendingReportChat: LivetalkChatItem? by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
@@ -105,7 +106,7 @@ fun LivetalkChatScreen(
             chatUiState,
             livetalkChatBubbleItems,
             messageText,
-            showingLikeCount,
+            myTeamShowingLikeCount,
             mascotQueue.toList(),
             clickedProfile,
             pendingDeleteChat,
@@ -126,10 +127,15 @@ fun LivetalkChatScreen(
                         text = messageText,
                         stadiumName = teams?.stadiumName,
                     ),
-                cheering =
+                myTeamCheering =
                     LivetalkChatScreenStates.Cheering(
-                        myTeam = teams?.myTeam,
-                        showingCount = showingLikeCount,
+                        team = teams?.myTeam,
+                        showingCount = myTeamShowingLikeCount,
+                    ),
+                otherTeamCheering =
+                    LivetalkChatScreenStates.Cheering(
+                        team = teams?.otherTeam,
+                        showingCount = otherTeamShowingLikeCount,
                     ),
                 dialog =
                     LivetalkChatScreenStates.Dialog(
@@ -307,13 +313,17 @@ fun LivetalkChatScreenContent(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
-                val cheeringState = state.cheering
-                val myTeam = cheeringState.myTeam
+                val myTeamCheeringState = state.myTeamCheering
+                val otherTeamCheeringState = state.otherTeamCheering
+                val myTeam = myTeamCheeringState.team
+                val otherTeam = otherTeamCheeringState.team
                 when {
-                    myTeam != null && state.toolbar.teams?.myTeamType != null -> {
+                    myTeam != null && otherTeam != null && state.toolbar.teams?.myTeamType != null -> {
                         LivetalkChatCheeringBar(
-                            team = myTeam,
-                            cheeringCount = cheeringState.showingCount,
+                            myTeam = myTeam,
+                            otherTeam = otherTeam,
+                            myTeamCheeringCount = myTeamCheeringState.showingCount,
+                            otherTeamCheeringCount = otherTeamCheeringState.showingCount,
                             onCheeringClick = {
                                 actions.chatCheering.onCheeringClick(myTeam.mascot)
                             },
@@ -446,10 +456,15 @@ fun LivetalkChatPreviewSuccess() {
                     text = "오늘 경기 직관 중인데 분위기 최고예요!",
                     stadiumName = mockTeams.stadiumName,
                 ),
-            cheering =
+            myTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    myTeam = mockTeams.myTeam,
+                    team = mockTeams.myTeam,
                     showingCount = 1250L,
+                ),
+            otherTeamCheering =
+                LivetalkChatScreenStates.Cheering(
+                    team = mockTeams.otherTeam,
+                    showingCount = 1050L,
                 ),
             isVerified = true,
         )
@@ -510,9 +525,14 @@ fun LivetalkChatPreviewVerifiedEmpty() {
                     text = "",
                     stadiumName = neutralTeams.stadiumName,
                 ),
-            cheering =
+            myTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    myTeam = neutralTeams.myTeam,
+                    team = neutralTeams.myTeam,
+                    showingCount = 0L,
+                ),
+            otherTeamCheering =
+                LivetalkChatScreenStates.Cheering(
+                    team = neutralTeams.otherTeam,
                     showingCount = 0L,
                 ),
             isVerified = true,
@@ -553,9 +573,14 @@ fun LivetalkChatPreviewEmpty() {
                     text = "",
                     stadiumName = neutralTeams.stadiumName,
                 ),
-            cheering =
+            myTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    myTeam = neutralTeams.myTeam,
+                    team = neutralTeams.myTeam,
+                    showingCount = 0L,
+                ),
+            otherTeamCheering =
+                LivetalkChatScreenStates.Cheering(
+                    team = neutralTeams.otherTeam,
                     showingCount = 0L,
                 ),
             isVerified = false,

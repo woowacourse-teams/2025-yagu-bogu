@@ -87,6 +87,9 @@ zoomable = "2.11.1"
 material = "1.12.0"
 calendar = "2.10.0"
 
+# WebView
+composeWebview = "2.0.3"
+
 # Logging
 kermit = "2.0.8"
 
@@ -200,6 +203,9 @@ zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 # UI Components
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 calendar-compose-multiplatform = { module = "com.kizitonwose.calendar:compose-multiplatform", version.ref = "calendar" }
+
+# WebView
+compose-webview = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "composeWebview" }
 
 # Logging
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import com.yagubogu.ui.home.model.LocationPermissionManager
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.PermissionState
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
+import com.yagubogu.ui.login.model.PopupNoticeDialog
 import com.yagubogu.ui.ranking.component.Ranking
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.ranking.model.RankingUiModel
@@ -111,6 +113,9 @@ fun HomeScreen(
                     }
             },
         )
+
+    val homeNoticeInfo by viewModel.homeNoticeInfo.collectAsStateWithLifecycle()
+    val isHomeNoticeConfirm = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchAll()
@@ -188,6 +193,21 @@ fun HomeScreen(
     )
 
     HomeDialog(viewModel)
+
+    homeNoticeInfo?.let { info ->
+        if (info.shouldShowPopup && !isHomeNoticeConfirm.value) {
+            PopupNoticeDialog(
+                onConfirm = { isChecked ->
+                    isHomeNoticeConfirm.value = true
+                    if (isChecked) {
+                        viewModel.ignoreHomeNoticeDialog(info.id, info.skippableDays ?: 0)
+                    }
+                },
+                popupNoticeInfo = info,
+                modifier = Modifier,
+            )
+        }
+    }
 
     if (permissionState == PermissionState.DENIED) {
         PermissionDeniedDialog(

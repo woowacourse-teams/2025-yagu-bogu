@@ -7,6 +7,7 @@ import com.yagubogu.data.dto.response.auth.LoginResultResponse
 import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.ui.home.model.MaintenanceInfo
 import com.yagubogu.ui.login.auth.OAuthCredentialManager
 import com.yagubogu.ui.login.auth.OAuthCredentialResult
 import com.yagubogu.ui.login.model.LoginResult
@@ -29,16 +30,12 @@ class LoginViewModel(
     private val _loginResult = MutableSharedFlow<LoginResult>()
     val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
 
-    private val _isMaintenance = MutableStateFlow(false)
-    val isMaintenance: StateFlow<Boolean> = _isMaintenance.asStateFlow()
-
-    private val _maintenanceMessage = MutableStateFlow("")
-    val maintenanceMessage: StateFlow<String> = _maintenanceMessage.asStateFlow()
+    private val _maintenanceInfo: MutableStateFlow<MaintenanceInfo?> = MutableStateFlow(null)
+    val maintenanceInfo: StateFlow<MaintenanceInfo?> = _maintenanceInfo.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _isMaintenance.value = appConfigRepository.isMaintenanceMode()
-            _maintenanceMessage.value = appConfigRepository.getMaintenanceMessage()
+            _maintenanceInfo.value = appConfigRepository.getMaintenanceInfo()
         }
     }
 
@@ -57,6 +54,15 @@ class LoginViewModel(
     fun signInWithApple(credentialManager: OAuthCredentialManager) {
         viewModelScope.launch {
             _loginResult.emit(signIn(credentialManager, OAuthProvider.APPLE))
+        }
+    }
+
+    fun ignoreMaintenanceDialog(
+        maintenanceId: Int,
+        days: Int,
+    ) {
+        viewModelScope.launch {
+            appConfigRepository.markMaintenanceDialogAsIgnored(maintenanceId, days)
         }
     }
 

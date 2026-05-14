@@ -38,6 +38,9 @@ class LikeCountStateHolder {
     private val _myTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
     val myTeamLikeShowingCount: StateFlow<Long?> = _myTeamLikeShowingCount.asStateFlow()
 
+    private val _otherTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
+    val otherTeamLikeShowingCount: StateFlow<Long?> = _otherTeamLikeShowingCount.asStateFlow()
+
     private val _myTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
     val myTeamLikeChangeAmount: SharedFlow<Long?> = _myTeamLikeChangeAmount.asSharedFlow()
 
@@ -73,6 +76,7 @@ class LikeCountStateHolder {
             }
             if (otherTeamLikeRealCount == 0L) {
                 otherTeamLikeRealCount = remoteOtherTeamLikeCount
+                _otherTeamLikeShowingCount.value = remoteOtherTeamLikeCount
             }
 
             // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행

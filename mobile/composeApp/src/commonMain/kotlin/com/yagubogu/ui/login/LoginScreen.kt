@@ -36,8 +36,8 @@ import com.yagubogu.ui.common.platform.PlatformType
 import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.auth.OAuthCredentialManager
 import com.yagubogu.ui.login.model.LoginResult
-import com.yagubogu.ui.login.model.MaintenanceDialog
 import com.yagubogu.ui.login.model.OAuthProvider
+import com.yagubogu.ui.login.model.PopupNoticeDialog
 import com.yagubogu.ui.theme.Dimming025
 import com.yagubogu.ui.theme.Dimming050
 import com.yagubogu.ui.theme.EsamanruBold
@@ -75,26 +75,33 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val isMaintenance by viewModel.isMaintenance.collectAsStateWithLifecycle()
+    val maintenanceInfo by viewModel.maintenanceInfo.collectAsStateWithLifecycle()
     val isMaintenanceConfirm = remember { mutableStateOf(false) }
-    val maintenanceMessage by viewModel.maintenanceMessage.collectAsStateWithLifecycle()
 
     Box(modifier = modifier) {
         LoginScreen(
             onGoogleLoginClick = { viewModel.signInWithGoogle(googleCredentialManager) },
             onAppleLoginClick = { viewModel.signInWithApple(appleCredentialManager) },
+            isLoginBlock = maintenanceInfo?.isLoginBlock ?: true,
         )
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
 
-        if (isMaintenance && !isMaintenanceConfirm.value) {
-            MaintenanceDialog(
-                onConfirm = { isMaintenanceConfirm.value = true },
-                maintenanceMessage = maintenanceMessage,
-                modifier = Modifier,
-            )
+        maintenanceInfo?.let { info ->
+            if (info.shouldShowPopup && !isMaintenanceConfirm.value) {
+                PopupNoticeDialog(
+                    onConfirm = { isChecked ->
+                        isMaintenanceConfirm.value = true
+                        if (isChecked) {
+                            viewModel.ignoreMaintenanceDialog(info.id, info.skippableDays ?: 0)
+                        }
+                    },
+                    popupNoticeInfo = info,
+                    modifier = Modifier,
+                )
+            }
         }
     }
     LoginResultHandler(
@@ -111,6 +118,7 @@ fun LoginScreen(
 private fun LoginScreen(
     onGoogleLoginClick: () -> Unit,
     onAppleLoginClick: () -> Unit,
+    isLoginBlock: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -157,16 +165,18 @@ private fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                LoginButton(
-                    provider = OAuthProvider.GOOGLE,
-                    onClick = onGoogleLoginClick,
-                )
-
-                if (currentPlatform == PlatformType.IOS) {
+                if (!isLoginBlock) {
                     LoginButton(
-                        provider = OAuthProvider.APPLE,
-                        onClick = onAppleLoginClick,
+                        provider = OAuthProvider.GOOGLE,
+                        onClick = onGoogleLoginClick,
                     )
+
+                    if (currentPlatform == PlatformType.IOS) {
+                        LoginButton(
+                            provider = OAuthProvider.APPLE,
+                            onClick = onAppleLoginClick,
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(180.dp))
@@ -267,5 +277,5 @@ fun LoginResultHandler(
 @Preview
 @Composable
 private fun LoginScreenPreview() {
-    LoginScreen(onGoogleLoginClick = {}, onAppleLoginClick = {})
+    LoginScreen(onGoogleLoginClick = {}, onAppleLoginClick = {}, isLoginBlock = false)
 }

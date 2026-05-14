@@ -1,9 +1,11 @@
 package com.yagubogu.ui.common.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ fun DefaultDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    bottomContent: @Composable (() -> Unit)? = null,
 ) {
     DefaultDialog(
         negativeText = dialogUiModel.negativeText,
@@ -67,14 +70,16 @@ fun DefaultDialog(
         )
 
         dialogUiModel.message?.let { message: String ->
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = message,
                 style = PretendardMedium.copy(fontSize = 14.sp),
-                textAlign = TextAlign.Center,
+                textAlign = dialogUiModel.textAlign.toTextAlign(),
                 color = Gray700,
             )
+            Spacer(modifier = Modifier.height(16.dp))
         }
+        bottomContent?.invoke()
     }
 }
 
@@ -104,11 +109,10 @@ fun DefaultDialog(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 content()
-                Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -154,18 +158,28 @@ fun DefaultDialog(
     }
 }
 
+private fun String?.toTextAlign(): TextAlign =
+    when {
+        this == "Start" -> TextAlign.Start
+        this == "End" -> TextAlign.End
+        this == "Justify" -> TextAlign.Justify
+        else -> TextAlign.Center
+    }
+
 @Preview
 @Composable
 private fun DefaultDialogPreview() {
-    DefaultDialog(
-        dialogUiModel =
-            DefaultDialogUiModel(
-                title = "잠실야구장\n직관 인증할까요?",
-                emoji = "🏟️",
-                message = "직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.",
-                negativeText = "취소",
-            ),
-        onConfirm = {},
-        onCancel = {},
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        DefaultDialog(
+            dialogUiModel =
+                DefaultDialogUiModel(
+                    title = "잠실야구장\n직관 인증할까요?",
+                    emoji = "🏟️",
+                    message = "직관 통계는 매일 자정에 자동 반영돼요.\n응원팀 경기가 아니면 인증 횟수에만 집계돼요.",
+                    negativeText = "취소",
+                ),
+            onConfirm = {},
+            onCancel = {},
+        )
+    }
 }

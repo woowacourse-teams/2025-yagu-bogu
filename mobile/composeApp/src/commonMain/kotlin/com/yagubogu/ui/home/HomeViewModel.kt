@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.location.CoordinateDto
 import com.yagubogu.data.mapper.toDomain
+import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.location.LocationRepository
 import com.yagubogu.data.repository.member.MemberRepository
@@ -23,6 +24,7 @@ import com.yagubogu.ui.common.model.MemberProfile
 import com.yagubogu.ui.home.model.CheckInSseEvent
 import com.yagubogu.ui.home.model.CheckInUiEvent
 import com.yagubogu.ui.home.model.HomeDialogEvent
+import com.yagubogu.ui.home.model.HomeNoticeInfo
 import com.yagubogu.ui.home.model.MemberStatsUiModel
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
@@ -66,6 +68,7 @@ class HomeViewModel(
     private val locationRepository: LocationRepository,
     private val stadiumRepository: StadiumRepository,
     private val streamRepository: StreamRepository,
+    private val appConfigRepository: AppConfigRepository,
     private val clock: Clock,
 ) : ViewModel() {
     private val logger = Logger.withTag("HomeViewModel")
@@ -139,7 +142,11 @@ class HomeViewModel(
 
     val openingHour: Int = getOpeningDateHour()
 
+    private val _homeNoticeInfo: MutableStateFlow<HomeNoticeInfo?> = MutableStateFlow(null)
+    val homeNoticeInfo: StateFlow<HomeNoticeInfo?> = _homeNoticeInfo.asStateFlow()
+
     init {
+        setupHomeNoticeInfo()
         startOpeningCountdown()
     }
 
@@ -235,6 +242,21 @@ class HomeViewModel(
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "API 호출 실패 (fetchMemberProfile)" }
                 }
+        }
+    }
+
+    fun ignoreHomeNoticeDialog(
+        homeDialogId: Int,
+        days: Int,
+    ) {
+        viewModelScope.launch {
+            appConfigRepository.markHomeNoticeDialogAsIgnored(homeDialogId, days)
+        }
+    }
+
+    private fun setupHomeNoticeInfo() {
+        viewModelScope.launch {
+            _homeNoticeInfo.value = appConfigRepository.getHomeNoticeInfo()
         }
     }
 

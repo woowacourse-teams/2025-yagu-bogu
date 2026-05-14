@@ -75,6 +75,7 @@ import yagubogu.composeapp.generated.resources.setting_edit_my_team
 import yagubogu.composeapp.generated.resources.setting_edit_nickname
 import yagubogu.composeapp.generated.resources.setting_edit_profile_image
 import yagubogu.composeapp.generated.resources.setting_edited_nickname_alert
+import yagubogu.composeapp.generated.resources.setting_faq
 import yagubogu.composeapp.generated.resources.setting_geofencing_notification
 import yagubogu.composeapp.generated.resources.setting_geofencing_notification_tooltip
 import yagubogu.composeapp.generated.resources.setting_main_sign_up_date
@@ -93,6 +94,8 @@ fun SettingMainScreen(
     onSettingAccountClick: () -> Unit,
     onFavoriteTeamEditClick: () -> Unit,
     onProfileImagePickerOpen: () -> Unit,
+    onNoticeClick: () -> Unit,
+    onFaqClick: () -> Unit,
     onOssLicenseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -168,6 +171,8 @@ fun SettingMainScreen(
         onFavoriteTeamEditClick = onFavoriteTeamEditClick,
         onNicknameEdit = { showNicknameEditDialog = true },
         onProfileImageUpload = onProfileImagePickerOpen,
+        onNoticeClick = onNoticeClick,
+        onFaqClick = onFaqClick,
         onOssLicenseClick = onOssLicenseClick,
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
@@ -229,6 +234,8 @@ private fun SettingMainScreen(
     onNicknameEdit: () -> Unit,
     onProfileImageUpload: () -> Unit,
     onFavoriteTeamEditClick: () -> Unit,
+    onNoticeClick: () -> Unit,
+    onFaqClick: () -> Unit,
     onOssLicenseClick: () -> Unit,
     memberInfoItem: MemberInfoItem,
     appVersion: String,
@@ -280,7 +287,11 @@ private fun SettingMainScreen(
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(Res.string.setting_notice),
-                onClick = { uriHandler.openUri(NOTICE_URL) },
+                onClick = onNoticeClick,
+            )
+            SettingButton(
+                text = stringResource(Res.string.setting_faq),
+                onClick = onFaqClick,
             )
             SettingButton(
                 text = stringResource(Res.string.setting_contact_us),
@@ -348,8 +359,6 @@ private fun getAppVersion(): String {
     }
 }
 
-private const val NOTICE_URL =
-    "https://scented-allosaurus-6df.notion.site/251ad073c10b805baf8af1a7badd20e7?pvs=74"
 private const val CONTACT_URL = "https://forms.gle/wBhXjfTLyobZa19K8"
 
 @Preview(showBackground = true)
@@ -360,6 +369,8 @@ private fun SettingMainScreenPreview() {
         onNicknameEdit = {},
         onProfileImageUpload = {},
         onFavoriteTeamEditClick = {},
+        onNoticeClick = {},
+        onFaqClick = {},
         onOssLicenseClick = {},
         memberInfoItem = MemberInfoItem(nickName = "야구보구"),
         appVersion = "1.0.0",

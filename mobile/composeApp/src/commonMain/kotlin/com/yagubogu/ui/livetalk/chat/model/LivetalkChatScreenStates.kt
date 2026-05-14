@@ -7,7 +7,8 @@ data class LivetalkChatScreenStates(
     val toolbar: Toolbar = Toolbar(),
     val chatList: ChatList = ChatList(),
     val inputBar: InputBar = InputBar(),
-    val cheering: Cheering = Cheering(),
+    val myTeamCheering: Cheering = Cheering(),
+    val otherTeamCheering: Cheering = Cheering(),
     val dialog: Dialog = Dialog(),
     val mascotLayer: MascotLayer = MascotLayer(),
     val isVerified: Boolean = false,
@@ -27,8 +28,8 @@ data class LivetalkChatScreenStates(
     )
 
     data class Cheering(
-        val myTeam: Team? = null,
-        val showingCount: Long? = 0L,
+        val team: Team? = null,
+        val showingCount: Long? = null,
     )
 
     data class Dialog(
