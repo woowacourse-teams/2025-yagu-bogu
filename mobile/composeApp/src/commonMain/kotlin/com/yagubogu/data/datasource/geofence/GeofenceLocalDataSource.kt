@@ -5,6 +5,8 @@ import com.kmp.geofence.GeofenceEvent
 import com.kmp.geofence.GeofenceEventListener
 import com.kmp.geofence.GeofenceManager
 import com.yagubogu.domain.model.Stadium
+import com.yagubogu.ui.common.platform.PlatformType
+import com.yagubogu.ui.common.platform.currentPlatform
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,23 +19,16 @@ class GeofenceLocalDataSource(
 ) : GeofenceDataSource {
     private val logger = Logger.withTag("GeofenceLocalDataSource")
 
-    private val _geofenceEvents = MutableSharedFlow<GeofenceEvent>(replay = 1, extraBufferCapacity = 64)
-    override val geofenceEvents: Flow<GeofenceEvent> = _geofenceEvents.asSharedFlow()
+    private val _iosGeofenceEvents = MutableSharedFlow<GeofenceEvent>(replay = 1, extraBufferCapacity = 64)
+    override val iosGeofenceEvents: Flow<GeofenceEvent> =
+        _iosGeofenceEvents.asSharedFlow()
 
     init {
-        geofenceManager.setGeofenceEventListener(
-            object : GeofenceEventListener {
-                override fun onGeofenceEnter(event: GeofenceEvent) {
-                    logger.i { "지오펜스 입장 감지: ${event.geofenceId}" }
-                    _geofenceEvents.tryEmit(event)
-                }
-
-                override fun onGeofenceExit(event: GeofenceEvent) {
-                    _geofenceEvents.tryEmit(event)
-                }
-            },
-        )
+        // GeofenceManager 내부 CLLocationManager가 lazy로 선언되어 있어
+        // 앱 재실행 시 didDetermineState 콜백 전에 delegate가 연결되도록
+        // 강제로 lazy 초기화를 트리거하는 우회 코드
         geofenceManager.checkLocationPermissions()
+        initIosGeofenceEventListener()
     }
 
     override suspend fun addAllGeofences(stadiums: List<Stadium>): Result<Unit> =
@@ -68,4 +63,21 @@ class GeofenceLocalDataSource(
                 )
             }
         }
+
+    private fun initIosGeofenceEventListener() {
+        if (currentPlatform == PlatformType.IOS) {
+            geofenceManager.setGeofenceEventListener(
+                object : GeofenceEventListener {
+                    override fun onGeofenceEnter(event: GeofenceEvent) {
+                        logger.i { "지오펜스 입장 감지: ${event.geofenceId}" }
+                        _iosGeofenceEvents.tryEmit(event)
+                    }
+
+                    override fun onGeofenceExit(event: GeofenceEvent) {
+                        _iosGeofenceEvents.tryEmit(event)
+                    }
+                },
+            )
+        }
+    }
 }

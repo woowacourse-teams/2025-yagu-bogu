@@ -4,7 +4,7 @@ import com.kmp.geofence.GeofenceEvent
 import kotlinx.coroutines.flow.Flow
 
 interface GeofenceRepository {
-    val geofenceEvents: Flow<GeofenceEvent>
+    val iosGeofenceEvents: Flow<GeofenceEvent>
 
     fun isGeofenceEnabled(): Flow<Boolean>
 

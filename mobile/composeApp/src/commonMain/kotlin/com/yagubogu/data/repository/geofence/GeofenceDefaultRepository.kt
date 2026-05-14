@@ -11,7 +11,7 @@ class GeofenceDefaultRepository(
     private val preferenceDataSource: PreferenceDataSource,
     private val geofenceDataSource: GeofenceDataSource,
 ) : GeofenceRepository {
-    override val geofenceEvents: Flow<GeofenceEvent> = geofenceDataSource.geofenceEvents
+    override val iosGeofenceEvents: Flow<GeofenceEvent> = geofenceDataSource.iosGeofenceEvents
 
     override fun isGeofenceEnabled(): Flow<Boolean> = preferenceDataSource.getBoolean(KEY_GEOFENCE_ENABLED, false)
 

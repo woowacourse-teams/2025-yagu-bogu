@@ -5,7 +5,7 @@ import com.yagubogu.domain.model.Stadium
 import kotlinx.coroutines.flow.Flow
 
 interface GeofenceDataSource {
-    val geofenceEvents: Flow<GeofenceEvent>
+    val iosGeofenceEvents: Flow<GeofenceEvent>
 
     suspend fun addAllGeofences(stadiums: List<Stadium>): Result<Unit>
 
