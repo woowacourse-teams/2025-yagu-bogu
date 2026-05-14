@@ -10,12 +10,16 @@ import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.domain.util.now
+import com.yagubogu.ui.common.model.PresignedUrlItem
+import com.yagubogu.ui.mapper.text.toUiText
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
-import com.yagubogu.ui.setting.model.PresignedUrlItem
 import com.yagubogu.ui.setting.model.SettingEvent
+import com.yagubogu.ui.util.CompressedImage
+import com.yagubogu.ui.util.ImageCompressionSpec
 import com.yagubogu.ui.util.UiText
+import com.yagubogu.ui.util.compressImage
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +29,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.image_processing_failed
+import yagubogu.composeapp.generated.resources.image_upload_failed
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_duplicate
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_invalid_format
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_member_not_found
@@ -33,8 +39,7 @@ import yagubogu.composeapp.generated.resources.setting_edit_nickname_no_permissi
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_server_error
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_too_long
 import yagubogu.composeapp.generated.resources.setting_edit_nickname_unknown_error
-import yagubogu.composeapp.generated.resources.setting_edit_profile_image_processing_failed
-import yagubogu.composeapp.generated.resources.setting_edit_profile_image_upload_failed
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
 class SettingViewModel(
@@ -114,20 +119,18 @@ class SettingViewModel(
     fun handleProfileImage(uri: String) {
         viewModelScope.launch {
             runCatching {
-                handleImagePickerKMPCroppedImage(
-                    sourceImageUri = uri,
-                    onUploadFailure = {
-                        emitProfileError(UiText.StringRes(Res.string.setting_edit_profile_image_upload_failed))
-                    },
-                    onProcessingFailure = {
-                        emitProfileError(UiText.StringRes(Res.string.setting_edit_profile_image_processing_failed))
-                    },
-                    onProfileImageUpload = ::uploadProfileImage,
-                )
-            }.onFailure { exception ->
-                logger.e(exception) { "이미지 처리 과정 중 예외 발생" }
-                emitProfileError(UiText.StringRes(Res.string.setting_edit_profile_image_processing_failed))
-            }
+                compressImage(sourceUri = uri, spec = ImageCompressionSpec.Profile)
+            }.fold(
+                onSuccess = { image: CompressedImage ->
+                    uploadProfileImage(image.uri, image.mimeType, image.fileSize)
+                        .onFailure { emitProfileError(UiText.StringRes(Res.string.image_upload_failed)) }
+                },
+                onFailure = { exception ->
+                    if (exception is CancellationException) throw exception
+                    logger.e(exception) { "이미지 처리 과정 중 예외 발생" }
+                    emitProfileError(UiText.StringRes(Res.string.image_processing_failed))
+                },
+            )
         }
     }
 
@@ -165,6 +168,7 @@ class SettingViewModel(
             _myMemberInfoItem.value =
                 myMemberInfoItem.value.copy(profileImageUrl = completeItem.imageUrl)
         }.onFailure { exception: Throwable ->
+            if (exception is CancellationException) throw exception
             logger.e(exception) { "프로필 이미지 업로드 실패" }
         }
 

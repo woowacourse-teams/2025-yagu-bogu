@@ -5,40 +5,39 @@ import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.util.minusDays
 import com.yagubogu.domain.util.now
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
-import com.yagubogu.ui.attendance.model.GameScoreBoard
-import com.yagubogu.ui.attendance.model.GameTeam
+import com.yagubogu.ui.attendance.model.GameState
 import com.yagubogu.ui.attendance.model.PastGameUiModel
+import com.yagubogu.ui.attendance.model.TeamType
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
 val ATTENDANCE_HISTORY_ITEM_PLAYED =
-    AttendanceHistoryItem.Played(
-        summary =
-            AttendanceHistoryItem.Summary(
-                id = 0L,
-                attendanceDate = LocalDate.now().minusDays(1),
-                stadiumName = "잠실 야구장",
-                awayTeam =
-                    GameTeam(
-                        team = Team.HT,
-                        name = "KIA",
-                        score = "10",
-                        isMyTeam = true,
-                        gameResult = GameResult.WIN,
-                    ),
-                homeTeam =
-                    GameTeam(
-                        team = Team.OB,
-                        name = "두산",
-                        score = "4",
-                        isMyTeam = false,
-                        gameResult = GameResult.LOSE,
-                    ),
+    AttendanceHistoryItem(
+        id = 0L,
+        gameState = GameState.COMPLETED,
+        dateTime = LocalDateTime(LocalDate.now(), LocalTime.now()),
+        stadiumName = "잠실 야구장",
+        awayTeam =
+            AttendanceHistoryItem.GameTeam(
+                team = Team.HT,
+                name = "KIA",
+                score = "10",
+                isMyTeam = true,
+                gameResult = GameResult.WIN,
+                type = TeamType.AWAY,
             ),
-        awayTeamPitcher = "이의리",
-        homeTeamPitcher = "김택연",
+        homeTeam =
+            AttendanceHistoryItem.GameTeam(
+                team = Team.OB,
+                name = "두산",
+                score = "4",
+                isMyTeam = false,
+                gameResult = GameResult.LOSE,
+                type = TeamType.HOME,
+            ),
         awayTeamScoreBoard =
-            GameScoreBoard(
+            AttendanceHistoryItem.GameScoreBoard(
                 runs = 10,
                 hits = 13,
                 errors = 0,
@@ -46,7 +45,7 @@ val ATTENDANCE_HISTORY_ITEM_PLAYED =
                 scores = listOf("0", "0", "1", "0", "1", "4", "1", "1", "2", "-", "-"),
             ),
         homeTeamScoreBoard =
-            GameScoreBoard(
+            AttendanceHistoryItem.GameScoreBoard(
                 runs = 4,
                 hits = 9,
                 errors = 2,
@@ -56,28 +55,44 @@ val ATTENDANCE_HISTORY_ITEM_PLAYED =
     )
 
 val ATTENDANCE_HISTORY_ITEM_CANCELED =
-    AttendanceHistoryItem.Canceled(
-        summary =
-            AttendanceHistoryItem.Summary(
-                id = 1L,
-                attendanceDate = LocalDate.now().minusDays(2),
-                stadiumName = "잠실 야구장",
-                awayTeam =
-                    GameTeam(
-                        team = Team.HT,
-                        name = "KIA",
-                        score = "-",
-                        isMyTeam = true,
-                        gameResult = GameResult.DRAW,
-                    ),
-                homeTeam =
-                    GameTeam(
-                        team = Team.OB,
-                        name = "두산",
-                        score = "-",
-                        isMyTeam = false,
-                        gameResult = GameResult.DRAW,
-                    ),
+    AttendanceHistoryItem(
+        id = 1L,
+        gameState = GameState.CANCELED,
+        dateTime = LocalDateTime(LocalDate.now().minusDays(2), LocalTime.now()),
+        stadiumName = "잠실 야구장",
+        awayTeam =
+            AttendanceHistoryItem.GameTeam(
+                team = Team.HT,
+                name = "KIA",
+                score = "-",
+                isMyTeam = true,
+                gameResult = GameResult.DRAW,
+                type = TeamType.AWAY,
+            ),
+        homeTeam =
+            AttendanceHistoryItem.GameTeam(
+                team = Team.OB,
+                name = "두산",
+                score = "-",
+                isMyTeam = false,
+                gameResult = GameResult.DRAW,
+                type = TeamType.HOME,
+            ),
+        awayTeamScoreBoard =
+            AttendanceHistoryItem.GameScoreBoard(
+                runs = 0,
+                hits = 0,
+                errors = 0,
+                basesOnBalls = 0,
+                scores = listOf("-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"),
+            ),
+        homeTeamScoreBoard =
+            AttendanceHistoryItem.GameScoreBoard(
+                runs = 0,
+                hits = 0,
+                errors = 0,
+                basesOnBalls = 0,
+                scores = listOf("-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"),
             ),
     )
 
@@ -86,18 +101,12 @@ val ATTENDANCE_HISTORY_ITEMS =
         ATTENDANCE_HISTORY_ITEM_PLAYED,
         ATTENDANCE_HISTORY_ITEM_CANCELED,
         ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
-            summary =
-                ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
-                    id = 2L,
-                    attendanceDate = LocalDate.now().minusDays(15),
-                ),
+            id = 2L,
+            dateTime = LocalDateTime(LocalDate.now().minusDays(15), LocalTime.now()),
         ),
         ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
-            summary =
-                ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
-                    id = 3L,
-                    attendanceDate = LocalDate.now().minusDays(5),
-                ),
+            id = 3L,
+            dateTime = LocalDateTime(LocalDate.now().minusDays(5), LocalTime.now()),
         ),
     )
 

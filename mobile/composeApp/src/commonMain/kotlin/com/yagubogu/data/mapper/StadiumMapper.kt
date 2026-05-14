@@ -1,5 +1,7 @@
 package com.yagubogu.data.mapper
 
+import com.yagubogu.data.dto.response.stadium.StadiumWeather
+import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
 import com.yagubogu.data.dto.response.stadium.StadiumWithGameDto
 import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import com.yagubogu.domain.model.Coordinate
@@ -7,6 +9,8 @@ import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
 import com.yagubogu.domain.model.StadiumWithGame
 import com.yagubogu.domain.model.StadiumsWithGames
+import com.yagubogu.ui.livetalk.model.Condition
+import com.yagubogu.ui.livetalk.model.WeatherUiModel
 
 fun StadiumsWithGamesResponse.toDomain(): StadiumsWithGames = StadiumsWithGames(values = stadiums.map { it.toDomain() })
 
@@ -20,3 +24,13 @@ fun StadiumWithGameDto.toDomain(): StadiumWithGame =
             ),
         gameIds = games.map { it.gameId },
     )
+
+fun StadiumWeatherResponse.toUiModel(): Map<Long, WeatherUiModel> =
+    data.associate { stadiumWeather: StadiumWeather ->
+        stadiumWeather.id.toLong() to
+            WeatherUiModel(
+                stadiumId = stadiumWeather.id.toLong(),
+                condition = Condition.from(stadiumWeather.weather.condition),
+                temperatureText = stadiumWeather.weather.temperature,
+            )
+    }

@@ -3,6 +3,7 @@ package com.yagubogu.data.service
 import com.yagubogu.data.dto.request.talk.TalkRequest
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
+import com.yagubogu.data.dto.response.talk.TalkLikeResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
@@ -42,6 +43,11 @@ interface TalkApiService {
     suspend fun reportTalks(
         @Path("talkId") talkId: Long,
     )
+
+    @POST("/api/v1/talks/{talkId}/likes")
+    suspend fun toggleLike(
+        @Path("talkId") talkId: Long,
+    ): TalkLikeResponse
 
     @GET("/api/v1/talks/{gameId}/initial")
     suspend fun getInitial(

@@ -33,6 +33,8 @@ fun TalkResponse.toUiModel(): LivetalkChatItem =
         teamName = favorite,
         timestamp = LocalDateTime.parse(createdAt),
         reported = content.contains("숨김처리되었습니다"), // TODO : 추후 백엔드에서 신고된 메시지 보내주는 방식 변경 필요
+        isLiked = isLiked,
+        likeCount = likeCount,
     )
 
 fun TalkEntranceResponse.toUiModel(): LivetalkTeams =

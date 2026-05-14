@@ -1,5 +1,7 @@
 package com.yagubogu.data.dto.response.checkin
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,9 +16,13 @@ data class CheckInGameDto(
     @SerialName("awayTeam")
     val awayTeam: CheckInGameTeamDto,
     @SerialName("attendanceDate")
-    val attendanceDate: String, // 직관 날짜 (예시 "2025-04-05")
+    val attendanceDate: LocalDate, // 경기 날짜
+    @SerialName("startAt")
+    val startAt: LocalTime, // 경기 시작 시간
     @SerialName("homeScoreBoard")
-    val homeScoreBoard: ScoreBoardDto?,
+    val homeScoreBoard: ScoreBoardDto,
     @SerialName("awayScoreBoard")
-    val awayScoreBoard: ScoreBoardDto?,
+    val awayScoreBoard: ScoreBoardDto,
+    @SerialName("gameState")
+    val gameState: String, // 경기 상태
 )

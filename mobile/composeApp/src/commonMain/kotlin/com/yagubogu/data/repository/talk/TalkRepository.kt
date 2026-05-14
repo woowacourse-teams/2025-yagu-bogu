@@ -2,6 +2,7 @@ package com.yagubogu.data.repository.talk
 
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
+import com.yagubogu.data.dto.response.talk.TalkLikeResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 
 interface TalkRepository {
@@ -30,4 +31,6 @@ interface TalkRepository {
     suspend fun reportTalks(talkId: Long): Result<Unit>
 
     suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse>
+
+    suspend fun toggleLike(talkId: Long): Result<TalkLikeResponse>
 }

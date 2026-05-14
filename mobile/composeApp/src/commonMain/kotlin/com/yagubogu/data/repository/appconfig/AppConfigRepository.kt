@@ -6,4 +6,6 @@ interface AppConfigRepository {
     fun isMaintenanceMode(): Boolean
 
     fun getMaintenanceMessage(): String
+
+    fun isPastCheckInAdEnabled(): Boolean
 }

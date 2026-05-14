@@ -1,5 +1,6 @@
 package com.yagubogu.ui.common.component
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +25,7 @@ fun DefaultToolbar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     title: String = "",
+    actions: @Composable (RowScope.() -> Unit) = {},
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = title, style = PretendardBold20) },
@@ -44,6 +46,7 @@ fun DefaultToolbar(
                 actionIconContentColor = Black,
                 scrolledContainerColor = Gray050,
             ),
+        actions = actions,
         modifier = modifier,
     )
 }

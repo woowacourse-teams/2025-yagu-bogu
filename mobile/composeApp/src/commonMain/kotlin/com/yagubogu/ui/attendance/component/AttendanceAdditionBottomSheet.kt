@@ -66,7 +66,7 @@ fun AttendanceAdditionBottomSheet(
     onPastCheckIn: (Long) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberModalBottomSheetState(),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     ModalBottomSheet(
         sheetState = sheetState,

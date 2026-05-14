@@ -10,6 +10,7 @@ import kotlinx.datetime.LocalDate
 fun GameWithCheckInDto.toLivetalkUiModel(): LivetalkStadiumItem =
     LivetalkStadiumItem(
         gameId = gameId,
+        stadiumId = stadium.id,
         stadiumName = stadium.name,
         userCount = totalCheckIns,
         awayTeam = awayTeam.toDomain(),

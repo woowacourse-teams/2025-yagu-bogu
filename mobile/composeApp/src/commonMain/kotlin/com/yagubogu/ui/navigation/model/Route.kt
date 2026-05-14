@@ -1,6 +1,7 @@
 package com.yagubogu.ui.navigation.model
 
 import androidx.navigation3.runtime.NavKey
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.ranking.model.RankingType
 import kotlinx.serialization.Serializable
 
@@ -37,5 +38,10 @@ sealed interface Route : NavKey {
     data class LivetalkChat(
         val gameId: Long,
         val isVerified: Boolean,
+    ) : Route
+
+    @Serializable
+    data class AttendanceHistoryDetail(
+        val attendanceItem: AttendanceHistoryItem,
     ) : Route
 }

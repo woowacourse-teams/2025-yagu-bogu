@@ -21,4 +21,8 @@ data class TalkResponse(
     val createdAt: String, // 메시지 작성 시간 (ISO 8601 형식) 예: "2025-07-30T12:00:00"
     @SerialName("isMine")
     val isMine: Boolean, // 내가 작성한 메시지인지 여부
+    @SerialName("isLiked")
+    val isLiked: Boolean = false, // 내가 좋아요한 여부
+    @SerialName("likeCount")
+    val likeCount: Int = 0, // 좋아요 개수
 )

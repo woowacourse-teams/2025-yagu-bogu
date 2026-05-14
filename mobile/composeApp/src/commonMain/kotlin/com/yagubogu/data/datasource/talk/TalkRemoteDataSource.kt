@@ -3,6 +3,7 @@ package com.yagubogu.data.datasource.talk
 import com.yagubogu.data.dto.request.talk.TalkRequest
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
+import com.yagubogu.data.dto.response.talk.TalkLikeResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.util.safeApiCall
@@ -55,5 +56,10 @@ class TalkRemoteDataSource(
     override suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse> =
         safeApiCall {
             talkApiService.getInitial(gameId)
+        }
+
+    override suspend fun toggleLike(talkId: Long): Result<TalkLikeResponse> =
+        safeApiCall {
+            talkApiService.toggleLike(talkId)
         }
 }

@@ -157,6 +157,7 @@ fun LivetalkChatScreen(
                     LivetalkChatScreenActions.ChatBubbleItems(
                         onRequestDelete = messageStateHolder::requestDelete,
                         onRequestReport = messageStateHolder::requestReport,
+                        onRequestLike = viewModel::toggleLike,
                         onFetchMemberProfile = viewModel::fetchMemberProfile,
                         onFetchBeforeTalks = viewModel::fetchBeforeTalks,
                     ),
@@ -284,6 +285,7 @@ fun LivetalkChatScreenContent(
                                 modifier = Modifier.fillMaxSize(),
                                 onDeleteClick = actions.chatBubbleItems.onRequestDelete,
                                 onReportClick = actions.chatBubbleItems.onRequestReport,
+                                onLikeClick = actions.chatBubbleItems.onRequestLike,
                                 onProfileClick = { actions.chatBubbleItems.onFetchMemberProfile(it.memberId) },
                                 fetchBeforeTalks = { actions.chatBubbleItems.onFetchBeforeTalks() },
                             )

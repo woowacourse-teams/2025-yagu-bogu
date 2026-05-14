@@ -6,6 +6,7 @@ import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 val LIVETALK_STADIUM_ITEM_VERIFIED =
     LivetalkStadiumItem(
         gameId = 0L,
+        stadiumId = 9L,
         stadiumName = "대전 한화생명 볼파크",
         userCount = 100,
         awayTeam = Team.SS,
@@ -16,6 +17,7 @@ val LIVETALK_STADIUM_ITEM_VERIFIED =
 val LIVETALK_STADIUM_ITEM_UNVERIFIED =
     LivetalkStadiumItem(
         gameId = 1L,
+        stadiumId = 8L,
         stadiumName = "창원 NC 파크",
         userCount = 10,
         awayTeam = Team.HT,

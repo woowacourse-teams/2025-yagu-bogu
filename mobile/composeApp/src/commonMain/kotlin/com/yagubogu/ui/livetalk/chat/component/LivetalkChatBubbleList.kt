@@ -38,6 +38,7 @@ import kotlinx.datetime.LocalDateTime
  * @param fetchBeforeTalks 이전 메시지를 불러오는 콜백 (무한 스크롤)
  * @param onDeleteClick 내 메시지 삭제 클릭 시 호출되는 콜백
  * @param onReportClick 다른 사용자 메시지 신고 클릭 시 호출되는 콜백
+ * @param onLikeClick 다른 사용자 메시지 좋아요 클릭 시 호출되는 콜백
  * @param onProfileClick 다른 사용자 프로필 클릭 시 호출되는 콜백
  * @param listState LazyColumn의 스크롤 상태를 제어하는 LazyListState
  */
@@ -48,6 +49,7 @@ fun LivetalkChatBubbleList(
     fetchBeforeTalks: () -> Unit = {},
     onDeleteClick: (LivetalkChatItem) -> Unit = {},
     onReportClick: (LivetalkChatItem) -> Unit = {},
+    onLikeClick: (LivetalkChatItem) -> Unit = {},
     onProfileClick: (LivetalkChatItem) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
 ) {
@@ -106,6 +108,7 @@ fun LivetalkChatBubbleList(
                     LivetalkOtherChatBubble(
                         livetalkChatItem = item.livetalkChatItem,
                         onReportClick = { onReportClick(item.livetalkChatItem) },
+                        onLikeClick = { onLikeClick(item.livetalkChatItem) },
                         onProfileClick = { onProfileClick(item.livetalkChatItem) },
                     )
                 }

@@ -73,11 +73,12 @@ fun AttendanceCalendarContent(
     pastGameUiState: PastGameUiState,
     onPastGamesRequest: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
+    onItemClick: (item: AttendanceHistoryItem) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
     val itemsByDate: Map<LocalDate, List<AttendanceHistoryItem>> =
-        items.groupBy { item: AttendanceHistoryItem -> item.summary.attendanceDate }
+        items.groupBy { item: AttendanceHistoryItem -> item.dateTime.date }
     val currentItems: List<AttendanceHistoryItem>? = itemsByDate[selectedDate]
     val scrollState: ScrollState = rememberScrollState()
     var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
@@ -126,24 +127,29 @@ fun AttendanceCalendarContent(
                 // 직관 내역이 있는 경우
                 currentItems != null -> {
                     currentItems.forEach { item: AttendanceHistoryItem ->
-                        AttendanceItem(item = item, isExpanded = true)
+                        AttendanceItem(item = item, onItemClick = onItemClick)
                     }
                 }
+
+                // 오늘인 경우
+                isToday ->
+                    BannerAd(
+                        adUnitId = AdUnitIds.attendanceCalendarBanner,
+                        bannerAdType = BannerAdType.BANNER,
+                    )
 
                 // 경기가 없는 날인 경우
                 selectedDate !in gameDates -> NoGameDayView()
 
                 // 직관 내역이 없는 경우
                 else -> {
-                    if (!isToday) {
-                        AttendanceAdditionButton(
-                            onClick = {
-                                onPastGamesRequest(selectedDate)
-                                showBottomSheet = true
-                            },
-                            modifier = Modifier.padding(top = 10.dp),
-                        )
-                    }
+                    AttendanceAdditionButton(
+                        onClick = {
+                            onPastGamesRequest(selectedDate)
+                            showBottomSheet = true
+                        },
+                        modifier = Modifier.padding(vertical = 10.dp),
+                    )
 
                     BannerAd(
                         adUnitId = AdUnitIds.attendanceCalendarBanner,
@@ -243,6 +249,7 @@ private fun AttendanceCalendarContentPreview() {
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
+        onItemClick = {},
     )
 }
 
@@ -250,16 +257,7 @@ private fun AttendanceCalendarContentPreview() {
 @Composable
 private fun AttendanceCalendarContentHasAttendancePreview() {
     AttendanceCalendarContent(
-        items =
-            listOf(
-                ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
-                    summary =
-                        ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
-                            id = 2L,
-                            attendanceDate = LocalDate.now(),
-                        ),
-                ),
-            ),
+        items = listOf(ATTENDANCE_HISTORY_ITEM_PLAYED),
         gameDates = GAME_DATES,
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
@@ -270,6 +268,7 @@ private fun AttendanceCalendarContentHasAttendancePreview() {
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
+        onItemClick = {},
     )
 }
 
@@ -277,16 +276,7 @@ private fun AttendanceCalendarContentHasAttendancePreview() {
 @Composable
 private fun AttendanceCalendarContentNoGamePreview() {
     AttendanceCalendarContent(
-        items =
-            listOf(
-                ATTENDANCE_HISTORY_ITEM_PLAYED.copy(
-                    summary =
-                        ATTENDANCE_HISTORY_ITEM_PLAYED.summary.copy(
-                            id = 2L,
-                            attendanceDate = LocalDate.now(),
-                        ),
-                ),
-            ),
+        items = listOf(),
         gameDates = emptySet(),
         startMonth = YearMonth.now().minusMonths(1),
         endMonth = YearMonth.now(),
@@ -297,5 +287,6 @@ private fun AttendanceCalendarContentNoGamePreview() {
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
+        onItemClick = {},
     )
 }

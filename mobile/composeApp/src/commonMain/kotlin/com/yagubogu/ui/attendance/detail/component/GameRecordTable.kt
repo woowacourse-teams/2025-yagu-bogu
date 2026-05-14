@@ -1,4 +1,4 @@
-package com.yagubogu.ui.attendance.component
+package com.yagubogu.ui.attendance.detail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

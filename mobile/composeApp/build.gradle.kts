@@ -242,6 +242,7 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
             implementation(libs.imagepickerkmp)
+            implementation(libs.zoomable)
 
             // UI Components
             implementation(libs.calendar.compose.multiplatform)
@@ -370,6 +371,12 @@ aboutLibraries {
 
 ktorfit {
     compilerPluginVersion.set("2.3.3")
+}
+
+composeCompiler {
+    stabilityConfigurationFiles.add(
+        rootProject.layout.projectDirectory.file("stability_config.conf"),
+    )
 }
 
 // ktlint와 ksp 태스크 간의 순서를 명시적으로 지정하여 Gradle의 암시적 종속성 경고를 해결합니다.

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto
+import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.domain.util.now
@@ -31,6 +32,7 @@ import kotlinx.datetime.number
 class AttendanceHistoryViewModel(
     private val checkInRepository: CheckInRepository,
     private val gameRepository: GameRepository,
+    appConfigRepository: AppConfigRepository,
 ) : ViewModel() {
     private val logger = Logger.withTag("AttendanceHistoryViewModel")
 
@@ -72,7 +74,12 @@ class AttendanceHistoryViewModel(
         )
     val showInterstitialAdEvent: SharedFlow<Unit> = _showInterstitialAdEvent.asSharedFlow()
 
+    private var isPastCheckInAdEnabled = true
     private var pastCheckInCount = 0
+
+    init {
+        isPastCheckInAdEnabled = appConfigRepository.isPastCheckInAdEnabled()
+    }
 
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth,
@@ -142,7 +149,7 @@ class AttendanceHistoryViewModel(
 
     private suspend fun emitPastCheckInEvent() {
         pastCheckInCount++
-        if (pastCheckInCount % 3 == 1) {
+        if (isPastCheckInAdEnabled && pastCheckInCount % 3 == 1) {
             _showInterstitialAdEvent.emit(Unit)
         } else {
             _pastCheckInUiEvent.emit(Unit)

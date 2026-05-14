@@ -33,18 +33,18 @@ sealed interface BottomNavKey : NavKey {
     }
 
     @Serializable
-    data object Stats : BottomNavKey {
-        override val icon: DrawableResource = Res.drawable.ic_stats
-        override val label: StringResource = Res.string.bottom_navigation_stats
-    }
-
-    @Serializable
     data object AttendanceHistory : BottomNavKey {
         override val icon: DrawableResource = Res.drawable.ic_attendance_history
         override val label: StringResource = Res.string.bottom_navigation_attendance_history
     }
 
+    @Serializable
+    data object Stats : BottomNavKey {
+        override val icon: DrawableResource = Res.drawable.ic_stats
+        override val label: StringResource = Res.string.bottom_navigation_stats
+    }
+
     companion object {
-        val items: List<BottomNavKey> = listOf(Home, Livetalk, Stats, AttendanceHistory)
+        val items: List<BottomNavKey> = listOf(Home, Livetalk, AttendanceHistory, Stats)
     }
 }

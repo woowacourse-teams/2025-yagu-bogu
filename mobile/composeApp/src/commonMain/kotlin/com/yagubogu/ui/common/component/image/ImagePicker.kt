@@ -1,50 +1,51 @@
-package com.yagubogu.ui.setting
+package com.yagubogu.ui.common.component.image
 
 import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Logger
-import com.yagubogu.ui.util.UiText
 import io.github.ismoy.imagepickerkmp.domain.config.CameraCaptureConfig
 import io.github.ismoy.imagepickerkmp.domain.config.CropConfig
 import io.github.ismoy.imagepickerkmp.domain.models.CompressionLevel
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import io.github.ismoy.imagepickerkmp.domain.models.MimeType.Companion.ALL_SUPPORTED_TYPES
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+import org.jetbrains.compose.resources.StringResource
 import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.setting_edit_profile_image_selection_failed
+import yagubogu.composeapp.generated.resources.image_selection_failed
 
 @Composable
-fun ProfileImagePicker(
-    onPhotosSelected: (String) -> Unit,
-    onError: (UiText) -> Unit,
+fun ImagePicker(
+    onPhotosSelected: (List<String>) -> Unit,
+    onError: (message: StringResource) -> Unit,
     onClosePicker: () -> Unit,
+    allowMultiple: Boolean = false,
+    selectionLimit: Long = 1,
+    enableCrop: Boolean = true,
 ) {
-    val logger: Logger = Logger.withTag("ProfileImagePicker")
-    logger.d { "ProfileImagePicker 열림" }
+    val logger: Logger = Logger.withTag("ImagePicker")
+    logger.d { "ImagePicker 열림" }
     GalleryPickerLauncher(
-        allowMultiple = false,
+        allowMultiple = allowMultiple,
+        selectionLimit = selectionLimit,
         mimeTypes = ALL_SUPPORTED_TYPES,
         onPhotosSelected = { photos: List<GalleryPhotoResult> ->
             logger.d { "onPhotosSelected, 사진 개수: ${photos.size}" }
-            onClosePicker()
-
-            val photo: GalleryPhotoResult? = photos.firstOrNull()
-            if (photo == null) {
+            if (photos.isEmpty()) {
                 logger.w { "선택된 사진이 없습니다" }
-                return@GalleryPickerLauncher
+            } else {
+                onPhotosSelected(photos.map { it.uri })
             }
-            onPhotosSelected(photo.uri)
             onClosePicker()
         },
         onError = { exception: Exception ->
             logger.e(exception) { "GalleryPicker 에러 발생" }
-            onError(UiText.StringRes(Res.string.setting_edit_profile_image_selection_failed))
+            onError(Res.string.image_selection_failed)
             onClosePicker()
         },
         onDismiss = {
             logger.d { "GalleryPicker 닫힘" }
             onClosePicker()
         },
-        enableCrop = true,
+        enableCrop = enableCrop,
         cameraCaptureConfig =
             CameraCaptureConfig(
                 compressionLevel = CompressionLevel.HIGH,

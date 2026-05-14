@@ -54,6 +54,8 @@ class LivetalkChatViewModel(
     private var pollingJob: Job? = null
 
     private var likeBatchingJob: Job? = null
+    private val likeDebounceJobs = mutableMapOf<Long, Job>()
+    private val remoteLikes = mutableMapOf<Long, LivetalkChatItem>()
 
     private val _selectedProfile = MutableStateFlow<MemberProfile?>(null)
     val selectedProfile: StateFlow<MemberProfile?> = _selectedProfile.asStateFlow()
@@ -197,6 +199,68 @@ class LivetalkChatViewModel(
         }
     }
 
+    fun toggleLike(chat: LivetalkChatItem) {
+        updateOptimisticLike(chat)
+        scheduleLikeSync(chat)
+    }
+
+    private fun updateOptimisticLike(chat: LivetalkChatItem) {
+        val optimisticLiked = !chat.isLiked
+        val optimisticCount =
+            if (chat.isLiked) (chat.likeCount - 1).coerceAtLeast(0) else chat.likeCount + 1
+        viewModelScope.launch {
+            messageStateHolder.updateLikeStatus(chat.chatId, optimisticLiked, optimisticCount)
+        }
+    }
+
+    private fun scheduleLikeSync(chat: LivetalkChatItem) {
+        val chatId = chat.chatId
+        if (likeDebounceJobs[chatId]?.isActive != true) {
+            remoteLikes[chatId] = chat
+        }
+        likeDebounceJobs[chatId]?.cancel()
+        likeDebounceJobs[chatId] =
+            viewModelScope.launch {
+                delay(LIKE_DEBOUNCE_MS)
+                sendLikeStatus(chatId)
+            }
+    }
+
+    private suspend fun sendLikeStatus(chatId: Long) {
+        // 디바운스 시작 시점의 서버에서 받은 채팅 상태와 현재 UI 상태가 다를 때만 API 호출
+        val remoteLike = remoteLikes.remove(chatId) ?: return
+        likeDebounceJobs.remove(chatId)
+
+        val currentUiLiked =
+            messageStateHolder.livetalkChatBubbleItems.value
+                .find { it.livetalkChatItem.chatId == chatId }
+                ?.livetalkChatItem
+                ?.isLiked ?: return
+
+        if (remoteLike.isLiked == currentUiLiked) return
+
+        talkRepository
+            .toggleLike(talkId = chatId)
+            .onSuccess { response ->
+                // API 호출 중 새 클릭 발생시 새 debounce에 위임
+                if (remoteLikes.containsKey(chatId)) return@onSuccess
+                messageStateHolder.updateLikeStatus(
+                    chatId = chatId,
+                    liked = response.liked,
+                    likeCount = response.likeCount,
+                )
+            }.onFailure { exception ->
+                // 실패 시 서버 상태로 롤백, 새 클릭이 발생한 경우 롤백하지 않음
+                if (remoteLikes.containsKey(chatId)) return@onFailure
+                messageStateHolder.updateLikeStatus(
+                    chatId,
+                    remoteLike.isLiked,
+                    remoteLike.likeCount,
+                )
+                logger.w(exception) { "현장톡 좋아요 API 호출 실패" }
+            }
+    }
+
     fun addLikeToBatch() {
         viewModelScope.launch {
             likeCountStateHolder.increaseMyTeamShowingCount()
@@ -325,5 +389,6 @@ class LivetalkChatViewModel(
         private const val CHAT_LOAD_LIMIT = 30
 
         private const val LIKE_BATCH_INTERVAL_MILLS = 5_000L
+        private const val LIKE_DEBOUNCE_MS = 1_000L
     }
 }

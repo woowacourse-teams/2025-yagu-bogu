@@ -213,7 +213,7 @@ private fun AttendanceCalendarPreview() {
         onMonthChange = {},
         selectedDate = LocalDate.now().minusDays(1),
         onDateChange = {},
-        attendanceDates = ATTENDANCE_HISTORY_ITEMS.map { it.summary.attendanceDate }.toSet(),
+        attendanceDates = ATTENDANCE_HISTORY_ITEMS.map { it.dateTime.date }.toSet(),
         gameDates = GAME_DATES,
     )
 }

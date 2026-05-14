@@ -2,59 +2,63 @@ package com.yagubogu.ui.attendance.model
 
 import androidx.compose.ui.graphics.Color
 import com.yagubogu.domain.model.GameResult
+import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.util.color
-import kotlinx.datetime.LocalDate
-import org.jetbrains.compose.resources.StringResource
-import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.attendance_history_draw_pitcher
-import yagubogu.composeapp.generated.resources.attendance_history_losing_pitcher
-import yagubogu.composeapp.generated.resources.attendance_history_winning_pitcher
+import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.Serializable
 
-sealed interface AttendanceHistoryItem {
-    val summary: Summary
+@Serializable
+data class AttendanceHistoryItem(
+    val id: Long,
+    val gameState: GameState,
+    val dateTime: LocalDateTime,
+    val stadiumName: String,
+    val awayTeam: GameTeam,
+    val homeTeam: GameTeam,
+    val awayTeamScoreBoard: GameScoreBoard,
+    val homeTeamScoreBoard: GameScoreBoard,
+) {
+    val awayTeamColor: Color
+        get() = determineTeamColor(awayTeam)
+    val homeTeamColor: Color
+        get() = determineTeamColor(homeTeam)
 
-    data class Summary(
-        val id: Long,
-        val attendanceDate: LocalDate,
-        val stadiumName: String,
-        val awayTeam: GameTeam,
-        val homeTeam: GameTeam,
+    private fun determineTeamColor(team: GameTeam): Color =
+        if (team.isMyTeam && team.gameResult == GameResult.WIN) {
+            team.team.color
+        } else {
+            Gray400
+        }
+
+    @Serializable
+    data class GameTeam(
+        val team: Team,
+        val name: String,
+        val score: String,
+        val isMyTeam: Boolean,
+        val gameResult: GameResult,
+        val type: TeamType,
+    )
+
+    @Serializable
+    data class GameScoreBoard(
+        val runs: Int,
+        val hits: Int,
+        val errors: Int,
+        val basesOnBalls: Int,
+        private val scores: List<String>,
     ) {
-        val awayTeamColor: Color = determineTeamColor(awayTeam)
-        val homeTeamColor: Color = determineTeamColor(homeTeam)
-
-        private fun determineTeamColor(team: GameTeam): Color =
-            if (team.isMyTeam && team.gameResult == GameResult.WIN) {
-                team.team.color
+        val inningScores: List<String> =
+            if (scores.size >= NUMBER_OF_INNINGS) {
+                scores.take(NUMBER_OF_INNINGS)
             } else {
-                Gray400
+                scores + List(NUMBER_OF_INNINGS - scores.size) { EMPTY_SCORE }
             }
+
+        companion object {
+            private const val NUMBER_OF_INNINGS = 11
+            private const val EMPTY_SCORE = "-"
+        }
     }
-
-    data class Played(
-        override val summary: Summary,
-        val awayTeamPitcher: String,
-        val homeTeamPitcher: String,
-        val awayTeamScoreBoard: GameScoreBoard,
-        val homeTeamScoreBoard: GameScoreBoard,
-    ) : AttendanceHistoryItem {
-        val awayTeam: GameTeam get() = summary.awayTeam
-        val homeTeam: GameTeam get() = summary.homeTeam
-
-        val awayTeamPitcherStringRes: StringResource = determineTeamPitcher(awayTeam)
-
-        val homeTeamPitcherStringRes: StringResource = determineTeamPitcher(homeTeam)
-
-        private fun determineTeamPitcher(team: GameTeam): StringResource =
-            when (team.gameResult) {
-                GameResult.WIN -> Res.string.attendance_history_winning_pitcher
-                GameResult.DRAW -> Res.string.attendance_history_draw_pitcher
-                GameResult.LOSE -> Res.string.attendance_history_losing_pitcher
-            }
-    }
-
-    data class Canceled(
-        override val summary: Summary,
-    ) : AttendanceHistoryItem
 }

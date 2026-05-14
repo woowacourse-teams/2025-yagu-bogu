@@ -23,6 +23,7 @@ data class LivetalkChatScreenActions(
     data class ChatBubbleItems(
         val onRequestDelete: (LivetalkChatItem) -> Unit = {},
         val onRequestReport: (LivetalkChatItem) -> Unit = {},
+        val onRequestLike: (LivetalkChatItem) -> Unit = {},
         val onFetchMemberProfile: (Long) -> Unit = {},
         val onFetchBeforeTalks: () -> Unit = {},
     )

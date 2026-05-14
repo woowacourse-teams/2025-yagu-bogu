@@ -22,6 +22,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.attendance.AttendanceHistoryScreen
+import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.home.HomeScreen
 import com.yagubogu.ui.livetalk.LivetalkScreen
 import com.yagubogu.ui.main.component.LoadingOverlay
@@ -50,6 +51,7 @@ fun MainScreen(
     onBadgeClick: () -> Unit,
     onRankingShowMoreClick: (RankingType) -> Unit,
     onLivetalkItemClick: (Long, Boolean) -> Unit,
+    onAttendanceHistoryItemClick: (item: AttendanceHistoryItem) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
@@ -126,6 +128,7 @@ fun MainScreen(
                         LivetalkScreen(
                             scrollToTopEvent = scrollToTopEvent,
                             onLivetalkItemClick = onLivetalkItemClick,
+                            modifier = modifier,
                         )
                     }
                     entry<BottomNavKey.Stats> {
@@ -136,6 +139,7 @@ fun MainScreen(
                     entry<BottomNavKey.AttendanceHistory> {
                         AttendanceHistoryScreen(
                             scrollToTopEvent = scrollToTopEvent,
+                            onAttendanceHistoryItemClick = onAttendanceHistoryItemClick,
                         )
                     }
                 }

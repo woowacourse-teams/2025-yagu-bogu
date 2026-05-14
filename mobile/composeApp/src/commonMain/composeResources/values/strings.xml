@@ -12,6 +12,7 @@
     <string name="all_count">%1$d회</string>
     <string name="all_null_nick_name">(알 수 없음)</string>
     <string name="all_back_button_content_description">뒤로가기</string>
+    <string name="all_close">닫기</string>
     <string name="all_ranking">%1$d등</string>
     <string name="all_score">%1$d점</string>
     <string name="all_score_first_float">%1$s점</string>
@@ -124,7 +125,7 @@
     <string name="attendance_history_add_attendance">직관 내역 추가하기</string>
     <string name="attendance_history_add_attendance_description">직관 내역에 추가할 경기를 선택해 주세요</string>
     <string name="attendance_history_add_attendance_confirm">%1$s\n직관 내역에 추가할까요?</string>
-    <string name="attendance_history_add_attendance_message">추가된 직관 내역은 삭제할 수 없어요.</string>
+    <string name="attendance_history_add_attendance_message">추가된 직관 내역은 통계에 반영돼요.</string>
     <string name="attendance_history_check_in_success_message">직관 내역이 추가되었습니다!</string>
     <string name="attendance_history_no_game_description">경기가 없는 날이에요</string>
     <string name="attendance_history_empty_description">직관 내역이 없어요</string>
@@ -133,14 +134,50 @@
     <string name="attendance_history_yearly">%1$d년 전체</string>
     <string name="attendance_history_latest">최신순</string>
     <string name="attendance_history_oldest">오래된순</string>
-    <string name="attendance_history_winning_pitcher">승 - %1$s</string>
-    <string name="attendance_history_draw_pitcher">무 - %1$s</string>
-    <string name="attendance_history_losing_pitcher">패 - %1$s</string>
     <string name="attendance_history_team_name">팀명</string>
     <string name="attendance_history_team_record">팀 기록</string>
     <string name="attendance_history_hits">안타</string>
     <string name="attendance_history_errors">실책</string>
     <string name="attendance_history_balls">사사구</string>
+
+    <string name="attendance_detail_tab_game_record">경기 기록</string>
+    <string name="attendance_detail_tab_diary">직관 기록</string>
+    <string name="attendance_detail_game_result">경기 결과</string>
+    <string name="attendance_detail_hitter_name">타자명</string>
+    <string name="attendance_detail_at_bats">타수</string>
+    <string name="attendance_detail_hits">안타</string>
+    <string name="attendance_detail_rbi">타점</string>
+    <string name="attendance_detail_runs">득점</string>
+    <string name="attendance_detail_pitcher_name">투수명</string>
+    <string name="attendance_detail_innings">이닝</string>
+    <string name="attendance_detail_hits_allowed">피안타</string>
+    <string name="attendance_detail_runs_allowed">실점</string>
+    <string name="attendance_detail_earned_runs">자책</string>
+    <string name="attendance_detail_strikeouts">삼진</string>
+    <string name="attendance_detail_walks_and_hbp">4사구</string>
+    <string name="attendance_detail_pitch_count">투구수</string>
+    <string name="attendance_detail_pitcher_win">승</string>
+    <string name="attendance_detail_pitcher_lose">패</string>
+    <string name="attendance_detail_pitcher_hold">홀</string>
+    <string name="attendance_detail_pitcher_save">세</string>
+    <string name="attendance_detail_game_record_update">경기 종료 후 기록이 업데이트돼요.</string>
+
+    <string name="attendance_detail_diary_save">저장하기</string>
+    <string name="attendance_detail_delete">삭제</string>
+    <string name="attendance_detail_diary_edit">수정하기</string>
+    <string name="attendance_detail_diary_placeholder">뜨거웠던 직관의 순간을 기록해 보세요!</string>
+    <string name="attendance_detail_image_picker">사진</string>
+    <string name="attendance_detail_image_content_description">%1$d번 사진</string>
+    <string name="attendance_detail_delete_photo">사진 삭제</string>
+    <string name="attendance_detail_update_memo_failed">기록을 서버에 업로드하는 데 실패했어요. 다시 시도해 주세요.</string>
+    <string name="attendance_detail_upload_image_failed">이미지를 서버에 업로드하는 데 실패했어요. 다시 시도해 주세요.</string>
+    <string name="attendance_detail_delete_diary_title">직관 기록을 삭제할까요?</string>
+    <string name="attendance_detail_delete_diary_message">삭제된 기록은 복구할 수 없어요.</string>
+    <string name="attendance_detail_load_failed">직관 기록을 불러오지 못했어요.</string>
+    <string name="attendance_detail_delete_failed">직관 내역 삭제에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="attendance_detail_exit_diary_title">저장하지 않고 나갈까요?</string>
+    <string name="attendance_detail_exit_diary_message">변경사항이 저장되지 않아요.</string>
+    <string name="attendance_detail_exit_diary_positive">나가기</string>
 
     <string name="login_failed_message">로그인에 실패했습니다.</string>
 
@@ -158,9 +195,20 @@
     <string name="nickname_next">다음</string>
 
     <string name="livetalk_user_icon_description">직관 인증 수 사람 아이콘</string>
+    <string name="livetalk_weather_icon_description">%1$s 아이콘</string>
     <string name="livetalk_stadium_select_arrow_description">현장톡 구장 선택 진입 아이콘</string>
     <string name="livetalk_empty_game_description">오늘은 경기가 없어요</string>
     <string name="livetalk_empty_game_illustration_description">야구공을 놓치는 일러스트</string>
+    <string name="livetalk_weather_type_clear">맑음</string>
+    <string name="livetalk_weather_type_cloudy">흐림</string>
+    <string name="livetalk_weather_type_heavy_rain">강한 비</string>
+    <string name="livetalk_weather_type_light_rain">약한 비</string>
+    <string name="livetalk_weather_type_partly_cloudy">구름 많음</string>
+    <string name="livetalk_weather_type_rain_snow">진눈깨비</string>
+    <string name="livetalk_weather_type_snow">눈</string>
+    <string name="livetalk_weather_type_strong_wind">강풍</string>
+    <string name="livetalk_weather_type_thunderstorm">뇌우</string>
+    <string name="livetalk_weather_source_info_text">날씨 정보 제공: 기상청</string>
 
     <string name="livetalk_send_btn_description">메시지 전송</string>
     <string name="livetalk_send_btn_locked_description">잠긴 메시지 전송</string>
@@ -177,13 +225,15 @@
     <string name="livetalk_trash_dialog_message">정말 현장톡을 삭제할까요?\n삭제된 현장톡은 모두에게 보이지 않습니다.</string>
     <string name="livetalk_delete_succeed">메시지가 삭제되었습니다.</string>
     <string name="livetalk_user_report_icon_description">신고 깃발 아이콘</string>
-    <string name="livetalk_user_report_btn">신고</string>
+    <string name="livetalk_user_report_btn">신고하기</string>
     <string name="livetalk_user_report_dialog_message">정말 %1$s님의 현장톡을 신고할까요?</string>
     <string name="livetalk_reported_chat_message">신고가 접수된 현장톡입니다.</string>
     <string name="livetalk_already_reported">이미 신고한 현장톡입니다.</string>
     <string name="livetalk_report_succeed">정상 신고 되었습니다.</string>
     <string name="livetalk_loading_error">현장톡을 불러오는 데 실패했습니다.</string>
     <string name="livetalk_like_count_message">실시간 %1$s %2$s회 응원중!</string>
+    <string name="livetalk_kebab_icon_description">더보기 메뉴</string>
+    <string name="livetalk_like_icon_description">좋아요</string>
 
     <string name="badge_icon_description">배지 아이콘</string>
     <string name="badge_title">배지</string>
@@ -197,15 +247,16 @@
     <string name="badge_achieved_date">획득한 날: %1$s</string>
     <string name="badge_progress_rate">달성률: %1$s%</string>
 
+    <string name="image_crop_failed">이미지 자르기에 실패했습니다\n다른 이미지를 선택해보세요</string>
+    <string name="image_processing_failed">이미지 처리에 실패했습니다\n다른 이미지를 선택해보세요</string>
+    <string name="image_upload_failed">이미지 업로드에 실패했습니다\n나중에 다시 시도하세요</string>
+    <string name="image_size_failed">이미지 파일 크기를 확인할 수 없습니다</string>
+    <string name="image_selection_failed">이미지 선택 중 오류가 발생했습니다</string>
+
     <string name="setting_main_title">설정</string>
     <string name="setting_main_sign_up_date">가입한 날 : %1$s</string>
     <string name="setting_icon_description">설정 아이콘</string>
     <string name="setting_edit_profile_image">프로필 사진 수정</string>
-    <string name="setting_edit_profile_image_crop_failed">이미지 자르기에 실패했습니다\n다른 이미지를 선택해보세요</string>
-    <string name="setting_edit_profile_image_processing_failed">이미지 처리에 실패했습니다\n다른 이미지를 선택해보세요</string>
-    <string name="setting_edit_profile_image_upload_failed">이미지 업로드에 실패했습니다\n나중에 다시 시도하세요</string>
-    <string name="setting_edit_profile_get_image_size_failed">이미지 파일 크기를 확인할 수 없습니다</string>
-    <string name="setting_edit_profile_image_selection_failed">이미지 선택 중 오류가 발생했습니다</string>
     <string name="setting_edit_nickname">닉네임 수정</string>
     <string name="setting_edit_nickname_dialog_hint">새 닉네임을 입력해 주세요</string>
     <string name="setting_edited_nickname_alert">닉네임이 '%1$s'(으)로 변경되었습니다.</string>

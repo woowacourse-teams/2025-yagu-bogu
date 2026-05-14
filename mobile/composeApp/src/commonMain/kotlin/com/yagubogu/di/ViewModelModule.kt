@@ -1,6 +1,7 @@
 package com.yagubogu.di
 
 import com.yagubogu.ui.attendance.AttendanceHistoryViewModel
+import com.yagubogu.ui.attendance.detail.AttendanceDetailViewModel
 import com.yagubogu.ui.badge.BadgeViewModel
 import com.yagubogu.ui.home.HomeViewModel
 import com.yagubogu.ui.livetalk.LivetalkViewModel
@@ -70,4 +71,14 @@ val viewModelModule =
         viewModelOf(::SettingViewModel)
 
         viewModelOf(::StatsViewModel)
+
+        viewModel { (checkInId: Long) ->
+            AttendanceDetailViewModel(
+                checkInId = checkInId,
+                checkInRepository = get(),
+                thirdPartyRepository = get(),
+                loadDiaryUseCase = get(),
+                deleteCheckInUseCase = get(),
+            )
+        }
     }

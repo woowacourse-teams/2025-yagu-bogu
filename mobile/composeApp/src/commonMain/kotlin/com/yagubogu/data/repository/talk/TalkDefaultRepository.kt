@@ -3,6 +3,7 @@ package com.yagubogu.data.repository.talk
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.dto.response.talk.TalkCursorResponse
 import com.yagubogu.data.dto.response.talk.TalkEntranceResponse
+import com.yagubogu.data.dto.response.talk.TalkLikeResponse
 import com.yagubogu.data.dto.response.talk.TalkResponse
 
 class TalkDefaultRepository(
@@ -51,4 +52,6 @@ class TalkDefaultRepository(
     override suspend fun reportTalks(talkId: Long): Result<Unit> = talkDataSource.reportTalks(talkId = talkId)
 
     override suspend fun getInitial(gameId: Long): Result<TalkEntranceResponse> = talkDataSource.getInitial(gameId)
+
+    override suspend fun toggleLike(talkId: Long): Result<TalkLikeResponse> = talkDataSource.toggleLike(talkId = talkId)
 }

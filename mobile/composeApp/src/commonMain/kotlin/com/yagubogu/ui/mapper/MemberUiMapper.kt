@@ -9,9 +9,9 @@ import com.yagubogu.data.dto.response.presigned.PresignedUrlStartResponse
 import com.yagubogu.ui.badge.model.BadgeInfoUiModel
 import com.yagubogu.ui.badge.model.BadgeUiModel
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.PresignedUrlCompleteItem
-import com.yagubogu.ui.setting.model.PresignedUrlItem
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 
