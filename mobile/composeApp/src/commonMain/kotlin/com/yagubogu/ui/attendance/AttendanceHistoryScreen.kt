@@ -93,6 +93,7 @@ fun AttendanceHistoryScreen(
     val selectedDate: LocalDate by viewModel.selectedDate.collectAsStateWithLifecycle()
     val filterState: AttendanceFilterState by viewModel.filterState.collectAsStateWithLifecycle()
     val sort: AttendanceHistorySort by viewModel.sort.collectAsStateWithLifecycle()
+    val isGameDatesLoading: Boolean by viewModel.isGameDatesLoading.collectAsStateWithLifecycle()
     val pastGameUiState: PastGameUiState by viewModel.pastGameUiState.collectAsStateWithLifecycle()
 
     val startMonth: YearMonth = AttendanceHistoryViewModel.START_MONTH
@@ -168,6 +169,7 @@ fun AttendanceHistoryScreen(
         onYearlyFilterToggle = viewModel::toggleYearlyFilter,
         sort = sort,
         updateSort = viewModel::updateSort,
+        isGameDatesLoading = isGameDatesLoading,
         pastGameUiState = pastGameUiState,
         onPastGamesRequest = viewModel::fetchPastGames,
         onPastCheckIn = viewModel::addPastCheckIn,
@@ -194,6 +196,7 @@ private fun AttendanceHistoryScreen(
     onYearlyFilterToggle: () -> Unit,
     sort: AttendanceHistorySort,
     updateSort: (AttendanceHistorySort) -> Unit,
+    isGameDatesLoading: Boolean,
     pastGameUiState: PastGameUiState,
     onPastGamesRequest: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
@@ -229,6 +232,7 @@ private fun AttendanceHistoryScreen(
                     onMonthChange = onMonthChange,
                     selectedDate = selectedDate,
                     onDateChange = onDateChange,
+                    isGameDatesLoading = isGameDatesLoading,
                     pastGameUiState = pastGameUiState,
                     onPastGamesRequest = onPastGamesRequest,
                     onPastCheckIn = onPastCheckIn,
@@ -416,6 +420,7 @@ private fun AttendanceCalenderScreenPreview() {
         onYearlyFilterToggle = {},
         sort = AttendanceHistorySort.LATEST,
         updateSort = {},
+        isGameDatesLoading = false,
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
@@ -442,6 +447,7 @@ private fun AttendanceListScreenPreview() {
         onYearlyFilterToggle = {},
         sort = AttendanceHistorySort.LATEST,
         updateSort = {},
+        isGameDatesLoading = false,
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},

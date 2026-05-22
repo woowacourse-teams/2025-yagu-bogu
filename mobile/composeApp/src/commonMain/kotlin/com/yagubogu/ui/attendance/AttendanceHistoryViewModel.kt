@@ -55,6 +55,9 @@ class AttendanceHistoryViewModel(
     private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
     val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
 
+    private val _isGameDatesLoading = MutableStateFlow(true)
+    val isGameDatesLoading: StateFlow<Boolean> = _isGameDatesLoading.asStateFlow()
+
     private val _pastGameUiState = MutableStateFlow<PastGameUiState>(PastGameUiState.Loading)
     val pastGameUiState: StateFlow<PastGameUiState> = _pastGameUiState.asStateFlow()
 
@@ -105,6 +108,7 @@ class AttendanceHistoryViewModel(
 
     fun fetchGameDates() {
         viewModelScope.launch {
+            _isGameDatesLoading.value = true
             val yearMonth: YearMonth = selectedMonth.value
             gameRepository
                 .getGameDates(yearMonth)
@@ -113,6 +117,7 @@ class AttendanceHistoryViewModel(
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "API 호출 실패" }
                 }
+            _isGameDatesLoading.value = false
         }
     }
 

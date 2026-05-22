@@ -191,10 +191,11 @@ private fun AttendanceAdditionButton(
             AnalyticsLogger.logEvent("past_attendance_addition")
         },
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Primary500,
-            contentColor = White,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Primary500,
+                contentColor = White,
+            ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
         contentPadding = PaddingValues(horizontal = 36.dp, vertical = 12.dp),
         modifier = modifier,
