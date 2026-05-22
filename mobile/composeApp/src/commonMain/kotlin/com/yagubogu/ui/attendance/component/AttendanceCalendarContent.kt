@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
@@ -38,6 +39,7 @@ import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.common.AdUnitIds
 import com.yagubogu.ui.common.component.BannerAd
 import com.yagubogu.ui.common.component.BannerAdType
+import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.PretendardMedium16
@@ -70,6 +72,7 @@ fun AttendanceCalendarContent(
     onMonthChange: (YearMonth) -> Unit,
     selectedDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
+    isGameDatesLoading: Boolean,
     pastGameUiState: PastGameUiState,
     onPastGamesRequest: (LocalDate) -> Unit,
     onPastCheckIn: (Long) -> Unit,
@@ -123,12 +126,24 @@ fun AttendanceCalendarContent(
                 gameDates = gameDates,
             )
 
+            BannerAd(
+                adUnitId = AdUnitIds.attendanceCalendarBanner,
+                bannerAdType = BannerAdType.BANNER,
+            )
+
             when {
                 // 직관 내역이 있는 경우
                 currentItems != null -> {
                     currentItems.forEach { item: AttendanceHistoryItem ->
                         AttendanceItem(item = item, onItemClick = onItemClick)
                     }
+                }
+                // 경기 일정 로딩 중인 경우
+                isGameDatesLoading -> {
+                    CircularProgressIndicator(
+                        color = Gray300,
+                        modifier = Modifier.size(24.dp),
+                    )
                 }
                 // 경기가 없는 날인 경우
                 selectedDate !in gameDates -> NoGameDayView()
@@ -144,10 +159,6 @@ fun AttendanceCalendarContent(
                             modifier = Modifier.padding(vertical = 10.dp),
                         )
                     }
-                    BannerAd(
-                        adUnitId = AdUnitIds.attendanceCalendarBanner,
-                        bannerAdType = BannerAdType.BANNER,
-                    )
                 }
             }
         }
@@ -161,10 +172,7 @@ fun AttendanceCalendarContent(
                 containerColor = Primary500,
                 contentColor = White,
                 shape = CircleShape,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(20.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
             ) {
                 Icon(painter = painterResource(Res.drawable.ic_add), contentDescription = null)
             }
@@ -183,11 +191,10 @@ private fun AttendanceAdditionButton(
             AnalyticsLogger.logEvent("past_attendance_addition")
         },
         shape = CircleShape,
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = Primary500,
-                contentColor = White,
-            ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Primary500,
+            contentColor = White,
+        ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
         contentPadding = PaddingValues(horizontal = 36.dp, vertical = 12.dp),
         modifier = modifier,
@@ -219,10 +226,7 @@ private fun NoGameDayView(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(Res.drawable.img_baseball_fly_error),
             contentDescription = null,
-            modifier =
-                Modifier
-                    .height(180.dp)
-                    .fillMaxWidth(),
+            modifier = Modifier.height(180.dp).fillMaxWidth(),
         )
     }
 }
@@ -239,6 +243,7 @@ private fun AttendanceCalendarContentPreview() {
         onMonthChange = {},
         selectedDate = LocalDate.now().minusDays(3),
         onDateChange = {},
+        isGameDatesLoading = false,
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
@@ -258,6 +263,7 @@ private fun AttendanceCalendarContentHasAttendancePreview() {
         onMonthChange = {},
         selectedDate = LocalDate.now(),
         onDateChange = {},
+        isGameDatesLoading = false,
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
@@ -277,6 +283,7 @@ private fun AttendanceCalendarContentNoGamePreview() {
         onMonthChange = {},
         selectedDate = LocalDate.now().minusDays(1),
         onDateChange = {},
+        isGameDatesLoading = false,
         pastGameUiState = PastGameUiState.Loading,
         onPastGamesRequest = {},
         onPastCheckIn = {},
