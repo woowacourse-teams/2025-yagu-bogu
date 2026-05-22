@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +45,7 @@ import com.yagubogu.ui.util.getDisplayNameResId
 import com.yagubogu.ui.util.minusMonths
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.now
+import kotlinx.coroutines.flow.filter
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -77,10 +79,14 @@ fun AttendanceCalendar(
         }
     }
 
-    LaunchedEffect(state.firstVisibleMonth) {
-        if (state.firstVisibleMonth.yearMonth != selectedMonth) {
-            onMonthChange(state.firstVisibleMonth.yearMonth)
-        }
+    LaunchedEffect(state) {
+        snapshotFlow { state.isScrollInProgress }
+            .filter { isScrolling -> !isScrolling }
+            .collect {
+                if (state.firstVisibleMonth.yearMonth != selectedMonth) {
+                    onMonthChange(state.firstVisibleMonth.yearMonth)
+                }
+            }
     }
 
     Column(
