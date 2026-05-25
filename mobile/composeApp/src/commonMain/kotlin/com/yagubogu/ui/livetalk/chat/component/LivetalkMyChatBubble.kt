@@ -24,12 +24,14 @@ import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.Primary900
+import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.util.formatToAmPm
 import com.yagubogu.ui.util.now
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.ic_heart
 import yagubogu.composeapp.generated.resources.ic_trash
 import yagubogu.composeapp.generated.resources.livetalk_pending_message
 import yagubogu.composeapp.generated.resources.livetalk_trash_btn
@@ -72,15 +74,33 @@ fun LivetalkMyChatBubble(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text =
-                    livetalkChatItem.timestamp.formatToAmPm(
-                        amText = stringResource(Res.string.time_am),
-                        pmText = stringResource(Res.string.time_pm),
-                    ),
-                style = PretendardRegular12,
-                color = Primary700,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text =
+                        livetalkChatItem.timestamp.formatToAmPm(
+                            amText = stringResource(Res.string.time_am),
+                            pmText = stringResource(Res.string.time_pm),
+                        ),
+                    style = PretendardRegular12,
+                    color = Primary700,
+                )
+                if (livetalkChatItem.likeCount > 0) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_heart),
+                        contentDescription = null,
+                        tint = Red,
+                        modifier = Modifier.padding(start = 6.dp).size(14.dp),
+                    )
+                    Text(
+                        text = "${livetalkChatItem.likeCount}",
+                        style = PretendardRegular12,
+                        color = Red,
+                        modifier = Modifier.padding(start = 2.dp),
+                    )
+                }
+            }
 
             when (isPending) {
                 true -> {
@@ -165,6 +185,27 @@ private fun LivetalkMyChatBubblePreview() {
                 null,
                 LocalDateTime.now(),
                 false,
+            ),
+        onDeleteClick = {},
+    )
+}
+
+@Preview
+@Composable
+private fun LivetalkMyChatBubbleWithLikePreview() {
+    LivetalkMyChatBubble(
+        livetalkChatItem =
+            LivetalkChatItem(
+                0L,
+                0L,
+                true,
+                "좋아요 받은 텍스트인 것이다",
+                null,
+                null,
+                null,
+                LocalDateTime.now(),
+                false,
+                likeCount = 5,
             ),
         onDeleteClick = {},
     )
