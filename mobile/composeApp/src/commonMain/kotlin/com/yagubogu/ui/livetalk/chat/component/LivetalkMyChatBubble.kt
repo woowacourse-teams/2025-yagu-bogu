@@ -18,14 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.yagubogu.domain.util.formatToAmPm
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary700
 import com.yagubogu.ui.theme.Primary900
-import com.yagubogu.ui.util.formatToAmPm
-import com.yagubogu.ui.util.now
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

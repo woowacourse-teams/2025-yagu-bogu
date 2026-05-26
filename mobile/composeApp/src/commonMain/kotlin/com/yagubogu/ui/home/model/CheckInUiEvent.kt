@@ -1,5 +1,7 @@
 package com.yagubogu.ui.home.model
 
+import com.yagubogu.domain.model.StadiumWithGame
+
 sealed interface CheckInUiEvent {
     data class Success(
         val stadium: StadiumWithGame,

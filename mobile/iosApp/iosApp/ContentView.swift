@@ -6,11 +6,7 @@ import ComposeApp
 struct ComposeView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIViewController {
-        // GoogleSignInDelegate, AppleSignInDelegate를 생성해 Kotlin DI(Koin)에 주입
-        MainViewControllerKt.MainViewController(
-            googleSignInDelegate: SwiftGoogleSignInDelegate(),
-            appleSignInDelegate: SwiftAppleSignInDelegate()
-        )
+        return MainViewControllerKt.MainViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

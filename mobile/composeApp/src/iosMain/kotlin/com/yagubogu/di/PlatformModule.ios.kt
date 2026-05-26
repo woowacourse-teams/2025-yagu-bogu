@@ -5,7 +5,7 @@ import com.yagubogu.data.network.TokenManager
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-actual val commonModule =
+actual val platformModule =
     module {
         single<TokenManager> { TokenManager(dataStore = get(named(AUTH_PREFS))) }
     }

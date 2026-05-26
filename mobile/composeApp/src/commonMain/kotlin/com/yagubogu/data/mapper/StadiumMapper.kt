@@ -1,4 +1,4 @@
-package com.yagubogu.ui.mapper
+package com.yagubogu.data.mapper
 
 import com.yagubogu.data.dto.response.stadium.StadiumWeather
 import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
@@ -7,14 +7,14 @@ import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
-import com.yagubogu.ui.home.model.StadiumWithGame
-import com.yagubogu.ui.home.model.StadiumsWithGames
+import com.yagubogu.domain.model.StadiumWithGame
+import com.yagubogu.domain.model.StadiumsWithGames
 import com.yagubogu.ui.livetalk.model.Condition
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 
-fun StadiumsWithGamesResponse.toUiModel(): StadiumsWithGames = StadiumsWithGames(values = stadiums.map { it.toUiModel() })
+fun StadiumsWithGamesResponse.toDomain(): StadiumsWithGames = StadiumsWithGames(values = stadiums.map { it.toDomain() })
 
-fun StadiumWithGameDto.toUiModel(): StadiumWithGame =
+fun StadiumWithGameDto.toDomain(): StadiumWithGame =
     StadiumWithGame(
         name = name,
         coordinate =

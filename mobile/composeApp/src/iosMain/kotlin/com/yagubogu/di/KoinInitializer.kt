@@ -1,0 +1,21 @@
+package com.yagubogu.di
+
+import com.yagubogu.ui.login.AppleSignInDelegate
+import com.yagubogu.ui.login.GoogleSignInDelegate
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+
+fun setup(
+    googleSignInDelegate: GoogleSignInDelegate,
+    appleSignInDelegate: AppleSignInDelegate,
+) {
+    startKoin {
+        modules(
+            sharedModules + GeofenceObserverModule +
+                module {
+                    single<GoogleSignInDelegate> { googleSignInDelegate }
+                    single<AppleSignInDelegate> { appleSignInDelegate }
+                },
+        )
+    }
+}

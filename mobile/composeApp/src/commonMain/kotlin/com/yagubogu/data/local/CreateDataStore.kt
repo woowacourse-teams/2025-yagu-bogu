@@ -10,6 +10,6 @@ fun createDataStore(producePath: () -> String): DataStore<Preferences> =
         produceFile = { producePath().toPath() },
     )
 
+const val COMMON_PREFS = "common_prefs"
 const val AUTH_PREFS = "auth_prefs"
-
 const val APP_CONFIG_PREFS = "app_config_prefs"

@@ -4,10 +4,16 @@ import GoogleMobileAds
 import GoogleSignIn
 import SwiftUI
 import UIKit
-import FirebaseCore
 
 @main
 struct iOSApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    init() {
+        setupBannerAdProvider()
+        setupInterstitialAdProvider()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -19,12 +25,6 @@ struct iOSApp: App {
                 requestATTAndInitAds()
             }
         }
-    }
-
-    init() {
-        FirebaseApp.configure()
-        setupBannerAdProvider()
-        setupInterstitialAdProvider()
     }
 
     /// ATT 요청 및 AdMob 초기화 로직

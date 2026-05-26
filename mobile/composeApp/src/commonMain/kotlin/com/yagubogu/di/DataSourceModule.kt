@@ -10,8 +10,12 @@ import com.yagubogu.data.datasource.checkin.CheckInDataSource
 import com.yagubogu.data.datasource.checkin.CheckInRemoteDataSource
 import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.datasource.game.GameRemoteDataSource
+import com.yagubogu.data.datasource.geofence.GeofenceDataSource
+import com.yagubogu.data.datasource.geofence.GeofenceLocalDataSource
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
+import com.yagubogu.data.datasource.preferences.PreferenceDataSource
+import com.yagubogu.data.datasource.preferences.PreferenceLocalDataSource
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsDataSource
@@ -21,6 +25,7 @@ import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.local.APP_CONFIG_PREFS
+import com.yagubogu.data.local.COMMON_PREFS
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -52,6 +57,12 @@ val datasourceModule =
         single<AppConfigLocalDataSource> {
             AppConfigDataStoreLocalDataSource(dataStore = get(named(APP_CONFIG_PREFS)))
         }
+
+        single<PreferenceDataSource> {
+            PreferenceLocalDataSource(dataStore = get(named(COMMON_PREFS)))
+        }
+
+        singleOf(::GeofenceLocalDataSource) { bind<GeofenceDataSource>() }
 
         registerPlatformDataSources()
     }

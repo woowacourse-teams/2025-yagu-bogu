@@ -16,9 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,13 +29,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.BuildKonfig
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.common.platform.PlatformType
+import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
+import com.yagubogu.ui.setting.component.SettingToggleButton
 import com.yagubogu.ui.setting.component.dialog.NicknameEditDialog
+import com.yagubogu.ui.setting.component.dialog.PermissionSettingsDialog
 import com.yagubogu.ui.setting.model.MemberInfoItem
 import com.yagubogu.ui.setting.model.SettingEvent
 import com.yagubogu.ui.theme.Gray050
@@ -45,8 +53,17 @@ import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.LocalSnackbarHostState
+import com.yagubogu.ui.util.rememberOpenNotificationSettings
 import com.yagubogu.ui.util.showSingleSnackbar
 import com.yagubogu.ui.util.yyyyMMddFormatter
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import dev.icerock.moko.permissions.location.BACKGROUND_LOCATION
+import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -58,10 +75,17 @@ import yagubogu.composeapp.generated.resources.setting_edit_nickname
 import yagubogu.composeapp.generated.resources.setting_edit_profile_image
 import yagubogu.composeapp.generated.resources.setting_edited_nickname_alert
 import yagubogu.composeapp.generated.resources.setting_faq
+import yagubogu.composeapp.generated.resources.setting_geofencing_notification
+import yagubogu.composeapp.generated.resources.setting_geofencing_notification_tooltip
 import yagubogu.composeapp.generated.resources.setting_main_sign_up_date
 import yagubogu.composeapp.generated.resources.setting_manage_account
 import yagubogu.composeapp.generated.resources.setting_notice
 import yagubogu.composeapp.generated.resources.setting_open_source_license
+import yagubogu.composeapp.generated.resources.setting_permission_location_message_android
+import yagubogu.composeapp.generated.resources.setting_permission_location_message_ios
+import yagubogu.composeapp.generated.resources.setting_permission_location_title
+import yagubogu.composeapp.generated.resources.setting_permission_notification_message
+import yagubogu.composeapp.generated.resources.setting_permission_notification_title
 
 @Composable
 fun SettingMainScreen(
@@ -74,19 +98,42 @@ fun SettingMainScreen(
     onOssLicenseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val factory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
+    val controller = remember(factory) { factory.createPermissionsController() }
+    val openNotificationSettings =
+        rememberOpenNotificationSettings {
+            controller.openAppSettings()
+        }
+
+    BindEffect(controller)
+
     val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
 
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+    var showLocationPermissionDialog by rememberSaveable { mutableStateOf(false) }
+    var showNotificationPermissionDialog by rememberSaveable { mutableStateOf(false) }
+
+    val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsStateWithLifecycle()
+
+    val permissionHandler =
+        remember(controller, viewModel, coroutineScope) {
+            GeofencePermissionHandler(
+                permissionController = controller,
+                updateGeofenceNotification = viewModel::updateGeofenceNotification,
+                onShowLocationDialog = { showLocationPermissionDialog = true },
+                onShowNotificationDialog = { showNotificationPermissionDialog = true },
+                scope = coroutineScope,
+            )
+        }
+
+    LaunchedEffect(Unit) { viewModel.fetchMemberInfo() }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchMemberInfo()
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.settingEvent.collect { settingEvent: SettingEvent ->
+        viewModel.settingEvent.collect { settingEvent ->
             when (settingEvent) {
                 is SettingEvent.NicknameEditSuccess -> {
                     val message =
@@ -94,21 +141,26 @@ fun SettingMainScreen(
                             Res.string.setting_edited_nickname_alert,
                             settingEvent.newNickname,
                         )
-                    snackbarHostState.showSingleSnackbar(
-                        scope = this,
-                        message = message,
-                    )
+                    snackbarHostState.showSingleSnackbar(scope = this, message = message)
                 }
-
                 is SettingEvent.NicknameEditFailure -> {
-                    val errorMessage = settingEvent.uiText.asString()
                     snackbarHostState.showSingleSnackbar(
                         scope = this,
-                        message = errorMessage,
+                        message = settingEvent.uiText.asString(),
                     )
                 }
-
                 else -> Unit
+            }
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        coroutineScope.launch {
+            val hasNotification = controller.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
+            val hasBackgroundLocation = controller.isPermissionGranted(Permission.BACKGROUND_LOCATION)
+
+            if (geofenceNotification.value && (!hasNotification || !hasBackgroundLocation)) {
+                viewModel.updateGeofenceNotification(false)
             }
         }
     }
@@ -123,6 +175,10 @@ fun SettingMainScreen(
         onOssLicenseClick = onOssLicenseClick,
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
+        geofenceNotification = geofenceNotification.value,
+        onGeofenceNotificationToggle = { enable ->
+            permissionHandler.handleToggle(enable)
+        },
         modifier = modifier,
     )
 
@@ -130,13 +186,43 @@ fun SettingMainScreen(
         NicknameEditDialog(
             nickname =
                 viewModel.myMemberInfoItem
-                    .collectAsState()
+                    .collectAsStateWithLifecycle()
                     .value.nickName,
             onConfirm = { nickname ->
                 viewModel.updateNickname(nickname)
                 showNicknameEditDialog = false
             },
             onCancel = { showNicknameEditDialog = false },
+        )
+    }
+
+    if (showLocationPermissionDialog) {
+        PermissionSettingsDialog(
+            title = stringResource(Res.string.setting_permission_location_title),
+            message =
+                when (currentPlatform) {
+                    PlatformType.IOS -> stringResource(Res.string.setting_permission_location_message_ios)
+                    PlatformType.ANDROID -> stringResource(Res.string.setting_permission_location_message_android)
+                },
+            onConfirm = {
+                showLocationPermissionDialog = false
+                coroutineScope.launch {
+                    delay(300L) // iOS가 설정 앱 항목 등록할 시간 확보
+                    controller.openAppSettings()
+                }
+            },
+            onCancel = { showLocationPermissionDialog = false },
+        )
+    }
+    if (showNotificationPermissionDialog) {
+        PermissionSettingsDialog(
+            title = stringResource(Res.string.setting_permission_notification_title),
+            message = stringResource(Res.string.setting_permission_notification_message),
+            onConfirm = {
+                showNotificationPermissionDialog = false
+                openNotificationSettings() // Android: 알림 설정 직접 / iOS: 앱 설정
+            },
+            onCancel = { showNotificationPermissionDialog = false },
         )
     }
 }
@@ -152,6 +238,8 @@ private fun SettingMainScreen(
     onOssLicenseClick: () -> Unit,
     memberInfoItem: MemberInfoItem,
     appVersion: String,
+    geofenceNotification: Boolean,
+    onGeofenceNotificationToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -168,6 +256,15 @@ private fun SettingMainScreen(
         MyProfile(memberInfoItem = memberInfoItem)
 
         SettingButtonGroup {
+            SettingToggleButton(
+                text = stringResource(Res.string.setting_geofencing_notification),
+                toolTipText = stringResource(Res.string.setting_geofencing_notification_tooltip),
+                checked = geofenceNotification,
+                onCheckedChange = {
+                    AnalyticsLogger.logEvent("Geofence Switch Click ($geofenceNotification -> ${!geofenceNotification})")
+                    onGeofenceNotificationToggle(!geofenceNotification)
+                },
+            )
             SettingButton(
                 text = stringResource(Res.string.setting_edit_profile_image),
                 onClick = onProfileImageUpload,
@@ -276,5 +373,7 @@ private fun SettingMainScreenPreview() {
         onOssLicenseClick = {},
         memberInfoItem = MemberInfoItem(nickName = "야구보구"),
         appVersion = "1.0.0",
+        geofenceNotification = false,
+        onGeofenceNotificationToggle = {},
     )
 }

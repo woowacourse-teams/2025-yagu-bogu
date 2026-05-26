@@ -32,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.yagubogu.domain.util.formatToAmPm
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.common.component.profile.ProfileImage
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.theme.Black
@@ -48,9 +50,7 @@ import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.crop
-import com.yagubogu.ui.util.formatToAmPm
 import com.yagubogu.ui.util.noRippleClickable
-import com.yagubogu.ui.util.now
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

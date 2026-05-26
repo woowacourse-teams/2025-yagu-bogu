@@ -10,22 +10,18 @@ import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.kmp.geofence.GeofenceBroadcastReceiver
+import com.kmp.geofence.GeofenceContext
+import com.kmp.geofence.GeofenceEvent
+import com.kmp.geofence.TransitionType
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.analytics.FirebaseAnalyticsLogger
-import com.yagubogu.di.authModule
-import com.yagubogu.di.commonModule
-import com.yagubogu.di.configModule
-import com.yagubogu.di.datasourceModule
-import com.yagubogu.di.localModule
-import com.yagubogu.di.networkModule
-import com.yagubogu.di.repositoryModule
-import com.yagubogu.di.serviceModule
-import com.yagubogu.di.timeModule
-import com.yagubogu.di.useCaseModule
-import com.yagubogu.di.viewModelModule
+import com.yagubogu.di.sharedModules
+import com.yagubogu.domain.geofence.SendGeofenceNotificationUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -37,6 +33,7 @@ class YaguBoguApplication : Application() {
         setupAnalytics()
         setupAds()
         setupKoin()
+        setupGeofence()
     }
 
     private fun setupAds() {
@@ -71,19 +68,28 @@ class YaguBoguApplication : Application() {
         startKoin {
             androidContext(androidContext = this@YaguBoguApplication)
 
-            modules(
-                authModule,
-                commonModule,
-                datasourceModule,
-                networkModule,
-                repositoryModule,
-                serviceModule,
-                timeModule,
-                useCaseModule,
-                viewModelModule,
-                localModule,
-                configModule,
-            )
+            modules(sharedModules)
+        }
+    }
+
+    private fun setupGeofence() {
+        val logger = Logger.withTag("GeofenceAndroid")
+        GeofenceContext.init(this)
+
+        val sendGeofenceNotificationUseCase: SendGeofenceNotificationUseCase by inject()
+
+        GeofenceBroadcastReceiver.setEventListener { event: GeofenceEvent ->
+            when (event.transitionType) {
+                TransitionType.ENTER -> {
+                    logger.i { "Android 지오펜스 입장 감지: ${event.geofenceId}" }
+                    val stadiumId = event.geofenceId.toIntOrNull() ?: return@setEventListener
+                    logger.i { "Android 지오펜스 입장 브로드캐스트 리스너 수신: $stadiumId" }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        sendGeofenceNotificationUseCase(stadiumId)
+                    }
+                }
+                TransitionType.EXIT -> logger.i { "Android 지오펜스 퇴장 감지: ${event.geofenceId}" }
+            }
         }
     }
 }

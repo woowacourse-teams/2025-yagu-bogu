@@ -8,6 +8,8 @@ import com.yagubogu.data.repository.checkin.CheckInDefaultRepository
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.game.GameDefaultRepository
 import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.geofence.GeofenceDefaultRepository
+import com.yagubogu.data.repository.geofence.GeofenceRepository
 import com.yagubogu.data.repository.location.LocationDefaultRepository
 import com.yagubogu.data.repository.location.LocationRepository
 import com.yagubogu.data.repository.member.MemberDefaultRepository
@@ -39,6 +41,8 @@ val repositoryModule =
         singleOf(::LocationDefaultRepository) { bind<LocationRepository>() }
 
         singleOf(::StadiumDefaultRepository) { bind<StadiumRepository>() }
+
+        singleOf(::GeofenceDefaultRepository) { bind<GeofenceRepository>() }
 
         singleOf(::StreamDefaultRepository) { bind<StreamRepository>() }
 

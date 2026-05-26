@@ -1,7 +1,4 @@
-package com.yagubogu.ui.home.model
-
-import com.yagubogu.domain.model.Coordinate
-import com.yagubogu.domain.model.Distance
+package com.yagubogu.domain.model
 
 data class StadiumsWithGames(
     val values: List<StadiumWithGame>,
@@ -17,4 +14,12 @@ data class StadiumsWithGames(
                 val distance = getDistance(coordinate, stadium.coordinate)
                 stadium to distance
             }.minByOrNull { it.second.value }
+
+    fun findNearestTo(
+        coordinate: Coordinate,
+        threshold: Distance,
+        getDistance: (Coordinate, Coordinate) -> Distance,
+    ): Pair<StadiumWithGame, Distance>? =
+        findNearestTo(coordinate, getDistance)
+            ?.takeIf { (_, distance) -> distance.isWithin(threshold) }
 }

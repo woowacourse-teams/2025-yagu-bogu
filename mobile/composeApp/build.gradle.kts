@@ -117,12 +117,16 @@ kotlin {
         binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            export(libs.permissions)
+            export(libs.permissions.compose)
         }
     }
     iosSimulatorArm64 {
         binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            export(libs.permissions)
+            export(libs.permissions.compose)
         }
     }
 
@@ -256,6 +260,18 @@ kotlin {
             // Oss-licenses
             implementation(libs.aboutlibraries.core)
             implementation(libs.aboutlibraries.compose.m3)
+
+            // Geofence
+            implementation(libs.geofence)
+
+            // Notification
+            implementation(libs.alarmee)
+
+            // Permission
+            api(libs.permissions)
+            api(libs.permissions.compose)
+            implementation(libs.permissions.location)
+            implementation(libs.permissions.notifications)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

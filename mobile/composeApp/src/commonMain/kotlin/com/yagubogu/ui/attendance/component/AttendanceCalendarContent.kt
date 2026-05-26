@@ -33,6 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.analytics.AnalyticsLogger
+import com.yagubogu.domain.util.minusDays
+import com.yagubogu.domain.util.minusMonths
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.common.AdUnitIds
@@ -43,9 +46,6 @@ import com.yagubogu.ui.theme.PretendardBold16
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.minusDays
-import com.yagubogu.ui.util.minusMonths
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.datetime.LocalDate

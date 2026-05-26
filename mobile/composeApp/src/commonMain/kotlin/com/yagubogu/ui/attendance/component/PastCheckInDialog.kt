@@ -3,9 +3,9 @@ package com.yagubogu.ui.attendance.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.common.component.DefaultDialog
 import com.yagubogu.ui.common.model.DefaultDialogUiModel
-import com.yagubogu.ui.util.now
 import com.yagubogu.ui.util.yyyyMMddFormatter
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format

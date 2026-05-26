@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.yagubogu.domain.util.minusYears
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.common.component.Picker
 import com.yagubogu.ui.theme.Gray200
 import com.yagubogu.ui.theme.Gray500
@@ -35,8 +37,6 @@ import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.Primary050
 import com.yagubogu.ui.theme.Primary500
-import com.yagubogu.ui.util.minusYears
-import com.yagubogu.ui.util.now
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import org.jetbrains.compose.resources.stringResource

@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
+import com.yagubogu.data.mapper.toUiModel
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
+import com.yagubogu.domain.util.now
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import com.yagubogu.ui.mapper.toLivetalkUiModel
-import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

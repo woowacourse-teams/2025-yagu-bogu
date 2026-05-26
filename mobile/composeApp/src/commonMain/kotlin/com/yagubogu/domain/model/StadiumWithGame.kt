@@ -1,6 +1,4 @@
-package com.yagubogu.ui.home.model
-
-import com.yagubogu.domain.model.Coordinate
+package com.yagubogu.domain.model
 
 data class StadiumWithGame(
     val name: String,
