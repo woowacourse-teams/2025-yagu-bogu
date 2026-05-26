@@ -83,7 +83,7 @@ class YaguBoguApplication : Application() {
                 TransitionType.ENTER -> {
                     logger.i { "Android 지오펜스 입장 감지: ${event.geofenceId}" }
                     val stadiumId = event.geofenceId.toIntOrNull() ?: return@setEventListener
-                    logger.i { "안드로이드 지오펜스 입장 브로드캐스트 리스너 수신: $stadiumId" }
+                    logger.i { "Android 지오펜스 입장 브로드캐스트 리스너 수신: $stadiumId" }
                     CoroutineScope(Dispatchers.IO).launch {
                         sendGeofenceNotificationUseCase(stadiumId)
                     }
