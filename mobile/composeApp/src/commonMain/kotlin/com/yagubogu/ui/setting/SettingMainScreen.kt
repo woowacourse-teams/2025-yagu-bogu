@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -118,7 +117,7 @@ fun SettingMainScreen(
     var showLocationPermissionDialog by rememberSaveable { mutableStateOf(false) }
     var showNotificationPermissionDialog by rememberSaveable { mutableStateOf(false) }
 
-    val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsState()
+    val geofenceNotification: State<Boolean> = viewModel.geofenceNotification.collectAsStateWithLifecycle()
 
     val permissionHandler =
         remember(controller, viewModel, coroutineScope) {
@@ -187,7 +186,7 @@ fun SettingMainScreen(
         NicknameEditDialog(
             nickname =
                 viewModel.myMemberInfoItem
-                    .collectAsState()
+                    .collectAsStateWithLifecycle()
                     .value.nickName,
             onConfirm = { nickname ->
                 viewModel.updateNickname(nickname)
