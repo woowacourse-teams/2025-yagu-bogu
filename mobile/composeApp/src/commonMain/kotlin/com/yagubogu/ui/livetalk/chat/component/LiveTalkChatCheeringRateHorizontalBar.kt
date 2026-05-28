@@ -1,14 +1,18 @@
 package com.yagubogu.ui.livetalk.chat.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +23,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.theme.EsamanruMedium
+import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray200
+import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray600
+import com.yagubogu.ui.theme.Gray700
 import com.yagubogu.ui.theme.YaguBoguTheme
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
@@ -30,6 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.livetalk_cheering_count_format
 import yagubogu.composeapp.generated.resources.livetalk_cheering_count_label
+import yagubogu.composeapp.generated.resources.livetalk_cheering_vs_label
 
 @Composable
 fun LiveTalkChatCheeringRateHorizontalBar(
@@ -47,15 +55,23 @@ fun LiveTalkChatCheeringRateHorizontalBar(
 
     val homeTeamChartRange = chartRange(totalCount, safeHomeCount)
     val awayTeamChartRange = chartRange(totalCount, safeAwayCount)
+    val awayTeamBoundaryRatio =
+        when {
+            totalCount > 0L -> safeAwayCount.toFloat() / totalCount
+            else -> 0.5f
+        }
 
     val barHeight = 8.dp
+    val vsBadgeWidth = 24.dp
+    val vsBadgeHeight = 18.dp
+    val labelBottomPadding = 3.dp
 
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = labelBottomPadding),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -107,17 +123,31 @@ fun LiveTalkChatCheeringRateHorizontalBar(
             )
         }
 
-        Box(
+        BoxWithConstraints(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(barHeight)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Gray200)
-                    .shimmerIf(isLoading),
+                    .height(vsBadgeHeight),
         ) {
+            Box(
+                modifier =
+                    Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .height(barHeight)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Gray200)
+                        .shimmerIf(isLoading),
+            )
             if (!isLoading) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier =
+                        Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth()
+                            .height(barHeight)
+                            .clip(RoundedCornerShape(12.dp)),
+                ) {
                     Box(
                         modifier =
                             Modifier
@@ -133,8 +163,37 @@ fun LiveTalkChatCheeringRateHorizontalBar(
                                 .background(color = homeTeam.color),
                     )
                 }
+                val maxBadgeOffsetX = (maxWidth - vsBadgeWidth).coerceAtLeast(0.dp)
+                val badgeOffsetX =
+                    (maxWidth * awayTeamBoundaryRatio - vsBadgeWidth / 2)
+                        .coerceIn(0.dp, maxBadgeOffsetX)
+
+                CheeringVsBadge(
+                    modifier =
+                        Modifier
+                            .align(Alignment.CenterStart)
+                            .offset(x = badgeOffsetX),
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun CheeringVsBadge(modifier: Modifier = Modifier) {
+    Box(
+        modifier =
+            modifier
+                .width(24.dp)
+                .height(18.dp)
+                .background(Gray050, RoundedCornerShape(8.dp))
+                .border(0.6.dp, Gray300, RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.livetalk_cheering_vs_label),
+            style = EsamanruMedium.copy(fontSize = 10.dpToSp, color = Gray700),
+        )
     }
 }
 
@@ -163,7 +222,40 @@ private fun LiveTalkChatCheeringRateHorizontalBarPreview() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("로딩됨")
+            Text("0대0")
+            LiveTalkChatCheeringRateHorizontalBar(
+                homeTeam = Team.HH,
+                awayTeam = Team.NC,
+                homeTeamCheeringCount = 0L,
+                awayTeamCheeringCount = 0L,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text("홈 100%")
+            LiveTalkChatCheeringRateHorizontalBar(
+                homeTeam = Team.HH,
+                awayTeam = Team.NC,
+                homeTeamCheeringCount = 1000L,
+                awayTeamCheeringCount = 0L,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text("원정 100%")
+            LiveTalkChatCheeringRateHorizontalBar(
+                homeTeam = Team.HH,
+                awayTeam = Team.NC,
+                homeTeamCheeringCount = 0L,
+                awayTeamCheeringCount = 1000L,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text("약 3대1")
             LiveTalkChatCheeringRateHorizontalBar(
                 homeTeam = Team.HH,
                 awayTeam = Team.NC,

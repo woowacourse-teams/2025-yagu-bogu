@@ -234,6 +234,7 @@
     <string name="livetalk_like_icon_description">좋아요</string>
     <string name="livetalk_cheering_count_format">%1$s %2$s</string>
     <string name="livetalk_cheering_count_label">실시간 응원</string>
+    <string name="livetalk_cheering_vs_label">VS</string>
 
     <string name="badge_icon_description">배지 아이콘</string>
     <string name="badge_title">배지</string>
