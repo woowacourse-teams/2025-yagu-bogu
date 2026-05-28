@@ -28,6 +28,8 @@ import kotlinx.coroutines.sync.withLock
 class LikeCountStateHolder {
     private val logger = Logger.withTag("LikeCountStateHolder")
 
+    private var isHomeTeamLikeInitialized: Boolean = false
+    private var isAwayTeamLikeInitialized: Boolean = false
     private var homeTeamLikeRealCount: Long = 0L
     private var awayTeamLikeRealCount: Long = 0L
 
@@ -71,13 +73,15 @@ class LikeCountStateHolder {
         logger.d { "remoteAwayTeamLikeCount : $remoteAwayTeamLikeCount" }
 
         lock.withLock {
-            if (homeTeamLikeRealCount == 0L) {
+            if (!isHomeTeamLikeInitialized) {
                 homeTeamLikeRealCount = remoteHomeTeamLikeCount
                 _homeTeamLikeShowingCount.value = remoteHomeTeamLikeCount
+                isHomeTeamLikeInitialized = true
             }
-            if (awayTeamLikeRealCount == 0L) {
+            if (!isAwayTeamLikeInitialized) {
                 awayTeamLikeRealCount = remoteAwayTeamLikeCount
                 _awayTeamLikeShowingCount.value = remoteAwayTeamLikeCount
+                isAwayTeamLikeInitialized = true
             }
 
             // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행

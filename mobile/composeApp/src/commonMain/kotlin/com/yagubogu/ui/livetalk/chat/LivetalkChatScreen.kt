@@ -21,6 +21,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +42,6 @@ import com.yagubogu.ui.livetalk.chat.component.LivetalkChatCheeringBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatDialogs
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatInputBar
 import com.yagubogu.ui.livetalk.chat.component.LivetalkChatToolbar
-import com.yagubogu.ui.livetalk.chat.model.HomeAwayType
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatScreenActions
@@ -89,6 +89,7 @@ fun LivetalkChatScreen(
 
     val mascotQueue = remember { mutableStateListOf<MascotAnimationItem>() }
     var mascotButtonPos: Offset by remember { mutableStateOf(Offset.Zero) }
+    val latestTeams by rememberUpdatedState(teams)
 
     fun generateMascotAnimation(mascot: DrawableResource) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -196,7 +197,7 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.homeTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val homeTeamMascot = teams?.myTeamMascot?.takeIf { teams?.myTeamType == HomeAwayType.HOME }
+                val homeTeamMascot = latestTeams?.homeTeam?.mascot?.takeIf { latestTeams?.isMyTeamGame == true }
                 scheduleMascotWithCounter(
                     count = count,
                     scope = this,
@@ -214,7 +215,7 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.awayTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val awayTeamMascot = teams?.myTeamMascot?.takeIf { teams?.myTeamType == HomeAwayType.AWAY }
+                val awayTeamMascot = latestTeams?.awayTeam?.mascot?.takeIf { latestTeams?.isMyTeamGame == true }
                 scheduleMascotWithCounter(
                     count = count,
                     scope = this,
