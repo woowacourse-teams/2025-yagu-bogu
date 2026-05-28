@@ -25,15 +25,17 @@ import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.shimmerIf
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LivetalkChatCheeringBar(
-    myTeam: Team,
-    otherTeam: Team,
-    myTeamCheeringCount: Long?,
-    otherTeamCheeringCount: Long?,
+    homeTeam: Team,
+    awayTeam: Team,
+    myTeamMascot: DrawableResource?,
+    homeTeamCheeringCount: Long?,
+    awayTeamCheeringCount: Long?,
     showCheeringButton: Boolean,
     modifier: Modifier = Modifier,
     onCheeringClick: () -> Unit,
@@ -53,13 +55,13 @@ fun LivetalkChatCheeringBar(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             LiveTalkChatCheeringRateHorizontalBar(
-                myTeam = myTeam,
-                otherTeam = otherTeam,
-                myTeamCheeringCount = myTeamCheeringCount,
-                otherTeamCheeringCount = otherTeamCheeringCount,
+                homeTeam = homeTeam,
+                awayTeam = awayTeam,
+                homeTeamCheeringCount = homeTeamCheeringCount,
+                awayTeamCheeringCount = awayTeamCheeringCount,
             )
         }
-        if (showCheeringButton) {
+        if (showCheeringButton && myTeamMascot != null) {
             Spacer(Modifier.width(8.dp))
 
             Box(
@@ -67,12 +69,12 @@ fun LivetalkChatCheeringBar(
                 contentAlignment = Alignment.Center,
             ) {
                 Image(
-                    painter = painterResource(myTeam.mascot),
+                    painter = painterResource(myTeamMascot),
                     contentDescription = null,
                     modifier =
                         Modifier
                             .size(32.dp)
-                            .shimmerIf(myTeamCheeringCount == null)
+                            .shimmerIf(homeTeamCheeringCount == null || awayTeamCheeringCount == null)
                             .noRippleClickable(
                                 onClick = onCheeringClick,
                             ).onGloballyPositioned { coordinates ->
@@ -94,10 +96,11 @@ fun LivetalkChatCheeringBar(
 @Composable
 private fun LivetalkChatCheeringBarPreviewShimmer() {
     LivetalkChatCheeringBar(
-        myTeam = Team.HH,
-        otherTeam = Team.HT,
-        myTeamCheeringCount = null,
-        otherTeamCheeringCount = null,
+        homeTeam = Team.HH,
+        awayTeam = Team.HT,
+        myTeamMascot = Team.HH.mascot,
+        homeTeamCheeringCount = null,
+        awayTeamCheeringCount = null,
         showCheeringButton = true,
         onCheeringClick = {},
         onPositioned = {},
@@ -108,10 +111,11 @@ private fun LivetalkChatCheeringBarPreviewShimmer() {
 @Composable
 private fun LivetalkChatCheeringBarPreview() {
     LivetalkChatCheeringBar(
-        myTeam = Team.HH,
-        otherTeam = Team.HT,
-        myTeamCheeringCount = 12345L,
-        otherTeamCheeringCount = 54321L,
+        homeTeam = Team.HH,
+        awayTeam = Team.HT,
+        myTeamMascot = Team.HH.mascot,
+        homeTeamCheeringCount = 12345L,
+        awayTeamCheeringCount = 54321L,
         showCheeringButton = true,
         onCheeringClick = {},
         onPositioned = {},

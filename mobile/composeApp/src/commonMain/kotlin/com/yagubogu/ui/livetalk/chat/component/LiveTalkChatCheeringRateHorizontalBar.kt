@@ -33,20 +33,20 @@ import yagubogu.composeapp.generated.resources.livetalk_cheering_count_label
 
 @Composable
 fun LiveTalkChatCheeringRateHorizontalBar(
-    myTeam: Team,
-    otherTeam: Team,
-    myTeamCheeringCount: Long?,
-    otherTeamCheeringCount: Long?,
+    homeTeam: Team,
+    awayTeam: Team,
+    homeTeamCheeringCount: Long?,
+    awayTeamCheeringCount: Long?,
     modifier: Modifier = Modifier,
 ) {
-    val isLoading = myTeamCheeringCount == null || otherTeamCheeringCount == null
+    val isLoading = homeTeamCheeringCount == null || awayTeamCheeringCount == null
 
-    val safeMyCount = myTeamCheeringCount ?: 0L
-    val safeOtherCount = otherTeamCheeringCount ?: 0L
-    val totalCount = safeMyCount + safeOtherCount
+    val safeHomeCount = homeTeamCheeringCount ?: 0L
+    val safeAwayCount = awayTeamCheeringCount ?: 0L
+    val totalCount = safeHomeCount + safeAwayCount
 
-    val myTeamChartRange = chartRange(totalCount, safeMyCount)
-    val otherTeamChartRange = chartRange(totalCount, safeOtherCount)
+    val homeTeamChartRange = chartRange(totalCount, safeHomeCount)
+    val awayTeamChartRange = chartRange(totalCount, safeAwayCount)
 
     val barHeight = 8.dp
 
@@ -65,11 +65,11 @@ fun LiveTalkChatCheeringRateHorizontalBar(
                     } else {
                         stringResource(
                             Res.string.livetalk_cheering_count_format,
-                            otherTeam.shortname,
-                            safeOtherCount.formatWithComma(),
+                            awayTeam.shortname,
+                            safeAwayCount.formatWithComma(),
                         )
                     },
-                style = EsamanruMedium.copy(fontSize = 14.dpToSp, color = otherTeam.color),
+                style = EsamanruMedium.copy(fontSize = 14.dpToSp, color = awayTeam.color),
                 modifier =
                     Modifier
                         .align(Alignment.CenterStart)
@@ -95,11 +95,11 @@ fun LiveTalkChatCheeringRateHorizontalBar(
                     } else {
                         stringResource(
                             Res.string.livetalk_cheering_count_format,
-                            myTeam.shortname,
-                            safeMyCount.formatWithComma(),
+                            homeTeam.shortname,
+                            safeHomeCount.formatWithComma(),
                         )
                     },
-                style = EsamanruMedium.copy(fontSize = 14.dpToSp, color = myTeam.color),
+                style = EsamanruMedium.copy(fontSize = 14.dpToSp, color = homeTeam.color),
                 modifier =
                     Modifier
                         .align(Alignment.CenterEnd)
@@ -121,16 +121,16 @@ fun LiveTalkChatCheeringRateHorizontalBar(
                     Box(
                         modifier =
                             Modifier
-                                .weight(otherTeamChartRange)
+                                .weight(awayTeamChartRange)
                                 .fillMaxHeight()
-                                .background(color = otherTeam.color),
+                                .background(color = awayTeam.color),
                     )
                     Box(
                         modifier =
                             Modifier
-                                .weight(myTeamChartRange)
+                                .weight(homeTeamChartRange)
                                 .fillMaxHeight()
-                                .background(color = myTeam.color),
+                                .background(color = homeTeam.color),
                     )
                 }
             }
@@ -154,10 +154,10 @@ private fun LiveTalkChatCheeringRateHorizontalBarPreview() {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("로딩중")
             LiveTalkChatCheeringRateHorizontalBar(
-                myTeam = Team.HH,
-                otherTeam = Team.NC,
-                myTeamCheeringCount = null,
-                otherTeamCheeringCount = null,
+                homeTeam = Team.HH,
+                awayTeam = Team.NC,
+                homeTeamCheeringCount = null,
+                awayTeamCheeringCount = null,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
 
@@ -165,10 +165,10 @@ private fun LiveTalkChatCheeringRateHorizontalBarPreview() {
 
             Text("로딩됨")
             LiveTalkChatCheeringRateHorizontalBar(
-                myTeam = Team.HH,
-                otherTeam = Team.NC,
-                myTeamCheeringCount = 1000L,
-                otherTeamCheeringCount = 3000L,
+                homeTeam = Team.HH,
+                awayTeam = Team.NC,
+                homeTeamCheeringCount = 1000L,
+                awayTeamCheeringCount = 3000L,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
         }

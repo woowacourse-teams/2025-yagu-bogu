@@ -2,6 +2,7 @@ package com.yagubogu.ui.livetalk.chat
 
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.ui.livetalk.chat.model.HomeAwayType
 import com.yagubogu.ui.livetalk.chat.model.LivetalkTeams
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +14,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /**
- * 현장톡 내에서 우리 팀과 상대 팀의 '좋아요' 수 상태를 관리합니다.
+ * 현장톡 내에서 홈팀과 원정팀의 '좋아요' 수 상태를 관리합니다.
  *
  * 이 클래스는 다음을 담당합니다:
- * - 서버로부터 받은 실제 좋아요 수(`myTeamLikeRealCount`, `otherTeamLikeRealCount`)를 추적합니다.
- * - 사용자의 로컬 인터랙션을 포함하여 UI에 표시되는 좋아요 수(`myTeamLikeShowingCount`)를 관리합니다.
+ * - 서버로부터 받은 실제 좋아요 수(`homeTeamLikeRealCount`, `awayTeamLikeRealCount`)를 추적합니다.
+ * - 사용자의 로컬 인터랙션을 포함하여 UI에 표시되는 좋아요 수(`homeTeamLikeShowingCount`)를 관리합니다.
  * - 사용자가 누른 '좋아요' 클릭(`pendingLikeCount`)을 버퍼링하여 서버에 일괄 전송합니다.
  * - [SharedFlow] 이벤트를 통해 다른 사용자로부터 들어온 '좋아요'에 대한 값을 트리거합니다.
  *
@@ -27,89 +28,92 @@ import kotlinx.coroutines.sync.withLock
 class LikeCountStateHolder {
     private val logger = Logger.withTag("LikeCountStateHolder")
 
-    private var myTeamLikeRealCount: Long = 0L
-    private var otherTeamLikeRealCount: Long = 0L
+    private var homeTeamLikeRealCount: Long = 0L
+    private var awayTeamLikeRealCount: Long = 0L
 
     var pendingLikeCount = 0
         private set
 
     private val lock = Mutex()
 
-    private val _myTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
-    val myTeamLikeShowingCount: StateFlow<Long?> = _myTeamLikeShowingCount.asStateFlow()
+    private val _homeTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
+    val homeTeamLikeShowingCount: StateFlow<Long?> = _homeTeamLikeShowingCount.asStateFlow()
 
-    private val _otherTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
-    val otherTeamLikeShowingCount: StateFlow<Long?> = _otherTeamLikeShowingCount.asStateFlow()
+    private val _awayTeamLikeShowingCount: MutableStateFlow<Long?> = MutableStateFlow(null)
+    val awayTeamLikeShowingCount: StateFlow<Long?> = _awayTeamLikeShowingCount.asStateFlow()
 
-    private val _myTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
-    val myTeamLikeChangeAmount: SharedFlow<Long?> = _myTeamLikeChangeAmount.asSharedFlow()
+    private val _homeTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
+    val homeTeamLikeChangeAmount: SharedFlow<Long?> = _homeTeamLikeChangeAmount.asSharedFlow()
 
-    private val _otherTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
-    val otherTeamLikeChangeAmount: SharedFlow<Long?> = _otherTeamLikeChangeAmount.asSharedFlow()
+    private val _awayTeamLikeChangeAmount: MutableSharedFlow<Long?> = MutableSharedFlow()
+    val awayTeamLikeChangeAmount: SharedFlow<Long?> = _awayTeamLikeChangeAmount.asSharedFlow()
 
     suspend fun updateLikeCount(
         livetalkTeams: LivetalkTeams,
         likeCountsResponse: LikeCountsResponse,
     ) {
         // 서버에서 받아온 좋아요 수
-        val remoteMyTeamLikeCount: Long =
+        val remoteHomeTeamLikeCount: Long =
             if (likeCountsResponse.counts.isEmpty()) {
                 0L
             } else {
-                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.myTeam.name }?.totalCount
+                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.homeTeam.name }?.totalCount
                     ?: 0L
             }
-        val remoteOtherTeamLikeCount: Long =
+        val remoteAwayTeamLikeCount: Long =
             if (likeCountsResponse.counts.isEmpty()) {
                 0L
             } else {
-                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam.name }?.totalCount
+                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.awayTeam.name }?.totalCount
                     ?: 0L
             }
-        logger.d { "remoteMyTeamLikeCount : $remoteMyTeamLikeCount" }
-        logger.d { "remoteOtherTeamLikeCount : $remoteOtherTeamLikeCount" }
+        logger.d { "remoteHomeTeamLikeCount : $remoteHomeTeamLikeCount" }
+        logger.d { "remoteAwayTeamLikeCount : $remoteAwayTeamLikeCount" }
 
         lock.withLock {
-            if (myTeamLikeRealCount == 0L) {
-                myTeamLikeRealCount = remoteMyTeamLikeCount
-                _myTeamLikeShowingCount.value = remoteMyTeamLikeCount
+            if (homeTeamLikeRealCount == 0L) {
+                homeTeamLikeRealCount = remoteHomeTeamLikeCount
+                _homeTeamLikeShowingCount.value = remoteHomeTeamLikeCount
             }
-            if (otherTeamLikeRealCount == 0L) {
-                otherTeamLikeRealCount = remoteOtherTeamLikeCount
-                _otherTeamLikeShowingCount.value = remoteOtherTeamLikeCount
+            if (awayTeamLikeRealCount == 0L) {
+                awayTeamLikeRealCount = remoteAwayTeamLikeCount
+                _awayTeamLikeShowingCount.value = remoteAwayTeamLikeCount
             }
 
             // 서버에서 받은 좋아요 수보다 (로컬 클릭 포함)실제 응원수가 작은 경우만 애니메이션 실행
-            if (myTeamLikeRealCount < remoteMyTeamLikeCount) {
-                val diffCount: Long = remoteMyTeamLikeCount - myTeamLikeRealCount
-                myTeamLikeRealCount = remoteMyTeamLikeCount
-                _myTeamLikeChangeAmount.emit(diffCount)
+            if (homeTeamLikeRealCount < remoteHomeTeamLikeCount) {
+                val diffCount: Long = remoteHomeTeamLikeCount - homeTeamLikeRealCount
+                homeTeamLikeRealCount = remoteHomeTeamLikeCount
+                _homeTeamLikeChangeAmount.emit(diffCount)
             }
-            if (otherTeamLikeRealCount < remoteOtherTeamLikeCount) {
-                val diffCount: Long = remoteOtherTeamLikeCount - otherTeamLikeRealCount
-                otherTeamLikeRealCount = remoteOtherTeamLikeCount
-                _otherTeamLikeChangeAmount.emit(diffCount)
+            if (awayTeamLikeRealCount < remoteAwayTeamLikeCount) {
+                val diffCount: Long = remoteAwayTeamLikeCount - awayTeamLikeRealCount
+                awayTeamLikeRealCount = remoteAwayTeamLikeCount
+                _awayTeamLikeChangeAmount.emit(diffCount)
             }
         }
     }
 
-    suspend fun increaseMyTeamShowingCount(addValue: Long = 1L) {
+    suspend fun increaseHomeTeamShowingCount(addValue: Long = 1L) {
         lock.withLock {
-            _myTeamLikeShowingCount.value =
-                _myTeamLikeShowingCount.value?.plus(addValue) ?: addValue
+            _homeTeamLikeShowingCount.value =
+                _homeTeamLikeShowingCount.value?.plus(addValue) ?: addValue
         }
     }
 
-    suspend fun increaseOtherTeamShowingCount(addValue: Long = 1L) {
+    suspend fun increaseAwayTeamShowingCount(addValue: Long = 1L) {
         lock.withLock {
-            _otherTeamLikeShowingCount.value =
-                _otherTeamLikeShowingCount.value?.plus(addValue) ?: addValue
+            _awayTeamLikeShowingCount.value =
+                _awayTeamLikeShowingCount.value?.plus(addValue) ?: addValue
         }
     }
 
-    suspend fun increaseLikeCount() {
+    suspend fun increaseLikeCount(myTeamType: HomeAwayType) {
         lock.withLock {
-            myTeamLikeRealCount++
+            when (myTeamType) {
+                HomeAwayType.HOME -> homeTeamLikeRealCount++
+                HomeAwayType.AWAY -> awayTeamLikeRealCount++
+            }
             pendingLikeCount++
         }
     }
