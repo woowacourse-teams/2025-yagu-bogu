@@ -77,6 +77,7 @@ fun LivetalkChatScreen(
     val messageStateHolder = viewModel.messageStateHolder
     val likeCountStateHolder = viewModel.likeCountStateHolder
     val teams: LivetalkTeams? by viewModel.teams.collectAsStateWithLifecycle()
+    val latestTeams by rememberUpdatedState(teams)
     val clickedProfile: MemberProfile? by viewModel.selectedProfile.collectAsStateWithLifecycle()
     val chatUiState: LivetalkChatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
@@ -89,7 +90,6 @@ fun LivetalkChatScreen(
 
     val mascotQueue = remember { mutableStateListOf<MascotAnimationItem>() }
     var mascotButtonPos: Offset by remember { mutableStateOf(Offset.Zero) }
-    val latestTeams by rememberUpdatedState(teams)
 
     fun generateMascotAnimation(mascot: DrawableResource) {
         // 클릭 시점의 버튼 위치를 캡처해서 큐에 넣음
@@ -197,15 +197,23 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.homeTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val homeTeamMascot = latestTeams?.homeTeam?.mascot?.takeIf { latestTeams?.isMyTeamGame == true }
-                scheduleMascotWithCounter(
-                    count = count,
-                    scope = this,
-                    increaseCountText = { increment ->
-                        likeCountStateHolder.increaseHomeTeamShowingCount(increment)
-                    },
-                ) {
-                    homeTeamMascot?.let { generateMascotAnimation(it) }
+                val teams = latestTeams
+                when (teams?.isMyTeamGame) {
+                    true -> {
+                        scheduleMascotWithCounter(
+                            count = count,
+                            scope = this,
+                            increaseCountText = { increment ->
+                                likeCountStateHolder.increaseHomeTeamShowingCount(increment)
+                            },
+                        ) {
+                            generateMascotAnimation(teams.homeTeam.mascot)
+                        }
+                    }
+
+                    else -> {
+                        likeCountStateHolder.increaseHomeTeamShowingCount(count)
+                    }
                 }
             }
         }
@@ -215,15 +223,23 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.awayTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val awayTeamMascot = latestTeams?.awayTeam?.mascot?.takeIf { latestTeams?.isMyTeamGame == true }
-                scheduleMascotWithCounter(
-                    count = count,
-                    scope = this,
-                    increaseCountText = { increment ->
-                        likeCountStateHolder.increaseAwayTeamShowingCount(increment)
-                    },
-                ) {
-                    awayTeamMascot?.let { generateMascotAnimation(it) }
+                val teams = latestTeams
+                when (teams?.isMyTeamGame) {
+                    true -> {
+                        scheduleMascotWithCounter(
+                            count = count,
+                            scope = this,
+                            increaseCountText = { increment ->
+                                likeCountStateHolder.increaseAwayTeamShowingCount(increment)
+                            },
+                        ) {
+                            generateMascotAnimation(teams.awayTeam.mascot)
+                        }
+                    }
+
+                    else -> {
+                        likeCountStateHolder.increaseAwayTeamShowingCount(count)
+                    }
                 }
             }
         }
