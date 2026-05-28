@@ -34,6 +34,7 @@ fun LivetalkChatCheeringBar(
     otherTeam: Team,
     myTeamCheeringCount: Long?,
     otherTeamCheeringCount: Long?,
+    showCheeringButton: Boolean,
     modifier: Modifier = Modifier,
     onCheeringClick: () -> Unit,
     onPositioned: (Offset) -> Unit = {},
@@ -58,31 +59,33 @@ fun LivetalkChatCheeringBar(
                 otherTeamCheeringCount = otherTeamCheeringCount,
             )
         }
-        Spacer(Modifier.width(8.dp))
+        if (showCheeringButton) {
+            Spacer(Modifier.width(8.dp))
 
-        Box(
-            modifier = Modifier.size(40.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                painter = painterResource(myTeam.mascot),
-                contentDescription = null,
-                modifier =
-                    Modifier
-                        .size(32.dp)
-                        .shimmerIf(myTeamCheeringCount == null)
-                        .noRippleClickable(
-                            onClick = onCheeringClick,
-                        ).onGloballyPositioned { coordinates ->
-                            val posInRoot = coordinates.positionInRoot()
-                            val centerPos =
-                                Offset(
-                                    x = posInRoot.x + coordinates.size.width / 2f,
-                                    y = posInRoot.y + coordinates.size.height / 2f,
-                                )
-                            onPositioned(centerPos)
-                        },
-            )
+            Box(
+                modifier = Modifier.size(40.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(myTeam.mascot),
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .size(32.dp)
+                            .shimmerIf(myTeamCheeringCount == null)
+                            .noRippleClickable(
+                                onClick = onCheeringClick,
+                            ).onGloballyPositioned { coordinates ->
+                                val posInRoot = coordinates.positionInRoot()
+                                val centerPos =
+                                    Offset(
+                                        x = posInRoot.x + coordinates.size.width / 2f,
+                                        y = posInRoot.y + coordinates.size.height / 2f,
+                                    )
+                                onPositioned(centerPos)
+                            },
+                )
+            }
         }
     }
 }
@@ -95,6 +98,7 @@ private fun LivetalkChatCheeringBarPreviewShimmer() {
         otherTeam = Team.HT,
         myTeamCheeringCount = null,
         otherTeamCheeringCount = null,
+        showCheeringButton = true,
         onCheeringClick = {},
         onPositioned = {},
     )
@@ -108,6 +112,7 @@ private fun LivetalkChatCheeringBarPreview() {
         otherTeam = Team.HT,
         myTeamCheeringCount = 12345L,
         otherTeamCheeringCount = 54321L,
+        showCheeringButton = true,
         onCheeringClick = {},
         onPositioned = {},
     )

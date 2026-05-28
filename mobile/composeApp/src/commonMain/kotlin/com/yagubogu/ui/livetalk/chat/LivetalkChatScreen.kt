@@ -194,7 +194,7 @@ fun LivetalkChatScreen(
     LaunchedEffect(Unit) {
         likeCountStateHolder.myTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val myTeamMascot = teams?.myTeamMascot ?: return@collect
+                val myTeamMascot = teams?.myTeamMascot
                 scheduleMascotWithCounter(
                     count = count,
                     scope = this,
@@ -202,22 +202,25 @@ fun LivetalkChatScreen(
                         likeCountStateHolder.increaseMyTeamShowingCount(increment)
                     },
                 ) {
-                    generateMascotAnimation(myTeamMascot)
+                    myTeamMascot?.let { generateMascotAnimation(it) }
                 }
             }
         }
     }
 
-    // 상대 팀 (이모지 애니메이션만)
+    // 상대 팀 (카운트 증가 + 이모지 애니메이션)
     LaunchedEffect(Unit) {
         likeCountStateHolder.otherTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val otherTeamMascot = teams?.otherTeamMascot ?: return@collect
+                val otherTeamMascot = teams?.otherTeamMascot
                 scheduleMascotWithCounter(
                     count = count,
                     scope = this,
+                    increaseCountText = { increment ->
+                        likeCountStateHolder.increaseOtherTeamShowingCount(increment)
+                    },
                 ) {
-                    generateMascotAnimation(otherTeamMascot)
+                    otherTeamMascot?.let { generateMascotAnimation(it) }
                 }
             }
         }
@@ -318,12 +321,13 @@ fun LivetalkChatScreenContent(
                 val myTeam = myTeamCheeringState.team
                 val otherTeam = otherTeamCheeringState.team
                 when {
-                    myTeam != null && otherTeam != null && state.toolbar.teams?.myTeamType != null -> {
+                    myTeam != null && otherTeam != null -> {
                         LivetalkChatCheeringBar(
                             myTeam = myTeam,
                             otherTeam = otherTeam,
                             myTeamCheeringCount = myTeamCheeringState.showingCount,
                             otherTeamCheeringCount = otherTeamCheeringState.showingCount,
+                            showCheeringButton = state.toolbar.teams?.isFavoriteTeamGame == true,
                             onCheeringClick = {
                                 actions.chatCheering.onCheeringClick(myTeam.mascot)
                             },

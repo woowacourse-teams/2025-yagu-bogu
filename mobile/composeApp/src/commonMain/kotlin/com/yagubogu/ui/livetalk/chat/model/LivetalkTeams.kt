@@ -13,19 +13,32 @@ class LivetalkTeams(
 ) {
     val homeTeam: Team = Team.getByCode(homeTeamCode)
     val awayTeam: Team = Team.getByCode(awayTeamCode)
-    val myTeam: Team = Team.getByCode(myTeamCode)
-    val myTeamMascot: DrawableResource = myTeam.mascot
+    val favoriteTeam: Team = Team.getByCode(myTeamCode)
     val myTeamType: HomeAwayType? =
-        when (myTeam) {
+        when (favoriteTeam) {
             homeTeam -> HomeAwayType.HOME
             awayTeam -> HomeAwayType.AWAY
             else -> null
         }
-    val otherTeam: Team? =
+
+    val isFavoriteTeamGame: Boolean = myTeamType != null
+    val myTeam: Team =
+        when (myTeamType) {
+            HomeAwayType.HOME -> homeTeam
+            HomeAwayType.AWAY -> awayTeam
+            null -> homeTeam
+        }
+    val myTeamMascot: DrawableResource? =
+        when (myTeamType) {
+            HomeAwayType.HOME -> homeTeam.mascot
+            HomeAwayType.AWAY -> awayTeam.mascot
+            null -> null
+        }
+    val otherTeam: Team =
         when (myTeamType) {
             HomeAwayType.HOME -> awayTeam
             HomeAwayType.AWAY -> homeTeam
-            null -> null
+            null -> awayTeam
         }
     val otherTeamMascot: DrawableResource? =
         when (myTeamType) {

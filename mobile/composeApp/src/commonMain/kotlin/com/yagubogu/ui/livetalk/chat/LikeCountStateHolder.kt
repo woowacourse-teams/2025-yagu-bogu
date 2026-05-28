@@ -63,7 +63,7 @@ class LikeCountStateHolder {
             if (likeCountsResponse.counts.isEmpty()) {
                 0L
             } else {
-                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam?.name }?.totalCount
+                likeCountsResponse.counts.firstOrNull { it.teamCode == livetalkTeams.otherTeam.name }?.totalCount
                     ?: 0L
             }
         logger.d { "remoteMyTeamLikeCount : $remoteMyTeamLikeCount" }
@@ -97,6 +97,13 @@ class LikeCountStateHolder {
         lock.withLock {
             _myTeamLikeShowingCount.value =
                 _myTeamLikeShowingCount.value?.plus(addValue) ?: addValue
+        }
+    }
+
+    suspend fun increaseOtherTeamShowingCount(addValue: Long = 1L) {
+        lock.withLock {
+            _otherTeamLikeShowingCount.value =
+                _otherTeamLikeShowingCount.value?.plus(addValue) ?: addValue
         }
     }
 
