@@ -1,5 +1,6 @@
 package com.yagubogu.ui.attendance.detail
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHostState
@@ -36,10 +38,13 @@ import com.yagubogu.ui.attendance.detail.model.PlayerRecordUiModel
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.main.component.LoadingOverlay
+import com.yagubogu.ui.share.rememberImageSharer
+import com.yagubogu.ui.share.shareAttendanceExampleImage
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.util.LocalSnackbarHostState
 import com.yagubogu.ui.util.showSingleSnackbar
 import com.yagubogu.ui.util.yyyyMMddDayOfWeekFormatter
+import kotlinx.coroutines.launch
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -51,6 +56,7 @@ import yagubogu.composeapp.generated.resources.attendance_detail_delete
 import yagubogu.composeapp.generated.resources.ic_share
 import yagubogu.composeapp.generated.resources.ic_trash
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceDetailScreen(
     item: AttendanceHistoryItem,
@@ -63,6 +69,7 @@ fun AttendanceDetailScreen(
 
     val snackbarState: SnackbarHostState = LocalSnackbarHostState.current
     val scope = rememberCoroutineScope()
+    val imageSharer = rememberImageSharer()
     val pagerState = rememberPagerState { AttendanceDetailTab.entries.size }
 
     val playerRecordUiModel: PlayerRecordUiModel by viewModel.playerRecordUiModel.collectAsStateWithLifecycle()
@@ -104,6 +111,11 @@ fun AttendanceDetailScreen(
         onEditClick = viewModel::editDiary,
         onSaveClick = viewModel::saveDiary,
         onImagePickerError = { message -> snackbarState.showSingleSnackbar(scope, message) },
+        onShareClick = {
+            scope.launch {
+                shareAttendanceExampleImage(imageSharer)
+            }
+        },
         modifier = modifier,
     )
 
@@ -139,6 +151,7 @@ private fun AttendanceDetailScreen(
     onEditClick: () -> Unit,
     onSaveClick: (comment: String) -> Unit,
     onImagePickerError: (message: StringResource) -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
@@ -154,6 +167,7 @@ private fun AttendanceDetailScreen(
                 date = date,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
+                onShareClick = onShareClick,
             )
             if (!isKeyboardVisible) {
                 AttendanceDetailTabRow(pagerState)
@@ -191,6 +205,7 @@ private fun AttendanceDetailToolbar(
     date: String,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DefaultToolbar(
@@ -198,7 +213,7 @@ private fun AttendanceDetailToolbar(
         modifier = modifier,
         title = date,
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = onShareClick) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_share),
                     contentDescription = null,
@@ -230,5 +245,6 @@ private fun AttendanceDetailScreenDiaryTabPreview() {
         onEditClick = {},
         onSaveClick = { _ -> },
         onImagePickerError = {},
+        onShareClick = {},
     )
 }

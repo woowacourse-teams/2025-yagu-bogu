@@ -15,15 +15,21 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yagubogu.ui.share.ImageSharer
+import com.yagubogu.ui.share.rememberImageSharer
+import com.yagubogu.ui.share.shareAttendanceExampleImage
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray800
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.YaguBoguTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
@@ -38,6 +44,9 @@ fun AttendanceShareBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
+    val imageSharer: ImageSharer = rememberImageSharer()
+    val scope: CoroutineScope = rememberCoroutineScope()
+
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
@@ -45,7 +54,12 @@ fun AttendanceShareBottomSheet(
         modifier = modifier,
     ) {
         AttendanceShareBottomSheetContent(
-            onShareClick = onShareClick,
+            onShareClick = {
+                scope.launch {
+                    shareAttendanceExampleImage(imageSharer)
+                    onShareClick()
+                }
+            },
         )
     }
 }
