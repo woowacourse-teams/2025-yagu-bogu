@@ -11,12 +11,14 @@ import com.yagubogu.domain.usecase.DeleteCheckInUseCase
 import com.yagubogu.domain.usecase.LoadDiaryUseCase
 import com.yagubogu.ui.attendance.detail.AttendanceDetailViewModel.Companion.DIARY_MAX_IMAGE_SIZE
 import com.yagubogu.ui.attendance.detail.model.AttendanceDetailDiaryUiState
+import com.yagubogu.ui.attendance.detail.model.AttendanceDetailShareUiState
 import com.yagubogu.ui.attendance.detail.model.AttendanceDetailUiEvent
 import com.yagubogu.ui.attendance.detail.model.DiaryImageItem
 import com.yagubogu.ui.attendance.detail.model.DiaryMode
 import com.yagubogu.ui.attendance.detail.model.PlayerRecordUiModel
 import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.mapper.toUiModel
+import com.yagubogu.ui.share.LoadAttendanceTicketShareDataUseCase
 import com.yagubogu.ui.util.ImageCompressionSpec
 import com.yagubogu.ui.util.compressImage
 import kotlinx.collections.immutable.ImmutableList
@@ -42,6 +44,7 @@ import yagubogu.composeapp.generated.resources.attendance_detail_upload_image_fa
 class AttendanceDetailViewModel(
     private val checkInId: Long,
     private val checkInRepository: CheckInRepository,
+    private val loadAttendanceTicketShareDataUseCase: LoadAttendanceTicketShareDataUseCase,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val loadDiaryUseCase: LoadDiaryUseCase,
     private val deleteCheckInUseCase: DeleteCheckInUseCase,
@@ -54,6 +57,9 @@ class AttendanceDetailViewModel(
     private val _attendanceDetailDiaryUiState = MutableStateFlow(AttendanceDetailDiaryUiState())
     val attendanceDetailDiaryUiState: StateFlow<AttendanceDetailDiaryUiState> =
         _attendanceDetailDiaryUiState.asStateFlow()
+
+    private val _shareUiState = MutableStateFlow(AttendanceDetailShareUiState())
+    val shareUiState: StateFlow<AttendanceDetailShareUiState> = _shareUiState.asStateFlow()
 
     private val _uiEvent =
         MutableSharedFlow<AttendanceDetailUiEvent>(
@@ -131,6 +137,23 @@ class AttendanceDetailViewModel(
             } else {
                 _attendanceDetailDiaryUiState.update { it.copy(isLoading = false) }
             }
+        }
+    }
+
+    fun loadShareData(year: Int) {
+        viewModelScope.launch {
+            _shareUiState.value = AttendanceDetailShareUiState()
+
+            loadAttendanceTicketShareDataUseCase(year)
+                .onSuccess { shareData ->
+                    _shareUiState.value =
+                        AttendanceDetailShareUiState(
+                            shareData = shareData,
+                            isLoaded = shareData.isReady,
+                        )
+                }.onFailure { exception ->
+                    logger.w(exception) { "공유용 직관 데이터 조회 실패" }
+                }
         }
     }
 

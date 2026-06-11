@@ -21,15 +21,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEM_PLAYED
 import com.yagubogu.ui.attendance.detail.component.AttendanceDetailTabRow
 import com.yagubogu.ui.attendance.detail.component.DeleteDiaryDialog
 import com.yagubogu.ui.attendance.detail.component.ExitDiaryDialog
 import com.yagubogu.ui.attendance.detail.model.AttendanceDetailDiaryUiState
+import com.yagubogu.ui.attendance.detail.model.AttendanceDetailShareUiState
 import com.yagubogu.ui.attendance.detail.model.AttendanceDetailTab
 import com.yagubogu.ui.attendance.detail.model.AttendanceDetailUiEvent
 import com.yagubogu.ui.attendance.detail.model.DiaryMode
@@ -38,13 +42,13 @@ import com.yagubogu.ui.attendance.detail.model.PlayerRecordUiModel
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.main.component.LoadingOverlay
+import com.yagubogu.ui.share.AttendanceTicketCaptureLayer
 import com.yagubogu.ui.share.rememberImageSharer
-import com.yagubogu.ui.share.shareAttendanceExampleImage
+import com.yagubogu.ui.share.shareAttendanceTicketImage
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.util.LocalSnackbarHostState
 import com.yagubogu.ui.util.showSingleSnackbar
 import com.yagubogu.ui.util.yyyyMMddDayOfWeekFormatter
-import kotlinx.coroutines.launch
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -56,6 +60,8 @@ import yagubogu.composeapp.generated.resources.attendance_detail_delete
 import yagubogu.composeapp.generated.resources.ic_share
 import yagubogu.composeapp.generated.resources.ic_trash
 
+private val shareLogger = Logger.withTag("AttendanceDetailShare")
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AttendanceDetailScreen(
@@ -66,14 +72,19 @@ fun AttendanceDetailScreen(
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var shareRequestKey: Int by remember(item.id) { mutableStateOf(0) }
+    var isCaptureLayerVisible: Boolean by remember(item.id) { mutableStateOf(false) }
 
     val snackbarState: SnackbarHostState = LocalSnackbarHostState.current
     val scope = rememberCoroutineScope()
     val imageSharer = rememberImageSharer()
+    val graphicsLayer = rememberGraphicsLayer()
     val pagerState = rememberPagerState { AttendanceDetailTab.entries.size }
 
     val playerRecordUiModel: PlayerRecordUiModel by viewModel.playerRecordUiModel.collectAsStateWithLifecycle()
     val attendanceDetailDiaryUiState: AttendanceDetailDiaryUiState by viewModel.attendanceDetailDiaryUiState.collectAsStateWithLifecycle()
+    val shareUiState: AttendanceDetailShareUiState by viewModel.shareUiState.collectAsStateWithLifecycle()
+    val isShareEnabled = shareUiState.isLoaded && !isCaptureLayerVisible
 
     val isWriting =
         pagerState.currentPage == AttendanceDetailTab.DIARY.ordinal && attendanceDetailDiaryUiState.mode == DiaryMode.WRITE
@@ -92,12 +103,35 @@ fun AttendanceDetailScreen(
         }
     }
 
+    LaunchedEffect(item.id) {
+        viewModel.loadShareData(year = item.dateTime.year)
+    }
+
+    LaunchedEffect(shareRequestKey) {
+        if (shareRequestKey == 0) return@LaunchedEffect
+
+        withFrameNanos { }
+
+        try {
+            shareAttendanceTicketImage(
+                graphicsLayer = graphicsLayer,
+                imageSharer = imageSharer,
+                checkInId = item.id,
+            )
+        } catch (exception: Exception) {
+            shareLogger.w(exception) { "Ticket capture failed" }
+        } finally {
+            isCaptureLayerVisible = false
+        }
+    }
+
     AttendanceDetailScreen(
         item = item,
         playerRecordUiModel = playerRecordUiModel,
         attendanceDetailDiaryUiState = attendanceDetailDiaryUiState,
         date = item.dateTime.date.format(yyyyMMddDayOfWeekFormatter),
         pagerState = pagerState,
+        isShareEnabled = isShareEnabled,
         onBackClick = {
             when {
                 attendanceDetailDiaryUiState.isLoading -> Unit
@@ -112,12 +146,21 @@ fun AttendanceDetailScreen(
         onSaveClick = viewModel::saveDiary,
         onImagePickerError = { message -> snackbarState.showSingleSnackbar(scope, message) },
         onShareClick = {
-            scope.launch {
-                shareAttendanceExampleImage(imageSharer)
-            }
+            isCaptureLayerVisible = true
+            shareRequestKey++
         },
         modifier = modifier,
     )
+
+    if (isCaptureLayerVisible) {
+        shareUiState.shareData?.let { shareData ->
+            AttendanceTicketCaptureLayer(
+                item = item,
+                shareData = shareData,
+                graphicsLayer = graphicsLayer,
+            )
+        }
+    }
 
     if (showExitDialog) {
         ExitDiaryDialog(
@@ -144,6 +187,7 @@ private fun AttendanceDetailScreen(
     attendanceDetailDiaryUiState: AttendanceDetailDiaryUiState,
     pagerState: PagerState,
     date: String,
+    isShareEnabled: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImagesSelected: (images: List<String>) -> Unit,
@@ -167,6 +211,7 @@ private fun AttendanceDetailScreen(
                 date = date,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
+                isShareEnabled = isShareEnabled,
                 onShareClick = onShareClick,
             )
             if (!isKeyboardVisible) {
@@ -205,6 +250,7 @@ private fun AttendanceDetailToolbar(
     date: String,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    isShareEnabled: Boolean,
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -213,7 +259,10 @@ private fun AttendanceDetailToolbar(
         modifier = modifier,
         title = date,
         actions = {
-            IconButton(onClick = onShareClick) {
+            IconButton(
+                enabled = isShareEnabled,
+                onClick = onShareClick,
+            ) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_share),
                     contentDescription = null,
@@ -238,6 +287,7 @@ private fun AttendanceDetailScreenDiaryTabPreview() {
         attendanceDetailDiaryUiState = AttendanceDetailDiaryUiState(),
         pagerState = rememberPagerState(AttendanceDetailTab.DIARY.ordinal) { AttendanceDetailTab.entries.size },
         date = "2025.08.14 (목)",
+        isShareEnabled = true,
         onBackClick = {},
         onDeleteClick = {},
         onImagesSelected = {},

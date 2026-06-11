@@ -150,6 +150,7 @@ private fun AttendanceList(
 
     shareTargetItem?.let { item: AttendanceHistoryItem ->
         AttendanceShareBottomSheet(
+            item = item,
             onShareClick = { shareTargetItem = null },
             onDismiss = { shareTargetItem = null },
         )

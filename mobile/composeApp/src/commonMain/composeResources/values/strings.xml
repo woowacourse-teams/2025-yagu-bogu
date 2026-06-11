@@ -306,4 +306,16 @@
     <string name="profile_representative_badge_content_description">대표 배지 이미지</string>
     <string name="profile_victory_fairy_ranking_emoji">🎖️</string>
     <string name="profile_victory_fairy_score_emoji">🧚</string>
+
+    <!-- 직관 결과 SNS 공유 리소스 -->
+    <string name="attendance_share_quote_win">오늘은 내가 승리요정!</string>
+    <string name="attendance_share_quote_lose">다음엔 꼭 승리요정!</string>
+    <string name="attendance_share_quote_draw">끝까지 뜨거웠던 승부!</string>
+    <string name="attendance_share_quote_neutral">오늘도 야구장 출석!</string>
+    <string name="attendance_share_history_title">%1$d년 직관 기록</string>
+    <string name="attendance_share_stat_win_count">%1$d승</string>
+    <string name="attendance_share_stat_draw_lose_count">%1$d무 %2$d패</string>
+    <string name="attendance_share_stat_total_count">%1$d번째</string>
+    <string name="attendance_share_stat_total_label">직관</string>
+    <string name="attendance_share_footer_cta">클릭 한번에 직관 기록은 야구보구</string>
 </resources>

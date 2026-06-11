@@ -108,6 +108,7 @@ fun AttendanceCalendarContent(
 
     shareTargetItem?.let { item: AttendanceHistoryItem ->
         AttendanceShareBottomSheet(
+            item = item,
             onShareClick = { shareTargetItem = null },
             onDismiss = { shareTargetItem = null },
         )

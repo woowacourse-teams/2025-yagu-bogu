@@ -76,6 +76,7 @@ val viewModelModule =
             AttendanceDetailViewModel(
                 checkInId = checkInId,
                 checkInRepository = get(),
+                loadAttendanceTicketShareDataUseCase = get(),
                 thirdPartyRepository = get(),
                 loadDiaryUseCase = get(),
                 deleteCheckInUseCase = get(),
