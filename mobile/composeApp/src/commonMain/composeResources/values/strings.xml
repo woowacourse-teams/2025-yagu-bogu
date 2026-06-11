@@ -138,6 +138,7 @@
     <string name="attendance_history_hits">안타</string>
     <string name="attendance_history_errors">실책</string>
     <string name="attendance_history_balls">사사구</string>
+    <string name="attendance_history_share">SNS로 공유하기</string>
 
     <string name="attendance_detail_tab_game_record">경기 기록</string>
     <string name="attendance_detail_tab_diary">직관 기록</string>

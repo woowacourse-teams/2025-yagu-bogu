@@ -48,6 +48,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.attendance_detail_delete
+import yagubogu.composeapp.generated.resources.ic_share
 import yagubogu.composeapp.generated.resources.ic_trash
 
 @Composable
@@ -197,6 +198,12 @@ private fun AttendanceDetailToolbar(
         modifier = modifier,
         title = date,
         actions = {
+            IconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_share),
+                    contentDescription = null,
+                )
+            }
             IconButton(onClick = onDeleteClick) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_trash),
