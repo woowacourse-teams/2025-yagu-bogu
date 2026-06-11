@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.attendance.component.ATTENDANCE_HISTORY_ITEM_PLAYED
 import com.yagubogu.ui.attendance.detail.component.AttendanceDetailTabRow
 import com.yagubogu.ui.attendance.detail.component.DeleteDiaryDialog
@@ -146,6 +147,7 @@ fun AttendanceDetailScreen(
         onSaveClick = viewModel::saveDiary,
         onImagePickerError = { message -> snackbarState.showSingleSnackbar(scope, message) },
         onShareClick = {
+            AnalyticsLogger.logEvent("attendance_share", mapOf("source" to "detail_screen"))
             isCaptureLayerVisible = true
             shareRequestKey++
         },

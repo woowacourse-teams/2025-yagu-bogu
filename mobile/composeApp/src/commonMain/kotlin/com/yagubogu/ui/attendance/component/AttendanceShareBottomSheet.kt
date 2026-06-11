@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.share.AttendanceTicketCaptureLayer
 import com.yagubogu.ui.share.AttendanceTicketShareData
@@ -90,6 +91,7 @@ fun AttendanceShareBottomSheet(
             AttendanceShareBottomSheetContent(
                 isShareEnabled = isShareDataLoaded,
                 onShareClick = {
+                    AnalyticsLogger.logEvent("attendance_share", mapOf("source" to "bottom_sheet"))
                     scope.launch {
                         try {
                             shareAttendanceTicketImage(
