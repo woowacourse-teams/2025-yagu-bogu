@@ -4,8 +4,11 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import java.io.File
@@ -59,4 +62,11 @@ private class AndroidImageSharer(
     companion object {
         private const val SHARE_DIRECTORY_NAME = "share"
     }
+}
+
+actual fun ImageBitmap.toByteArray(): ByteArray {
+    val bitmap = this.asAndroidBitmap()
+    val stream = java.io.ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    return stream.toByteArray()
 }
