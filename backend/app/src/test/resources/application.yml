@@ -67,11 +67,14 @@ sse:
 app:
   s3:
     bucket: yagubogu
+    check-in-private-bucket: yagubogu-check-in-image-private
     presign-expiration: 10m
     endpoint: https://test-account.r2.cloudflarestorage.com
     region: auto
     public-base-url: https://images.yagubogu.com
     default-profile-image-url: https://images.yagubogu.com/images/defaults/profile.png
+    check-in-access-key-id: test-check-in-access-key
+    check-in-secret-access-key: test-check-in-secret-key
   clock:
     fixed-date: 2024-08-15
 

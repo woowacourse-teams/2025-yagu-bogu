@@ -17,7 +17,10 @@ class S3PropertiesTest {
                 "https://test-account.r2.cloudflarestorage.com",
                 "auto",
                 "https://images.yagubogu.com/",
-                "https://images.yagubogu.com/images/defaults/profile.png"
+                "https://images.yagubogu.com/images/defaults/profile.png",
+                "yagubogu-check-in-image-private",
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
         );
 
         String objectUrl = properties.objectUrl("/profile/abc-123");
@@ -35,7 +38,10 @@ class S3PropertiesTest {
                 "https://test-account.r2.cloudflarestorage.com/",
                 "auto",
                 null,
-                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png"
+                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png",
+                "yagubogu-check-in-image-private",
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
         );
 
         String objectUrl = properties.objectUrl("profile/abc-123");
@@ -53,7 +59,10 @@ class S3PropertiesTest {
                 "https://test-account.r2.cloudflarestorage.com/yagubogu",
                 "auto",
                 null,
-                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png"
+                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png",
+                "yagubogu-check-in-image-private",
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
         );
 
         assertThat(properties.apiEndpoint())
@@ -69,12 +78,34 @@ class S3PropertiesTest {
                 "https://test-account.r2.cloudflarestorage.com/yagubogu",
                 "auto",
                 "https://test-account.r2.cloudflarestorage.com/yagubogu/yagubogu",
-                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png"
+                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png",
+                "yagubogu-check-in-image-private",
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
         );
 
         String objectUrl = properties.objectUrl("profile/abc-123");
 
         assertThat(objectUrl)
                 .isEqualTo("https://test-account.r2.cloudflarestorage.com/yagubogu/profile/abc-123");
+    }
+
+    @DisplayName("endpoint에 check-in private bucket 경로가 있어도 API endpoint에서는 bucket 경로를 제거한다")
+    @Test
+    void apiEndpoint_removesCheckInPrivateBucketPath() {
+        S3Properties properties = new S3Properties(
+                "yagubogu",
+                Duration.ofMinutes(5),
+                "https://test-account.r2.cloudflarestorage.com/yagubogu-check-in-image-private",
+                "auto",
+                null,
+                "https://test-account.r2.cloudflarestorage.com/yagubogu/images/defaults/profile.png",
+                "yagubogu-check-in-image-private",
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
+        );
+
+        assertThat(properties.apiEndpoint())
+                .isEqualTo("https://test-account.r2.cloudflarestorage.com");
     }
 }

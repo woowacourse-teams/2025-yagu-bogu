@@ -27,19 +27,21 @@ import com.yagubogu.sse.dto.GameWithFanRateParam;
 import com.yagubogu.sse.dto.event.CheckInCreatedEvent;
 import com.yagubogu.stat.repository.LocationCheckInRankingRepository;
 import com.yagubogu.team.domain.Team;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class CheckInService {
@@ -55,7 +57,34 @@ public class CheckInService {
     private final LocationCheckInRankingRepository locationCheckInRankingRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
     private final S3Properties s3Properties;
+
+    public CheckInService(
+            final CheckInRepository checkInRepository,
+            final CheckInImageRepository checkInImageRepository,
+            final MemberRepository memberRepository,
+            final GameRepository gameRepository,
+            final GameHitterRecordRepository hitterRecordRepository,
+            final GamePitcherRecordRepository pitcherRecordRepository,
+            final LocationCheckInRankingRepository locationCheckInRankingRepository,
+            final ApplicationEventPublisher applicationEventPublisher,
+            @Qualifier("checkInS3") final S3Client s3Client,
+            @Qualifier("checkInPresigner") final S3Presigner s3Presigner,
+            final S3Properties s3Properties
+    ) {
+        this.checkInRepository = checkInRepository;
+        this.checkInImageRepository = checkInImageRepository;
+        this.memberRepository = memberRepository;
+        this.gameRepository = gameRepository;
+        this.hitterRecordRepository = hitterRecordRepository;
+        this.pitcherRecordRepository = pitcherRecordRepository;
+        this.locationCheckInRankingRepository = locationCheckInRankingRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
+        this.s3Properties = s3Properties;
+    }
 
     @Transactional
     public void createCheckIn(final Long memberId, final CreateCheckInRequest request) {
@@ -117,9 +146,9 @@ public class CheckInService {
     public CheckInImageParam addImage(final Long memberId, final Long checkInId, final String imageKey) {
         Member member = getMember(memberId);
         CheckIn checkIn = getCheckInByIdAndMember(checkInId, member);
-        String imageUrl = resolveImageUrl(imageKey);
-        CheckInImage image = checkInImageRepository.save(new CheckInImage(checkIn, imageUrl));
-        return new CheckInImageParam(image.getId(), image.getImageUrl());
+        assertObjectExists(imageKey);
+        CheckInImage image = checkInImageRepository.save(CheckInImage.privateImage(checkIn, imageKey));
+        return new CheckInImageParam(image.getId(), resolveImageUrl(image));
     }
 
     @Transactional
@@ -136,7 +165,7 @@ public class CheckInService {
         Member member = getMember(memberId);
         getCheckInByIdAndMember(checkInId, member);
         List<CheckInImageParam> images = checkInImageRepository.findByCheckInId(checkInId).stream()
-                .map(img -> new CheckInImageParam(img.getId(), img.getImageUrl()))
+                .map(img -> new CheckInImageParam(img.getId(), resolveImageUrl(img)))
                 .toList();
         return new CheckInImagesResponse(images);
     }
@@ -292,14 +321,31 @@ public class CheckInService {
         return Math.round(((double) checkInCounts / total) * 1000) / ROUND_FACTOR;
     }
 
-    private String resolveImageUrl(final String imageKey) {
-        assertObjectExists(imageKey);
-        return s3Properties.objectUrl(imageKey);
+    private String resolveImageUrl(final CheckInImage image) {
+        if (image.hasImageKey()) {
+            return createSignedImageUrl(image.getImageKey());
+        }
+        return image.getImageUrl();
+    }
+
+    private String createSignedImageUrl(final String imageKey) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(s3Properties.checkInPrivateBucket())
+                .key(imageKey)
+                .build();
+
+        return s3Presigner.presignGetObject(b -> b
+                .signatureDuration(s3Properties.presignExpiration())
+                .getObjectRequest(getObjectRequest)).url().toString();
     }
 
     private void assertObjectExists(final String key) {
         try {
-            s3Client.headObject(r -> r.bucket(s3Properties.bucket()).key(key));
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(s3Properties.checkInPrivateBucket())
+                    .key(key)
+                    .build();
+            s3Client.headObject(headObjectRequest);
         } catch (NoSuchKeyException e) {
             throw new NotFoundException("File does not exist in S3: " + key);
         }
