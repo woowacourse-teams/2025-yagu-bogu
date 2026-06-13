@@ -27,8 +27,14 @@ public class TicketService {
                 recordYear
         );
         double winRate = calculateWinRate(statCounts.winCounts(), statCounts.winCounts() + statCounts.loseCounts());
+        int checkInCounts = checkInRepository.countByMemberAndYearUntilCheckIn(
+                checkIn.getMember(),
+                recordYear,
+                checkIn.getGame().getDate(),
+                checkIn.getId()
+        );
 
-        return TicketResponse.from(checkIn, recordYear, statCounts, winRate);
+        return TicketResponse.from(checkIn, recordYear, statCounts, winRate, checkInCounts);
     }
 
     private double calculateWinRate(final long winCounts, final long totalCountsWithoutDraw) {

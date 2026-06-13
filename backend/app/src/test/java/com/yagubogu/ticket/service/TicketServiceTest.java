@@ -77,6 +77,7 @@ class TicketServiceTest {
                 .team(lg)
                 .game(targetGame)
         );
+        saveCheckIn(member, lg, 7, doosan, 2, LocalDate.of(2026, 6, 1));
         saveCheckIn(member, lg, 8, doosan, 0, LocalDate.of(2025, 5, 7));
 
         // when
@@ -91,10 +92,10 @@ class TicketServiceTest {
         assertThat(actual.stadiumName()).isEqualTo("잠실 야구장");
         assertThat(actual.attendanceDate()).isEqualTo(LocalDate.of(2026, 5, 7));
         assertThat(actual.record().year()).isEqualTo(2026);
-        assertThat(actual.record().winCounts()).isEqualTo(2);
+        assertThat(actual.record().winCounts()).isEqualTo(3);
         assertThat(actual.record().drawCounts()).isZero();
         assertThat(actual.record().loseCounts()).isEqualTo(1);
-        assertThat(actual.record().winRate()).isEqualTo(66.7);
+        assertThat(actual.record().winRate()).isEqualTo(75.0);
         assertThat(actual.record().checkInCounts()).isEqualTo(3);
     }
 

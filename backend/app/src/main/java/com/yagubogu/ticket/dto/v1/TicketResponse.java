@@ -20,7 +20,8 @@ public record TicketResponse(
             final CheckIn checkIn,
             final int recordYear,
             final StatCountsParam statCounts,
-            final double winRate
+            final double winRate,
+            final int checkInCounts
     ) {
         Game game = checkIn.getGame();
 
@@ -30,7 +31,7 @@ public record TicketResponse(
                 game.getHomeScore(),
                 game.getAwayScore(),
                 checkIn.getTeam().getTeamCode(),
-                TicketRecordResponse.from(recordYear, statCounts, winRate),
+                TicketRecordResponse.from(recordYear, statCounts, winRate, checkInCounts),
                 game.getStadium().getFullName(),
                 game.getDate()
         );
@@ -48,10 +49,9 @@ public record TicketResponse(
         private static TicketRecordResponse from(
                 final int year,
                 final StatCountsParam statCounts,
-                final double winRate
+                final double winRate,
+                final int checkInCounts
         ) {
-            int checkInCounts = statCounts.winCounts() + statCounts.drawCounts() + statCounts.loseCounts();
-
             return new TicketRecordResponse(
                     year,
                     statCounts.winCounts(),

@@ -107,6 +107,28 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
+    public int countByMemberAndYearUntilCheckIn(
+            final Member member,
+            final int year,
+            final LocalDate gameDate,
+            final Long checkInId
+    ) {
+        Long result = jpaQueryFactory
+                .select(CHECK_IN.id.count())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.eq(member),
+                        isBetweenYear(GAME, year),
+                        GAME.date.lt(gameDate)
+                                .or(GAME.date.eq(gameDate).and(CHECK_IN.id.loe(checkInId)))
+                )
+                .fetchOne();
+
+        return result == null ? 0 : result.intValue();
+    }
+
+    @Override
     public int findWinCounts(final Member member, final Integer year) {
         return conditionCount(member, year, winCondition(QCheckIn.checkIn, QGame.game));
     }
