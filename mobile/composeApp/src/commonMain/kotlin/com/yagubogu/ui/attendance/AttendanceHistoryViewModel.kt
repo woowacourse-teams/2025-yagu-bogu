@@ -7,12 +7,14 @@ import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.domain.model.PastCheckInAdState
 import com.yagubogu.ui.attendance.model.AttendanceFilterState
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.mapper.toAttendanceUiModel
+import com.yagubogu.ui.mapper.toDomain
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
@@ -42,10 +44,10 @@ class AttendanceHistoryViewModel(
     private val _gameDates = MutableStateFlow<Set<LocalDate>>(emptySet())
     val gameDates: StateFlow<Set<LocalDate>> = _gameDates.asStateFlow()
 
-    private val _selectedMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    private val _selectedMonth = MutableStateFlow(YearMonth.now())
     val selectedMonth: StateFlow<YearMonth> = _selectedMonth.asStateFlow()
 
-    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     private val _filterState =
@@ -77,12 +79,8 @@ class AttendanceHistoryViewModel(
         )
     val showInterstitialAdEvent: SharedFlow<Unit> = _showInterstitialAdEvent.asSharedFlow()
 
-    private var isPastCheckInAdEnabled = true
-    private var pastCheckInCount = 0
-
-    init {
-        isPastCheckInAdEnabled = appConfigRepository.isPastCheckInAdEnabled()
-    }
+    private val pastCheckInAdState: PastCheckInAdState =
+        appConfigRepository.getPastCheckInAdConfig().toDomain()
 
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth,
@@ -153,8 +151,7 @@ class AttendanceHistoryViewModel(
     }
 
     private suspend fun emitPastCheckInEvent() {
-        pastCheckInCount++
-        if (isPastCheckInAdEnabled && pastCheckInCount % 3 == 1) {
+        if (pastCheckInAdState.incrementAndShouldShowAd()) {
             _showInterstitialAdEvent.emit(Unit)
         } else {
             _pastCheckInUiEvent.emit(Unit)
