@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +33,7 @@ import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardMedium
+import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
@@ -69,38 +70,46 @@ fun LivetalkStadiumItem(
                 .padding(20.dp),
     ) {
         Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = item.stadiumName,
-                style = PretendardBold.copy(fontSize = 18.dpToSp),
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-
             Row(
-                modifier = Modifier.weight(1.0f),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1.0f),
             ) {
-                if (item.weatherUiModel != null) {
-                    val weatherStatusText =
-                        stringResource(item.weatherUiModel.condition.toStringResource())
+                Text(
+                    text = item.stadiumName,
+                    style = PretendardBold.copy(fontSize = 18.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (item.weatherUiModel != null) {
+                        val weatherStatusText =
+                            stringResource(item.weatherUiModel.condition.toStringResource())
+                        IconWithText(
+                            icon = item.weatherUiModel.condition.toResource(),
+                            iconDescription =
+                                stringResource(
+                                    Res.string.livetalk_weather_icon_description,
+                                    weatherStatusText,
+                                ),
+                            text = item.weatherUiModel.temperatureText,
+                        )
+                    }
+
                     IconWithText(
-                        icon = item.weatherUiModel.condition.toResource(),
-                        iconDescription =
-                            stringResource(
-                                Res.string.livetalk_weather_icon_description,
-                                weatherStatusText,
-                            ),
-                        text = item.weatherUiModel.temperatureText,
+                        icon = Res.drawable.ic_users,
+                        iconDescription = stringResource(Res.string.livetalk_user_icon_description),
+                        text = item.userCount.toString(),
                     )
                 }
-
-                IconWithText(
-                    icon = Res.drawable.ic_users,
-                    iconDescription = stringResource(Res.string.livetalk_user_icon_description),
-                    text = item.userCount.toString(),
-                )
             }
 
             Icon(
@@ -166,7 +175,7 @@ private fun IconWithText(
         )
         Text(
             text = text,
-            style = PretendardMedium.copy(fontSize = 12.dpToSp, color = Gray500),
+            style = PretendardMedium12.copy(color = Gray500),
         )
     }
 }
