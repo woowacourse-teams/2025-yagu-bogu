@@ -3,14 +3,17 @@ package com.yagubogu.ui.attendance.detail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -143,41 +146,48 @@ private fun AttendanceDetailScreen(
     val isKeyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Gray050),
-        ) {
-            AttendanceDetailToolbar(
-                date = date,
-                onBackClick = onBackClick,
-                onDeleteClick = onDeleteClick,
-            )
-            if (!isKeyboardVisible) {
-                AttendanceDetailTabRow(pagerState)
-            }
-            HorizontalPager(
-                state = pagerState,
-                beyondViewportPageCount = AttendanceDetailTab.entries.size,
-                modifier = Modifier.fillMaxSize(),
-            ) { page ->
-                when (page) {
-                    AttendanceDetailTab.GAME_RECORD.ordinal ->
-                        AttendanceDetailGameRecordScreen(
-                            item = item,
-                            playerRecord = playerRecordUiModel,
-                        )
+        Scaffold(
+            containerColor = Gray050,
+            topBar = {
+                AttendanceDetailToolbar(
+                    date = date,
+                    onBackClick = onBackClick,
+                    onDeleteClick = onDeleteClick,
+                )
+            },
+        ) { innerPadding: PaddingValues ->
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(Gray050),
+            ) {
+                if (!isKeyboardVisible) {
+                    AttendanceDetailTabRow(pagerState)
+                }
+                HorizontalPager(
+                    state = pagerState,
+                    beyondViewportPageCount = AttendanceDetailTab.entries.size,
+                    modifier = Modifier.fillMaxSize(),
+                ) { page ->
+                    when (page) {
+                        AttendanceDetailTab.GAME_RECORD.ordinal ->
+                            AttendanceDetailGameRecordScreen(
+                                item = item,
+                                playerRecord = playerRecordUiModel,
+                            )
 
-                    AttendanceDetailTab.DIARY.ordinal ->
-                        AttendanceDetailDiaryScreen(
-                            uiState = attendanceDetailDiaryUiState,
-                            onImagesSelected = onImagesSelected,
-                            onImageDeleted = onImageDeleted,
-                            onEditClick = onEditClick,
-                            onSaveClick = onSaveClick,
-                            onImagePickerError = onImagePickerError,
-                        )
+                        AttendanceDetailTab.DIARY.ordinal ->
+                            AttendanceDetailDiaryScreen(
+                                uiState = attendanceDetailDiaryUiState,
+                                onImagesSelected = onImagesSelected,
+                                onImageDeleted = onImageDeleted,
+                                onEditClick = onEditClick,
+                                onSaveClick = onSaveClick,
+                                onImagePickerError = onImagePickerError,
+                            )
+                    }
                 }
             }
         }
