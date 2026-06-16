@@ -31,9 +31,8 @@ import com.yagubogu.ui.livetalk.model.toStringResource
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.PretendardBold20
+import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardMedium
-import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.theme.dpToSp
@@ -67,36 +66,41 @@ fun LivetalkStadiumItem(
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
                 ).noRippleClickable { onClick(item) }
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(20.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = item.stadiumName,
-                style = PretendardBold20,
+                style = PretendardBold.copy(fontSize = 18.dpToSp),
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             Row(
                 modifier = Modifier.weight(1.0f),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (item.weatherUiModel != null) {
+                    val weatherStatusText =
+                        stringResource(item.weatherUiModel.condition.toStringResource())
+                    IconWithText(
+                        icon = item.weatherUiModel.condition.toResource(),
+                        iconDescription =
+                            stringResource(
+                                Res.string.livetalk_weather_icon_description,
+                                weatherStatusText,
+                            ),
+                        text = item.weatherUiModel.temperatureText,
+                    )
+                }
+
                 IconWithText(
                     icon = Res.drawable.ic_users,
                     iconDescription = stringResource(Res.string.livetalk_user_icon_description),
                     text = item.userCount.toString(),
                 )
-                if (item.weatherUiModel != null) {
-                    val weatherStatusText = stringResource(item.weatherUiModel.condition.toStringResource())
-
-                    IconWithText(
-                        icon = item.weatherUiModel.condition.toResource(),
-                        iconDescription = stringResource(Res.string.livetalk_weather_icon_description, weatherStatusText),
-                        text = item.weatherUiModel.temperatureText,
-                    )
-                }
             }
 
             Icon(
@@ -149,7 +153,11 @@ private fun IconWithText(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = iconDescription,
@@ -158,7 +166,7 @@ private fun IconWithText(
         )
         Text(
             text = text,
-            style = PretendardMedium12.copy(color = Gray500),
+            style = PretendardMedium.copy(fontSize = 12.dpToSp, color = Gray500),
         )
     }
 }
@@ -200,7 +208,15 @@ private fun LivetalkStadiumItemVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemUnVerifiedPreview() {
     LivetalkStadiumItem(
-        item = LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(weatherUiModel = WeatherUiModel(1, Condition.Clear, "12.3°C")),
+        item =
+            LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(
+                weatherUiModel =
+                    WeatherUiModel(
+                        1,
+                        Condition.Clear,
+                        "12.3°C",
+                    ),
+            ),
         onClick = {},
     )
 }
