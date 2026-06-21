@@ -173,21 +173,35 @@ public class KboGameCenterPage extends BaseKboPage {
     }
 
     private void extractTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
-        boolean isTopInning = isTopInning(gameCenter.getStatus());
-        extractAwayTeamInfo(gameElement, gameCenter, isTopInning);
-        extractHomeTeamInfo(gameElement, gameCenter, isTopInning);
+        InningHalf inningHalf = parseInningHalf(gameCenter.getStatus());
+        extractAwayTeamInfo(gameElement, gameCenter, inningHalf);
+        extractHomeTeamInfo(gameElement, gameCenter, inningHalf);
     }
 
     /**
      * 이닝 초(원정팀 공격)/말(홈팀 공격) 여부.
      * .today-pitcher는 공격중인 팀에서는 타자, 수비중인 팀에서는 투수를 나타내므로
      * 어느 팀에 어떤 의미를 부여할지 이걸로 판별한다.
+     * status에 초/말이 없는 경우(경기예정/종료 등)는 UNKNOWN으로 두고 배정을 건너뛴다.
      */
-    private boolean isTopInning(String status) {
-        return status != null && status.contains("초");
+    private enum InningHalf {
+        TOP, BOTTOM, UNKNOWN
     }
 
-    private void extractAwayTeamInfo(Locator gameElement, GameCenterDetail gameCenter, boolean isTopInning) {
+    private InningHalf parseInningHalf(String status) {
+        if (status == null) {
+            return InningHalf.UNKNOWN;
+        }
+        if (status.contains("초")) {
+            return InningHalf.TOP;
+        }
+        if (status.contains("말")) {
+            return InningHalf.BOTTOM;
+        }
+        return InningHalf.UNKNOWN;
+    }
+
+    private void extractAwayTeamInfo(Locator gameElement, GameCenterDetail gameCenter, InningHalf inningHalf) {
         Locator awayTeam = gameElement.locator(".team.away");
         if (awayTeam.count() == 0) {
             return;
@@ -204,20 +218,20 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 현재 타자/투수: 초(원정팀 공격)면 타자, 아니면 투수
+        // 현재 타자/투수: 초(원정팀 공격)면 타자, 말이면 투수, 알 수 없으면 배정하지 않음
         String todayPlayer = extractTodayPlayer(awayTeam);
         if (todayPlayer != null) {
-            if (isTopInning) {
+            if (inningHalf == InningHalf.TOP) {
                 gameCenter.setCurrentBatterTeam("away");
                 gameCenter.setCurrentBatterName(todayPlayer);
-            } else {
+            } else if (inningHalf == InningHalf.BOTTOM) {
                 gameCenter.setCurrentPitcherTeam("away");
                 gameCenter.setCurrentPitcherName(todayPlayer);
             }
         }
     }
 
-    private void extractHomeTeamInfo(Locator gameElement, GameCenterDetail gameCenter, boolean isTopInning) {
+    private void extractHomeTeamInfo(Locator gameElement, GameCenterDetail gameCenter, InningHalf inningHalf) {
         Locator homeTeam = gameElement.locator(".team.home");
         if (homeTeam.count() == 0) {
             return;
@@ -234,13 +248,13 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 현재 타자/투수: 말(홈팀 공격)이면 타자, 아니면 투수
+        // 현재 타자/투수: 말(홈팀 공격)이면 타자, 초면 투수, 알 수 없으면 배정하지 않음
         String todayPlayer = extractTodayPlayer(homeTeam);
         if (todayPlayer != null) {
-            if (!isTopInning) {
+            if (inningHalf == InningHalf.BOTTOM) {
                 gameCenter.setCurrentBatterTeam("home");
                 gameCenter.setCurrentBatterName(todayPlayer);
-            } else {
+            } else if (inningHalf == InningHalf.TOP) {
                 gameCenter.setCurrentPitcherTeam("home");
                 gameCenter.setCurrentPitcherName(todayPlayer);
             }
