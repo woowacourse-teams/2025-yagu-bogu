@@ -4,11 +4,13 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.domain.Role;
@@ -52,6 +54,9 @@ public class GameE2eTest extends E2eTestBase {
 
     @Autowired
     private GameFactory gameFactory;
+
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private CheckInFactory checkInFactory;
@@ -156,6 +161,35 @@ public class GameE2eTest extends E2eTestBase {
 
         // then
         assertThat(actual.dates()).containsExactlyInAnyOrder(date1, date2);
+    }
+
+    @DisplayName("경기중인 경기의 스코어보드를 조회하면 라이브 상태가 포함된다")
+    @Test
+    void findScoreBoard_WithLiveState() {
+        // given
+        LocalDate date = TestFixture.getToday();
+        Game game = makeGame(date, "HT", "LT", "잠실구장");
+        game.updateLiveBatterAndPitcher("away", "최지훈", "home", "김태경");
+        game.updateLiveBaseState(true, false, true, 1, 2, 0);
+        gameRepository.save(game);
+
+        Member member = makeMember(getTeamByCode("SS"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when
+        GameResultParam actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .when().get("/api/v1/games/" + game.getId() + "/score-board")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(GameResultParam.class);
+
+        // then
+        assertThat(actual.liveState()).isEqualTo(new GameResultParam.LiveStateParam(
+                "away", "최지훈", "home", "김태경", true, false, true, 1, 2, 0
+        ));
     }
 
     @DisplayName("취소된 경기만 있는 날짜는 결과에서 제외된다")
