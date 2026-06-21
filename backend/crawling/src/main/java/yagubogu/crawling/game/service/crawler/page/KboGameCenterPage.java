@@ -129,6 +129,8 @@ public class KboGameCenterPage extends BaseKboPage {
             gameCenter.setGameStatus("경기종료");
         } else if (classAttr.contains("cancel")) {
             gameCenter.setGameStatus("경기취소");
+        } else if (classAttr.contains("ing")) {
+            gameCenter.setGameStatus("경기중");
         } else {
             gameCenter.setGameStatus("경기예정");
         }
