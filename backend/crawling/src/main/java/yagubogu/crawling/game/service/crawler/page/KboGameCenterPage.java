@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.KboCrawlerProperties;
 import yagubogu.crawling.game.dto.GameCenterDetail;
@@ -172,11 +171,21 @@ public class KboGameCenterPage extends BaseKboPage {
     }
 
     private void extractTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
-        extractAwayTeamInfo(gameElement, gameCenter);
-        extractHomeTeamInfo(gameElement, gameCenter);
+        boolean isTopInning = isTopInning(gameCenter.getStatus());
+        extractAwayTeamInfo(gameElement, gameCenter, isTopInning);
+        extractHomeTeamInfo(gameElement, gameCenter, isTopInning);
     }
 
-    private void extractAwayTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
+    /**
+     * 이닝 초(원정팀 공격)/말(홈팀 공격) 여부.
+     * .today-pitcher는 공격중인 팀에서는 타자, 수비중인 팀에서는 투수를 나타내므로
+     * 어느 팀에 어떤 의미를 부여할지 이걸로 판별한다.
+     */
+    private boolean isTopInning(String status) {
+        return status != null && status.contains("초");
+    }
+
+    private void extractAwayTeamInfo(Locator gameElement, GameCenterDetail gameCenter, boolean isTopInning) {
         Locator awayTeam = gameElement.locator(".team.away");
         if (awayTeam.count() == 0) {
             return;
@@ -193,12 +202,20 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 투수 정보
-        List<String> awayPitchers = extractPitchers(awayTeam);
-        gameCenter.setAwayPitchers(awayPitchers);
+        // 현재 타자/투수: 초(원정팀 공격)면 타자, 아니면 투수
+        String todayPlayer = extractTodayPlayer(awayTeam);
+        if (todayPlayer != null) {
+            if (isTopInning) {
+                gameCenter.setCurrentBatterTeam("away");
+                gameCenter.setCurrentBatterName(todayPlayer);
+            } else {
+                gameCenter.setCurrentPitcherTeam("away");
+                gameCenter.setCurrentPitcherName(todayPlayer);
+            }
+        }
     }
 
-    private void extractHomeTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
+    private void extractHomeTeamInfo(Locator gameElement, GameCenterDetail gameCenter, boolean isTopInning) {
         Locator homeTeam = gameElement.locator(".team.home");
         if (homeTeam.count() == 0) {
             return;
@@ -215,18 +232,26 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 투수 정보
-        List<String> homePitchers = extractPitchers(homeTeam);
-        gameCenter.setHomePitchers(homePitchers);
+        // 현재 타자/투수: 말(홈팀 공격)이면 타자, 아니면 투수
+        String todayPlayer = extractTodayPlayer(homeTeam);
+        if (todayPlayer != null) {
+            if (!isTopInning) {
+                gameCenter.setCurrentBatterTeam("home");
+                gameCenter.setCurrentBatterName(todayPlayer);
+            } else {
+                gameCenter.setCurrentPitcherTeam("home");
+                gameCenter.setCurrentPitcherName(todayPlayer);
+            }
+        }
     }
 
-    private List<String> extractPitchers(Locator teamElement) {
+    private String extractTodayPlayer(Locator teamElement) {
         Locator pitcherElem = teamElement.locator(".today-pitcher");
         if (pitcherElem.count() == 0) {
-            return List.of();
+            return null;
         }
 
-        String pitcherName = pitcherElem.textContent().trim();
-        return pitcherName.isEmpty() ? List.of() : List.of(pitcherName);
+        String text = pitcherElem.textContent().trim();
+        return text.isEmpty() ? null : text;
     }
 }

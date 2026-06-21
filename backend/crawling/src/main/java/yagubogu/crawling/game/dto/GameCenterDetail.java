@@ -1,6 +1,5 @@
 package yagubogu.crawling.game.dto;
 
-import java.util.List;
 import lombok.Data;
 
 @Data
@@ -34,8 +33,10 @@ public class GameCenterDetail {
     private String homeScore;
     private String winner;  // "away" or "home"
 
-    // 투수 정보
-    private List<String> awayPitchers;
-    private List<String> homePitchers;
+    // 현재 타자/투수
+    // .today-pitcher는 공격중인 팀에서는 타자, 수비중인 팀에서는 투수를 나타냄 (이닝 초/말로 판별)
+    private String currentBatterTeam;  // "away" or "home"
+    private String currentBatterName;
+    private String currentPitcherTeam; // "away" or "home"
+    private String currentPitcherName;
 }
-
