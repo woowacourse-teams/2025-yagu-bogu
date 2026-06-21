@@ -171,6 +171,9 @@ public class KboScoreboardService {
             bronzeGameService.upsertByNaturalKey(date, stadium, homeTeamName, awayTeamName, startTime, payload);
             log.debug("[BRONZE] Saved gameCode={}, state={}", gameCode, data.getStatus());
 
+            // 진루정보/볼·스트라이크·아웃은 재처리 대상이 아니라 games 테이블에 바로 반영
+            updateLiveBaseState(gameCode, data);
+
             // 경기 종료 시 이벤트 발행 (ETL 트리거)
             GameState state = GameState.fromName(data.getStatus());
             if (state == GameState.COMPLETED || state == GameState.CANCELED) {
@@ -262,6 +265,23 @@ public class KboScoreboardService {
                 data.inningScores()
         );
         return existing;
+    }
+
+    /**
+     * 크롤링한 진루정보/볼·스트라이크·아웃을 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음)
+     */
+    private void updateLiveBaseState(String gameCode, KboScoreboardGame data) {
+        gameRepository.findByGameCode(gameCode).ifPresentOrElse(
+                game -> game.updateLiveBaseState(
+                        data.getFirstBaseOccupied(),
+                        data.getSecondBaseOccupied(),
+                        data.getThirdBaseOccupied(),
+                        data.getBalls(),
+                        data.getStrikes(),
+                        data.getOuts()
+                ),
+                () -> log.debug("[LIVE_STATE] Game not found for gameCode={}, skip base state update", gameCode)
+        );
     }
 
     /**
