@@ -150,7 +150,8 @@ class GameServiceTest {
         GameResultParam expected = new GameResultParam(
                 ScoreBoardParam.from(expectedHomeScoreBoard()),
                 ScoreBoardParam.from(expectedAwayScoreBoard()),
-                "이포라", "김롯데"
+                "이포라", "김롯데",
+                new GameResultParam.LiveStateParam(null, null, null, null, null, null, null, null, null, null)
         );
 
         // when
@@ -158,6 +159,28 @@ class GameServiceTest {
 
         // then
         assertThat(scoreBoard).isEqualTo(expected);
+    }
+
+    @DisplayName("경기중인 경기는 스코어보드에 라이브 상태(타자/투수/진루/카운트)가 포함된다")
+    @Test
+    void findGameScoreBoard_WithLiveState() {
+        // given
+        LocalDate date = TestFixture.getToday();
+        Game game = makeGameWithScoreBoard(date, "HT", "LT", "잠실구장");
+        game.updateLiveBatterAndPitcher("away", "최지훈", "home", "김태경");
+        game.updateLiveBaseState(true, false, true, 1, 2, 0);
+        gameRepository.save(game);
+        long gameId = game.getId();
+
+        GameResultParam.LiveStateParam expectedLiveState = new GameResultParam.LiveStateParam(
+                "away", "최지훈", "home", "김태경", true, false, true, 1, 2, 0
+        );
+
+        // when
+        GameResultParam scoreBoard = gameService.findScoreBoard(gameId);
+
+        // then
+        assertThat(scoreBoard.liveState()).isEqualTo(expectedLiveState);
     }
 
     @DisplayName("해당 월에 경기가 있는 날짜 목록을 반환한다")

@@ -1,6 +1,7 @@
 package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.dto.MemberClaims;
+import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import java.time.YearMonth;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,5 +43,16 @@ public interface GameControllerInterface {
     ResponseEntity<GameDatesResponse> findGameDatesByYearMonth(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth
+    );
+
+    @Operation(summary = "경기 스코어보드 조회", description = "경기의 스코어보드와 경기중 실시간 상태(현재 타자/투수, 진루정보, 카운트)를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "스코어보드 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "경기를 찾을 수 없거나 스코어보드가 아직 없음")
+    })
+    @GetMapping("/{gameId}/score-board")
+    ResponseEntity<GameResultParam> findScoreBoard(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @PathVariable long gameId
     );
 }
