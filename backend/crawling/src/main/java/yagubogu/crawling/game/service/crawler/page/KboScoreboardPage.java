@@ -126,7 +126,7 @@ public class KboScoreboardPage extends BaseKboPage {
         // 투수 정보 파싱
         Pitcher pitcher = parsePitcher(scoreboard);
 
-        return Optional.of(new KboScoreboardGame(
+        KboScoreboardGame game = new KboScoreboardGame(
                 date,
                 emptyToNull(status),
                 emptyToNull(stadium),
@@ -139,7 +139,35 @@ public class KboScoreboardPage extends BaseKboPage {
                 pitcher.winning(),
                 pitcher.saving(),
                 pitcher.losing()
-        ));
+        );
+
+        // 진루정보 (경기중이 아니면 .base 자체가 없어서 모두 null로 남음)
+        parseBaseOccupancy(scoreboard, game);
+
+        return Optional.of(game);
+    }
+
+    private void parseBaseOccupancy(ElementHandle scoreboard, KboScoreboardGame game) {
+        var baseSelectors = properties.getSelectors().getScoreboard().getBase();
+
+        ElementHandle container = queryCSS(scoreboard, baseSelectors.getContainer());
+        if (container == null) {
+            return;
+        }
+
+        game.setFirstBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getFirst()));
+        game.setSecondBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getSecond()));
+        game.setThirdBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getThird()));
+    }
+
+    private Boolean isBaseOccupied(ElementHandle scoreboard, String selector) {
+        ElementHandle img = queryCSS(scoreboard, selector);
+        if (img == null) {
+            return null;
+        }
+
+        String src = img.getAttribute("src");
+        return src != null && src.contains("base_on");
     }
 
     // ==================== 내부 파싱 메서드 ====================

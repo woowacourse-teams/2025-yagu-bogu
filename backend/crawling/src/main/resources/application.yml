@@ -94,6 +94,13 @@ kbo:
         container: ".score_wrap p.win"
         spans: "span"
 
+      # 진루정보 (경기중이 아니면 .base 자체가 없음)
+      base:
+        container: ".score_wrap .base"
+        first: ".base1 img"
+        second: ".base2 img"
+        third: ".base3 img"
+
   # 정규표현식 패턴
   patterns:
     pitcherLabel: "^\\s*(승|세|패)\\s*[:：]\\s*(.+?)\\s*$"

@@ -22,6 +22,11 @@ public final class KboScoreboardGame {
     private final String savingPitcher;
     private final String losingPitcher;
 
+    // 진루정보 (경기중이 아니면 null)
+    private Boolean firstBaseOccupied;
+    private Boolean secondBaseOccupied;
+    private Boolean thirdBaseOccupied;
+
     public KboScoreboardGame(
             LocalDate date,
             String status,
