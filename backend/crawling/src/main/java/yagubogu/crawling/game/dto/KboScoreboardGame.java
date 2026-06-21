@@ -27,6 +27,11 @@ public final class KboScoreboardGame {
     private Boolean secondBaseOccupied;
     private Boolean thirdBaseOccupied;
 
+    // 볼/스트라이크/아웃 카운트 (경기중이 아니면 null)
+    private Integer balls;
+    private Integer strikes;
+    private Integer outs;
+
     public KboScoreboardGame(
             LocalDate date,
             String status,

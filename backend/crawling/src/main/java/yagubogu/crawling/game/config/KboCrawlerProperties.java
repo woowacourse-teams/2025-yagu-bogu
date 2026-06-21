@@ -115,6 +115,7 @@ public class KboCrawlerProperties {
         private String first;
         private String second;
         private String third;
+        private String count;
     }
 
     @Getter
@@ -123,5 +124,6 @@ public class KboCrawlerProperties {
         private String pitcherLabel;
         private String dateFormat;
         private String timeFormat;
+        private String countLabel;
     }
 }

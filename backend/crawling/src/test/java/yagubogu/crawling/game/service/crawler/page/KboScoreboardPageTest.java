@@ -126,6 +126,7 @@ class KboScoreboardPageTest {
         lenient().when(mockBaseSelectors.getFirst()).thenReturn(".base1 img");
         lenient().when(mockBaseSelectors.getSecond()).thenReturn(".base2 img");
         lenient().when(mockBaseSelectors.getThird()).thenReturn(".base3 img");
+        lenient().when(mockBaseSelectors.getCount()).thenReturn(".base > p");
 
         // CalendarSelectors 설정
         lenient().when(mockCalendarSelectors.getUpdatePanel()).thenReturn("#update-panel");
@@ -133,6 +134,7 @@ class KboScoreboardPageTest {
         // Patterns 설정
         lenient().when(mockPatterns.getTimeFormat()).thenReturn("HH:mm");
         lenient().when(mockPatterns.getPitcherLabel()).thenReturn("(승|패|세)\\s+(.+)");
+        lenient().when(mockPatterns.getCountLabel()).thenReturn("(\\d+)-(\\d+)\\s*(\\d+)out");
 
         scoreboardPage = new KboScoreboardPage(mockPage, mockProperties);
     }
@@ -343,6 +345,50 @@ class KboScoreboardPageTest {
             assertThat(game.getFirstBaseOccupied()).isNull();
             assertThat(game.getSecondBaseOccupied()).isNull();
             assertThat(game.getThirdBaseOccupied()).isNull();
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 볼/스트라이크/아웃 카운트 파싱")
+        void parseScoreboard_WithCount() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+
+            ElementHandle countElem = createMockElementWithText("1-2 0out");
+            lenient().when(mockScoreboard.querySelector(".base > p")).thenReturn(countElem);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getBalls()).isEqualTo(1);
+            assertThat(game.getStrikes()).isEqualTo(2);
+            assertThat(game.getOuts()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 경기중이 아니면 카운트는 null")
+        void parseScoreboard_NoCount_CountFieldsAreNull() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+            lenient().when(mockScoreboard.querySelector(".base > p")).thenReturn(null);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getBalls()).isNull();
+            assertThat(game.getStrikes()).isNull();
+            assertThat(game.getOuts()).isNull();
         }
 
         @Test

@@ -110,6 +110,7 @@ class KboScoreboardCrawlerTest {
         lenient().when(mockBaseSelectors.getFirst()).thenReturn(".base1 img");
         lenient().when(mockBaseSelectors.getSecond()).thenReturn(".base2 img");
         lenient().when(mockBaseSelectors.getThird()).thenReturn(".base3 img");
+        lenient().when(mockBaseSelectors.getCount()).thenReturn(".base > p");
 
         //  TeamSelectors 내부 설정
         lenient().when(mockHomeTeamSelectors.getName()).thenReturn(".home-team .name");
@@ -130,6 +131,7 @@ class KboScoreboardCrawlerTest {
         lenient().when(mockPatterns.getDateFormat()).thenReturn("yyyy.MM.dd");
         lenient().when(mockPatterns.getTimeFormat()).thenReturn("HH:mm");
         lenient().when(mockPatterns.getPitcherLabel()).thenReturn("(승|패|세)\\s+(.+)");
+        lenient().when(mockPatterns.getCountLabel()).thenReturn("(\\d+)-(\\d+)\\s*(\\d+)out");
 
         crawler = new KboScoreboardCrawler(mockProperties, mockPlaywrightManager);
     }
