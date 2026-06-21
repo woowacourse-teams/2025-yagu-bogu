@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.KboCrawlerProperties;
@@ -222,14 +221,12 @@ public class KboGameCenterPage extends BaseKboPage {
     }
 
     private List<String> extractPitchers(Locator teamElement) {
-        Locator pitchers = teamElement.locator(".today-pitcher p");
-        List<String> pitcherList = new ArrayList<>();
-
-        for (int i = 0; i < pitchers.count(); i++) {
-            String pitcherInfo = pitchers.nth(i).textContent().trim();
-            pitcherList.add(pitcherInfo);
+        Locator pitcherElem = teamElement.locator(".today-pitcher");
+        if (pitcherElem.count() == 0) {
+            return List.of();
         }
 
-        return pitcherList;
+        String pitcherName = pitcherElem.textContent().trim();
+        return pitcherName.isEmpty() ? List.of() : List.of(pitcherName);
     }
 }
