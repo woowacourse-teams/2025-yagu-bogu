@@ -202,6 +202,7 @@ private fun FavoriteTeamDialog(
             text = teamName,
             style = PretendardSemiBold16,
         )
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
