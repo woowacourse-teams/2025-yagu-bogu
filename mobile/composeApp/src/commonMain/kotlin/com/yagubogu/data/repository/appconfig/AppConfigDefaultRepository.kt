@@ -2,7 +2,7 @@ package com.yagubogu.data.repository.appconfig
 
 import com.yagubogu.data.datasource.appconfig.AppConfigLocalDataSource
 import com.yagubogu.data.datasource.appconfig.AppConfigRemoteDataSource
-import com.yagubogu.ui.attendance.model.PastCheckInAdInfo
+import com.yagubogu.domain.model.PastCheckInAdState
 import com.yagubogu.ui.home.model.HomeNoticeInfo
 import com.yagubogu.ui.home.model.MaintenanceInfo
 import kotlinx.coroutines.flow.first
@@ -75,9 +75,9 @@ class AppConfigDefaultRepository(
         localDataSource.saveHomeNoticeIgnoreInfo(homeNoticeId, expiryTime)
     }
 
-    override fun getPastCheckInAdConfig(): PastCheckInAdInfo {
+    override fun getPastCheckInAdConfig(): PastCheckInAdState {
         val response = remoteDataSource.getPastCheckInAdResponse()
-        return PastCheckInAdInfo(
+        return PastCheckInAdState(
             isEnabled = response.isEnabled,
             startCount = response.startCount,
             interval = response.interval,

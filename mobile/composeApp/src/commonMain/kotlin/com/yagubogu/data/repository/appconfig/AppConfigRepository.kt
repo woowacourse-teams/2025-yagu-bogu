@@ -1,6 +1,6 @@
 package com.yagubogu.data.repository.appconfig
 
-import com.yagubogu.ui.attendance.model.PastCheckInAdInfo
+import com.yagubogu.domain.model.PastCheckInAdState
 import com.yagubogu.ui.home.model.HomeNoticeInfo
 import com.yagubogu.ui.home.model.MaintenanceInfo
 
@@ -21,5 +21,5 @@ interface AppConfigRepository {
         days: Int,
     )
 
-    fun getPastCheckInAdConfig(): PastCheckInAdInfo
+    fun getPastCheckInAdConfig(): PastCheckInAdState
 }

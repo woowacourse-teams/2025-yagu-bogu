@@ -14,7 +14,6 @@ import com.yagubogu.ui.attendance.model.AttendanceHistorySort
 import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.attendance.model.PastGameUiState
 import com.yagubogu.ui.mapper.toAttendanceUiModel
-import com.yagubogu.ui.mapper.toDomain
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
@@ -80,7 +79,7 @@ class AttendanceHistoryViewModel(
     val showInterstitialAdEvent: SharedFlow<Unit> = _showInterstitialAdEvent.asSharedFlow()
 
     private val pastCheckInAdState: PastCheckInAdState =
-        appConfigRepository.getPastCheckInAdConfig().toDomain()
+        appConfigRepository.getPastCheckInAdConfig()
 
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth,
