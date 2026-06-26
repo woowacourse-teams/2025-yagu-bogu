@@ -217,6 +217,25 @@ private fun AttendanceDetailToolbar(
 
 @Preview
 @Composable
+private fun AttendanceDetailScreenGameRecordTabPreview() {
+    AttendanceDetailScreen(
+        item = ATTENDANCE_HISTORY_ITEM_PLAYED,
+        playerRecordUiModel = PLAYER_RECORD,
+        attendanceDetailDiaryUiState = AttendanceDetailDiaryUiState(),
+        pagerState = rememberPagerState(AttendanceDetailTab.GAME_RECORD.ordinal) { AttendanceDetailTab.entries.size },
+        date = "2025.08.14 (목)",
+        onBackClick = {},
+        onDeleteClick = {},
+        onImagesSelected = {},
+        onImageDeleted = {},
+        onEditClick = {},
+        onSaveClick = { _ -> },
+        onImagePickerError = {},
+    )
+}
+
+@Preview
+@Composable
 private fun AttendanceDetailScreenDiaryTabPreview() {
     AttendanceDetailScreen(
         item = ATTENDANCE_HISTORY_ITEM_PLAYED,
