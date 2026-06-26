@@ -1,6 +1,5 @@
 package com.yagubogu.ui.attendance.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -160,8 +159,7 @@ private fun AttendanceDetailScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .background(Gray050),
+                        .padding(innerPadding),
             ) {
                 if (!isKeyboardVisible) {
                     AttendanceDetailTabRow(pagerState)
