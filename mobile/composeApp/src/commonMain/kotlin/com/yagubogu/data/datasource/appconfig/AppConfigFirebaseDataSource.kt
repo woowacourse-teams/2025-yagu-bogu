@@ -3,6 +3,7 @@ package com.yagubogu.data.datasource.appconfig
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.appconfig.HomeNoticeResponse
 import com.yagubogu.data.dto.response.appconfig.MaintenanceResponse
+import com.yagubogu.data.dto.response.appconfig.PastCheckInAdResponse
 import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
@@ -24,6 +25,7 @@ class AppConfigFirebaseDataSource(
             "maintenance_message" to "",
             "maintenance" to json.encodeToString(MaintenanceResponse()),
             "home_notice" to json.encodeToString(HomeNoticeResponse()),
+            "past_check_in_ad" to json.encodeToString(PastCheckInAdResponse()),
         )
         isConfigured = true
     }
@@ -57,6 +59,15 @@ class AppConfigFirebaseDataSource(
             json.decodeFromString<HomeNoticeResponse>(jsonString)
         } catch (e: Exception) {
             HomeNoticeResponse()
+        }
+    }
+
+    override fun getPastCheckInAdResponse(): PastCheckInAdResponse {
+        val jsonString = remoteConfig.getValue("past_check_in_ad").asString()
+        return try {
+            json.decodeFromString<PastCheckInAdResponse>(jsonString)
+        } catch (e: Exception) {
+            PastCheckInAdResponse()
         }
     }
 }
