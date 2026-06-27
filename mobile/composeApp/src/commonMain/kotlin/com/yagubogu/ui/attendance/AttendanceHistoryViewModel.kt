@@ -7,6 +7,7 @@ import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.data.repository.checkin.CheckInRepository
 import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.domain.model.PastCheckInAdState
 import com.yagubogu.ui.attendance.model.AttendanceFilterState
 import com.yagubogu.ui.attendance.model.AttendanceHistoryItem
 import com.yagubogu.ui.attendance.model.AttendanceHistorySort
@@ -42,10 +43,10 @@ class AttendanceHistoryViewModel(
     private val _gameDates = MutableStateFlow<Set<LocalDate>>(emptySet())
     val gameDates: StateFlow<Set<LocalDate>> = _gameDates.asStateFlow()
 
-    private val _selectedMonth = MutableStateFlow<YearMonth>(YearMonth.now())
+    private val _selectedMonth = MutableStateFlow(YearMonth.now())
     val selectedMonth: StateFlow<YearMonth> = _selectedMonth.asStateFlow()
 
-    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     private val _filterState =
@@ -54,6 +55,9 @@ class AttendanceHistoryViewModel(
 
     private val _sort = MutableStateFlow(AttendanceHistorySort.LATEST)
     val sort: StateFlow<AttendanceHistorySort> = _sort.asStateFlow()
+
+    private val _isGameDatesLoading = MutableStateFlow(true)
+    val isGameDatesLoading: StateFlow<Boolean> = _isGameDatesLoading.asStateFlow()
 
     private val _pastGameUiState = MutableStateFlow<PastGameUiState>(PastGameUiState.Loading)
     val pastGameUiState: StateFlow<PastGameUiState> = _pastGameUiState.asStateFlow()
@@ -74,12 +78,8 @@ class AttendanceHistoryViewModel(
         )
     val showInterstitialAdEvent: SharedFlow<Unit> = _showInterstitialAdEvent.asSharedFlow()
 
-    private var isPastCheckInAdEnabled = true
-    private var pastCheckInCount = 0
-
-    init {
-        isPastCheckInAdEnabled = appConfigRepository.isPastCheckInAdEnabled()
-    }
+    private val pastCheckInAdState: PastCheckInAdState =
+        appConfigRepository.getPastCheckInAdConfig()
 
     fun fetchAttendanceHistoryItems(
         yearMonth: YearMonth,
@@ -105,6 +105,7 @@ class AttendanceHistoryViewModel(
 
     fun fetchGameDates() {
         viewModelScope.launch {
+            _isGameDatesLoading.value = true
             val yearMonth: YearMonth = selectedMonth.value
             gameRepository
                 .getGameDates(yearMonth)
@@ -113,6 +114,7 @@ class AttendanceHistoryViewModel(
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "API 호출 실패" }
                 }
+            _isGameDatesLoading.value = false
         }
     }
 
@@ -148,8 +150,7 @@ class AttendanceHistoryViewModel(
     }
 
     private suspend fun emitPastCheckInEvent() {
-        pastCheckInCount++
-        if (isPastCheckInAdEnabled && pastCheckInCount % 3 == 1) {
+        if (pastCheckInAdState.incrementAndShouldShowAd()) {
             _showInterstitialAdEvent.emit(Unit)
         } else {
             _pastCheckInUiEvent.emit(Unit)

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +31,7 @@ import com.yagubogu.ui.livetalk.model.toStringResource
 import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.PretendardBold20
+import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
@@ -67,34 +67,47 @@ fun LivetalkStadiumItem(
                     if (item.isVerified) Primary500 else Gray100,
                     RoundedCornerShape(12.dp),
                 ).noRippleClickable { onClick(item) }
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(20.dp),
     ) {
         Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = item.stadiumName,
-                style = PretendardBold20,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-
             Row(
-                modifier = Modifier.weight(1.0f),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1.0f),
             ) {
-                IconWithText(
-                    icon = Res.drawable.ic_users,
-                    iconDescription = stringResource(Res.string.livetalk_user_icon_description),
-                    text = item.userCount.toString(),
+                Text(
+                    text = item.stadiumName,
+                    style = PretendardBold.copy(fontSize = 18.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
                 )
-                if (item.weatherUiModel != null) {
-                    val weatherStatusText = stringResource(item.weatherUiModel.condition.toStringResource())
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (item.weatherUiModel != null) {
+                        val weatherStatusText =
+                            stringResource(item.weatherUiModel.condition.toStringResource())
+                        IconWithText(
+                            icon = item.weatherUiModel.condition.toResource(),
+                            iconDescription =
+                                stringResource(
+                                    Res.string.livetalk_weather_icon_description,
+                                    weatherStatusText,
+                                ),
+                            text = item.weatherUiModel.temperatureText,
+                        )
+                    }
 
                     IconWithText(
-                        icon = item.weatherUiModel.condition.toResource(),
-                        iconDescription = stringResource(Res.string.livetalk_weather_icon_description, weatherStatusText),
-                        text = item.weatherUiModel.temperatureText,
+                        icon = Res.drawable.ic_users,
+                        iconDescription = stringResource(Res.string.livetalk_user_icon_description),
+                        text = item.userCount.toString(),
                     )
                 }
             }
@@ -149,7 +162,11 @@ private fun IconWithText(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = iconDescription,
@@ -200,7 +217,15 @@ private fun LivetalkStadiumItemVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemUnVerifiedPreview() {
     LivetalkStadiumItem(
-        item = LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(weatherUiModel = WeatherUiModel(1, Condition.Clear, "12.3°C")),
+        item =
+            LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(
+                weatherUiModel =
+                    WeatherUiModel(
+                        1,
+                        Condition.Clear,
+                        "12.3°C",
+                    ),
+            ),
         onClick = {},
     )
 }
