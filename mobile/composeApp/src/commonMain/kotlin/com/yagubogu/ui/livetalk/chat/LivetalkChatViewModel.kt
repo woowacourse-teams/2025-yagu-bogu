@@ -11,6 +11,7 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.ui.common.model.MemberProfile
+import com.yagubogu.ui.livetalk.chat.model.HomeAwayType
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatBubbleItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatItem
 import com.yagubogu.ui.livetalk.chat.model.LivetalkChatUiState
@@ -263,8 +264,12 @@ class LivetalkChatViewModel(
 
     fun addLikeToBatch() {
         viewModelScope.launch {
-            likeCountStateHolder.increaseMyTeamShowingCount()
-            likeCountStateHolder.increaseLikeCount()
+            val myTeamType = teams.value?.myTeamType ?: return@launch
+            when (myTeamType) {
+                HomeAwayType.HOME -> likeCountStateHolder.increaseHomeTeamShowingCount()
+                HomeAwayType.AWAY -> likeCountStateHolder.increaseAwayTeamShowingCount()
+            }
+            likeCountStateHolder.increaseLikeCount(myTeamType)
             if (likeBatchingJob?.isActive != true) {
                 likeBatchingJob =
                     launch {
@@ -276,8 +281,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        val teams: LivetalkTeams? = teams.value
-        teams?.myTeamType ?: return
+        val teams: LivetalkTeams = teams.value ?: return
 
         gameRepository
             .getLikeCounts(gameId)
@@ -289,8 +293,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun sendLikeBatch() {
-        val teams: LivetalkTeams? = teams.value
-        teams ?: return
+        val teams: LivetalkTeams = teams.value ?: return
 
         val countToSend: Int = likeCountStateHolder.getCountToSend()
         val request =
@@ -303,7 +306,7 @@ class LivetalkChatViewModel(
                     ),
             )
 
-        if (countToSend > 0 && teams.myTeamType != null) {
+        if (countToSend > 0 && teams.isMyTeamGame) {
             gameRepository
                 .addLikeBatches(gameId, request)
                 .onSuccess {

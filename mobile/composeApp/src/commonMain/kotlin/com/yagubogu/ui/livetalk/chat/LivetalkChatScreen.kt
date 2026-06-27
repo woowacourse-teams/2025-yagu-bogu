@@ -21,6 +21,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,12 +77,13 @@ fun LivetalkChatScreen(
     val messageStateHolder = viewModel.messageStateHolder
     val likeCountStateHolder = viewModel.likeCountStateHolder
     val teams: LivetalkTeams? by viewModel.teams.collectAsStateWithLifecycle()
+    val latestTeams by rememberUpdatedState(teams)
     val clickedProfile: MemberProfile? by viewModel.selectedProfile.collectAsStateWithLifecycle()
     val chatUiState: LivetalkChatUiState by viewModel.chatUiState.collectAsStateWithLifecycle()
 
     val messageText: String by messageStateHolder.messageText.collectAsStateWithLifecycle()
-    val myTeamShowingLikeCount: Long? by likeCountStateHolder.myTeamLikeShowingCount.collectAsStateWithLifecycle()
-    val otherTeamShowingLikeCount: Long? by likeCountStateHolder.otherTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val homeTeamShowingLikeCount: Long? by likeCountStateHolder.homeTeamLikeShowingCount.collectAsStateWithLifecycle()
+    val awayTeamShowingLikeCount: Long? by likeCountStateHolder.awayTeamLikeShowingCount.collectAsStateWithLifecycle()
     val livetalkChatBubbleItems: List<LivetalkChatBubbleItem> by messageStateHolder.livetalkChatBubbleItems.collectAsStateWithLifecycle()
     val pendingDeleteChat: LivetalkChatItem? by messageStateHolder.pendingDeleteChat.collectAsStateWithLifecycle()
     val pendingReportChat: LivetalkChatItem? by messageStateHolder.pendingReportChat.collectAsStateWithLifecycle()
@@ -106,7 +108,8 @@ fun LivetalkChatScreen(
             chatUiState,
             livetalkChatBubbleItems,
             messageText,
-            myTeamShowingLikeCount,
+            homeTeamShowingLikeCount,
+            awayTeamShowingLikeCount,
             mascotQueue.toList(),
             clickedProfile,
             pendingDeleteChat,
@@ -127,15 +130,15 @@ fun LivetalkChatScreen(
                         text = messageText,
                         stadiumName = teams?.stadiumName,
                     ),
-                myTeamCheering =
+                homeTeamCheering =
                     LivetalkChatScreenStates.Cheering(
-                        team = teams?.myTeam,
-                        showingCount = myTeamShowingLikeCount,
+                        team = teams?.homeTeam,
+                        showingCount = homeTeamShowingLikeCount,
                     ),
-                otherTeamCheering =
+                awayTeamCheering =
                     LivetalkChatScreenStates.Cheering(
-                        team = teams?.otherTeam,
-                        showingCount = otherTeamShowingLikeCount,
+                        team = teams?.awayTeam,
+                        showingCount = awayTeamShowingLikeCount,
                     ),
                 dialog =
                     LivetalkChatScreenStates.Dialog(
@@ -190,34 +193,53 @@ fun LivetalkChatScreen(
             )
         }
 
-    // 내 팀 (카운트 증가 + 이모지 애니메이션)
+    // 홈팀 (카운트 증가 + 이모지 애니메이션)
     LaunchedEffect(Unit) {
-        likeCountStateHolder.myTeamLikeChangeAmount.collect { count ->
+        likeCountStateHolder.homeTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val myTeamMascot = teams?.myTeamMascot ?: return@collect
-                scheduleMascotWithCounter(
-                    count = count,
-                    scope = this,
-                    increaseCountText = { increment ->
-                        likeCountStateHolder.increaseMyTeamShowingCount(increment)
-                    },
-                ) {
-                    generateMascotAnimation(myTeamMascot)
+                val teams = latestTeams
+                when (teams?.isMyTeamGame) {
+                    true -> {
+                        scheduleMascotWithCounter(
+                            count = count,
+                            scope = this,
+                            increaseCountText = { increment ->
+                                likeCountStateHolder.increaseHomeTeamShowingCount(increment)
+                            },
+                        ) {
+                            generateMascotAnimation(teams.homeTeam.mascot)
+                        }
+                    }
+
+                    else -> {
+                        likeCountStateHolder.increaseHomeTeamShowingCount(count)
+                    }
                 }
             }
         }
     }
 
-    // 상대 팀 (이모지 애니메이션만)
+    // 원정팀 (카운트 증가 + 이모지 애니메이션)
     LaunchedEffect(Unit) {
-        likeCountStateHolder.otherTeamLikeChangeAmount.collect { count ->
+        likeCountStateHolder.awayTeamLikeChangeAmount.collect { count ->
             count?.let {
-                val otherTeamMascot = teams?.otherTeamMascot ?: return@collect
-                scheduleMascotWithCounter(
-                    count = count,
-                    scope = this,
-                ) {
-                    generateMascotAnimation(otherTeamMascot)
+                val teams = latestTeams
+                when (teams?.isMyTeamGame) {
+                    true -> {
+                        scheduleMascotWithCounter(
+                            count = count,
+                            scope = this,
+                            increaseCountText = { increment ->
+                                likeCountStateHolder.increaseAwayTeamShowingCount(increment)
+                            },
+                        ) {
+                            generateMascotAnimation(teams.awayTeam.mascot)
+                        }
+                    }
+
+                    else -> {
+                        likeCountStateHolder.increaseAwayTeamShowingCount(count)
+                    }
                 }
             }
         }
@@ -313,19 +335,23 @@ fun LivetalkChatScreenContent(
                 HorizontalDivider(thickness = max(0.4.dp, Dp.Hairline), color = Gray300)
 
                 // 응원 바
-                val myTeamCheeringState = state.myTeamCheering
-                val otherTeamCheeringState = state.otherTeamCheering
-                val myTeam = myTeamCheeringState.team
-                val otherTeam = otherTeamCheeringState.team
+                val homeTeamCheeringState = state.homeTeamCheering
+                val awayTeamCheeringState = state.awayTeamCheering
+                val homeTeam = homeTeamCheeringState.team
+                val awayTeam = awayTeamCheeringState.team
                 when {
-                    myTeam != null && otherTeam != null && state.toolbar.teams?.myTeamType != null -> {
+                    homeTeam != null && awayTeam != null -> {
                         LivetalkChatCheeringBar(
-                            myTeam = myTeam,
-                            otherTeam = otherTeam,
-                            myTeamCheeringCount = myTeamCheeringState.showingCount,
-                            otherTeamCheeringCount = otherTeamCheeringState.showingCount,
+                            homeTeam = homeTeam,
+                            awayTeam = awayTeam,
+                            myTeamMascot = state.toolbar.teams?.myTeamMascot,
+                            homeTeamCheeringCount = homeTeamCheeringState.showingCount,
+                            awayTeamCheeringCount = awayTeamCheeringState.showingCount,
+                            showCheeringButton = state.toolbar.teams?.isMyTeamGame == true,
                             onCheeringClick = {
-                                actions.chatCheering.onCheeringClick(myTeam.mascot)
+                                state.toolbar.teams
+                                    ?.myTeamMascot
+                                    ?.let(actions.chatCheering.onCheeringClick)
                             },
                             onPositioned = actions.chatCheering.onMascotButtonPositioned,
                         )
@@ -456,14 +482,14 @@ fun LivetalkChatPreviewSuccess() {
                     text = "오늘 경기 직관 중인데 분위기 최고예요!",
                     stadiumName = mockTeams.stadiumName,
                 ),
-            myTeamCheering =
+            homeTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = mockTeams.myTeam,
+                    team = mockTeams.homeTeam,
                     showingCount = 1250L,
                 ),
-            otherTeamCheering =
+            awayTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = mockTeams.otherTeam,
+                    team = mockTeams.awayTeam,
                     showingCount = 1050L,
                 ),
             isVerified = true,
@@ -525,14 +551,14 @@ fun LivetalkChatPreviewVerifiedEmpty() {
                     text = "",
                     stadiumName = neutralTeams.stadiumName,
                 ),
-            myTeamCheering =
+            homeTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = neutralTeams.myTeam,
+                    team = neutralTeams.homeTeam,
                     showingCount = 0L,
                 ),
-            otherTeamCheering =
+            awayTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = neutralTeams.otherTeam,
+                    team = neutralTeams.awayTeam,
                     showingCount = 0L,
                 ),
             isVerified = true,
@@ -573,14 +599,14 @@ fun LivetalkChatPreviewEmpty() {
                     text = "",
                     stadiumName = neutralTeams.stadiumName,
                 ),
-            myTeamCheering =
+            homeTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = neutralTeams.myTeam,
+                    team = neutralTeams.homeTeam,
                     showingCount = 0L,
                 ),
-            otherTeamCheering =
+            awayTeamCheering =
                 LivetalkChatScreenStates.Cheering(
-                    team = neutralTeams.otherTeam,
+                    team = neutralTeams.awayTeam,
                     showingCount = 0L,
                 ),
             isVerified = false,
