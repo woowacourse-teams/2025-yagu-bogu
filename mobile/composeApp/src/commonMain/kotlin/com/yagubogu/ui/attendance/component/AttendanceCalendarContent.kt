@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -85,6 +86,7 @@ fun AttendanceCalendarContent(
     val currentItems: List<AttendanceHistoryItem>? = itemsByDate[selectedDate]
     val scrollState: ScrollState = rememberScrollState()
     var showBottomSheet: Boolean by rememberSaveable { mutableStateOf(false) }
+    var shareTargetItem: AttendanceHistoryItem? by remember { mutableStateOf(null) }
     val isToday: Boolean = selectedDate == LocalDate.now()
 
     LaunchedEffect(Unit) {
@@ -101,6 +103,14 @@ fun AttendanceCalendarContent(
                 showBottomSheet = false
             },
             onDismiss = { showBottomSheet = false },
+        )
+    }
+
+    shareTargetItem?.let { item: AttendanceHistoryItem ->
+        AttendanceShareBottomSheet(
+            item = item,
+            onShareClick = { shareTargetItem = null },
+            onDismiss = { shareTargetItem = null },
         )
     }
 
@@ -135,7 +145,11 @@ fun AttendanceCalendarContent(
                 // 직관 내역이 있는 경우
                 currentItems != null -> {
                     currentItems.forEach { item: AttendanceHistoryItem ->
-                        AttendanceItem(item = item, onItemClick = onItemClick)
+                        AttendanceItem(
+                            item = item,
+                            onItemClick = onItemClick,
+                            onItemLongClick = { shareTargetItem = it },
+                        )
                     }
                 }
                 // 경기 일정 로딩 중인 경우
