@@ -281,8 +281,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun getLikeCount() {
-        val teams: LivetalkTeams? = teams.value
-        teams ?: return
+        val teams: LivetalkTeams = teams.value ?: return
 
         gameRepository
             .getLikeCounts(gameId)
@@ -294,8 +293,7 @@ class LivetalkChatViewModel(
     }
 
     private suspend fun sendLikeBatch() {
-        val teams: LivetalkTeams? = teams.value
-        teams ?: return
+        val teams: LivetalkTeams = teams.value ?: return
 
         val countToSend: Int = likeCountStateHolder.getCountToSend()
         val request =
