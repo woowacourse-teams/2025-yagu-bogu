@@ -64,6 +64,15 @@ sse:
     enabled: true
     interval-ms: 25000
 
+tour:
+  api:
+    service-key: test-service-key
+    base-url: https://apis.data.go.kr/B551011/KorService2
+    radius: 1000
+    num-of-rows: 50
+    connect-timeout: 10s
+    read-timeout: 30s
+
 app:
   s3:
     bucket: yagubogu
