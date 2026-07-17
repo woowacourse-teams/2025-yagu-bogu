@@ -11,6 +11,7 @@ import com.yagubogu.member.domain.Member;
 import com.yagubogu.prediction.domain.GamePrediction;
 import com.yagubogu.prediction.domain.PredictionPick;
 import com.yagubogu.prediction.domain.PredictionStatus;
+import com.yagubogu.prediction.dto.WeeklyScoreParam;
 import com.yagubogu.prediction.repository.GamePredictionRepository;
 import com.yagubogu.stadium.domain.Stadium;
 import com.yagubogu.stadium.repository.StadiumRepository;
@@ -20,6 +21,7 @@ import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,5 +153,55 @@ class PredictionScoringServiceUsingMysqlTest extends ServiceUsingMysqlTestBase {
         // then
         GamePrediction actual = gamePredictionRepository.findById(prediction.getId()).orElseThrow();
         assertThat(actual.getStatus()).isEqualTo(PredictionStatus.WON);
+    }
+
+    @DisplayName("주간 점수는 그 주에 WON한 예측 개수로 회원별 집계된다")
+    @Test
+    void findWeeklyScores_countsWonPerMember() {
+        // given
+        LocalDate monday = LocalDate.of(2025, 7, 21);
+        LocalDate sunday = LocalDate.of(2025, 7, 27);
+
+        Game game1 = gameFactory.save(b -> b.stadium(stadium)
+                .homeTeam(homeTeam).awayTeam(awayTeam)
+                .date(monday)
+                .homeScore(5).awayScore(3)
+                .gameState(GameState.COMPLETED));
+        Game game2 = gameFactory.save(b -> b.stadium(stadium)
+                .homeTeam(homeTeam).awayTeam(awayTeam)
+                .date(sunday)
+                .homeScore(2).awayScore(1)
+                .gameState(GameState.COMPLETED));
+        Game gameOutsideWeek = gameFactory.save(b -> b.stadium(stadium)
+                .homeTeam(homeTeam).awayTeam(awayTeam)
+                .date(monday.minusDays(1))
+                .homeScore(4).awayScore(0)
+                .gameState(GameState.COMPLETED));
+
+        Member twoWins = memberFactory.save(b -> b.team(homeTeam));
+        Member oneWin = memberFactory.save(b -> b.team(homeTeam));
+
+        gamePredictionRepository.save(new GamePrediction(twoWins, game1, PredictionPick.HOME));
+        gamePredictionRepository.save(new GamePrediction(twoWins, game2, PredictionPick.HOME));
+        gamePredictionRepository.save(new GamePrediction(oneWin, game1, PredictionPick.HOME));
+        gamePredictionRepository.save(new GamePrediction(oneWin, gameOutsideWeek, PredictionPick.HOME));
+
+        predictionScoringService.scorePendingGames();
+
+        // when
+        List<WeeklyScoreParam> results = predictionScoringService.findWeeklyScores(monday, sunday);
+
+        // then
+        WeeklyScoreParam twoWinsResult = results.stream()
+                .filter(r -> r.memberId().equals(twoWins.getId()))
+                .findFirst().orElseThrow();
+        WeeklyScoreParam oneWinResult = results.stream()
+                .filter(r -> r.memberId().equals(oneWin.getId()))
+                .findFirst().orElseThrow();
+
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(twoWinsResult.score()).isEqualTo(2L);
+            softAssertions.assertThat(oneWinResult.score()).isEqualTo(1L);
+        });
     }
 }

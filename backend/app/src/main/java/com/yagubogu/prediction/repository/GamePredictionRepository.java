@@ -5,6 +5,8 @@ import com.yagubogu.game.domain.GameState;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.prediction.domain.GamePrediction;
 import com.yagubogu.prediction.domain.PredictionStatus;
+import com.yagubogu.prediction.dto.WeeklyScoreParam;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -27,5 +29,15 @@ public interface GamePredictionRepository extends JpaRepository<GamePrediction, 
     List<Game> findGamesByPredictionStatusAndGameStateIn(
             @Param("status") PredictionStatus status,
             @Param("gameStates") Collection<GameState> gameStates
+    );
+
+    @Query("SELECT new com.yagubogu.prediction.dto.WeeklyScoreParam(p.member.id, COUNT(p)) "
+            + "FROM GamePrediction p "
+            + "WHERE p.status = :status AND p.game.date BETWEEN :weekStart AND :weekEnd "
+            + "GROUP BY p.member.id")
+    List<WeeklyScoreParam> findWeeklyScores(
+            @Param("status") PredictionStatus status,
+            @Param("weekStart") LocalDate weekStart,
+            @Param("weekEnd") LocalDate weekEnd
     );
 }

@@ -4,7 +4,9 @@ import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.prediction.domain.GamePrediction;
 import com.yagubogu.prediction.domain.PredictionStatus;
+import com.yagubogu.prediction.dto.WeeklyScoreParam;
 import com.yagubogu.prediction.repository.GamePredictionRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,10 @@ public class PredictionScoringService {
         for (Game game : pendingGames) {
             scoreGame(game);
         }
+    }
+
+    public List<WeeklyScoreParam> findWeeklyScores(final LocalDate weekStart, final LocalDate weekEnd) {
+        return gamePredictionRepository.findWeeklyScores(PredictionStatus.WON, weekStart, weekEnd);
     }
 
     private void scoreGame(final Game game) {
