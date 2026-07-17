@@ -140,4 +140,12 @@ public class Game {
     public boolean hasTeam(final Team team) {
         return homeTeam.equals(team) || awayTeam.equals(team);
     }
+
+    public boolean isHomeWin() {
+        return homeScore != null && awayScore != null && homeScore > awayScore;
+    }
+
+    public boolean isAwayWin() {
+        return homeScore != null && awayScore != null && awayScore > homeScore;
+    }
 }

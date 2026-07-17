@@ -1,6 +1,7 @@
 package com.yagubogu.prediction.domain;
 
 import com.yagubogu.game.domain.Game;
+import com.yagubogu.game.domain.GameState;
 import com.yagubogu.global.domain.BaseEntity;
 import com.yagubogu.member.domain.Member;
 import jakarta.persistence.Column;
@@ -53,5 +54,24 @@ public class GamePrediction extends BaseEntity {
 
     public void updatePick(final PredictionPick pick) {
         this.pick = pick;
+    }
+
+    public void applyResult(final Game game) {
+        if (game.getGameState() == GameState.CANCELED) {
+            this.status = PredictionStatus.VOID;
+            return;
+        }
+        if (isWinningPick(game)) {
+            this.status = PredictionStatus.WON;
+            return;
+        }
+        this.status = PredictionStatus.LOST;
+    }
+
+    private boolean isWinningPick(final Game game) {
+        if (pick == PredictionPick.HOME) {
+            return game.isHomeWin();
+        }
+        return game.isAwayWin();
     }
 }
