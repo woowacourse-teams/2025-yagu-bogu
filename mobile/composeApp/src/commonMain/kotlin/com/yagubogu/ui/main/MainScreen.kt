@@ -144,7 +144,9 @@ fun MainScreen(
                         )
                     }
                     entry<BottomNavKey.Place> {
-                        PlaceScreen()
+                        PlaceScreen(
+                            scrollToTopEvent = scrollToTopEvent,
+                        )
                     }
                 }
 
