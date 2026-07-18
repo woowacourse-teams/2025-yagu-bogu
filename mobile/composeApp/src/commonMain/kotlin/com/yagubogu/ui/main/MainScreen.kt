@@ -31,6 +31,7 @@ import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.model.BottomNavKey
 import com.yagubogu.ui.navigation.model.NavigationState
 import com.yagubogu.ui.navigation.model.toEntries
+import com.yagubogu.ui.place.PlaceScreen
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
@@ -141,6 +142,9 @@ fun MainScreen(
                             scrollToTopEvent = scrollToTopEvent,
                             onAttendanceHistoryItemClick = onAttendanceHistoryItemClick,
                         )
+                    }
+                    entry<BottomNavKey.Place> {
+                        PlaceScreen()
                     }
                 }
 

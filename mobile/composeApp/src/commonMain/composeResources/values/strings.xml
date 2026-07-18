@@ -37,6 +37,7 @@
     <string name="bottom_navigation_stats">통계</string>
     <string name="bottom_navigation_attendance_history">직관 내역</string>
     <string name="bottom_navigation_livetalk">현장톡</string>
+    <string name="bottom_navigation_place">플레이스</string>
 
     <string name="exit_dialog_title">야구보구를 종료할까요?</string>
     <string name="exit_dialog_confirm">앱 종료하기</string>
