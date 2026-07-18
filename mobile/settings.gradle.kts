@@ -25,6 +25,12 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("org.chromium")
             }
         }
+        maven {
+            url = uri("https://devrepo.kakao.com/nexus/repository/kakaomap-releases/")
+            mavenContent {
+                includeGroup("com.kakao.maps.open")
+            }
+        }
         mavenCentral()
     }
 }

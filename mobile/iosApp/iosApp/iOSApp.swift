@@ -2,6 +2,7 @@ import AppTrackingTransparency
 import ComposeApp
 import GoogleMobileAds
 import GoogleSignIn
+import KakaoMapsSDK
 import SwiftUI
 import UIKit
 import FirebaseCore
@@ -23,8 +24,21 @@ struct iOSApp: App {
 
     init() {
         FirebaseApp.configure()
+        setupKakaoMaps()
         setupBannerAdProvider()
         setupInterstitialAdProvider()
+    }
+
+    private func setupKakaoMaps() {
+        guard
+            let appKey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_MAP_API") as? String,
+            !appKey.isEmpty
+        else {
+            assertionFailure("Missing KAKAO_MAP_API in Info.plist")
+            return
+        }
+
+        SDKInitializer.InitSDK(appKey: appKey)
     }
 
     /// ATT 요청 및 AdMob 초기화 로직

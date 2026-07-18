@@ -59,6 +59,9 @@ firebaseGitlive = "2.4.0"
 googleidVersion = "1.1.1"
 playServicesLocation = "21.3.0"
 
+# Kakao Maps
+kakaoMaps = "2.14.0"
+
 # Oss-licenses
 aboutLibraries = "13.2.1"
 
@@ -160,6 +163,9 @@ firebase-config-gitlive = { module = "dev.gitlive:firebase-config", version.ref 
 # Google Services
 google-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleidVersion" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+# Kakao Maps
+kakao-maps-open-android = { module = "com.kakao.maps.open:android", version.ref = "kakaoMaps" }
 
 # Oss-licenses
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }

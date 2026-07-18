@@ -20,6 +20,7 @@ node_modules/
 composeApp/release/
 iosApp/Pods/
 iosApp/Configuration/Config.xcconfig
+iosApp/Configuration/Secrets.xcconfig
 **/google-services.json
 **/yagubogu-keystore
 keystore.properties

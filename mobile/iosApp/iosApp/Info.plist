@@ -17,6 +17,8 @@
 	</array>
 	<key>GADApplicationIdentifier</key>
 	<string>$(ADMOB_IOS_APP_ID)</string>
+	<key>KAKAO_MAP_API</key>
+	<string>$(KAKAO_MAP_APP_KEY)</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>더 나은 광고 경험을 위해 광고 식별자를 사용합니다.</string>
 	<key>SKAdNetworkItems</key>
