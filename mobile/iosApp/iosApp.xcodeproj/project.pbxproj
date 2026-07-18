@@ -19,7 +19,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B33D4A6F2898C62A18C822EB /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		B33D4A6F2898C62A18C822EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -32,7 +32,7 @@
 		845D417FAF810A7A5C98D5D8 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				B33D4A6F2898C62A18C822EB /* Exceptions for "iosApp" folder in "iosApp" target */,
+				B33D4A6F2898C62A18C822EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -92,6 +92,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 752821172649CFD66E5851B4 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
+				331415A39D64D59AF160CDB9 /* Compile Kotlin */,
 				4733B7AE168AFD1D2A211997 /* Compile Kotlin Framework */,
 				0187A14D1C3486B6618EC9CC /* Sources */,
 				C83AD0042AA1F521439F0436 /* Frameworks */,
@@ -168,6 +169,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		331415A39D64D59AF160CDB9 /* Compile Kotlin */ = {
+			isa = PBXShellScriptBuildPhase;
+			inputPaths = (
+			);
+			name = "Compile Kotlin";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode";
+		};
 		4733B7AE168AFD1D2A211997 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -219,9 +230,12 @@
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = (
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
 					"$(inherited)",
 					"$(SRCROOT)/../composeApp/build/bin/iosArm64/debugFramework",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"$(inherited)",
 					"$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/debugFramework",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
@@ -340,9 +354,12 @@
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = (
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = (
 					"$(inherited)",
 					"$(SRCROOT)/../composeApp/build/bin/iosArm64/releaseFramework",
+				);
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"$(inherited)",
 					"$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/releaseFramework",
 				);
 				GENERATE_INFOPLIST_FILE = YES;

@@ -25,6 +25,7 @@ struct iOSApp: App {
     init() {
         FirebaseApp.configure()
         setupKakaoMaps()
+        setupPlaceMapProvider()
         setupBannerAdProvider()
         setupInterstitialAdProvider()
     }
@@ -39,6 +40,22 @@ struct iOSApp: App {
         }
 
         SDKInitializer.InitSDK(appKey: appKey)
+    }
+
+    private func setupPlaceMapProvider() {
+        let provider = PlaceMapViewProvider.shared
+
+        provider.create = { (address: String, placeName: String) -> UIView in
+            KakaoPlaceMapView(address: address, placeName: placeName)
+        }
+
+        provider.update = { (view: UIView, address: String, placeName: String) in
+            (view as? KakaoPlaceMapView)?.update(address: address, placeName: placeName)
+        }
+
+        provider.dispose = { (view: UIView) in
+            (view as? KakaoPlaceMapView)?.releaseMap()
+        }
     }
 
     /// ATT 요청 및 AdMob 초기화 로직
@@ -95,7 +112,7 @@ struct iOSApp: App {
                     .flatMap({ $0.windows })
                     .first(where: { $0.isKeyWindow })?.rootViewController
             else {
-                onComplete()
+                _ = onComplete()
                 return
             }
             coordinator.show(from: rootVC, adUnitId: adUnitId, onComplete: { _ = onComplete() })

@@ -1,6 +1,5 @@
 package com.yagubogu.ui.place
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,22 +27,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yagubogu.ui.common.component.DefaultToolbar
+import com.yagubogu.ui.common.component.PlaceMapView
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.labelResource
+import com.yagubogu.ui.theme.Gold
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.Gray600
 import com.yagubogu.ui.theme.Gray900
-import com.yagubogu.ui.theme.Gold
-import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardBold
+import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardMedium16
@@ -59,7 +58,6 @@ import yagubogu.composeapp.generated.resources.ic_compass
 import yagubogu.composeapp.generated.resources.ic_copy
 import yagubogu.composeapp.generated.resources.ic_phone
 import yagubogu.composeapp.generated.resources.ic_walk
-import yagubogu.composeapp.generated.resources.img_place_mock_map
 import yagubogu.composeapp.generated.resources.place_detail_business_hours
 import yagubogu.composeapp.generated.resources.place_detail_copy_address_content_description
 import yagubogu.composeapp.generated.resources.place_detail_location_title
@@ -221,7 +219,15 @@ private fun PlaceLocationSection(
             color = Gray900,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        MockMapImage()
+        PlaceMapView(
+            address = placeDetail.address,
+            placeName = placeDetail.name,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(198.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -268,64 +274,6 @@ private fun PlaceLocationSection(
             }
         }
     }
-}
-
-@Composable
-private fun MockMapImage(modifier: Modifier = Modifier) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(198.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFFE7F4EA)),
-    ) {
-        Image(
-            painter = painterResource(Res.drawable.img_place_mock_map),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .size(72.dp)
-                    .align(Alignment.Center)
-                    .background(PrimaryMapPinBackground, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_compass),
-                contentDescription = null,
-                tint = White,
-                modifier = Modifier.size(34.dp),
-            )
-        }
-        MapLabel(
-            text = "잠실 야구장",
-            modifier = Modifier.align(Alignment.TopStart).padding(start = 28.dp, top = 28.dp),
-        )
-        MapLabel(
-            text = "석촌호수",
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 28.dp),
-        )
-    }
-}
-
-@Composable
-private fun MapLabel(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = text,
-        style = PretendardMedium12,
-        color = Gray500,
-        modifier =
-            modifier
-                .background(White.copy(alpha = 0.86f), RoundedCornerShape(8.dp))
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-    )
 }
 
 @Composable
@@ -424,10 +372,9 @@ private fun PlaceRankBadge(
 }
 
 @Composable
-private fun rememberPlaceDetailUiModel(placeName: String): PlaceDetailUiModel {
-    return PLACE_DETAIL_ITEMS[placeName]
+private fun rememberPlaceDetailUiModel(placeName: String): PlaceDetailUiModel =
+    PLACE_DETAIL_ITEMS[placeName]
         ?: PLACE_DETAIL_ITEMS.values.first().copy(name = placeName)
-}
 
 private data class PlaceDetailUiModel(
     val name: String,
@@ -443,8 +390,6 @@ private data class PlaceDetailUiModel(
     val heroStartColor: Color,
     val heroEndColor: Color,
 )
-
-private val PrimaryMapPinBackground = Color(0xFF22C55E)
 
 private val PLACE_DETAIL_ITEMS: Map<String, PlaceDetailUiModel> =
     listOf(
