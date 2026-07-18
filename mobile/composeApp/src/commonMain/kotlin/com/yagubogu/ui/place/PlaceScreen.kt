@@ -50,6 +50,7 @@ import yagubogu.composeapp.generated.resources.place_sort_popular
 @Composable
 fun PlaceScreen(
     scrollToTopEvent: SharedFlow<Unit>,
+    onPlaceItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
@@ -102,7 +103,7 @@ fun PlaceScreen(
         ) { item: PlaceItem ->
             PlaceRecommendationCard(
                 item = item,
-                onClick = {},
+                onClick = { onPlaceItemClick(item.name) },
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -200,5 +201,8 @@ private val PLACE_ITEMS: List<PlaceItem> =
 @Preview(showBackground = true)
 @Composable
 private fun PlaceScreenPreview() {
-    PlaceScreen(scrollToTopEvent = MutableSharedFlow<Unit>())
+    PlaceScreen(
+        scrollToTopEvent = MutableSharedFlow<Unit>(),
+        onPlaceItemClick = {},
+    )
 }

@@ -44,4 +44,9 @@ sealed interface Route : NavKey {
     data class AttendanceHistoryDetail(
         val attendanceItem: AttendanceHistoryItem,
     ) : Route
+
+    @Serializable
+    data class PlaceDetail(
+        val placeName: String,
+    ) : Route
 }

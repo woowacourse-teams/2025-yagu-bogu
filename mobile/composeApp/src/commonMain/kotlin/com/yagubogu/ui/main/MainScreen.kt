@@ -53,6 +53,7 @@ fun MainScreen(
     onRankingShowMoreClick: (RankingType) -> Unit,
     onLivetalkItemClick: (Long, Boolean) -> Unit,
     onAttendanceHistoryItemClick: (item: AttendanceHistoryItem) -> Unit,
+    onPlaceItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
@@ -146,6 +147,7 @@ fun MainScreen(
                     entry<BottomNavKey.Place> {
                         PlaceScreen(
                             scrollToTopEvent = scrollToTopEvent,
+                            onPlaceItemClick = onPlaceItemClick,
                         )
                     }
                 }
