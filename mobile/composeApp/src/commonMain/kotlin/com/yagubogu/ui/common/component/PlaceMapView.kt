@@ -7,5 +7,7 @@ import androidx.compose.ui.Modifier
 expect fun PlaceMapView(
     address: String,
     placeName: String,
+    latitude: Double,
+    longitude: Double,
     modifier: Modifier = Modifier,
 )

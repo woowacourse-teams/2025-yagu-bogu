@@ -8,12 +8,11 @@ private enum PlaceMapConstants {
     static let markerLayerID = "place-marker-layer"
     static let markerStyleID = "place-marker-style"
     static let markerPoiID = "place-marker"
-    static let zoomLevel = 3
+    static let zoomLevel = 16
 }
 
 final class KakaoPlaceMapView: UIView, MapControllerDelegate {
     private let mapContainer = KMViewContainer()
-    private let geocoder = CLGeocoder()
     private var controller: KMController?
     private var coordinate = CLLocationCoordinate2D(latitude: 37.512150, longitude: 127.071960)
     private var currentAddress = ""
@@ -27,9 +26,9 @@ final class KakaoPlaceMapView: UIView, MapControllerDelegate {
         setupView()
     }
 
-    convenience init(address: String, placeName: String) {
+    convenience init(address: String, placeName: String, latitude: Double, longitude: Double) {
         self.init(frame: .zero)
-        update(address: address, placeName: placeName)
+        update(address: address, placeName: placeName, latitude: latitude, longitude: longitude)
     }
 
     required init?(coder: NSCoder) {
@@ -47,29 +46,20 @@ final class KakaoPlaceMapView: UIView, MapControllerDelegate {
         resizeMap(to: bounds.size)
     }
 
-    func update(address: String, placeName: String) {
-        guard currentAddress != address else { return }
+    func update(address: String, placeName: String, latitude: Double, longitude: Double) {
+        guard
+            currentAddress != address ||
+            coordinate.latitude != latitude ||
+            coordinate.longitude != longitude
+        else { return }
+
         currentAddress = address
-
-        geocoder.cancelGeocode()
-        let requestedAddress = address
-        geocoder.geocodeAddressString(address) { [weak self] placemarks, _ in
-            guard
-                let self,
-                self.currentAddress == requestedAddress,
-                let coordinate = placemarks?.first?.location?.coordinate
-            else { return }
-
-            DispatchQueue.main.async {
-                self.coordinate = coordinate
-                self.updateMarker(to: coordinate)
-                self.moveCamera(to: coordinate)
-            }
-        }
+        coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        updateMarker(to: coordinate)
+        moveCamera(to: coordinate)
     }
 
     func releaseMap() {
-        geocoder.cancelGeocode()
         controller?.pauseEngine()
         controller?.resetEngine()
         controller = nil
@@ -210,7 +200,7 @@ final class KakaoPlaceMapView: UIView, MapControllerDelegate {
                 blur: 4,
                 color: UIColor.black.withAlphaComponent(0.25).cgColor
             )
-            UIColor(red: 0.94, green: 0.17, blue: 0.15, alpha: 1.0).setFill()
+            UIColor(red: 0.13, green: 0.77, blue: 0.37, alpha: 1.0).setFill()
             pinPath.fill()
 
             UIColor.white.setFill()

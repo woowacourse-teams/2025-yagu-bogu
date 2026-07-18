@@ -12,14 +12,16 @@ import platform.UIKit.UIView
 actual fun PlaceMapView(
     address: String,
     placeName: String,
+    latitude: Double,
+    longitude: Double,
     modifier: Modifier,
 ) {
     UIKitView(
         factory = {
-            PlaceMapViewProvider.create?.invoke(address, placeName) ?: UIView()
+            PlaceMapViewProvider.create?.invoke(address, placeName, latitude, longitude) ?: UIView()
         },
         modifier = modifier,
-        update = { view -> PlaceMapViewProvider.update?.invoke(view, address, placeName) },
+        update = { view -> PlaceMapViewProvider.update?.invoke(view, address, placeName, latitude, longitude) },
         onRelease = { view -> PlaceMapViewProvider.dispose?.invoke(view) },
         properties =
             UIKitInteropProperties(

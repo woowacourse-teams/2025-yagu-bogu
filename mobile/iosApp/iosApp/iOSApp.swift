@@ -45,12 +45,22 @@ struct iOSApp: App {
     private func setupPlaceMapProvider() {
         let provider = PlaceMapViewProvider.shared
 
-        provider.create = { (address: String, placeName: String) -> UIView in
-            KakaoPlaceMapView(address: address, placeName: placeName)
+        provider.create = { address, placeName, latitude, longitude in
+            KakaoPlaceMapView(
+                address: address,
+                placeName: placeName,
+                latitude: latitude.doubleValue,
+                longitude: longitude.doubleValue
+            )
         }
 
-        provider.update = { (view: UIView, address: String, placeName: String) in
-            (view as? KakaoPlaceMapView)?.update(address: address, placeName: placeName)
+        provider.update = { view, address, placeName, latitude, longitude in
+            (view as? KakaoPlaceMapView)?.update(
+                address: address,
+                placeName: placeName,
+                latitude: latitude.doubleValue,
+                longitude: longitude.doubleValue
+            )
         }
 
         provider.dispose = { (view: UIView) in

@@ -7,7 +7,7 @@ import platform.UIKit.UIView
 @OptIn(ExperimentalObjCName::class)
 @ObjCName(swiftName = "PlaceMapViewProvider")
 object PlaceMapViewProvider {
-    var create: ((address: String, placeName: String) -> UIView)? = null
-    var update: ((view: UIView, address: String, placeName: String) -> Unit)? = null
+    var create: ((address: String, placeName: String, latitude: Double, longitude: Double) -> UIView)? = null
+    var update: ((view: UIView, address: String, placeName: String, latitude: Double, longitude: Double) -> Unit)? = null
     var dispose: ((view: UIView) -> Unit)? = null
 }

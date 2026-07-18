@@ -222,6 +222,8 @@ private fun PlaceLocationSection(
         PlaceMapView(
             address = placeDetail.address,
             placeName = placeDetail.name,
+            latitude = placeDetail.latitude,
+            longitude = placeDetail.longitude,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -384,6 +386,8 @@ private data class PlaceDetailUiModel(
     val description: String,
     val address: String,
     val addressGuide: String,
+    val latitude: Double,
+    val longitude: Double,
     val businessHours: String,
     val phoneNumber: String,
     val heroText: String,
@@ -401,6 +405,8 @@ private val PLACE_DETAIL_ITEMS: Map<String, PlaceDetailUiModel> =
             description = "경기 전후로 팬들이 가장 많이 찾는 명소입니다. 바삭한 튀김과 깊은 소스 맛으로 이미 잠실 야구장 근처에서는 소문난 맛집입니다. 주문 즉시 조리되어 최고의 맛을 보장합니다.",
             address = "서울 송파구 올림픽로 25",
             addressGuide = "야구장 서문에서 도보 5분 거리",
+            latitude = 37.513184,
+            longitude = 127.070145,
             businessHours = "11:00 - 22:00",
             phoneNumber = "02-123-4567",
             heroText = "돈까스",
@@ -415,6 +421,8 @@ private val PLACE_DETAIL_ITEMS: Map<String, PlaceDetailUiModel> =
             description = "매콤달콤한 떡볶이와 바삭한 튀김을 함께 즐길 수 있는 경기장 근처 인기 분식집입니다. 경기 시작 전 빠르게 들르기 좋아요.",
             address = "서울 송파구 백제고분로 12",
             addressGuide = "야구장 남문에서 도보 7분 거리",
+            latitude = 37.509861,
+            longitude = 127.073682,
             businessHours = "10:30 - 21:30",
             phoneNumber = "02-222-4567",
             heroText = "분식",
@@ -429,6 +437,8 @@ private val PLACE_DETAIL_ITEMS: Map<String, PlaceDetailUiModel> =
             description = "두툼한 한우구이와 든든한 식사 메뉴가 준비된 회식형 맛집입니다. 경기 후 여유 있게 승리의 기분을 나누기 좋은 장소입니다.",
             address = "서울 송파구 올림픽로 32길 8",
             addressGuide = "야구장 동문에서 도보 10분 거리",
+            latitude = 37.514452,
+            longitude = 127.076927,
             businessHours = "12:00 - 23:00",
             phoneNumber = "02-333-4567",
             heroText = "한우",
@@ -443,6 +453,8 @@ private val PLACE_DETAIL_ITEMS: Map<String, PlaceDetailUiModel> =
             description = "야구장 근처에서 잠시 쉬어가기 좋은 카페입니다. 넓은 좌석과 고소한 커피, 간단한 디저트 메뉴가 준비되어 있습니다.",
             address = "서울 송파구 올림픽로 45",
             addressGuide = "야구장 북문에서 도보 12분 거리",
+            latitude = 37.516092,
+            longitude = 127.073914,
             businessHours = "09:00 - 22:00",
             phoneNumber = "02-444-4567",
             heroText = "카페",
