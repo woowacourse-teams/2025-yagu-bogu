@@ -3,6 +3,8 @@ package com.yagubogu.reward.client;
 import com.yagubogu.reward.config.KakaoGiftProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -38,15 +40,15 @@ public class KakaoGiftOrderClient implements GiftOrderClient {
             }
             return new GiftOrderResult(response.reserveTraceId());
         } catch (HttpClientErrorException exception) {
-            int status = exception.getStatusCode().value();
-            if (status == 429) {
+            HttpStatusCode statusCode = exception.getStatusCode();
+            if (statusCode.isSameCodeAs(HttpStatus.TOO_MANY_REQUESTS)) {
                 throw new KakaoGiftRequestUncertainException(
                         "Kakao gift order was rate-limited",
                         exception
                 );
             }
             throw new KakaoGiftRequestRejectedException(
-                    "Kakao gift order was rejected: status=" + status,
+                    "Kakao gift order was rejected: status=" + statusCode.value(),
                     exception
             );
         } catch (HttpServerErrorException | ResourceAccessException exception) {
