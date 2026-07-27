@@ -50,6 +50,44 @@ class KakaoGiftOrderClientTest {
         server.verify();
     }
 
+    @DisplayName("카카오 응답에 추적 ID가 없으면 결과가 불확실한 실패로 분류한다")
+    @Test
+    void classifyMissingReserveTraceIdAsUncertain() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        KakaoGiftOrderClient client = new KakaoGiftOrderClient(
+                builder.baseUrl("https://gift.example.com").build(),
+                properties()
+        );
+        server.expect(requestTo("https://gift.example.com/v1/template/order"))
+                .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+
+        assertThatThrownBy(() -> client.requestOrder(
+                new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))))
+                .isInstanceOf(KakaoGiftRequestUncertainException.class)
+                .hasMessage("Kakao gift order response has no reserve_trace_id");
+        server.verify();
+    }
+
+    @DisplayName("카카오 응답 본문이 없으면 결과가 불확실한 실패로 분류한다")
+    @Test
+    void classifyMissingResponseBodyAsUncertain() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        KakaoGiftOrderClient client = new KakaoGiftOrderClient(
+                builder.baseUrl("https://gift.example.com").build(),
+                properties()
+        );
+        server.expect(requestTo("https://gift.example.com/v1/template/order"))
+                .andRespond(withSuccess());
+
+        assertThatThrownBy(() -> client.requestOrder(
+                new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))))
+                .isInstanceOf(KakaoGiftRequestUncertainException.class)
+                .hasMessage("Kakao gift order response has no reserve_trace_id");
+        server.verify();
+    }
+
     @DisplayName("카카오가 요청을 거절하면 명확한 실패로 분류한다")
     @Test
     void classifyRejectedRequest() {

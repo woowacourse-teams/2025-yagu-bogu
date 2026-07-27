@@ -35,8 +35,11 @@ public class KakaoGiftOrderClient implements GiftOrderClient {
                     .body(KakaoGiftOrderRequest.from(request, properties.templateToken()))
                     .retrieve()
                     .body(KakaoGiftOrderResponse.class);
-            if (response == null) {
-                throw new KakaoGiftRequestUncertainException("Kakao gift order returned an empty response", null);
+            if (response == null || response.reserveTraceId() == null) {
+                throw new KakaoGiftRequestUncertainException(
+                        "Kakao gift order response has no reserve_trace_id",
+                        null
+                );
             }
             return new GiftOrderResult(response.reserveTraceId());
         } catch (HttpClientErrorException exception) {
