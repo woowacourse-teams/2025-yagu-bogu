@@ -39,7 +39,9 @@ public class KakaoGiftOrderClient implements GiftOrderClient {
             return new GiftOrderResult(response.reserveTraceId());
         } catch (HttpClientErrorException exception) {
             throw new KakaoGiftRequestRejectedException(
-                    "Kakao gift order was rejected: status=" + exception.getStatusCode().value());
+                    "Kakao gift order was rejected: status=" + exception.getStatusCode().value(),
+                    exception
+            );
         } catch (HttpServerErrorException | ResourceAccessException exception) {
             throw new KakaoGiftRequestUncertainException("Kakao gift order result is uncertain", exception);
         }

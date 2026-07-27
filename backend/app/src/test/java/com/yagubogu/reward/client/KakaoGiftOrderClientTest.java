@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 class KakaoGiftOrderClientTest {
@@ -61,7 +62,8 @@ class KakaoGiftOrderClientTest {
 
         assertThatThrownBy(() -> client.requestOrder(
                 new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))))
-                .isInstanceOf(KakaoGiftRequestRejectedException.class);
+                .isInstanceOf(KakaoGiftRequestRejectedException.class)
+                .hasCauseInstanceOf(HttpClientErrorException.class);
         server.verify();
     }
 
