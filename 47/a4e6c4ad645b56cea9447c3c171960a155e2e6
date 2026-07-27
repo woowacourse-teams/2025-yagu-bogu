@@ -1,0 +1,27 @@
+backend/app/.env.example
+  s_1251cf9cc5d83d::t_6f3c027b4b4e59 16,20-23
+  s_1251cf9cc5d83d::t_5cb07bb063fa3b 24
+backend/app/src/main/resources/application.yml
+  s_1251cf9cc5d83d::t_8f701bf61f6e8e 70-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "47a4e6c4ad645b56cea9447c3c171960a155e2e6",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
