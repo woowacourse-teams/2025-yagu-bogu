@@ -269,7 +269,7 @@ POST /admin/rewards/weekly-draws?monday=YYYY-MM-DD
 - 카카오가 정상 응답(`200 OK`)을 주면, `reserve_trace_id`를 저장하고 발급 상태를 `REQUEST_ACCEPTED`로 바꿉니다.
 - 카카오가 요청을 확실히 받지 못한 경우에는 상태를 `REQUEST_RETRYABLE`로 전환해 재요청할 수 있게 합니다.
 - 타임아웃 등 요청 결과를 확인할 수 없는 상황이면, 발급 상태를 `REQUEST_IN_PROGRESS`로 유지합니다.
-    - 이후에 같은 `external_order_id`로 주문 상태를 확인해 보정합니다.
+    - 주문 상태 조회·보정은 현재 지원하지 않으며, 후속 복구 흐름은 [#6](https://github.com/Starlight258/yagubogu-mirror/issues/6)에서 추적합니다.
 - 한 번 `REQUEST_IN_PROGRESS`로 넘어가면 전화번호를 다시 수정할 수 없습니다.
 - 응답이나 로그에는 전화번호가 항상 마스킹 처리되어 노출됩니다.
 
@@ -331,7 +331,8 @@ POST /admin/rewards/weekly-draws?monday=YYYY-MM-DD
     - API 키와 템플릿 토큰은 환경 변수에서 불러옵니다.
 - 카카오에서 정상적으로 응답(`200 OK`)이 오면, `reserve_trace_id`를 저장하고 발급 상태를 `REQUEST_ACCEPTED`로 바꿉니다.
 - 카카오가 요청을 제대로 받지 못했다면 상태를 `REQUEST_RETRYABLE`로 전환해 재요청할 수 있게 합니다.
-- 타임아웃 등으로 결과를 확인할 수 없는 경우엔 발급 상태가 `REQUEST_IN_PROGRESS`에 머무르며, 이후 동일한 `external_order_id`로 주문 상태를 다시 확인해 보정합니다.
+- 타임아웃 등으로 결과를 확인할 수 없는 경우엔 발급 상태가 `REQUEST_IN_PROGRESS`에 머무릅니다.
+    - 주문 상태 조회·보정은 현재 지원하지 않으며, 후속 복구 흐름은 [#6](https://github.com/Starlight258/yagubogu-mirror/issues/6)에서 추적합니다.
 - 한 번 `REQUEST_IN_PROGRESS` 상태가 되면 전화번호는 다시 수정할 수 없습니다.
 - 응답이나 로그에는 전화번호가 항상 마스킹 처리되어 노출됩니다.
 
@@ -351,4 +352,3 @@ POST /admin/rewards/weekly-draws?monday=YYYY-MM-DD
 | 주간 점수         | 그 주간에 맞춘 승 예측 개수                     |
 | 정기 추첨         | 매주 일요일 23시 30분, 서울 기준                |
 | 추첨 조건         | 해당                                             |
-
