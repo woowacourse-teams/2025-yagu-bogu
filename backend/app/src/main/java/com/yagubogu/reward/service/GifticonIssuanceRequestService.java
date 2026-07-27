@@ -62,7 +62,6 @@ public class GifticonIssuanceRequestService {
                 } catch (InvalidGifticonIssuanceStateException exception) {
                     throw new ConflictException(exception.getMessage());
                 }
-                gifticonIssuanceRepository.flush();
                 return new GiftOrderRequest(
                         issuance.getExternalOrderId(),
                         issuance.getRecipientPhoneNumber().getValue()
