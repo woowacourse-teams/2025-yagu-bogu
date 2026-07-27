@@ -1,0 +1,25 @@
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_1251cf9cc5d83d::t_f911a50fe9236a 23,25-27,37,39,57-59,86,88,101,103,111-113
+  s_1251cf9cc5d83d::t_33aa298568e4e9 24,38,87,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ad82d4a9e64da4fe9558ce356fac7f8d16ab68f1",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
