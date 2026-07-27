@@ -2,6 +2,7 @@ backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftOrderClient.java
   s_70889bb2ac8aa7::t_9241bdd55215c6 41-47,49-51
 backend/app/src/test/java/com/yagubogu/reward/client/KakaoGiftOrderClientTest.java
   s_70889bb2ac8aa7::t_9241bdd55215c6 10,19,22,67-83,86-87
+  s_70889bb2ac8aa7::t_e0a6066ccee4d6 84-85
 backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftRequestRejectedException.java
   s_70889bb2ac8aa7::t_9241bdd55215c6 8-11
 ---
