@@ -64,7 +64,7 @@ public class GifticonIssuanceRequestService {
                 }
                 return new GiftOrderRequest(
                         issuance.getExternalOrderId(),
-                        issuance.getRecipientPhoneNumber().getValue()
+                        issuance.getRecipientPhoneNumber()
                 );
             });
         } catch (ObjectOptimisticLockingFailureException exception) {

@@ -14,7 +14,10 @@ record KakaoGiftOrderRequest(
         return new KakaoGiftOrderRequest(
                 templateToken,
                 "PHONE",
-                List.of(new KakaoGiftReceiver(request.externalOrderId(), request.recipientPhoneNumber())),
+                List.of(new KakaoGiftReceiver(
+                        request.externalOrderId(),
+                        request.recipientPhoneNumber().getValue()
+                )),
                 request.externalOrderId()
         );
     }

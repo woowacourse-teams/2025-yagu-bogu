@@ -74,7 +74,8 @@ class GifticonIssuanceRequestServiceTest {
     @DisplayName("카카오가 발급 요청을 접수하면 예약 거래 번호를 저장한다")
     @Test
     void markRequestAccepted() {
-        when(giftOrderClient.requestOrder(new GiftOrderRequest("order-id", "01012345678")))
+        when(giftOrderClient.requestOrder(
+                new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))))
                 .thenReturn(new GiftOrderResult(123L));
 
         GifticonIssuanceResponse response = service.requestIssuance(2L, 1L, "01012345678");

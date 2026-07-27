@@ -10,6 +10,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.yagubogu.reward.config.KakaoGiftProperties;
+import com.yagubogu.reward.domain.RecipientPhoneNumber;
 import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,9 @@ class KakaoGiftOrderClientTest {
                 .andExpect(jsonPath("$.receivers[0].receiver_id").value("01012345678"))
                 .andRespond(withSuccess("{\"reserve_trace_id\":202607200000000001}", MediaType.APPLICATION_JSON));
 
-        GiftOrderResult result = client.requestOrder(new GiftOrderRequest("order-id", "01012345678"));
+        GiftOrderResult result = client.requestOrder(
+                new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))
+        );
 
         assertThat(result.reserveTraceId()).isEqualTo(202607200000000001L);
         server.verify();
@@ -56,7 +59,8 @@ class KakaoGiftOrderClientTest {
         server.expect(requestTo("https://gift.example.com/v1/template/order"))
                 .andRespond(withBadRequest());
 
-        assertThatThrownBy(() -> client.requestOrder(new GiftOrderRequest("order-id", "01012345678")))
+        assertThatThrownBy(() -> client.requestOrder(
+                new GiftOrderRequest("order-id", new RecipientPhoneNumber("01012345678"))))
                 .isInstanceOf(KakaoGiftRequestRejectedException.class);
         server.verify();
     }
