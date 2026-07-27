@@ -1,0 +1,23 @@
+backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftRequestRejectedException.java
+  s_a6aceb99661642::t_6ae5821180e9aa 8-11
+backend/app/src/test/java/com/yagubogu/reward/client/KakaoGiftOrderClientTest.java
+  s_a6aceb99661642::t_6ae5821180e9aa 19,61-62
+backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftOrderClient.java
+  s_a6aceb99661642::t_6ae5821180e9aa 42-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "298f3e49abc6c065e51caa7450854ee83b4f743d",
+  "prompts": {},
+  "sessions": {
+    "s_a6aceb99661642": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa264-7cc2-7a63-a00f-a6200a30d079",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
