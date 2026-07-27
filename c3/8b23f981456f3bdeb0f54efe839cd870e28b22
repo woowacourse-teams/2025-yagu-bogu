@@ -1,0 +1,36 @@
+backend/app/src/main/java/com/yagubogu/reward/domain/GifticonIssuance.java
+  s_1251cf9cc5d83d::t_19127f65adfe81 76,79,82
+backend/app/src/test/java/com/yagubogu/reward/domain/GifticonIssuanceTest.java
+  s_1251cf9cc5d83d::t_19127f65adfe81 22,24,27,29,33,35,37,39
+backend/app/src/main/java/com/yagubogu/reward/domain/InvalidGifticonIssuanceStateException.java
+  s_1251cf9cc5d83d::t_bb3aa6c437e689 1-19
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_1251cf9cc5d83d::t_19127f65adfe81 13,32-37,49-53,58-61
+backend/app/src/main/java/com/yagubogu/reward/controller/v1/GifticonController.java
+  s_1251cf9cc5d83d::t_19127f65adfe81 34-38
+backend/app/src/test/java/com/yagubogu/reward/service/GifticonIssuanceRequestServiceTest.java
+  s_1251cf9cc5d83d::t_4c7c1057dcd4dc 106
+  s_1251cf9cc5d83d::t_c625280d1979f9 7,11,107-116
+  s_1251cf9cc5d83d::t_19127f65adfe81 80,92,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c38b23f981456f3bdeb0f54efe839cd870e28b22",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
