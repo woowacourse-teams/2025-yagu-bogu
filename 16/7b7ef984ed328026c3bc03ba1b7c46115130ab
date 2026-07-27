@@ -1,0 +1,38 @@
+backend/docs/prediction-prd.md
+  s_1251cf9cc5d83d::t_0b08a8a506af5e 55-57,108-112,115,262,264,269-271,273,300,325,327,332-335
+backend/app/src/test/java/com/yagubogu/reward/domain/GifticonIssuanceTest.java
+  s_1251cf9cc5d83d::t_a808c4f85f05d9 43-55
+  s_1251cf9cc5d83d::t_5b67af3ed76443 29
+backend/app/src/main/resources/db/migration/mysql/V21__add_gifticon_recipient_and_request_details.sql
+  s_1251cf9cc5d83d::t_e49e9df605af97 8-15
+backend/app/src/test/java/com/yagubogu/reward/service/GifticonIssuanceRequestServiceTest.java
+  s_1251cf9cc5d83d::t_d9421db209c757 76
+  s_1251cf9cc5d83d::t_5b67af3ed76443 82,86,88,94,105
+backend/app/src/main/java/com/yagubogu/reward/domain/GifticonIssuance.java
+  s_1251cf9cc5d83d::t_5b67af3ed76443 78,82,86-87,89,93-95
+backend/app/src/main/java/com/yagubogu/reward/domain/GifticonIssuanceStatus.java
+  s_1251cf9cc5d83d::t_5b67af3ed76443 5-7
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_1251cf9cc5d83d::t_5b67af3ed76443 40,42,76,83,88,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "167b7ef984ed328026c3bc03ba1b7c46115130ab",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null
+    }
+  }
+}
