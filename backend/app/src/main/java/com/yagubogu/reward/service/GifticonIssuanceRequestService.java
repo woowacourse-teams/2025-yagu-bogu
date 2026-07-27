@@ -20,6 +20,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+/**
+ * 기프티콘 발급 요청과 상태 변경을 조율한다.
+ *
+ * <p>외부 호출은 DB 트랜잭션 밖에서 수행한다.
+ */
 @RequiredArgsConstructor
 @Service
 public class GifticonIssuanceRequestService {
@@ -29,6 +34,9 @@ public class GifticonIssuanceRequestService {
     private final TransactionTemplate transactionTemplate;
     private final Clock clock;
 
+    /**
+     * 전화번호를 저장해 발급 요청을 선점하고 외부 발급 응답을 상태에 반영한다.
+     */
     public GifticonIssuanceResponse requestIssuance(
             final long memberId,
             final long gifticonIssuanceId,
@@ -46,6 +54,9 @@ public class GifticonIssuanceRequestService {
         }
     }
 
+    /**
+     * 전화번호 저장과 발급 요청 선점을 한 트랜잭션으로 처리한다.
+     */
     private GiftOrderRequest prepareRequest(
             final long memberId,
             final long gifticonIssuanceId,
@@ -72,6 +83,9 @@ public class GifticonIssuanceRequestService {
         }
     }
 
+    /**
+     * 외부 제공자가 접수한 요청의 추적 번호와 상태를 저장한다.
+     */
     private GifticonIssuanceResponse markRequestAccepted(
             final long memberId,
             final long gifticonIssuanceId,
@@ -84,6 +98,9 @@ public class GifticonIssuanceRequestService {
         });
     }
 
+    /**
+     * 외부 제공자가 거절한 요청을 재시도 가능한 상태로 변경한다.
+     */
     private void markRequestRetryable(final long memberId, final long gifticonIssuanceId) {
         transactionTemplate.executeWithoutResult(status -> {
             GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
@@ -91,6 +108,9 @@ public class GifticonIssuanceRequestService {
         });
     }
 
+    /**
+     * 회원이 소유한 발급 건을 조회한다.
+     */
     private GifticonIssuance findOwnedIssuance(final long gifticonIssuanceId, final long memberId) {
         return gifticonIssuanceRepository.findByIdAndMemberId(gifticonIssuanceId, memberId)
                 .orElseThrow(() -> new NotFoundException("Gifticon issuance is not found"));
