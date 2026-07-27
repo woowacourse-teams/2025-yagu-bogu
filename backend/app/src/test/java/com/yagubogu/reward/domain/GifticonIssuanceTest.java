@@ -30,6 +30,18 @@ class GifticonIssuanceTest {
         assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01012345678");
     }
 
+    @DisplayName("수신자 전화번호가 없으면 발급 요청을 준비할 수 없다")
+    @Test
+    void rejectPreparingRequestWithoutRecipientPhoneNumber() {
+        GifticonIssuance issuance = new GifticonIssuance(null, null, "order-id", NOW);
+
+        assertThatThrownBy(() -> issuance.prepareRequest(null, NOW.plusMinutes(1)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Recipient phone number must not be null");
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO);
+        assertThat(issuance.getRecipientPhoneNumber()).isNull();
+    }
+
     @DisplayName("발송 요청을 선점한 뒤에는 다시 준비할 수 없다")
     @Test
     void rejectPreparingRequestAfterRequestStarted() {

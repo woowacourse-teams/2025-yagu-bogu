@@ -74,6 +74,9 @@ public class GifticonIssuance {
     }
 
     public void prepareRequest(final RecipientPhoneNumber recipientPhoneNumber, final LocalDateTime now) {
+        if (recipientPhoneNumber == null) {
+            throw new IllegalArgumentException("Recipient phone number must not be null");
+        }
         if (status != GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO
                 && status != GifticonIssuanceStatus.REQUEST_RETRYABLE) {
             throw new InvalidGifticonIssuanceStateException("prepare request", status);
