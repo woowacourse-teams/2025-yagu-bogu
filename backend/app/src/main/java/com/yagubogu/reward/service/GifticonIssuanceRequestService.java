@@ -37,9 +37,9 @@ public class GifticonIssuanceRequestService {
         GiftOrderRequest request = prepareRequest(memberId, gifticonIssuanceId, recipientPhoneNumber);
         try {
             GiftOrderResult result = giftOrderClient.requestOrder(request);
-            return completeRequest(memberId, gifticonIssuanceId, result);
+            return markRequestAccepted(memberId, gifticonIssuanceId, result);
         } catch (KakaoGiftRequestRejectedException exception) {
-            returnToReady(memberId, gifticonIssuanceId);
+            markRequestRetryable(memberId, gifticonIssuanceId);
             throw new BadGatewayException("Kakao rejected the gifticon issuance request");
         } catch (KakaoGiftRequestUncertainException exception) {
             throw new BadGatewayException("Kakao gifticon issuance result is uncertain");
@@ -73,22 +73,22 @@ public class GifticonIssuanceRequestService {
         }
     }
 
-    private GifticonIssuanceResponse completeRequest(
+    private GifticonIssuanceResponse markRequestAccepted(
             final long memberId,
             final long gifticonIssuanceId,
             final GiftOrderResult result
     ) {
         return transactionTemplate.execute(status -> {
             GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
-            issuance.markRequested(result.reserveTraceId(), LocalDateTime.now(clock));
+            issuance.markRequestAccepted(result.reserveTraceId(), LocalDateTime.now(clock));
             return GifticonIssuanceResponse.from(issuance);
         });
     }
 
-    private void returnToReady(final long memberId, final long gifticonIssuanceId) {
+    private void markRequestRetryable(final long memberId, final long gifticonIssuanceId) {
         transactionTemplate.executeWithoutResult(status -> {
             GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
-            issuance.returnToReady(LocalDateTime.now(clock));
+            issuance.markRequestRetryable(LocalDateTime.now(clock));
         });
     }
 

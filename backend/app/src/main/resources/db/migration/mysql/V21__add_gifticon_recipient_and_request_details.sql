@@ -5,6 +5,11 @@ ALTER TABLE gifticon_issuances
     MODIFY COLUMN status VARCHAR(30) NOT NULL;
 
 UPDATE gifticon_issuances
-SET status = 'AWAITING_RECIPIENT_INFO'
-WHERE status = 'READY'
-  AND recipient_phone_number IS NULL;
+SET status = CASE
+                 WHEN status = 'READY' AND recipient_phone_number IS NULL THEN 'AWAITING_RECIPIENT_INFO'
+                 WHEN status = 'READY' THEN 'REQUEST_RETRYABLE'
+                 WHEN status = 'REQUESTING' THEN 'REQUEST_IN_PROGRESS'
+                 WHEN status = 'REQUESTED' THEN 'REQUEST_ACCEPTED'
+                 ELSE status
+             END
+WHERE status IN ('READY', 'REQUESTING', 'REQUESTED');

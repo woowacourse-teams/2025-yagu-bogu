@@ -75,24 +75,24 @@ public class GifticonIssuance {
 
     public void prepareRequest(final RecipientPhoneNumber recipientPhoneNumber, final LocalDateTime now) {
         if (status != GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO
-                && status != GifticonIssuanceStatus.READY) {
+                && status != GifticonIssuanceStatus.REQUEST_RETRYABLE) {
             throw new InvalidGifticonIssuanceStateException("prepare request", status);
         }
         this.recipientPhoneNumber = recipientPhoneNumber;
-        this.status = GifticonIssuanceStatus.REQUESTING;
+        this.status = GifticonIssuanceStatus.REQUEST_IN_PROGRESS;
         this.updatedAt = now;
     }
 
-    public void markRequested(final long reserveTraceId, final LocalDateTime now) {
-        validateStatus(GifticonIssuanceStatus.REQUESTING);
+    public void markRequestAccepted(final long reserveTraceId, final LocalDateTime now) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
         this.reserveTraceId = reserveTraceId;
-        this.status = GifticonIssuanceStatus.REQUESTED;
+        this.status = GifticonIssuanceStatus.REQUEST_ACCEPTED;
         this.updatedAt = now;
     }
 
-    public void returnToReady(final LocalDateTime now) {
-        validateStatus(GifticonIssuanceStatus.REQUESTING);
-        this.status = GifticonIssuanceStatus.READY;
+    public void markRequestRetryable(final LocalDateTime now) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        this.status = GifticonIssuanceStatus.REQUEST_RETRYABLE;
         this.updatedAt = now;
     }
 

@@ -26,7 +26,7 @@ class GifticonIssuanceTest {
 
         issuance.prepareRequest(new RecipientPhoneNumber("01012345678"), NOW.plusMinutes(1));
 
-        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUESTING);
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
         assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01012345678");
     }
 
@@ -39,5 +39,18 @@ class GifticonIssuanceTest {
         assertThatThrownBy(() -> issuance.prepareRequest(
                 new RecipientPhoneNumber("01087654321"), NOW.plusMinutes(1)))
                 .isInstanceOf(InvalidGifticonIssuanceStateException.class);
+    }
+
+    @DisplayName("재시도 가능 상태에서는 전화번호를 갱신하고 발급 요청을 다시 선점한다")
+    @Test
+    void prepareRetryableRequest() {
+        GifticonIssuance issuance = new GifticonIssuance(null, null, "order-id", NOW);
+        issuance.prepareRequest(new RecipientPhoneNumber("01012345678"), NOW);
+        issuance.markRequestRetryable(NOW.plusMinutes(1));
+
+        issuance.prepareRequest(new RecipientPhoneNumber("01087654321"), NOW.plusMinutes(2));
+
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01087654321");
     }
 }

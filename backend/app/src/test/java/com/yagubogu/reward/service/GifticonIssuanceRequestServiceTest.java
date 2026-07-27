@@ -73,25 +73,25 @@ class GifticonIssuanceRequestServiceTest {
 
     @DisplayName("카카오가 발급 요청을 접수하면 예약 거래 번호를 저장한다")
     @Test
-    void markRequested() {
+    void markRequestAccepted() {
         when(giftOrderClient.requestOrder(new GiftOrderRequest("order-id", "01012345678")))
                 .thenReturn(new GiftOrderResult(123L));
 
         GifticonIssuanceResponse response = service.requestIssuance(2L, 1L, "01012345678");
 
-        assertThat(response.status()).isEqualTo(GifticonIssuanceStatus.REQUESTED);
+        assertThat(response.status()).isEqualTo(GifticonIssuanceStatus.REQUEST_ACCEPTED);
         assertThat(issuance.getReserveTraceId()).isEqualTo(123L);
     }
 
-    @DisplayName("카카오가 요청을 거절하면 다시 발송 준비 상태로 돌린다")
+    @DisplayName("카카오가 요청을 거절하면 재시도 가능 상태로 전환한다")
     @Test
-    void returnToReadyWhenRejected() {
+    void markRequestRetryableWhenRejected() {
         when(giftOrderClient.requestOrder(any()))
                 .thenThrow(new KakaoGiftRequestRejectedException("rejected"));
 
         assertThatThrownBy(() -> service.requestIssuance(2L, 1L, "01012345678"))
                 .isInstanceOf(BadGatewayException.class);
-        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.READY);
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUEST_RETRYABLE);
     }
 
     @DisplayName("카카오 접수 여부를 알 수 없으면 요청 중 상태를 유지한다")
@@ -102,7 +102,7 @@ class GifticonIssuanceRequestServiceTest {
 
         assertThatThrownBy(() -> service.requestIssuance(2L, 1L, "01012345678"))
                 .isInstanceOf(BadGatewayException.class);
-        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUESTING);
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
         assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01012345678");
     }
 
