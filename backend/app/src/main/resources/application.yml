@@ -67,8 +67,8 @@ kakao:
     base-url: ${KAKAO_GIFT_API_BASE_URL:https://gateway-giftbiz.kakao.com/openapi/giftbiz}
     api-key: ${KAKAO_GIFT_API_KEY:}
     template-token: ${KAKAO_GIFT_TEMPLATE_TOKEN:}
-    connect-timeout: 3s
-    read-timeout: 5s
+    connect-timeout: ${KAKAO_GIFT_CONNECT_TIMEOUT:3s}
+    read-timeout: ${KAKAO_GIFT_READ_TIMEOUT:5s}
 
 security:
   token:

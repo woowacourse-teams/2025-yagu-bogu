@@ -11,16 +11,4 @@ public record KakaoGiftProperties(
         Duration connectTimeout,
         Duration readTimeout
 ) {
-
-    public KakaoGiftProperties {
-        if (baseUrl == null || baseUrl.isBlank()) {
-            baseUrl = "https://gateway-giftbiz.kakao.com/openapi/giftbiz";
-        }
-        if (connectTimeout == null) {
-            connectTimeout = Duration.ofSeconds(3);
-        }
-        if (readTimeout == null) {
-            readTimeout = Duration.ofSeconds(5);
-        }
-    }
 }
