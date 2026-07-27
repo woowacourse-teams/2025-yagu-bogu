@@ -27,7 +27,6 @@ public class KakaoGiftOrderClient implements GiftOrderClient {
 
     @Override
     public GiftOrderResult requestOrder(final GiftOrderRequest request) {
-        validateConfiguration();
         try {
             KakaoGiftOrderResponse response = restClient.post()
                     .uri("/v1/template/order")
@@ -56,13 +55,6 @@ public class KakaoGiftOrderClient implements GiftOrderClient {
             );
         } catch (HttpServerErrorException | ResourceAccessException exception) {
             throw new KakaoGiftRequestUncertainException("Kakao gift order result is uncertain", exception);
-        }
-    }
-
-    private void validateConfiguration() {
-        if (properties.apiKey() == null || properties.apiKey().isBlank()
-                || properties.templateToken() == null || properties.templateToken().isBlank()) {
-            throw new KakaoGiftRequestRejectedException("Kakao gift configuration is missing");
         }
     }
 }

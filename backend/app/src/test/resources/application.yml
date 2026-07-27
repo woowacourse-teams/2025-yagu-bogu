@@ -21,6 +21,14 @@ admin:
     google:
       client-id: 'admin-google-client-id'
 
+kakao:
+  gift:
+    base-url: 'https://gift.example.com'
+    api-key: 'test-api-key'
+    template-token: 'test-template-token'
+    connect-timeout: 1s
+    read-timeout: 1s
+
 security:
   token:
     access-token:
