@@ -1,0 +1,30 @@
+backend/app/src/main/java/com/yagubogu/reward/domain/GifticonIssuance.java
+  s_1251cf9cc5d83d::t_bb3aa6c437e689 80,108
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_1251cf9cc5d83d::t_bb3aa6c437e689 12,50
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonRecipientService.java
+  s_1251cf9cc5d83d::t_bb3aa6c437e689 6,39
+backend/app/src/test/java/com/yagubogu/reward/domain/GifticonIssuanceTest.java
+  s_1251cf9cc5d83d::t_bb3aa6c437e689 42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "98802253e4dac775b253c46078a9cd7f9285d637",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
