@@ -77,7 +77,7 @@ public class GifticonIssuance {
                                              final LocalDateTime now) {
         if (status != GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO
                 && status != GifticonIssuanceStatus.READY) {
-            throw new IllegalStateException("Recipient phone number cannot be changed: status=" + status);
+            throw new InvalidGifticonIssuanceStateException("change recipient phone number", status);
         }
         this.recipientPhoneNumber = recipientPhoneNumber;
         this.status = GifticonIssuanceStatus.READY;
@@ -105,8 +105,7 @@ public class GifticonIssuance {
 
     private void validateStatus(final GifticonIssuanceStatus expected) {
         if (status != expected) {
-            throw new IllegalStateException(
-                    "Invalid gifticon issuance status: expected=" + expected + ", actual=" + status);
+            throw new InvalidGifticonIssuanceStateException("transition status", expected, status);
         }
     }
 }

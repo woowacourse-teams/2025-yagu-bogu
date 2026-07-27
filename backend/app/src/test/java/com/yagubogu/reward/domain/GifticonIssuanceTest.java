@@ -39,6 +39,6 @@ class GifticonIssuanceTest {
 
         assertThatThrownBy(() -> issuance.registerRecipientPhoneNumber(
                 new RecipientPhoneNumber("01087654321"), NOW.plusMinutes(1)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(InvalidGifticonIssuanceStateException.class);
     }
 }

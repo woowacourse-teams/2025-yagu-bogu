@@ -3,6 +3,7 @@ package com.yagubogu.reward.service;
 import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.reward.domain.GifticonIssuance;
+import com.yagubogu.reward.domain.InvalidGifticonIssuanceStateException;
 import com.yagubogu.reward.domain.RecipientPhoneNumber;
 import com.yagubogu.reward.dto.v1.GifticonIssuancesResponse;
 import com.yagubogu.reward.repository.GifticonIssuanceRepository;
@@ -35,7 +36,7 @@ public class GifticonRecipientService {
                     LocalDateTime.now(clock)
             );
             gifticonIssuanceRepository.flush();
-        } catch (IllegalStateException exception) {
+        } catch (InvalidGifticonIssuanceStateException exception) {
             throw new ConflictException(exception.getMessage());
         } catch (ObjectOptimisticLockingFailureException exception) {
             throw new ConflictException("Recipient phone number is already being registered");

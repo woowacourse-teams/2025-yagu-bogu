@@ -9,6 +9,7 @@ import com.yagubogu.reward.client.GiftOrderResult;
 import com.yagubogu.reward.client.KakaoGiftRequestRejectedException;
 import com.yagubogu.reward.client.KakaoGiftRequestUncertainException;
 import com.yagubogu.reward.domain.GifticonIssuance;
+import com.yagubogu.reward.domain.InvalidGifticonIssuanceStateException;
 import com.yagubogu.reward.dto.v1.GifticonIssuanceResponse;
 import com.yagubogu.reward.repository.GifticonIssuanceRepository;
 import java.time.Clock;
@@ -46,7 +47,7 @@ public class GifticonIssuanceRequestService {
                 GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
                 try {
                     issuance.startRequesting(LocalDateTime.now(clock));
-                } catch (IllegalStateException exception) {
+                } catch (InvalidGifticonIssuanceStateException exception) {
                     throw new ConflictException(exception.getMessage());
                 }
                 gifticonIssuanceRepository.flush();
