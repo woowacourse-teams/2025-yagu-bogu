@@ -30,12 +30,11 @@ public class GifticonController implements GifticonControllerInterface {
             final long gifticonIssuanceId,
             final GifticonRecipientRequest request
     ) {
-        gifticonRecipientService.registerPhoneNumber(
-                memberClaims.id(),
-                gifticonIssuanceId,
-                request.phoneNumber()
-        );
         return ResponseEntity.ok(
-                gifticonIssuanceRequestService.requestIssuance(memberClaims.id(), gifticonIssuanceId));
+                gifticonIssuanceRequestService.requestIssuance(
+                        memberClaims.id(),
+                        gifticonIssuanceId,
+                        request.phoneNumber()
+                ));
     }
 }

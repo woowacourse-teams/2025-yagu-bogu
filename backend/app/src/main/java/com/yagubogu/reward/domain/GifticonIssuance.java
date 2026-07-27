@@ -73,14 +73,13 @@ public class GifticonIssuance {
         this.updatedAt = now;
     }
 
-    public void registerRecipientPhoneNumber(final RecipientPhoneNumber recipientPhoneNumber,
-                                             final LocalDateTime now) {
+    public void prepareRequest(final RecipientPhoneNumber recipientPhoneNumber, final LocalDateTime now) {
         if (status != GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO
                 && status != GifticonIssuanceStatus.READY) {
-            throw new InvalidGifticonIssuanceStateException("change recipient phone number", status);
+            throw new InvalidGifticonIssuanceStateException("prepare request", status);
         }
         this.recipientPhoneNumber = recipientPhoneNumber;
-        this.status = GifticonIssuanceStatus.READY;
+        this.status = GifticonIssuanceStatus.REQUESTING;
         this.updatedAt = now;
     }
 
@@ -88,12 +87,6 @@ public class GifticonIssuance {
         validateStatus(GifticonIssuanceStatus.REQUESTING);
         this.reserveTraceId = reserveTraceId;
         this.status = GifticonIssuanceStatus.REQUESTED;
-        this.updatedAt = now;
-    }
-
-    public void startRequesting(final LocalDateTime now) {
-        validateStatus(GifticonIssuanceStatus.READY);
-        this.status = GifticonIssuanceStatus.REQUESTING;
         this.updatedAt = now;
     }
 

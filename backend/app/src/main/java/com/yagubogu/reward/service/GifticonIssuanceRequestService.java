@@ -10,6 +10,7 @@ import com.yagubogu.reward.client.KakaoGiftRequestRejectedException;
 import com.yagubogu.reward.client.KakaoGiftRequestUncertainException;
 import com.yagubogu.reward.domain.GifticonIssuance;
 import com.yagubogu.reward.domain.InvalidGifticonIssuanceStateException;
+import com.yagubogu.reward.domain.RecipientPhoneNumber;
 import com.yagubogu.reward.dto.v1.GifticonIssuanceResponse;
 import com.yagubogu.reward.repository.GifticonIssuanceRepository;
 import java.time.Clock;
@@ -28,8 +29,12 @@ public class GifticonIssuanceRequestService {
     private final TransactionTemplate transactionTemplate;
     private final Clock clock;
 
-    public GifticonIssuanceResponse requestIssuance(final long memberId, final long gifticonIssuanceId) {
-        GiftOrderRequest request = prepareRequest(memberId, gifticonIssuanceId);
+    public GifticonIssuanceResponse requestIssuance(
+            final long memberId,
+            final long gifticonIssuanceId,
+            final String recipientPhoneNumber
+    ) {
+        GiftOrderRequest request = prepareRequest(memberId, gifticonIssuanceId, recipientPhoneNumber);
         try {
             GiftOrderResult result = giftOrderClient.requestOrder(request);
             return completeRequest(memberId, gifticonIssuanceId, result);
@@ -41,12 +46,19 @@ public class GifticonIssuanceRequestService {
         }
     }
 
-    private GiftOrderRequest prepareRequest(final long memberId, final long gifticonIssuanceId) {
+    private GiftOrderRequest prepareRequest(
+            final long memberId,
+            final long gifticonIssuanceId,
+            final String recipientPhoneNumber
+    ) {
         try {
             return transactionTemplate.execute(status -> {
                 GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
                 try {
-                    issuance.startRequesting(LocalDateTime.now(clock));
+                    issuance.prepareRequest(
+                            new RecipientPhoneNumber(recipientPhoneNumber),
+                            LocalDateTime.now(clock)
+                    );
                 } catch (InvalidGifticonIssuanceStateException exception) {
                     throw new ConflictException(exception.getMessage());
                 }

@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.yagubogu.global.exception.BadGatewayException;
+import com.yagubogu.global.exception.ConflictException;
 import com.yagubogu.reward.client.GiftOrderClient;
 import com.yagubogu.reward.client.GiftOrderRequest;
 import com.yagubogu.reward.client.GiftOrderResult;
@@ -65,7 +67,6 @@ class GifticonIssuanceRequestServiceTest {
                 LocalDateTime.of(2026, 7, 20, 0, 0)
         );
         issuance = new GifticonIssuance(weeklyTopScore, null, "order-id", LocalDateTime.MIN);
-        issuance.registerRecipientPhoneNumber(new RecipientPhoneNumber("01012345678"), LocalDateTime.MIN);
         when(gifticonIssuanceRepository.findByIdAndMemberId(1L, 2L)).thenReturn(Optional.of(issuance));
         executeTransactionCallbacksImmediately();
     }
@@ -76,7 +77,7 @@ class GifticonIssuanceRequestServiceTest {
         when(giftOrderClient.requestOrder(new GiftOrderRequest("order-id", "01012345678")))
                 .thenReturn(new GiftOrderResult(123L));
 
-        GifticonIssuanceResponse response = service.requestIssuance(2L, 1L);
+        GifticonIssuanceResponse response = service.requestIssuance(2L, 1L, "01012345678");
 
         assertThat(response.status()).isEqualTo(GifticonIssuanceStatus.REQUESTED);
         assertThat(issuance.getReserveTraceId()).isEqualTo(123L);
@@ -88,7 +89,7 @@ class GifticonIssuanceRequestServiceTest {
         when(giftOrderClient.requestOrder(any()))
                 .thenThrow(new KakaoGiftRequestRejectedException("rejected"));
 
-        assertThatThrownBy(() -> service.requestIssuance(2L, 1L))
+        assertThatThrownBy(() -> service.requestIssuance(2L, 1L, "01012345678"))
                 .isInstanceOf(BadGatewayException.class);
         assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.READY);
     }
@@ -99,9 +100,20 @@ class GifticonIssuanceRequestServiceTest {
         when(giftOrderClient.requestOrder(any()))
                 .thenThrow(new KakaoGiftRequestUncertainException("uncertain", null));
 
-        assertThatThrownBy(() -> service.requestIssuance(2L, 1L))
+        assertThatThrownBy(() -> service.requestIssuance(2L, 1L, "01012345678"))
                 .isInstanceOf(BadGatewayException.class);
         assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUESTING);
+        assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01012345678");
+    }
+
+    @DisplayName("이미 발급 요청 중인 건은 다시 선점할 수 없다")
+    @Test
+    void rejectRequestAlreadyInProgress() {
+        issuance.prepareRequest(new RecipientPhoneNumber("01012345678"), LocalDateTime.MIN);
+
+        assertThatThrownBy(() -> service.requestIssuance(2L, 1L, "01012345678"))
+                .isInstanceOf(ConflictException.class);
+        verifyNoInteractions(giftOrderClient);
     }
 
     @SuppressWarnings("unchecked")

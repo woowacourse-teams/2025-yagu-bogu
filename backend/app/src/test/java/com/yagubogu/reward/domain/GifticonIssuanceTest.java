@@ -19,25 +19,24 @@ class GifticonIssuanceTest {
         assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.AWAITING_RECIPIENT_INFO);
     }
 
-    @DisplayName("전화번호를 등록하면 발송 준비 상태가 된다")
+    @DisplayName("전화번호를 등록하면서 발급 요청을 선점한다")
     @Test
-    void registerRecipientPhoneNumber() {
+    void prepareRequest() {
         GifticonIssuance issuance = new GifticonIssuance(null, null, "order-id", NOW);
 
-        issuance.registerRecipientPhoneNumber(new RecipientPhoneNumber("01012345678"), NOW.plusMinutes(1));
+        issuance.prepareRequest(new RecipientPhoneNumber("01012345678"), NOW.plusMinutes(1));
 
-        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.READY);
+        assertThat(issuance.getStatus()).isEqualTo(GifticonIssuanceStatus.REQUESTING);
         assertThat(issuance.getRecipientPhoneNumber().getValue()).isEqualTo("01012345678");
     }
 
-    @DisplayName("발송 요청을 시작한 뒤에는 전화번호를 변경할 수 없다")
+    @DisplayName("발송 요청을 선점한 뒤에는 다시 준비할 수 없다")
     @Test
-    void rejectPhoneNumberChangeAfterRequestStarted() {
+    void rejectPreparingRequestAfterRequestStarted() {
         GifticonIssuance issuance = new GifticonIssuance(null, null, "order-id", NOW);
-        issuance.registerRecipientPhoneNumber(new RecipientPhoneNumber("01012345678"), NOW);
-        issuance.startRequesting(NOW);
+        issuance.prepareRequest(new RecipientPhoneNumber("01012345678"), NOW);
 
-        assertThatThrownBy(() -> issuance.registerRecipientPhoneNumber(
+        assertThatThrownBy(() -> issuance.prepareRequest(
                 new RecipientPhoneNumber("01087654321"), NOW.plusMinutes(1)))
                 .isInstanceOf(InvalidGifticonIssuanceStateException.class);
     }
