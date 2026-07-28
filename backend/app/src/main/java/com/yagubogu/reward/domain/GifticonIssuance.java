@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 당첨자 발급 기록
+ * 당첨자의 기프티콘 발급 상태와 외부 주문 대사 이력을 관리한다.
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -53,6 +53,21 @@ public class GifticonIssuance {
     @Column(name = "reserve_trace_id")
     private Long reserveTraceId;
 
+    @Column(name = "request_started_at")
+    private LocalDateTime requestStartedAt;
+
+    @Column(name = "reconciliation_attempt_count", nullable = false)
+    private int reconciliationAttemptCount;
+
+    @Column(name = "next_reconciliation_at")
+    private LocalDateTime nextReconciliationAt;
+
+    @Column(name = "last_reconciled_at")
+    private LocalDateTime lastReconciledAt;
+
+    @Column(name = "last_reconciliation_error", length = 1000)
+    private String lastReconciliationError;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -83,20 +98,121 @@ public class GifticonIssuance {
         }
         this.recipientPhoneNumber = recipientPhoneNumber;
         this.status = GifticonIssuanceStatus.REQUEST_IN_PROGRESS;
+        this.requestStartedAt = now;
+        this.reconciliationAttemptCount = 0;
+        this.nextReconciliationAt = null;
+        this.lastReconciledAt = null;
+        this.lastReconciliationError = null;
         this.updatedAt = now;
     }
 
     public void markRequestAccepted(final long reserveTraceId, final LocalDateTime now) {
         validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        validateReserveTraceId(reserveTraceId);
         this.reserveTraceId = reserveTraceId;
         this.status = GifticonIssuanceStatus.REQUEST_ACCEPTED;
+        clearReconciliationSchedule();
         this.updatedAt = now;
     }
 
     public void markRequestRetryable(final LocalDateTime now) {
         validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
         this.status = GifticonIssuanceStatus.REQUEST_RETRYABLE;
+        clearReconciliationSchedule();
         this.updatedAt = now;
+    }
+
+    /**
+     * 최초 주문 결과가 불확실할 때 첫 대사 시각을 예약한다.
+     */
+    public void scheduleInitialReconciliation(
+            final LocalDateTime now,
+            final LocalDateTime nextReconciliationAt,
+            final String error
+    ) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        this.nextReconciliationAt = nextReconciliationAt;
+        this.lastReconciliationError = summarize(error);
+        this.updatedAt = now;
+    }
+
+    /**
+     * 조회된 주문이 없으면 현재 상태를 유지하고 다음 대사를 예약한다.
+     */
+    public void recordReconciliationNotFound(
+            final LocalDateTime now,
+            final LocalDateTime nextReconciliationAt
+    ) {
+        recordUncertainReconciliation(now, nextReconciliationAt, "Gift order not found");
+    }
+
+    /**
+     * 주문 결과를 판단할 수 없으면 오류를 기록하고 다음 대사를 예약한다.
+     */
+    public void recordReconciliationUncertain(
+            final LocalDateTime now,
+            final LocalDateTime nextReconciliationAt,
+            final String error
+    ) {
+        recordUncertainReconciliation(now, nextReconciliationAt, error);
+    }
+
+    /**
+     * 외부 주문이 확인되면 추적 번호를 복구하고 접수 완료 상태로 전환한다.
+     */
+    public void recoverRequestAccepted(final long reserveTraceId, final LocalDateTime now) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        validateReserveTraceId(reserveTraceId);
+        this.reserveTraceId = reserveTraceId;
+        this.status = GifticonIssuanceStatus.REQUEST_ACCEPTED;
+        recordCompletedReconciliation(now);
+    }
+
+    /**
+     * 외부 주문 생성 실패가 확인되면 다시 요청할 수 있는 상태로 전환한다.
+     */
+    public void markCreationFailedRetryable(final LocalDateTime now) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        this.status = GifticonIssuanceStatus.REQUEST_RETRYABLE;
+        recordCompletedReconciliation(now);
+    }
+
+    private void recordUncertainReconciliation(
+            final LocalDateTime now,
+            final LocalDateTime nextReconciliationAt,
+            final String error
+    ) {
+        validateStatus(GifticonIssuanceStatus.REQUEST_IN_PROGRESS);
+        this.reconciliationAttemptCount++;
+        this.lastReconciledAt = now;
+        this.nextReconciliationAt = nextReconciliationAt;
+        this.lastReconciliationError = summarize(error);
+        this.updatedAt = now;
+    }
+
+    private void recordCompletedReconciliation(final LocalDateTime now) {
+        this.reconciliationAttemptCount++;
+        this.lastReconciledAt = now;
+        clearReconciliationSchedule();
+        this.updatedAt = now;
+    }
+
+    private void clearReconciliationSchedule() {
+        this.nextReconciliationAt = null;
+        this.lastReconciliationError = null;
+    }
+
+    private String summarize(final String error) {
+        if (error == null) {
+            return null;
+        }
+        return error.substring(0, Math.min(error.length(), 1000));
+    }
+
+    private void validateReserveTraceId(final long reserveTraceId) {
+        if (reserveTraceId <= 0) {
+            throw new InvalidGifticonReserveTraceIdException(reserveTraceId);
+        }
     }
 
     private void validateStatus(final GifticonIssuanceStatus expected) {
