@@ -1,0 +1,41 @@
+backend/app/src/test/java/com/yagubogu/reward/client/KakaoGiftOrderStatusClientTest.java
+  s_1251cf9cc5d83d::t_a449f1d5cb4539 64-72,94-101,141-150,162-166,178-181,193-197,213-247
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-20,22-63,73-93,102-140,151-161,167-177,182-192,198-212,248-286,302-350
+  s_1251cf9cc5d83d::t_d57630268b975a 21,287-301
+backend/app/src/main/java/com/yagubogu/reward/client/GiftOrderLookupUncertainException.java
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-12
+backend/app/src/main/java/com/yagubogu/reward/client/InvalidGiftOrderLookupRequestException.java
+  s_1251cf9cc5d83d::t_a449f1d5cb4539 1-8
+backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftOrderStatusClient.java
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-2,4-6,8-17,21-40,44-45,49-57,59-68,73-76,78-99,107-108,115-126,130-140,142-176
+  s_1251cf9cc5d83d::t_b2ff48ccec054b 3
+  s_1251cf9cc5d83d::t_aa7e07fbe62e54 18-20,41-43,100-102,127-129
+  s_1251cf9cc5d83d::t_2ee39516f16f4b 7,141
+  s_1251cf9cc5d83d::t_a449f1d5cb4539 46-48,58,69-72,77,103-106,109-114
+backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftOrderStatusResponse.java
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-16
+backend/app/src/main/java/com/yagubogu/reward/client/GiftOrderVendorStatus.java
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-39
+backend/app/src/main/java/com/yagubogu/reward/client/GiftOrderLookupResult.java
+  s_1251cf9cc5d83d::t_aa7e07fbe62e54 3-5
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-2,6-21
+backend/app/src/main/java/com/yagubogu/reward/client/GiftOrderStatusClient.java
+  s_1251cf9cc5d83d::t_48ec88d5a61ff9 1-2,6-7,11-12
+  s_1251cf9cc5d83d::t_aa7e07fbe62e54 3-5,8-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "e3f0e79298a88a1944798fd757e1700ff4665841",
+  "prompts": {},
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
