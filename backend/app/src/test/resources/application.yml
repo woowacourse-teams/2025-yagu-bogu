@@ -29,6 +29,11 @@ kakao:
     connect-timeout: 1s
     read-timeout: 1s
 
+reward:
+  gifticon:
+    reconciliation:
+      initial-delay: 1m
+
 security:
   token:
     access-token:

@@ -8,6 +8,7 @@ import com.yagubogu.reward.client.GiftOrderRequest;
 import com.yagubogu.reward.client.GiftOrderResult;
 import com.yagubogu.reward.client.KakaoGiftRequestRejectedException;
 import com.yagubogu.reward.client.KakaoGiftRequestUncertainException;
+import com.yagubogu.reward.config.GifticonReconciliationProperties;
 import com.yagubogu.reward.domain.GifticonIssuance;
 import com.yagubogu.reward.domain.InvalidGifticonIssuanceStateException;
 import com.yagubogu.reward.domain.RecipientPhoneNumber;
@@ -33,6 +34,7 @@ public class GifticonIssuanceRequestService {
     private final GiftOrderClient giftOrderClient;
     private final TransactionTemplate transactionTemplate;
     private final Clock clock;
+    private final GifticonReconciliationProperties reconciliationProperties;
 
     /**
      * 전화번호를 저장해 발급 요청을 선점하고 외부 발급 응답을 상태에 반영한다.
@@ -55,7 +57,7 @@ public class GifticonIssuanceRequestService {
     }
 
     /**
-     * 전화번호 저장과 발급 요청 선점을 한 트랜잭션으로 처리한다.
+     * 전화번호 저장, 발급 요청 선점, 첫 대사 예약을 한 트랜잭션으로 처리한다.
      */
     private GiftOrderRequest prepareRequest(
             final long memberId,
@@ -66,9 +68,15 @@ public class GifticonIssuanceRequestService {
             return transactionTemplate.execute(status -> {
                 GifticonIssuance issuance = findOwnedIssuance(gifticonIssuanceId, memberId);
                 try {
+                    LocalDateTime now = LocalDateTime.now(clock);
                     issuance.prepareRequest(
                             new RecipientPhoneNumber(recipientPhoneNumber),
-                            LocalDateTime.now(clock)
+                            now
+                    );
+                    issuance.scheduleInitialReconciliation(
+                            now,
+                            now.plus(reconciliationProperties.initialDelay()),
+                            null
                     );
                 } catch (InvalidGifticonIssuanceStateException exception) {
                     throw new ConflictException(exception.getMessage());
