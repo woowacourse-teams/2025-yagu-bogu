@@ -1,0 +1,37 @@
+backend/app/src/test/resources/application.yml
+  s_1251cf9cc5d83d::t_b433bcaf74d7ca 32-36
+backend/app/src/main/resources/application.yml
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 73-77
+backend/app/.env.example
+  s_1251cf9cc5d83d::t_ec22181d3b2ca8 24
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 11,37,60,71,74-79
+backend/app/src/test/java/com/yagubogu/reward/config/GifticonReconciliationPropertiesTest.java
+  s_1251cf9cc5d83d::t_ec22181d3b2ca8 15-30
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 1-14,31-46
+backend/app/src/main/java/com/yagubogu/reward/config/GifticonReconciliationProperties.java
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 1-23
+backend/app/src/test/java/com/yagubogu/reward/service/GifticonIssuanceRequestServiceTest.java
+  s_1251cf9cc5d83d::t_8d89a50c524c3b 106-110
+  s_1251cf9cc5d83d::t_a45564d9856234 25,65
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 17,64,88,100,116-117
+backend/app/src/main/java/com/yagubogu/reward/config/GifticonReconciliationConfig.java
+  s_1251cf9cc5d83d::t_ec22181d3b2ca8 6-8
+  s_1251cf9cc5d83d::t_bdc1383a8a8a8d 1-5,9-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "26f2709ab9b09b9e2ec4e262e674d90b9e2030b3",
+  "prompts": {},
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
