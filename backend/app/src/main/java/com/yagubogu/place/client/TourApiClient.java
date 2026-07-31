@@ -7,6 +7,8 @@ import com.yagubogu.place.config.TourApiProperties;
 import com.yagubogu.place.domain.PlaceCategory;
 import com.yagubogu.place.dto.PlaceParam;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,10 +41,13 @@ public class TourApiClient {
      */
     public List<PlaceParam> fetchPlacesNear(PlaceCategory category, long stadiumId, double mapX, double mapY) {
         // ServiceKey는 공공데이터포털에서 발급된 디코딩된 값을 환경변수에 저장해야 합니다.
-        // UriComponentsBuilder가 자동으로 URL 인코딩하므로 이미 인코딩된 키를 저장하면 이중 인코딩됩니다.
+        // '+'는 URI 문법상 합법적인 문자라 UriComponentsBuilder#encode()가 건드리지 않고 그대로
+        // 통과시키는데, 게이트웨이는 이를 공백으로 해석해 401을 반환한다. 그래서 서비스키만 별도로
+        // URLEncoder로 퍼센트 인코딩한 뒤 build(true)(이미 인코딩됨)로 이중 인코딩을 피한다.
+        String encodedServiceKey = URLEncoder.encode(props.getServiceKey(), StandardCharsets.UTF_8);
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromUriString(props.getBaseUrl() + LIST_ENDPOINT)
-                .queryParam("serviceKey", props.getServiceKey())
+                .queryParam("serviceKey", encodedServiceKey)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "Yagubogu")
                 .queryParam("_type", "json")
@@ -57,7 +62,7 @@ public class TourApiClient {
             builder.queryParam("cat3", category.getCat3());
         }
 
-        URI uri = builder.build().toUri();
+        URI uri = builder.build(true).toUri();
 
         try {
             String json = restClient.get()
@@ -95,9 +100,10 @@ public class TourApiClient {
     }
 
     private JsonNode callDetailEndpoint(String endpoint, String contentId, Integer contentTypeId) throws Exception {
+        String encodedServiceKey = URLEncoder.encode(props.getServiceKey(), StandardCharsets.UTF_8);
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromUriString(props.getBaseUrl() + endpoint)
-                .queryParam("serviceKey", props.getServiceKey())
+                .queryParam("serviceKey", encodedServiceKey)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "Yagubogu")
                 .queryParam("_type", "json")
@@ -107,7 +113,7 @@ public class TourApiClient {
             builder.queryParam("contentTypeId", contentTypeId);
         }
 
-        URI uri = builder.build().toUri();
+        URI uri = builder.build(true).toUri();
 
         String json = restClient.get()
                 .uri(uri)
