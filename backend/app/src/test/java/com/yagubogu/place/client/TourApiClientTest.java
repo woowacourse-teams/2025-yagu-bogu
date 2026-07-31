@@ -85,7 +85,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION);
 
         assertThat(result).hasSize(1);
         PlaceParam param = result.get(0);
@@ -117,7 +117,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION);
 
         assertThat(result).isEmpty();
     }
@@ -134,7 +134,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L))
+        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION))
                 .isInstanceOf(TourApiException.class)
                 .hasMessageContaining("code=99");
     }
@@ -150,7 +150,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L))
+        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION))
                 .isInstanceOf(TourApiException.class)
                 .hasMessageContaining("code=10");
     }
@@ -182,7 +182,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 2L);
+        List<PlaceParam> result = tourApiClient.parseItems(json, 2L, PlaceCategory.ATTRACTION);
 
         assertThat(result).hasSize(1);
         PlaceParam param = result.get(0);
@@ -215,11 +215,68 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION);
 
         assertThat(result).hasSize(3);
         assertThat(result).extracting(PlaceParam::contentId)
                 .containsExactly("1", "2", "3");
+    }
+
+    @DisplayName("RESTAURANT로 조회하면 cat3가 카페(A05020900)인 항목은 제외한다 "
+            + "(RESTAURANT는 cat3 필터 없이 같은 contentTypeId를 조회해 카페까지 함께 내려오므로, "
+            + "그대로 저장하면 같은 장소가 RESTAURANT/CAFE 두 카테고리에 중복 노출된다)")
+    @Test
+    void parseItems_RESTAURANT_조회시_카페_항목_제외() {
+        String json = """
+                {
+                  "response": {
+                    "header": { "resultCode": "0000", "resultMsg": "OK" },
+                    "body": {
+                      "numOfRows": 50,
+                      "pageNo": 1,
+                      "totalCount": 2,
+                      "items": {
+                        "item": [
+                          { "contentid": "1", "title": "일반 음식점", "mapx": "127.0", "mapy": "37.5", "cat3": "A05020100" },
+                          { "contentid": "2", "title": "카페", "mapx": "127.1", "mapy": "37.6", "cat3": "A05020900" }
+                        ]
+                      }
+                    }
+                  }
+                }
+                """;
+
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.RESTAURANT);
+
+        assertThat(result).extracting(PlaceParam::contentId)
+                .containsExactly("1");
+    }
+
+    @DisplayName("CAFE로 조회할 때는 cat3=A05020900 항목을 걸러내지 않고 그대로 포함한다")
+    @Test
+    void parseItems_CAFE_조회시_자기_자신의_cat3_항목은_유지() {
+        String json = """
+                {
+                  "response": {
+                    "header": { "resultCode": "0000", "resultMsg": "OK" },
+                    "body": {
+                      "numOfRows": 50,
+                      "pageNo": 1,
+                      "totalCount": 1,
+                      "items": {
+                        "item": [
+                          { "contentid": "2", "title": "카페", "mapx": "127.1", "mapy": "37.6", "cat3": "A05020900" }
+                        ]
+                      }
+                    }
+                  }
+                }
+                """;
+
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.CAFE);
+
+        assertThat(result).extracting(PlaceParam::contentId)
+                .containsExactly("2");
     }
 
     @DisplayName("단건 결과일 때 item이 배열이 아닌 단일 객체로 와도 파싱한다")
@@ -250,7 +307,7 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
+        List<PlaceParam> result = tourApiClient.parseItems(json, 1L, PlaceCategory.ATTRACTION);
 
         assertThat(result).hasSize(1);
         PlaceParam param = result.get(0);

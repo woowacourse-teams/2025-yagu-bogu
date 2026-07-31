@@ -70,7 +70,7 @@ public class TourApiClient {
                     .retrieve()
                     .body(String.class);
 
-            return parseItems(json, stadiumId);
+            return parseItems(json, stadiumId, category);
         } catch (RestClientException e) {
             log.error("[TourApi] HTTP error for stadiumId={} category={}: {}", stadiumId, category, e.getMessage());
             throw new TourApiException("Tour API call failed for stadiumId=" + stadiumId, e);
@@ -130,7 +130,7 @@ public class TourApiClient {
         return itemNode;
     }
 
-    List<PlaceParam> parseItems(String json, long stadiumId) {
+    List<PlaceParam> parseItems(String json, long stadiumId, PlaceCategory category) {
         JsonNode root;
         try {
             root = objectMapper.readTree(json);
@@ -157,13 +157,41 @@ public class TourApiClient {
         if (itemNode.isArray()) {
             // 다건: "item": [...]
             for (JsonNode item : itemNode) {
-                result.add(toParam(item, stadiumId));
+                if (!belongsToAnotherCategory(category, item)) {
+                    result.add(toParam(item, stadiumId));
+                }
             }
         } else if (itemNode.isObject()) {
             // 단건: "item": {...}
-            result.add(toParam(itemNode, stadiumId));
+            if (!belongsToAnotherCategory(category, itemNode)) {
+                result.add(toParam(itemNode, stadiumId));
+            }
         }
         return result;
+    }
+
+    /**
+     * RESTAURANT는 cat3 필터 없이 contentTypeId(39) 전체를 조회하는데, CAFE는 같은 contentTypeId를
+     * cat3=A05020900으로만 필터링해서 조회한다. 즉 cat3 필터가 없는 카테고리로 조회하면 다른 카테고리가
+     * 이미 전담하는 항목(카페)까지 함께 내려온다 — 그대로 저장하면 같은 장소가 RESTAURANT/CAFE 두
+     * 카테고리에 중복 노출된다. 그래서 다른 카테고리가 cat3로 전담하는 항목은 여기서 걸러낸다.
+     */
+    private boolean belongsToAnotherCategory(PlaceCategory category, JsonNode item) {
+        if (category.getCat3() != null) {
+            return false;
+        }
+        String itemCat3 = item.path("cat3").asText();
+        if (itemCat3.isEmpty()) {
+            return false;
+        }
+        for (PlaceCategory other : PlaceCategory.values()) {
+            if (other != category
+                    && other.getContentTypeId() == category.getContentTypeId()
+                    && itemCat3.equals(other.getCat3())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
