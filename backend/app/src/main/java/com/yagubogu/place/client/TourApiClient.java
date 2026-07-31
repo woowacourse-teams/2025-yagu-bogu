@@ -116,9 +116,6 @@ public class TourApiClient {
 
         JsonNode root = objectMapper.readTree(json);
         JsonNode body = extractBody(root, "contentId=" + contentId);
-        if (body == null) {
-            return objectMapper.createObjectNode();
-        }
 
         JsonNode itemNode = body.path("items").path("item");
         if (itemNode.isArray() && !itemNode.isEmpty()) {
@@ -128,39 +125,39 @@ public class TourApiClient {
     }
 
     List<PlaceParam> parseItems(String json, long stadiumId) {
+        JsonNode root;
         try {
-            JsonNode root = objectMapper.readTree(json);
-            JsonNode body = extractBody(root, "stadiumId=" + stadiumId);
-            if (body == null) {
-                return Collections.emptyList();
-            }
-
-            JsonNode itemsNode = body.path("items");
-            // KTO API는 결과가 없을 때 items를 빈 문자열("")로 반환합니다.
-            if (itemsNode.isMissingNode() || itemsNode.isTextual()) {
-                return Collections.emptyList();
-            }
-
-            JsonNode itemNode = itemsNode.path("item");
-            if (itemNode.isMissingNode()) {
-                return Collections.emptyList();
-            }
-
-            List<PlaceParam> result = new ArrayList<>();
-            if (itemNode.isArray()) {
-                // 다건: "item": [...]
-                for (JsonNode item : itemNode) {
-                    result.add(toParam(item, stadiumId));
-                }
-            } else if (itemNode.isObject()) {
-                // 단건: "item": {...}
-                result.add(toParam(itemNode, stadiumId));
-            }
-            return result;
+            root = objectMapper.readTree(json);
         } catch (Exception e) {
             log.error("[TourApi] Failed to parse response for stadiumId={}: {}", stadiumId, e.getMessage());
             throw new TourApiException("Failed to parse Tour API response", e);
         }
+
+        JsonNode body = extractBody(root, "stadiumId=" + stadiumId);
+
+        JsonNode itemsNode = body.path("items");
+        // KTO API는 결과가 없을 때 items를 빈 문자열("")로 반환합니다. 이는 정상 응답(resultCode=0000)
+        // 이후에만 확인하는 "진짜로 결과가 없음"이므로 빈 리스트가 맞다 (API 오류와는 extractBody에서 구분됨).
+        if (itemsNode.isMissingNode() || itemsNode.isTextual()) {
+            return Collections.emptyList();
+        }
+
+        JsonNode itemNode = itemsNode.path("item");
+        if (itemNode.isMissingNode()) {
+            return Collections.emptyList();
+        }
+
+        List<PlaceParam> result = new ArrayList<>();
+        if (itemNode.isArray()) {
+            // 다건: "item": [...]
+            for (JsonNode item : itemNode) {
+                result.add(toParam(item, stadiumId));
+            }
+        } else if (itemNode.isObject()) {
+            // 단건: "item": {...}
+            result.add(toParam(itemNode, stadiumId));
+        }
+        return result;
     }
 
     /**
@@ -168,22 +165,30 @@ public class TourApiClient {
      * - 성공: {"response": {"header": {"resultCode": "0000", ...}, "body": {...}}}
      * - 파라미터/인증 오류: {"resultCode": "10", "resultMsg": "..."} ("response"/"header" 래퍼 없이 최상위에 옴)
      *
-     * @return 정상 응답의 body 노드, 오류/비정상 응답이면 null
+     * <p>오류 응답을 빈 결과로 취급하면 안 된다 — 호출부(PlaceSyncService)가 "반경 내 진짜로 없음"과
+     * "API 호출 실패"를 구분하지 못해, 일시적 오류에도 기존에 저장된 장소를 전부 삭제하게 된다.
+     * 그래서 여기서는 오류일 때 빈 값을 반환하는 대신 예외를 던져 재시도/실패 처리로 넘긴다.</p>
+     *
+     * @return 정상 응답의 body 노드
+     * @throws TourApiException 오류/비정상 응답인 경우
      */
     private JsonNode extractBody(JsonNode root, String logContext) {
         JsonNode envelope = root.path("response");
         if (envelope.isMissingNode()) {
-            log.warn("[TourApi] Error response for {}: code={}, msg={}",
-                    logContext, root.path("resultCode").asText(), root.path("resultMsg").asText());
-            return null;
+            String resultCode = root.path("resultCode").asText();
+            String resultMsg = root.path("resultMsg").asText();
+            throw new TourApiException(
+                    "Tour API error response for " + logContext + ": code=" + resultCode + ", msg=" + resultMsg,
+                    null);
         }
 
         JsonNode header = envelope.path("header");
         String resultCode = header.path("resultCode").asText();
         if (!RESULT_CODE_OK.equals(resultCode)) {
-            log.warn("[TourApi] Non-OK response for {}: code={}, msg={}",
-                    logContext, resultCode, header.path("resultMsg").asText());
-            return null;
+            throw new TourApiException(
+                    "Tour API non-OK response for " + logContext + ": code=" + resultCode
+                            + ", msg=" + header.path("resultMsg").asText(),
+                    null);
         }
 
         return envelope.path("body");

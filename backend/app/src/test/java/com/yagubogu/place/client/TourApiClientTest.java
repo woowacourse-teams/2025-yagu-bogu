@@ -122,9 +122,9 @@ class TourApiClientTest {
         assertThat(result).isEmpty();
     }
 
-    @DisplayName("resultCode가 0000이 아니면 빈 리스트를 반환한다")
+    @DisplayName("resultCode가 0000이 아니면 예외를 던진다 (빈 리스트로 처리하면 정상 데이터가 삭제될 수 있음)")
     @Test
-    void parseItems_비정상_resultCode_빈_리스트_반환() {
+    void parseItems_비정상_resultCode_예외_발생() {
         String json = """
                 {
                   "response": {
@@ -134,14 +134,14 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
-
-        assertThat(result).isEmpty();
+        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L))
+                .isInstanceOf(TourApiException.class)
+                .hasMessageContaining("code=99");
     }
 
-    @DisplayName("파라미터/인증 오류처럼 response 래퍼 없이 resultCode가 최상위에 오는 응답도 빈 리스트를 반환한다")
+    @DisplayName("파라미터/인증 오류처럼 response 래퍼 없이 resultCode가 최상위에 오는 응답도 예외를 던진다")
     @Test
-    void parseItems_response_래퍼_없는_오류_응답_빈_리스트_반환() {
+    void parseItems_response_래퍼_없는_오류_응답_예외_발생() {
         String json = """
                 {
                   "responseTime": "2026-08-01T02:17:32.250",
@@ -150,9 +150,9 @@ class TourApiClientTest {
                 }
                 """;
 
-        List<PlaceParam> result = tourApiClient.parseItems(json, 1L);
-
-        assertThat(result).isEmpty();
+        assertThatThrownBy(() -> tourApiClient.parseItems(json, 1L))
+                .isInstanceOf(TourApiException.class)
+                .hasMessageContaining("code=10");
     }
 
     @DisplayName("선택 필드(tel, firstimage, addr1)가 없거나 비어있으면 null로 처리한다")
