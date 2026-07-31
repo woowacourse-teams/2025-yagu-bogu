@@ -1,8 +1,10 @@
-package com.yagubogu.restaurant.domain;
+package com.yagubogu.place.domain;
 
 import com.yagubogu.global.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,17 +15,24 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "restaurants")
+@Table(name = "places")
 @Entity
-public class Restaurant extends BaseEntity {
+public class Place extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "restaurant_id")
+    @Column(name = "place_id")
     private Long id;
 
     @Column(name = "content_id", nullable = false)
     private String contentId;
+
+    @Column(name = "content_type_id", nullable = false)
+    private Integer contentTypeId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private PlaceCategory category;
 
     @Column(name = "stadium_id", nullable = false)
     private Long stadiumId;
@@ -49,23 +58,28 @@ public class Restaurant extends BaseEntity {
     @Column(name = "image_url", length = 1024)
     private String imageUrl;
 
-    public static Restaurant of(String contentId, Long stadiumId, String title, String address,
-                                double mapX, double mapY, Integer distance, String tel, String imageUrl) {
-        Restaurant r = new Restaurant();
-        r.contentId = contentId;
-        r.stadiumId = stadiumId;
-        r.title = title;
-        r.address = address;
-        r.mapX = mapX;
-        r.mapY = mapY;
-        r.distance = distance;
-        r.tel = tel;
-        r.imageUrl = imageUrl;
-        return r;
+    @Column(name = "detail_info", columnDefinition = "json")
+    private String detailInfo;
+
+    public static Place of(PlaceCategory category, String contentId, Long stadiumId, String title, String address,
+                            double mapX, double mapY, Integer distance, String tel, String imageUrl) {
+        Place place = new Place();
+        place.category = category;
+        place.contentTypeId = category.getContentTypeId();
+        place.contentId = contentId;
+        place.stadiumId = stadiumId;
+        place.title = title;
+        place.address = address;
+        place.mapX = mapX;
+        place.mapY = mapY;
+        place.distance = distance;
+        place.tel = tel;
+        place.imageUrl = imageUrl;
+        return place;
     }
 
     public void update(String title, String address, double mapX, double mapY,
-                       Integer distance, String tel, String imageUrl) {
+                        Integer distance, String tel, String imageUrl) {
         this.title = title;
         this.address = address;
         this.mapX = mapX;
@@ -73,5 +87,13 @@ public class Restaurant extends BaseEntity {
         this.distance = distance;
         this.tel = tel;
         this.imageUrl = imageUrl;
+    }
+
+    public void updateDetailInfo(String detailInfo) {
+        this.detailInfo = detailInfo;
+    }
+
+    public boolean hasDetailInfo() {
+        return detailInfo != null;
     }
 }
