@@ -1,6 +1,6 @@
-package com.yagubogu.restaurant.dto;
+package com.yagubogu.place.dto;
 
-public record RestaurantParam(
+public record PlaceParam(
         String contentId,
         Long stadiumId,
         String title,

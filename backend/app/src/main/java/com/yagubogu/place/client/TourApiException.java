@@ -1,4 +1,4 @@
-package com.yagubogu.restaurant.client;
+package com.yagubogu.place.client;
 
 public class TourApiException extends RuntimeException {
 

@@ -1,7 +1,7 @@
-package com.yagubogu.restaurant.config;
+package com.yagubogu.place.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yagubogu.restaurant.client.TourApiClient;
+import com.yagubogu.place.client.TourApiClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

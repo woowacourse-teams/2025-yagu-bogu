@@ -1,4 +1,4 @@
-package com.yagubogu.restaurant.config;
+package com.yagubogu.place.config;
 
 import java.time.Duration;
 import lombok.Getter;
