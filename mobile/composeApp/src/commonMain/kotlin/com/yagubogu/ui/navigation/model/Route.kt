@@ -47,6 +47,7 @@ sealed interface Route : NavKey {
 
     @Serializable
     data class PlaceDetail(
+        val placeId: Long,
         val placeName: String,
     ) : Route
 }

@@ -50,7 +50,7 @@ import yagubogu.composeapp.generated.resources.place_sort_popular
 @Composable
 fun PlaceScreen(
     scrollToTopEvent: SharedFlow<Unit>,
-    onPlaceItemClick: (String) -> Unit,
+    onPlaceItemClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
@@ -103,7 +103,7 @@ fun PlaceScreen(
         ) { item: PlaceItem ->
             PlaceRecommendationCard(
                 item = item,
-                onClick = { onPlaceItemClick(item.name) },
+                onClick = { onPlaceItemClick(item.id, item.name) },
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -161,6 +161,7 @@ private val PlaceSort.labelResource: StringResource
 private val PLACE_ITEMS: List<PlaceItem> =
     listOf(
         PlaceItem(
+            id = 1L,
             category = PlaceCategory.FOOD,
             name = "잠실 돈까스 본점",
             distance = "도보 320m",
@@ -170,6 +171,7 @@ private val PLACE_ITEMS: List<PlaceItem> =
             thumbnailColor = Color(0xFFE8A444),
         ),
         PlaceItem(
+            id = 2L,
             category = PlaceCategory.FOOD,
             name = "승리 떡볶이",
             distance = "도보 450m",
@@ -179,6 +181,7 @@ private val PLACE_ITEMS: List<PlaceItem> =
             thumbnailColor = Color(0xFFE85D4A),
         ),
         PlaceItem(
+            id = 3L,
             category = PlaceCategory.FOOD,
             name = "홈런 한우구이",
             distance = "도보 680m",
@@ -188,6 +191,7 @@ private val PLACE_ITEMS: List<PlaceItem> =
             thumbnailColor = Color(0xFF8F5A3C),
         ),
         PlaceItem(
+            id = 4L,
             category = PlaceCategory.FOOD,
             name = "카페 베이스런",
             distance = "도보 810m",
@@ -203,6 +207,6 @@ private val PLACE_ITEMS: List<PlaceItem> =
 private fun PlaceScreenPreview() {
     PlaceScreen(
         scrollToTopEvent = MutableSharedFlow<Unit>(),
-        onPlaceItemClick = {},
+        onPlaceItemClick = { _, _ -> },
     )
 }

@@ -3,6 +3,7 @@ package com.yagubogu.ui.place.model
 import androidx.compose.ui.graphics.Color
 
 data class PlaceItem(
+    val id: Long,
     val category: PlaceCategory,
     val name: String,
     val distance: String,

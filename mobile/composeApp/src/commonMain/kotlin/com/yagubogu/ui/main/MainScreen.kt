@@ -53,7 +53,7 @@ fun MainScreen(
     onRankingShowMoreClick: (RankingType) -> Unit,
     onLivetalkItemClick: (Long, Boolean) -> Unit,
     onAttendanceHistoryItemClick: (item: AttendanceHistoryItem) -> Unit,
-    onPlaceItemClick: (String) -> Unit,
+    onPlaceItemClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {

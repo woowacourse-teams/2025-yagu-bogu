@@ -92,8 +92,8 @@ fun NavigationRoot(
                         onAttendanceHistoryItemClick = { item: AttendanceHistoryItem ->
                             rootNavigator.navigate(Route.AttendanceHistoryDetail(item))
                         },
-                        onPlaceItemClick = { placeName: String ->
-                            rootNavigator.navigate(Route.PlaceDetail(placeName))
+                        onPlaceItemClick = { placeId: Long, placeName: String ->
+                            rootNavigator.navigate(Route.PlaceDetail(placeId, placeName))
                         },
                     )
                 }
