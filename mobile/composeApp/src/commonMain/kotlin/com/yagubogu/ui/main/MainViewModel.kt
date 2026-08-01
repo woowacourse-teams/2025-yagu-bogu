@@ -1,12 +1,17 @@
 package com.yagubogu.ui.main
 
 import androidx.lifecycle.ViewModel
+import com.yagubogu.data.repository.appconfig.AppConfigRepository
 import com.yagubogu.ui.navigation.model.BottomNavKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    appConfigRepository: AppConfigRepository,
+) : ViewModel() {
+    val isPlaceTabVisible: Boolean = appConfigRepository.isPlaceTabVisible()
+
     private val _selectedBottomNavKey = MutableStateFlow<BottomNavKey>(BottomNavKey.Home)
     val selectedBottomNavKey: StateFlow<BottomNavKey> = _selectedBottomNavKey.asStateFlow()
 

@@ -32,6 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MainNavigationBar(
+    items: List<BottomNavKey>,
     selectedItem: BottomNavKey,
     onItemClick: (BottomNavKey) -> Unit,
     onItemReselect: (BottomNavKey) -> Unit,
@@ -50,7 +51,7 @@ fun MainNavigationBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            BottomNavKey.items.forEach { item: BottomNavKey ->
+            items.forEach { item: BottomNavKey ->
                 val isSelected: Boolean = selectedItem == item
                 val contentColor: Color = if (isSelected) Primary500 else Gray500
 
@@ -88,6 +89,18 @@ fun MainNavigationBar(
 @Composable
 private fun MainNavigationBarPreview() {
     MainNavigationBar(
+        items = BottomNavKey.items,
+        selectedItem = BottomNavKey.Home,
+        onItemClick = {},
+        onItemReselect = {},
+    )
+}
+
+@Preview
+@Composable
+private fun MainNavigationBarWithoutPlacePreview() {
+    MainNavigationBar(
+        items = BottomNavKey.items.filterNot { it == BottomNavKey.Place },
         selectedItem = BottomNavKey.Home,
         onItemClick = {},
         onItemReselect = {},

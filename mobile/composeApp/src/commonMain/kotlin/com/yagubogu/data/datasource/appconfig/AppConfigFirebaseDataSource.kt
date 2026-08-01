@@ -26,6 +26,7 @@ class AppConfigFirebaseDataSource(
             "maintenance" to json.encodeToString(MaintenanceResponse()),
             "home_notice" to json.encodeToString(HomeNoticeResponse()),
             "past_check_in_ad" to json.encodeToString(PastCheckInAdResponse()),
+            "is_place_tab_visible" to true,
         )
         isConfigured = true
     }

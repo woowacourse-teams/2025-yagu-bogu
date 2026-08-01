@@ -59,14 +59,21 @@ fun MainScreen(
 ) {
     val selectedItem: BottomNavKey by viewModel.selectedBottomNavKey.collectAsStateWithLifecycle()
     val isLoading: Boolean by viewModel.isLoading.collectAsStateWithLifecycle()
+    val bottomNavItems: List<BottomNavKey> =
+        if (viewModel.isPlaceTabVisible) {
+            BottomNavKey.items
+        } else {
+            BottomNavKey.items.filterNot { it == BottomNavKey.Place }
+        }
 
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
     val scrollToTopEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
 
-    LaunchedEffect(Unit) {
-        viewModel.selectBottomNavKey(
-            navigationState.currentRoute as? BottomNavKey ?: BottomNavKey.Home,
-        )
+    LaunchedEffect(navigationState.currentRoute, viewModel.isPlaceTabVisible) {
+        val currentItem = navigationState.currentRoute as? BottomNavKey ?: BottomNavKey.Home
+        val visibleItem = currentItem.takeIf { it in bottomNavItems } ?: BottomNavKey.Home
+        viewModel.selectBottomNavKey(visibleItem)
+        if (visibleItem != currentItem) onBottomItemClick(visibleItem)
     }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
@@ -94,6 +101,7 @@ fun MainScreen(
             },
             bottomBar = {
                 MainNavigationBar(
+                    items = bottomNavItems,
                     selectedItem = selectedItem,
                     onItemClick = { item: BottomNavKey ->
                         viewModel.selectBottomNavKey(item)
