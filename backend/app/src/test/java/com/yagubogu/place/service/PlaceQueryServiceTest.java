@@ -11,6 +11,10 @@ import com.yagubogu.place.domain.Place;
 import com.yagubogu.place.domain.PlaceCategory;
 import com.yagubogu.place.dto.v1.PlaceDetailResponse;
 import com.yagubogu.place.dto.v1.PlacesResponse;
+import com.yagubogu.place.dto.v1.detail.AttractionDetail;
+import com.yagubogu.place.dto.v1.detail.FoodDetail;
+import com.yagubogu.place.dto.v1.detail.LodgingDetail;
+import com.yagubogu.place.dto.v1.detail.PerformanceDetail;
 import com.yagubogu.place.repository.PlaceRepository;
 import java.util.List;
 import java.util.Optional;
@@ -90,15 +94,121 @@ class PlaceQueryServiceTest {
         Place place = Place.of(PlaceCategory.RESTAURANT, "1001", 1L, "맛집A", "서울 송파구",
                 127.07, 37.51, 300, "02-111", null);
         place.updateDetailInfo("""
-                {"common":{"overview":"소개"},"intro":{"opentimefood":"11:00~22:00"}}
+                {"common":{"overview":"소개","homepage":"http://example.com"},"intro":{"opentimefood":"11:00~22:00","restdatefood":"연중무휴"}}
                 """);
         given(placeRepository.findById(10L)).willReturn(Optional.of(place));
 
         PlaceDetailResponse response = placeQueryService.findDetailById(10L);
 
         assertThat(response.title()).isEqualTo("맛집A");
-        assertThat(response.detail().path("common").path("overview").asText()).isEqualTo("소개");
-        assertThat(response.detail().path("intro").path("opentimefood").asText()).isEqualTo("11:00~22:00");
+        assertThat(response.overview()).isEqualTo("소개");
+        assertThat(response.homepage()).isEqualTo("http://example.com");
+        assertThat(response.detail()).isInstanceOf(FoodDetail.class);
+        FoodDetail detail = (FoodDetail) response.detail();
+        assertThat(detail.opentimefood()).isEqualTo("11:00~22:00");
+        assertThat(detail.restdatefood()).isEqualTo("연중무휴");
+    }
+
+    @DisplayName("ATTRACTION 카테고리는 detail이 AttractionDetail로 매핑된다")
+    @Test
+    void findDetailById_ATTRACTION_카테고리는_AttractionDetail로_매핑된다() {
+        Place place = Place.of(PlaceCategory.ATTRACTION, "1603175", 1L, "석촌호수공원", "서울 송파구",
+                127.07, 37.51, null, null, null);
+        place.updateDetailInfo("""
+                {"common":{"overview":"잠실 인근 도심 속 호수공원"},
+                 "intro":{"infocenter":"송파구청 공원녹지과 02-2147-3392","opendate":"1986년 4월 30일",
+                           "restdate":"연중무휴","usetime":"상시 개방","parking":"가능 (108대)",
+                           "chkbabycarriage":"있음","chkcreditcard":"있음"}}
+                """);
+        given(placeRepository.findById(20L)).willReturn(Optional.of(place));
+
+        PlaceDetailResponse response = placeQueryService.findDetailById(20L);
+
+        assertThat(response.detail()).isInstanceOf(AttractionDetail.class);
+        AttractionDetail detail = (AttractionDetail) response.detail();
+        assertThat(detail.infocenter()).isEqualTo("송파구청 공원녹지과 02-2147-3392");
+        assertThat(detail.restdate()).isEqualTo("연중무휴");
+        assertThat(detail.parking()).isEqualTo("가능 (108대)");
+        assertThat(detail.chkpet()).isNull();
+    }
+
+    @DisplayName("PERFORMANCE 카테고리는 detail이 PerformanceDetail로 매핑된다")
+    @Test
+    void findDetailById_PERFORMANCE_카테고리는_PerformanceDetail로_매핑된다() {
+        Place place = Place.of(PlaceCategory.PERFORMANCE, "3439947", 1L, "강남 미디어 아트페스티벌", null,
+                127.07, 37.51, null, null, null);
+        place.updateDetailInfo("""
+                {"common":{},
+                 "intro":{"sponsor1":"강남아이즈 (Gangnam Eyes)","sponsor1tel":"02-6000-0114",
+                           "eventstartdate":"20251219","eventenddate":"20260103",
+                           "playtime":"11:00~22:00","eventplace":"잠실역 5, 6번 출구 잠실광장",
+                           "usetimefestival":"무료"}}
+                """);
+        given(placeRepository.findById(21L)).willReturn(Optional.of(place));
+
+        PlaceDetailResponse response = placeQueryService.findDetailById(21L);
+
+        assertThat(response.detail()).isInstanceOf(PerformanceDetail.class);
+        PerformanceDetail detail = (PerformanceDetail) response.detail();
+        assertThat(detail.eventstartdate()).isEqualTo("20251219");
+        assertThat(detail.eventenddate()).isEqualTo("20260103");
+        assertThat(detail.sponsor1()).isEqualTo("강남아이즈 (Gangnam Eyes)");
+        assertThat(detail.sponsor2()).isNull();
+    }
+
+    @DisplayName("LODGING 카테고리는 detail이 LodgingDetail로 매핑된다")
+    @Test
+    void findDetailById_LODGING_카테고리는_LodgingDetail로_매핑된다() {
+        Place place = Place.of(PlaceCategory.LODGING, "3464974", 1L, "롯데호텔 월드", null,
+                127.07, 37.51, null, null, null);
+        place.updateDetailInfo("""
+                {"common":{},
+                 "intro":{"roomcount":"309실","checkintime":"15:00","checkouttime":"12:00",
+                           "infocenterlodging":"02-2175-9000",
+                           "parkinglodging":"지하주차장(자주식+기계식). 장소 인주차구역 2자리"}}
+                """);
+        given(placeRepository.findById(22L)).willReturn(Optional.of(place));
+
+        PlaceDetailResponse response = placeQueryService.findDetailById(22L);
+
+        assertThat(response.detail()).isInstanceOf(LodgingDetail.class);
+        LodgingDetail detail = (LodgingDetail) response.detail();
+        assertThat(detail.checkintime()).isEqualTo("15:00");
+        assertThat(detail.checkouttime()).isEqualTo("12:00");
+        assertThat(detail.infocenterlodging()).isEqualTo("02-2175-9000");
+        assertThat(detail.reservationurl()).isNull();
+    }
+
+    @DisplayName("CAFE 카테고리도 RESTAURANT와 같은 FoodDetail을 공유한다 (둘 다 Tour API contentTypeId=39)")
+    @Test
+    void findDetailById_CAFE_카테고리도_RESTAURANT와_같은_FoodDetail을_공유한다() {
+        Place place = Place.of(PlaceCategory.CAFE, "2869452", 1L, "카페엠", null,
+                127.07, 37.51, null, null, null);
+        place.updateDetailInfo("""
+                {"common":{}, "intro":{"opentimefood":"09:00~22:00","firstmenu":"아메리카노"}}
+                """);
+        given(placeRepository.findById(23L)).willReturn(Optional.of(place));
+
+        PlaceDetailResponse response = placeQueryService.findDetailById(23L);
+
+        assertThat(response.detail()).isInstanceOf(FoodDetail.class);
+        assertThat(((FoodDetail) response.detail()).firstmenu()).isEqualTo("아메리카노");
+    }
+
+    @DisplayName("intro에 우리 레코드에 없는 미지의 필드가 섞여 있어도 무시하고 파싱한다 "
+            + "(Tour API가 필드를 추가해도 매핑이 깨지지 않아야 함)")
+    @Test
+    void findDetailById_알수없는_필드는_무시하고_파싱한다() {
+        Place place = Place.of(PlaceCategory.RESTAURANT, "1001", 1L, "맛집A", null,
+                127.07, 37.51, null, null, null);
+        place.updateDetailInfo("""
+                {"common":{}, "intro":{"opentimefood":"11:00~22:00","newFieldFromTourApi":"미래에 추가될 필드"}}
+                """);
+        given(placeRepository.findById(24L)).willReturn(Optional.of(place));
+
+        PlaceDetailResponse response = placeQueryService.findDetailById(24L);
+
+        assertThat(((FoodDetail) response.detail()).opentimefood()).isEqualTo("11:00~22:00");
     }
 
     @DisplayName("상세 정보가 아직 수집되지 않았으면 detail은 null이다")
@@ -111,6 +221,8 @@ class PlaceQueryServiceTest {
         PlaceDetailResponse response = placeQueryService.findDetailById(10L);
 
         assertThat(response.detail()).isNull();
+        assertThat(response.overview()).isNull();
+        assertThat(response.homepage()).isNull();
     }
 
     @DisplayName("존재하지 않는 장소 ID로 조회하면 NotFoundException을 던진다")

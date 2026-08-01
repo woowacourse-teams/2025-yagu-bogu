@@ -1,8 +1,8 @@
 package com.yagubogu.place.dto.v1;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.yagubogu.place.domain.Place;
 import com.yagubogu.place.domain.PlaceCategory;
+import com.yagubogu.place.dto.v1.detail.PlaceDetail;
 
 public record PlaceDetailResponse(
         Long id,
@@ -13,9 +13,11 @@ public record PlaceDetailResponse(
         Double mapY,
         String tel,
         String imageUrl,
-        JsonNode detail
+        String overview,
+        String homepage,
+        PlaceDetail detail
 ) {
-    public static PlaceDetailResponse from(Place place, JsonNode detail) {
+    public static PlaceDetailResponse from(Place place, String overview, String homepage, PlaceDetail detail) {
         return new PlaceDetailResponse(
                 place.getId(),
                 place.getCategory(),
@@ -25,6 +27,8 @@ public record PlaceDetailResponse(
                 place.getMapY(),
                 place.getTel(),
                 place.getImageUrl(),
+                overview,
+                homepage,
                 detail
         );
     }

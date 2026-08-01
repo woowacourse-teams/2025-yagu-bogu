@@ -1,12 +1,12 @@
 package com.yagubogu.place;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.place.domain.Place;
 import com.yagubogu.place.domain.PlaceCategory;
-import com.yagubogu.place.dto.v1.PlaceDetailResponse;
 import com.yagubogu.place.dto.v1.PlacesResponse;
 import com.yagubogu.place.repository.PlaceRepository;
 import com.yagubogu.support.base.E2eTestBase;
@@ -151,16 +151,16 @@ class PlaceE2eTest extends E2eTestBase {
         placeRepository.save(saved);
 
         // when & then
-        PlaceDetailResponse response = RestAssured.given().log().all()
+        // detail은 카테고리(RESTAURANT)에 따라 FoodDetail 등으로 다형적으로 내려오는 sealed
+        // interface라 특정 타입으로 역직렬화하지 않고 JsonPath로 필드를 검증한다.
+        RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/api/v1/places/" + saved.getId())
                 .then().log().all()
                 .statusCode(200)
-                .extract()
-                .as(PlaceDetailResponse.class);
-
-        assertThat(response.title()).isEqualTo("상세 맛집");
-        assertThat(response.detail().get("common").get("overview").asText()).isEqualTo("소개글");
+                .body("title", equalTo("상세 맛집"))
+                .body("overview", equalTo("소개글"))
+                .body("detail.opentimefood", equalTo("11:00~22:00"));
     }
 
     @DisplayName("존재하지 않는 장소 ID로 상세 조회하면 404를 반환한다")
