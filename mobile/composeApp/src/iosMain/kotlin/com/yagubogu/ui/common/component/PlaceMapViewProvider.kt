@@ -1,8 +1,8 @@
 package com.yagubogu.ui.common.component
 
+import platform.UIKit.UIView
 import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
-import platform.UIKit.UIView
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName(swiftName = "PlaceMapViewProvider")

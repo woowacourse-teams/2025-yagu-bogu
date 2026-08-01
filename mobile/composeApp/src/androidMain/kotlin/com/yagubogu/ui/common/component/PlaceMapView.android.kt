@@ -138,9 +138,31 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
     val path =
         Path().apply {
             moveTo(width / 2f, height - 1f)
-            cubicTo(context.dpToPx(10f).toFloat(), context.dpToPx(31f).toFloat(), context.dpToPx(4f).toFloat(), context.dpToPx(24f).toFloat(), context.dpToPx(4f).toFloat(), context.dpToPx(15f).toFloat())
-            arcTo(context.dpToPx(4f).toFloat(), context.dpToPx(3f).toFloat(), context.dpToPx(28f).toFloat(), context.dpToPx(27f).toFloat(), 180f, 180f, false)
-            cubicTo(context.dpToPx(28f).toFloat(), context.dpToPx(24f).toFloat(), context.dpToPx(22f).toFloat(), context.dpToPx(31f).toFloat(), width / 2f, height - 1f)
+            cubicTo(
+                context.dpToPx(10f).toFloat(),
+                context.dpToPx(31f).toFloat(),
+                context.dpToPx(4f).toFloat(),
+                context.dpToPx(24f).toFloat(),
+                context.dpToPx(4f).toFloat(),
+                context.dpToPx(15f).toFloat(),
+            )
+            arcTo(
+                context.dpToPx(4f).toFloat(),
+                context.dpToPx(3f).toFloat(),
+                context.dpToPx(28f).toFloat(),
+                context.dpToPx(27f).toFloat(),
+                180f,
+                180f,
+                false,
+            )
+            cubicTo(
+                context.dpToPx(28f).toFloat(),
+                context.dpToPx(24f).toFloat(),
+                context.dpToPx(22f).toFloat(),
+                context.dpToPx(31f).toFloat(),
+                width / 2f,
+                height - 1f,
+            )
             close()
         }
 
@@ -151,8 +173,7 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
     return bitmap
 }
 
-private fun Context.dpToPx(dp: Float): Int =
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
+private fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
 
 private fun disableMapGestures(kakaoMap: KakaoMap) {
     GestureType.values().forEach { gestureType ->
