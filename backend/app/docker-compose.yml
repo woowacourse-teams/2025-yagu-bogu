@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     container_name: yagubogu-backend
     ports:
-      - "80:80"
+      - "127.0.0.1:80:80"
     environment:
       TZ: Asia/Seoul
       JAVA_OPTS: "-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
