@@ -71,7 +71,7 @@ fun PlaceDetailScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val placeDetail: PlaceDetailUiModel = rememberPlaceDetailUiModel(placeName)
+    val placeDetail: PlaceDetailUiModel = getPlaceDetailUiModel(placeName)
 
     Scaffold(
         topBar = {
@@ -373,8 +373,7 @@ private fun PlaceRankBadge(
     )
 }
 
-@Composable
-private fun rememberPlaceDetailUiModel(placeName: String): PlaceDetailUiModel =
+private fun getPlaceDetailUiModel(placeName: String): PlaceDetailUiModel =
     PLACE_DETAIL_ITEMS[placeName]
         ?: PLACE_DETAIL_ITEMS.values.first().copy(name = placeName)
 
