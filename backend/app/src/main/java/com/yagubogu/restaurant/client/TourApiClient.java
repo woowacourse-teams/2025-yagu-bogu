@@ -72,9 +72,10 @@ public class TourApiClient {
             String resultCode = header.path("resultCode").asText();
 
             if (!RESULT_CODE_OK.equals(resultCode)) {
-                log.warn("[TourApi] Non-OK response for stadiumId={}: code={}, msg={}",
-                        stadiumId, resultCode, header.path("resultMsg").asText());
-                return Collections.emptyList();
+                String msg = header.path("resultMsg").asText();
+                log.warn("[TourApi] Non-OK response for stadiumId={}: code={}, msg={}", stadiumId, resultCode, msg);
+                throw new TourApiException(
+                        "Tour API returned non-OK code=" + resultCode + ", msg=" + msg + " for stadiumId=" + stadiumId);
             }
 
             JsonNode itemsNode = root.path("body").path("items");
