@@ -13,6 +13,9 @@
     <string name="score_widget_bottom">말</string>
     <string name="score_widget_completed">최종</string>
     <string name="score_widget_canceled">경기 취소</string>
+    <string name="score_widget_title_match">%1$s vs %2$s · %3$s</string>
+    <string name="score_widget_title_score">%1$s %2$d : %3$d %4$s · %5$s</string>
+    <string name="score_widget_content_count">B %1$d · S %2$d · O %3$d</string>
     <string name="score_widget_pitcher">투 %1$s</string>
     <string name="score_widget_batter">타 %1$s</string>
 </resources>

@@ -50,8 +50,8 @@ class ScoreWidgetNotificationManager(
         return NotificationCompat
             .Builder(context, ScoreWidgetNotificationChannel.ID)
             .setSmallIcon(R.drawable.ic_score_widget_notification)
-            .setContentTitle(context.getString(R.string.score_widget_title))
-            .setContentText(statusText(payload))
+            .setContentTitle(notificationTitle(payload))
+            .setContentText(notificationText(payload))
             .setCustomContentView(createContentView(payload))
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(createContentIntent(payload.gameId))
@@ -208,6 +208,61 @@ class ScoreWidgetNotificationManager(
                 } ?: context.getString(R.string.score_widget_live)
             ScoreWidgetPayload.GameState.COMPLETED -> context.getString(R.string.score_widget_completed)
             ScoreWidgetPayload.GameState.CANCELED -> context.getString(R.string.score_widget_canceled)
+        }
+
+    private fun notificationTitle(payload: ScoreWidgetPayload): String =
+        when (payload.gameState) {
+            ScoreWidgetPayload.GameState.SCHEDULED ->
+                context.getString(
+                    R.string.score_widget_title_match,
+                    payload.awayTeamName,
+                    payload.homeTeamName,
+                    context.getString(R.string.score_widget_scheduled),
+                )
+            ScoreWidgetPayload.GameState.LIVE,
+            ScoreWidgetPayload.GameState.COMPLETED,
+            -> scoreTitle(payload)
+            ScoreWidgetPayload.GameState.CANCELED ->
+                context.getString(
+                    R.string.score_widget_title_match,
+                    payload.awayTeamName,
+                    payload.homeTeamName,
+                    context.getString(R.string.score_widget_canceled),
+                )
+        }
+
+    private fun scoreTitle(payload: ScoreWidgetPayload): String {
+        val awayScore = payload.awayScore ?: return notificationMatchTitle(payload)
+        val homeScore = payload.homeScore ?: return notificationMatchTitle(payload)
+
+        return context.getString(
+            R.string.score_widget_title_score,
+            payload.awayTeamName,
+            awayScore,
+            homeScore,
+            payload.homeTeamName,
+            statusText(payload),
+        )
+    }
+
+    private fun notificationMatchTitle(payload: ScoreWidgetPayload): String =
+        context.getString(
+            R.string.score_widget_title_match,
+            payload.awayTeamName,
+            payload.homeTeamName,
+            statusText(payload),
+        )
+
+    private fun notificationText(payload: ScoreWidgetPayload): String =
+        if (payload.gameState == ScoreWidgetPayload.GameState.LIVE && payload.count != null) {
+            context.getString(
+                R.string.score_widget_content_count,
+                payload.count.balls,
+                payload.count.strikes,
+                payload.count.outs,
+            )
+        } else {
+            payload.stadiumName ?: context.getString(R.string.score_widget_title)
         }
 
     enum class HandleResult {
