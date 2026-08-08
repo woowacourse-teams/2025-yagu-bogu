@@ -199,6 +199,10 @@ private fun SettingMainScreen(
             )
         }
 
+        if (BuildKonfig.IS_DEBUG && currentPlatform == PlatformType.ANDROID) {
+            ScoreWidgetDebugControls()
+        }
+
         SettingButtonGroup {
             SettingButton(
                 text = stringResource(Res.string.setting_notice),

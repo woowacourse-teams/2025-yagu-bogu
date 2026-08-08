@@ -31,6 +31,15 @@ class ScoreWidgetStateStore(
         }
     }
 
+    suspend fun clear() {
+        context.scoreWidgetDataStore.edit { preferences ->
+            preferences.remove(GAME_ID_KEY)
+            preferences.remove(DISPLAY_REVISION_KEY)
+            preferences.remove(LAST_PAYLOAD_UPDATED_AT_KEY)
+            preferences.remove(LAST_PAYLOAD_KEY)
+        }
+    }
+
     data class State(
         val gameId: Long?,
         val displayRevision: Long,

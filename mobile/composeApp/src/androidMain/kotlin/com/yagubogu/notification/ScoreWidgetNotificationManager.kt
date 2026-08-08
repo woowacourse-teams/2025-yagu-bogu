@@ -41,6 +41,13 @@ class ScoreWidgetNotificationManager(
             HandleResult.Displayed
         }
 
+    suspend fun resetForDebug() {
+        mutex.withLock {
+            stateStore.clear()
+            cancel(context)
+        }
+    }
+
     private fun createNotification(payload: ScoreWidgetPayload): NotificationCompat.Builder {
         val isOngoing =
             payload.type != ScoreWidgetPayload.Type.END &&
