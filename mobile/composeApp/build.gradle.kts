@@ -151,6 +151,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.analytics)
             implementation(libs.firebase.crashlytics.ndk)
+            implementation(libs.firebase.messaging)
 
             // Google Credentials
             implementation(libs.androidx.credentials)

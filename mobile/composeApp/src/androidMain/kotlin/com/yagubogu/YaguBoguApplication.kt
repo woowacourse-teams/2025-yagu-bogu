@@ -23,6 +23,7 @@ import com.yagubogu.di.serviceModule
 import com.yagubogu.di.timeModule
 import com.yagubogu.di.useCaseModule
 import com.yagubogu.di.viewModelModule
+import com.yagubogu.notification.ScoreWidgetNotificationChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class YaguBoguApplication : Application() {
         setupAnalytics()
         setupAds()
         setupKoin()
+        ScoreWidgetNotificationChannel.create(this)
     }
 
     private fun setupAds() {

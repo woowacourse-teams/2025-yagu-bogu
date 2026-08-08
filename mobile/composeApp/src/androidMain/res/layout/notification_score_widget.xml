@@ -1,0 +1,254 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="142dp"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp"
+    tools:context=".notification.ScoreWidgetNotificationManager">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/score_widget_stadium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/score_widget_header"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="고척 스카이돔" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/score_widget_away_logo"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:contentDescription="@null"
+                android:scaleType="centerInside"
+                tools:src="@drawable/img_mascot_ht" />
+
+            <TextView
+                android:id="@+id/score_widget_away_team"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="@color/score_widget_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="KIA" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/score_widget_away_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="@color/score_widget_text"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="8" />
+
+        <LinearLayout
+            android:layout_width="58dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/score_widget_bases"
+                android:layout_width="40dp"
+                android:layout_height="34dp">
+
+                <ImageView
+                    android:id="@+id/score_widget_base_second"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="2dp"
+                    android:contentDescription="@null"
+                    android:rotation="45"
+                    tools:src="@drawable/bg_score_widget_base_active" />
+
+                <ImageView
+                    android:id="@+id/score_widget_base_third"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@null"
+                    android:rotation="45"
+                    tools:src="@drawable/bg_score_widget_base_inactive" />
+
+                <ImageView
+                    android:id="@+id/score_widget_base_first"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="4dp"
+                    android:contentDescription="@null"
+                    android:rotation="45"
+                    tools:src="@drawable/bg_score_widget_base_active" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/score_widget_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/bg_score_widget_status"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/score_widget_status"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="1회초" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/score_widget_home_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:textColor="@color/score_widget_text"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="4" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/score_widget_home_logo"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:contentDescription="@null"
+                android:scaleType="centerInside"
+                tools:src="@drawable/img_mascot_ss" />
+
+            <TextView
+                android:id="@+id/score_widget_home_team"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="@color/score_widget_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="삼성" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/score_widget_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/score_widget_pitcher"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/score_widget_detail"
+            android:textSize="12sp"
+            tools:text="투 김투수" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="B"
+                android:textColor="@color/score_widget_detail"
+                android:textSize="11sp"
+                android:includeFontPadding="false"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/score_widget_ball_dot_1"
+                style="@style/ScoreWidgetDot"
+                tools:src="@drawable/bg_score_widget_dot_ball" />
+            <ImageView android:id="@+id/score_widget_ball_dot_2" style="@style/ScoreWidgetDot" />
+            <ImageView android:id="@+id/score_widget_ball_dot_3" style="@style/ScoreWidgetDot" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="S"
+                android:textColor="@color/score_widget_detail"
+                android:textSize="11sp"
+                android:includeFontPadding="false"
+                android:textStyle="bold" />
+
+            <ImageView android:id="@+id/score_widget_strike_dot_1" style="@style/ScoreWidgetDot" />
+            <ImageView android:id="@+id/score_widget_strike_dot_2" style="@style/ScoreWidgetDot" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="O"
+                android:textColor="@color/score_widget_detail"
+                android:textSize="11sp"
+                android:includeFontPadding="false"
+                android:textStyle="bold" />
+
+            <ImageView android:id="@+id/score_widget_out_dot_1" style="@style/ScoreWidgetDot" />
+            <ImageView android:id="@+id/score_widget_out_dot_2" style="@style/ScoreWidgetDot" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/score_widget_batter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:maxLines="1"
+            android:textColor="@color/score_widget_detail"
+            android:textSize="12sp"
+            tools:text="타 김타자" />
+    </LinearLayout>
+</LinearLayout>
