@@ -11,7 +11,7 @@
     <string name="score_widget_inning">%1$d회%2$s</string>
     <string name="score_widget_top">초</string>
     <string name="score_widget_bottom">말</string>
-    <string name="score_widget_completed">최종</string>
+    <string name="score_widget_completed">경기 종료</string>
     <string name="score_widget_canceled">경기 취소</string>
     <string name="score_widget_title_match">%1$s vs %2$s · %3$s</string>
     <string name="score_widget_title_score">%1$s %2$d : %3$d %4$s · %5$s</string>

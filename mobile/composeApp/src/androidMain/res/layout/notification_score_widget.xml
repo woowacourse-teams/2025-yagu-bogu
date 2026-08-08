@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="142dp"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
     android:paddingVertical="14dp"
@@ -44,8 +43,8 @@
 
             <ImageView
                 android:id="@+id/score_widget_away_logo"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:contentDescription="@null"
                 android:scaleType="centerInside"
                 tools:src="@drawable/img_mascot_ht" />
@@ -75,7 +74,7 @@
             tools:text="8" />
 
         <LinearLayout
-            android:layout_width="58dp"
+            android:layout_width="76dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical">
@@ -127,7 +126,7 @@
                 android:textColor="@color/score_widget_status"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                tools:text="1회초" />
+                tools:text="경기 종료" />
         </LinearLayout>
 
         <TextView
@@ -149,8 +148,8 @@
 
             <ImageView
                 android:id="@+id/score_widget_home_logo"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:contentDescription="@null"
                 android:scaleType="centerInside"
                 tools:src="@drawable/img_mascot_ss" />

@@ -59,7 +59,8 @@ class ScoreWidgetNotificationManager(
             .setSmallIcon(R.drawable.ic_score_widget_notification)
             .setContentTitle(notificationTitle(payload))
             .setContentText(notificationText(payload))
-            .setCustomContentView(createContentView(payload))
+            .setCustomContentView(createCompactContentView(payload))
+            .setCustomBigContentView(createExpandedContentView(payload))
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(createContentIntent(payload.gameId))
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -68,7 +69,25 @@ class ScoreWidgetNotificationManager(
             .setShowWhen(false)
     }
 
-    private fun createContentView(payload: ScoreWidgetPayload): RemoteViews =
+    private fun createCompactContentView(payload: ScoreWidgetPayload): RemoteViews =
+        RemoteViews(context.packageName, R.layout.notification_score_widget_compact).apply {
+            setTextViewText(R.id.score_widget_compact_away_team, payload.awayTeamName)
+            setTextViewText(R.id.score_widget_compact_home_team, payload.homeTeamName)
+            setTextViewText(R.id.score_widget_compact_status, statusText(payload))
+            setImageViewResource(R.id.score_widget_compact_away_logo, mascotResource(payload.awayTeamCode))
+            setImageViewResource(R.id.score_widget_compact_home_logo, mascotResource(payload.homeTeamCode))
+
+            val showScores =
+                (payload.awayScore != null && payload.homeScore != null) ||
+                    payload.gameState == ScoreWidgetPayload.GameState.CANCELED
+            setViewVisibility(R.id.score_widget_compact_away_score, if (showScores) View.VISIBLE else View.GONE)
+            setViewVisibility(R.id.score_widget_compact_score_separator, if (showScores) View.VISIBLE else View.GONE)
+            setViewVisibility(R.id.score_widget_compact_home_score, if (showScores) View.VISIBLE else View.GONE)
+            setTextViewText(R.id.score_widget_compact_away_score, scoreText(payload.awayScore, payload))
+            setTextViewText(R.id.score_widget_compact_home_score, scoreText(payload.homeScore, payload))
+        }
+
+    private fun createExpandedContentView(payload: ScoreWidgetPayload): RemoteViews =
         RemoteViews(context.packageName, R.layout.notification_score_widget).apply {
             setTextViewText(R.id.score_widget_status, statusText(payload))
             setTextViewText(
@@ -77,36 +96,15 @@ class ScoreWidgetNotificationManager(
             )
             setTextViewText(R.id.score_widget_away_team, payload.awayTeamName)
             setTextViewText(R.id.score_widget_home_team, payload.homeTeamName)
-            val showScores = payload.awayScore != null && payload.homeScore != null
+            val showScores =
+                (payload.awayScore != null && payload.homeScore != null) ||
+                    payload.gameState == ScoreWidgetPayload.GameState.CANCELED
             setViewVisibility(R.id.score_widget_away_score, if (showScores) View.VISIBLE else View.GONE)
             setViewVisibility(R.id.score_widget_home_score, if (showScores) View.VISIBLE else View.GONE)
-            setTextViewText(R.id.score_widget_away_score, payload.awayScore?.toString().orEmpty())
-            setTextViewText(R.id.score_widget_home_score, payload.homeScore?.toString().orEmpty())
+            setTextViewText(R.id.score_widget_away_score, scoreText(payload.awayScore, payload))
+            setTextViewText(R.id.score_widget_home_score, scoreText(payload.homeScore, payload))
             setImageViewResource(R.id.score_widget_away_logo, mascotResource(payload.awayTeamCode))
             setImageViewResource(R.id.score_widget_home_logo, mascotResource(payload.homeTeamCode))
-
-            val awayIsMyTeam = payload.awayTeamCode == payload.myTeamCode
-            val homeIsMyTeam = payload.homeTeamCode == payload.myTeamCode
-            setInt(
-                R.id.score_widget_away_team,
-                "setTextColor",
-                context.getColor(if (awayIsMyTeam) R.color.score_widget_accent else R.color.score_widget_text),
-            )
-            setInt(
-                R.id.score_widget_away_score,
-                "setTextColor",
-                context.getColor(if (awayIsMyTeam) R.color.score_widget_accent else R.color.score_widget_text),
-            )
-            setInt(
-                R.id.score_widget_home_team,
-                "setTextColor",
-                context.getColor(if (homeIsMyTeam) R.color.score_widget_accent else R.color.score_widget_text),
-            )
-            setInt(
-                R.id.score_widget_home_score,
-                "setTextColor",
-                context.getColor(if (homeIsMyTeam) R.color.score_widget_accent else R.color.score_widget_text),
-            )
 
             val showLiveDetails = payload.gameState == ScoreWidgetPayload.GameState.LIVE
             setViewVisibility(R.id.score_widget_details, if (showLiveDetails) View.VISIBLE else View.GONE)
@@ -259,6 +257,13 @@ class ScoreWidgetNotificationManager(
             payload.homeTeamName,
             statusText(payload),
         )
+
+    private fun scoreText(
+        score: Int?,
+        payload: ScoreWidgetPayload,
+    ): String =
+        score?.toString()
+            ?: if (payload.gameState == ScoreWidgetPayload.GameState.CANCELED) "-" else ""
 
     private fun notificationText(payload: ScoreWidgetPayload): String =
         if (payload.gameState == ScoreWidgetPayload.GameState.LIVE && payload.count != null) {
