@@ -14,8 +14,8 @@ data class ScoreWidgetPayload(
     val awayTeamCode: String,
     val awayTeamName: String,
     val myTeamCode: String,
-    val homeScore: Int,
-    val awayScore: Int,
+    val homeScore: Int?,
+    val awayScore: Int?,
     val inning: Int?,
     val inningHalf: InningHalf?,
     val gameState: GameState,
@@ -66,6 +66,13 @@ data class ScoreWidgetPayload(
                 val inningHalf = data["inningHalf"]?.takeIf(String::isNotBlank)?.let(InningHalf::valueOf)
                 val bases = data.basesOrNull()
                 val count = data.countOrNull()
+                val gameState = GameState.valueOf(data.required("gameState"))
+                val homeScore = data.scoreOrNull("homeScore")
+                val awayScore = data.scoreOrNull("awayScore")
+
+                if (gameState != GameState.CANCELED && (homeScore == null || awayScore == null)) {
+                    error("Scores are required unless the game is canceled")
+                }
 
                 ScoreWidgetPayload(
                     type = type,
@@ -79,11 +86,11 @@ data class ScoreWidgetPayload(
                     awayTeamCode = data.required("awayTeamCode"),
                     awayTeamName = data.required("awayTeamName"),
                     myTeamCode = data.required("myTeamCode"),
-                    homeScore = data.required("homeScore").toInt(),
-                    awayScore = data.required("awayScore").toInt(),
+                    homeScore = homeScore,
+                    awayScore = awayScore,
                     inning = inning,
                     inningHalf = inningHalf,
-                    gameState = GameState.valueOf(data.required("gameState")),
+                    gameState = gameState,
                     bases = bases,
                     count = count,
                     pitcherName = data["pitcherName"]?.takeIf(String::isNotBlank),
@@ -93,6 +100,8 @@ data class ScoreWidgetPayload(
             }.getOrNull()
 
         private fun Map<String, String>.required(key: String): String = get(key)?.takeIf(String::isNotBlank) ?: error("Missing $key")
+
+        private fun Map<String, String>.scoreOrNull(key: String): Int? = get(key)?.takeIf(String::isNotBlank)?.toInt()
 
         private fun Map<String, String>.basesOrNull(): Bases? {
             val first = get("baseFirst") ?: return null

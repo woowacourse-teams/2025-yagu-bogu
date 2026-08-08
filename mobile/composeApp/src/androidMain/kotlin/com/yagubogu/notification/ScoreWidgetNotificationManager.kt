@@ -70,8 +70,11 @@ class ScoreWidgetNotificationManager(
             )
             setTextViewText(R.id.score_widget_away_team, payload.awayTeamName)
             setTextViewText(R.id.score_widget_home_team, payload.homeTeamName)
-            setTextViewText(R.id.score_widget_away_score, payload.awayScore.toString())
-            setTextViewText(R.id.score_widget_home_score, payload.homeScore.toString())
+            val showScores = payload.awayScore != null && payload.homeScore != null
+            setViewVisibility(R.id.score_widget_away_score, if (showScores) View.VISIBLE else View.GONE)
+            setViewVisibility(R.id.score_widget_home_score, if (showScores) View.VISIBLE else View.GONE)
+            setTextViewText(R.id.score_widget_away_score, payload.awayScore?.toString().orEmpty())
+            setTextViewText(R.id.score_widget_home_score, payload.homeScore?.toString().orEmpty())
             setImageViewResource(R.id.score_widget_away_logo, mascotResource(payload.awayTeamCode))
             setImageViewResource(R.id.score_widget_home_logo, mascotResource(payload.homeTeamCode))
 
