@@ -21,6 +21,8 @@ import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
 import com.yagubogu.data.local.APP_CONFIG_PREFS
+import com.yagubogu.data.local.ScoreWidgetSettings
+import com.yagubogu.data.local.WIDGET_PREFS
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -52,6 +54,8 @@ val datasourceModule =
         single<AppConfigLocalDataSource> {
             AppConfigDataStoreLocalDataSource(dataStore = get(named(APP_CONFIG_PREFS)))
         }
+
+        single { ScoreWidgetSettings(dataStore = get(named(WIDGET_PREFS))) }
 
         registerPlatformDataSources()
     }

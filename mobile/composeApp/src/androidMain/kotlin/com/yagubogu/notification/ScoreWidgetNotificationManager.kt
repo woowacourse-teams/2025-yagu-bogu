@@ -217,22 +217,26 @@ class ScoreWidgetNotificationManager(
         IgnoredDifferentGame,
     }
 
-    private companion object {
-        const val NOTIFICATION_ID = 4021
-        const val EXTRA_GAME_ID = "score_widget_game_id"
-        val mutex = Mutex()
-        val SCORE_WIDGET_BALL_DOTS =
+    companion object {
+        fun cancel(context: Context) {
+            NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID)
+        }
+
+        private const val NOTIFICATION_ID = 4021
+        private const val EXTRA_GAME_ID = "score_widget_game_id"
+        private val mutex = Mutex()
+        private val SCORE_WIDGET_BALL_DOTS =
             intArrayOf(
                 R.id.score_widget_ball_dot_1,
                 R.id.score_widget_ball_dot_2,
                 R.id.score_widget_ball_dot_3,
             )
-        val SCORE_WIDGET_STRIKE_DOTS =
+        private val SCORE_WIDGET_STRIKE_DOTS =
             intArrayOf(
                 R.id.score_widget_strike_dot_1,
                 R.id.score_widget_strike_dot_2,
             )
-        val SCORE_WIDGET_OUT_DOTS =
+        private val SCORE_WIDGET_OUT_DOTS =
             intArrayOf(
                 R.id.score_widget_out_dot_1,
                 R.id.score_widget_out_dot_2,

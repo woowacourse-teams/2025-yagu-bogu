@@ -3,6 +3,7 @@ package com.yagubogu.ui.setting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.yagubogu.data.local.ScoreWidgetSettings
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
@@ -38,6 +39,7 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
+    private val scoreWidgetSettings: ScoreWidgetSettings,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -51,6 +53,23 @@ class SettingViewModel(
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
     val settingEvent = _settingEvent.asSharedFlow()
+
+    private val _scoreWidgetNotification = MutableStateFlow(false)
+    val scoreWidgetNotification: StateFlow<Boolean> = _scoreWidgetNotification.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            scoreWidgetSettings.isEnabled.collect { enabled ->
+                _scoreWidgetNotification.value = enabled
+            }
+        }
+    }
+
+    fun updateScoreWidgetNotification(enabled: Boolean) {
+        viewModelScope.launch {
+            scoreWidgetSettings.setEnabled(enabled)
+        }
+    }
 
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
