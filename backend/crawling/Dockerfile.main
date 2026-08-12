@@ -1,5 +1,5 @@
 # --- Build stage ---
-FROM amazoncorretto:21-al2023-jdk AS build
+FROM amazoncorretto:21 AS build
 WORKDIR /workspace
 
 # Gradle wrapper가 JVM 옵션 파싱에 사용하는 xargs 설치
