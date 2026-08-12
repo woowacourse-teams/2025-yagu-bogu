@@ -39,9 +39,9 @@ public class GameScheduler {
             int savedCount = gameCenterSyncService.fetchGameCenter(today);
             log.info("[DAILY_SCHEDULE] Bronze layer saved {} games", savedCount);
 
-            // 2. 즉시 ETL 실행 (오늘 날짜)
-            LocalDateTime todayStart = today.atStartOfDay();
-            int etlCount = gameEtlService.transformBronzeToSilver(todayStart);
+            // 2. 즉시 ETL 실행 (함께 수집한 전날 데이터 포함)
+            LocalDateTime yesterdayStart = yesterday.atStartOfDay();
+            int etlCount = gameEtlService.transformBronzeToSilver(yesterdayStart);
             log.info("[DAILY_SCHEDULE] ETL completed: {} games transformed", etlCount);
 
             // 3. AdaptivePoller 초기화 (Silver 최신 상태)
@@ -52,6 +52,29 @@ public class GameScheduler {
             log.error("[DAILY_SCHEDULE] Failed for {}: {}", today, e.getMessage(), e);
         } catch (Exception e) {
             log.error("[DAILY_SCHEDULE] Unexpected error for {}: {}", today, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 경기 당일 GameCenter 메타데이터를 주기적으로 확인한다.
+     * 시작 시각이 앞당겨져 기존 Poller 기상 시각보다 빨라지는 경우도 이 동기화로 감지한다.
+     */
+    @Scheduled(fixedDelay = 600_000, initialDelay = 300_000)
+    public void refreshTodayGameMetadata() {
+        LocalDate today = LocalDate.now(clock);
+
+        try {
+            int updatedCount = gameCenterSyncService.fetchGameCenter(today);
+            if (updatedCount == 0) {
+                return;
+            }
+
+            int etlCount = gameEtlService.transformPendingDateRange(today, today);
+            adaptivePoller.initializeTodaySchedule(today);
+            log.info("[GAME_METADATA_REFRESH] date={}, updated={}, transformed={}",
+                    today, updatedCount, etlCount);
+        } catch (Exception e) {
+            log.error("[GAME_METADATA_REFRESH] Failed for {}", today, e);
         }
     }
 }

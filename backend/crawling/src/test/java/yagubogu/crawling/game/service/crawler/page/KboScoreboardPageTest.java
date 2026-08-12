@@ -238,6 +238,7 @@ class KboScoreboardPageTest {
             KboScoreboardGame game = result.get();
 
             assertThat(game.getDate()).isEqualTo(date);
+            assertThat(game.getGameCode()).isEqualTo("20251026KTLG0");
             assertThat(game.getStatus()).isEqualTo("경기종료");
             assertThat(game.getStadium()).isEqualTo("잠실");
             assertThat(game.getStartTime()).isEqualTo(LocalTime.of(18, 30));
@@ -287,7 +288,9 @@ class KboScoreboardPageTest {
             ElementHandle mockAnchor = mock(ElementHandle.class);
 
             when(mockScoreboard.querySelector("a.box-score")).thenReturn(mockAnchor);
-            when(mockAnchor.getAttribute("href")).thenReturn("/game/boxscore/20251026LGKT");
+            when(mockAnchor.getAttribute("href")).thenReturn(
+                    "/Schedule/GameCenter/Main.aspx?gameDate=20251026&gameId=20251026KTLG0&section=REVIEW"
+            );
 
             LocalDate date = LocalDate.of(2025, 10, 26);
 
@@ -297,7 +300,9 @@ class KboScoreboardPageTest {
             // Then
             assertThat(result).isPresent();
             assertThat(result.get().getBoxScoreUrl())
-                    .isEqualTo("https://www.koreabaseball.com/game/boxscore/20251026LGKT");
+                    .isEqualTo("https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx"
+                            + "?gameDate=20251026&gameId=20251026KTLG0&section=REVIEW");
+            assertThat(result.get().getGameCode()).isEqualTo("20251026KTLG0");
         }
     }
 
@@ -373,7 +378,9 @@ class KboScoreboardPageTest {
 
         // BoxScore Link
         ElementHandle boxScoreLink = mock(ElementHandle.class);
-        lenient().when(boxScoreLink.getAttribute("href")).thenReturn("/game/boxscore/20251026LGKT");
+        lenient().when(boxScoreLink.getAttribute("href")).thenReturn(
+                "/Schedule/GameCenter/Main.aspx?gameDate=20251026&gameId=20251026KTLG0&section=REVIEW"
+        );
         lenient().when(mockScoreboard.querySelector("a.box-score")).thenReturn(boxScoreLink);
 
         // 스코어 테이블
