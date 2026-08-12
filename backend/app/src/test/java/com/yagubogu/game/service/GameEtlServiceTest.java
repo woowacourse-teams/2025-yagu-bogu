@@ -80,7 +80,7 @@ class GameEtlServiceTest {
                   "date":"2026-08-11",
                   "status":"경기종료",
                   "stadium":"창원",
-                  "startTime":"19:00:00",
+                  "startTime":"18:30:00",
                   "awayScore":0,
                   "homeScore":3,
                   "winningPitcher":"구창모",

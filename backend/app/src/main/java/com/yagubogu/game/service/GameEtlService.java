@@ -284,12 +284,14 @@ public class GameEtlService {
 
         // JSON 필드 추출
         final String status = json.path("status").asText(null);
-        final String stadiumLocation = json.path("stadium").asText();
-        final LocalDate date = LocalDate.parse(json.path("date").asText());
+        final String stadiumLocation = bronzeGame.getStadium();
+        final LocalDate date = bronzeGame.getDate();
         final String startTimeStr = json.path("startTime").asText(null);
-        final LocalTime startTime = startTimeStr != null && !startTimeStr.isEmpty()
+        final LocalTime payloadStartTime = startTimeStr != null && !startTimeStr.isEmpty()
                 ? LocalTime.parse(startTimeStr)
-                : LocalTime.of(0, 0);
+                : null;
+        final LocalTime startTime = Optional.ofNullable(bronzeGame.getStartTime())
+                .orElse(Optional.ofNullable(payloadStartTime).orElse(LocalTime.of(0, 0)));
 
         final Integer homeScore = json.path("homeScore").isNull() ? null : json.path("homeScore").asInt();
         final Integer awayScore = json.path("awayScore").isNull() ? null : json.path("awayScore").asInt();
@@ -299,8 +301,8 @@ public class GameEtlService {
         final JsonNode homeTeamScoreboard = json.path("homeTeamScoreboard");
         final JsonNode awayTeamScoreboard = json.path("awayTeamScoreboard");
 
-        final String homeTeamName = homeTeamScoreboard.path("name").asText();
-        final String awayTeamName = awayTeamScoreboard.path("name").asText();
+        final String homeTeamName = bronzeGame.getHomeTeam();
+        final String awayTeamName = bronzeGame.getAwayTeam();
 
         // 2. Transform: Team/Stadium 조회
         final Team homeTeam = teamRepository.findByShortName(homeTeamName)

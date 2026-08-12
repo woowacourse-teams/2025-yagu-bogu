@@ -95,12 +95,15 @@ public class BronzeGameService {
     ) {
         return findExisting(gameCode, date, stadium, homeTeam, awayTeam, startTime)
                 .map(existing -> {
-                    boolean gameCodeUpdated = existing.updateGameCode(gameCode);
+                    boolean metadataUpdated = existing.updateMetadata(
+                            gameCode, date, stadium, homeTeam, awayTeam, startTime, LocalDateTime.now()
+                    );
                     boolean stateUpdated = existing.updateState(gameState);
-                    boolean updated = gameCodeUpdated || stateUpdated;
+                    boolean updated = metadataUpdated || stateUpdated;
                     if (updated) {
-                        log.info("Bronze GameCenter data updated: gameCode={}, date={}, stadium={}, home={}, away={}, state={}",
-                                gameCode, date, stadium, homeTeam, awayTeam, gameState);
+                        log.info("Bronze GameCenter data updated: gameCode={}, date={}, stadium={}, home={}, away={}, "
+                                        + "startTime={}, state={}, metadataChanged={}",
+                                gameCode, date, stadium, homeTeam, awayTeam, startTime, gameState, metadataUpdated);
                     }
                     return updated;
                 })

@@ -86,4 +86,58 @@ class AdaptivePollerTest {
         verify(scoreboardService).updateFromScoreboard(gameCode, fetched);
         verify(scheduleManager).scheduleNextPoll(1L);
     }
+
+    @DisplayName("상태가 경기전으로 같아도 시작 시각이 바뀌면 갱신한다")
+    @Test
+    void updateScheduledGameWhenStartTimeChanged() {
+        GameReadOnlyService gameReadOnlyService = mock(GameReadOnlyService.class);
+        KboScoreboardService scoreboardService = mock(KboScoreboardService.class);
+        GameCenterSyncService gameCenterSyncService = mock(GameCenterSyncService.class);
+        GameScheduleManager scheduleManager = mock(GameScheduleManager.class);
+        BackoffStrategy backoffStrategy = mock(BackoffStrategy.class);
+        GlobalBackOffManager globalBackoff = mock(GlobalBackOffManager.class);
+        Clock clock = Clock.fixed(Instant.parse("2026-08-13T09:30:00Z"), ZoneId.of("Asia/Seoul"));
+        AdaptivePoller poller = new AdaptivePoller(
+                gameReadOnlyService, scoreboardService, gameCenterSyncService, scheduleManager,
+                backoffStrategy, globalBackoff, clock
+        );
+
+        LocalDate date = LocalDate.of(2026, 8, 13);
+        String gameCode = "20260813HHOB0";
+        Team homeTeam = new Team("두산 베어스", "두산", "OB", TeamStatus.ACTIVE);
+        Team awayTeam = new Team("한화 이글스", "한화", "HH", TeamStatus.ACTIVE);
+        Stadium stadium = new Stadium("서울종합운동장 야구장", "잠실", "잠실", 0.0, 0.0, StadiumLevel.MAIN);
+        Game game = new Game(
+                stadium, homeTeam, awayTeam, date, LocalTime.of(18, 30), gameCode,
+                null, null, null, null, null, null, GameState.SCHEDULED
+        );
+        ReflectionTestUtils.setField(game, "id", 1L);
+        KboScoreboardGame fetched = new KboScoreboardGame(
+                gameCode,
+                date,
+                "경기전",
+                "잠실",
+                LocalTime.of(19, 0),
+                null,
+                new KboScoreboardTeam("한화", null, null, null, null, List.of()),
+                new KboScoreboardTeam("두산", null, null, null, null, List.of()),
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        when(globalBackoff.isActive(any())).thenReturn(false);
+        when(scheduleManager.shouldWake(any())).thenReturn(true);
+        when(gameReadOnlyService.existsByDateAndGameStateIn(any(), any())).thenReturn(true);
+        when(scoreboardService.fetchScoreboardOnly(date)).thenReturn(List.of(fetched));
+        when(gameReadOnlyService.findAllByDateWithStadium(date)).thenReturn(List.of(game));
+        when(scheduleManager.shouldPollGame(1L, Instant.now(clock))).thenReturn(true);
+
+        poller.pollGameWhenReachDue();
+
+        verify(scoreboardService).updateFromScoreboard(gameCode, fetched);
+        verify(scheduleManager).scheduleNextPoll(1L);
+    }
 }

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -219,27 +220,41 @@ public class AdaptivePoller {
      * 업데이트 케이스:
      * - 상태 변경 (SCHEDULED → LIVE → FINALIZED)
      * - LIVE 상태 (점수/이닝 변경 가능성)
+     * - 같은 gameCode의 날짜/시각/구장/대진 정보 변경
      *
      * 생략 케이스:
-     * - SCHEDULED 상태 유지 (변경 사항 없음)
+     * - 상태와 경기 정보가 모두 동일한 SCHEDULED 경기
      */
     private void updateGameIfNeeded(Game game, KboScoreboardGame scoreboardGame) {
         GameState fetchedState = GameState.fromName(scoreboardGame.getStatus());
 
         boolean stateChanged = game.getGameState() != fetchedState;
         boolean isLive = fetchedState == GameState.LIVE;
+        boolean metadataChanged = hasMetadataChanged(game, scoreboardGame);
 
-        if (stateChanged || isLive) {
-            log.debug("[UPDATE] Calling updateFromScoreboard for gameCode={}, stadium={}, home={}, away={}",
+        if (stateChanged || isLive || metadataChanged) {
+            log.info("[UPDATE] Scoreboard changed: gameCode={}, stadium={}, home={}, away={}, "
+                            + "startTime={}→{}, metadataChanged={}",
                     game.getGameCode(), scoreboardGame.getStadium(),
                     scoreboardGame.getHomeTeamScoreboard().name(),
-                    scoreboardGame.getAwayTeamScoreboard().name());
+                    scoreboardGame.getAwayTeamScoreboard().name(), game.getStartAt(),
+                    scoreboardGame.getStartTime(), metadataChanged);
             kboScoreboardService.updateFromScoreboard(
                     game.getGameCode(),
                     scoreboardGame
             );
             game.updateGameState(fetchedState);
         }
+    }
+
+    private boolean hasMetadataChanged(final Game game, final KboScoreboardGame scoreboardGame) {
+        return !Objects.equals(game.getDate(), scoreboardGame.getDate())
+                || !Objects.equals(game.getStartAt(), scoreboardGame.getStartTime())
+                || !Objects.equals(game.getStadium().getLocation(), scoreboardGame.getStadium())
+                || !Objects.equals(game.getHomeTeam().getShortName(),
+                scoreboardGame.getHomeTeamScoreboard().name())
+                || !Objects.equals(game.getAwayTeam().getShortName(),
+                scoreboardGame.getAwayTeamScoreboard().name());
     }
 
     private boolean isGameFinalized(KboScoreboardGame scoreboardGame) {

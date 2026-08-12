@@ -12,6 +12,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -115,11 +116,31 @@ public class BronzeGame {
         this.etlProcessedAt = processedAt;
     }
 
-    public boolean updateGameCode(final String newGameCode) {
-        if (newGameCode == null || newGameCode.isBlank() || newGameCode.equals(this.gameCode)) {
+    public boolean updateMetadata(final String newGameCode,
+                                  final LocalDate newDate,
+                                  final String newStadium,
+                                  final String newHomeTeam,
+                                  final String newAwayTeam,
+                                  final LocalTime newStartTime,
+                                  final LocalDateTime newCollectedAt) {
+        String resolvedGameCode = newGameCode == null || newGameCode.isBlank() ? this.gameCode : newGameCode;
+        boolean changed = !Objects.equals(this.gameCode, resolvedGameCode)
+                || !Objects.equals(this.date, newDate)
+                || !Objects.equals(this.stadium, newStadium)
+                || !Objects.equals(this.homeTeam, newHomeTeam)
+                || !Objects.equals(this.awayTeam, newAwayTeam)
+                || !Objects.equals(this.startTime, newStartTime);
+        if (!changed) {
             return false;
         }
-        this.gameCode = newGameCode;
+
+        this.gameCode = resolvedGameCode;
+        this.date = newDate;
+        this.stadium = newStadium;
+        this.homeTeam = newHomeTeam;
+        this.awayTeam = newAwayTeam;
+        this.startTime = newStartTime;
+        this.collectedAt = newCollectedAt;
         this.etlProcessedAt = null;
         return true;
     }

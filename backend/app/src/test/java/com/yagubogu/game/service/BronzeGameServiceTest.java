@@ -73,4 +73,26 @@ class BronzeGameServiceTest {
         assertThat(bronzeGame.getStartTime()).isEqualTo(LocalTime.of(19, 0));
         assertThat(bronzeGame.getPayload()).isEqualTo("new");
     }
+
+    @DisplayName("같은 gameCode의 시작 시각이 바뀌면 GameCenter 정보로 Bronze 메타데이터를 갱신한다")
+    @Test
+    void updateMetadataByGameCodeWhenStartTimeChanged() {
+        LocalDate date = LocalDate.of(2026, 8, 13);
+        String gameCode = "20260813HHOB0";
+        BronzeGame bronzeGame = new BronzeGame(
+                gameCode, date, "잠실", "두산", "한화", LocalTime.of(18, 30),
+                LocalDateTime.of(2026, 8, 13, 0, 0), "{}", "hash"
+        );
+        bronzeGame.markEtlProcessed(LocalDateTime.of(2026, 8, 13, 0, 1));
+
+        when(bronzeGameRepository.findByGameCode(gameCode)).thenReturn(Optional.of(bronzeGame));
+
+        boolean updated = bronzeGameService.updateGameState(
+                gameCode, date, "잠실", "두산", "한화", LocalTime.of(19, 0), GameState.SCHEDULED
+        );
+
+        assertThat(updated).isTrue();
+        assertThat(bronzeGame.getStartTime()).isEqualTo(LocalTime.of(19, 0));
+        assertThat(bronzeGame.getEtlProcessedAt()).isNull();
+    }
 }

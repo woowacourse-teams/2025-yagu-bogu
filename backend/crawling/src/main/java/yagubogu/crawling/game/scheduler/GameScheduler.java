@@ -54,4 +54,27 @@ public class GameScheduler {
             log.error("[DAILY_SCHEDULE] Unexpected error for {}: {}", today, e.getMessage(), e);
         }
     }
+
+    /**
+     * 경기 당일 GameCenter 메타데이터를 주기적으로 확인한다.
+     * 시작 시각이 앞당겨져 기존 Poller 기상 시각보다 빨라지는 경우도 이 동기화로 감지한다.
+     */
+    @Scheduled(fixedDelay = 600_000, initialDelay = 300_000)
+    public void refreshTodayGameMetadata() {
+        LocalDate today = LocalDate.now(clock);
+
+        try {
+            int updatedCount = gameCenterSyncService.fetchGameCenter(today);
+            if (updatedCount == 0) {
+                return;
+            }
+
+            int etlCount = gameEtlService.transformPendingDateRange(today, today);
+            adaptivePoller.initializeTodaySchedule(today);
+            log.info("[GAME_METADATA_REFRESH] date={}, updated={}, transformed={}",
+                    today, updatedCount, etlCount);
+        } catch (Exception e) {
+            log.error("[GAME_METADATA_REFRESH] Failed for {}", today, e);
+        }
+    }
 }

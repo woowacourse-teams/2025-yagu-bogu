@@ -50,7 +50,7 @@ public class GameCenterSyncService {
             }
         }
 
-        log.info("[BRONZE] Processed {} games, {} state updates", gameDetails.size(), updatedCount);
+        log.info("[BRONZE] Processed {} games, {} data updates", gameDetails.size(), updatedCount);
         return updatedCount;
     }
 
