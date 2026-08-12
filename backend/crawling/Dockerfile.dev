@@ -1,6 +1,10 @@
 # --- Build stage ---
-FROM amazoncorretto:21 AS build
+FROM amazoncorretto:21-al2023-jdk AS build
 WORKDIR /workspace
+
+# Gradle wrapper가 JVM 옵션 파싱에 사용하는 xargs 설치
+RUN yum install -y findutils \
+    && yum clean all
 
 # 빌드 컨텍스트는 backend/ (Gradle 루트)
 COPY gradlew gradlew
@@ -13,7 +17,7 @@ COPY app/build.gradle app/build.gradle
 COPY crawling/build.gradle crawling/build.gradle
 
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
-RUN ./gradlew --no-daemon dependencies || true
+RUN ./gradlew --no-daemon dependencies
 
 # crawling 모듈은 app 모듈 의존성이 있어 둘 다 복사
 COPY app/src app/src
