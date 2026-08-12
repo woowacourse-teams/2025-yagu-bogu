@@ -66,7 +66,7 @@ public class GameCenterSyncService {
         GameState state = GameState.fromName(detail.getStatus());
 
         boolean updated = bronzeGameService.updateGameState(
-                date, stadium, homeTeam, awayTeam, startTime, state
+                detail.getGameCode(), date, stadium, homeTeam, awayTeam, startTime, state
         );
 
         if (updated) {

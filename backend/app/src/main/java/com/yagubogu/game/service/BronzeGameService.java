@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class BronzeGameService {
 
     @Transactional
     public boolean upsertByNaturalKey(
+            final String gameCode,
             final LocalDate date,
             final String stadium,
             final String homeTeam,
@@ -34,19 +38,54 @@ public class BronzeGameService {
         final String contentHash = calculateHash(payload);
         final LocalDateTime now = LocalDateTime.now();
 
-        return bronzeGameRepository
-                .findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
-                        date, stadium, homeTeam, awayTeam, startTime
-                )
-                .map(existing -> updateIfHashChanged(existing, payload, contentHash, now))
+        return findExisting(gameCode, date, stadium, homeTeam, awayTeam, startTime)
+                .map(existing -> updateIfHashChanged(
+                        existing, gameCode, date, stadium, homeTeam, awayTeam, startTime,
+                        payload, contentHash, now
+                ))
                 .orElseGet(() -> createNewByNaturalKey(
-                        date, stadium, homeTeam, awayTeam, startTime,
+                        gameCode, date, stadium, homeTeam, awayTeam, startTime,
                         payload, contentHash, now
                 ));
     }
 
+    private Optional<BronzeGame> findExisting(
+            final String gameCode,
+            final LocalDate date,
+            final String stadium,
+            final String homeTeam,
+            final String awayTeam,
+            final LocalTime startTime
+    ) {
+        if (gameCode != null && !gameCode.isBlank()) {
+            Optional<BronzeGame> byGameCode = bronzeGameRepository.findByGameCode(gameCode);
+            if (byGameCode.isPresent()) {
+                return byGameCode;
+            }
+        }
+
+        Optional<BronzeGame> byNaturalKey = bronzeGameRepository
+                .findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
+                date, stadium, homeTeam, awayTeam, startTime
+        );
+        if (byNaturalKey.isPresent()) {
+            return byNaturalKey;
+        }
+
+        List<BronzeGame> sameMatchup = bronzeGameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeam(
+                date, stadium, homeTeam, awayTeam
+        );
+        if (sameMatchup.size() == 1) {
+            log.info("Bronze matched without startTime: gameCode={}, date={}, stadium={}, home={}, away={}",
+                    gameCode, date, stadium, homeTeam, awayTeam);
+            return Optional.of(sameMatchup.getFirst());
+        }
+        return Optional.empty();
+    }
+
     @Transactional
     public boolean updateGameState(
+            final String gameCode,
             final LocalDate date,
             final String stadium,
             final String homeTeam,
@@ -54,15 +93,14 @@ public class BronzeGameService {
             final LocalTime startTime,
             final GameState gameState
     ) {
-        return bronzeGameRepository
-                .findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
-                        date, stadium, homeTeam, awayTeam, startTime
-                )
+        return findExisting(gameCode, date, stadium, homeTeam, awayTeam, startTime)
                 .map(existing -> {
-                    boolean updated = existing.updateState(gameState);
+                    boolean gameCodeUpdated = existing.updateGameCode(gameCode);
+                    boolean stateUpdated = existing.updateState(gameState);
+                    boolean updated = gameCodeUpdated || stateUpdated;
                     if (updated) {
-                        log.info("Bronze gameCenterState updated: date={}, stadium={}, home={}, away={}, state={}",
-                                date, stadium, homeTeam, awayTeam, gameState);
+                        log.info("Bronze GameCenter data updated: gameCode={}, date={}, stadium={}, home={}, away={}, state={}",
+                                gameCode, date, stadium, homeTeam, awayTeam, gameState);
                     }
                     return updated;
                 })
@@ -73,21 +111,35 @@ public class BronzeGameService {
                 });
     }
 
-    private boolean updateIfHashChanged(final BronzeGame existing, final String payload,
+    private boolean updateIfHashChanged(final BronzeGame existing,
+                                        final String gameCode,
+                                        final LocalDate date,
+                                        final String stadium,
+                                        final String homeTeam,
+                                        final String awayTeam,
+                                        final LocalTime startTime,
+                                        final String payload,
                                         final String contentHash, final LocalDateTime now) {
-        if (existing.getContentHash().equals(contentHash)) {
+        boolean identityChanged = !Objects.equals(existing.getGameCode(), gameCode)
+                || !existing.getDate().equals(date)
+                || !existing.getStadium().equals(stadium)
+                || !existing.getHomeTeam().equals(homeTeam)
+                || !existing.getAwayTeam().equals(awayTeam)
+                || !Objects.equals(existing.getStartTime(), startTime);
+        if (!identityChanged && existing.getContentHash().equals(contentHash)) {
             log.debug("No change detected: date={}, stadium={}, home={}, away={}",
                     existing.getDate(), existing.getStadium(), existing.getHomeTeam(), existing.getAwayTeam());
             return false;
         }
 
-        existing.update(now, payload, contentHash);
+        existing.update(gameCode, date, stadium, homeTeam, awayTeam, startTime, now, payload, contentHash);
         log.info("Bronze updated: date={}, stadium={}, home={}, away={}",
                 existing.getDate(), existing.getStadium(), existing.getHomeTeam(), existing.getAwayTeam());
         return true;
     }
 
     private boolean createNewByNaturalKey(
+            final String gameCode,
             final LocalDate date,
             final String stadium,
             final String homeTeam,
@@ -98,7 +150,7 @@ public class BronzeGameService {
             final LocalDateTime now
     ) {
         final BronzeGame bronzeGame = new BronzeGame(
-                date, stadium, homeTeam, awayTeam, startTime,
+                gameCode, date, stadium, homeTeam, awayTeam, startTime,
                 now, payload, contentHash
         );
         bronzeGameRepository.save(bronzeGame);

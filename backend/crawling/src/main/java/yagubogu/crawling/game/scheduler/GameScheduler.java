@@ -39,9 +39,9 @@ public class GameScheduler {
             int savedCount = gameCenterSyncService.fetchGameCenter(today);
             log.info("[DAILY_SCHEDULE] Bronze layer saved {} games", savedCount);
 
-            // 2. 즉시 ETL 실행 (오늘 날짜)
-            LocalDateTime todayStart = today.atStartOfDay();
-            int etlCount = gameEtlService.transformBronzeToSilver(todayStart);
+            // 2. 즉시 ETL 실행 (함께 수집한 전날 데이터 포함)
+            LocalDateTime yesterdayStart = yesterday.atStartOfDay();
+            int etlCount = gameEtlService.transformBronzeToSilver(yesterdayStart);
             log.info("[DAILY_SCHEDULE] ETL completed: {} games transformed", etlCount);
 
             // 3. AdaptivePoller 초기화 (Silver 최신 상태)

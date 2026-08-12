@@ -5,7 +5,6 @@ import com.yagubogu.game.domain.GameState;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -112,7 +111,7 @@ public class AdaptivePoller {
     private void processGame(Game game, Map<String, KboScoreboardGame> scoreboardGames) {
         try {
             KboScoreboardGame scoreboardGame = scoreboardGames.get(
-                    makeGameKey(game.getDate(), game.getStartAt(), game.getStadium().getLocation()));
+                    game.getGameCode());
 
             if (scoreboardGame == null) {
                 handleMissingGame(game);
@@ -173,8 +172,9 @@ public class AdaptivePoller {
             List<KboScoreboardGame> scoreboardResponses = kboScoreboardService.fetchScoreboardOnly(date);
 
             return scoreboardResponses.stream()
+                    .filter(game -> game.getGameCode() != null && !game.getGameCode().isBlank())
                     .collect(Collectors.toMap(
-                            game -> makeGameKey(game.getDate(), game.getStartTime(), game.getStadium()),
+                            KboScoreboardGame::getGameCode,
                             game -> game
                     ));
         } catch (Exception e) {
@@ -182,10 +182,6 @@ public class AdaptivePoller {
             log.warn("[POLLER] Scoreboard fetch failed: {}", e.getMessage());
             return Map.of();
         }
-    }
-
-    private String makeGameKey(LocalDate date, LocalTime startAt, String stadium) {
-        return String.format("%s_%s_%s", date, startAt, stadium);
     }
 
     private Game fetchFromGameCenter(Game game) {

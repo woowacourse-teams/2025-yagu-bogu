@@ -6,6 +6,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.yagubogu.game.exception.GameSyncException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -109,6 +112,7 @@ public class KboScoreboardPage extends BaseKboPage {
         // 박스스코어 URL
         ElementHandle boxScoreAnchor = queryCSS(scoreboard, selectors.getBoxScoreLink());
         String boxScoreUrl = boxScoreAnchor != null ? resolveUrl(boxScoreAnchor.getAttribute("href")) : null;
+        String gameCode = extractGameCode(boxScoreUrl);
 
         // 테이블 점수 파싱
         ElementHandle table = queryCSS(scoreboard, selectors.getScoreTable().getTable());
@@ -127,6 +131,7 @@ public class KboScoreboardPage extends BaseKboPage {
         Pitcher pitcher = parsePitcher(scoreboard);
 
         return Optional.of(new KboScoreboardGame(
+                gameCode,
                 date,
                 emptyToNull(status),
                 emptyToNull(stadium),
@@ -140,6 +145,29 @@ public class KboScoreboardPage extends BaseKboPage {
                 pitcher.saving(),
                 pitcher.losing()
         ));
+    }
+
+    private String extractGameCode(String boxScoreUrl) {
+        if (boxScoreUrl == null || boxScoreUrl.isBlank()) {
+            return null;
+        }
+
+        try {
+            String query = URI.create(boxScoreUrl).getRawQuery();
+            if (query == null) {
+                return null;
+            }
+
+            for (String parameter : query.split("&")) {
+                String[] pair = parameter.split("=", 2);
+                if (pair.length == 2 && "gameId".equals(pair[0])) {
+                    return URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("게임센터 URL에서 gameCode 추출 실패: {}", boxScoreUrl);
+        }
+        return null;
     }
 
     // ==================== 내부 파싱 메서드 ====================

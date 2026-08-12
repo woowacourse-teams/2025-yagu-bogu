@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface BronzeGameRepository extends JpaRepository<BronzeGame, Long> {
 
+    Optional<BronzeGame> findByGameCode(String gameCode);
+
     /**
      * 미처리 Bronze 데이터 조회 (ETL용)
      * collected_at >= since AND etl_processed_at IS NULL
@@ -24,12 +26,30 @@ public interface BronzeGameRepository extends JpaRepository<BronzeGame, Long> {
             """)
     List<BronzeGame> findPendingEtl(@Param("since") LocalDateTime since);
 
+    @Query("""
+            SELECT b FROM BronzeGame b
+            WHERE b.date BETWEEN :startDate AND :endDate
+            AND b.etlProcessedAt IS NULL
+            ORDER BY b.date, b.startTime
+            """)
+    List<BronzeGame> findPendingEtlByDateRange(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
     Optional<BronzeGame> findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
             LocalDate date,
             String stadium,
             String homeTeam,
             String awayTeam,
             LocalTime startTime
+    );
+
+    List<BronzeGame> findByDateAndStadiumAndHomeTeamAndAwayTeam(
+            LocalDate date,
+            String stadium,
+            String homeTeam,
+            String awayTeam
     );
 
     @Query("SELECT b FROM BronzeGame b WHERE b.collectedAt >= :since ORDER BY b.collectedAt DESC")

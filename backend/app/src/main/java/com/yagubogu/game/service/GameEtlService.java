@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Bronze → Silver ETL 서비스
@@ -47,6 +48,7 @@ public class GameEtlService {
     private final StadiumRepository stadiumRepository;
     private final ObjectMapper objectMapper;
     private final Clock clock;
+    private final TransactionTemplate transactionTemplate;
 
     /**
      * 최근 수집된 Bronze 데이터를 Silver로 ETL
@@ -55,12 +57,18 @@ public class GameEtlService {
      * @param since 이 시각 이후 수집된 데이터만 처리
      * @return 처리된 게임 수
      */
-    @Transactional
     public int transformBronzeToSilver(final LocalDateTime since) {
-         final List<BronzeGame> bronzeGames = bronzeGameRepository.findPendingEtl(since);
+        return transformPendingGames(bronzeGameRepository.findPendingEtl(since));
+    }
+
+    public int transformPendingDateRange(final LocalDate startDate, final LocalDate endDate) {
+        return transformPendingGames(bronzeGameRepository.findPendingEtlByDateRange(startDate, endDate));
+    }
+
+    private int transformPendingGames(final List<BronzeGame> bronzeGames) {
 
         if (bronzeGames.isEmpty()) {
-            log.debug("No bronze data to transform since {}", since);
+            log.debug("No pending bronze data to transform");
             return 0;
         }
 
@@ -97,10 +105,12 @@ public class GameEtlService {
             for (BronzeGame bronzeGame : gamesOnDate) {
                 try {
                     final int order = doubleHeaderOrderMap.getOrDefault(bronzeGame, 0);
-                    transformSingleGame(bronzeGame, order);
-                    bronzeGame.markEtlProcessed(LocalDateTime.now(clock));
-
-                    transformedCount++;
+                    Boolean transformed = transactionTemplate.execute(status ->
+                            transformAndMarkProcessed(bronzeGame.getId(), order)
+                    );
+                    if (Boolean.TRUE.equals(transformed)) {
+                        transformedCount++;
+                    }
                 } catch (Exception e) {
                     log.error("Failed to transform bronze game: bronzeGameId={}",
                             bronzeGame.getId(), e);
@@ -112,23 +122,34 @@ public class GameEtlService {
         return transformedCount;
     }
 
+    private boolean transformAndMarkProcessed(final Long bronzeGameId, final int doubleHeaderOrder) {
+        final BronzeGame bronzeGame = bronzeGameRepository.findById(bronzeGameId)
+                .orElseThrow(() -> new NotFoundException("Bronze game not found: " + bronzeGameId));
+        try {
+            transformSingleGame(bronzeGame, doubleHeaderOrder);
+            bronzeGame.markEtlProcessed(LocalDateTime.now(clock));
+            return true;
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to transform bronze game: " + bronzeGameId, e);
+        }
+    }
+
     /**
      * 특정 게임 코드들에 대해 즉시 ETL 실행
      *
      * 경기 종료 이벤트 발생 시 호출
      */
-    @Transactional
     public void transformSpecificGame(
+            final String gameCode,
             final LocalDate date,
             final String stadium,
             final String homeTeam,
             final String awayTeam,
             final LocalTime startTime
     ) {
-        final Optional<BronzeGame> bronzeGameOpt = bronzeGameRepository
-                .findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
-                        date, stadium, homeTeam, awayTeam, startTime
-                );
+        final Optional<BronzeGame> bronzeGameOpt = findBronzeGame(
+                gameCode, date, stadium, homeTeam, awayTeam, startTime
+        );
 
         if (bronzeGameOpt.isEmpty()) {
             log.warn("Bronze game not found: date={}, stadium={}, home={}, away={}",
@@ -156,13 +177,35 @@ public class GameEtlService {
                 }
             }
 
-            transformSingleGame(targetGame, order);
+            final int doubleHeaderOrder = order;
+            transactionTemplate.executeWithoutResult(status ->
+                    transformAndMarkProcessed(targetGame.getId(), doubleHeaderOrder)
+            );
             log.info("Immediate ETL completed: date={}, home={}, away={}, order={}",
                     date, homeTeam, awayTeam, order);
         } catch (Exception e) {
             log.error("Failed to transform game: date={}, home={}, away={}",
                     date, homeTeam, awayTeam, e);
         }
+    }
+
+    private Optional<BronzeGame> findBronzeGame(
+            final String gameCode,
+            final LocalDate date,
+            final String stadium,
+            final String homeTeam,
+            final String awayTeam,
+            final LocalTime startTime
+    ) {
+        if (gameCode != null && !gameCode.isBlank()) {
+            Optional<BronzeGame> byGameCode = bronzeGameRepository.findByGameCode(gameCode);
+            if (byGameCode.isPresent()) {
+                return byGameCode;
+            }
+        }
+        return bronzeGameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartTime(
+                date, stadium, homeTeam, awayTeam, startTime
+        );
     }
 
     /**
@@ -267,10 +310,16 @@ public class GameEtlService {
         final Stadium stadium = stadiumRepository.findByLocation(stadiumLocation)
                 .orElseThrow(() -> new NotFoundException("Stadium not found: " + stadiumLocation));
 
-        // 올바른 더블헤더 순서로 게임 코드 생성
-        final String gameCode = generateGameCode(date, homeTeam, awayTeam, doubleHeaderOrder);
+        // KBO가 제공한 gameId를 사용하고, 기존 Bronze 데이터만 조합 방식으로 호환한다.
+        final String payloadGameCode = json.path("gameCode").asText(null);
+        final String gameCode = firstNonBlank(
+                bronzeGame.getGameCode(),
+                payloadGameCode,
+                generateGameCode(date, homeTeam, awayTeam, doubleHeaderOrder)
+        );
 
-        final GameState gameState = GameState.fromName(status);
+        final GameState payloadState = GameState.fromName(status);
+        final GameState gameState = Optional.ofNullable(bronzeGame.getState()).orElse(payloadState);
 
         PitcherResult result = assignPitchers(homeScore, awayScore, winningPitcher, losingPitcher);
         final String homePitcher = result.home();
@@ -280,9 +329,9 @@ public class GameEtlService {
         final ScoreBoard awayScoreBoard = convertToScoreBoardFromJson(awayTeamScoreboard);
 
         // 3. Load: Game 엔티티 UPSERT
-        // Natural Key로 조회하여 더블헤더 구분
-        final Optional<Game> existingGameOpt = gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
-                date, stadium, homeTeam, awayTeam, startTime
+        // gameCode가 경기 시각 변경에도 안정적인 식별자다. Natural Key는 기존 데이터 호환용 fallback이다.
+        final Optional<Game> existingGameOpt = findExistingGame(
+                gameCode, date, stadium, homeTeam, awayTeam, startTime
         );
 
         existingGameOpt.ifPresentOrElse(
@@ -313,6 +362,46 @@ public class GameEtlService {
         );
 
         log.debug("[ETL] Processed Game: gameCode={}, state={}", gameCode, gameState);
+    }
+
+    private Optional<Game> findExistingGame(
+            final String gameCode,
+            final LocalDate date,
+            final Stadium stadium,
+            final Team homeTeam,
+            final Team awayTeam,
+            final LocalTime startTime
+    ) {
+        Optional<Game> byGameCode = gameRepository.findByGameCode(gameCode);
+        if (byGameCode.isPresent()) {
+            return byGameCode;
+        }
+
+        Optional<Game> byNaturalKey = gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
+                date, stadium, homeTeam, awayTeam, startTime
+        );
+        if (byNaturalKey.isPresent()) {
+            return byNaturalKey;
+        }
+
+        List<Game> sameMatchup = gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeam(
+                date, stadium, homeTeam, awayTeam
+        );
+        if (sameMatchup.size() == 1) {
+            log.info("[ETL] Game matched without startTime: gameCode={}, date={}, stadium={}, home={}, away={}",
+                    gameCode, date, stadium.getLocation(), homeTeam.getShortName(), awayTeam.getShortName());
+            return Optional.of(sameMatchup.getFirst());
+        }
+        return Optional.empty();
+    }
+
+    private String firstNonBlank(final String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("gameCode must not be blank");
     }
 
     /**
