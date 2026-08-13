@@ -122,6 +122,42 @@ public class Game {
             final ScoreBoard awayScoreBoard, final String homePitcher, final String awayPitcher,
             final GameState newState
     ) {
+        updateDetails(
+                stadium, homeTeam, awayTeam,
+                date, startAt, gameCode,
+                homeScore, awayScore,
+                homeScoreBoard, awayScoreBoard,
+                homePitcher, awayPitcher
+        );
+        updateGameState(newState);
+    }
+
+    /**
+     * Admin 정합성 복구 시 Bronze 원본을 기준으로 전체 필드를 강제 동기화한다.
+     */
+    public void reconcile(
+            final Stadium stadium, final Team homeTeam, final Team awayTeam,
+            final LocalDate date, final LocalTime startAt, final String gameCode,
+            final Integer homeScore, final Integer awayScore, final ScoreBoard homeScoreBoard,
+            final ScoreBoard awayScoreBoard, final String homePitcher, final String awayPitcher,
+            final GameState gameState
+    ) {
+        updateDetails(
+                stadium, homeTeam, awayTeam,
+                date, startAt, gameCode,
+                homeScore, awayScore,
+                homeScoreBoard, awayScoreBoard,
+                homePitcher, awayPitcher
+        );
+        this.gameState = gameState;
+    }
+
+    private void updateDetails(
+            final Stadium stadium, final Team homeTeam, final Team awayTeam,
+            final LocalDate date, final LocalTime startAt, final String gameCode,
+            final Integer homeScore, final Integer awayScore, final ScoreBoard homeScoreBoard,
+            final ScoreBoard awayScoreBoard, final String homePitcher, final String awayPitcher
+    ) {
         this.stadium = stadium;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
@@ -134,7 +170,6 @@ public class Game {
         this.awayScoreBoard = awayScoreBoard;
         this.homePitcher = homePitcher;
         this.awayPitcher = awayPitcher;
-        updateGameState(newState);
     }
 
     public boolean hasTeam(final Team team) {

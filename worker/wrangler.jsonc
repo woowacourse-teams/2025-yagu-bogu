@@ -1,0 +1,18 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yagubogu-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-14",
+  "observability": {
+    "enabled": true
+  },
+  // 일반 환경 변수
+  "vars": {
+    "ENV": "prod" // 개발중에는 "development", 변경후 npx wrangler types 필요
+    // JWT_ACCESS_TOKEN_SECRET_KEY 는 시크릿 환경변수로 주입됨
+  }
+}

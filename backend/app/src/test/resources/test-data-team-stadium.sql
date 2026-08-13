@@ -40,12 +40,12 @@ VALUES (1, '광주 기아 챔피언스필드', '챔피언스필드', '광주', 3
 -- 3. 회원가입 뱃지 데이터
 INSERT INTO badges (badge_name, badge_description, badge_policy, badge_threshold, badge_image_url)
 VALUES ('리드오프', '회원가입한 회원', 'SIGN_UP', 1,
-        'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/leadoff_500.png'),
+        'https://images.yagubogu.com/badge/500x500/leadoff_500.png'),
        ('말문이 트이다', '첫 현장톡 작성', 'CHAT', 1,
-        'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/open_mouth_500.png'),
+        'https://images.yagubogu.com/badge/500x500/open_mouth_500.png'),
        ('공포의 주둥아리', '현장톡 누적 100회', 'CHAT', 100,
-        'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/terrible_mouth_500.png'),
+        'https://images.yagubogu.com/badge/500x500/terrible_mouth_500.png'),
        ('플레이볼', '첫 직관 인증', 'CHECK_IN', 1,
-        'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/playball_500.png'),
+        'https://images.yagubogu.com/badge/500x500/playball_500.png'),
        ('그랜드슬램', '9개 전구장 방문', 'GRAND_SLAM', 9,
-        'https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/grandslam_500.png');
+        'https://images.yagubogu.com/badge/500x500/grandslam_500.png');

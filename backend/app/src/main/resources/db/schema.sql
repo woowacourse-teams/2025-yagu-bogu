@@ -114,6 +114,7 @@ CREATE TABLE victory_fairy_rankings
     updated_at               DATETIME(6) NULL,
     PRIMARY KEY (victory_fairy_ranking_id),
     UNIQUE KEY uq_vfr_member_year (member_id, game_year),
+    INDEX idx_victory_fairy_rankings_year_score (game_year, score DESC),
     CONSTRAINT fk_vfr_member FOREIGN KEY (member_id) REFERENCES members (member_id)
 ) ENGINE = InnoDB;
 

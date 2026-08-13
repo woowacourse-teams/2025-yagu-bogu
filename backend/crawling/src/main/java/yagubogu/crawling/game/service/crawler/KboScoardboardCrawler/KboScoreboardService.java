@@ -1,6 +1,5 @@
 package yagubogu.crawling.game.service.crawler.KboScoardboardCrawler;
 
-import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.util.stream.Collectors.toMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +7,6 @@ import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.domain.ScoreBoard;
 import com.yagubogu.game.event.GameFinalizedEvent;
 import com.yagubogu.game.exception.GameSyncException;
-import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.BronzeGameService;
 import com.yagubogu.game.service.GameEtlService;
 import com.yagubogu.stadium.domain.Stadium;
@@ -19,7 +17,6 @@ import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +33,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 import yagubogu.crawling.game.dto.BatchResult;
 import yagubogu.crawling.game.dto.FailedGame;
+import yagubogu.crawling.game.dto.GameCenter;
+import yagubogu.crawling.game.dto.GameCenterDetail;
 import yagubogu.crawling.game.dto.GameDateCrawlResponse;
 import yagubogu.crawling.game.dto.GameUpsertRow;
 import yagubogu.crawling.game.dto.KboScoreboardGame;
@@ -45,6 +44,7 @@ import yagubogu.crawling.game.dto.ScoreBoardData;
 import yagubogu.crawling.game.dto.ScoreboardResponse;
 import yagubogu.crawling.game.dto.UpsertResult;
 import yagubogu.crawling.game.repository.GameJdbcBatchUpsertRepository;
+import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyncService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,9 +58,9 @@ public class KboScoreboardService {
     private final StadiumRepository stadiumRepository;
     private final TransactionTemplate transactionTemplate;
     private final TransactionTemplate readOnlyTransactionTemplate;
-    private final GameRepository gameRepository;
     private final BronzeGameService bronzeGameService;
     private final GameEtlService gameEtlService;
+    private final GameCenterSyncService gameCenterSyncService;
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -111,31 +111,32 @@ public class KboScoreboardService {
         Map<LocalDate, List<KboScoreboardGame>> gamesByDate = kboScoreboardCrawler.crawl(List.of(date));
         Map<String, Team> teamByShort = loadTeams();
         Map<String, Stadium> stadiumByLocation = loadStadiums();
-        Map<String, KboScoreboardGame> scoreboardGamesByCode = mapByGameCode(gamesByDate, teamByShort);
 
-        List<Map.Entry<String, KboScoreboardGame>> newGameEntries = scoreboardGamesByCode.entrySet().stream()
-                .filter(entry -> !gameRepository.existsByGameCode(entry.getKey()))
+        List<KboScoreboardGame> crawledGames = gamesByDate.values().stream()
+                .flatMap(List::stream)
                 .toList();
-        List<KboScoreboardGame> newGames = newGameEntries.stream()
-                .map(Map.Entry::getValue)
-                .toList();
-        List<String> savedGameCodes = newGameEntries.stream()
+        int savedCount = saveToBronzeLayerInChunks(crawledGames, teamByShort, stadiumByLocation);
+
+        // 예정 경기의 ScoreBoard에는 gameId가 없으므로 GameCenter의 공식 g_id를 Bronze에 연결한다.
+        GameCenter gameCenter = gameCenterSyncService.fetchGameCenterOnly(date);
+        gameCenterSyncService.saveToBronzeLayer(gameCenter.getGames());
+
+        Map<String, GameState> gamesByOfficialCode = collectOfficialGameCodes(gamesByDate, gameCenter);
+        List<String> savedGameCodes = List.copyOf(gamesByOfficialCode.keySet());
+        List<String> completedGameCodes = gamesByOfficialCode.entrySet().stream()
+                .filter(entry -> entry.getValue().isCompleted())
                 .map(Map.Entry::getKey)
                 .toList();
-        List<String> completedGameCodes = newGameEntries.stream()
-                .filter(entry -> GameState.fromName(entry.getValue().getStatus()).isCompleted())
-                .map(Map.Entry::getKey)
-                .toList();
 
-        int savedCount = saveToBronzeLayerInChunks(newGames, teamByShort, stadiumByLocation);
-        int transformedCount = newGames.isEmpty() ? 0 : gameEtlService.transformBronzeToSilver(date.atStartOfDay());
-        int skippedCount = scoreboardGamesByCode.size() - newGameEntries.size();
+        // Admin 복구 요청은 Bronze 변경 여부와 무관하게 해당 날짜 Silver를 강제로 원본과 맞춘다.
+        int transformedCount = gameEtlService.reprocessDate(date);
+        int skippedCount = Math.max(0, crawledGames.size() - savedCount);
 
         log.info("[GAME_DATE_CRAWL] date={}, matched={}, saved={}, skipped={}, transformed={}",
-                date, scoreboardGamesByCode.size(), savedCount, skippedCount, transformedCount);
+                date, gamesByOfficialCode.size(), savedCount, skippedCount, transformedCount);
         return new GameDateCrawlResponse(
-                scoreboardGamesByCode.size(),
-                scoreboardGamesByCode.size(),
+                crawledGames.size(),
+                gamesByOfficialCode.size(),
                 savedCount,
                 skippedCount,
                 transformedCount,
@@ -168,7 +169,12 @@ public class KboScoreboardService {
             String homeTeamName = data.getHomeTeamScoreboard().name();
             String awayTeamName = data.getAwayTeamScoreboard().name();
             LocalTime startTime = data.getStartTime();
-            bronzeGameService.upsertByNaturalKey(date, stadium, homeTeamName, awayTeamName, startTime, payload);
+            String officialGameCode = data.getGameCode() == null || data.getGameCode().isBlank()
+                    ? gameCode
+                    : data.getGameCode();
+            bronzeGameService.upsertByNaturalKey(
+                    officialGameCode, date, stadium, homeTeamName, awayTeamName, startTime, payload
+            );
             log.debug("[BRONZE] Saved gameCode={}, state={}", gameCode, data.getStatus());
 
             // 경기 종료 시 이벤트 발행 (ETL 트리거)
@@ -217,6 +223,7 @@ public class KboScoreboardService {
                         String payload = objectMapper.writeValueAsString(game);
 
                         boolean changed = bronzeGameService.upsertByNaturalKey(
+                                game.getGameCode(),
                                 game.getDate(),
                                 game.getStadium(),
                                 game.getHomeTeamScoreboard().name(),
@@ -294,33 +301,47 @@ public class KboScoreboardService {
     }
 
     private Map<String, KboScoreboardGame> mapByGameCode(
-            final Map<LocalDate, List<KboScoreboardGame>> gamesByDate,
-            final Map<String, Team> teamByShort
+            final Map<LocalDate, List<KboScoreboardGame>> gamesByDate
     ) {
         Map<String, KboScoreboardGame> result = new LinkedHashMap<>();
 
-        gamesByDate.forEach((date, games) -> games.stream()
-                .collect(Collectors.groupingBy(game -> game.getHomeTeamScoreboard().name()))
-                .values()
-                .forEach(homeTeamGames -> {
-                    homeTeamGames.sort(Comparator.comparing(
-                            KboScoreboardGame::getStartTime,
-                            Comparator.nullsLast(Comparator.naturalOrder())
-                    ));
-
-                    for (int order = 0; order < homeTeamGames.size(); order++) {
-                        KboScoreboardGame game = homeTeamGames.get(order);
-                        Team awayTeam = teamByShort.get(game.getAwayTeamScoreboard().name());
-                        Team homeTeam = teamByShort.get(game.getHomeTeamScoreboard().name());
-                        if (awayTeam == null || homeTeam == null) {
-                            continue;
-                        }
-
-                        result.put(generateGameCode(date, homeTeam, awayTeam, order), game);
+        gamesByDate.values().stream()
+                .flatMap(List::stream)
+                .forEach(game -> {
+                    if (game.getGameCode() == null || game.getGameCode().isBlank()) {
+                        log.warn("[GAME_CODE] Skip scoreboard without KBO gameId: date={}, stadium={}",
+                                game.getDate(), game.getStadium());
+                        return;
                     }
-                }));
+                    result.put(game.getGameCode(), game);
+                });
 
         return result;
+    }
+
+    private Map<String, GameState> collectOfficialGameCodes(
+            final Map<LocalDate, List<KboScoreboardGame>> gamesByDate,
+            final GameCenter gameCenter
+    ) {
+        Map<String, GameState> result = new LinkedHashMap<>();
+        mapByGameCode(gamesByDate).forEach((gameCode, game) ->
+                result.put(gameCode, GameState.fromName(game.getStatus()))
+        );
+        for (GameCenterDetail detail : gameCenter.getGames()) {
+            if (detail.getGameCode() == null || detail.getGameCode().isBlank()) {
+                continue;
+            }
+            result.put(detail.getGameCode(), parseGameCenterState(detail));
+        }
+        return result;
+    }
+
+    private GameState parseGameCenterState(final GameCenterDetail detail) {
+        try {
+            return GameState.fromNumber(Integer.parseInt(detail.getGameSc()));
+        } catch (RuntimeException ignored) {
+            return GameState.fromName(detail.getStatus());
+        }
     }
 
     /**
@@ -458,11 +479,6 @@ public class KboScoreboardService {
         } else {
             return new PitcherAssignment(losingPitcher, winningPitcher);
         }
-    }
-
-    private String generateGameCode(final LocalDate date, final Team homeTeam, final Team awayTeam,
-                                    final int headerOrder) {
-        return date.format(BASIC_ISO_DATE) + awayTeam.getTeamCode() + homeTeam.getTeamCode() + headerOrder;
     }
 
 //    private void applyDoubleHeaderOrder(final List<KboScoreboardGame> games) {

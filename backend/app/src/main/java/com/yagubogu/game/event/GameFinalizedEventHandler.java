@@ -28,6 +28,7 @@ public class GameFinalizedEventHandler {
         try {
             // 단일 게임 ETL
             gameEtlService.transformSpecificGame(
+                    event.gameCode(),
                     event.date(),
                     event.stadium(),
                     event.homeTeam(),

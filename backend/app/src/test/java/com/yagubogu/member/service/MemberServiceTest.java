@@ -367,31 +367,31 @@ public class MemberServiceTest {
                         1L, "리드오프", "회원가입한 회원",
                         Policy.SIGN_UP, true, LocalDateTime.now(),
                         100.0, 100.0,
-                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/leadoff_500.png"
+                        "https://images.yagubogu.com/badge/500x500/leadoff_500.png"
                 ),
                 new BadgeResponseWithRates(
                         2L, "말문이 트이다", "첫 현장톡 작성",
                         Policy.CHAT, false, null,
                         0.0, 0.0,
-                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/open_mouth_500.png"
+                        "https://images.yagubogu.com/badge/500x500/open_mouth_500.png"
                 ),
                 new BadgeResponseWithRates(
                         3L, "공포의 주둥아리", "현장톡 누적 100회",
                         Policy.CHAT, false, null,
                         0.0, 0.0,
-                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/terrible_mouth_500.png"
+                        "https://images.yagubogu.com/badge/500x500/terrible_mouth_500.png"
                 ),
                 new BadgeResponseWithRates(
                         4L, "플레이볼", "첫 직관 인증",
                         Policy.CHECK_IN, false, null,
                         0.0, 0.0,
-                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/playball_500.png"
+                        "https://images.yagubogu.com/badge/500x500/playball_500.png"
                 ),
                 new BadgeResponseWithRates(
                         5L, "그랜드슬램", "9개 전구장 방문",
                         Policy.GRAND_SLAM, false, null,
                         0.0, 0.0,
-                        "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/badges/500x500/grandslam_500.png"
+                        "https://images.yagubogu.com/badge/500x500/grandslam_500.png"
                 )
         );
 

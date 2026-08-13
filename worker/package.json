@@ -1,0 +1,21 @@
+{
+	"name": "yagubogu-worker",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.11.1",
+		"typescript": "^5.9.3",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.63.0"
+	},
+	"dependencies": {
+		"jose": "^6.1.3"
+	}
+}

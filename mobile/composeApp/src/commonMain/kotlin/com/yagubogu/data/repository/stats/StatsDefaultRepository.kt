@@ -1,0 +1,53 @@
+package com.yagubogu.data.repository.stats
+
+import com.yagubogu.data.datasource.stats.StatsDataSource
+import com.yagubogu.data.dto.response.stats.AverageStatisticResponse
+import com.yagubogu.data.dto.response.stats.LocationCheckInRankingCursorResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateResponse
+import com.yagubogu.data.dto.response.stats.OpponentWinRateTeamDto
+import com.yagubogu.data.dto.response.stats.StatsCountsResponse
+import com.yagubogu.data.dto.response.stats.StatsLuckyStadiumsResponse
+import com.yagubogu.data.dto.response.stats.StatsWinRateResponse
+import com.yagubogu.data.dto.response.stats.VictoryFairyRankingResponse
+
+class StatsDefaultRepository(
+    private val statsDataSource: StatsDataSource,
+) : StatsRepository {
+    override suspend fun getStatsWinRate(year: Int?): Result<Double> =
+        statsDataSource
+            .getStatsWinRate(year)
+            .map { statsWinRateResponse: StatsWinRateResponse ->
+                statsWinRateResponse.winPercent
+            }
+
+    override suspend fun getStatsCounts(year: Int?): Result<StatsCountsResponse> = statsDataSource.getStatsCounts(year)
+
+    override suspend fun getLuckyStadiums(year: Int?): Result<String?> =
+        statsDataSource
+            .getLuckyStadiums(year)
+            .map { statsLuckyStadiumsResponse: StatsLuckyStadiumsResponse ->
+                statsLuckyStadiumsResponse.shortName
+            }
+
+    override suspend fun getAverageStats(year: Int?): Result<AverageStatisticResponse> = statsDataSource.getAverageStats(year)
+
+    override suspend fun getVsTeamStats(year: Int?): Result<List<OpponentWinRateTeamDto>> =
+        statsDataSource
+            .getVsTeamStats(year)
+            .map { opponentWinRateResponse: OpponentWinRateResponse ->
+                opponentWinRateResponse.opponents
+            }
+
+    override suspend fun getVictoryFairyRankings(
+        year: Int,
+        teamCode: String?,
+        before: Long?,
+        limit: Int,
+    ): Result<VictoryFairyRankingResponse> = statsDataSource.getVictoryFairyRankings(year, teamCode, before, limit)
+
+    override suspend fun getCheckInRankings(
+        year: Int,
+        before: Long?,
+        limit: Int,
+    ): Result<LocationCheckInRankingCursorResponse> = statsDataSource.getCheckInRankings(year, before, limit)
+}

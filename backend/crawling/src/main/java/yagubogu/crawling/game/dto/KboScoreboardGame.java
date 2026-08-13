@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 public final class KboScoreboardGame {
 
+    private final String gameCode;
     private final LocalDate date;
     private final String status;
     private final String stadium;
@@ -21,6 +22,36 @@ public final class KboScoreboardGame {
     private final String winningPitcher;
     private final String savingPitcher;
     private final String losingPitcher;
+
+    public KboScoreboardGame(
+            String gameCode,
+            LocalDate date,
+            String status,
+            String stadium,
+            LocalTime startTime,
+            String boxScoreUrl,
+            KboScoreboardTeam awayTeamScoreboard,
+            KboScoreboardTeam homeTeamScoreboard,
+            Integer awayScore,
+            Integer homeScore,
+            String winningPitcher,
+            String savingPitcher,
+            String losingPitcher
+    ) {
+        this.gameCode = gameCode;
+        this.date = date;
+        this.status = status;
+        this.stadium = stadium;
+        this.startTime = startTime;
+        this.boxScoreUrl = boxScoreUrl;
+        this.awayTeamScoreboard = awayTeamScoreboard;
+        this.homeTeamScoreboard = homeTeamScoreboard;
+        this.awayScore = awayScore;
+        this.homeScore = homeScore;
+        this.winningPitcher = winningPitcher;
+        this.savingPitcher = savingPitcher;
+        this.losingPitcher = losingPitcher;
+    }
 
     public KboScoreboardGame(
             LocalDate date,
@@ -36,17 +67,8 @@ public final class KboScoreboardGame {
             String savingPitcher,
             String losingPitcher
     ) {
-        this.date = date;
-        this.status = status;
-        this.stadium = stadium;
-        this.startTime = startTime;
-        this.boxScoreUrl = boxScoreUrl;
-        this.awayTeamScoreboard = awayTeamScoreboard;
-        this.homeTeamScoreboard = homeTeamScoreboard;
-        this.awayScore = awayScore;
-        this.homeScore = homeScore;
-        this.winningPitcher = winningPitcher;
-        this.savingPitcher = savingPitcher;
-        this.losingPitcher = losingPitcher;
+        this(null, date, status, stadium, startTime, boxScoreUrl,
+                awayTeamScoreboard, homeTeamScoreboard, awayScore, homeScore,
+                winningPitcher, savingPitcher, losingPitcher);
     }
 }

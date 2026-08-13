@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     container_name: yagubogu-backend
     ports:
-      - "80:80"
+      - "127.0.0.1:80:80"
     environment:
       TZ: Asia/Seoul
       JAVA_OPTS: "-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
@@ -39,12 +39,12 @@ services:
     image: mysql:8.1
     container_name: yagubogu-db
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: yagubogu
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - db-data:/var/lib/mysql
     restart: unless-stopped

@@ -50,7 +50,7 @@ public class GameCenterSyncService {
             }
         }
 
-        log.info("[BRONZE] Processed {} games, {} state updates", gameDetails.size(), updatedCount);
+        log.info("[BRONZE] Processed {} games, {} data updates", gameDetails.size(), updatedCount);
         return updatedCount;
     }
 
@@ -66,7 +66,7 @@ public class GameCenterSyncService {
         GameState state = GameState.fromName(detail.getStatus());
 
         boolean updated = bronzeGameService.updateGameState(
-                date, stadium, homeTeam, awayTeam, startTime, state
+                detail.getGameCode(), date, stadium, homeTeam, awayTeam, startTime, state
         );
 
         if (updated) {

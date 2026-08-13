@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @EnableScheduling
 @Configuration
@@ -30,10 +31,10 @@ public class PipelineConfig {
     public GameEtlService gameEtlService(final BronzeGameRepository bronzeGameRepository,
                                          final GameRepository gameRepository, final TeamRepository teamRepository,
                                          final StadiumRepository stadiumRepository, final ObjectMapper objectMapper,
-                                         final Clock clock
+                                         final Clock clock, final TransactionTemplate transactionTemplate
     ) {
         return new GameEtlService(bronzeGameRepository, gameRepository, teamRepository, stadiumRepository,
-                objectMapper, clock);
+                objectMapper, clock, transactionTemplate);
     }
 
     @Bean

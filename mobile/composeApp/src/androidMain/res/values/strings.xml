@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">야구보구</string>
+    
+    <string name="login_should_immediate_update_message">앱을 계속 사용하려면\n최신 버전으로 업데이트 해주세요</string>
+    <string name="login_complete_update_message">업데이트 중이에요! ⚾</string>
+</resources>

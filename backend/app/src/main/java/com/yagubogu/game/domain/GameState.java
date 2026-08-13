@@ -46,7 +46,7 @@ public enum GameState {
         }
 
         return switch (this) {
-            case SCHEDULED -> newState == LIVE || newState == CANCELED;
+            case SCHEDULED -> newState == LIVE || newState == COMPLETED || newState == CANCELED;
             case LIVE -> newState == COMPLETED || newState == CANCELED;
             default -> false;
         };
