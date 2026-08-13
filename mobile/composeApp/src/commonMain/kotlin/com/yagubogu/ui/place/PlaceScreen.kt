@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.place.component.PlaceFilterChips
 import com.yagubogu.ui.place.component.PlaceRecommendationCard
 import com.yagubogu.ui.place.component.PlaceStadiumDropdown
+import com.yagubogu.ui.place.model.PLACE_STADIUMS
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceItem
 import com.yagubogu.ui.place.model.PlaceListUiState
@@ -147,18 +148,9 @@ private fun PlaceScreen(
                 }
 
             PlaceListUiState.Empty -> Unit
-
-            PlaceListUiState.NoStadium -> Unit
         }
     }
 }
-
-private val PLACE_STADIUM_ITEMS: List<PlaceStadiumItem> =
-    listOf(
-        PlaceStadiumItem(id = 1L, name = "잠실야구장"),
-        PlaceStadiumItem(id = 2L, name = "고척스카이돔"),
-        PlaceStadiumItem(id = 3L, name = "수원 케이티위즈파크"),
-    )
 
 private val PLACE_ITEMS: List<PlaceItem> =
     listOf(
@@ -184,8 +176,8 @@ private val PLACE_ITEMS: List<PlaceItem> =
 @Composable
 private fun PlaceScreenPreview() {
     PlaceScreen(
-        stadiums = PLACE_STADIUM_ITEMS,
-        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        stadiums = PLACE_STADIUMS,
+        selectedStadiumId = PLACE_STADIUMS.first().id,
         selectedCategory = PlaceCategory.FOOD,
         placesUiState = PlaceListUiState.Success(PLACE_ITEMS),
         onStadiumClick = {},
@@ -198,8 +190,8 @@ private fun PlaceScreenPreview() {
 @Composable
 private fun PlaceScreenLoadingPreview() {
     PlaceScreen(
-        stadiums = PLACE_STADIUM_ITEMS,
-        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        stadiums = PLACE_STADIUMS,
+        selectedStadiumId = PLACE_STADIUMS.first().id,
         selectedCategory = PlaceCategory.STAY,
         placesUiState = PlaceListUiState.Loading,
         onStadiumClick = {},
@@ -212,24 +204,10 @@ private fun PlaceScreenLoadingPreview() {
 @Composable
 private fun PlaceScreenEmptyPreview() {
     PlaceScreen(
-        stadiums = PLACE_STADIUM_ITEMS,
-        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        stadiums = PLACE_STADIUMS,
+        selectedStadiumId = PLACE_STADIUMS.first().id,
         selectedCategory = PlaceCategory.SHOW,
         placesUiState = PlaceListUiState.Empty,
-        onStadiumClick = {},
-        onCategoryClick = {},
-        onPlaceItemClick = { _, _, _ -> },
-    )
-}
-
-@Preview("플레이스 목록 화면 - 오늘 경기 없음")
-@Composable
-private fun PlaceScreenNoStadiumPreview() {
-    PlaceScreen(
-        stadiums = emptyList(),
-        selectedStadiumId = null,
-        selectedCategory = PlaceCategory.STAY,
-        placesUiState = PlaceListUiState.NoStadium,
         onStadiumClick = {},
         onCategoryClick = {},
         onPlaceItemClick = { _, _, _ -> },

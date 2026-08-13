@@ -8,6 +8,4 @@ sealed interface PlaceListUiState {
     ) : PlaceListUiState
 
     data object Empty : PlaceListUiState
-
-    data object NoStadium : PlaceListUiState
 }

@@ -3,40 +3,34 @@ package com.yagubogu.ui.place
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.dto.response.place.PlaceDetailResponse
 import com.yagubogu.data.dto.response.place.PlacesResponse
-import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.place.PlaceRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
-import com.yagubogu.domain.model.homeStadiumName
+import com.yagubogu.domain.model.homeStadiumId
 import com.yagubogu.ui.mapper.toApiCategory
 import com.yagubogu.ui.mapper.toUiModel
+import com.yagubogu.ui.place.model.PLACE_STADIUMS
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceDetailUiModel
 import com.yagubogu.ui.place.model.PlaceDetailUiState
 import com.yagubogu.ui.place.model.PlaceListUiState
 import com.yagubogu.ui.place.model.PlaceStadiumItem
-import com.yagubogu.ui.util.now
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
 
 class PlaceViewModel(
     private val placeRepository: PlaceRepository,
-    private val gameRepository: GameRepository,
     private val memberRepository: MemberRepository,
-    private val clock: Clock,
 ) : ViewModel() {
     private val logger = Logger.withTag("PlaceViewModel")
 
-    private val _stadiums = MutableStateFlow<List<PlaceStadiumItem>>(emptyList())
+    private val _stadiums = MutableStateFlow<List<PlaceStadiumItem>>(PLACE_STADIUMS)
     val stadiums: StateFlow<List<PlaceStadiumItem>> = _stadiums.asStateFlow()
 
     private val _selectedStadiumId = MutableStateFlow<Long?>(null)
@@ -55,40 +49,20 @@ class PlaceViewModel(
     private var placeDetailJob: Job? = null
 
     fun loadStadiums() {
+        // 이미 선택된 구장이 있다면(탭 재진입 등) 사용자의 선택을 유지한다.
+        if (_selectedStadiumId.value != null) return
+
         viewModelScope.launch {
-            val gamesResult: Result<List<GameWithCheckInDto>> = gameRepository.getGames(LocalDate.now(clock))
-            gamesResult
-                .onSuccess { games: List<GameWithCheckInDto> ->
-                    val stadiumItems: List<PlaceStadiumItem> =
-                        games
-                            .map { game: GameWithCheckInDto -> PlaceStadiumItem(game.stadium.id, game.stadium.name) }
-                            .distinctBy { it.id }
-                    _stadiums.value = stadiumItems
-
-                    // 이미 선택된 구장이 있다면(탭 재진입 등) 목록만 갱신하고 사용자의 선택은 유지한다.
-                    if (_selectedStadiumId.value != null) return@onSuccess
-
-                    val defaultStadiumId: Long? = resolveDefaultStadiumId(stadiumItems)
-                    if (defaultStadiumId != null) {
-                        selectStadium(defaultStadiumId)
-                    } else {
-                        _places.value = PlaceListUiState.NoStadium
-                    }
-                }.onFailure { exception: Throwable ->
-                    logger.w(exception) { "오늘 경기 구장 조회 실패" }
-                }
+            selectStadium(resolveDefaultStadiumId())
         }
     }
 
-    private suspend fun resolveDefaultStadiumId(stadiumItems: List<PlaceStadiumItem>): Long? {
-        if (stadiumItems.isEmpty()) return null
-
+    private suspend fun resolveDefaultStadiumId(): Long {
         val favoriteTeamCode: String? = memberRepository.getFavoriteTeam().getOrNull()
-        val favoriteHomeStadiumName: String? =
-            favoriteTeamCode?.let { code: String -> runCatching { Team.getByCode(code) }.getOrNull()?.homeStadiumName }
+        val favoriteHomeStadiumId: Long? =
+            favoriteTeamCode?.let { code: String -> runCatching { Team.getByCode(code) }.getOrNull()?.homeStadiumId }
 
-        val matched: PlaceStadiumItem? = stadiumItems.firstOrNull { it.name == favoriteHomeStadiumName }
-        return (matched ?: stadiumItems.first()).id
+        return favoriteHomeStadiumId ?: PLACE_STADIUMS.first().id
     }
 
     fun selectStadium(stadiumId: Long) {
