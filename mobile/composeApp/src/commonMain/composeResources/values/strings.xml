@@ -129,9 +129,7 @@
     <string name="place_detail_extra_info_title">상세 정보</string>
     <string name="place_list_empty">해당 카테고리에 등록된 장소가 없어요</string>
     <string name="place_list_error">장소 정보를 불러오지 못했어요</string>
-    <string name="place_list_retry">다시 시도</string>
     <string name="place_detail_not_found">존재하지 않는 장소예요</string>
-    <string name="place_stadium_bottom_sheet_title">구장 선택</string>
     <string name="place_stadium_empty">오늘 예정된 경기가 없어요</string>
 
     <string name="exit_dialog_title">야구보구를 종료할까요?</string>

@@ -1,20 +1,18 @@
 package com.yagubogu.ui.place
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.place.component.PlaceFilterChips
 import com.yagubogu.ui.place.component.PlaceRecommendationCard
-import com.yagubogu.ui.place.component.PlaceStadiumBottomSheet
+import com.yagubogu.ui.place.component.PlaceStadiumAccordionItem
 import com.yagubogu.ui.place.component.PlaceStadiumSelector
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceItem
@@ -38,20 +36,15 @@ import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray600
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium16
-import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.util.BackPressHandler
-import com.yagubogu.ui.util.rememberNoRippleInteractionSource
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.place_list_empty
-import yagubogu.composeapp.generated.resources.place_list_error
-import yagubogu.composeapp.generated.resources.place_list_retry
 import yagubogu.composeapp.generated.resources.place_recommendation_title
 import yagubogu.composeapp.generated.resources.place_stadium_empty
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceScreen(
     scrollToTopEvent: SharedFlow<Unit>,
@@ -64,7 +57,7 @@ fun PlaceScreen(
     val selectedStadiumId: Long? by viewModel.selectedStadiumId.collectAsStateWithLifecycle()
     val selectedCategory: PlaceCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     val placesUiState: PlaceListUiState by viewModel.places.collectAsStateWithLifecycle()
-    var isStadiumSheetVisible: Boolean by rememberSaveable { mutableStateOf(false) }
+    var isStadiumListExpanded: Boolean by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadStadiums()
@@ -77,18 +70,6 @@ fun PlaceScreen(
     }
 
     BackPressHandler()
-
-    if (isStadiumSheetVisible) {
-        PlaceStadiumBottomSheet(
-            stadiums = stadiums,
-            selectedStadiumId = selectedStadiumId,
-            onStadiumClick = { stadiumId: Long ->
-                viewModel.selectStadium(stadiumId)
-                isStadiumSheetVisible = false
-            },
-            onDismiss = { isStadiumSheetVisible = false },
-        )
-    }
 
     LazyColumn(
         state = lazyListState,
@@ -104,8 +85,43 @@ fun PlaceScreen(
                     ?: stringResource(Res.string.place_stadium_empty)
             PlaceStadiumSelector(
                 stadiumName = selectedStadiumName,
-                onClick = { isStadiumSheetVisible = true },
+                onClick = { isStadiumListExpanded = !isStadiumListExpanded },
             )
+        }
+
+        if (isStadiumListExpanded) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            if (stadiums.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.place_stadium_empty),
+                        style = PretendardMedium16,
+                        color = Gray600,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                    )
+                }
+            } else {
+                items(
+                    items = stadiums,
+                    key = { item: PlaceStadiumItem -> item.id },
+                ) { item: PlaceStadiumItem ->
+                    PlaceStadiumAccordionItem(
+                        name = item.name,
+                        isSelected = item.id == selectedStadiumId,
+                        onClick = {
+                            viewModel.selectStadium(item.id)
+                            isStadiumListExpanded = false
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
+            }
+        }
+
+        item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -164,29 +180,6 @@ fun PlaceScreen(
                         color = Gray600,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                }
-
-            is PlaceListUiState.Error ->
-                item {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = stringResource(Res.string.place_list_error),
-                            style = PretendardMedium16,
-                            color = Gray600,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(Res.string.place_list_retry),
-                            style = PretendardMedium16,
-                            color = Primary500,
-                            modifier =
-                                Modifier.clickable(
-                                    interactionSource = rememberNoRippleInteractionSource(),
-                                    indication = null,
-                                    onClick = { viewModel.retry() },
-                                ),
-                        )
-                    }
                 }
         }
     }

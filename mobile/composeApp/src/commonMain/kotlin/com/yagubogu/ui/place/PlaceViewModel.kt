@@ -76,17 +76,7 @@ class PlaceViewModel(
                     }
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "오늘 경기 구장 조회 실패" }
-                    _places.value = PlaceListUiState.Error(exception.message ?: "")
                 }
-        }
-    }
-
-    fun retry() {
-        val stadiumId: Long? = _selectedStadiumId.value
-        if (stadiumId == null) {
-            loadStadiums()
-        } else {
-            fetchPlaces(stadiumId, _selectedCategory.value)
         }
     }
 
@@ -131,7 +121,6 @@ class PlaceViewModel(
                             }
                     }.onFailure { exception: Throwable ->
                         logger.w(exception) { "플레이스 목록 조회 실패" }
-                        _places.value = PlaceListUiState.Error(exception.message ?: "")
                     }
             }
     }
