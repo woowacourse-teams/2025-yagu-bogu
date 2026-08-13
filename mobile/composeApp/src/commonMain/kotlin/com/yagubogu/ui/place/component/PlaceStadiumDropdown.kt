@@ -23,9 +23,6 @@ import com.yagubogu.ui.theme.PretendardSemiBold16
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.crop
-import org.jetbrains.compose.resources.stringResource
-import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.place_stadium_empty
 
 @Composable
 fun PlaceStadiumDropdown(
@@ -51,41 +48,27 @@ fun PlaceStadiumDropdown(
             border = BorderStroke(0.4.dp, Gray300),
             modifier = Modifier.crop(vertical = 8.dp),
         ) {
-            if (stadiums.isEmpty()) {
+            stadiums.forEach { stadium: PlaceStadiumItem ->
+                val isSelected: Boolean = stadium.id == selectedStadiumId
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = stringResource(Res.string.place_stadium_empty),
-                            style = PretendardRegular16.copy(color = Gray500),
+                            text = stadium.name,
+                            style =
+                                if (isSelected) {
+                                    PretendardSemiBold16.copy(color = Primary500)
+                                } else {
+                                    PretendardRegular16.copy(color = Gray500)
+                                },
                         )
                     },
-                    onClick = { isExpanded = false },
+                    onClick = {
+                        onStadiumClick(stadium.id)
+                        isExpanded = false
+                    },
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                     modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
                 )
-            } else {
-                stadiums.forEach { stadium: PlaceStadiumItem ->
-                    val isSelected: Boolean = stadium.id == selectedStadiumId
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = stadium.name,
-                                style =
-                                    if (isSelected) {
-                                        PretendardSemiBold16.copy(color = Primary500)
-                                    } else {
-                                        PretendardRegular16.copy(color = Gray500)
-                                    },
-                            )
-                        },
-                        onClick = {
-                            onStadiumClick(stadium.id)
-                            isExpanded = false
-                        },
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                        modifier = Modifier.crop(horizontal = 0.dp, vertical = 8.dp),
-                    )
-                }
             }
         }
     }

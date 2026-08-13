@@ -29,9 +29,7 @@ import com.yagubogu.ui.place.model.PlaceItem
 import com.yagubogu.ui.place.model.PlaceListUiState
 import com.yagubogu.ui.place.model.PlaceStadiumItem
 import com.yagubogu.ui.theme.Gray050
-import com.yagubogu.ui.theme.Gray600
 import com.yagubogu.ui.theme.PretendardBold20
-import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.util.BackPressHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,7 +37,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.place_recommendation_title
-import yagubogu.composeapp.generated.resources.place_stadium_empty
 
 @Composable
 fun PlaceScreen(
@@ -102,8 +99,7 @@ private fun PlaceScreen(
     ) {
         item {
             val selectedStadiumName: String =
-                stadiums.firstOrNull { it.id == selectedStadiumId }?.name
-                    ?: stringResource(Res.string.place_stadium_empty)
+                stadiums.firstOrNull { it.id == selectedStadiumId }?.name.orEmpty()
             PlaceStadiumDropdown(
                 stadiumName = selectedStadiumName,
                 stadiums = stadiums,
@@ -152,15 +148,7 @@ private fun PlaceScreen(
 
             PlaceListUiState.Empty -> Unit
 
-            PlaceListUiState.NoStadium ->
-                item {
-                    Text(
-                        text = stringResource(Res.string.place_stadium_empty),
-                        style = PretendardMedium16,
-                        color = Gray600,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+            PlaceListUiState.NoStadium -> Unit
         }
     }
 }
