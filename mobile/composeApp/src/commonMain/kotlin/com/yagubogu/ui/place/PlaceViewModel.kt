@@ -9,7 +9,7 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.place.PlaceRepository
 import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
-import com.yagubogu.domain.model.homeStadiumId
+import com.yagubogu.domain.model.homeStadiumName
 import com.yagubogu.ui.mapper.toApiCategory
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.place.model.PLACE_STADIUMS
@@ -59,10 +59,11 @@ class PlaceViewModel(
 
     private suspend fun resolveDefaultStadiumId(): Long {
         val favoriteTeamCode: String? = memberRepository.getFavoriteTeam().getOrNull()
-        val favoriteHomeStadiumId: Long? =
-            favoriteTeamCode?.let { code: String -> runCatching { Team.getByCode(code) }.getOrNull()?.homeStadiumId }
+        val favoriteHomeStadiumName: String? =
+            favoriteTeamCode?.let { code: String -> runCatching { Team.getByCode(code) }.getOrNull()?.homeStadiumName }
 
-        return favoriteHomeStadiumId ?: PLACE_STADIUMS.first().id
+        val matched: PlaceStadiumItem? = PLACE_STADIUMS.firstOrNull { it.name == favoriteHomeStadiumName }
+        return (matched ?: PLACE_STADIUMS.first()).id
     }
 
     fun selectStadium(stadiumId: Long) {
