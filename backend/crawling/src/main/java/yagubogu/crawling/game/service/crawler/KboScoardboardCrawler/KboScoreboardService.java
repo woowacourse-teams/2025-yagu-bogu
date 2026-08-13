@@ -128,7 +128,8 @@ public class KboScoreboardService {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        int transformedCount = crawledGames.isEmpty() ? 0 : gameEtlService.transformPendingDateRange(date, date);
+        // Admin 복구 요청은 Bronze 변경 여부와 무관하게 해당 날짜 Silver를 강제로 원본과 맞춘다.
+        int transformedCount = gameEtlService.reprocessDate(date);
         int skippedCount = Math.max(0, crawledGames.size() - savedCount);
 
         log.info("[GAME_DATE_CRAWL] date={}, matched={}, saved={}, skipped={}, transformed={}",

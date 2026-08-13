@@ -3,6 +3,8 @@ package com.yagubogu.game.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -117,5 +119,60 @@ class GameEtlServiceTest {
         assertThat(existingGame.getAwayScore()).isZero();
         assertThat(existingGame.getGameState()).isEqualTo(GameState.COMPLETED);
         assertThat(bronzeGame.getEtlProcessedAt()).isNotNull();
+    }
+
+    @DisplayName("Admin 강제 재처리는 ETL 완료된 Bronze로 gameCode가 같은 Silver의 정합성을 복구한다")
+    @Test
+    void reprocessCompletedBronzeByGameCode() {
+        LocalDate date = LocalDate.of(2026, 8, 13);
+        String gameCode = "20260813HHOB0";
+        Team homeTeam = new Team("두산 베어스", "두산", "OB", TeamStatus.ACTIVE);
+        Team awayTeam = new Team("한화 이글스", "한화", "HH", TeamStatus.ACTIVE);
+        Stadium stadium = new Stadium("서울종합운동장 야구장", "잠실", "잠실", 0.0, 0.0, StadiumLevel.MAIN);
+        Game inconsistentGame = new Game(
+                stadium, homeTeam, awayTeam, date, LocalTime.of(18, 30), gameCode,
+                9, 6, null, null, "최민석", "류현진", GameState.CANCELED
+        );
+        String payload = """
+                {
+                  "gameCode":"20260813HHOB0",
+                  "date":"2026-08-13",
+                  "status":"경기종료",
+                  "stadium":"잠실",
+                  "startTime":"19:00:00",
+                  "awayScore":6,
+                  "homeScore":9,
+                  "winningPitcher":"최민석",
+                  "losingPitcher":"류현진",
+                  "awayTeamScoreboard":{"name":"한화","runs":6,"hits":8,"errors":0,"basesOnBalls":2,"inningScores":[]},
+                  "homeTeamScoreboard":{"name":"두산","runs":9,"hits":12,"errors":0,"basesOnBalls":4,"inningScores":[]}
+                }
+                """;
+        BronzeGame processedBronze = new BronzeGame(
+                gameCode, date, "잠실", "두산", "한화", LocalTime.of(19, 0),
+                LocalDateTime.of(2026, 8, 13, 23, 0), payload, "hash"
+        );
+        ReflectionTestUtils.setField(processedBronze, "id", 2L);
+        processedBronze.markEtlProcessed(LocalDateTime.of(2026, 8, 13, 23, 1));
+
+        when(bronzeGameRepository.findByDate(date)).thenReturn(java.util.List.of(processedBronze));
+        when(bronzeGameRepository.findById(2L)).thenReturn(Optional.of(processedBronze));
+        when(teamRepository.findByShortName("두산")).thenReturn(Optional.of(homeTeam));
+        when(teamRepository.findByShortName("한화")).thenReturn(Optional.of(awayTeam));
+        when(stadiumRepository.findByLocation("잠실")).thenReturn(Optional.of(stadium));
+        when(gameRepository.findByGameCode(gameCode)).thenReturn(Optional.of(inconsistentGame));
+
+        int transformed = gameEtlService.reprocessDate(date);
+
+        assertThat(transformed).isEqualTo(1);
+        assertThat(inconsistentGame.getStartAt()).isEqualTo(LocalTime.of(19, 0));
+        assertThat(inconsistentGame.getGameCode()).isEqualTo(gameCode);
+        assertThat(inconsistentGame.getHomeScore()).isEqualTo(9);
+        assertThat(inconsistentGame.getAwayScore()).isEqualTo(6);
+        assertThat(inconsistentGame.getHomePitcher()).isEqualTo("최민석");
+        assertThat(inconsistentGame.getAwayPitcher()).isEqualTo("류현진");
+        assertThat(inconsistentGame.getGameState()).isEqualTo(GameState.COMPLETED);
+        assertThat(processedBronze.getEtlProcessedAt()).isNotNull();
+        verify(gameRepository, never()).save(any(Game.class));
     }
 }

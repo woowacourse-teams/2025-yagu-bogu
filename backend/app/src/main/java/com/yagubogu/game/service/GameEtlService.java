@@ -58,17 +58,30 @@ public class GameEtlService {
      * @return 처리된 게임 수
      */
     public int transformBronzeToSilver(final LocalDateTime since) {
-        return transformPendingGames(bronzeGameRepository.findPendingEtl(since));
+        return transformGames(bronzeGameRepository.findPendingEtl(since), false);
     }
 
     public int transformPendingDateRange(final LocalDate startDate, final LocalDate endDate) {
-        return transformPendingGames(bronzeGameRepository.findPendingEtlByDateRange(startDate, endDate));
+        return transformGames(bronzeGameRepository.findPendingEtlByDateRange(startDate, endDate), false);
     }
 
-    private int transformPendingGames(final List<BronzeGame> bronzeGames) {
+    /**
+     * Admin 정합성 복구용 강제 재처리.
+     * Bronze의 ETL 완료 여부와 경기 상태 전이 규칙에 관계없이 해당 날짜 Silver를 원본과 맞춘다.
+     */
+    public int reprocessDate(final LocalDate date) {
+        List<BronzeGame> bronzeGames = bronzeGameRepository.findByDate(date);
+        log.info("[ETL_REPROCESS] Starting forced reconciliation: date={}, games={}", date, bronzeGames.size());
+        int transformedCount = transformGames(bronzeGames, true);
+        log.info("[ETL_REPROCESS] Completed forced reconciliation: date={}, transformed={}",
+                date, transformedCount);
+        return transformedCount;
+    }
+
+    private int transformGames(final List<BronzeGame> bronzeGames, final boolean forceReconcile) {
 
         if (bronzeGames.isEmpty()) {
-            log.debug("No pending bronze data to transform");
+            log.debug("No bronze data to transform");
             return 0;
         }
 
@@ -106,7 +119,7 @@ public class GameEtlService {
                 try {
                     final int order = doubleHeaderOrderMap.getOrDefault(bronzeGame, 0);
                     Boolean transformed = transactionTemplate.execute(status ->
-                            transformAndMarkProcessed(bronzeGame.getId(), order)
+                            transformAndMarkProcessed(bronzeGame.getId(), order, forceReconcile)
                     );
                     if (Boolean.TRUE.equals(transformed)) {
                         transformedCount++;
@@ -122,11 +135,12 @@ public class GameEtlService {
         return transformedCount;
     }
 
-    private boolean transformAndMarkProcessed(final Long bronzeGameId, final int doubleHeaderOrder) {
+    private boolean transformAndMarkProcessed(final Long bronzeGameId, final int doubleHeaderOrder,
+                                              final boolean forceReconcile) {
         final BronzeGame bronzeGame = bronzeGameRepository.findById(bronzeGameId)
                 .orElseThrow(() -> new NotFoundException("Bronze game not found: " + bronzeGameId));
         try {
-            transformSingleGame(bronzeGame, doubleHeaderOrder);
+            transformSingleGame(bronzeGame, doubleHeaderOrder, forceReconcile);
             bronzeGame.markEtlProcessed(LocalDateTime.now(clock));
             return true;
         } catch (Exception e) {
@@ -179,7 +193,7 @@ public class GameEtlService {
 
             final int doubleHeaderOrder = order;
             transactionTemplate.executeWithoutResult(status ->
-                    transformAndMarkProcessed(targetGame.getId(), doubleHeaderOrder)
+                    transformAndMarkProcessed(targetGame.getId(), doubleHeaderOrder, false)
             );
             log.info("Immediate ETL completed: date={}, home={}, away={}, order={}",
                     date, homeTeam, awayTeam, order);
@@ -278,7 +292,8 @@ public class GameEtlService {
      * 단일 BronzeGame을 Silver(Game)로 변환
      * gameCode는 해당 게임의 더블헤더 순서를 미리 계산하여 생성
      */
-    private void transformSingleGame(final BronzeGame bronzeGame, final int doubleHeaderOrder) throws Exception {
+    private void transformSingleGame(final BronzeGame bronzeGame, final int doubleHeaderOrder,
+                                     final boolean forceReconcile) throws Exception {
         // 1. Extract: Bronze에서 JSON 파싱
         final JsonNode json = objectMapper.readTree(bronzeGame.getPayload());
 
@@ -344,7 +359,8 @@ public class GameEtlService {
                             date, startTime, gameCode,
                             homeScore, awayScore,
                             homeScoreBoard, awayScoreBoard,
-                            homePitcher, awayPitcher, gameState
+                            homePitcher, awayPitcher, gameState,
+                            forceReconcile
                     );
                     log.debug("[ETL] Updated Game: stadium={}, date={}, startTime={}, gameCode={}",
                             stadium, date, startTime, gameCode);
@@ -482,19 +498,31 @@ public class GameEtlService {
             Integer homeScore, Integer awayScore,
             ScoreBoard homeScoreBoard, ScoreBoard awayScoreBoard,
             String homePitcher, String awayPitcher,
-            GameState gameState
+            GameState gameState,
+            boolean forceReconcile
     ) {
         ScoreBoard updatedHome = resolveScoreBoard(existing.getHomeScoreBoard(), homeScoreBoard);
         ScoreBoard updatedAway = resolveScoreBoard(existing.getAwayScoreBoard(), awayScoreBoard);
 
-        existing.update(
-                stadium, homeTeam, awayTeam,
-                date, startTime, gameCode,
-                homeScore, awayScore,
-                updatedHome, updatedAway,
-                homePitcher, awayPitcher,
-                gameState
-        );
+        if (forceReconcile) {
+            existing.reconcile(
+                    stadium, homeTeam, awayTeam,
+                    date, startTime, gameCode,
+                    homeScore, awayScore,
+                    updatedHome, updatedAway,
+                    homePitcher, awayPitcher,
+                    gameState
+            );
+        } else {
+            existing.update(
+                    stadium, homeTeam, awayTeam,
+                    date, startTime, gameCode,
+                    homeScore, awayScore,
+                    updatedHome, updatedAway,
+                    homePitcher, awayPitcher,
+                    gameState
+            );
+        }
         return existing;
     }
 
