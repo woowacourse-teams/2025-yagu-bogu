@@ -9,6 +9,7 @@ import com.yagubogu.data.dto.response.place.PlacesResponse
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.place.PlaceRepository
+import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.model.homeStadiumName
 import com.yagubogu.ui.mapper.toApiCategory
@@ -71,7 +72,7 @@ class PlaceViewModel(
                     if (defaultStadiumId != null) {
                         selectStadium(defaultStadiumId)
                     } else {
-                        _places.value = PlaceListUiState.Empty
+                        _places.value = PlaceListUiState.NoStadium
                     }
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "오늘 경기 구장 조회 실패" }
@@ -158,7 +159,7 @@ class PlaceViewModel(
                     }.onFailure { exception: Throwable ->
                         logger.w(exception) { "플레이스 상세 조회 실패" }
                         _placeDetail.value =
-                            if (exception.message?.contains("404") == true) {
+                            if (exception is ApiException.NotFound) {
                                 PlaceDetailUiState.NotFound
                             } else {
                                 PlaceDetailUiState.Error(exception.message ?: "")

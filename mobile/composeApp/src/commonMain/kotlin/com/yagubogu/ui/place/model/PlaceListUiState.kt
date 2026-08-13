@@ -9,6 +9,8 @@ sealed interface PlaceListUiState {
 
     data object Empty : PlaceListUiState
 
+    data object NoStadium : PlaceListUiState
+
     data class Error(
         val message: String,
     ) : PlaceListUiState

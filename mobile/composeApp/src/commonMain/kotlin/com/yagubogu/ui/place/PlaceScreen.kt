@@ -156,6 +156,16 @@ fun PlaceScreen(
                     )
                 }
 
+            PlaceListUiState.NoStadium ->
+                item {
+                    Text(
+                        text = stringResource(Res.string.place_stadium_empty),
+                        style = PretendardMedium16,
+                        color = Gray600,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
             is PlaceListUiState.Error ->
                 item {
                     Column(modifier = Modifier.fillMaxWidth()) {

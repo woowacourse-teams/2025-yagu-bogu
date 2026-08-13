@@ -132,13 +132,21 @@ fun PlaceDetailResponse.toUiModel(distanceMeters: Int?): PlaceDetailUiModel {
         longitude = mapX,
         tel = tel,
         imageUrl = imageUrl,
-        overview = overview,
-        homepage = homepage,
+        overview = stripHtml(overview),
+        homepage = stripHtml(homepage),
         distanceMeters = distanceMeters,
         businessHours = decoded.businessHours,
         rows = decoded.rows,
     )
 }
+
+private fun stripHtml(raw: String?): String? =
+    raw
+        ?.replace(Regex("<[^>]*>"), "")
+        ?.replace("&amp;", "&")
+        ?.replace("&nbsp;", " ")
+        ?.trim()
+        ?.takeIf { it.isNotBlank() }
 
 private data class DecodedPlaceDetail(
     val businessHours: String?,
@@ -214,11 +222,13 @@ private fun AttractionDetailDto.toDecoded(): DecodedPlaceDetail =
     )
 
 private fun LodgingDetailDto.toDecoded(): DecodedPlaceDetail {
+    val filteredCheckinTime: String? = checkintime?.takeIf { it.isNotBlank() }
+    val filteredCheckoutTime: String? = checkouttime?.takeIf { it.isNotBlank() }
     val businessHours: String? =
         when {
-            checkintime != null && checkouttime != null -> "$checkintime ~ $checkouttime"
-            checkintime != null -> checkintime
-            checkouttime != null -> checkouttime
+            filteredCheckinTime != null && filteredCheckoutTime != null -> "$filteredCheckinTime ~ $filteredCheckoutTime"
+            filteredCheckinTime != null -> filteredCheckinTime
+            filteredCheckoutTime != null -> filteredCheckoutTime
             else -> null
         }
     return DecodedPlaceDetail(
