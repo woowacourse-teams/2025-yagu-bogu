@@ -273,7 +273,7 @@ private fun PlaceLocationSection(
                     .height(198.dp)
                     .clip(RoundedCornerShape(12.dp)),
         )
-        if (placeDetail.address != null) {
+        if (!placeDetail.address.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
