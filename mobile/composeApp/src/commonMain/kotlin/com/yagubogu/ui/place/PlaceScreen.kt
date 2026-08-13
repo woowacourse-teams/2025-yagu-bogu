@@ -173,7 +173,7 @@ fun PlaceScreen(
                                 Modifier.clickable(
                                     interactionSource = rememberNoRippleInteractionSource(),
                                     indication = null,
-                                    onClick = { viewModel.selectCategory(selectedCategory) },
+                                    onClick = { viewModel.retry() },
                                 ),
                         )
                     }

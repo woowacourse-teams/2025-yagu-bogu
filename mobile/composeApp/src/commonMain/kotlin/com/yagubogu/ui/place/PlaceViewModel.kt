@@ -64,6 +64,9 @@ class PlaceViewModel(
                             .distinctBy { it.id }
                     _stadiums.value = stadiumItems
 
+                    // 이미 선택된 구장이 있다면(탭 재진입 등) 목록만 갱신하고 사용자의 선택은 유지한다.
+                    if (_selectedStadiumId.value != null) return@onSuccess
+
                     val defaultStadiumId: Long? = resolveDefaultStadiumId(stadiumItems)
                     if (defaultStadiumId != null) {
                         selectStadium(defaultStadiumId)
@@ -74,6 +77,15 @@ class PlaceViewModel(
                     logger.w(exception) { "오늘 경기 구장 조회 실패" }
                     _places.value = PlaceListUiState.Error(exception.message ?: "")
                 }
+        }
+    }
+
+    fun retry() {
+        val stadiumId: Long? = _selectedStadiumId.value
+        if (stadiumId == null) {
+            loadStadiums()
+        } else {
+            fetchPlaces(stadiumId, _selectedCategory.value)
         }
     }
 
