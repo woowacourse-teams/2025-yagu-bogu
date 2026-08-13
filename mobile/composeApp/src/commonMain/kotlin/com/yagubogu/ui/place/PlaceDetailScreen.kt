@@ -29,12 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.common.component.PlaceMapView
+import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceDetailRow
 import com.yagubogu.ui.place.model.PlaceDetailUiModel
 import com.yagubogu.ui.place.model.PlaceDetailUiState
@@ -68,6 +70,9 @@ import yagubogu.composeapp.generated.resources.ic_walk
 import yagubogu.composeapp.generated.resources.place_detail_business_hours
 import yagubogu.composeapp.generated.resources.place_detail_copy_address_content_description
 import yagubogu.composeapp.generated.resources.place_detail_extra_info_title
+import yagubogu.composeapp.generated.resources.place_detail_field_firstmenu
+import yagubogu.composeapp.generated.resources.place_detail_field_packing
+import yagubogu.composeapp.generated.resources.place_detail_field_smoking
 import yagubogu.composeapp.generated.resources.place_detail_homepage_title
 import yagubogu.composeapp.generated.resources.place_detail_location_title
 import yagubogu.composeapp.generated.resources.place_detail_not_found
@@ -90,6 +95,21 @@ fun PlaceDetailScreen(
         viewModel.loadPlaceDetail(placeId, distanceMeters)
     }
 
+    PlaceDetailScreen(
+        placeName = placeName,
+        placeDetailUiState = placeDetailUiState,
+        onBackClick = onBackClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun PlaceDetailScreen(
+    placeName: String,
+    placeDetailUiState: PlaceDetailUiState,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             DefaultToolbar(
@@ -453,5 +473,84 @@ private fun PlaceCategoryLabel(
             modifier
                 .background(Gray100, RoundedCornerShape(8.dp))
                 .padding(horizontal = 8.dp, vertical = 4.dp),
+    )
+}
+
+private val PLACE_DETAIL_UI_MODEL: PlaceDetailUiModel =
+    PlaceDetailUiModel(
+        id = 1L,
+        category = PlaceCategory.FOOD,
+        name = "잠실 원조 순대국밥",
+        address = "서울 송파구 올림픽로 25",
+        latitude = 37.5122,
+        longitude = 127.0715,
+        tel = "02-123-4567",
+        imageUrl = "https://picsum.photos/seed/place-detail-preview/800/600",
+        overview = "경기 전후로 팬들이 가장 많이 찾는 순대국밥 명소입니다. 바삭한 튀김과 깊은 소스 맛으로 이미 소문난 맛집입니다.",
+        homepage = "http://example-restaurant.com",
+        distanceMeters = 320,
+        businessHours = "11:00~22:00",
+        rows =
+            listOf(
+                PlaceDetailRow(labelRes = Res.string.place_detail_field_firstmenu, value = "순대국밥"),
+                PlaceDetailRow(labelRes = Res.string.place_detail_field_smoking, value = "불가능"),
+                PlaceDetailRow(labelRes = Res.string.place_detail_field_packing, value = "가능"),
+            ),
+    )
+
+private val PLACE_DETAIL_UI_MODEL_MINIMAL: PlaceDetailUiModel =
+    PlaceDetailUiModel(
+        id = 2L,
+        category = PlaceCategory.TOUR,
+        name = "롯데월드타워",
+        address = null,
+        latitude = 37.5125,
+        longitude = 127.1025,
+        tel = null,
+        imageUrl = null,
+        overview = null,
+        homepage = null,
+        distanceMeters = null,
+        businessHours = null,
+        rows = emptyList(),
+    )
+
+@Preview("플레이스 상세 화면")
+@Composable
+private fun PlaceDetailScreenPreview() {
+    PlaceDetailScreen(
+        placeName = PLACE_DETAIL_UI_MODEL.name,
+        placeDetailUiState = PlaceDetailUiState.Success(PLACE_DETAIL_UI_MODEL),
+        onBackClick = {},
+    )
+}
+
+@Preview("플레이스 상세 화면 - 최소 정보")
+@Composable
+private fun PlaceDetailScreenMinimalPreview() {
+    PlaceDetailScreen(
+        placeName = PLACE_DETAIL_UI_MODEL_MINIMAL.name,
+        placeDetailUiState = PlaceDetailUiState.Success(PLACE_DETAIL_UI_MODEL_MINIMAL),
+        onBackClick = {},
+    )
+}
+
+@Preview("플레이스 상세 화면 - 로딩")
+@Composable
+private fun PlaceDetailScreenLoadingPreview() {
+    PlaceDetailScreen(
+        placeName = "잠실 원조 순대국밥",
+        placeDetailUiState = PlaceDetailUiState.Loading,
+        onBackClick = {},
+    )
+}
+
+@Preview("플레이스 상세 화면 - 존재하지 않음")
+@Composable
+private fun PlaceDetailScreenNotFoundPreview() {
+    PlaceDetailScreen(
+        placeName = "잠실 원조 순대국밥",
+        placeDetailUiState = PlaceDetailUiState.NotFound,
+        onBackClick = {},
     )
 }

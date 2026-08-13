@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.place.component.PlaceFilterChips
@@ -37,6 +38,7 @@ import com.yagubogu.ui.theme.Gray600
 import com.yagubogu.ui.theme.PretendardBold20
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.util.BackPressHandler
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -52,16 +54,43 @@ fun PlaceScreen(
     modifier: Modifier = Modifier,
     viewModel: PlaceViewModel = koinViewModel(),
 ) {
-    val lazyListState: LazyListState = rememberLazyListState()
     val stadiums: List<PlaceStadiumItem> by viewModel.stadiums.collectAsStateWithLifecycle()
     val selectedStadiumId: Long? by viewModel.selectedStadiumId.collectAsStateWithLifecycle()
     val selectedCategory: PlaceCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     val placesUiState: PlaceListUiState by viewModel.places.collectAsStateWithLifecycle()
-    var isStadiumListExpanded: Boolean by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadStadiums()
     }
+
+    PlaceScreen(
+        stadiums = stadiums,
+        selectedStadiumId = selectedStadiumId,
+        selectedCategory = selectedCategory,
+        placesUiState = placesUiState,
+        onStadiumClick = viewModel::selectStadium,
+        onCategoryClick = viewModel::selectCategory,
+        onPlaceItemClick = onPlaceItemClick,
+        modifier = modifier,
+        scrollToTopEvent = scrollToTopEvent,
+    )
+}
+
+@Composable
+private fun PlaceScreen(
+    stadiums: List<PlaceStadiumItem>,
+    selectedStadiumId: Long?,
+    selectedCategory: PlaceCategory,
+    placesUiState: PlaceListUiState,
+    onStadiumClick: (Long) -> Unit,
+    onCategoryClick: (PlaceCategory) -> Unit,
+    onPlaceItemClick: (Long, String, Int?) -> Unit,
+    modifier: Modifier = Modifier,
+    scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
+    initiallyStadiumListExpanded: Boolean = false,
+) {
+    val lazyListState: LazyListState = rememberLazyListState()
+    var isStadiumListExpanded: Boolean by rememberSaveable { mutableStateOf(initiallyStadiumListExpanded) }
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
@@ -112,7 +141,7 @@ fun PlaceScreen(
                         name = item.name,
                         isSelected = item.id == selectedStadiumId,
                         onClick = {
-                            viewModel.selectStadium(item.id)
+                            onStadiumClick(item.id)
                             isStadiumListExpanded = false
                         },
                         modifier = Modifier.padding(bottom = 8.dp),
@@ -128,7 +157,7 @@ fun PlaceScreen(
         item {
             PlaceFilterChips(
                 selectedCategory = selectedCategory,
-                onCategoryClick = { category: PlaceCategory -> viewModel.selectCategory(category) },
+                onCategoryClick = onCategoryClick,
             )
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -183,4 +212,102 @@ fun PlaceScreen(
                 }
         }
     }
+}
+
+private val PLACE_STADIUM_ITEMS: List<PlaceStadiumItem> =
+    listOf(
+        PlaceStadiumItem(id = 1L, name = "잠실야구장"),
+        PlaceStadiumItem(id = 2L, name = "고척스카이돔"),
+        PlaceStadiumItem(id = 3L, name = "수원 케이티위즈파크"),
+    )
+
+private val PLACE_ITEMS: List<PlaceItem> =
+    listOf(
+        PlaceItem(
+            id = 1L,
+            category = PlaceCategory.FOOD,
+            name = "잠실 원조 순대국밥",
+            distance = "도보 320m",
+            distanceMeters = 320,
+            imageUrl = null,
+        ),
+        PlaceItem(
+            id = 2L,
+            category = PlaceCategory.CAFE,
+            name = "카페 베이스런",
+            distance = "도보 810m",
+            distanceMeters = 810,
+            imageUrl = "https://picsum.photos/seed/place-preview-cafe/400/300",
+        ),
+    )
+
+@Preview("플레이스 목록 화면")
+@Composable
+private fun PlaceScreenPreview() {
+    PlaceScreen(
+        stadiums = PLACE_STADIUM_ITEMS,
+        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        selectedCategory = PlaceCategory.FOOD,
+        placesUiState = PlaceListUiState.Success(PLACE_ITEMS),
+        onStadiumClick = {},
+        onCategoryClick = {},
+        onPlaceItemClick = { _, _, _ -> },
+    )
+}
+
+@Preview("플레이스 목록 화면 - 구장 선택 펼침")
+@Composable
+private fun PlaceScreenStadiumExpandedPreview() {
+    PlaceScreen(
+        stadiums = PLACE_STADIUM_ITEMS,
+        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        selectedCategory = PlaceCategory.FOOD,
+        placesUiState = PlaceListUiState.Success(PLACE_ITEMS),
+        onStadiumClick = {},
+        onCategoryClick = {},
+        onPlaceItemClick = { _, _, _ -> },
+        initiallyStadiumListExpanded = true,
+    )
+}
+
+@Preview("플레이스 목록 화면 - 로딩")
+@Composable
+private fun PlaceScreenLoadingPreview() {
+    PlaceScreen(
+        stadiums = PLACE_STADIUM_ITEMS,
+        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        selectedCategory = PlaceCategory.STAY,
+        placesUiState = PlaceListUiState.Loading,
+        onStadiumClick = {},
+        onCategoryClick = {},
+        onPlaceItemClick = { _, _, _ -> },
+    )
+}
+
+@Preview("플레이스 목록 화면 - 빈 카테고리")
+@Composable
+private fun PlaceScreenEmptyPreview() {
+    PlaceScreen(
+        stadiums = PLACE_STADIUM_ITEMS,
+        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
+        selectedCategory = PlaceCategory.SHOW,
+        placesUiState = PlaceListUiState.Empty,
+        onStadiumClick = {},
+        onCategoryClick = {},
+        onPlaceItemClick = { _, _, _ -> },
+    )
+}
+
+@Preview("플레이스 목록 화면 - 오늘 경기 없음")
+@Composable
+private fun PlaceScreenNoStadiumPreview() {
+    PlaceScreen(
+        stadiums = emptyList(),
+        selectedStadiumId = null,
+        selectedCategory = PlaceCategory.STAY,
+        placesUiState = PlaceListUiState.NoStadium,
+        onStadiumClick = {},
+        onCategoryClick = {},
+        onPlaceItemClick = { _, _, _ -> },
+    )
 }
