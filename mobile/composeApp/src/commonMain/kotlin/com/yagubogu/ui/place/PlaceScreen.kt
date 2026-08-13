@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -17,9 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,8 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.place.component.PlaceFilterChips
 import com.yagubogu.ui.place.component.PlaceRecommendationCard
-import com.yagubogu.ui.place.component.PlaceStadiumAccordionItem
-import com.yagubogu.ui.place.component.PlaceStadiumSelector
+import com.yagubogu.ui.place.component.PlaceStadiumDropdown
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceItem
 import com.yagubogu.ui.place.model.PlaceListUiState
@@ -86,10 +81,8 @@ private fun PlaceScreen(
     onPlaceItemClick: (Long, String, Int?) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
-    initiallyStadiumListExpanded: Boolean = false,
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
-    var isStadiumListExpanded: Boolean by rememberSaveable { mutableStateOf(initiallyStadiumListExpanded) }
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
@@ -111,45 +104,12 @@ private fun PlaceScreen(
             val selectedStadiumName: String =
                 stadiums.firstOrNull { it.id == selectedStadiumId }?.name
                     ?: stringResource(Res.string.place_stadium_empty)
-            PlaceStadiumSelector(
+            PlaceStadiumDropdown(
                 stadiumName = selectedStadiumName,
-                onClick = { isStadiumListExpanded = !isStadiumListExpanded },
+                stadiums = stadiums,
+                selectedStadiumId = selectedStadiumId,
+                onStadiumClick = onStadiumClick,
             )
-        }
-
-        if (isStadiumListExpanded) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            if (stadiums.isEmpty()) {
-                item {
-                    Text(
-                        text = stringResource(Res.string.place_stadium_empty),
-                        style = PretendardMedium16,
-                        color = Gray600,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                    )
-                }
-            } else {
-                items(
-                    items = stadiums,
-                    key = { item: PlaceStadiumItem -> "stadium-${item.id}" },
-                ) { item: PlaceStadiumItem ->
-                    PlaceStadiumAccordionItem(
-                        name = item.name,
-                        isSelected = item.id == selectedStadiumId,
-                        onClick = {
-                            onStadiumClick(item.id)
-                            isStadiumListExpanded = false
-                        },
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
-                }
-            }
-        }
-
-        item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -243,21 +203,6 @@ private fun PlaceScreenPreview() {
         onStadiumClick = {},
         onCategoryClick = {},
         onPlaceItemClick = { _, _, _ -> },
-    )
-}
-
-@Preview("플레이스 목록 화면 - 구장 선택 펼침")
-@Composable
-private fun PlaceScreenStadiumExpandedPreview() {
-    PlaceScreen(
-        stadiums = PLACE_STADIUM_ITEMS,
-        selectedStadiumId = PLACE_STADIUM_ITEMS.first().id,
-        selectedCategory = PlaceCategory.FOOD,
-        placesUiState = PlaceListUiState.Success(PLACE_ITEMS),
-        onStadiumClick = {},
-        onCategoryClick = {},
-        onPlaceItemClick = { _, _, _ -> },
-        initiallyStadiumListExpanded = true,
     )
 }
 
