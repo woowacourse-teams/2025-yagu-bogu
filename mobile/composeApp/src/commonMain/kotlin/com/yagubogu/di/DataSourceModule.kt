@@ -13,6 +13,7 @@ import com.yagubogu.data.datasource.game.GameRemoteDataSource
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
 import com.yagubogu.data.datasource.place.PlaceDataSource
+import com.yagubogu.data.datasource.place.PlaceMockDataSource
 import com.yagubogu.data.datasource.place.PlaceRemoteDataSource
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
@@ -31,13 +32,21 @@ import org.koin.dsl.module
 
 expect fun Module.registerPlatformDataSources()
 
+// 백엔드 /api/v1/places API가 아직 배포되지 않아 임시로 목 데이터를 쓴다.
+// 실제 API 배포 후 false로 되돌린다.
+private const val USE_PLACE_MOCK_DATA = true
+
 val datasourceModule =
     module {
         singleOf(::AuthRemoteDataSource) { bind<AuthDataSource>() }
 
         singleOf(::MemberRemoteDataSource) { bind<MemberDataSource>() }
 
-        singleOf(::PlaceRemoteDataSource) { bind<PlaceDataSource>() }
+        if (USE_PLACE_MOCK_DATA) {
+            singleOf(::PlaceMockDataSource) { bind<PlaceDataSource>() }
+        } else {
+            singleOf(::PlaceRemoteDataSource) { bind<PlaceDataSource>() }
+        }
 
         singleOf(::CheckInRemoteDataSource) { bind<CheckInDataSource>() }
 
