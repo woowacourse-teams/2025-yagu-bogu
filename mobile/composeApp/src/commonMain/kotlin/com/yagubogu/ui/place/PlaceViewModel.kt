@@ -94,7 +94,8 @@ class PlaceViewModel(
         if (stadiumItems.isEmpty()) return null
 
         val favoriteTeamCode: String? = memberRepository.getFavoriteTeam().getOrNull()
-        val favoriteHomeStadiumName: String? = favoriteTeamCode?.let { code: String -> Team.getByCode(code).homeStadiumName }
+        val favoriteHomeStadiumName: String? =
+            favoriteTeamCode?.let { code: String -> runCatching { Team.getByCode(code) }.getOrNull()?.homeStadiumName }
 
         val matched: PlaceStadiumItem? = stadiumItems.firstOrNull { it.name == favoriteHomeStadiumName }
         return (matched ?: stadiumItems.first()).id
