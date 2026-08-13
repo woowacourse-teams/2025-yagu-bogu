@@ -5,5 +5,6 @@ data class PlaceItem(
     val category: PlaceCategory,
     val name: String,
     val distance: String,
+    val distanceMeters: Int?,
     val imageUrl: String?,
 )

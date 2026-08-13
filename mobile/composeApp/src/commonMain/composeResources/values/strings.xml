@@ -45,8 +45,6 @@
     <string name="place_category_show">공연</string>
     <string name="place_category_cafe">카페</string>
     <string name="place_recommendation_title">추천 인기 플레이스</string>
-    <string name="place_sort_distance">거리순</string>
-    <string name="place_sort_popular">인기순</string>
     <string name="place_detail_title">%1$s 플레이스</string>
     <string name="place_detail_visitor_standard">주변 방문자 기준</string>
     <string name="place_detail_location_title">위치</string>

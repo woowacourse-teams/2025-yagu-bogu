@@ -116,6 +116,7 @@ fun PlaceDto.toUiModel(): PlaceItem =
         category = category.toUiCategory(),
         name = title,
         distance = formatDistanceMeters(distance),
+        distanceMeters = distance,
         imageUrl = imageUrl,
     )
 
