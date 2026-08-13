@@ -49,5 +49,6 @@ sealed interface Route : NavKey {
     data class PlaceDetail(
         val placeId: Long,
         val placeName: String,
+        val distanceMeters: Int? = null,
     ) : Route
 }
