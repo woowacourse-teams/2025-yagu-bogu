@@ -81,7 +81,7 @@ class KboScoreboardServiceTest {
                 any(), any(), any(), any(), any(), any(), any()
         )).thenReturn(true);
         when(gameCenterSyncService.fetchGameCenterOnly(date)).thenReturn(gameCenter);
-        when(gameEtlService.transformPendingDateRange(date, date)).thenReturn(1);
+        when(gameEtlService.reprocessDate(date)).thenReturn(1);
 
         KboScoreboardService service = new KboScoreboardService(
                 crawler,
@@ -101,9 +101,10 @@ class KboScoreboardServiceTest {
         GameDateCrawlResponse response = service.fetchGamesByDate(date);
 
         verify(gameCenterSyncService).saveToBronzeLayer(List.of(detail));
-        verify(gameEtlService).transformPendingDateRange(date, date);
+        verify(gameEtlService).reprocessDate(date);
         assertThat(response.requested()).isEqualTo(1);
         assertThat(response.matched()).isEqualTo(1);
+        assertThat(response.transformed()).isEqualTo(1);
         assertThat(response.savedGameCodes()).containsExactly(gameCode);
         assertThat(response.completedGameCodes()).isEmpty();
     }
