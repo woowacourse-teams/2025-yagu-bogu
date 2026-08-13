@@ -84,6 +84,8 @@ class AppConfigDefaultRepository(
         )
     }
 
+    override fun isPlaceTabVisible(): Boolean = remoteDataSource.getBoolean("is_place_tab_visible")
+
     private fun Int.toExpiryMillis(): Long = clock.now().toEpochMilliseconds() + (this * 86400_000L)
 
     companion object {

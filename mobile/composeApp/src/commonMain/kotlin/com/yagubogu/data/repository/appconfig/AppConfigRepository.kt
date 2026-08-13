@@ -22,4 +22,6 @@ interface AppConfigRepository {
     )
 
     fun getPastCheckInAdConfig(): PastCheckInAdState
+
+    fun isPlaceTabVisible(): Boolean
 }

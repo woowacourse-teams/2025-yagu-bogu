@@ -31,6 +31,7 @@ import com.yagubogu.ui.main.component.MainToolbar
 import com.yagubogu.ui.navigation.model.BottomNavKey
 import com.yagubogu.ui.navigation.model.NavigationState
 import com.yagubogu.ui.navigation.model.toEntries
+import com.yagubogu.ui.place.PlaceScreen
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.stats.StatsScreen
 import com.yagubogu.ui.theme.Gray050
@@ -52,19 +53,27 @@ fun MainScreen(
     onRankingShowMoreClick: (RankingType) -> Unit,
     onLivetalkItemClick: (Long, Boolean) -> Unit,
     onAttendanceHistoryItemClick: (item: AttendanceHistoryItem) -> Unit,
+    onPlaceItemClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = koinViewModel(),
 ) {
     val selectedItem: BottomNavKey by viewModel.selectedBottomNavKey.collectAsStateWithLifecycle()
     val isLoading: Boolean by viewModel.isLoading.collectAsStateWithLifecycle()
+    val bottomNavItems: List<BottomNavKey> =
+        if (viewModel.isPlaceTabVisible) {
+            BottomNavKey.items
+        } else {
+            BottomNavKey.items.filterNot { it == BottomNavKey.Place }
+        }
 
     val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
     val scrollToTopEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
 
-    LaunchedEffect(Unit) {
-        viewModel.selectBottomNavKey(
-            navigationState.currentRoute as? BottomNavKey ?: BottomNavKey.Home,
-        )
+    LaunchedEffect(navigationState.currentRoute, viewModel.isPlaceTabVisible) {
+        val currentItem = navigationState.currentRoute as? BottomNavKey ?: BottomNavKey.Home
+        val visibleItem = currentItem.takeIf { it in bottomNavItems } ?: BottomNavKey.Home
+        viewModel.selectBottomNavKey(visibleItem)
+        if (visibleItem != currentItem) onBottomItemClick(visibleItem)
     }
 
     val selectedItemLabel: String = stringResource(selectedItem.label)
@@ -92,6 +101,7 @@ fun MainScreen(
             },
             bottomBar = {
                 MainNavigationBar(
+                    items = bottomNavItems,
                     selectedItem = selectedItem,
                     onItemClick = { item: BottomNavKey ->
                         viewModel.selectBottomNavKey(item)
@@ -140,6 +150,12 @@ fun MainScreen(
                         AttendanceHistoryScreen(
                             scrollToTopEvent = scrollToTopEvent,
                             onAttendanceHistoryItemClick = onAttendanceHistoryItemClick,
+                        )
+                    }
+                    entry<BottomNavKey.Place> {
+                        PlaceScreen(
+                            scrollToTopEvent = scrollToTopEvent,
+                            onPlaceItemClick = onPlaceItemClick,
                         )
                     }
                 }

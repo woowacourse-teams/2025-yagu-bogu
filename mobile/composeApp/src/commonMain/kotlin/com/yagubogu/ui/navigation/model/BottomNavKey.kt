@@ -8,8 +8,10 @@ import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.bottom_navigation_attendance_history
 import yagubogu.composeapp.generated.resources.bottom_navigation_home
 import yagubogu.composeapp.generated.resources.bottom_navigation_livetalk
+import yagubogu.composeapp.generated.resources.bottom_navigation_place
 import yagubogu.composeapp.generated.resources.bottom_navigation_stats
 import yagubogu.composeapp.generated.resources.ic_attendance_history
+import yagubogu.composeapp.generated.resources.ic_globe_location_pin
 import yagubogu.composeapp.generated.resources.ic_home
 import yagubogu.composeapp.generated.resources.ic_livetalk
 import yagubogu.composeapp.generated.resources.ic_stats
@@ -44,7 +46,13 @@ sealed interface BottomNavKey : NavKey {
         override val label: StringResource = Res.string.bottom_navigation_stats
     }
 
+    @Serializable
+    data object Place : BottomNavKey {
+        override val icon: DrawableResource = Res.drawable.ic_globe_location_pin
+        override val label: StringResource = Res.string.bottom_navigation_place
+    }
+
     companion object {
-        val items: List<BottomNavKey> = listOf(Home, Livetalk, AttendanceHistory, Stats)
+        val items: List<BottomNavKey> = listOf(Home, Livetalk, AttendanceHistory, Stats, Place)
     }
 }

@@ -98,15 +98,12 @@ jobs:
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml') }}
           restore-keys: ${{ runner.os }}-konan-
 
-      # SPM 패키지 캐시
-      # xcodebuild -resolvePackageDependencies 단계에서 다운로드되는 패키지들을 보존
-      # Package.resolved 해시 기반 → 의존성 변경 시 자동 갱신
-      - name: Cache SPM packages
+      # SPM checkout만 캐시한다. DerivedData 전체를 복원하면 이전 빌드 산출물이
+      # Xcode/Kotlin 프레임워크 복사 단계와 충돌하거나 디스크를 과도하게 사용한다.
+      - name: Cache SPM source packages
         uses: actions/cache@v4
         with:
-          path: |
-            ~/Library/Developer/Xcode/DerivedData
-            ~/.swiftpm
+          path: ${{ runner.temp }}/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
 
@@ -120,7 +117,11 @@ jobs:
 
       - name: Resolve Xcode Package Dependencies
         run: |
-          xcodebuild -resolvePackageDependencies -project iosApp/iosApp.xcodeproj -scheme iosApp
+          xcodebuild -resolvePackageDependencies \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData"
 
       - name: iOS Build Test
         run: |
@@ -128,8 +129,11 @@ jobs:
 
       - name: Xcode Project Build Check
         run: |
+          rm -rf composeApp/build/xcode-frameworks
           xcodebuild build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData"
