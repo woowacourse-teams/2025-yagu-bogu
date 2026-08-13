@@ -75,7 +75,6 @@ import yagubogu.composeapp.generated.resources.place_detail_field_packing
 import yagubogu.composeapp.generated.resources.place_detail_field_smoking
 import yagubogu.composeapp.generated.resources.place_detail_homepage_title
 import yagubogu.composeapp.generated.resources.place_detail_location_title
-import yagubogu.composeapp.generated.resources.place_detail_not_found
 import yagubogu.composeapp.generated.resources.place_detail_phone_number
 import yagubogu.composeapp.generated.resources.place_detail_title
 import yagubogu.composeapp.generated.resources.place_list_error
@@ -133,8 +132,7 @@ private fun PlaceDetailScreen(
                 is PlaceDetailUiState.Success ->
                     PlaceDetailContent(placeDetail = state.detail)
 
-                PlaceDetailUiState.NotFound ->
-                    PlaceDetailMessage(message = stringResource(Res.string.place_detail_not_found))
+                PlaceDetailUiState.NotFound -> Unit
 
                 is PlaceDetailUiState.Error ->
                     PlaceDetailMessage(message = stringResource(Res.string.place_list_error))

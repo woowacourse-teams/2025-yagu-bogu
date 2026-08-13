@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.place_list_empty
 import yagubogu.composeapp.generated.resources.place_recommendation_title
 import yagubogu.composeapp.generated.resources.place_stadium_empty
 
@@ -135,7 +134,7 @@ private fun PlaceScreen(
             } else {
                 items(
                     items = stadiums,
-                    key = { item: PlaceStadiumItem -> item.id },
+                    key = { item: PlaceStadiumItem -> "stadium-${item.id}" },
                 ) { item: PlaceStadiumItem ->
                     PlaceStadiumAccordionItem(
                         name = item.name,
@@ -174,7 +173,7 @@ private fun PlaceScreen(
         when (val state = placesUiState) {
             PlaceListUiState.Loading ->
                 item {
-                    Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 }
@@ -182,7 +181,7 @@ private fun PlaceScreen(
             is PlaceListUiState.Success ->
                 items(
                     items = state.items,
-                    key = { item: PlaceItem -> item.id },
+                    key = { item: PlaceItem -> "place-${item.id}" },
                 ) { item: PlaceItem ->
                     PlaceRecommendationCard(
                         item = item,
@@ -191,15 +190,7 @@ private fun PlaceScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-            PlaceListUiState.Empty ->
-                item {
-                    Text(
-                        text = stringResource(Res.string.place_list_empty),
-                        style = PretendardMedium16,
-                        color = Gray600,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+            PlaceListUiState.Empty -> Unit
 
             PlaceListUiState.NoStadium ->
                 item {
