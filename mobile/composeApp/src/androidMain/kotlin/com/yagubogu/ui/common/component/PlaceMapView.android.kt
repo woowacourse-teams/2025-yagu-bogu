@@ -147,7 +147,7 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
                 context.dpToPx(4f).toFloat(),
                 0f,
                 context.dpToPx(2f).toFloat(),
-                Color.argb(64, 0, 0, 0)
+                Color.argb(64, 0, 0, 0),
             )
         }
     val path =
@@ -188,13 +188,12 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
         width / 2f,
         context.dpToPx(15f).toFloat(),
         context.dpToPx(5f).toFloat(),
-        paint
+        paint,
     )
     return bitmap
 }
 
-private fun Context.dpToPx(dp: Float): Int =
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
+private fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
 
 private fun disableMapGestures(kakaoMap: KakaoMap) {
     GestureType.values().forEach { gestureType ->

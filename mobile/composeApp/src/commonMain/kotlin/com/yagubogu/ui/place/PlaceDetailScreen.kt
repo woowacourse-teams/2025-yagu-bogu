@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,8 +57,11 @@ import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardRegular16
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.LocalSnackbarHostState
+import com.yagubogu.ui.util.LocalSnackbarScope
 import com.yagubogu.ui.util.categoryThumbnailColor
 import com.yagubogu.ui.util.rememberNoRippleInteractionSource
+import com.yagubogu.ui.util.showSingleSnackbar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -67,6 +72,7 @@ import yagubogu.composeapp.generated.resources.ic_copy
 import yagubogu.composeapp.generated.resources.ic_globe_location_pin
 import yagubogu.composeapp.generated.resources.ic_phone
 import yagubogu.composeapp.generated.resources.ic_walk
+import yagubogu.composeapp.generated.resources.place_detail_address_copied
 import yagubogu.composeapp.generated.resources.place_detail_business_hours
 import yagubogu.composeapp.generated.resources.place_detail_copy_address_content_description
 import yagubogu.composeapp.generated.resources.place_detail_extra_info_title
@@ -267,6 +273,11 @@ private fun PlaceLocationSection(
     placeDetail: PlaceDetailUiModel,
     modifier: Modifier = Modifier,
 ) {
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarScope = LocalSnackbarScope.current
+    val addressCopiedMessage: String = stringResource(Res.string.place_detail_address_copied)
+
     Column(
         modifier =
             modifier
@@ -318,7 +329,13 @@ private fun PlaceLocationSection(
                             .clickable(
                                 interactionSource = rememberNoRippleInteractionSource(),
                                 indication = null,
-                                onClick = {},
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(placeDetail.address))
+                                    snackbarHostState.showSingleSnackbar(
+                                        scope = snackbarScope,
+                                        message = addressCopiedMessage,
+                                    )
+                                },
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
