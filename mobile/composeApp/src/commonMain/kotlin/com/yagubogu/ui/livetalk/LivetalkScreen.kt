@@ -31,10 +31,12 @@ import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUM_ITEMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.component.ShimmerStadiumItem
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.util.BackPressHandler
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.painterResource
@@ -55,10 +57,7 @@ fun LivetalkScreen(
     modifier: Modifier = Modifier,
     viewModel: LivetalkViewModel = koinViewModel(),
 ) {
-    val livetalkStadiumDelegatedItems: List<LivetalkStadiumItem>? by viewModel.stadiumItems.collectAsStateWithLifecycle()
-    val isWeatherLoaded: Boolean by viewModel.isWeatherLoaded.collectAsStateWithLifecycle()
-
-    val livetalkStadiumItems = livetalkStadiumDelegatedItems
+    val uiState: LivetalkUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchGames()
@@ -67,25 +66,22 @@ fun LivetalkScreen(
     BackPressHandler()
 
     when {
-        // 로딩 중 (데이터가 아직 null인 경우 shimmer)
-        livetalkStadiumItems == null -> {
+        uiState.isLoading -> {
             ShimmerLivetalkScreen(modifier = modifier)
         }
 
-        // 데이터가 비어있는 경우
-        livetalkStadiumItems.isEmpty() -> {
+        uiState.stadiumItems.isEmpty() -> {
             EmptyLivetalkScreen(modifier = modifier)
         }
 
-        // 데이터가 존재할 경우
         else -> {
             LivetalkScreen(
-                items = livetalkStadiumItems,
+                items = uiState.stadiumItems,
                 onItemClick = { item: LivetalkStadiumItem ->
                     onLivetalkItemClick(item.gameId, item.isVerified)
                 },
                 modifier = modifier,
-                isWeatherLoaded = isWeatherLoaded,
+                isWeatherLoaded = uiState.isWeatherLoaded,
                 scrollToTopEvent = scrollToTopEvent,
             )
         }
@@ -110,7 +106,7 @@ private fun ShimmerLivetalkScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun LivetalkScreen(
-    items: List<LivetalkStadiumItem>,
+    items: ImmutableList<LivetalkStadiumItem>,
     onItemClick: (LivetalkStadiumItem) -> Unit,
     modifier: Modifier = Modifier,
     isWeatherLoaded: Boolean = false,

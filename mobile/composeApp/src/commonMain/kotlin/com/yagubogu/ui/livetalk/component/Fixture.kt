@@ -2,6 +2,7 @@ package com.yagubogu.ui.livetalk.component
 
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import kotlinx.collections.immutable.persistentListOf
 
 val LIVETALK_STADIUM_ITEM_VERIFIED =
     LivetalkStadiumItem(
@@ -26,7 +27,7 @@ val LIVETALK_STADIUM_ITEM_UNVERIFIED =
     )
 
 val LIVETALK_STADIUM_ITEMS =
-    listOf(
+    persistentListOf(
         LIVETALK_STADIUM_ITEM_VERIFIED,
         LIVETALK_STADIUM_ITEM_UNVERIFIED,
         LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(gameId = 2L),
