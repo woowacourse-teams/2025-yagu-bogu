@@ -7,8 +7,6 @@ sealed interface PlaceDetailUiState {
         val detail: PlaceDetailUiModel,
     ) : PlaceDetailUiState
 
-    data object NotFound : PlaceDetailUiState
-
     data class Error(
         val message: String,
     ) : PlaceDetailUiState

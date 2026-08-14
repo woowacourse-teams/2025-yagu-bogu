@@ -81,6 +81,7 @@ import yagubogu.composeapp.generated.resources.place_detail_field_packing
 import yagubogu.composeapp.generated.resources.place_detail_field_smoking
 import yagubogu.composeapp.generated.resources.place_detail_homepage_title
 import yagubogu.composeapp.generated.resources.place_detail_location_title
+import yagubogu.composeapp.generated.resources.place_detail_phone_copied
 import yagubogu.composeapp.generated.resources.place_detail_phone_number
 import yagubogu.composeapp.generated.resources.place_detail_title
 import yagubogu.composeapp.generated.resources.place_list_error
@@ -137,8 +138,6 @@ private fun PlaceDetailScreen(
 
                 is PlaceDetailUiState.Success ->
                     PlaceDetailContent(placeDetail = state.detail)
-
-                PlaceDetailUiState.NotFound -> Unit
 
                 is PlaceDetailUiState.Error ->
                     PlaceDetailMessage(message = stringResource(Res.string.place_list_error))
@@ -358,6 +357,11 @@ private fun PlaceInfoCards(
 ) {
     if (placeDetail.businessHours.isNullOrBlank() && placeDetail.tel.isNullOrBlank()) return
 
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarScope = LocalSnackbarScope.current
+    val phoneCopiedMessage: String = stringResource(Res.string.place_detail_phone_copied)
+
     Row(
         modifier =
             modifier
@@ -381,6 +385,13 @@ private fun PlaceInfoCards(
                 icon = Res.drawable.ic_phone,
                 title = stringResource(Res.string.place_detail_phone_number),
                 value = placeDetail.tel,
+                onClick = {
+                    clipboardManager.setText(AnnotatedString(placeDetail.tel))
+                    snackbarHostState.showSingleSnackbar(
+                        scope = snackbarScope,
+                        message = phoneCopiedMessage,
+                    )
+                },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -393,13 +404,24 @@ private fun PlaceInfoCard(
     title: String,
     value: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     Column(
         modifier =
             modifier
                 .background(White, RoundedCornerShape(12.dp))
                 .border(1.dp, Gray300, RoundedCornerShape(12.dp))
-                .padding(20.dp),
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable(
+                            interactionSource = rememberNoRippleInteractionSource(),
+                            indication = null,
+                            onClick = onClick,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ).padding(20.dp),
     ) {
         Icon(
             painter = painterResource(icon),
@@ -556,16 +578,6 @@ private fun PlaceDetailScreenLoadingPreview() {
     PlaceDetailScreen(
         placeName = "잠실 원조 순대국밥",
         placeDetailUiState = PlaceDetailUiState.Loading,
-        onBackClick = {},
-    )
-}
-
-@Preview("플레이스 상세 화면 - 존재하지 않음")
-@Composable
-private fun PlaceDetailScreenNotFoundPreview() {
-    PlaceDetailScreen(
-        placeName = "잠실 원조 순대국밥",
-        placeDetailUiState = PlaceDetailUiState.NotFound,
         onBackClick = {},
     )
 }
