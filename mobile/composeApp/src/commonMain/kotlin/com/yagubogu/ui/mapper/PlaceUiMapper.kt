@@ -133,7 +133,7 @@ fun PlaceDetailResponse.toUiModel(distanceMeters: Int?): PlaceDetailUiModel {
         tel = tel,
         imageUrl = imageUrl,
         overview = stripHtml(overview),
-        homepage = stripHtml(homepage),
+        homepage = extractHomepageUrl(homepage),
         distanceMeters = distanceMeters,
         businessHours = decoded.businessHours,
         rows = decoded.rows,
@@ -147,6 +147,17 @@ private fun stripHtml(raw: String?): String? =
         ?.replace("&nbsp;", " ")
         ?.trim()
         ?.takeIf { it.isNotBlank() }
+
+private val hrefRegex = Regex("""href\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+
+// homepage 필드는 원본 데이터가 <a href="URL">텍스트</a> 형태의 HTML로 올 수 있어,
+// 태그를 단순 제거하면 실제 링크 주소(href)가 아니라 화면 표기용 텍스트만 남는다.
+// 하이퍼링크 클릭 시 이 값을 그대로 URI로 열기 때문에 href를 우선 추출한다.
+private fun extractHomepageUrl(raw: String?): String? {
+    if (raw.isNullOrBlank()) return null
+    val href: String? = hrefRegex.find(raw)?.groupValues?.get(1)
+    return (href ?: stripHtml(raw))?.trim()?.takeIf { it.isNotBlank() }
+}
 
 private data class DecodedPlaceDetail(
     val businessHours: String?,
