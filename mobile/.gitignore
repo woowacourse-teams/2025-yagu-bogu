@@ -26,4 +26,3 @@ iosApp/Configuration/Secrets.xcconfig
 keystore.properties
 **/aboutlibraries.json
 **/GoogleService-Info.plist
-.worktrees/
