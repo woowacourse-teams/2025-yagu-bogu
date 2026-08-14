@@ -30,7 +30,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +58,7 @@ import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardMedium16
 import com.yagubogu.ui.theme.PretendardRegular12
 import com.yagubogu.ui.theme.PretendardRegular16
+import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
 import com.yagubogu.ui.util.LocalSnackbarHostState
 import com.yagubogu.ui.util.LocalSnackbarScope
@@ -453,6 +456,8 @@ private fun PlaceExtraInfoSection(
     placeDetail: PlaceDetailUiModel,
     modifier: Modifier = Modifier,
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier =
             modifier
@@ -468,7 +473,11 @@ private fun PlaceExtraInfoSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         if (!placeDetail.homepage.isNullOrBlank()) {
-            PlaceExtraInfoRow(label = stringResource(Res.string.place_detail_homepage_title), value = placeDetail.homepage)
+            PlaceExtraInfoRow(
+                label = stringResource(Res.string.place_detail_homepage_title),
+                value = placeDetail.homepage,
+                onClick = { uriHandler.openUri(placeDetail.homepage) },
+            )
         }
 
         placeDetail.rows.forEach { row: PlaceDetailRow ->
@@ -482,6 +491,7 @@ private fun PlaceExtraInfoRow(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -494,9 +504,22 @@ private fun PlaceExtraInfoRow(
         )
         Text(
             text = value,
-            style = PretendardRegular16,
-            color = Gray900,
-            modifier = Modifier.weight(1f),
+            style = if (onClick != null) PretendardRegular16.copy(textDecoration = TextDecoration.Underline) else PretendardRegular16,
+            color = if (onClick != null) Primary500 else Gray900,
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .then(
+                        if (onClick != null) {
+                            Modifier.clickable(
+                                interactionSource = rememberNoRippleInteractionSource(),
+                                indication = null,
+                                onClick = onClick,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
         )
     }
 }
