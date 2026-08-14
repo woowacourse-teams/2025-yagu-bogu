@@ -101,10 +101,26 @@ fun PlaceDetailScreen(
         viewModel.loadPlaceDetail(placeId, distanceMeters)
     }
 
+    // CompositionLocal은 미리보기(Preview)에서 제공되지 않으므로, 상태(ViewModel)를 읽는
+    // 이 최상위 컴포저블에서만 소비하고 아래로는 순수 콜백으로 전달한다.
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarScope = LocalSnackbarScope.current
+    val addressCopiedMessage: String = stringResource(Res.string.place_detail_address_copied)
+    val phoneCopiedMessage: String = stringResource(Res.string.place_detail_phone_copied)
+
     PlaceDetailScreen(
         placeName = placeName,
         placeDetailUiState = placeDetailUiState,
         onBackClick = onBackClick,
+        onCopyAddress = { address: String ->
+            clipboardManager.setText(AnnotatedString(address))
+            snackbarHostState.showSingleSnackbar(scope = snackbarScope, message = addressCopiedMessage)
+        },
+        onCopyPhone = { phone: String ->
+            clipboardManager.setText(AnnotatedString(phone))
+            snackbarHostState.showSingleSnackbar(scope = snackbarScope, message = phoneCopiedMessage)
+        },
         modifier = modifier,
     )
 }
@@ -114,6 +130,8 @@ private fun PlaceDetailScreen(
     placeName: String,
     placeDetailUiState: PlaceDetailUiState,
     onBackClick: () -> Unit,
+    onCopyAddress: (String) -> Unit = {},
+    onCopyPhone: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -137,7 +155,11 @@ private fun PlaceDetailScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
                 is PlaceDetailUiState.Success ->
-                    PlaceDetailContent(placeDetail = state.detail)
+                    PlaceDetailContent(
+                        placeDetail = state.detail,
+                        onCopyAddress = onCopyAddress,
+                        onCopyPhone = onCopyPhone,
+                    )
 
                 is PlaceDetailUiState.Error ->
                     PlaceDetailMessage(message = stringResource(Res.string.place_list_error))
@@ -159,6 +181,8 @@ private fun PlaceDetailMessage(
 @Composable
 private fun PlaceDetailContent(
     placeDetail: PlaceDetailUiModel,
+    onCopyAddress: (String) -> Unit,
+    onCopyPhone: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -173,8 +197,8 @@ private fun PlaceDetailContent(
         if (!placeDetail.overview.isNullOrBlank()) {
             PlaceDescription(description = placeDetail.overview)
         }
-        PlaceLocationSection(placeDetail = placeDetail)
-        PlaceInfoCards(placeDetail = placeDetail)
+        PlaceLocationSection(placeDetail = placeDetail, onCopyAddress = onCopyAddress)
+        PlaceInfoCards(placeDetail = placeDetail, onCopyPhone = onCopyPhone)
         if (placeDetail.rows.isNotEmpty() || !placeDetail.homepage.isNullOrBlank()) {
             PlaceExtraInfoSection(placeDetail = placeDetail)
         }
@@ -270,13 +294,9 @@ private fun PlaceDescription(
 @Composable
 private fun PlaceLocationSection(
     placeDetail: PlaceDetailUiModel,
+    onCopyAddress: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clipboardManager = LocalClipboardManager.current
-    val snackbarHostState = LocalSnackbarHostState.current
-    val snackbarScope = LocalSnackbarScope.current
-    val addressCopiedMessage: String = stringResource(Res.string.place_detail_address_copied)
-
     Column(
         modifier =
             modifier
@@ -328,13 +348,7 @@ private fun PlaceLocationSection(
                             .clickable(
                                 interactionSource = rememberNoRippleInteractionSource(),
                                 indication = null,
-                                onClick = {
-                                    clipboardManager.setText(AnnotatedString(placeDetail.address))
-                                    snackbarHostState.showSingleSnackbar(
-                                        scope = snackbarScope,
-                                        message = addressCopiedMessage,
-                                    )
-                                },
+                                onClick = { onCopyAddress(placeDetail.address) },
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -353,14 +367,10 @@ private fun PlaceLocationSection(
 @Composable
 private fun PlaceInfoCards(
     placeDetail: PlaceDetailUiModel,
+    onCopyPhone: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (placeDetail.businessHours.isNullOrBlank() && placeDetail.tel.isNullOrBlank()) return
-
-    val clipboardManager = LocalClipboardManager.current
-    val snackbarHostState = LocalSnackbarHostState.current
-    val snackbarScope = LocalSnackbarScope.current
-    val phoneCopiedMessage: String = stringResource(Res.string.place_detail_phone_copied)
 
     Row(
         modifier =
@@ -385,13 +395,7 @@ private fun PlaceInfoCards(
                 icon = Res.drawable.ic_phone,
                 title = stringResource(Res.string.place_detail_phone_number),
                 value = placeDetail.tel,
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(placeDetail.tel))
-                    snackbarHostState.showSingleSnackbar(
-                        scope = snackbarScope,
-                        message = phoneCopiedMessage,
-                    )
-                },
+                onClick = { onCopyPhone(placeDetail.tel) },
                 modifier = Modifier.weight(1f),
             )
         }
