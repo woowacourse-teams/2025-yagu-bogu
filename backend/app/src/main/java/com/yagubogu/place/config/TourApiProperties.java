@@ -22,15 +22,17 @@ public class TourApiProperties {
     private final String baseUrl;
     private final int radius;
     private final int numOfRows;
+    private final Duration requestInterval;
     private final Duration connectTimeout;
     private final Duration readTimeout;
 
     public TourApiProperties(String serviceKey, String baseUrl, int radius, int numOfRows,
-                             Duration connectTimeout, Duration readTimeout) {
+                             Duration requestInterval, Duration connectTimeout, Duration readTimeout) {
         this.serviceKey = serviceKey;
         this.baseUrl = baseUrl;
         this.radius = radius;
         this.numOfRows = numOfRows;
+        this.requestInterval = requestInterval;
         this.connectTimeout = connectTimeout;
         this.readTimeout = readTimeout;
     }

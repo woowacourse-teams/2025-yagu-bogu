@@ -21,6 +21,7 @@ class TourApiPropertiesTest {
                     "tour.api.base-url=https://apis.data.go.kr/B551011/KorService2",
                     "tour.api.radius=3000",
                     "tour.api.num-of-rows=50",
+                    "tour.api.request-interval=100ms",
                     "tour.api.connect-timeout=10s",
                     "tour.api.read-timeout=30s"
             );

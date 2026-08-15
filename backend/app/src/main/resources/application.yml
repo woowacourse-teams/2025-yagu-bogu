@@ -85,6 +85,7 @@ tour:
     base-url: https://apis.data.go.kr/B551011/KorService2
     radius: 10000       # 구장 중심으로부터 반경 (미터)
     num-of-rows: 50     # 한 번에 가져올 최대 결과 수
+    request-interval: 100ms # 요청 간 최소 간격 (초당 요청 제한 대응, 100ms = 초당 10건)
     connect-timeout: 10s
     read-timeout: 30s
 
