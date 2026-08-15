@@ -8,6 +8,7 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.data.repository.widget.WidgetDeviceRegistrar
 import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.mapper.text.toUiText
@@ -41,6 +42,7 @@ class SettingViewModel(
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
     private val widgetSettingsRepository: WidgetSettingsRepository,
+    private val widgetDeviceRegistrar: WidgetDeviceRegistrar,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -75,18 +77,39 @@ class SettingViewModel(
 
     fun updateScoreWidgetNotification(enabled: Boolean) {
         viewModelScope.launch {
-            widgetSettingsRepository
-                .setEnabled(enabled)
-                .onFailure { exception: Throwable ->
-                    if (exception is CancellationException) throw exception
-                    logger.w(exception) { "위젯 사용 설정 변경 실패" }
-                    _settingEvent.emit(
-                        SettingEvent.ScoreWidgetNotificationChangeFailure(
-                            UiText.StringRes(Res.string.setting_score_widget_change_failed),
-                        ),
-                    )
+            if (!enabled) {
+                setScoreWidgetNotification(false)
+                return@launch
+            }
+            // 토글 ON은 "기기 등록 성공"을 선행 조건으로 보장한다.
+            // 등록이 실패하면 토글을 켜지 않아 토글-실제 수신 비일치를 막는다.
+            widgetDeviceRegistrar
+                .register()
+                .onSuccess {
+                    setScoreWidgetNotification(true)
+                }.onFailure { exception: Throwable ->
+                    logger.w(exception) { "토글 ON 이전 디바이스 등록 실패" }
+                    emitScoreWidgetNotificationChangeFailure()
                 }
         }
+    }
+
+    private suspend fun setScoreWidgetNotification(enabled: Boolean) {
+        widgetSettingsRepository
+            .setEnabled(enabled)
+            .onFailure { exception: Throwable ->
+                if (exception is CancellationException) throw exception
+                logger.w(exception) { "위젯 사용 설정 변경 실패" }
+                emitScoreWidgetNotificationChangeFailure()
+            }
+    }
+
+    private suspend fun emitScoreWidgetNotificationChangeFailure() {
+        _settingEvent.emit(
+            SettingEvent.ScoreWidgetNotificationChangeFailure(
+                UiText.StringRes(Res.string.setting_score_widget_change_failed),
+            ),
+        )
     }
 
     fun updateNickname(newNickname: String) {

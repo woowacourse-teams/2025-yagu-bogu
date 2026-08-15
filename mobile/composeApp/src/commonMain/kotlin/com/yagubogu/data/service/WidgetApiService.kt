@@ -1,10 +1,12 @@
 package com.yagubogu.data.service
 
+import com.yagubogu.data.dto.request.widget.WidgetDeviceRequest
 import com.yagubogu.data.dto.request.widget.WidgetSettingRequest
 import com.yagubogu.data.dto.response.widget.WidgetSettingResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.PATCH
+import de.jensklingenberg.ktorfit.http.POST
 
 /**
  * 잠금화면 위젯 API.
@@ -22,4 +24,9 @@ interface WidgetApiService {
     suspend fun patchSetting(
         @Body body: WidgetSettingRequest,
     ): WidgetSettingResponse
+
+    @POST("/api/v1/widgets/devices")
+    suspend fun postDevice(
+        @Body body: WidgetDeviceRequest,
+    )
 }

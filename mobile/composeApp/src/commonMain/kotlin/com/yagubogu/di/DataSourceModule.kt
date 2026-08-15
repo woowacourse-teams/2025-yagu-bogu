@@ -20,9 +20,12 @@ import com.yagubogu.data.datasource.stream.StreamDataSource
 import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
+import com.yagubogu.data.datasource.widget.WidgetDeviceDataSource
+import com.yagubogu.data.datasource.widget.WidgetDeviceRemoteDataSource
 import com.yagubogu.data.datasource.widget.WidgetSettingsDataSource
 import com.yagubogu.data.datasource.widget.WidgetSettingsRemoteDataSource
 import com.yagubogu.data.local.APP_CONFIG_PREFS
+import com.yagubogu.data.local.ScoreWidgetDeviceId
 import com.yagubogu.data.local.ScoreWidgetSettings
 import com.yagubogu.data.local.WIDGET_PREFS
 import org.koin.core.module.Module
@@ -53,6 +56,8 @@ val datasourceModule =
 
         singleOf(::WidgetSettingsRemoteDataSource) { bind<WidgetSettingsDataSource>() }
 
+        singleOf(::WidgetDeviceRemoteDataSource) { bind<WidgetDeviceDataSource>() }
+
         singleOf(::AppConfigFirebaseDataSource) { bind<AppConfigRemoteDataSource>() }
 
         single<AppConfigLocalDataSource> {
@@ -60,6 +65,8 @@ val datasourceModule =
         }
 
         single { ScoreWidgetSettings(dataStore = get(named(WIDGET_PREFS))) }
+
+        single { ScoreWidgetDeviceId(dataStore = get(named(WIDGET_PREFS))) }
 
         registerPlatformDataSources()
     }

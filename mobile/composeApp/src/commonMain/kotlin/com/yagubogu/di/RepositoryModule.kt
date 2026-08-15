@@ -22,6 +22,8 @@ import com.yagubogu.data.repository.talk.TalkDefaultRepository
 import com.yagubogu.data.repository.talk.TalkRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyDefaultRepository
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.data.repository.widget.WidgetDeviceDefaultRepository
+import com.yagubogu.data.repository.widget.WidgetDeviceRepository
 import com.yagubogu.data.repository.widget.WidgetSettingsDefaultRepository
 import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import org.koin.core.module.dsl.bind
@@ -55,4 +57,6 @@ val repositoryModule =
         singleOf(::AppConfigDefaultRepository) { bind<AppConfigRepository>() }
 
         singleOf(::WidgetSettingsDefaultRepository) { bind<WidgetSettingsRepository>() }
+
+        singleOf(::WidgetDeviceDefaultRepository) { bind<WidgetDeviceRepository>() }
     }

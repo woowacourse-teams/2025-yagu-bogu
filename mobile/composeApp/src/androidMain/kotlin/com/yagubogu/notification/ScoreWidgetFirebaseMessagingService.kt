@@ -13,6 +13,7 @@ class ScoreWidgetFirebaseMessagingService :
     KoinComponent {
     private val logger = Logger.withTag("ScoreWidgetFcm")
     private val scoreWidgetMessageProcessor: ScoreWidgetMessageProcessor by inject()
+    private val scoreWidgetDeviceRegistrar: ScoreWidgetDeviceRegistrar by inject()
 
     override fun onMessageReceived(message: RemoteMessage) {
         val result =
@@ -25,7 +26,9 @@ class ScoreWidgetFirebaseMessagingService :
     }
 
     override fun onNewToken(token: String) {
-        logger.i { "실시간 스코어 위젯 등록용 FCM 토큰이 갱신되었습니다." }
-        // Widget device registration is added when the backend API is available.
+        logger.i { "실시간 스코어 위젯 등록용 FCM 토큰이 갱신되어 디바이스 등록을 진행합니다." }
+        runBlocking(Dispatchers.IO) {
+            scoreWidgetDeviceRegistrar.register(token)
+        }
     }
 }
