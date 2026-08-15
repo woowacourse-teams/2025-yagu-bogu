@@ -87,6 +87,7 @@ import yagubogu.composeapp.generated.resources.place_detail_field_subfacility
 import yagubogu.composeapp.generated.resources.place_detail_field_treatmenu
 import yagubogu.composeapp.generated.resources.place_detail_field_useseason
 import yagubogu.composeapp.generated.resources.place_detail_field_usetimefestival
+import kotlin.math.roundToInt
 
 private val placeDetailJson = Json { ignoreUnknownKeys = true }
 
@@ -108,7 +109,15 @@ fun PlaceCategoryDto.toUiCategory(): PlaceCategory =
         PlaceCategoryDto.PERFORMANCE -> PlaceCategory.SHOW
     }
 
-private fun formatDistanceMeters(meters: Int?): String = if (meters == null) "" else "도보 ${meters}m"
+fun formatDistanceMeters(meters: Int?): String {
+    if (meters == null) return ""
+    if (meters < 1000) return "${meters}m"
+
+    val roundedTenths: Int = (meters / 100.0).roundToInt()
+    val whole: Int = roundedTenths / 10
+    val fraction: Int = roundedTenths % 10
+    return "$whole.${fraction}km"
+}
 
 fun PlaceDto.toUiModel(): PlaceItem =
     PlaceItem(

@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.yagubogu.ui.common.component.DefaultToolbar
 import com.yagubogu.ui.common.component.PlaceMapView
+import com.yagubogu.ui.mapper.formatDistanceMeters
 import com.yagubogu.ui.place.model.PlaceCategory
 import com.yagubogu.ui.place.model.PlaceDetailRow
 import com.yagubogu.ui.place.model.PlaceDetailUiModel
@@ -268,7 +269,7 @@ private fun PlaceDetailHeader(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "도보 ${placeDetail.distanceMeters}m",
+                    text = formatDistanceMeters(placeDetail.distanceMeters),
                     style = PretendardRegular12,
                     color = Gray600,
                 )
