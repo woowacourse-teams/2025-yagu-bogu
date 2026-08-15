@@ -7,6 +7,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.TypedValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -32,6 +35,7 @@ import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import com.yagubogu.BuildKonfig
+import com.yagubogu.ui.theme.Gray200
 
 private const val PLACE_MAP_ZOOM_LEVEL = 16
 
@@ -43,6 +47,12 @@ actual fun PlaceMapView(
     longitude: Double,
     modifier: Modifier,
 ) {
+    // 프리뷰/인스펙션 모드에서는 지도 대신 빈 박스로 대체.
+    if (LocalInspectionMode.current) {
+        Box(modifier = modifier.background(Gray200))
+        return
+    }
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val position = remember(latitude, longitude) { LatLng.from(latitude, longitude) }
@@ -133,7 +143,12 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.rgb(34, 197, 94)
             style = Paint.Style.FILL
-            setShadowLayer(context.dpToPx(4f).toFloat(), 0f, context.dpToPx(2f).toFloat(), Color.argb(64, 0, 0, 0))
+            setShadowLayer(
+                context.dpToPx(4f).toFloat(),
+                0f,
+                context.dpToPx(2f).toFloat(),
+                Color.argb(64, 0, 0, 0),
+            )
         }
     val path =
         Path().apply {
@@ -169,7 +184,12 @@ private fun createPlaceMarkerBitmap(context: Context): Bitmap {
     canvas.drawPath(path, paint)
     paint.clearShadowLayer()
     paint.color = Color.WHITE
-    canvas.drawCircle(width / 2f, context.dpToPx(15f).toFloat(), context.dpToPx(5f).toFloat(), paint)
+    canvas.drawCircle(
+        width / 2f,
+        context.dpToPx(15f).toFloat(),
+        context.dpToPx(5f).toFloat(),
+        paint,
+    )
     return bitmap
 }
 

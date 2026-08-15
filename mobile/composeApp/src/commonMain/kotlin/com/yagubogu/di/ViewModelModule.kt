@@ -11,6 +11,7 @@ import com.yagubogu.ui.main.MainViewModel
 import com.yagubogu.ui.main.YaguBoguViewModel
 import com.yagubogu.ui.onboarding.favorite.FavoriteTeamViewModel
 import com.yagubogu.ui.onboarding.nickname.NicknameViewModel
+import com.yagubogu.ui.place.PlaceViewModel
 import com.yagubogu.ui.ranking.RankingViewModel
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.setting.SettingViewModel
@@ -58,6 +59,8 @@ val viewModelModule =
         viewModelOf(::LoginViewModel)
 
         viewModelOf(::MainViewModel)
+
+        viewModelOf(::PlaceViewModel)
 
         viewModel { (type: RankingType) ->
             RankingViewModel(

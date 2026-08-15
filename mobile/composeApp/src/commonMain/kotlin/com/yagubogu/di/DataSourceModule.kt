@@ -12,6 +12,8 @@ import com.yagubogu.data.datasource.game.GameDataSource
 import com.yagubogu.data.datasource.game.GameRemoteDataSource
 import com.yagubogu.data.datasource.member.MemberDataSource
 import com.yagubogu.data.datasource.member.MemberRemoteDataSource
+import com.yagubogu.data.datasource.place.PlaceDataSource
+import com.yagubogu.data.datasource.place.PlaceRemoteDataSource
 import com.yagubogu.data.datasource.stadium.StadiumDataSource
 import com.yagubogu.data.datasource.stadium.StadiumRemoteDataSource
 import com.yagubogu.data.datasource.stats.StatsDataSource
@@ -34,6 +36,8 @@ val datasourceModule =
         singleOf(::AuthRemoteDataSource) { bind<AuthDataSource>() }
 
         singleOf(::MemberRemoteDataSource) { bind<MemberDataSource>() }
+
+        singleOf(::PlaceRemoteDataSource) { bind<PlaceDataSource>() }
 
         singleOf(::CheckInRemoteDataSource) { bind<CheckInDataSource>() }
 
