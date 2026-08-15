@@ -87,7 +87,6 @@ import yagubogu.composeapp.generated.resources.place_detail_homepage_title
 import yagubogu.composeapp.generated.resources.place_detail_location_title
 import yagubogu.composeapp.generated.resources.place_detail_phone_copied
 import yagubogu.composeapp.generated.resources.place_detail_phone_number
-import yagubogu.composeapp.generated.resources.place_detail_title
 import yagubogu.composeapp.generated.resources.place_list_error
 
 @Composable
@@ -141,7 +140,7 @@ private fun PlaceDetailScreen(
     Scaffold(
         topBar = {
             DefaultToolbar(
-                title = stringResource(Res.string.place_detail_title, placeName),
+                title = placeName,
                 onBackClick = onBackClick,
             )
         },
