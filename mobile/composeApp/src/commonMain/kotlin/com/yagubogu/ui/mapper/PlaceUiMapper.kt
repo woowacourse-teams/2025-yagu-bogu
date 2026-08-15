@@ -157,6 +157,12 @@ private fun stripHtml(raw: String?): String? =
         ?.trim()
         ?.takeIf { it.isNotBlank() }
 
+private val brRegex = Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE)
+
+// 영업시간류 필드는 원본 데이터에 <br> 태그로 줄바꿈이 들어있는 경우가 있어,
+// 태그를 지우기 전에 개행 문자로 먼저 치환해 줄바꿈이 사라지지 않도록 한다.
+private fun formatMultilineHtml(raw: String?): String? = stripHtml(raw?.replace(brRegex, "\n"))
+
 private val hrefRegex = Regex("""href\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
 
 // homepage 필드는 원본 데이터가 <a href="URL">텍스트</a> 형태의 HTML로 올 수 있어,
@@ -198,7 +204,7 @@ private fun row(
 
 private fun FoodDetailDto.toDecoded(): DecodedPlaceDetail =
     DecodedPlaceDetail(
-        businessHours = opentimefood,
+        businessHours = formatMultilineHtml(opentimefood),
         rows =
             listOfNotNull(
                 row(Res.string.place_detail_field_seat, seat),
@@ -221,7 +227,7 @@ private fun FoodDetailDto.toDecoded(): DecodedPlaceDetail =
 
 private fun AttractionDetailDto.toDecoded(): DecodedPlaceDetail =
     DecodedPlaceDetail(
-        businessHours = usetime,
+        businessHours = formatMultilineHtml(usetime),
         rows =
             listOfNotNull(
                 row(Res.string.place_detail_field_heritage1, heritage1),
@@ -242,8 +248,8 @@ private fun AttractionDetailDto.toDecoded(): DecodedPlaceDetail =
     )
 
 private fun LodgingDetailDto.toDecoded(): DecodedPlaceDetail {
-    val filteredCheckinTime: String? = checkintime?.takeIf { it.isNotBlank() }
-    val filteredCheckoutTime: String? = checkouttime?.takeIf { it.isNotBlank() }
+    val filteredCheckinTime: String? = formatMultilineHtml(checkintime)
+    val filteredCheckoutTime: String? = formatMultilineHtml(checkouttime)
     val businessHours: String? =
         when {
             filteredCheckinTime != null && filteredCheckoutTime != null -> "$filteredCheckinTime ~ $filteredCheckoutTime"
@@ -286,7 +292,7 @@ private fun LodgingDetailDto.toDecoded(): DecodedPlaceDetail {
 
 private fun PerformanceDetailDto.toDecoded(): DecodedPlaceDetail =
     DecodedPlaceDetail(
-        businessHours = playtime,
+        businessHours = formatMultilineHtml(playtime),
         rows =
             listOfNotNull(
                 row(Res.string.place_detail_field_sponsor1, sponsor1),
