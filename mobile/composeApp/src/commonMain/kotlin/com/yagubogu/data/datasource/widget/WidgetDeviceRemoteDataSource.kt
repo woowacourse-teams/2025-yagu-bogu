@@ -23,6 +23,11 @@ class WidgetDeviceRemoteDataSource(
             )
         }
 
+    override suspend fun deregisterDevice(deviceId: String): Result<Unit> =
+        safeApiCall {
+            widgetApiService.deleteDevice(deviceId)
+        }
+
     private companion object {
         const val PLATFORM_ANDROID = "ANDROID"
     }

@@ -4,9 +4,11 @@ import com.yagubogu.data.dto.request.widget.WidgetDeviceRequest
 import com.yagubogu.data.dto.request.widget.WidgetSettingRequest
 import com.yagubogu.data.dto.response.widget.WidgetSettingResponse
 import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Path
 
 /**
  * 잠금화면 위젯 API.
@@ -28,5 +30,10 @@ interface WidgetApiService {
     @POST("/api/v1/widgets/devices")
     suspend fun postDevice(
         @Body body: WidgetDeviceRequest,
+    )
+
+    @DELETE("/api/v1/widgets/devices/{deviceId}")
+    suspend fun deleteDevice(
+        @Path("deviceId") deviceId: String,
     )
 }

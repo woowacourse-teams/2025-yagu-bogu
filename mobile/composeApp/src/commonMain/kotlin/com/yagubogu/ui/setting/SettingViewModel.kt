@@ -9,6 +9,7 @@ import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
 import com.yagubogu.data.repository.widget.WidgetDeviceRegistrar
+import com.yagubogu.data.repository.widget.WidgetDeviceRepository
 import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.mapper.text.toUiText
@@ -43,6 +44,7 @@ class SettingViewModel(
     private val clock: Clock,
     private val widgetSettingsRepository: WidgetSettingsRepository,
     private val widgetDeviceRegistrar: WidgetDeviceRegistrar,
+    private val widgetDeviceRepository: WidgetDeviceRepository,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -130,6 +132,13 @@ class SettingViewModel(
 
     fun logout() {
         viewModelScope.launch {
+            // access token이 유효한 동안 서버 디바이스 등록을 먼저 해제한다 (best-effort).
+            widgetDeviceRepository
+                .deregisterDevice()
+                .onFailure { exception: Throwable ->
+                    logger.w(exception) { "로그아웃 시 디바이스 등록 해제 실패" }
+                }
+
             authRepository
                 .logout()
                 .onSuccess {

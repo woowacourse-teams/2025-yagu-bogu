@@ -6,4 +6,6 @@ interface WidgetDeviceDataSource {
         pushToken: String,
         appVersion: String?,
     ): Result<Unit>
+
+    suspend fun deregisterDevice(deviceId: String): Result<Unit>
 }
