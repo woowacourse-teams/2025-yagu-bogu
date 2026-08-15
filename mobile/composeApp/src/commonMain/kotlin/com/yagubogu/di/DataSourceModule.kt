@@ -20,6 +20,8 @@ import com.yagubogu.data.datasource.stream.StreamDataSource
 import com.yagubogu.data.datasource.stream.StreamRemoteDataSource
 import com.yagubogu.data.datasource.talk.TalkDataSource
 import com.yagubogu.data.datasource.talk.TalkRemoteDataSource
+import com.yagubogu.data.datasource.widget.WidgetSettingsDataSource
+import com.yagubogu.data.datasource.widget.WidgetSettingsRemoteDataSource
 import com.yagubogu.data.local.APP_CONFIG_PREFS
 import com.yagubogu.data.local.ScoreWidgetSettings
 import com.yagubogu.data.local.WIDGET_PREFS
@@ -48,6 +50,8 @@ val datasourceModule =
         singleOf(::GameRemoteDataSource) { bind<GameDataSource>() }
 
         singleOf(::TalkRemoteDataSource) { bind<TalkDataSource>() }
+
+        singleOf(::WidgetSettingsRemoteDataSource) { bind<WidgetSettingsDataSource>() }
 
         singleOf(::AppConfigFirebaseDataSource) { bind<AppConfigRemoteDataSource>() }
 

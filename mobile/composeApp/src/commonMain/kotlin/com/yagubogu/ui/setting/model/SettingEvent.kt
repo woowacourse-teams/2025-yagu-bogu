@@ -19,6 +19,10 @@ sealed interface SettingEvent {
 
     data object Logout : SettingEvent
 
+    data class ScoreWidgetNotificationChangeFailure(
+        val uiText: UiText,
+    ) : SettingEvent
+
     data object DeleteAccount : SettingEvent
 
     data object DeleteAccountCancel : SettingEvent

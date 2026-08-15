@@ -111,6 +111,14 @@ fun SettingMainScreen(
                     )
                 }
 
+                is SettingEvent.ScoreWidgetNotificationChangeFailure -> {
+                    val errorMessage = settingEvent.uiText.asString()
+                    snackbarHostState.showSingleSnackbar(
+                        scope = this,
+                        message = errorMessage,
+                    )
+                }
+
                 else -> Unit
             }
         }

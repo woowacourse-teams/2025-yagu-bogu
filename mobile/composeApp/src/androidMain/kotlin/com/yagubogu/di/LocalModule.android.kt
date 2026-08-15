@@ -24,5 +24,5 @@ actual val localModule =
             createDataStore(context = androidApplication(), fileName = WIDGET_PREFS)
         }
         single { ScoreWidgetNotificationManager(context = androidApplication()) }
-        single { ScoreWidgetMessageProcessor(scoreWidgetSettings = get(), notificationManager = get()) }
+        single { ScoreWidgetMessageProcessor(widgetSettingsRepository = get(), notificationManager = get()) }
     }

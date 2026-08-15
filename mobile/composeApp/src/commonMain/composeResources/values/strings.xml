@@ -272,6 +272,7 @@
     <string name="setting_edit_nickname_unknown_error">알 수 없는 오류가 발생했습니다</string>
     <string name="setting_edit_my_team">응원팀 수정</string>
     <string name="setting_score_widget_notification">실시간 경기 알림</string>
+    <string name="setting_score_widget_change_failed">실시간 경기 알림 설정을 변경하지 못했어요.\n잠시 후 다시 시도해 주세요.</string>
     <string name="setting_score_widget_permission_title">알림 권한이 필요해요</string>
     <string name="setting_score_widget_permission_message">실시간 경기 알림을 보려면 설정에서 알림을 허용해 주세요.</string>
     <string name="setting_go_to_settings">설정으로 이동</string>

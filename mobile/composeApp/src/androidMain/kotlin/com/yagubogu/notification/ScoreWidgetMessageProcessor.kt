@@ -1,17 +1,17 @@
 package com.yagubogu.notification
 
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.local.ScoreWidgetSettings
+import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import kotlinx.coroutines.flow.first
 
 class ScoreWidgetMessageProcessor(
-    private val scoreWidgetSettings: ScoreWidgetSettings,
+    private val widgetSettingsRepository: WidgetSettingsRepository,
     private val notificationManager: ScoreWidgetNotificationManager,
 ) {
     private val logger = Logger.withTag("ScoreWidgetProcessor")
 
     suspend fun process(data: Map<String, String>): ProcessResult {
-        if (!scoreWidgetSettings.isEnabled.first()) {
+        if (!widgetSettingsRepository.enabled.first()) {
             logger.i { "실시간 스코어 위젯이 꺼져 있어 메시지를 무시합니다." }
             return ProcessResult.IgnoredDisabled
         }

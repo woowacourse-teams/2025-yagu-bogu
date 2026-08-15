@@ -3,12 +3,12 @@ package com.yagubogu.ui.setting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.local.ScoreWidgetSettings
 import com.yagubogu.data.repository.auth.AuthRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.mapper.text.toUiText
 import com.yagubogu.ui.mapper.toUiModel
@@ -31,6 +31,7 @@ import kotlinx.datetime.LocalDate
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.image_processing_failed
 import yagubogu.composeapp.generated.resources.image_upload_failed
+import yagubogu.composeapp.generated.resources.setting_score_widget_change_failed
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
@@ -39,7 +40,7 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
-    private val scoreWidgetSettings: ScoreWidgetSettings,
+    private val widgetSettingsRepository: WidgetSettingsRepository,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -59,7 +60,14 @@ class SettingViewModel(
 
     init {
         viewModelScope.launch {
-            scoreWidgetSettings.isEnabled.collect { enabled ->
+            widgetSettingsRepository
+                .refresh()
+                .onFailure { exception: Throwable ->
+                    logger.w(exception) { "위젯 사용 설정 서버 동기화 실패" }
+                }
+        }
+        viewModelScope.launch {
+            widgetSettingsRepository.enabled.collect { enabled ->
                 _scoreWidgetNotification.value = enabled
             }
         }
@@ -67,7 +75,17 @@ class SettingViewModel(
 
     fun updateScoreWidgetNotification(enabled: Boolean) {
         viewModelScope.launch {
-            scoreWidgetSettings.setEnabled(enabled)
+            widgetSettingsRepository
+                .setEnabled(enabled)
+                .onFailure { exception: Throwable ->
+                    if (exception is CancellationException) throw exception
+                    logger.w(exception) { "위젯 사용 설정 변경 실패" }
+                    _settingEvent.emit(
+                        SettingEvent.ScoreWidgetNotificationChangeFailure(
+                            UiText.StringRes(Res.string.setting_score_widget_change_failed),
+                        ),
+                    )
+                }
         }
     }
 
