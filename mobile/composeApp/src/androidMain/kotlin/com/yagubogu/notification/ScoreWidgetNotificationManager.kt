@@ -56,7 +56,7 @@ class ScoreWidgetNotificationManager(
 
         return NotificationCompat
             .Builder(context, ScoreWidgetNotificationChannel.ID)
-            .setSmallIcon(R.drawable.ic_score_widget_notification)
+            .setSmallIcon(R.drawable.ic_yagubogu_notification)
             .setContentTitle(notificationTitle(payload))
             .setContentText(notificationText(payload))
             .setCustomContentView(createCompactContentView(payload))
@@ -180,7 +180,7 @@ class ScoreWidgetNotificationManager(
             "NC" -> R.drawable.img_mascot_nc
             "HH" -> R.drawable.img_mascot_hh
             "OB" -> R.drawable.img_mascot_ob
-            else -> R.drawable.ic_score_widget_notification
+            else -> R.drawable.ic_yagubogu_notification
         }
 
     private fun createContentIntent(gameId: Long): PendingIntent {
