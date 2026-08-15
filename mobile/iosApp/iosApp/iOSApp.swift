@@ -2,6 +2,7 @@ import AppTrackingTransparency
 import ComposeApp
 import GoogleMobileAds
 import GoogleSignIn
+import KakaoMapsSDK
 import SwiftUI
 import UIKit
 import FirebaseCore
@@ -23,8 +24,48 @@ struct iOSApp: App {
 
     init() {
         FirebaseApp.configure()
+        setupKakaoMaps()
+        setupPlaceMapProvider()
         setupBannerAdProvider()
         setupInterstitialAdProvider()
+    }
+
+    private func setupKakaoMaps() {
+        guard
+            let appKey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_MAP_API") as? String,
+            !appKey.isEmpty
+        else {
+            assertionFailure("Missing KAKAO_MAP_API in Info.plist")
+            return
+        }
+
+        SDKInitializer.InitSDK(appKey: appKey)
+    }
+
+    private func setupPlaceMapProvider() {
+        let provider = PlaceMapViewProvider.shared
+
+        provider.create = { address, placeName, latitude, longitude in
+            KakaoPlaceMapView(
+                address: address,
+                placeName: placeName,
+                latitude: latitude.doubleValue,
+                longitude: longitude.doubleValue
+            )
+        }
+
+        provider.update = { view, address, placeName, latitude, longitude in
+            (view as? KakaoPlaceMapView)?.update(
+                address: address,
+                placeName: placeName,
+                latitude: latitude.doubleValue,
+                longitude: longitude.doubleValue
+            )
+        }
+
+        provider.dispose = { (view: UIView) in
+            (view as? KakaoPlaceMapView)?.releaseMap()
+        }
     }
 
     /// ATT 요청 및 AdMob 초기화 로직
@@ -81,7 +122,7 @@ struct iOSApp: App {
                     .flatMap({ $0.windows })
                     .first(where: { $0.isKeyWindow })?.rootViewController
             else {
-                onComplete()
+                _ = onComplete()
                 return
             }
             coordinator.show(from: rootVC, adUnitId: adUnitId, onComplete: { _ = onComplete() })

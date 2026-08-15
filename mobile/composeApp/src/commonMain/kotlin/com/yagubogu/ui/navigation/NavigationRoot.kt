@@ -29,6 +29,7 @@ import com.yagubogu.ui.navigation.model.SettingNavKey
 import com.yagubogu.ui.navigation.model.toEntries
 import com.yagubogu.ui.onboarding.favorite.FavoriteTeamScreen
 import com.yagubogu.ui.onboarding.nickname.NicknameScreen
+import com.yagubogu.ui.place.PlaceDetailScreen
 import com.yagubogu.ui.ranking.component.RankingScreen
 import com.yagubogu.ui.ranking.model.RankingType
 import com.yagubogu.ui.setting.SettingScreen
@@ -90,6 +91,9 @@ fun NavigationRoot(
                         },
                         onAttendanceHistoryItemClick = { item: AttendanceHistoryItem ->
                             rootNavigator.navigate(Route.AttendanceHistoryDetail(item))
+                        },
+                        onPlaceItemClick = { placeId: Long, placeName: String ->
+                            rootNavigator.navigate(Route.PlaceDetail(placeId, placeName))
                         },
                     )
                 }
@@ -182,6 +186,12 @@ fun NavigationRoot(
                 entry<Route.AttendanceHistoryDetail> { key: Route.AttendanceHistoryDetail ->
                     AttendanceDetailScreen(
                         item = key.attendanceItem,
+                        onBackClick = { rootNavigator.goBack() },
+                    )
+                }
+                entry<Route.PlaceDetail> { key: Route.PlaceDetail ->
+                    PlaceDetailScreen(
+                        placeName = key.placeName,
                         onBackClick = { rootNavigator.goBack() },
                     )
                 }

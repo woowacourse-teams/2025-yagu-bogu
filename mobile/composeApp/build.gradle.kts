@@ -42,6 +42,7 @@ buildkonfig {
         buildConfigField(BOOLEAN, "IS_DEBUG", "true")
 
         stringField("BASE_URL", key = "BASE_URL_DEBUG")
+        stringField("KAKAO_MAP_API", key = "KAKAO_MAP_API_DEBUG")
         stringField("WEB_CLIENT_ID")
         stringField("IOS_CLIENT_ID")
         stringField("DEBUG_FIXED_DATE")
@@ -79,6 +80,7 @@ buildkonfig {
         buildConfigField(BOOLEAN, "IS_DEBUG", "false")
 
         stringField("BASE_URL", key = "BASE_URL_RELEASE")
+        stringField("KAKAO_MAP_API", key = "KAKAO_MAP_API")
         stringField("WEB_CLIENT_ID")
         stringField("IOS_CLIENT_ID")
         // AdMob Ids
@@ -160,6 +162,9 @@ kotlin {
 
             // Google Services
             implementation(libs.play.services.location)
+
+            // Kakao Maps
+            implementation(libs.kakao.maps.open.android)
 
             // AdMob
             implementation(libs.ads.mobile.sdk)

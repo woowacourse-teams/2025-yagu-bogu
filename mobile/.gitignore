@@ -19,6 +19,8 @@ captures
 node_modules/
 composeApp/release/
 iosApp/Pods/
+iosApp/Configuration/Config.xcconfig
+iosApp/Configuration/Secrets.xcconfig
 iosApp/Configuration/
 **/google-services.json
 **/yagubogu-keystore

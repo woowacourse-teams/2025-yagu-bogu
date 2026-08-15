@@ -37,6 +37,22 @@
     <string name="bottom_navigation_stats">통계</string>
     <string name="bottom_navigation_attendance_history">직관 내역</string>
     <string name="bottom_navigation_livetalk">현장톡</string>
+    <string name="bottom_navigation_place">플레이스</string>
+
+    <string name="place_category_food">맛집</string>
+    <string name="place_category_stay">숙소</string>
+    <string name="place_category_tour">관광지</string>
+    <string name="place_category_show">공연</string>
+    <string name="place_category_cafe">카페</string>
+    <string name="place_recommendation_title">추천 인기 플레이스</string>
+    <string name="place_sort_distance">거리순</string>
+    <string name="place_sort_popular">인기순</string>
+    <string name="place_detail_title">%1$s 플레이스</string>
+    <string name="place_detail_visitor_standard">주변 방문자 기준</string>
+    <string name="place_detail_location_title">위치</string>
+    <string name="place_detail_copy_address_content_description">주소 복사하기</string>
+    <string name="place_detail_business_hours">영업 시간</string>
+    <string name="place_detail_phone_number">전화번호</string>
 
     <string name="exit_dialog_title">야구보구를 종료할까요?</string>
     <string name="exit_dialog_confirm">앱 종료하기</string>
