@@ -63,7 +63,12 @@ public class GameCenterSyncService {
         String homeTeam = detail.getHomeTeamName();
         String awayTeam = detail.getAwayTeamName();
         LocalTime startTime = parseTime(detail.getStartTime());
-        GameState state = GameState.fromName(detail.getStatus());
+        GameState state = GameState.tryFromName(detail.getStatus()).orElse(null);
+        if (state == null) {
+            log.warn("[BRONZE] 알 수 없는 GameCenter 경기 상태로 저장 생략: gameCode={}, status={}",
+                    detail.getGameCode(), detail.getStatus());
+            return false;
+        }
 
         boolean updated = bronzeGameService.updateGameState(
                 detail.getGameCode(), date, stadium, homeTeam, awayTeam, startTime, state
