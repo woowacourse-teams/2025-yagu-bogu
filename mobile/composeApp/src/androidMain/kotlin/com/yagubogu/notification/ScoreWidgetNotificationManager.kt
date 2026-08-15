@@ -1,12 +1,16 @@
 package com.yagubogu.notification
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.yagubogu.R
 import com.yagubogu.YaguBoguActivity
 import kotlinx.coroutines.sync.Mutex
@@ -33,7 +37,16 @@ class ScoreWidgetNotificationManager(
 
             stateStore.save(payload)
 
-            if (!availability.isEnabled()) {
+            // POST_NOTIFICATIONS는 권한 요청 후 거부/철회될 수 있으므로
+            // notify() 직전에 동일 스코프에서 명시적으로 검사한다 (MissingPermission lint 대응).
+            val permissionGranted =
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS,
+                    ) == PackageManager.PERMISSION_GRANTED
+
+            if (!permissionGranted || !availability.isChannelEnabled()) {
                 return HandleResult.SavedNotificationDisabled
             }
 
