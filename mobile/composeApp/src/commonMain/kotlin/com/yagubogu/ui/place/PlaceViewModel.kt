@@ -7,7 +7,6 @@ import com.yagubogu.data.dto.response.place.PlaceDetailResponse
 import com.yagubogu.data.dto.response.place.PlacesResponse
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.place.PlaceRepository
-import com.yagubogu.data.util.ApiException
 import com.yagubogu.domain.model.Team
 import com.yagubogu.domain.model.homeStadiumName
 import com.yagubogu.ui.mapper.toApiCategory
@@ -36,7 +35,7 @@ class PlaceViewModel(
     private val _selectedStadiumId = MutableStateFlow<Long?>(null)
     val selectedStadiumId: StateFlow<Long?> = _selectedStadiumId.asStateFlow()
 
-    private val _selectedCategory = MutableStateFlow(PlaceCategory.STAY)
+    private val _selectedCategory = MutableStateFlow(PlaceCategory.FOOD)
     val selectedCategory: StateFlow<PlaceCategory> = _selectedCategory.asStateFlow()
 
     private val _places = MutableStateFlow<PlaceListUiState>(PlaceListUiState.Loading)
@@ -123,12 +122,7 @@ class PlaceViewModel(
                             )
                     }.onFailure { exception: Throwable ->
                         logger.w(exception) { "플레이스 상세 조회 실패" }
-                        _placeDetail.value =
-                            if (exception is ApiException.NotFound) {
-                                PlaceDetailUiState.NotFound
-                            } else {
-                                PlaceDetailUiState.Error(exception.message ?: "")
-                            }
+                        _placeDetail.value = PlaceDetailUiState.Error(exception.message ?: "")
                     }
             }
     }
