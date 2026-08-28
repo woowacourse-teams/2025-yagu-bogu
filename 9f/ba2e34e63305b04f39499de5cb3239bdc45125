@@ -1,0 +1,52 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_fd638edb5919f3::t_8113dba4b88103 165,169,174,183-184,227,238,242-243,252-301,309,316-317,379,384,389,394
+  s_fd638edb5919f3::t_703cc37380e867 153-154,156,176,178,245,247,311,313,330-331,333-367,396
+  s_fd638edb5919f3::t_5437756bf136dd 29
+  s_fd638edb5919f3::t_3bdfcfd2949b26 28
+  s_fd638edb5919f3::t_569e12d6905d6d 152
+  s_fd638edb5919f3::t_418e7354e7ad3d 155
+  s_fd638edb5919f3::t_c049443c08d02c 157-159,162-164
+  s_fd638edb5919f3::t_50b6eca0764b62 166-168
+  s_fd638edb5919f3::t_95148d708af87e 170-173
+  s_fd638edb5919f3::t_007e790bfc719f 175
+  s_fd638edb5919f3::t_4a99daaab8b5d1 177
+  s_fd638edb5919f3::t_f8e3734695968b 179-182
+  s_fd638edb5919f3::t_8b92af297aa7e3 185-186
+  s_fd638edb5919f3::t_4b36569b21c5b0 225-226
+  s_fd638edb5919f3::t_0ee220704ee6cc 228-230,235-237
+  s_fd638edb5919f3::t_8f086363d19ec2 239-241
+  s_fd638edb5919f3::t_3785df46027ec5 244
+  s_fd638edb5919f3::t_7ddc9814566851 246
+  s_fd638edb5919f3::t_ce5cc6e177f9c6 248-251
+  s_fd638edb5919f3::t_6a34c63cb55910 302-304,306-308
+  s_fd638edb5919f3::t_386d82a33d395a 310
+  s_fd638edb5919f3::t_f1da5b65fa27e6 312
+  s_fd638edb5919f3::t_0820f50e511102 314-315
+  s_fd638edb5919f3::t_a9eddcb53dba01 318-320,327-329
+  s_fd638edb5919f3::t_1fd9cffffb2a06 332
+  s_fd638edb5919f3::t_daba7331d61798 368-370
+  s_fd638edb5919f3::t_e6c2895e4e50f8 378
+  s_fd638edb5919f3::t_6bfc936191d58b 380-383
+  s_fd638edb5919f3::t_465407d6e16d98 385-388
+  s_fd638edb5919f3::t_47ea5573a10762 390-393
+  s_fd638edb5919f3::t_7e38b09a5a3bf8 395
+  s_fd638edb5919f3::t_f0a3f80d03da82 397-399
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/common/component/DiamondShape.kt
+  s_fd638edb5919f3::t_57d4f11af6e432 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "9fba2e34e63305b04f39499de5cb3239bdc45125",
+  "prompts": {},
+  "sessions": {
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jiyun Lee <02leejiyun@naver.com>"
+    }
+  }
+}
