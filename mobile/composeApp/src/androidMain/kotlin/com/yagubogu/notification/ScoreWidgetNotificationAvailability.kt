@@ -33,6 +33,7 @@ class ScoreWidgetNotificationAvailability(
                 ?.getNotificationChannel(ScoreWidgetNotificationChannel.ID)
 
         return NotificationManagerCompat.from(context).areNotificationsEnabled() &&
-            channel?.importance != NotificationManager.IMPORTANCE_NONE
+            channel != null &&
+            channel.importance != NotificationManager.IMPORTANCE_NONE
     }
 }
