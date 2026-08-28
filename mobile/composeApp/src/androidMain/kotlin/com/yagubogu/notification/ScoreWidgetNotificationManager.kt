@@ -30,7 +30,8 @@ class ScoreWidgetNotificationManager(
 
             if (currentState.gameId != null &&
                 currentState.gameId != payload.gameId &&
-                payload.type != ScoreWidgetPayload.Type.START
+                payload.type != ScoreWidgetPayload.Type.START &&
+                !currentState.isStale(payload.updatedAt)
             ) {
                 return HandleResult.IgnoredDifferentGame
             }
