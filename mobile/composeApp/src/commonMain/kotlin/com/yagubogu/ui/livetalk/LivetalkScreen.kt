@@ -36,7 +36,7 @@ import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.util.BackPressHandler
-import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.painterResource
@@ -76,12 +76,11 @@ fun LivetalkScreen(
 
         else -> {
             LivetalkScreen(
-                items = uiState.stadiumItems,
+                uiState = uiState,
                 onItemClick = { item: LivetalkStadiumItem ->
                     onLivetalkItemClick(item.gameId, item.isVerified)
                 },
                 modifier = modifier,
-                isWeatherLoaded = uiState.isWeatherLoaded,
                 scrollToTopEvent = scrollToTopEvent,
             )
         }
@@ -106,14 +105,13 @@ private fun ShimmerLivetalkScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun LivetalkScreen(
-    items: ImmutableList<LivetalkStadiumItem>,
+    uiState: LivetalkUiState,
     onItemClick: (LivetalkStadiumItem) -> Unit,
     modifier: Modifier = Modifier,
-    isWeatherLoaded: Boolean = false,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
-    val showBannerAd = items.size >= BANNER_AD_INDEX
+    val showBannerAd = uiState.stadiumItems.size >= BANNER_AD_INDEX
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
@@ -137,14 +135,14 @@ private fun LivetalkScreen(
                 .background(Gray050),
     ) {
         items(
-            count = items.size + if (showBannerAd) 1 else 0,
+            count = uiState.stadiumItems.size + if (showBannerAd) 1 else 0,
             key = { index: Int ->
                 if (showBannerAd && index == BANNER_AD_INDEX) {
                     "livetalk_banner_ad"
                 } else {
                     val itemIndex =
                         if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                    items[itemIndex].gameId
+                    uiState.stadiumItems[itemIndex].gameId
                 }
             },
         ) { index: Int ->
@@ -155,10 +153,10 @@ private fun LivetalkScreen(
                 )
             } else {
                 val itemIndex = if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                LivetalkStadiumItem(item = items[itemIndex], onClick = onItemClick)
+                LivetalkStadiumItem(item = uiState.stadiumItems[itemIndex], onClick = onItemClick)
             }
         }
-        if (isWeatherLoaded) {
+        if (uiState.isWeatherLoaded) {
             item {
                 Text(
                     text = stringResource(Res.string.livetalk_weather_source_info_text),
@@ -204,9 +202,13 @@ private fun EmptyLivetalkScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun LivetalkScreenPreview() {
     LivetalkScreen(
-        items = LIVETALK_STADIUM_ITEMS,
+        uiState =
+            LivetalkUiState(
+                isLoading = false,
+                stadiumItems = LIVETALK_STADIUM_ITEMS.toImmutableList(),
+                isWeatherLoaded = true,
+            ),
         onItemClick = {},
-        isWeatherLoaded = true,
     )
 }
 
