@@ -104,9 +104,9 @@ data class ScoreWidgetPayload(
         private fun Map<String, String>.scoreOrNull(key: String): Int? = get(key)?.takeIf(String::isNotBlank)?.toInt()
 
         private fun Map<String, String>.basesOrNull(): Bases? {
-            val first = get("baseFirst") ?: return null
-            val second = get("baseSecond") ?: return null
-            val third = get("baseThird") ?: return null
+            val first = get("baseFirst")?.takeIf(String::isNotBlank) ?: return null
+            val second = get("baseSecond")?.takeIf(String::isNotBlank) ?: return null
+            val third = get("baseThird")?.takeIf(String::isNotBlank) ?: return null
 
             return Bases(
                 first = first.toBooleanStrict(),
@@ -116,9 +116,9 @@ data class ScoreWidgetPayload(
         }
 
         private fun Map<String, String>.countOrNull(): Count? {
-            val balls = get("balls") ?: return null
-            val strikes = get("strikes") ?: return null
-            val outs = get("outs") ?: return null
+            val balls = get("balls")?.takeIf(String::isNotBlank) ?: return null
+            val strikes = get("strikes")?.takeIf(String::isNotBlank) ?: return null
+            val outs = get("outs")?.takeIf(String::isNotBlank) ?: return null
 
             return Count(
                 balls = balls.toInt(),
