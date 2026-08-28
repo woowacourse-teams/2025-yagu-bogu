@@ -50,8 +50,7 @@ class ScoreWidgetStateStore(
     ) {
         // 이전 게임의 마지막 갱신이 이 시간보다 오래됐다면, START 유실 등으로
         // 새 게임 전환을 더는 감지할 수 없는 상태로 보고 강제로 전환을 허용한다.
-        fun isStale(now: Instant): Boolean =
-            lastUpdatedAt == null || Duration.between(lastUpdatedAt, now) > STALE_THRESHOLD
+        fun isStale(now: Instant): Boolean = lastUpdatedAt == null || Duration.between(lastUpdatedAt, now) > STALE_THRESHOLD
     }
 
     private companion object {
