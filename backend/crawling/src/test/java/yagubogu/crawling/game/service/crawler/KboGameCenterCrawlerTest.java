@@ -302,7 +302,7 @@ class KboGameCenterCrawlerTest {
         lenient().when(scoreLocator.textContent()).thenReturn(score);
         lenient().when(scoreLocator.getAttribute("class")).thenReturn("score");
 
-        lenient().when(teamLocator.locator(".today-pitcher p")).thenReturn(pitcherLocator);
+        lenient().when(teamLocator.locator(".today-pitcher")).thenReturn(pitcherLocator);
         lenient().when(pitcherLocator.count()).thenReturn(0);
     }
 }

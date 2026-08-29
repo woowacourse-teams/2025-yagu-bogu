@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "crawler.scheduler")
+@ConfigurationProperties(prefix = "kbo.scheduler")
 public class CrawlerSchedulerProperties {
 
     @DateTimeFormat(pattern = "HH:mm")
