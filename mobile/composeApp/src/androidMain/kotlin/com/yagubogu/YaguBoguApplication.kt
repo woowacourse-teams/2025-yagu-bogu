@@ -23,20 +23,32 @@ import com.yagubogu.di.serviceModule
 import com.yagubogu.di.timeModule
 import com.yagubogu.di.useCaseModule
 import com.yagubogu.di.viewModelModule
+import com.yagubogu.notification.ScoreWidgetDeviceRegistrar
+import com.yagubogu.notification.ScoreWidgetNotificationChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 
 @OptIn(ExperimentalKermitApi::class)
-class YaguBoguApplication : Application() {
+class YaguBoguApplication :
+    Application(),
+    KoinComponent {
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val widgetDeviceRegistrar: ScoreWidgetDeviceRegistrar by inject()
+
     override fun onCreate() {
         super.onCreate()
         setupLogging()
         setupAnalytics()
         setupAds()
         setupKoin()
+        ScoreWidgetNotificationChannel.create(this)
+        setupWidgetDeviceRegistration()
     }
 
     private fun setupAds() {
@@ -85,5 +97,9 @@ class YaguBoguApplication : Application() {
                 configModule,
             )
         }
+    }
+
+    private fun setupWidgetDeviceRegistration() {
+        widgetDeviceRegistrar.start(scope = applicationScope)
     }
 }

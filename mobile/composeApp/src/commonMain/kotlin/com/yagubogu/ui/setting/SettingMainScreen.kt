@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.BuildKonfig
 import com.yagubogu.ui.common.component.profile.ProfileImage
+import com.yagubogu.ui.common.platform.PlatformType
+import com.yagubogu.ui.common.platform.currentPlatform
 import com.yagubogu.ui.login.model.VersionInfo
 import com.yagubogu.ui.setting.component.SettingButton
 import com.yagubogu.ui.setting.component.SettingButtonGroup
@@ -78,6 +80,7 @@ fun SettingMainScreen(
 
     val memberInfoItem: State<MemberInfoItem> =
         viewModel.myMemberInfoItem.collectAsStateWithLifecycle(MemberInfoItem())
+    val scoreWidgetNotification: Boolean by viewModel.scoreWidgetNotification.collectAsStateWithLifecycle()
 
     var showNicknameEditDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
@@ -108,6 +111,14 @@ fun SettingMainScreen(
                     )
                 }
 
+                is SettingEvent.ScoreWidgetNotificationChangeFailure -> {
+                    val errorMessage = settingEvent.uiText.asString()
+                    snackbarHostState.showSingleSnackbar(
+                        scope = this,
+                        message = errorMessage,
+                    )
+                }
+
                 else -> Unit
             }
         }
@@ -123,6 +134,8 @@ fun SettingMainScreen(
         onOssLicenseClick = onOssLicenseClick,
         memberInfoItem = memberInfoItem.value,
         appVersion = getAppVersion(),
+        scoreWidgetNotification = scoreWidgetNotification,
+        onScoreWidgetNotificationChange = viewModel::updateScoreWidgetNotification,
         modifier = modifier,
     )
 
@@ -152,6 +165,8 @@ private fun SettingMainScreen(
     onOssLicenseClick: () -> Unit,
     memberInfoItem: MemberInfoItem,
     appVersion: String,
+    scoreWidgetNotification: Boolean,
+    onScoreWidgetNotificationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -168,6 +183,12 @@ private fun SettingMainScreen(
         MyProfile(memberInfoItem = memberInfoItem)
 
         SettingButtonGroup {
+            if (currentPlatform == PlatformType.ANDROID) {
+                ScoreWidgetNotificationSetting(
+                    enabled = scoreWidgetNotification,
+                    onEnabledChange = onScoreWidgetNotificationChange,
+                )
+            }
             SettingButton(
                 text = stringResource(Res.string.setting_edit_profile_image),
                 onClick = onProfileImageUpload,
@@ -184,6 +205,10 @@ private fun SettingMainScreen(
                 text = stringResource(Res.string.setting_manage_account),
                 onClick = onClickSettingAccount,
             )
+        }
+
+        if (BuildKonfig.IS_DEBUG && currentPlatform == PlatformType.ANDROID) {
+            ScoreWidgetDebugControls()
         }
 
         SettingButtonGroup {
@@ -276,5 +301,7 @@ private fun SettingMainScreenPreview() {
         onOssLicenseClick = {},
         memberInfoItem = MemberInfoItem(nickName = "야구보구"),
         appVersion = "1.0.0",
+        scoreWidgetNotification = false,
+        onScoreWidgetNotificationChange = {},
     )
 }

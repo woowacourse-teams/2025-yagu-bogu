@@ -2,4 +2,10 @@
 <resources>
     <color name="white">#FFFFFFFF</color>
     <color name="primary500">#FF22C55E</color>
+    <color name="score_widget_text">#FF222222</color>
+    <color name="score_widget_accent">#FFE53935</color>
+    <color name="score_widget_header">#FF111111</color>
+    <color name="score_widget_status">#FF2E7D32</color>
+    <color name="score_widget_detail">#FF555555</color>
+    <color name="score_widget_muted">#FF777777</color>
 </resources>
