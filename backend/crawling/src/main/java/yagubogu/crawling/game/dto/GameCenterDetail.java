@@ -33,7 +33,7 @@ public class GameCenterDetail {
     private String homeScore;
     private String winner;  // "away" or "home"
 
-    // 선발 예고 투수 (경기예정 상태에서만 채워짐)
+    // 선발 예고 투수
     private String awayProbablePitcher;
     private String homeProbablePitcher;
 }
