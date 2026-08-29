@@ -185,6 +185,7 @@ jobs:
             -e R2_S3_BUCKET="${{ secrets.R2_S3_BUCKET }}" \
             -e R2_PUBLIC_BASE_URL="${{ secrets.R2_PUBLIC_BASE_URL || 'https://images.yagubogu.com' }}" \
             -e R2_DEFAULT_PROFILE_IMAGE_URL="${{ secrets.R2_DEFAULT_PROFILE_IMAGE_URL || 'https://images.yagubogu.com/images/defaults/profile.png' }}" \
+            -e TOUR_API_SERVICE_KEY="${{ secrets.TOUR_API_SERVICE_KEY }}" \
             -l app=yagubogu-backend \
             -l release.version="${NEXT_VERSION_WITH_V}" \
             -l release.digest="${DIGEST}" \

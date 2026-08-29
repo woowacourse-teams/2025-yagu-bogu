@@ -6,6 +6,7 @@ public record AdminCrawlingGamesResponse(
         int requested,
         int saved,
         int skipped,
+        int transformed,
         int reviewSaved,
         int reviewQueued,
         int failed,

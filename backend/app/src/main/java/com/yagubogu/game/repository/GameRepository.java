@@ -31,6 +31,13 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             LocalTime startAt
     );
 
+    List<Game> findByDateAndStadiumAndHomeTeamAndAwayTeam(
+            LocalDate date,
+            Stadium stadium,
+            Team homeTeam,
+            Team awayTeam
+    );
+
     @Query("""
             SELECT new com.yagubogu.game.dto.GameWithCheckInParam(
                 g.id,

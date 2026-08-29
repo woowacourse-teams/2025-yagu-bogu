@@ -27,6 +27,7 @@ public class AdminCrawlingService {
         int requested = 0;
         int saved = 0;
         int skipped = 0;
+        int transformed = 0;
         int reviewSaved = 0;
         int reviewQueued = 0;
         List<String> savedGameCodes = new ArrayList<>();
@@ -40,6 +41,7 @@ public class AdminCrawlingService {
                 requested += crawlingResponse.requested();
                 saved += crawlingResponse.saved();
                 skipped += crawlingResponse.skipped();
+                transformed += crawlingResponse.transformed();
                 savedGameCodes.addAll(crawlingResponse.savedGameCodes());
             } catch (Exception exception) {
                 failedDates.add(date.toString());
@@ -70,6 +72,7 @@ public class AdminCrawlingService {
                 requested,
                 saved,
                 skipped,
+                transformed,
                 reviewSaved,
                 reviewQueued,
                 failedDates.size() + failedGameCodes.size(),

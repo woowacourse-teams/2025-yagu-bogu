@@ -3,6 +3,8 @@ package com.yagubogu.game.domain;
 import com.yagubogu.game.exception.GameSyncException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public enum GameState {
 
@@ -13,6 +15,7 @@ public enum GameState {
     ;
 
     private static final List<GameState> FINALIZED_GAME_STATES = List.of(COMPLETED, CANCELED);
+    private static final Pattern LIVE_INNING_PATTERN = Pattern.compile("\\d+회\\s*(초|말)");
 
     private final Integer stateNumber;
     private final String statusName;
@@ -30,14 +33,37 @@ public enum GameState {
     }
 
     public static GameState fromName(final String state) {
-        if (state == null || state.isEmpty()) {
+        if (state == null || state.isBlank()) {
             return GameState.SCHEDULED;
         }
 
-        return Arrays.stream(values())
-                .filter(status -> state.contains(status.statusName))
-                .findFirst()
-                .orElse(LIVE);
+        return tryFromName(state)
+                .orElseThrow(() -> new GameSyncException("Unknown game status: " + state));
+    }
+
+    public static Optional<GameState> tryFromName(final String state) {
+        if (state == null || state.isBlank()) {
+            return Optional.empty();
+        }
+
+        String normalized = state.trim();
+        if (normalized.contains("경기전") || normalized.contains("경기예정")) {
+            return Optional.of(SCHEDULED);
+        }
+        if (normalized.contains("종료")) {
+            return Optional.of(COMPLETED);
+        }
+        if (normalized.contains("취소")) {
+            return Optional.of(CANCELED);
+        }
+        if (normalized.equals(LIVE.statusName)
+                || normalized.contains("경기중")
+                || normalized.contains("진행중")
+                || normalized.contains("중단")
+                || LIVE_INNING_PATTERN.matcher(normalized).find()) {
+            return Optional.of(LIVE);
+        }
+        return Optional.empty();
     }
 
     public boolean canTransitionTo(GameState newState) {
@@ -46,7 +72,7 @@ public enum GameState {
         }
 
         return switch (this) {
-            case SCHEDULED -> newState == LIVE || newState == CANCELED;
+            case SCHEDULED -> newState == LIVE || newState == COMPLETED || newState == CANCELED;
             case LIVE -> newState == COMPLETED || newState == CANCELED;
             default -> false;
         };

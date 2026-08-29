@@ -41,7 +41,7 @@ public interface KboCrawlerControllerInterface {
     ResponseEntity<Integer> fetchGameCenter(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
 
-    @Operation(summary = "특정 날짜 게임 크롤링", description = "지정한 날짜의 모든 스코어보드를 가져와 신규 게임을 저장하고 즉시 ETL합니다.")
+    @Operation(summary = "특정 날짜 게임 크롤링", description = "지정한 날짜의 스코어보드와 게임센터를 가져온 뒤 Bronze 처리 여부와 관계없이 Silver를 강제 동기화합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "날짜 기반 크롤링 성공")
     })

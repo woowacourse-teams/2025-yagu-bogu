@@ -12,6 +12,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,9 @@ public class BronzeGame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "raw_id")
     private Long id;
+
+    @Column(name = "game_code", unique = true, length = 20)
+    private String gameCode;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
@@ -65,7 +69,8 @@ public class BronzeGame {
     @Column(name = "state", length = 30)
     private GameState state;
 
-    public BronzeGame(final LocalDate date,
+    public BronzeGame(final String gameCode,
+                      final LocalDate date,
                       final String stadium,
                       final String homeTeam,
                       final String awayTeam,
@@ -73,6 +78,7 @@ public class BronzeGame {
                       final LocalDateTime collectedAt,
                       final String payload,
                       final String contentHash) {
+        this.gameCode = gameCode;
         this.date = date;
         this.stadium = stadium;
         this.homeTeam = homeTeam;
@@ -85,7 +91,21 @@ public class BronzeGame {
         this.state = null;
     }
 
-    public void update(final LocalDateTime collectedAt, final String payload, final String contentHash) {
+    public void update(final String gameCode,
+                       final LocalDate date,
+                       final String stadium,
+                       final String homeTeam,
+                       final String awayTeam,
+                       final LocalTime startTime,
+                       final LocalDateTime collectedAt,
+                       final String payload,
+                       final String contentHash) {
+        this.gameCode = gameCode;
+        this.date = date;
+        this.stadium = stadium;
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.startTime = startTime;
         this.collectedAt = collectedAt;
         this.payload = payload;
         this.contentHash = contentHash;
@@ -96,11 +116,41 @@ public class BronzeGame {
         this.etlProcessedAt = processedAt;
     }
 
+    public boolean updateMetadata(final String newGameCode,
+                                  final LocalDate newDate,
+                                  final String newStadium,
+                                  final String newHomeTeam,
+                                  final String newAwayTeam,
+                                  final LocalTime newStartTime,
+                                  final LocalDateTime newCollectedAt) {
+        String resolvedGameCode = newGameCode == null || newGameCode.isBlank() ? this.gameCode : newGameCode;
+        boolean changed = !Objects.equals(this.gameCode, resolvedGameCode)
+                || !Objects.equals(this.date, newDate)
+                || !Objects.equals(this.stadium, newStadium)
+                || !Objects.equals(this.homeTeam, newHomeTeam)
+                || !Objects.equals(this.awayTeam, newAwayTeam)
+                || !Objects.equals(this.startTime, newStartTime);
+        if (!changed) {
+            return false;
+        }
+
+        this.gameCode = resolvedGameCode;
+        this.date = newDate;
+        this.stadium = newStadium;
+        this.homeTeam = newHomeTeam;
+        this.awayTeam = newAwayTeam;
+        this.startTime = newStartTime;
+        this.collectedAt = newCollectedAt;
+        this.etlProcessedAt = null;
+        return true;
+    }
+
     public boolean updateState(final GameState newState) {
         if (newState == null || newState.equals(this.state)) {
             return false;
         }
         this.state = newState;
+        this.etlProcessedAt = null;
         return true;
     }
 }

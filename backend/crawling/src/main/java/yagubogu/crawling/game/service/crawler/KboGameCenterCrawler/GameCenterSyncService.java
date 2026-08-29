@@ -64,7 +64,7 @@ public class GameCenterSyncService {
             }
         }
 
-        log.info("[BRONZE] Processed {} games, {} state updates", gameDetails.size(), updatedCount);
+        log.info("[BRONZE] Processed {} games, {} data updates", gameDetails.size(), updatedCount);
         return updatedCount;
     }
 
@@ -103,6 +103,27 @@ public class GameCenterSyncService {
     }
 
     /**
+     * 스코어보드(ScoreBoard.aspx) 크롤링 결과로 진루정보/볼·스트라이크·아웃을 games 테이블에 직접 반영
+     * (Bronze/ETL을 거치지 않음)
+     */
+    public void updateLiveBaseState(
+            String gameCode,
+            Boolean firstBaseOccupied,
+            Boolean secondBaseOccupied,
+            Boolean thirdBaseOccupied,
+            Integer balls,
+            Integer strikes,
+            Integer outs
+    ) {
+        gameRepository.findByGameCode(gameCode).ifPresentOrElse(
+                game -> game.updateLiveBaseState(
+                        firstBaseOccupied, secondBaseOccupied, thirdBaseOccupied, balls, strikes, outs
+                ),
+                () -> log.debug("[LIVE_STATE] Game not found for gameCode={}, skip base state update", gameCode)
+        );
+    }
+
+    /**
      * 개별 경기 상태를 Bronze Layer에 반영
      */
     private boolean updateGameState(GameCenterDetail detail) {
@@ -111,10 +132,15 @@ public class GameCenterSyncService {
         String homeTeam = detail.getHomeTeamName();
         String awayTeam = detail.getAwayTeamName();
         LocalTime startTime = parseTime(detail.getStartTime());
-        GameState state = GameState.fromName(detail.getStatus());
+        GameState state = GameState.tryFromName(detail.getStatus()).orElse(null);
+        if (state == null) {
+            log.warn("[BRONZE] 알 수 없는 GameCenter 경기 상태로 저장 생략: gameCode={}, status={}",
+                    detail.getGameCode(), detail.getStatus());
+            return false;
+        }
 
         boolean updated = bronzeGameService.updateGameState(
-                date, stadium, homeTeam, awayTeam, startTime, state
+                detail.getGameCode(), date, stadium, homeTeam, awayTeam, startTime, state
         );
 
         if (updated) {
