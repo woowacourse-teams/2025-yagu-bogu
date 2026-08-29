@@ -65,6 +65,9 @@ class KboScoreboardCrawlerTest {
     @Mock
     private KboCrawlerProperties.PitcherSelectors mockPitcherSelectors;
 
+    @Mock
+    private KboCrawlerProperties.BaseSelectors mockBaseSelectors;
+
     @BeforeEach
     void setUp() {
         lenient().when(mockProperties.getCrawler()).thenReturn(mockCrawlerConfig);
@@ -100,6 +103,14 @@ class KboScoreboardCrawlerTest {
         lenient().when(mockScoreboardSelectors.getAwayTeam()).thenReturn(mockAwayTeamSelectors);
         lenient().when(mockScoreboardSelectors.getScoreTable()).thenReturn(mockScoreTableSelectors);
         lenient().when(mockScoreboardSelectors.getPitcher()).thenReturn(mockPitcherSelectors);
+        lenient().when(mockScoreboardSelectors.getBase()).thenReturn(mockBaseSelectors);
+
+        // BaseSelectors 설정 (테스트 픽스처에는 .base가 없어서 항상 매칭되지 않음)
+        lenient().when(mockBaseSelectors.getContainer()).thenReturn(".base");
+        lenient().when(mockBaseSelectors.getFirst()).thenReturn(".base1 img");
+        lenient().when(mockBaseSelectors.getSecond()).thenReturn(".base2 img");
+        lenient().when(mockBaseSelectors.getThird()).thenReturn(".base3 img");
+        lenient().when(mockBaseSelectors.getCount()).thenReturn(".base > p");
 
         //  TeamSelectors 내부 설정
         lenient().when(mockHomeTeamSelectors.getName()).thenReturn(".home-team .name");
@@ -120,6 +131,7 @@ class KboScoreboardCrawlerTest {
         lenient().when(mockPatterns.getDateFormat()).thenReturn("yyyy.MM.dd");
         lenient().when(mockPatterns.getTimeFormat()).thenReturn("HH:mm");
         lenient().when(mockPatterns.getPitcherLabel()).thenReturn("(승|패|세)\\s+(.+)");
+        lenient().when(mockPatterns.getCountLabel()).thenReturn("(\\d+)-(\\d+)\\s*(\\d+)out");
 
         crawler = new KboScoreboardCrawler(mockProperties, mockPlaywrightManager);
     }

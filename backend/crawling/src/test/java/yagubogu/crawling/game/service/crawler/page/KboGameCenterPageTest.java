@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import yagubogu.crawling.game.config.KboCrawlerProperties;
+import yagubogu.crawling.game.dto.GameCenterDetail;
 
 @ExtendWith(MockitoExtension.class)
 class KboGameCenterPageTest {
@@ -87,6 +88,101 @@ class KboGameCenterPageTest {
 
             // Then
             assertThat(count).isEqualTo(5);
+        }
+    }
+
+    @Nested
+    @DisplayName("경기 상세 정보 추출 테스트")
+    class ExtractGameDetailTests {
+
+        @Test
+        @DisplayName("extractGameDetail - class에 ing가 있으면 gameStatus는 경기중")
+        void extractGameDetail_InProgress_SetsGameStatusInProgress() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont ing");
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getGameStatus()).isEqualTo("경기중");
+        }
+
+        @Test
+        @DisplayName("extractGameDetail - class에 end가 있으면 gameStatus는 경기종료")
+        void extractGameDetail_Ended_SetsGameStatusEnded() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont end");
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getGameStatus()).isEqualTo("경기종료");
+        }
+
+        @Test
+        @DisplayName("extractGameDetail - end/cancel/ing 모두 없으면 gameStatus는 경기예정")
+        void extractGameDetail_Scheduled_SetsGameStatusScheduled() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont");
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getGameStatus()).isEqualTo("경기예정");
+        }
+
+        @Test
+        @DisplayName("extractGameDetail - 이닝(초/말)을 알 수 없으면 today-pitcher가 있어도 타자/투수로 배정하지 않음")
+        void extractGameDetail_UnknownInning_DoesNotAssignBatterOrPitcher() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont end");
+
+            Locator awayTeam = mock(Locator.class);
+            lenient().when(awayTeam.count()).thenReturn(1);
+            lenient().when(awayTeam.locator(".score")).thenReturn(mock(Locator.class));
+            Locator awayTodayPitcher = mock(Locator.class);
+            lenient().when(awayTodayPitcher.count()).thenReturn(1);
+            lenient().when(awayTodayPitcher.textContent()).thenReturn("선발투수A");
+            lenient().when(awayTeam.locator(".today-pitcher")).thenReturn(awayTodayPitcher);
+            lenient().when(gameElement.locator(".team.away")).thenReturn(awayTeam);
+
+            Locator homeTeam = mock(Locator.class);
+            lenient().when(homeTeam.count()).thenReturn(1);
+            lenient().when(homeTeam.locator(".score")).thenReturn(mock(Locator.class));
+            Locator homeTodayPitcher = mock(Locator.class);
+            lenient().when(homeTodayPitcher.count()).thenReturn(1);
+            lenient().when(homeTodayPitcher.textContent()).thenReturn("선발투수B");
+            lenient().when(homeTeam.locator(".today-pitcher")).thenReturn(homeTodayPitcher);
+            lenient().when(gameElement.locator(".team.home")).thenReturn(homeTeam);
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getCurrentBatterTeam()).isNull();
+            assertThat(result.getCurrentBatterName()).isNull();
+            assertThat(result.getCurrentPitcherTeam()).isNull();
+            assertThat(result.getCurrentPitcherName()).isNull();
+        }
+
+        private Locator createMinimalGameElement(String classAttr) {
+            Locator gameElement = mock(Locator.class);
+            lenient().when(gameElement.getAttribute("class")).thenReturn(classAttr);
+
+            lenient().when(gameElement.locator(".top > ul > li")).thenReturn(mock(Locator.class));
+            lenient().when(gameElement.locator(".middle .broadcasting")).thenReturn(mock(Locator.class));
+            lenient().when(gameElement.locator(".middle .staus")).thenReturn(mock(Locator.class));
+            lenient().when(gameElement.locator(".team.away")).thenReturn(mock(Locator.class));
+            lenient().when(gameElement.locator(".team.home")).thenReturn(mock(Locator.class));
+
+            return gameElement;
         }
     }
 

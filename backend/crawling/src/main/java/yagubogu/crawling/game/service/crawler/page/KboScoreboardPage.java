@@ -28,11 +28,13 @@ import yagubogu.crawling.game.dto.KboScoreboardTeam;
 public class KboScoreboardPage extends BaseKboPage {
 
     private final Pattern pitcherPattern;
+    private final Pattern countPattern;
     private final DateTimeFormatter timeFormatter;
 
     public KboScoreboardPage(Page page, KboCrawlerProperties properties) {
         super(page, properties);
         this.pitcherPattern = Pattern.compile(properties.getPatterns().getPitcherLabel());
+        this.countPattern = Pattern.compile(properties.getPatterns().getCountLabel());
         this.timeFormatter = DateTimeFormatter.ofPattern(properties.getPatterns().getTimeFormat());
     }
 
@@ -130,7 +132,7 @@ public class KboScoreboardPage extends BaseKboPage {
         // 투수 정보 파싱
         Pitcher pitcher = parsePitcher(scoreboard);
 
-        return Optional.of(new KboScoreboardGame(
+        KboScoreboardGame game = new KboScoreboardGame(
                 gameCode,
                 date,
                 emptyToNull(status),
@@ -144,7 +146,55 @@ public class KboScoreboardPage extends BaseKboPage {
                 pitcher.winning(),
                 pitcher.saving(),
                 pitcher.losing()
-        ));
+        );
+
+        // 진루정보 및 볼/스트라이크/아웃 (경기중이 아니면 .base 자체가 없어서 모두 null로 남음)
+        parseBaseOccupancy(scoreboard, game);
+        parseCount(scoreboard, game);
+
+        return Optional.of(game);
+    }
+
+    private void parseBaseOccupancy(ElementHandle scoreboard, KboScoreboardGame game) {
+        var baseSelectors = properties.getSelectors().getScoreboard().getBase();
+
+        ElementHandle container = queryCSS(scoreboard, baseSelectors.getContainer());
+        if (container == null) {
+            return;
+        }
+
+        game.setFirstBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getFirst()));
+        game.setSecondBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getSecond()));
+        game.setThirdBaseOccupied(isBaseOccupied(scoreboard, baseSelectors.getThird()));
+    }
+
+    private Boolean isBaseOccupied(ElementHandle scoreboard, String selector) {
+        ElementHandle img = queryCSS(scoreboard, selector);
+        if (img == null) {
+            return null;
+        }
+
+        String src = img.getAttribute("src");
+        return src != null && src.contains("base_on");
+    }
+
+    private void parseCount(ElementHandle scoreboard, KboScoreboardGame game) {
+        var baseSelectors = properties.getSelectors().getScoreboard().getBase();
+
+        ElementHandle countElem = queryCSS(scoreboard, baseSelectors.getCount());
+        if (countElem == null) {
+            return;
+        }
+
+        String text = countElem.innerText().replace('\u00A0', ' ').trim();
+        Matcher matcher = countPattern.matcher(text);
+        if (!matcher.find()) {
+            return;
+        }
+
+        game.setBalls(Integer.parseInt(matcher.group(1)));
+        game.setStrikes(Integer.parseInt(matcher.group(2)));
+        game.setOuts(Integer.parseInt(matcher.group(3)));
     }
 
     private String extractGameCode(String boxScoreUrl) {

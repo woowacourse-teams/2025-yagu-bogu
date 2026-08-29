@@ -31,6 +31,8 @@ public class TourApiClient {
     private final TourApiProperties props;
     private final ObjectMapper objectMapper;
 
+    private long lastRequestAtMillis = 0L;
+
     /**
      * 구장 주변 장소를 카테고리(contentTypeId, 카페는 cat3 추가)별로 한국관광공사 API로 조회합니다.
      *
@@ -65,6 +67,7 @@ public class TourApiClient {
         URI uri = builder.build(true).toUri();
 
         try {
+            throttle();
             String json = restClient.get()
                     .uri(uri)
                     .retrieve()
@@ -115,6 +118,7 @@ public class TourApiClient {
 
         URI uri = builder.build(true).toUri();
 
+        throttle();
         String json = restClient.get()
                 .uri(uri)
                 .retrieve()
@@ -226,6 +230,28 @@ public class TourApiClient {
         }
 
         return envelope.path("body");
+    }
+
+    /**
+     * TourAPI는 초당 요청 수를 제한한다(LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR).
+     * 실제 HTTP 호출 직전마다 불러 마지막 호출 이후 {@code requestInterval}만큼 간격을 보장한다.
+     * 스케줄러/admin 수동 트리거 모두 단일 스레드로 순차 호출하는 구조라 synchronized로 충분하다.
+     */
+    private synchronized void throttle() {
+        long intervalMillis = props.getRequestInterval().toMillis();
+        if (intervalMillis <= 0) {
+            return;
+        }
+
+        long waitMillis = lastRequestAtMillis + intervalMillis - System.currentTimeMillis();
+        if (waitMillis > 0) {
+            try {
+                Thread.sleep(waitMillis);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        lastRequestAtMillis = System.currentTimeMillis();
     }
 
     private PlaceParam toParam(JsonNode item, long stadiumId) {

@@ -48,6 +48,7 @@ class TourApiClientTest {
                 "test-service-key",
                 "https://apis.data.go.kr/B551011/KorService2",
                 1000, 50,
+                Duration.ZERO,
                 Duration.ofSeconds(10), Duration.ofSeconds(30)
         );
         tourApiClient = new TourApiClient(restClient, props, objectMapper);
