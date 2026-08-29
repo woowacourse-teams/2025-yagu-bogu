@@ -4,8 +4,6 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.KboCrawlerProperties;
 import yagubogu.crawling.game.dto.GameCenterDetail;
@@ -194,9 +192,8 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 투수 정보
-        List<String> awayPitchers = extractPitchers(awayTeam);
-        gameCenter.setAwayPitchers(awayPitchers);
+        // 선발 예고 투수
+        gameCenter.setAwayProbablePitcher(extractProbablePitcher(awayTeam));
     }
 
     private void extractHomeTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
@@ -216,20 +213,23 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
-        // 투수 정보
-        List<String> homePitchers = extractPitchers(homeTeam);
-        gameCenter.setHomePitchers(homePitchers);
+        // 선발 예고 투수
+        gameCenter.setHomeProbablePitcher(extractProbablePitcher(homeTeam));
     }
 
-    private List<String> extractPitchers(Locator teamElement) {
-        Locator pitchers = teamElement.locator(".today-pitcher p");
-        List<String> pitcherList = new ArrayList<>();
-
-        for (int i = 0; i < pitchers.count(); i++) {
-            String pitcherInfo = pitchers.nth(i).textContent().trim();
-            pitcherList.add(pitcherInfo);
+    /**
+     * 선발 예고 투수 추출. 경기예정 상태에서만 노출되며,
+     * "<span class="before">선</span>이름" 구조라 라벨(선)을 제거하고 이름만 취한다.
+     */
+    private String extractProbablePitcher(Locator teamElement) {
+        Locator pitcherElem = teamElement.locator(".today-pitcher p");
+        if (pitcherElem.count() == 0) {
+            return null;
         }
 
-        return pitcherList;
+        Locator labelElem = pitcherElem.locator(".before");
+        String label = labelElem.count() > 0 ? labelElem.textContent() : "";
+        String name = pitcherElem.textContent().replace(label, "").trim();
+        return name.isEmpty() ? null : name;
     }
 }

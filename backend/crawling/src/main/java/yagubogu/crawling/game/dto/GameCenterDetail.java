@@ -1,6 +1,5 @@
 package yagubogu.crawling.game.dto;
 
-import java.util.List;
 import lombok.Data;
 
 @Data
@@ -34,8 +33,8 @@ public class GameCenterDetail {
     private String homeScore;
     private String winner;  // "away" or "home"
 
-    // 투수 정보
-    private List<String> awayPitchers;
-    private List<String> homePitchers;
+    // 선발 예고 투수 (경기예정 상태에서만 채워짐)
+    private String awayProbablePitcher;
+    private String homeProbablePitcher;
 }
 

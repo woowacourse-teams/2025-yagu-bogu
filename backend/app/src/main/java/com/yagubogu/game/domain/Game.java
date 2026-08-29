@@ -75,6 +75,12 @@ public class Game {
     @Column(name = "away_pitcher", nullable = true)
     private String awayPitcher;
 
+    @Column(name = "home_probable_pitcher", nullable = true)
+    private String homeProbablePitcher;
+
+    @Column(name = "away_probable_pitcher", nullable = true)
+    private String awayProbablePitcher;
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "game_state")
     private GameState gameState;
@@ -174,5 +180,14 @@ public class Game {
 
     public boolean hasTeam(final Team team) {
         return homeTeam.equals(team) || awayTeam.equals(team);
+    }
+
+    /**
+     * 게임센터 크롤링 결과로 선발 예고 투수를 갱신한다.
+     * Bronze/ETL을 거치지 않고 games 테이블에 직접 반영한다.
+     */
+    public void updateProbablePitchers(final String homeProbablePitcher, final String awayProbablePitcher) {
+        this.homeProbablePitcher = homeProbablePitcher;
+        this.awayProbablePitcher = awayProbablePitcher;
     }
 }
