@@ -352,7 +352,9 @@ class KboScoreboardCrawlerTest {
 
         //  BoxScore Link
         ElementHandle boxScoreLink = mock(ElementHandle.class);
-        lenient().when(boxScoreLink.getAttribute("href")).thenReturn("/game/boxscore/20251026LGKT");
+        lenient().when(boxScoreLink.getAttribute("href")).thenReturn(
+                "/Schedule/GameCenter/Main.aspx?gameDate=20251026&gameId=20251026KTLG0&section=REVIEW"
+        );
         lenient().when(scoreboard.querySelector("a.box-score")).thenReturn(boxScoreLink);
 
         //  스코어 테이블 (완전한 Mock)

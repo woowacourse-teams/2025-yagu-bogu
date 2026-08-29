@@ -66,6 +66,7 @@ public abstract class E2eTestBase {
             em.createNativeQuery("TRUNCATE TABLE likes").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE like_windows").executeUpdate();
             em.createNativeQuery("TRUNCATE TABLE member_badges").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE places").executeUpdate();
 
             em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
         });
