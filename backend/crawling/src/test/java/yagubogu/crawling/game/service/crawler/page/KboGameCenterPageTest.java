@@ -138,6 +138,29 @@ class KboGameCenterPageTest {
         }
 
         @Test
+        @DisplayName("extractGameDetail - 경기예정이면 선발 라벨을 제외한 예고 투수 이름을 추출")
+        void extractGameDetail_Scheduled_ExtractsProbablePitchers() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont");
+            Locator awayTeam = createTeamWithProbablePitcher("로건");
+            Locator homeTeam = createTeamWithProbablePitcher("페덱");
+            lenient().when(gameElement.locator(".team.away"))
+                    .thenReturn(awayTeam);
+            lenient().when(gameElement.locator(".team.home"))
+                    .thenReturn(homeTeam);
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.getAwayProbablePitcher()).isEqualTo("로건");
+            assertThat(result.getHomeProbablePitcher()).isEqualTo("페덱");
+            assertThat(result.getCurrentBatterName()).isNull();
+            assertThat(result.getCurrentPitcherName()).isNull();
+        }
+
+        @Test
         @DisplayName("extractGameDetail - 이닝(초/말)을 알 수 없으면 today-pitcher가 있어도 타자/투수로 배정하지 않음")
         void extractGameDetail_UnknownInning_DoesNotAssignBatterOrPitcher() {
             // Given
@@ -183,6 +206,24 @@ class KboGameCenterPageTest {
             lenient().when(gameElement.locator(".team.home")).thenReturn(mock(Locator.class));
 
             return gameElement;
+        }
+
+        private Locator createTeamWithProbablePitcher(String pitcherName) {
+            Locator team = mock(Locator.class);
+            Locator score = mock(Locator.class);
+            Locator pitcher = mock(Locator.class);
+            Locator label = mock(Locator.class);
+
+            lenient().when(team.count()).thenReturn(1);
+            lenient().when(team.locator(".score")).thenReturn(score);
+            lenient().when(team.locator(".today-pitcher p")).thenReturn(pitcher);
+            lenient().when(pitcher.count()).thenReturn(1);
+            lenient().when(pitcher.locator(".before")).thenReturn(label);
+            lenient().when(label.count()).thenReturn(1);
+            lenient().when(label.textContent()).thenReturn("선");
+            lenient().when(pitcher.textContent()).thenReturn("선" + pitcherName);
+
+            return team;
         }
     }
 

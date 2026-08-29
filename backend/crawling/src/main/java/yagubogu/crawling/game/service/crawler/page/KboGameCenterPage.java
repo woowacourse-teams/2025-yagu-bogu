@@ -218,6 +218,11 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
+        if ("경기예정".equals(gameCenter.getGameStatus())) {
+            gameCenter.setAwayProbablePitcher(extractProbablePitcher(awayTeam));
+            return;
+        }
+
         // 현재 타자/투수: 초(원정팀 공격)면 타자, 말이면 투수, 알 수 없으면 배정하지 않음
         String todayPlayer = extractTodayPlayer(awayTeam);
         if (todayPlayer != null) {
@@ -248,6 +253,11 @@ public class KboGameCenterPage extends BaseKboPage {
             }
         }
 
+        if ("경기예정".equals(gameCenter.getGameStatus())) {
+            gameCenter.setHomeProbablePitcher(extractProbablePitcher(homeTeam));
+            return;
+        }
+
         // 현재 타자/투수: 말(홈팀 공격)이면 타자, 초면 투수, 알 수 없으면 배정하지 않음
         String todayPlayer = extractTodayPlayer(homeTeam);
         if (todayPlayer != null) {
@@ -269,5 +279,21 @@ public class KboGameCenterPage extends BaseKboPage {
 
         String text = pitcherElem.textContent().trim();
         return text.isEmpty() ? null : text;
+    }
+
+    /**
+     * 선발 예고 투수 추출. 경기예정 상태에서만 노출되며,
+     * "<span class="before">선</span>이름" 구조라 라벨(선)을 제거하고 이름만 취한다.
+     */
+    private String extractProbablePitcher(Locator teamElement) {
+        Locator pitcherElem = teamElement.locator(".today-pitcher p");
+        if (pitcherElem.count() == 0) {
+            return null;
+        }
+
+        Locator labelElem = pitcherElem.locator(".before");
+        String label = labelElem.count() > 0 ? labelElem.textContent() : "";
+        String name = pitcherElem.textContent().replace(label, "").trim();
+        return name.isEmpty() ? null : name;
     }
 }

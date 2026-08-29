@@ -1,14 +1,21 @@
 package yagubogu.crawling.game.service.crawler.KboGameCenterCrawler;
 
+import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
 import com.yagubogu.game.exception.GameSyncException;
+import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.BronzeGameService;
+import com.yagubogu.stadium.domain.Stadium;
+import com.yagubogu.stadium.repository.StadiumRepository;
+import com.yagubogu.team.domain.Team;
+import com.yagubogu.team.repository.TeamRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yagubogu.crawling.game.dto.GameCenter;
 import yagubogu.crawling.game.dto.GameCenterDetail;
 
@@ -19,6 +26,9 @@ public class GameCenterSyncService {
 
     private final KboGameCenterCrawler crawler;
     private final BronzeGameService bronzeGameService;
+    private final GameRepository gameRepository;
+    private final TeamRepository teamRepository;
+    private final StadiumRepository stadiumRepository;
 
     /**
      * 특정 날짜 경기 상세 정보 수집 및 Bronze Layer 저장
@@ -36,6 +46,7 @@ public class GameCenterSyncService {
     /**
      * GameCenterDetail 리스트를 받아서 Bronze Layer에 저장
      */
+    @Transactional
     public int saveToBronzeLayer(java.util.List<GameCenterDetail> gameDetails) {
         int updatedCount = 0;
 
@@ -45,6 +56,9 @@ public class GameCenterSyncService {
                 if (updated) {
                     updatedCount++;
                 }
+
+                // 선발 예고 투수는 재처리 대상이 아니라 games 테이블에 바로 반영
+                updateProbablePitchers(detail);
             } catch (Exception e) {
                 log.error("[BRONZE] 경기 상태 저장 실패: gameCode={}", detail.getGameCode(), e);
             }
@@ -52,6 +66,42 @@ public class GameCenterSyncService {
 
         log.info("[BRONZE] Processed {} games, {} data updates", gameDetails.size(), updatedCount);
         return updatedCount;
+    }
+
+    /**
+     * 크롤링한 선발 예고 투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음).
+     * 예정 경기에서만 값이 채워지며, 둘 다 없으면 건드리지 않는다.
+     */
+    private void updateProbablePitchers(GameCenterDetail detail) {
+        if (detail.getHomeProbablePitcher() == null && detail.getAwayProbablePitcher() == null) {
+            return;
+        }
+
+        LocalDate date = parseDate(detail.getGameDate());
+        String stadiumLocation = detail.getStadiumName();
+        String homeTeamName = detail.getHomeTeamName();
+        String awayTeamName = detail.getAwayTeamName();
+        LocalTime startTime = parseTime(detail.getStartTime());
+
+        Team homeTeam = teamRepository.findByShortName(homeTeamName).orElse(null);
+        Team awayTeam = teamRepository.findByShortName(awayTeamName).orElse(null);
+        Stadium stadium = stadiumRepository.findByLocation(stadiumLocation).orElse(null);
+
+        if (homeTeam == null || awayTeam == null || stadium == null) {
+            log.debug("[PROBABLE_PITCHER] Team/Stadium not found, skip: stadium={}, home={}, away={}",
+                    stadiumLocation, homeTeamName, awayTeamName);
+            return;
+        }
+
+        gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
+                        startTime)
+                .ifPresentOrElse(
+                        game -> game.updateProbablePitchers(
+                                detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
+                        ),
+                        () -> log.debug("[PROBABLE_PITCHER] Game not found, skip: gameCode={}",
+                                detail.getGameCode())
+                );
     }
 
     /**

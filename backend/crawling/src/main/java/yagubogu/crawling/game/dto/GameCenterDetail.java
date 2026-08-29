@@ -33,6 +33,10 @@ public class GameCenterDetail {
     private String homeScore;
     private String winner;  // "away" or "home"
 
+    // 선발 예고 투수
+    private String awayProbablePitcher;
+    private String homeProbablePitcher;
+
     // 현재 타자/투수
     // .today-pitcher는 공격중인 팀에서는 타자, 수비중인 팀에서는 투수를 나타냄 (이닝 초/말로 판별)
     private String currentBatterTeam;  // "away" or "home"
