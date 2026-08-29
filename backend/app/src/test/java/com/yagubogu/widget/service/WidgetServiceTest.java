@@ -188,15 +188,50 @@ class WidgetServiceTest {
         assertThat(widgetLiveActivityRepository.count()).isZero();
     }
 
-    @DisplayName("위젯 사용 설정은 기본 true이고 변경할 수 있다")
+    @DisplayName("위젯 사용 설정은 디바이스별로 기본 true이고 독립적으로 변경할 수 있다")
     @Test
     void settings() {
         Member member = memberFactory.save(MemberBuilder::build);
+        String disabledDeviceId = UUID.randomUUID().toString();
+        String enabledDeviceId = UUID.randomUUID().toString();
+        widgetService.registerDevice(
+                member.getId(),
+                deviceRequest(disabledDeviceId, "disabled-device-token", WidgetPlatform.IOS)
+        );
+        widgetService.registerDevice(
+                member.getId(),
+                deviceRequest(enabledDeviceId, "enabled-device-token", WidgetPlatform.ANDROID)
+        );
 
-        assertThat(widgetService.findSettings(member.getId()).enabled()).isTrue();
+        assertThat(widgetService.findSettings(member.getId(), disabledDeviceId).enabled()).isTrue();
+        assertThat(widgetService.findSettings(member.getId(), enabledDeviceId).enabled()).isTrue();
 
-        assertThat(widgetService.updateSettings(member.getId(), new WidgetSettingsRequest(false)).enabled()).isFalse();
-        assertThat(widgetService.findSettings(member.getId()).enabled()).isFalse();
+        assertThat(widgetService.updateSettings(
+                member.getId(),
+                disabledDeviceId,
+                new WidgetSettingsRequest(false)
+        ).enabled()).isFalse();
+        assertThat(widgetService.findSettings(member.getId(), disabledDeviceId).enabled()).isFalse();
+        assertThat(widgetService.findSettings(member.getId(), enabledDeviceId).enabled()).isTrue();
+
+        widgetService.registerDevice(
+                member.getId(),
+                deviceRequest(disabledDeviceId, "rotated-token", WidgetPlatform.IOS)
+        );
+        assertThat(widgetService.findSettings(member.getId(), disabledDeviceId).enabled()).isFalse();
+    }
+
+    @DisplayName("다른 회원의 디바이스 위젯 설정을 조회할 수 없다")
+    @Test
+    void findSettings_otherMember() {
+        Member owner = memberFactory.save(MemberBuilder::build);
+        Member other = memberFactory.save(MemberBuilder::build);
+        String deviceId = UUID.randomUUID().toString();
+        widgetService.registerDevice(owner.getId(), deviceRequest(deviceId, "push-token", WidgetPlatform.IOS));
+
+        assertThatThrownBy(() -> widgetService.findSettings(other.getId(), deviceId))
+                .isExactlyInstanceOf(NotFoundException.class)
+                .hasMessage("Widget device is not found");
     }
 
     private WidgetDeviceRegisterRequest deviceRequest(

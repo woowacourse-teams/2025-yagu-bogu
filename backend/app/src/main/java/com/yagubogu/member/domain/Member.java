@@ -58,9 +58,6 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "representative_badge_id", nullable = true)
     private Badge representativeBadge;
 
-    @Column(name = "widget_enabled", nullable = false)
-    private boolean widgetEnabled = true;
-
     public Member(final Team team, final Nickname nickname, final String email, final OAuthProvider provider,
                   final String oauthId, final Role role, final String imageUrl, final Badge representativeBadge) {
         this.team = team;
@@ -97,7 +94,4 @@ public class Member extends BaseEntity {
         this.representativeBadge = badge;
     }
 
-    public void updateWidgetEnabled(final boolean widgetEnabled) {
-        this.widgetEnabled = widgetEnabled;
-    }
 }

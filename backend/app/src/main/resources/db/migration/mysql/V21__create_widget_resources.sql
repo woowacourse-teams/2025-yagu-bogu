@@ -1,6 +1,3 @@
-ALTER TABLE members
-    ADD COLUMN widget_enabled BOOLEAN NOT NULL DEFAULT TRUE;
-
 CREATE TABLE widget_devices
 (
     widget_device_id BIGINT        NOT NULL AUTO_INCREMENT,
@@ -9,6 +6,7 @@ CREATE TABLE widget_devices
     device_id        VARCHAR(36)   NOT NULL,
     push_token       VARCHAR(4096) NOT NULL,
     app_version      VARCHAR(50)   NULL,
+    enabled          BOOLEAN       NOT NULL DEFAULT TRUE,
     created_at       DATETIME(6)   NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at       DATETIME(6)   NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     PRIMARY KEY (widget_device_id),

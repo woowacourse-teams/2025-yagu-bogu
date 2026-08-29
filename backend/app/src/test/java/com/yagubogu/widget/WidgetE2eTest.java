@@ -139,16 +139,21 @@ class WidgetE2eTest extends E2eTestBase {
         assertThat(widgetLiveActivityRepository.findByActivityId(activityId)).isEmpty();
     }
 
-    @DisplayName("위젯 사용 설정의 기본값을 조회하고 변경한다")
+    @DisplayName("위젯 사용 설정을 디바이스별로 조회하고 변경한다")
     @Test
     void settings() {
         Member member = memberFactory.save(MemberBuilder::build);
         String accessToken = accessToken(member);
+        String disabledDeviceId = UUID.randomUUID().toString();
+        String enabledDeviceId = UUID.randomUUID().toString();
+        registerDevice(accessToken, disabledDeviceId, "disabled-device-token", WidgetPlatform.IOS);
+        registerDevice(accessToken, enabledDeviceId, "enabled-device-token", WidgetPlatform.ANDROID);
 
         WidgetSettingsResponse initial = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/v1/widgets/settings")
+                .pathParam("deviceId", disabledDeviceId)
+                .when().get("/api/v1/widgets/devices/{deviceId}/settings")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(WidgetSettingsResponse.class);
@@ -156,14 +161,25 @@ class WidgetE2eTest extends E2eTestBase {
         WidgetSettingsResponse updated = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("deviceId", disabledDeviceId)
                 .body(new WidgetSettingsRequest(false))
-                .when().patch("/api/v1/widgets/settings")
+                .when().patch("/api/v1/widgets/devices/{deviceId}/settings")
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(WidgetSettingsResponse.class);
+
+        WidgetSettingsResponse otherDevice = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .pathParam("deviceId", enabledDeviceId)
+                .when().get("/api/v1/widgets/devices/{deviceId}/settings")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(WidgetSettingsResponse.class);
 
         assertThat(initial.enabled()).isTrue();
         assertThat(updated.enabled()).isFalse();
+        assertThat(otherDevice.enabled()).isTrue();
     }
 
     @DisplayName("잘못된 deviceId 형식은 400을 반환한다")
@@ -183,9 +199,12 @@ class WidgetE2eTest extends E2eTestBase {
     @DisplayName("인증 없이 위젯 API를 호출하면 401을 반환한다")
     @Test
     void findSettings_unauthorized() {
+        String deviceId = UUID.randomUUID().toString();
+
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .when().get("/api/v1/widgets/settings")
+                .pathParam("deviceId", deviceId)
+                .when().get("/api/v1/widgets/devices/{deviceId}/settings")
                 .then().log().all()
                 .statusCode(401);
     }

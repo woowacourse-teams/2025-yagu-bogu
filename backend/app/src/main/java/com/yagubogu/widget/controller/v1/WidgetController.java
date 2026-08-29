@@ -62,8 +62,11 @@ public class WidgetController implements WidgetControllerInterface {
     }
 
     @Override
-    public ResponseEntity<WidgetSettingsResponse> findSettings(final MemberClaims memberClaims) {
-        WidgetSettingsResponse response = widgetService.findSettings(memberClaims.id());
+    public ResponseEntity<WidgetSettingsResponse> findSettings(
+            final MemberClaims memberClaims,
+            @PathVariable final String deviceId
+    ) {
+        WidgetSettingsResponse response = widgetService.findSettings(memberClaims.id(), deviceId);
 
         return ResponseEntity.ok(response);
     }
@@ -71,9 +74,10 @@ public class WidgetController implements WidgetControllerInterface {
     @Override
     public ResponseEntity<WidgetSettingsResponse> updateSettings(
             final MemberClaims memberClaims,
+            @PathVariable final String deviceId,
             @Valid @RequestBody final WidgetSettingsRequest request
     ) {
-        WidgetSettingsResponse response = widgetService.updateSettings(memberClaims.id(), request);
+        WidgetSettingsResponse response = widgetService.updateSettings(memberClaims.id(), deviceId, request);
 
         return ResponseEntity.ok(response);
     }

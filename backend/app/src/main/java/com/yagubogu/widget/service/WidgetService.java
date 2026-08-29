@@ -65,9 +65,7 @@ public class WidgetService {
 
     @Transactional
     public void registerLiveActivity(final long memberId, final WidgetLiveActivityRegisterRequest request) {
-        String deviceId = normalizeDeviceId(request.deviceId());
-        WidgetDevice device = widgetDeviceRepository.findByDeviceIdAndMemberId(deviceId, memberId)
-                .orElseThrow(() -> new NotFoundException("Widget device is not found"));
+        WidgetDevice device = getOwnedDevice(memberId, request.deviceId());
         if (!device.isIos()) {
             throw new BadRequestException("Live Activity is available only on IOS devices");
         }
@@ -109,26 +107,35 @@ public class WidgetService {
 
     @Transactional
     public void removeDevice(final long memberId, final String rawDeviceId) {
-        String deviceId = normalizeDeviceId(rawDeviceId);
-        WidgetDevice device = widgetDeviceRepository.findByDeviceIdAndMemberId(deviceId, memberId)
-                .orElseThrow(() -> new NotFoundException("Widget device is not found"));
+        WidgetDevice device = getOwnedDevice(memberId, rawDeviceId);
 
         widgetLiveActivityRepository.deleteAllByDevice(device);
         widgetDeviceRepository.delete(device);
     }
 
-    public WidgetSettingsResponse findSettings(final long memberId) {
-        Member member = getMember(memberId);
+    public WidgetSettingsResponse findSettings(final long memberId, final String deviceId) {
+        WidgetDevice device = getOwnedDevice(memberId, deviceId);
 
-        return new WidgetSettingsResponse(member.isWidgetEnabled());
+        return new WidgetSettingsResponse(device.isEnabled());
     }
 
     @Transactional
-    public WidgetSettingsResponse updateSettings(final long memberId, final WidgetSettingsRequest request) {
-        Member member = getMember(memberId);
-        member.updateWidgetEnabled(request.enabled());
+    public WidgetSettingsResponse updateSettings(
+            final long memberId,
+            final String deviceId,
+            final WidgetSettingsRequest request
+    ) {
+        WidgetDevice device = getOwnedDevice(memberId, deviceId);
+        device.updateEnabled(request.enabled());
 
-        return new WidgetSettingsResponse(member.isWidgetEnabled());
+        return new WidgetSettingsResponse(device.isEnabled());
+    }
+
+    private WidgetDevice getOwnedDevice(final long memberId, final String rawDeviceId) {
+        String deviceId = normalizeDeviceId(rawDeviceId);
+
+        return widgetDeviceRepository.findByDeviceIdAndMemberId(deviceId, memberId)
+                .orElseThrow(() -> new NotFoundException("Widget device is not found"));
     }
 
     private Member getMember(final long memberId) {

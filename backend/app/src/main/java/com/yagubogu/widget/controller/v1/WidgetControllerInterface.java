@@ -72,16 +72,28 @@ public interface WidgetControllerInterface {
             @PathVariable String deviceId
     );
 
-    @Operation(summary = "위젯 사용 설정 조회")
-    @GetMapping("/settings")
+    @Operation(summary = "디바이스별 위젯 사용 설정 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "설정 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "deviceId 형식 오류"),
+            @ApiResponse(responseCode = "404", description = "디바이스를 찾을 수 없음")
+    })
+    @GetMapping("/devices/{deviceId}/settings")
     ResponseEntity<WidgetSettingsResponse> findSettings(
-            @Parameter(hidden = true) MemberClaims memberClaims
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @PathVariable String deviceId
     );
 
-    @Operation(summary = "위젯 사용 설정 변경")
-    @PatchMapping("/settings")
+    @Operation(summary = "디바이스별 위젯 사용 설정 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "설정 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "요청값 또는 deviceId 형식 오류"),
+            @ApiResponse(responseCode = "404", description = "디바이스를 찾을 수 없음")
+    })
+    @PatchMapping("/devices/{deviceId}/settings")
     ResponseEntity<WidgetSettingsResponse> updateSettings(
             @Parameter(hidden = true) MemberClaims memberClaims,
+            @PathVariable String deviceId,
             @Valid @RequestBody WidgetSettingsRequest request
     );
 }

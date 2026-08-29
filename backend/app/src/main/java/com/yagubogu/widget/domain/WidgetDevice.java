@@ -45,6 +45,9 @@ public class WidgetDevice {
     @Column(name = "app_version", length = 50)
     private String appVersion;
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -86,5 +89,10 @@ public class WidgetDevice {
 
     public boolean isIos() {
         return platform == WidgetPlatform.IOS;
+    }
+
+    public void updateEnabled(final boolean enabled) {
+        this.enabled = enabled;
+        this.updatedAt = LocalDateTime.now();
     }
 }
