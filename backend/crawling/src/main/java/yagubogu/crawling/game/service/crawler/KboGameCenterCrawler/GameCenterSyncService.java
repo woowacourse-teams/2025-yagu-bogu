@@ -59,6 +59,9 @@ public class GameCenterSyncService {
 
                 // 현재 타자/투수는 재처리 대상이 아니라 games 테이블에 바로 반영
                 updateLiveBatterAndPitcher(detail);
+
+                // 선발 예고 투수는 재처리 대상이 아니라 games 테이블에 바로 반영
+                updateProbablePitchers(detail);
             } catch (Exception e) {
                 log.error("[BRONZE] 경기 상태 저장 실패: gameCode={}", detail.getGameCode(), e);
             }
@@ -72,6 +75,13 @@ public class GameCenterSyncService {
      * 크롤링한 현재 타자/투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음)
      */
     private void updateLiveBatterAndPitcher(GameCenterDetail detail) {
+        if (detail.getCurrentBatterTeam() == null
+                && detail.getCurrentBatterName() == null
+                && detail.getCurrentPitcherTeam() == null
+                && detail.getCurrentPitcherName() == null) {
+            return;
+        }
+
         LocalDate date = parseDate(detail.getGameDate());
         String stadiumLocation = detail.getStadiumName();
         String homeTeamName = detail.getHomeTeamName();
@@ -98,6 +108,42 @@ public class GameCenterSyncService {
                                 detail.getCurrentPitcherName()
                         ),
                         () -> log.debug("[LIVE_STATE] Game not found, skip batter/pitcher update: gameCode={}",
+                                detail.getGameCode())
+                );
+    }
+
+    /**
+     * 크롤링한 선발 예고 투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음).
+     * 예정 경기에서만 값이 채워지며, 둘 다 없으면 건드리지 않는다.
+     */
+    private void updateProbablePitchers(GameCenterDetail detail) {
+        if (detail.getHomeProbablePitcher() == null && detail.getAwayProbablePitcher() == null) {
+            return;
+        }
+
+        LocalDate date = parseDate(detail.getGameDate());
+        String stadiumLocation = detail.getStadiumName();
+        String homeTeamName = detail.getHomeTeamName();
+        String awayTeamName = detail.getAwayTeamName();
+        LocalTime startTime = parseTime(detail.getStartTime());
+
+        Team homeTeam = teamRepository.findByShortName(homeTeamName).orElse(null);
+        Team awayTeam = teamRepository.findByShortName(awayTeamName).orElse(null);
+        Stadium stadium = stadiumRepository.findByLocation(stadiumLocation).orElse(null);
+
+        if (homeTeam == null || awayTeam == null || stadium == null) {
+            log.debug("[PROBABLE_PITCHER] Team/Stadium not found, skip: stadium={}, home={}, away={}",
+                    stadiumLocation, homeTeamName, awayTeamName);
+            return;
+        }
+
+        gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
+                        startTime)
+                .ifPresentOrElse(
+                        game -> game.updateProbablePitchers(
+                                detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
+                        ),
+                        () -> log.debug("[PROBABLE_PITCHER] Game not found, skip: gameCode={}",
                                 detail.getGameCode())
                 );
     }

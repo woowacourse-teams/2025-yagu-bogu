@@ -117,8 +117,51 @@ class GameCenterSyncServiceTest {
         when(teamRepository.findByShortName(any())).thenReturn(Optional.empty());
         when(stadiumRepository.findByLocation(any())).thenReturn(Optional.empty());
 
+        GameCenterDetail detail = gameDetail("2회초");
+        detail.setCurrentBatterName("오명진");
+
         // when & then (예외 없이 정상 종료되어야 함)
-        service.saveToBronzeLayer(List.of(gameDetail("2회초")));
+        service.saveToBronzeLayer(List.of(detail));
+
+        verify(gameRepository, never()).findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
+                any(), any(), any(), any(), any());
+    }
+
+    @DisplayName("saveToBronzeLayer - 선발 예고 투수를 games 테이블에 직접 반영한다")
+    @Test
+    void saveToBronzeLayer_UpdatesProbablePitchers() {
+        // given
+        Team homeTeam = mock(Team.class);
+        Team awayTeam = mock(Team.class);
+        Stadium stadium = mock(Stadium.class);
+        Game game = mock(Game.class);
+
+        when(teamRepository.findByShortName("삼성")).thenReturn(Optional.of(homeTeam));
+        when(teamRepository.findByShortName("한화")).thenReturn(Optional.of(awayTeam));
+        when(stadiumRepository.findByLocation("대구")).thenReturn(Optional.of(stadium));
+        when(gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
+                LocalDate.of(2026, 8, 14), stadium, homeTeam, awayTeam, LocalTime.of(19, 0)
+        )).thenReturn(Optional.of(game));
+
+        GameCenterDetail detail = gameDetail("경기예정");
+        detail.setHomeProbablePitcher("페덱");
+        detail.setAwayProbablePitcher("로건");
+
+        // when
+        service.saveToBronzeLayer(List.of(detail));
+
+        // then
+        verify(game).updateProbablePitchers("페덱", "로건");
+    }
+
+    @DisplayName("saveToBronzeLayer - 선발 예고 투수가 없으면 갱신을 건너뛴다")
+    @Test
+    void saveToBronzeLayer_NoProbablePitcher_SkipsUpdate() {
+        // given
+        GameCenterDetail detail = gameDetail("경기중");
+
+        // when & then (예외 없이 정상 종료되어야 함)
+        service.saveToBronzeLayer(List.of(detail));
 
         verify(gameRepository, never()).findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
                 any(), any(), any(), any(), any());
