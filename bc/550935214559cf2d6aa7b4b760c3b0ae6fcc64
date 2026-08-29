@@ -1,0 +1,51 @@
+backend/crawling/src/main/resources/application.yml
+  s_f9b8328292dc35::t_b3e073dd93a003 97-104,108
+backend/app/src/main/java/com/yagubogu/game/scheduler/GameEtlScheduler.java
+  s_f9b8328292dc35::t_b3e073dd93a003 17,30,32-33,36
+backend/crawling/src/main/java/yagubogu/crawling/game/config/KboCrawlerProperties.java
+  s_f9b8328292dc35::t_b3e073dd93a003 85,111-120,127
+backend/crawling/src/test/resources/application.yml
+  s_f9b8328292dc35::t_b3e073dd93a003 101-108,112
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/KboScoreboardGame.java
+  s_f9b8328292dc35::t_b3e073dd93a003 26-35
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboScoreboardCrawlerTest.java
+  s_f9b8328292dc35::t_b3e073dd93a003 68-70,106-113,134
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/page/KboGameCenterPageTest.java
+  s_f9b8328292dc35::t_ff9eea6beb9c22 141-144,147,149,151-163,209-212,214-217,219-227
+  s_f9b8328292dc35::t_f49ef39292b3fa 213,218
+  s_f9b8328292dc35::t_b3e073dd93a003 19,94-140,164-208
+  s_f9b8328292dc35::t_52b268905e9352 145-146,148,150
+  s_f9b8328292dc35::t_c8e47299d32397 228-229
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboGameCenterPage.java
+  s_f9b8328292dc35::t_bb663820729491 221-225,256-259,276-281
+  s_f9b8328292dc35::t_b3e073dd93a003 132-133,176-178,181-204,226-236,239,261-275
+  s_f9b8328292dc35::t_437dd891abd51f 260
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/GameCenterDetail.java
+  s_f9b8328292dc35::t_b3e073dd93a003 40-45
+  s_f9b8328292dc35::t_90322f8380e38a 46
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawlerTest.java
+  s_f9b8328292dc35::t_b3e073dd93a003 305
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPage.java
+  s_f9b8328292dc35::t_b3e073dd93a003 31,37,135,149-197
+backend/crawling/src/main/java/yagubogu/crawling/game/config/CrawlerSchedulerProperties.java
+  s_f9b8328292dc35::t_b3e073dd93a003 12
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPageTest.java
+  s_f9b8328292dc35::t_b3e073dd93a003 65-66,106,124-130,137,295-393
+  s_f9b8328292dc35::t_f3253aa0020504 64,394
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "bc550935214559cf2d6aa7b4b760c3b0ae6fcc64",
+  "prompts": {},
+  "sessions": {
+    "s_f9b8328292dc35": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04dac-a4ee-75c1-ac1a-332252c903ff",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
