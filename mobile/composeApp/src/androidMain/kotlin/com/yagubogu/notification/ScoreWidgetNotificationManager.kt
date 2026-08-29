@@ -62,7 +62,7 @@ class ScoreWidgetNotificationManager(
         }
     }
 
-    private fun createNotification(payload: ScoreWidgetPayload): NotificationCompat.Builder {
+    private suspend fun createNotification(payload: ScoreWidgetPayload): NotificationCompat.Builder {
         val isOngoing =
             payload.type != ScoreWidgetPayload.Type.END &&
                 payload.gameState != ScoreWidgetPayload.GameState.COMPLETED &&
@@ -83,13 +83,13 @@ class ScoreWidgetNotificationManager(
             .setShowWhen(false)
     }
 
-    private fun createCompactContentView(payload: ScoreWidgetPayload): RemoteViews =
+    private suspend fun createCompactContentView(payload: ScoreWidgetPayload): RemoteViews =
         RemoteViews(context.packageName, R.layout.notification_score_widget_compact).apply {
             setTextViewText(R.id.score_widget_compact_away_team, payload.awayTeamName)
             setTextViewText(R.id.score_widget_compact_home_team, payload.homeTeamName)
             setTextViewText(R.id.score_widget_compact_status, statusText(payload))
-            setImageViewResource(R.id.score_widget_compact_away_logo, mascotResource(payload.awayTeamCode))
-            setImageViewResource(R.id.score_widget_compact_home_logo, mascotResource(payload.homeTeamCode))
+            setMascot(R.id.score_widget_compact_away_logo, payload.awayTeamCode)
+            setMascot(R.id.score_widget_compact_home_logo, payload.homeTeamCode)
 
             val showScores =
                 (payload.awayScore != null && payload.homeScore != null) ||
@@ -101,7 +101,7 @@ class ScoreWidgetNotificationManager(
             setTextViewText(R.id.score_widget_compact_home_score, scoreText(payload.homeScore, payload))
         }
 
-    private fun createExpandedContentView(payload: ScoreWidgetPayload): RemoteViews =
+    private suspend fun createExpandedContentView(payload: ScoreWidgetPayload): RemoteViews =
         RemoteViews(context.packageName, R.layout.notification_score_widget).apply {
             setTextViewText(R.id.score_widget_status, statusText(payload))
             setTextViewText(
@@ -117,8 +117,8 @@ class ScoreWidgetNotificationManager(
             setViewVisibility(R.id.score_widget_home_score, if (showScores) View.VISIBLE else View.GONE)
             setTextViewText(R.id.score_widget_away_score, scoreText(payload.awayScore, payload))
             setTextViewText(R.id.score_widget_home_score, scoreText(payload.homeScore, payload))
-            setImageViewResource(R.id.score_widget_away_logo, mascotResource(payload.awayTeamCode))
-            setImageViewResource(R.id.score_widget_home_logo, mascotResource(payload.homeTeamCode))
+            setMascot(R.id.score_widget_away_logo, payload.awayTeamCode)
+            setMascot(R.id.score_widget_home_logo, payload.homeTeamCode)
 
             val showLiveDetails = payload.gameState == ScoreWidgetPayload.GameState.LIVE
             setViewVisibility(R.id.score_widget_details, if (showLiveDetails) View.VISIBLE else View.GONE)
@@ -182,20 +182,17 @@ class ScoreWidgetNotificationManager(
         }
     }
 
-    private fun mascotResource(teamCode: String): Int =
-        when (teamCode) {
-            "HT" -> R.drawable.img_mascot_ht
-            "LG" -> R.drawable.img_mascot_lg
-            "WO" -> R.drawable.img_mascot_wo
-            "KT" -> R.drawable.img_mascot_kt
-            "SS" -> R.drawable.img_mascot_ss
-            "LT" -> R.drawable.img_mascot_lt
-            "SK" -> R.drawable.img_mascot_sk
-            "NC" -> R.drawable.img_mascot_nc
-            "HH" -> R.drawable.img_mascot_hh
-            "OB" -> R.drawable.img_mascot_ob
-            else -> R.drawable.ic_yagubogu_notification
+    private suspend fun RemoteViews.setMascot(
+        viewId: Int,
+        teamCode: String,
+    ) {
+        val bitmap = ScoreWidgetMascotBitmapCache.get(context, teamCode)
+        if (bitmap != null) {
+            setImageViewBitmap(viewId, bitmap)
+        } else {
+            setImageViewResource(viewId, R.drawable.ic_yagubogu_notification)
         }
+    }
 
     private fun createContentIntent(gameId: Long): PendingIntent {
         val intent =

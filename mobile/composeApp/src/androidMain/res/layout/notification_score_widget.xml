@@ -46,8 +46,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="@null"
-                android:scaleType="centerInside"
-                tools:src="@drawable/img_mascot_ht" />
+                android:scaleType="centerInside" />
 
             <TextView
                 android:id="@+id/score_widget_away_team"
@@ -151,8 +150,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="@null"
-                android:scaleType="centerInside"
-                tools:src="@drawable/img_mascot_ss" />
+                android:scaleType="centerInside" />
 
             <TextView
                 android:id="@+id/score_widget_home_team"

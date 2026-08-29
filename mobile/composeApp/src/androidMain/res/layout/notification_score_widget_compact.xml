@@ -17,8 +17,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:contentDescription="@null"
-            android:scaleType="centerInside"
-            tools:src="@drawable/img_mascot_lg" />
+                android:scaleType="centerInside" />
 
         <TextView
             android:layout_width="8dp"
@@ -92,8 +91,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:contentDescription="@null"
-            android:scaleType="centerInside"
-            tools:src="@drawable/img_mascot_ob" />
+                android:scaleType="centerInside" />
     </LinearLayout>
 
     <TextView
