@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  *
  * 설계 원칙:
  * - 크롤링: 1분마다 (실시간성)
- * - ETL: 1분마다 (실시간성)
+ * - ETL: 30초마다 (위젯 최신성)
  * - 경기 종료 시: 즉시 ETL (중요한 순간)
  * - 더블헤더 처리: ETL 후 같은 날짜 경기들의 순서 재정렬
  */
@@ -27,13 +27,13 @@ public class GameEtlScheduler {
     private final Clock clock;
 
     /**
-     * 1분마다 Bronze → Silver ETL 실행
+     * 30초마다 Bronze → Silver ETL 실행
      *
-     * 실시간 점수 제공을 위해 1분 주기 적용
-     * Bronze가 1분마다 갱신되므로 ETL도 1분마다 실행
+     * 위젯 실시간 점수 제공을 위해 30초 주기 적용
+     * Bronze 수집 주기보다 짧게 실행해 반영 지연을 줄임
      * ETL 중에 날짜별로 더블헤더 순서가 자동 계산됨
      */
-    @Scheduled(fixedDelay = 60_000, initialDelay = 10_000) // 1분 = 60,000ms
+    @Scheduled(fixedDelay = 30_000, initialDelay = 10_000)
     public void runEtlPeriodically() {
         log.info("[ETL] Starting periodic Bronze → Silver transformation");
 
@@ -48,4 +48,3 @@ public class GameEtlScheduler {
         }
     }
 }
-

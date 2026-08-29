@@ -62,6 +62,9 @@ class KboScoreboardPageTest {
     private KboCrawlerProperties.PitcherSelectors mockPitcherSelectors;
 
     @Mock
+    private KboCrawlerProperties.BaseSelectors mockBaseSelectors;
+
+    @Mock
     private KboCrawlerProperties.CalendarSelectors mockCalendarSelectors;
 
     @Mock
@@ -100,6 +103,7 @@ class KboScoreboardPageTest {
         lenient().when(mockScoreboardSelectors.getAwayTeam()).thenReturn(mockAwayTeamSelectors);
         lenient().when(mockScoreboardSelectors.getScoreTable()).thenReturn(mockScoreTableSelectors);
         lenient().when(mockScoreboardSelectors.getPitcher()).thenReturn(mockPitcherSelectors);
+        lenient().when(mockScoreboardSelectors.getBase()).thenReturn(mockBaseSelectors);
 
         // TeamSelectors 설정
         lenient().when(mockHomeTeamSelectors.getName()).thenReturn(".home-team .name");
@@ -117,12 +121,20 @@ class KboScoreboardPageTest {
         lenient().when(mockPitcherSelectors.getContainer()).thenReturn(".pitcher-info");
         lenient().when(mockPitcherSelectors.getSpans()).thenReturn("span");
 
+        // BaseSelectors 설정 (테스트 픽스처에는 .base가 없어서 항상 매칭되지 않음)
+        lenient().when(mockBaseSelectors.getContainer()).thenReturn(".base");
+        lenient().when(mockBaseSelectors.getFirst()).thenReturn(".base1 img");
+        lenient().when(mockBaseSelectors.getSecond()).thenReturn(".base2 img");
+        lenient().when(mockBaseSelectors.getThird()).thenReturn(".base3 img");
+        lenient().when(mockBaseSelectors.getCount()).thenReturn(".base > p");
+
         // CalendarSelectors 설정
         lenient().when(mockCalendarSelectors.getUpdatePanel()).thenReturn("#update-panel");
 
         // Patterns 설정
         lenient().when(mockPatterns.getTimeFormat()).thenReturn("HH:mm");
         lenient().when(mockPatterns.getPitcherLabel()).thenReturn("(승|패|세)\\s+(.+)");
+        lenient().when(mockPatterns.getCountLabel()).thenReturn("(\\d+)-(\\d+)\\s*(\\d+)out");
 
         scoreboardPage = new KboScoreboardPage(mockPage, mockProperties);
     }
@@ -278,6 +290,106 @@ class KboScoreboardPageTest {
             assertThat(game.getWinningPitcher()).isEqualTo("김광현");
             assertThat(game.getLosingPitcher()).isEqualTo("엄상백");
             assertThat(game.getSavingPitcher()).isEqualTo("고우석");
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 진루정보 파싱")
+        void parseScoreboard_WithBaseOccupancy() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+
+            ElementHandle baseContainer = mock(ElementHandle.class);
+            lenient().when(mockScoreboard.querySelector(".base")).thenReturn(baseContainer);
+
+            ElementHandle firstBaseImg = mock(ElementHandle.class);
+            lenient().when(firstBaseImg.getAttribute("src")).thenReturn(".../base_on.png");
+            lenient().when(mockScoreboard.querySelector(".base1 img")).thenReturn(firstBaseImg);
+
+            ElementHandle secondBaseImg = mock(ElementHandle.class);
+            lenient().when(secondBaseImg.getAttribute("src")).thenReturn(".../base.png");
+            lenient().when(mockScoreboard.querySelector(".base2 img")).thenReturn(secondBaseImg);
+
+            ElementHandle thirdBaseImg = mock(ElementHandle.class);
+            lenient().when(thirdBaseImg.getAttribute("src")).thenReturn(".../base_on.png");
+            lenient().when(mockScoreboard.querySelector(".base3 img")).thenReturn(thirdBaseImg);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getFirstBaseOccupied()).isTrue();
+            assertThat(game.getSecondBaseOccupied()).isFalse();
+            assertThat(game.getThirdBaseOccupied()).isTrue();
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 경기중이 아니면 진루정보는 null")
+        void parseScoreboard_NoBase_BaseFieldsAreNull() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+            lenient().when(mockScoreboard.querySelector(".base")).thenReturn(null);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getFirstBaseOccupied()).isNull();
+            assertThat(game.getSecondBaseOccupied()).isNull();
+            assertThat(game.getThirdBaseOccupied()).isNull();
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 볼/스트라이크/아웃 카운트 파싱")
+        void parseScoreboard_WithCount() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+
+            ElementHandle countElem = createMockElementWithText("1-2 0out");
+            lenient().when(mockScoreboard.querySelector(".base > p")).thenReturn(countElem);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getBalls()).isEqualTo(1);
+            assertThat(game.getStrikes()).isEqualTo(2);
+            assertThat(game.getOuts()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("parseScoreboard - 경기중이 아니면 카운트는 null")
+        void parseScoreboard_NoCount_CountFieldsAreNull() {
+            // Given
+            ElementHandle mockScoreboard = createCompleteScoreboardElement();
+            lenient().when(mockScoreboard.querySelector(".base > p")).thenReturn(null);
+
+            LocalDate date = LocalDate.of(2025, 10, 26);
+
+            // When
+            Optional<KboScoreboardGame> result = scoreboardPage.parseScoreboard(mockScoreboard, date);
+
+            // Then
+            assertThat(result).isPresent();
+            KboScoreboardGame game = result.get();
+
+            assertThat(game.getBalls()).isNull();
+            assertThat(game.getStrikes()).isNull();
+            assertThat(game.getOuts()).isNull();
         }
 
         @Test

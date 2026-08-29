@@ -82,6 +82,7 @@ public class KboCrawlerProperties {
         private String boxScoreLink;
         private ScoreTableSelectors scoreTable;
         private PitcherSelectors pitcher;
+        private BaseSelectors base;
     }
 
     @Getter
@@ -109,9 +110,20 @@ public class KboCrawlerProperties {
 
     @Getter
     @Setter
+    public static class BaseSelectors {
+        private String container;
+        private String first;
+        private String second;
+        private String third;
+        private String count;
+    }
+
+    @Getter
+    @Setter
     public static class Patterns {
         private String pitcherLabel;
         private String dateFormat;
         private String timeFormat;
+        private String countLabel;
     }
 }
