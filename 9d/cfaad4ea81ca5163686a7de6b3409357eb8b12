@@ -1,0 +1,28 @@
+backend/crawling/src/test/java/yagubogu/crawling/game/service/poller/AdaptivePollerTest.java
+  s_475d306ae6f4f4::t_aa5177ab5a5d40 86,91-121
+  s_475d306ae6f4f4::t_971c2bb8962601 122-123
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_475d306ae6f4f4::t_aa5177ab5a5d40 50-52,75-76,87-92
+  s_475d306ae6f4f4::t_4e9e52c28279ce 93-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9dcfaad4ea81ca5163686a7de6b3409357eb8b12",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
