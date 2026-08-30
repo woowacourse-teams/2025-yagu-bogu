@@ -42,7 +42,7 @@ public class AdaptivePoller {
     }
 
     /**
-     * 1분마다 실행되는 메인 폴링 루프
+     * 설정된 경기 폴링 주기마다 실행되는 메인 폴링 루프
      *
      * 동작 흐름:
      * 1. 전역 백오프 체크 (API 장애 시 중단)
@@ -50,7 +50,7 @@ public class AdaptivePoller {
      * 3. 스코어보드 크롤링 (전체 경기 한번에)
      * 4. 각 경기별 업데이트 처리
      */
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelayString = "${kbo.scheduler.polling-interval}")
     public void pollGameWhenReachDue() {
         Instant now = Instant.now(clock);
 

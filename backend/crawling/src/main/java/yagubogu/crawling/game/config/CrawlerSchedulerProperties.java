@@ -15,5 +15,5 @@ public class CrawlerSchedulerProperties {
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime defaultGameStartTime = LocalTime.of(18, 30);
 
-    private Duration pollingInterval = Duration.ofMinutes(1);
+    private Duration pollingInterval = Duration.ofSeconds(30);
 }
