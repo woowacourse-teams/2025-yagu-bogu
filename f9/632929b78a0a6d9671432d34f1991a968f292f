@@ -1,0 +1,32 @@
+backend/app/src/main/java/com/yagubogu/game/dto/v1/LiveGamesResponse.java
+  s_475d306ae6f4f4::t_308c097b2907a3 9,51-53,55-56,60-62,64-65,68-70,72-77,79-80,98,124,135-136,144-146,151-153,159-161,165-169,176-183
+  s_475d306ae6f4f4::t_2237c8dc1e3fb2 84-86,115-119
+  s_475d306ae6f4f4::t_f1393520cfb361 46,54,63,71,78,99-114,120,172-175
+backend/app/src/test/java/com/yagubogu/game/GameE2eTest.java
+  s_475d306ae6f4f4::t_2237c8dc1e3fb2 268,270
+  s_475d306ae6f4f4::t_f1393520cfb361 14,250,254,269,271,285,287
+  s_475d306ae6f4f4::t_fb4a22ac4c2613 215-217,219-222,243,280-284,286,288
+  s_475d306ae6f4f4::t_963723c01a636a 218
+  s_475d306ae6f4f4::t_308c097b2907a3 189,199-200
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f9632929b78a0a6d9671432d34f1991a968f292f",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
