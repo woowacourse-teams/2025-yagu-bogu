@@ -21,6 +21,10 @@ public interface CustomCheckInRepository {
 
     StatCountsParam findStatCounts(Member member, Integer year);
 
+    StatCountsParam findStatCountsByMemberAndTeam(Member member, Team team, Integer year);
+
+    int countByMemberAndYearUntilCheckIn(Member member, int year, LocalDate gameDate, Long checkInId);
+
     int findWinCounts(Member member, Integer year);
 
     int findLoseCounts(Member member, Integer year);
