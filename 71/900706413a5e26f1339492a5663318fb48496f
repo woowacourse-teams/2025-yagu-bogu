@@ -1,0 +1,26 @@
+backend/app/src/test/java/com/yagubogu/game/GameE2eTest.java
+  s_475d306ae6f4f4::t_aa5177ab5a5d40 192-199,251,273-278,287,294
+backend/app/src/main/java/com/yagubogu/game/dto/v1/LiveGamesResponse.java
+  s_475d306ae6f4f4::t_aa5177ab5a5d40 130,134-135,140-150,161-163,176-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "71900706413a5e26f1339492a5663318fb48496f",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
