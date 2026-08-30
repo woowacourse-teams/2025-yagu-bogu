@@ -1,0 +1,30 @@
+backend/crawling/src/test/resources/application.yml
+  s_475d306ae6f4f4::t_308c097b2907a3 45
+backend/crawling/src/main/resources/application.yml
+  s_475d306ae6f4f4::t_308c097b2907a3 41
+backend/crawling/src/main/java/yagubogu/crawling/game/config/CrawlerSchedulerProperties.java
+  s_475d306ae6f4f4::t_fb4a22ac4c2613 18
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_475d306ae6f4f4::t_308c097b2907a3 45,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "5c75ac4623ed338876e2bb4c43f13e1dcbc3bf7a",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
