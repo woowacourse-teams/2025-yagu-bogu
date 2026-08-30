@@ -189,6 +189,14 @@ public class GameE2eTest extends E2eTestBase {
         liveGame.updateProbablePitchers("김태경", "최지훈");
         gameRepository.save(liveGame);
 
+        Game incompleteLiveGame = gameFactory.save(builder -> builder
+                .homeTeam(getTeamByCode("SK"))
+                .awayTeam(getTeamByCode("NC"))
+                .stadium(stadium)
+                .date(today)
+                .startAt(LocalTime.of(15, 0))
+                .gameState(GameState.LIVE));
+
         Game scheduledGame = gameFactory.save(builder -> builder
                 .homeTeam(getTeamByCode("WO"))
                 .awayTeam(getTeamByCode("HH"))
@@ -240,7 +248,7 @@ public class GameE2eTest extends E2eTestBase {
                 .as(LiveGamesResponse.class);
 
         // then
-        assertThat(actual.games()).hasSize(4);
+        assertThat(actual.games()).hasSize(5);
 
         LiveGamesResponse.LiveGameResponse actualLiveGame = actual.games().getFirst();
         assertThat(actualLiveGame.gameId()).isEqualTo(liveGame.getId());
@@ -262,7 +270,12 @@ public class GameE2eTest extends E2eTestBase {
         assertThat(actualLiveGame.liveState().count().strikes()).isEqualTo(2);
         assertThat(actualLiveGame.liveState().count().outs()).isZero();
 
-        LiveGamesResponse.LiveGameResponse actualScheduledGame = actual.games().get(1);
+        LiveGamesResponse.LiveGameResponse actualIncompleteLiveGame = actual.games().get(1);
+        assertThat(actualIncompleteLiveGame.gameId()).isEqualTo(incompleteLiveGame.getId());
+        assertThat(actualIncompleteLiveGame.gameState()).isEqualTo(GameState.LIVE);
+        assertThat(actualIncompleteLiveGame.liveState()).isNull();
+
+        LiveGamesResponse.LiveGameResponse actualScheduledGame = actual.games().get(2);
         assertThat(actualScheduledGame.gameId()).isEqualTo(scheduledGame.getId());
         assertThat(actualScheduledGame.gameState()).isEqualTo(GameState.SCHEDULED);
         assertThat(actualScheduledGame.homeTeam().currentPlayer()).isEqualTo("문동주");
@@ -271,14 +284,14 @@ public class GameE2eTest extends E2eTestBase {
         assertThat(actualScheduledGame.awayTeam().currentPlayerRole()).isEqualTo(CurrentPlayerRole.PITCHER);
         assertThat(actualScheduledGame.liveState()).isNull();
 
-        LiveGamesResponse.LiveGameResponse actualCompletedGame = actual.games().get(2);
+        LiveGamesResponse.LiveGameResponse actualCompletedGame = actual.games().get(3);
         assertThat(actualCompletedGame.gameId()).isEqualTo(completedGame.getId());
         assertThat(actualCompletedGame.gameState()).isEqualTo(GameState.COMPLETED);
         assertThat(actualCompletedGame.homeTeam().currentPlayer()).isNull();
         assertThat(actualCompletedGame.awayTeam().currentPlayer()).isNull();
         assertThat(actualCompletedGame.liveState()).isNull();
 
-        LiveGamesResponse.LiveGameResponse actualCanceledGame = actual.games().get(3);
+        LiveGamesResponse.LiveGameResponse actualCanceledGame = actual.games().get(4);
         assertThat(actualCanceledGame.gameId()).isEqualTo(canceledGame.getId());
         assertThat(actualCanceledGame.gameState()).isEqualTo(GameState.CANCELED);
         assertThat(actualCanceledGame.homeTeam().currentPlayer()).isNull();

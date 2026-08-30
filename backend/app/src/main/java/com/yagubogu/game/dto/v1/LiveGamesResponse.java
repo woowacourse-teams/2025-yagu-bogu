@@ -6,7 +6,6 @@ import com.yagubogu.game.domain.InningHalf;
 import com.yagubogu.team.domain.Team;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Objects;
 
 public record LiveGamesResponse(
         List<LiveGameResponse> games
@@ -128,15 +127,26 @@ public record LiveGamesResponse(
     ) {
 
         private static LiveStateResponse from(final Game game) {
-            if (game.getGameState() != GameState.LIVE) {
+            if (game.getGameState() != GameState.LIVE || hasIncompleteLiveState(game)) {
                 return null;
             }
             return new LiveStateResponse(
-                    requireLiveValue(game, game.getCurrentInning(), "inning"),
-                    requireLiveValue(game, game.getCurrentInningHalf(), "inningHalf"),
+                    game.getCurrentInning(),
+                    game.getCurrentInningHalf(),
                     BasesResponse.from(game),
                     BallCountResponse.from(game)
             );
+        }
+
+        private static boolean hasIncompleteLiveState(final Game game) {
+            return game.getCurrentInning() == null
+                    || game.getCurrentInningHalf() == null
+                    || game.getFirstBaseOccupied() == null
+                    || game.getSecondBaseOccupied() == null
+                    || game.getThirdBaseOccupied() == null
+                    || game.getBalls() == null
+                    || game.getStrikes() == null
+                    || game.getOuts() == null;
         }
     }
 
@@ -148,9 +158,9 @@ public record LiveGamesResponse(
 
         private static BasesResponse from(final Game game) {
             return new BasesResponse(
-                    requireLiveValue(game, game.getFirstBaseOccupied(), "firstBaseOccupied"),
-                    requireLiveValue(game, game.getSecondBaseOccupied(), "secondBaseOccupied"),
-                    requireLiveValue(game, game.getThirdBaseOccupied(), "thirdBaseOccupied")
+                    game.getFirstBaseOccupied(),
+                    game.getSecondBaseOccupied(),
+                    game.getThirdBaseOccupied()
             );
         }
     }
@@ -163,9 +173,9 @@ public record LiveGamesResponse(
 
         private static BallCountResponse from(final Game game) {
             return new BallCountResponse(
-                    requireLiveValue(game, game.getBalls(), "balls"),
-                    requireLiveValue(game, game.getStrikes(), "strikes"),
-                    requireLiveValue(game, game.getOuts(), "outs")
+                    game.getBalls(),
+                    game.getStrikes(),
+                    game.getOuts()
             );
         }
     }
@@ -175,10 +185,4 @@ public record LiveGamesResponse(
         PITCHER
     }
 
-    private static <T> T requireLiveValue(final Game game, final T value, final String fieldName) {
-        return Objects.requireNonNull(
-                value,
-                () -> "Live game has no " + fieldName + ": gameId=" + game.getId()
-        );
-    }
 }
