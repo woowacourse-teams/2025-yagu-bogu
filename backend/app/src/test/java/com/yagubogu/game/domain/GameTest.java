@@ -18,7 +18,7 @@ class GameTest {
     void updateLiveBaseState_DoesNotAffectBatterAndPitcher() {
         // given
         Game game = makeGame();
-        game.updateLiveBatterAndPitcher("away", "최지훈", "home", "김태경");
+        game.updateLiveGameCenterState("away", "최지훈", "home", "김태경", 5, InningHalf.TOP);
 
         // when
         game.updateLiveBaseState(true, false, true, 1, 2, 0);
@@ -36,21 +36,23 @@ class GameTest {
         assertThat(game.getCurrentPitcherName()).isEqualTo("김태경");
     }
 
-    @DisplayName("현재 타자/투수를 갱신해도 진루정보/카운트는 영향받지 않는다")
+    @DisplayName("현재 이닝과 타자/투수를 갱신해도 진루정보/카운트는 영향받지 않는다")
     @Test
-    void updateLiveBatterAndPitcher_DoesNotAffectBaseState() {
+    void updateLiveGameCenterState_DoesNotAffectBaseState() {
         // given
         Game game = makeGame();
         game.updateLiveBaseState(true, false, true, 1, 2, 0);
 
         // when
-        game.updateLiveBatterAndPitcher("away", "최지훈", "home", "김태경");
+        game.updateLiveGameCenterState("away", "최지훈", "home", "김태경", 5, InningHalf.TOP);
 
         // then
         assertThat(game.getCurrentBatterTeam()).isEqualTo("away");
         assertThat(game.getCurrentBatterName()).isEqualTo("최지훈");
         assertThat(game.getCurrentPitcherTeam()).isEqualTo("home");
         assertThat(game.getCurrentPitcherName()).isEqualTo("김태경");
+        assertThat(game.getCurrentInning()).isEqualTo(5);
+        assertThat(game.getCurrentInningHalf()).isEqualTo(InningHalf.TOP);
         assertThat(game.getFirstBaseOccupied()).isTrue();
         assertThat(game.getSecondBaseOccupied()).isFalse();
         assertThat(game.getThirdBaseOccupied()).isTrue();

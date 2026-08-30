@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.domain.InningHalf;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.BronzeGameService;
 import com.yagubogu.stadium.domain.Stadium;
@@ -102,12 +103,14 @@ class GameCenterSyncServiceTest {
         detail.setCurrentBatterName("오명진");
         detail.setCurrentPitcherTeam("home");
         detail.setCurrentPitcherName("웰스");
+        detail.setCurrentInning(2);
+        detail.setCurrentInningHalf(InningHalf.TOP);
 
         // when
         service.saveToBronzeLayer(List.of(detail));
 
         // then
-        verify(game).updateLiveBatterAndPitcher("away", "오명진", "home", "웰스");
+        verify(game).updateLiveGameCenterState("away", "오명진", "home", "웰스", 2, InningHalf.TOP);
     }
 
     @DisplayName("saveToBronzeLayer - 팀/구장을 찾을 수 없으면 타자/투수 갱신을 건너뛴다")

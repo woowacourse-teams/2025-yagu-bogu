@@ -1,5 +1,6 @@
 package yagubogu.crawling.game.dto;
 
+import com.yagubogu.game.domain.InningHalf;
 import lombok.Data;
 
 @Data
@@ -43,4 +44,6 @@ public class GameCenterDetail {
     private String currentBatterName;
     private String currentPitcherTeam; // "away" or "home"
     private String currentPitcherName;
+    private Integer currentInning;
+    private InningHalf currentInningHalf;
 }

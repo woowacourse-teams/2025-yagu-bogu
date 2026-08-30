@@ -98,6 +98,13 @@ public class Game {
     @Column(name = "current_pitcher_name", nullable = true)
     private String currentPitcherName;
 
+    @Column(name = "current_inning", nullable = true)
+    private Integer currentInning;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "current_inning_half", nullable = true)
+    private InningHalf currentInningHalf;
+
     @Column(name = "first_base_occupied", nullable = true)
     private Boolean firstBaseOccupied;
 
@@ -234,19 +241,23 @@ public class Game {
     }
 
     /**
-     * 게임센터 크롤링 결과로 현재 타자/투수를 갱신한다.
+     * 게임센터 크롤링 결과로 현재 이닝과 타자/투수를 갱신한다.
      * 스코어보드가 출처인 진루정보/카운트 값은 건드리지 않는다.
      */
-    public void updateLiveBatterAndPitcher(
+    public void updateLiveGameCenterState(
             final String currentBatterTeam,
             final String currentBatterName,
             final String currentPitcherTeam,
-            final String currentPitcherName
+            final String currentPitcherName,
+            final Integer currentInning,
+            final InningHalf currentInningHalf
     ) {
         this.currentBatterTeam = currentBatterTeam;
         this.currentBatterName = currentBatterName;
         this.currentPitcherTeam = currentPitcherTeam;
         this.currentPitcherName = currentPitcherName;
+        this.currentInning = currentInning;
+        this.currentInningHalf = currentInningHalf;
     }
 
     /**

@@ -57,8 +57,8 @@ public class GameCenterSyncService {
                     updatedCount++;
                 }
 
-                // 현재 타자/투수는 재처리 대상이 아니라 games 테이블에 바로 반영
-                updateLiveBatterAndPitcher(detail);
+                // 현재 이닝과 타자/투수는 재처리 대상이 아니라 games 테이블에 바로 반영
+                updateLiveGameCenterState(detail);
 
                 // 선발 예고 투수는 재처리 대상이 아니라 games 테이블에 바로 반영
                 updateProbablePitchers(detail);
@@ -72,16 +72,17 @@ public class GameCenterSyncService {
     }
 
     /**
-     * 크롤링한 현재 타자/투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음)
+     * 크롤링한 현재 이닝과 타자/투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음)
      */
-    private void updateLiveBatterAndPitcher(GameCenterDetail detail) {
+    private void updateLiveGameCenterState(GameCenterDetail detail) {
         if (detail.getCurrentBatterTeam() == null
                 && detail.getCurrentBatterName() == null
                 && detail.getCurrentPitcherTeam() == null
-                && detail.getCurrentPitcherName() == null) {
+                && detail.getCurrentPitcherName() == null
+                && detail.getCurrentInning() == null
+                && detail.getCurrentInningHalf() == null) {
             return;
         }
-
         LocalDate date = parseDate(detail.getGameDate());
         String stadiumLocation = detail.getStadiumName();
         String homeTeamName = detail.getHomeTeamName();
@@ -101,11 +102,13 @@ public class GameCenterSyncService {
         gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
                         startTime)
                 .ifPresentOrElse(
-                        game -> game.updateLiveBatterAndPitcher(
+                        game -> game.updateLiveGameCenterState(
                                 detail.getCurrentBatterTeam(),
                                 detail.getCurrentBatterName(),
                                 detail.getCurrentPitcherTeam(),
-                                detail.getCurrentPitcherName()
+                                detail.getCurrentPitcherName(),
+                                detail.getCurrentInning(),
+                                detail.getCurrentInningHalf()
                         ),
                         () -> log.debug("[LIVE_STATE] Game not found, skip batter/pitcher update: gameCode={}",
                                 detail.getGameCode())
