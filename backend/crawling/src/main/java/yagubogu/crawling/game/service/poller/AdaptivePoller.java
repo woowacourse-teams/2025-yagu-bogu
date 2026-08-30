@@ -47,8 +47,9 @@ public class AdaptivePoller {
      * 동작 흐름:
      * 1. 전역 백오프 체크 (API 장애 시 중단)
      * 2. 웨이크업 시각 체크 (불필요한 폴링 방지)
-     * 3. 스코어보드 크롤링 (전체 경기 한번에)
-     * 4. 각 경기별 업데이트 처리
+     * 3. 게임센터 크롤링 (현재 이닝/타자/투수)
+     * 4. 스코어보드 크롤링 (전체 경기 한번에)
+     * 5. 각 경기별 업데이트 처리
      */
     @Scheduled(fixedDelayString = "${kbo.scheduler.polling-interval}")
     public void pollGameWhenReachDue() {
@@ -71,6 +72,8 @@ public class AdaptivePoller {
             return;
         }
 
+        refreshGameCenter(today);
+
         Map<String, KboScoreboardGame> scoreboardGames = fetchScoreboard(today);
         if (scoreboardGames.isEmpty()) {
             log.debug("[POLLER] Skip: scoreboard empty");
@@ -79,6 +82,14 @@ public class AdaptivePoller {
 
         globalBackoff.clear();
         processGames(today, scoreboardGames, now);
+    }
+
+    private void refreshGameCenter(final LocalDate date) {
+        try {
+            gameCenterSyncService.fetchGameCenter(date);
+        } catch (Exception e) {
+            log.warn("[POLLER] GameCenter refresh failed: date={}, message={}", date, e.getMessage());
+        }
     }
 
     private void processGames(LocalDate today,
