@@ -97,11 +97,14 @@ sse:
 app:
   s3:
     bucket: ${R2_S3_BUCKET}
+    check-in-private-bucket: ${R2_CHECK_IN_PRIVATE_BUCKET:yagubogu-check-in-image-private}
     presign-expiration: 5m
     endpoint: ${R2_S3_ENDPOINT}
     region: ${R2_REGION:auto}
     public-base-url: ${R2_PUBLIC_BASE_URL:https://images.yagubogu.com}
     default-profile-image-url: ${R2_DEFAULT_PROFILE_IMAGE_URL:${app.s3.public-base-url}/images/defaults/profile.png}
+    check-in-access-key-id: ${R2_CHECK_IN_ACCESS_KEY_ID}
+    check-in-secret-access-key: ${R2_CHECK_IN_SECRET_ACCESS_KEY}
 
 ---
 spring:
