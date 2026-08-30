@@ -34,7 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -72,7 +75,11 @@ class GameServiceTest {
 
     @BeforeEach
     void setUp() {
-        gameService = new GameService(gameRepository, memberRepository);
+        Clock clock = Clock.fixed(
+                Instant.parse("2025-07-21T00:00:00Z"),
+                ZoneId.of("Asia/Seoul")
+        );
+        gameService = new GameService(gameRepository, memberRepository, clock);
     }
 
     @DisplayName("오늘 경기하는 모든 구장, 팀, 인증 횟수, 내 인증 여부를 조회한다")
