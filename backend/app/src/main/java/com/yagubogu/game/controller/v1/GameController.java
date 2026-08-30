@@ -2,16 +2,15 @@ package com.yagubogu.game.controller.v1;
 
 import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
-import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,11 +41,8 @@ public class GameController implements GameControllerInterface {
     }
 
     @RequireRole
-    public ResponseEntity<GameResultParam> findScoreBoard(
-            final MemberClaims memberClaims,
-            @PathVariable final long gameId
-    ) {
-        GameResultParam response = gameService.findScoreBoard(gameId);
+    public ResponseEntity<LiveGamesResponse> findLiveGames(final MemberClaims memberClaims) {
+        LiveGamesResponse response = gameService.findLiveGames();
 
         return ResponseEntity.ok(response);
     }

@@ -4,12 +4,13 @@ import com.yagubogu.auth.config.AuthTestConfig;
 import com.yagubogu.checkin.domain.CheckIn;
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
-import com.yagubogu.game.dto.GameResultParam;
+import com.yagubogu.game.domain.InningHalf;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.member.domain.Member;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -163,33 +165,100 @@ public class GameE2eTest extends E2eTestBase {
         assertThat(actual.dates()).containsExactlyInAnyOrder(date1, date2);
     }
 
-    @DisplayName("경기중인 경기의 스코어보드를 조회하면 라이브 상태가 포함된다")
+    @DisplayName("현장톡 화면에 당일 전체 경기의 점수와 실시간 상태를 반환한다")
     @Test
-    void findScoreBoard_WithLiveState() {
+    void findLiveGames() {
         // given
-        LocalDate date = TestFixture.getToday();
-        Game game = makeGame(date, "HT", "LT", "잠실구장");
-        game.updateLiveBatterAndPitcher("away", "최지훈", "home", "김태경");
-        game.updateLiveBaseState(true, false, true, 1, 2, 0);
-        gameRepository.save(game);
+        LocalDate today = LocalDate.now();
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        Game liveGame = gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(today)
+                .startAt(LocalTime.of(14, 0))
+                .homeScore(3)
+                .awayScore(2)
+                .gameState(GameState.LIVE));
+        liveGame.updateLiveGameCenterState("away", "최지훈", "home", "김태경", 5, InningHalf.TOP);
+        liveGame.updateLiveBaseState(true, false, true, 1, 2, 0);
+        gameRepository.save(liveGame);
+
+        Game scheduledGame = gameFactory.save(builder -> builder
+                .homeTeam(getTeamByCode("WO"))
+                .awayTeam(getTeamByCode("HH"))
+                .stadium(stadiumRepository.findByShortName("고척돔").orElseThrow())
+                .date(today)
+                .startAt(LocalTime.of(18, 30))
+                .gameState(GameState.SCHEDULED));
+
+        Game completedGame = gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(today)
+                .startAt(LocalTime.of(19, 0))
+                .homeScore(5)
+                .awayScore(4)
+                .gameState(GameState.COMPLETED));
+        completedGame.updateLiveGameCenterState("away", "직전타자", "home", "직전투수", 9, InningHalf.TOP);
+        completedGame.updateLiveBaseState(false, false, false, 0, 0, 3);
+        gameRepository.save(completedGame);
+
+        gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(today.minusDays(1)));
 
         Member member = makeMember(getTeamByCode("SS"));
         String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
 
         // when
-        GameResultParam actual = RestAssured.given().log().all()
+        LiveGamesResponse actual = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .when().get("/api/v1/games/" + game.getId() + "/score-board")
+                .when().get("/api/v1/games/live")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(GameResultParam.class);
+                .as(LiveGamesResponse.class);
 
         // then
-        assertThat(actual.liveState()).isEqualTo(new GameResultParam.LiveStateParam(
-                "away", "최지훈", "home", "김태경", true, false, true, 1, 2, 0
-        ));
+        assertThat(actual.games()).hasSize(3);
+
+        LiveGamesResponse.LiveGameResponse actualLiveGame = actual.games().getFirst();
+        assertThat(actualLiveGame.gameId()).isEqualTo(liveGame.getId());
+        assertThat(actualLiveGame.gameState()).isEqualTo(GameState.LIVE);
+        assertThat(actualLiveGame.homeTeam().code()).isEqualTo("HT");
+        assertThat(actualLiveGame.homeTeam().currentPlayer()).isEqualTo("김태경");
+        assertThat(actualLiveGame.homeTeam().score()).isEqualTo(3);
+        assertThat(actualLiveGame.awayTeam().code()).isEqualTo("LT");
+        assertThat(actualLiveGame.awayTeam().currentPlayer()).isEqualTo("최지훈");
+        assertThat(actualLiveGame.awayTeam().score()).isEqualTo(2);
+        assertThat(actualLiveGame.liveState().inning()).isEqualTo(5);
+        assertThat(actualLiveGame.liveState().inningHalf()).isEqualTo(InningHalf.TOP);
+        assertThat(actualLiveGame.liveState().bases().firstBaseOccupied()).isTrue();
+        assertThat(actualLiveGame.liveState().bases().secondBaseOccupied()).isFalse();
+        assertThat(actualLiveGame.liveState().bases().thirdBaseOccupied()).isTrue();
+        assertThat(actualLiveGame.liveState().count().balls()).isEqualTo(1);
+        assertThat(actualLiveGame.liveState().count().strikes()).isEqualTo(2);
+        assertThat(actualLiveGame.liveState().count().outs()).isZero();
+
+        LiveGamesResponse.LiveGameResponse actualScheduledGame = actual.games().get(1);
+        assertThat(actualScheduledGame.gameId()).isEqualTo(scheduledGame.getId());
+        assertThat(actualScheduledGame.gameState()).isEqualTo(GameState.SCHEDULED);
+        assertThat(actualScheduledGame.liveState()).isNull();
+
+        LiveGamesResponse.LiveGameResponse actualCompletedGame = actual.games().get(2);
+        assertThat(actualCompletedGame.gameId()).isEqualTo(completedGame.getId());
+        assertThat(actualCompletedGame.gameState()).isEqualTo(GameState.COMPLETED);
+        assertThat(actualCompletedGame.homeTeam().currentPlayer()).isNull();
+        assertThat(actualCompletedGame.awayTeam().currentPlayer()).isNull();
+        assertThat(actualCompletedGame.liveState()).isNull();
     }
 
     @DisplayName("취소된 경기만 있는 날짜는 결과에서 제외된다")

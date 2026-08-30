@@ -5,6 +5,7 @@ import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
@@ -42,6 +43,12 @@ public class GameService {
         validateScoreBoard(game);
 
         return GameResultParam.from(game);
+    }
+
+    public LiveGamesResponse findLiveGames() {
+        List<Game> games = gameRepository.findAllByDateWithTeamsOrderByStartAt(LocalDate.now());
+
+        return LiveGamesResponse.from(games);
     }
 
     private static void validateScoreBoard(final Game game) {

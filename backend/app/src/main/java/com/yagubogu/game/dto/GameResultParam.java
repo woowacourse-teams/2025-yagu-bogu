@@ -8,8 +8,7 @@ public record GameResultParam(
         ScoreBoardParam homeTeamScoreBoard,
         ScoreBoardParam awayTeamScoreBoard,
         String homePitcher,
-        String awayPitcher,
-        LiveStateParam liveState
+        String awayPitcher
 ) {
 
     public static GameResultParam from(Game game) {
@@ -17,38 +16,8 @@ public record GameResultParam(
                 ScoreBoardParam.from(game.getHomeScoreBoard()),
                 ScoreBoardParam.from(game.getAwayScoreBoard()),
                 game.getHomePitcher(),
-                game.getAwayPitcher(),
-                LiveStateParam.from(game)
+                game.getAwayPitcher()
         );
-    }
-
-    public record LiveStateParam(
-            String currentBatterTeam,
-            String currentBatterName,
-            String currentPitcherTeam,
-            String currentPitcherName,
-            Boolean firstBaseOccupied,
-            Boolean secondBaseOccupied,
-            Boolean thirdBaseOccupied,
-            Integer balls,
-            Integer strikes,
-            Integer outs
-    ) {
-
-        public static LiveStateParam from(Game game) {
-            return new LiveStateParam(
-                    game.getCurrentBatterTeam(),
-                    game.getCurrentBatterName(),
-                    game.getCurrentPitcherTeam(),
-                    game.getCurrentPitcherName(),
-                    game.getFirstBaseOccupied(),
-                    game.getSecondBaseOccupied(),
-                    game.getThirdBaseOccupied(),
-                    game.getBalls(),
-                    game.getStrikes(),
-                    game.getOuts()
-            );
-        }
     }
 
     public record ScoreBoardParam(
