@@ -39,6 +39,11 @@ import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import com.yagubogu.widget.repository.WidgetDeviceRepository;
+import com.yagubogu.widget.domain.WidgetDevice;
+import com.yagubogu.widget.domain.WidgetLiveActivity;
+import com.yagubogu.widget.domain.WidgetPlatform;
+import com.yagubogu.widget.repository.WidgetLiveActivityRepository;
 import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -118,10 +123,16 @@ public class MemberServiceTest {
     @Autowired
     private LocationCheckInRankingRepository locationCheckInRankingRepository;
 
+    @Autowired
+    private WidgetDeviceRepository widgetDeviceRepository;
+
+    @Autowired
+    private WidgetLiveActivityRepository widgetLiveActivityRepository;
+
     @BeforeEach
     void setUp() {
         memberService = new MemberService(memberRepository, teamRepository, badgeRepository, memberBadgeRepository,
-                publisher, statService);
+                publisher, statService, widgetDeviceRepository, widgetLiveActivityRepository);
     }
 
     @DisplayName("멤버가 응원하는 팀을 조회한다")
@@ -233,6 +244,26 @@ public class MemberServiceTest {
         // given
         Member member = memberFactory.save(MemberBuilder::build);
         Long memberId = member.getId();
+        WidgetDevice widgetDevice = widgetDeviceRepository.save(new WidgetDevice(
+                member,
+                WidgetPlatform.IOS,
+                java.util.UUID.randomUUID().toString(),
+                "push-token",
+                "3.1.0"
+        ));
+        Team homeTeam = teamRepository.findByTeamCode("HT").orElseThrow();
+        Team awayTeam = teamRepository.findByTeamCode("LG").orElseThrow();
+        Stadium stadium = stadiumRepository.findAll().getFirst();
+        Game game = gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium));
+        widgetLiveActivityRepository.save(new WidgetLiveActivity(
+                widgetDevice,
+                game,
+                "activity-id",
+                "update-token"
+        ));
 
         // when
         memberService.removeMember(memberId);
@@ -241,6 +272,8 @@ public class MemberServiceTest {
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(member.isDeleted()).isTrue();
             softAssertions.assertThat(member.getDeletedAt()).isNotNull();
+            softAssertions.assertThat(widgetDeviceRepository.count()).isZero();
+            softAssertions.assertThat(widgetLiveActivityRepository.count()).isZero();
         });
     }
 
@@ -577,7 +610,8 @@ public class MemberServiceTest {
                 Clock.system(ZoneId.of("Asia/Seoul"))
         );
         MemberService realMemberService = new MemberService(memberRepository, teamRepository, badgeRepository,
-                memberBadgeRepository, publisher, realStatService);
+                memberBadgeRepository, publisher, realStatService, widgetDeviceRepository,
+                widgetLiveActivityRepository);
 
         // when — findMemberProfile 내부에서 LocalDate.now().getYear() = 2026 사용
         MemberProfileResponse actual = realMemberService.findMemberProfile(member.getId());

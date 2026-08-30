@@ -26,6 +26,8 @@ import com.yagubogu.member.repository.MemberRepository;
 import com.yagubogu.stat.service.StatService;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import com.yagubogu.widget.repository.WidgetDeviceRepository;
+import com.yagubogu.widget.repository.WidgetLiveActivityRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,8 @@ public class MemberService {
     private final MemberBadgeRepository memberBadgeRepository;
     private final ApplicationEventPublisher publisher;
     private final StatService statService;
+    private final WidgetDeviceRepository widgetDeviceRepository;
+    private final WidgetLiveActivityRepository widgetLiveActivityRepository;
 
     @Value("${app.s3.default-profile-image-url}")
     private String defaultProfileImageUrl;
@@ -64,6 +68,8 @@ public class MemberService {
     public void removeMember(final Long memberId) {
         Member member = getMember(memberId);
 
+        widgetLiveActivityRepository.deleteAllByDeviceMember(member);
+        widgetDeviceRepository.deleteAllByMember(member);
         member.delete();
     }
 
