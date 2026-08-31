@@ -6,8 +6,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
+import com.yagubogu.ui.livetalk.model.PlayerRole
 import com.yagubogu.ui.livetalk.model.toResource
 import com.yagubogu.ui.livetalk.model.toStringResource
 import com.yagubogu.ui.theme.Gray100
@@ -37,7 +40,6 @@ import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardSemiBold12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
@@ -143,6 +145,7 @@ private fun StadiumLiveScores(liveGameState: LiveGameStateUiModel) {
     // TODO: 데이터 연동
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(IntrinsicSize.Min),
     ) {
         TeamItem(
             livetalkTeamUiModel = liveGameState.awayTeam,
@@ -151,6 +154,7 @@ private fun StadiumLiveScores(liveGameState: LiveGameStateUiModel) {
 
         LiveGameState(
             liveGameState = liveGameState,
+            modifier = Modifier.fillMaxHeight(),
         )
 
         TeamItem(
@@ -210,20 +214,25 @@ private fun TeamItem(
             style = PretendardSemiBold12,
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                // TODO: "투" or "타"
-                text = livetalkTeamUiModel.currentPlayerName?.first().toString(),
-                style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
-            )
-            Text(
-                text = livetalkTeamUiModel.currentPlayerName ?: "",
-                style = PretendardMedium12,
-            )
+        if (livetalkTeamUiModel.currentPlayerName != null && livetalkTeamUiModel.currentPlayerRole != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text =
+                        when (livetalkTeamUiModel.currentPlayerRole) {
+                            PlayerRole.PITCHER -> "투"
+                            PlayerRole.BATTER -> "타"
+                        },
+                    style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
+                )
+                Text(
+                    text = livetalkTeamUiModel.currentPlayerName,
+                    style = PretendardMedium12,
+                )
+            }
         }
     }
 }

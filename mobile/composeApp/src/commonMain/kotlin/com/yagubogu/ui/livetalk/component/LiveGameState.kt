@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.yagubogu.ui.common.component.DiamondShape
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
+import com.yagubogu.ui.livetalk.model.InningHalf
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray300
@@ -89,12 +90,17 @@ private fun LiveGame(
                     bases = gameState.bases,
                 )
                 Text(
-                    text = "${gameState.inning}회${gameState.inningHalf}",
+                    text = "${gameState.inning}회${
+                        when (gameState.inningHalf) {
+                            InningHalf.TOP -> "초"
+                            InningHalf.BOTTOM -> "말"
+                        }
+                    }",
                     style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
                     modifier =
                         Modifier
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                            .background(color = Primary100, shape = RoundedCornerShape(12.dp)),
+                            .background(color = Primary100, shape = RoundedCornerShape(12.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
                 )
             }
 
@@ -136,8 +142,8 @@ private fun ScheduledGame(modifier: Modifier = Modifier) {
                     style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
                     modifier =
                         Modifier
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                            .background(color = Primary100, shape = RoundedCornerShape(12.dp)),
+                            .background(color = Primary100, shape = RoundedCornerShape(12.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
                 )
             }
 
@@ -175,8 +181,8 @@ private fun CompletedGame(
             style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
             modifier =
                 Modifier
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .background(color = Primary100, shape = RoundedCornerShape(12.dp)),
+                    .background(color = Primary100, shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
         )
 
         Text(
@@ -207,8 +213,8 @@ private fun CanceledGame(modifier: Modifier = Modifier) {
             style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
             modifier =
                 Modifier
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .background(color = Primary100, shape = RoundedCornerShape(12.dp)),
+                    .background(color = Primary100, shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
         )
 
         Text(
@@ -225,7 +231,7 @@ private fun RunnerBases(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy((-6).dp),
         modifier = modifier,
     ) {
         Base(isOccupied = bases?.isSecondBaseOccupied ?: false)

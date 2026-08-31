@@ -31,8 +31,6 @@ data class LiveGamesResponse(
     data class LiveTeamDto(
         @SerialName("code")
         val code: String, // 팀 코드
-        @SerialName("name")
-        val name: String, // 팀 이름
         @SerialName("currentPlayer")
         val currentPlayer: String?, // 현재 선수 (타자 또는 투수)
         @SerialName("currentPlayerRole")
