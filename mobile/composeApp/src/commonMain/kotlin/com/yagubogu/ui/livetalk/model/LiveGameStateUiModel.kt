@@ -1,8 +1,10 @@
 package com.yagubogu.ui.livetalk.model
 
+import androidx.compose.runtime.Immutable
 import com.yagubogu.domain.model.Team
 import kotlinx.datetime.LocalTime
 
+@Immutable
 sealed interface LiveGameStateUiModel {
     val awayTeam: LivetalkTeamUiModel
     val homeTeam: LivetalkTeamUiModel
