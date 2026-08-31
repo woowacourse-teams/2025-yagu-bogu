@@ -1,0 +1,23 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_fd638edb5919f3::t_8b5007abff608c 9,12
+  s_fd638edb5919f3::t_6d20e90935a594 148,157
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_fd638edb5919f3::t_ddab0d7d8d3bbb 102-103,145-146,184-185,216-217,234
+  s_fd638edb5919f3::t_98158a42f437fa 22,93-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f1efbe52144274503cdf87b4b819386a5676d0d8",
+  "prompts": {},
+  "sessions": {
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
