@@ -1,0 +1,19 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/model/LiveGameStateUiModel.kt
+  s_fd638edb5919f3::t_786d9765f83671 3,7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "9a5634bea1b9d9bc692d6fcb2b4f7793f90ecd7e",
+  "prompts": {},
+  "sessions": {
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
