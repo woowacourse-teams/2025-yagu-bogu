@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameDatesResponse
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.dto.response.game.LiveGamesResponse
 import com.yagubogu.data.service.GameApiService
 import com.yagubogu.data.util.safeApiCall
 import kotlinx.datetime.LocalDate
@@ -15,6 +16,11 @@ class GameRemoteDataSource(
     override suspend fun getGames(date: LocalDate): Result<GameResponse> =
         safeApiCall {
             gameApiService.getGames(date.toString())
+        }
+
+    override suspend fun getLiveGames(): Result<LiveGamesResponse> =
+        safeApiCall {
+            gameApiService.getLiveGames()
         }
 
     override suspend fun getGameDates(yearMonth: YearMonth): Result<GameDatesResponse> =

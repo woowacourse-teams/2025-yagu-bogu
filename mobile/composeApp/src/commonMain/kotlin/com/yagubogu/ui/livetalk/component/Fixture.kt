@@ -8,6 +8,7 @@ import com.yagubogu.ui.livetalk.model.InningHalf
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
+import com.yagubogu.ui.livetalk.model.PlayerRole
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import kotlinx.collections.immutable.persistentListOf
@@ -17,12 +18,14 @@ private val LIVETALK_TEAM_AWAY =
     LivetalkTeamUiModel(
         team = Team.SS,
         currentPlayerName = "김타자",
+        currentPlayerRole = PlayerRole.BATTER,
     )
 
 private val LIVETALK_TEAM_HOME =
     LivetalkTeamUiModel(
         team = Team.HT,
         currentPlayerName = "김투수",
+        currentPlayerRole = PlayerRole.PITCHER,
     )
 
 val LIVE_GAME_STATE_SCHEDULED =

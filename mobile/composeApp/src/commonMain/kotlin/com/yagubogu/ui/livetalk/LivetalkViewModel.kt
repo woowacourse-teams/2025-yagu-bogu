@@ -3,17 +3,20 @@ package com.yagubogu.ui.livetalk
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.yagubogu.data.dto.response.game.GameWithCheckInDto
+import com.yagubogu.data.dto.response.game.LiveGamesResponse.LiveGameDto
 import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
-import com.yagubogu.ui.mapper.toLivetalkUiModel
+import com.yagubogu.ui.mapper.GameUiMapper
 import com.yagubogu.ui.mapper.toUiModel
-import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,10 +37,21 @@ class LivetalkViewModel(
 
     fun fetchGames(date: LocalDate = LocalDate.now(clock)) {
         viewModelScope.launch {
-            gameRepository
-                .getGames(date)
-                .mapList { it.toLivetalkUiModel() }
-                .onSuccess { stadiums: List<LivetalkStadiumUiModel> ->
+            val gamesDeferred: Deferred<Result<List<GameWithCheckInDto>>> =
+                async { gameRepository.getGames(date) }
+            val liveGamesDeferred: Deferred<Result<List<LiveGameDto>>> =
+                async { gameRepository.getLiveGames() }
+
+            val gamesResult: Result<List<GameWithCheckInDto>> = gamesDeferred.await()
+            val liveGamesResult: Result<List<LiveGameDto>> = liveGamesDeferred.await()
+
+            gamesResult
+                .mapCatching { games: List<GameWithCheckInDto> ->
+                    GameUiMapper.mapToLivetalkUiModels(
+                        games = games,
+                        liveGames = liveGamesResult.getOrThrow(),
+                    )
+                }.onSuccess { stadiums: List<LivetalkStadiumUiModel> ->
                     val previousWeather: Map<Long, WeatherUiModel?> =
                         uiState.value.stadiums.associate { it.stadiumId to it.weatherUiModel }
                     val stadiumsWithPreviousWeather: List<LivetalkStadiumUiModel> =

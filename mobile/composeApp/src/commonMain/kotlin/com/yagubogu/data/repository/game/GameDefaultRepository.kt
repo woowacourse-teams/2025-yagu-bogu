@@ -6,6 +6,8 @@ import com.yagubogu.data.dto.response.game.GameDatesResponse
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.dto.response.game.LiveGamesResponse
+import com.yagubogu.data.dto.response.game.LiveGamesResponse.LiveGameDto
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 
@@ -15,6 +17,11 @@ class GameDefaultRepository(
     override suspend fun getGames(date: LocalDate): Result<List<GameWithCheckInDto>> =
         gameDataSource.getGames(date).map { gameResponse: GameResponse ->
             gameResponse.games
+        }
+
+    override suspend fun getLiveGames(): Result<List<LiveGameDto>> =
+        gameDataSource.getLiveGames().map { response: LiveGamesResponse ->
+            response.games
         }
 
     override suspend fun getGameDates(yearMonth: YearMonth): Result<List<LocalDate>> =

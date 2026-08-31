@@ -21,12 +21,7 @@ sealed interface LiveGameStateUiModel {
         val inningHalf: InningHalf,
         val bases: BasesUiModel,
         val ballCount: BallCountUiModel,
-    ) : LiveGameStateUiModel {
-        private val battingSide: TeamSide
-            get() = if (inningHalf == InningHalf.TOP) TeamSide.AWAY else TeamSide.HOME
-
-        fun playerRoleOf(side: TeamSide): PlayerRole = if (side == battingSide) PlayerRole.BATTER else PlayerRole.PITCHER
-    }
+    ) : LiveGameStateUiModel
 
     data class Completed(
         override val awayTeam: LivetalkTeamUiModel,
@@ -50,6 +45,7 @@ sealed interface LiveGameStateUiModel {
 data class LivetalkTeamUiModel(
     val team: Team,
     val currentPlayerName: String?,
+    val currentPlayerRole: PlayerRole?,
 )
 
 data class ScoreUiModel(
@@ -69,8 +65,12 @@ data class BallCountUiModel(
     val outCount: Int,
 )
 
-enum class InningHalf { TOP, BOTTOM }
+enum class InningHalf {
+    TOP,
+    BOTTOM,
+}
 
-enum class TeamSide { AWAY, HOME }
-
-enum class PlayerRole { PITCHER, BATTER }
+enum class PlayerRole {
+    PITCHER,
+    BATTER,
+}
