@@ -5,6 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 
 data class LivetalkUiState(
     val isLoading: Boolean = false,
-    val stadiumItems: ImmutableList<LivetalkStadiumItem> = persistentListOf(),
+    val stadiums: ImmutableList<LivetalkStadiumUiModel> = persistentListOf(),
     val isWeatherLoaded: Boolean = false,
 )

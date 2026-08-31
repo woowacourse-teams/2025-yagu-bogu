@@ -20,35 +20,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.common.component.DiamondShape
-import com.yagubogu.ui.livetalk.model.Condition
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
-import com.yagubogu.ui.livetalk.model.WeatherUiModel
+import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
+import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
 import com.yagubogu.ui.livetalk.model.toResource
 import com.yagubogu.ui.livetalk.model.toStringResource
-import com.yagubogu.ui.theme.EsamanruBold
 import com.yagubogu.ui.theme.Gray100
-import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.Gray700
-import com.yagubogu.ui.theme.Green
 import com.yagubogu.ui.theme.PretendardBold
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
-import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.PretendardSemiBold12
-import com.yagubogu.ui.theme.Primary100
 import com.yagubogu.ui.theme.Primary500
-import com.yagubogu.ui.theme.Primary600
-import com.yagubogu.ui.theme.Red
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.Yellow
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.mascot
@@ -63,12 +51,11 @@ import yagubogu.composeapp.generated.resources.ic_users
 import yagubogu.composeapp.generated.resources.livetalk_stadium_select_arrow_description
 import yagubogu.composeapp.generated.resources.livetalk_user_icon_description
 import yagubogu.composeapp.generated.resources.livetalk_weather_icon_description
-import kotlin.repeat
 
 @Composable
 fun LivetalkStadiumItem(
-    item: LivetalkStadiumItem,
-    onClick: (LivetalkStadiumItem) -> Unit,
+    item: LivetalkStadiumUiModel,
+    onClick: (LivetalkStadiumUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -134,7 +121,9 @@ fun LivetalkStadiumItem(
             )
         }
 
-        StadiumLiveScores(item = item)
+        StadiumLiveScores(
+            liveGameState = item.liveGameState,
+        )
     }
 }
 
@@ -150,35 +139,22 @@ fun ShimmerStadiumItem(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StadiumLiveScores(item: LivetalkStadiumItem) {
+private fun StadiumLiveScores(liveGameState: LiveGameStateUiModel) {
     // TODO: 데이터 연동
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TeamItem(
-            team = item.awayTeam,
-            playerName = "김투수",
+            livetalkTeamUiModel = liveGameState.awayTeam,
             modifier = Modifier.weight(1.0f),
         )
-        Text(
-            text = "vs",
-            style = PretendardMedium.copy(fontSize = 20.dpToSp, color = Gray500),
-        )
-        LiveScoreBoard(
-            awayTeamScore = 88,
-            homeTeamScore = 1,
-            inning = 6,
-            firstBaseOccupied = true,
-            secondBaseOccupied = false,
-            thirdBaseOccupied = true,
-            ballCount = 2,
-            strikeCount = 1,
-            outCount = 1,
+
+        LiveGameState(
+            liveGameState = liveGameState,
         )
 
         TeamItem(
-            team = item.homeTeam,
-            playerName = "김타자",
+            livetalkTeamUiModel = liveGameState.homeTeam,
             modifier = Modifier.weight(1.0f),
         )
     }
@@ -211,8 +187,7 @@ private fun IconWithText(
 
 @Composable
 private fun TeamItem(
-    team: Team,
-    playerName: String,
+    livetalkTeamUiModel: LivetalkTeamUiModel,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -220,18 +195,18 @@ private fun TeamItem(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(team.mascot),
+            painter = painterResource(livetalkTeamUiModel.team.mascot),
             contentDescription = null,
             modifier =
                 Modifier
                     .clip(CircleShape)
                     .size(52.dp)
-                    .background(team.color.copy(alpha = 0.2f))
+                    .background(livetalkTeamUiModel.team.color.copy(alpha = 0.2f))
                     .padding(8.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = team.shortname,
+            text = livetalkTeamUiModel.team.shortname,
             style = PretendardSemiBold12,
         )
 
@@ -242,175 +217,12 @@ private fun TeamItem(
         ) {
             Text(
                 // TODO: "투" or "타"
-                text = playerName.first().toString(),
+                text = livetalkTeamUiModel.currentPlayerName?.first().toString(),
                 style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
             )
             Text(
-                text = playerName,
+                text = livetalkTeamUiModel.currentPlayerName ?: "",
                 style = PretendardMedium12,
-            )
-        }
-    }
-}
-
-@Composable
-private fun LiveScoreBoard(
-    awayTeamScore: Int,
-    homeTeamScore: Int,
-    inning: Int,
-    firstBaseOccupied: Boolean,
-    secondBaseOccupied: Boolean,
-    thirdBaseOccupied: Boolean,
-    ballCount: Int,
-    strikeCount: Int,
-    outCount: Int,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.padding(top = 8.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = awayTeamScore.toString(),
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                RunnerBases(
-                    firstBaseOccupied = firstBaseOccupied,
-                    secondBaseOccupied = secondBaseOccupied,
-                    thirdBaseOccupied = thirdBaseOccupied,
-                )
-                Text(
-                    text = inning.toString(),
-                    style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
-                    modifier =
-                        Modifier
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                            .background(color = Primary100, shape = RoundedCornerShape(12.dp)),
-                )
-            }
-
-            Text(
-                text = homeTeamScore.toString(),
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-        }
-
-        BallStrikeOutCount(
-            ballCount = ballCount,
-            strikeCount = strikeCount,
-            outCount = outCount,
-        )
-    }
-}
-
-@Composable
-private fun RunnerBases(
-    firstBaseOccupied: Boolean,
-    secondBaseOccupied: Boolean,
-    thirdBaseOccupied: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = modifier,
-    ) {
-        Base(isOccupied = secondBaseOccupied)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Base(isOccupied = thirdBaseOccupied)
-            Base(isOccupied = firstBaseOccupied)
-        }
-    }
-}
-
-@Composable
-private fun Base(
-    isOccupied: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .size(14.dp)
-                .background(
-                    color = if (isOccupied) Yellow else Gray300,
-                    shape = DiamondShape,
-                ),
-    )
-}
-
-@Composable
-private fun BallStrikeOutCount(
-    ballCount: Int,
-    strikeCount: Int,
-    outCount: Int,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        CountRow(
-            label = "B",
-            count = ballCount,
-            maxCount = 3,
-            color = Green,
-        )
-        CountRow(
-            label = "S",
-            count = strikeCount,
-            maxCount = 2,
-            color = Yellow,
-        )
-        CountRow(
-            label = "O",
-            count = outCount,
-            maxCount = 2,
-            color = Red,
-        )
-    }
-}
-
-@Composable
-private fun CountRow(
-    label: String,
-    count: Int,
-    maxCount: Int,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Text(
-            text = label,
-            style = PretendardSemiBold12.copy(color = Gray500),
-        )
-
-        repeat(maxCount) { index: Int ->
-            Box(
-                modifier =
-                    Modifier
-                        .size(10.dp)
-                        .background(
-                            color = if (index < count) color else Gray300,
-                            shape = CircleShape,
-                        ),
             )
         }
     }
@@ -420,7 +232,7 @@ private fun CountRow(
 @Composable
 private fun LivetalkStadiumItemVerifiedPreview() {
     LivetalkStadiumItem(
-        item = LIVETALK_STADIUM_ITEM_VERIFIED,
+        item = LIVETALK_STADIUM_VERIFIED,
         onClick = {},
     )
 }
@@ -429,15 +241,7 @@ private fun LivetalkStadiumItemVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemUnVerifiedPreview() {
     LivetalkStadiumItem(
-        item =
-            LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(
-                weatherUiModel =
-                    WeatherUiModel(
-                        1,
-                        Condition.Clear,
-                        "12.3°C",
-                    ),
-            ),
+        item = LIVETALK_STADIUM_UNVERIFIED,
         onClick = {},
     )
 }
@@ -446,37 +250,4 @@ private fun LivetalkStadiumItemUnVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemShimmerPreview() {
     ShimmerStadiumItem()
-}
-
-@Preview
-@Composable
-private fun RunnerBasesPreview() {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
-        modifier =
-            Modifier
-                .background(White)
-                .padding(20.dp),
-    ) {
-        RunnerBases(
-            firstBaseOccupied = false,
-            secondBaseOccupied = false,
-            thirdBaseOccupied = false,
-        )
-        RunnerBases(
-            firstBaseOccupied = true,
-            secondBaseOccupied = false,
-            thirdBaseOccupied = false,
-        )
-        RunnerBases(
-            firstBaseOccupied = false,
-            secondBaseOccupied = true,
-            thirdBaseOccupied = true,
-        )
-        RunnerBases(
-            firstBaseOccupied = true,
-            secondBaseOccupied = true,
-            thirdBaseOccupied = true,
-        )
-    }
 }

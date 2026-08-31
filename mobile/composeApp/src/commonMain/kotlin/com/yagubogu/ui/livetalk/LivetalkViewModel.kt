@@ -6,7 +6,7 @@ import co.touchlab.kermit.Logger
 import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import com.yagubogu.ui.mapper.toLivetalkUiModel
@@ -37,18 +37,18 @@ class LivetalkViewModel(
             gameRepository
                 .getGames(date)
                 .mapList { it.toLivetalkUiModel() }
-                .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
+                .onSuccess { stadiums: List<LivetalkStadiumUiModel> ->
                     val previousWeather: Map<Long, WeatherUiModel?> =
-                        uiState.value.stadiumItems.associate { it.stadiumId to it.weatherUiModel }
-                    val itemsWithPreviousWeather =
-                        livetalkStadiumItems.map { item ->
-                            item.copy(weatherUiModel = previousWeather[item.stadiumId])
+                        uiState.value.stadiums.associate { it.stadiumId to it.weatherUiModel }
+                    val stadiumsWithPreviousWeather: List<LivetalkStadiumUiModel> =
+                        stadiums.map { stadium: LivetalkStadiumUiModel ->
+                            stadium.copy(weatherUiModel = previousWeather[stadium.stadiumId])
                         }
                     _uiState.update { current: LivetalkUiState ->
                         current.copy(
                             isLoading = false,
-                            stadiumItems =
-                                itemsWithPreviousWeather
+                            stadiums =
+                                stadiumsWithPreviousWeather
                                     .sortedByVerification()
                                     .toImmutableList(),
                         )
@@ -65,7 +65,7 @@ class LivetalkViewModel(
     }
 
     private suspend fun fetchWeather() {
-        val ids: List<Long> = uiState.value.stadiumItems.map { it.stadiumId }
+        val ids: List<Long> = uiState.value.stadiums.map { it.stadiumId }
         if (ids.isEmpty()) return
 
         stadiumRepository
@@ -76,10 +76,10 @@ class LivetalkViewModel(
 
                 _uiState.update { current: LivetalkUiState ->
                     current.copy(
-                        stadiumItems =
-                            current.stadiumItems
-                                .map { livetalkStadiumItem: LivetalkStadiumItem ->
-                                    livetalkStadiumItem.copy(weatherUiModel = weatherUiModels[livetalkStadiumItem.stadiumId])
+                        stadiums =
+                            current.stadiums
+                                .map { stadium: LivetalkStadiumUiModel ->
+                                    stadium.copy(weatherUiModel = weatherUiModels[stadium.stadiumId])
                                 }.toImmutableList(),
                         isWeatherLoaded = true,
                     )
@@ -89,10 +89,10 @@ class LivetalkViewModel(
             }
     }
 
-    private fun List<LivetalkStadiumItem>.sortedByVerification(): List<LivetalkStadiumItem> {
+    private fun List<LivetalkStadiumUiModel>.sortedByVerification(): List<LivetalkStadiumUiModel> {
         val (verifiedItems, unverifiedItems) =
-            partition { liveTalkStadiumItem: LivetalkStadiumItem ->
-                liveTalkStadiumItem.isVerified
+            partition { stadium: LivetalkStadiumUiModel ->
+                stadium.isVerified
             }
         return verifiedItems + unverifiedItems
     }

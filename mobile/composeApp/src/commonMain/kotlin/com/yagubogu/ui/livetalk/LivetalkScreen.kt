@@ -27,10 +27,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.common.AdUnitIds
 import com.yagubogu.ui.common.component.BannerAd
 import com.yagubogu.ui.common.component.BannerAdType
-import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUM_ITEMS
+import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.component.ShimmerStadiumItem
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
@@ -70,14 +70,14 @@ fun LivetalkScreen(
             ShimmerLivetalkScreen(modifier = modifier)
         }
 
-        uiState.stadiumItems.isEmpty() -> {
+        uiState.stadiums.isEmpty() -> {
             EmptyLivetalkScreen(modifier = modifier)
         }
 
         else -> {
             LivetalkScreen(
                 uiState = uiState,
-                onItemClick = { item: LivetalkStadiumItem ->
+                onItemClick = { item: LivetalkStadiumUiModel ->
                     onLivetalkItemClick(item.gameId, item.isVerified)
                 },
                 modifier = modifier,
@@ -106,12 +106,12 @@ private fun ShimmerLivetalkScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun LivetalkScreen(
     uiState: LivetalkUiState,
-    onItemClick: (LivetalkStadiumItem) -> Unit,
+    onItemClick: (LivetalkStadiumUiModel) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
-    val showBannerAd = uiState.stadiumItems.size >= BANNER_AD_INDEX
+    val showBannerAd = uiState.stadiums.size >= BANNER_AD_INDEX
 
     LaunchedEffect(Unit) {
         scrollToTopEvent.collect {
@@ -135,14 +135,14 @@ private fun LivetalkScreen(
                 .background(Gray050),
     ) {
         items(
-            count = uiState.stadiumItems.size + if (showBannerAd) 1 else 0,
+            count = uiState.stadiums.size + if (showBannerAd) 1 else 0,
             key = { index: Int ->
                 if (showBannerAd && index == BANNER_AD_INDEX) {
                     "livetalk_banner_ad"
                 } else {
                     val itemIndex =
                         if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                    uiState.stadiumItems[itemIndex].gameId
+                    uiState.stadiums[itemIndex].gameId
                 }
             },
         ) { index: Int ->
@@ -153,7 +153,7 @@ private fun LivetalkScreen(
                 )
             } else {
                 val itemIndex = if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                LivetalkStadiumItem(item = uiState.stadiumItems[itemIndex], onClick = onItemClick)
+                LivetalkStadiumItem(item = uiState.stadiums[itemIndex], onClick = onItemClick)
             }
         }
         if (uiState.isWeatherLoaded) {
@@ -205,7 +205,7 @@ private fun LivetalkScreenPreview() {
         uiState =
             LivetalkUiState(
                 isLoading = false,
-                stadiumItems = LIVETALK_STADIUM_ITEMS.toImmutableList(),
+                stadiums = LIVETALK_STADIUMS.toImmutableList(),
                 isWeatherLoaded = true,
             ),
         onItemClick = {},
