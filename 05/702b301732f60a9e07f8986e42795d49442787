@@ -1,0 +1,59 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/LivetalkViewModel.kt
+  s_fd638edb5919f3::t_328f8a2a25d933 45
+  s_fd638edb5919f3::t_af48c57d9bf0f9 42-44
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_fd638edb5919f3::t_8113dba4b88103 220
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_fd638edb5919f3::t_157417bc876569 39,64,66,112,114,153,155,192,194,220,222,240,242,255-256,258,287,289,319-358
+  s_fd638edb5919f3::t_36eee8a1f80a04 17
+  s_fd638edb5919f3::t_03229a3c0f807c 14-16
+  s_fd638edb5919f3::t_f5cf8a87ffda77 18-20,36-38
+  s_fd638edb5919f3::t_e58e19f846bba8 40-42,61-63
+  s_fd638edb5919f3::t_100a3917722a9a 65
+  s_fd638edb5919f3::t_3d3e6d23c1111a 67-69,109-111
+  s_fd638edb5919f3::t_b07445db4a0ad5 113
+  s_fd638edb5919f3::t_4d6e6b7648935c 115-117,150-152
+  s_fd638edb5919f3::t_6d4f83d5ce4f9a 154
+  s_fd638edb5919f3::t_35da439a110932 156-158,189-191
+  s_fd638edb5919f3::t_d60fd27937d48a 193
+  s_fd638edb5919f3::t_d3736b88c1ded9 195-197,217-219
+  s_fd638edb5919f3::t_8f3bc7738cbd2d 221
+  s_fd638edb5919f3::t_0589a35febf61a 223-225,237-239
+  s_fd638edb5919f3::t_e43aaca8ea3d53 241
+  s_fd638edb5919f3::t_c9bae599c3f6fd 243-245,252-254
+  s_fd638edb5919f3::t_6832a108eb8a16 257
+  s_fd638edb5919f3::t_b6adfc0bfce72a 259-261,284-286
+  s_fd638edb5919f3::t_418cc365bafb8f 288
+  s_fd638edb5919f3::t_c9303ac6e96359 290-292,316-318
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/Fixture.kt
+  s_fd638edb5919f3::t_b4eebe98047818 23,34,42,48,54,59,61,66,82,107,114-115
+  s_fd638edb5919f3::t_ca71729ff77083 4-12
+  s_fd638edb5919f3::t_02546399e67b1e 20-22
+  s_fd638edb5919f3::t_46c958c6b4d4cc 24-26,31-33
+  s_fd638edb5919f3::t_be946d8d0a1a0b 35-37,39-41
+  s_fd638edb5919f3::t_c42e176b3ec4ec 43-47
+  s_fd638edb5919f3::t_0cb96dc14458ad 49-53
+  s_fd638edb5919f3::t_5090c82e8dbd0b 55-58
+  s_fd638edb5919f3::t_d2e50a9342ead3 60
+  s_fd638edb5919f3::t_c4ff9494efa295 62-65
+  s_fd638edb5919f3::t_0dd5570c81a096 67-69,79-81
+  s_fd638edb5919f3::t_36257090ffb82b 83-85
+  s_fd638edb5919f3::t_8ad9e8f10902ea 106
+  s_fd638edb5919f3::t_df8937bc313b86 112-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "05702b301732f60a9e07f8986e42795d49442787",
+  "prompts": {},
+  "sessions": {
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jiyun Lee <02leejiyun@naver.com>"
+    }
+  }
+}
