@@ -1,0 +1,23 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/LivetalkViewModel.kt
+  s_fd638edb5919f3::t_fb6e50e31847b6 40-54
+  s_fd638edb5919f3::t_876500da6a3625 6-7,14,18-19
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/Fixture.kt
+  s_fd638edb5919f3::t_aebd12e1eb468f 21,28
+  s_fd638edb5919f3::t_590d77f5ef5285 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6dd8d1cf4518af2d79400f7e7ba8084e281ada20",
+  "prompts": {},
+  "sessions": {
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jiyun Lee <02leejiyun@naver.com>"
+    }
+  }
+}
