@@ -41,8 +41,11 @@ public class GameController implements GameControllerInterface {
     }
 
     @RequireRole
-    public ResponseEntity<LiveGamesResponse> findLiveGames(final MemberClaims memberClaims) {
-        LiveGamesResponse response = gameService.findLiveGames();
+    public ResponseEntity<LiveGamesResponse> findLiveGames(
+            final MemberClaims memberClaims,
+            @RequestParam(required = false) final LocalDate date
+    ) {
+        LiveGamesResponse response = gameService.findLiveGames(date);
 
         return ResponseEntity.ok(response);
     }

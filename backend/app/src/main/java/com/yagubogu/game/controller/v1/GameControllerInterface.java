@@ -44,12 +44,14 @@ public interface GameControllerInterface {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth
     );
 
-    @Operation(summary = "현장톡 실시간 경기 목록 조회", description = "당일 전체 경기의 점수와 실시간 경기 상태를 조회합니다.")
+    @Operation(summary = "현장톡 실시간 경기 목록 조회",
+            description = "지정한 날짜 전체 경기의 점수와 실시간 경기 상태를 조회합니다. date를 생략하면 서버 기준 오늘 날짜로 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "실시간 경기 목록 조회 성공")
     })
     @GetMapping("/live")
     ResponseEntity<LiveGamesResponse> findLiveGames(
-            @Parameter(hidden = true) MemberClaims memberClaims
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam(required = false) LocalDate date
     );
 }

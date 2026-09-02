@@ -47,8 +47,9 @@ public class GameService {
         return GameResultParam.from(game);
     }
 
-    public LiveGamesResponse findLiveGames() {
-        List<Game> games = gameRepository.findAllByDateWithTeamsOrderByStartAt(LocalDate.now(clock));
+    public LiveGamesResponse findLiveGames(final LocalDate date) {
+        LocalDate targetDate = date != null ? date : LocalDate.now(clock);
+        List<Game> games = gameRepository.findAllByDateWithTeamsOrderByStartAt(targetDate);
 
         return LiveGamesResponse.from(games);
     }
