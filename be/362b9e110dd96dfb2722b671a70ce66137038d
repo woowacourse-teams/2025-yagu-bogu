@@ -1,0 +1,21 @@
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
+  s_6ecfaa5a5fc83c::t_01af2192bde199 105-115,149-154
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_6ecfaa5a5fc83c::t_6a37e3e5fea0f8 75,94,121,123,179,181,185,189-234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "be362b9e110dd96dfb2722b671a70ce66137038d",
+  "prompts": {},
+  "sessions": {
+    "s_6ecfaa5a5fc83c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736ef240-4e94-42a7-8016-4c1accc83b3f",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
