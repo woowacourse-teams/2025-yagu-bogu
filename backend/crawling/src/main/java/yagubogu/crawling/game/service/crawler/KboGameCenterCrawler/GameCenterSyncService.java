@@ -102,14 +102,17 @@ public class GameCenterSyncService {
         gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
                         startTime)
                 .ifPresentOrElse(
-                        game -> game.updateLiveGameCenterState(
-                                detail.getCurrentBatterTeam(),
-                                detail.getCurrentBatterName(),
-                                detail.getCurrentPitcherTeam(),
-                                detail.getCurrentPitcherName(),
-                                detail.getCurrentInning(),
-                                detail.getCurrentInningHalf()
-                        ),
+                        game -> {
+                            game.updateLiveGameCenterState(
+                                    detail.getCurrentBatterTeam(),
+                                    detail.getCurrentBatterName(),
+                                    detail.getCurrentPitcherTeam(),
+                                    detail.getCurrentPitcherName(),
+                                    detail.getCurrentInning(),
+                                    detail.getCurrentInningHalf()
+                            );
+                            gameRepository.save(game);
+                        },
                         () -> log.debug("[LIVE_STATE] Game not found, skip batter/pitcher update: gameCode={}",
                                 detail.getGameCode())
                 );
@@ -143,9 +146,12 @@ public class GameCenterSyncService {
         gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
                         startTime)
                 .ifPresentOrElse(
-                        game -> game.updateProbablePitchers(
-                                detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
-                        ),
+                        game -> {
+                            game.updateProbablePitchers(
+                                    detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
+                            );
+                            gameRepository.save(game);
+                        },
                         () -> log.debug("[PROBABLE_PITCHER] Game not found, skip: gameCode={}",
                                 detail.getGameCode())
                 );
