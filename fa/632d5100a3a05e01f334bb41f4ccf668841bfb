@@ -1,0 +1,28 @@
+backend/app/src/main/java/com/yagubogu/game/controller/v1/GameController.java
+  s_6ecfaa5a5fc83c::t_b19997bd46b053 44-48
+backend/app/src/main/java/com/yagubogu/game/controller/v1/GameControllerInterface.java
+  s_6ecfaa5a5fc83c::t_b1d2d123b8b19c 47-48,54-55
+backend/app/src/main/java/com/yagubogu/game/service/GameService.java
+  s_6ecfaa5a5fc83c::t_db5c41993eba0c 50-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fa632d5100a3a05e01f334bb41f4ccf668841bfb",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_6ecfaa5a5fc83c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736ef240-4e94-42a7-8016-4c1accc83b3f",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
