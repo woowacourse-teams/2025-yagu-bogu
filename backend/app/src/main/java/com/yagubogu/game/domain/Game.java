@@ -85,6 +85,44 @@ public class Game {
     @Column(name = "game_state")
     private GameState gameState;
 
+    // 경기중 실시간 상태 (경기중이 아니면 모두 null)
+    @Column(name = "current_batter_team", nullable = true)
+    private String currentBatterTeam;
+
+    @Column(name = "current_batter_name", nullable = true)
+    private String currentBatterName;
+
+    @Column(name = "current_pitcher_team", nullable = true)
+    private String currentPitcherTeam;
+
+    @Column(name = "current_pitcher_name", nullable = true)
+    private String currentPitcherName;
+
+    @Column(name = "current_inning", nullable = true)
+    private Integer currentInning;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "current_inning_half", nullable = true)
+    private InningHalf currentInningHalf;
+
+    @Column(name = "first_base_occupied", nullable = true)
+    private Boolean firstBaseOccupied;
+
+    @Column(name = "second_base_occupied", nullable = true)
+    private Boolean secondBaseOccupied;
+
+    @Column(name = "third_base_occupied", nullable = true)
+    private Boolean thirdBaseOccupied;
+
+    @Column(name = "balls", nullable = true)
+    private Integer balls;
+
+    @Column(name = "strikes", nullable = true)
+    private Integer strikes;
+
+    @Column(name = "outs", nullable = true)
+    private Integer outs;
+
     public Game(final Stadium stadium, final Team homeTeam, final Team awayTeam, final LocalDate date,
                 final LocalTime startAt, final String gameCode,
                 final Integer homeScore, final Integer awayScore, final ScoreBoard homeScoreBoard,
@@ -180,6 +218,46 @@ public class Game {
 
     public boolean hasTeam(final Team team) {
         return homeTeam.equals(team) || awayTeam.equals(team);
+    }
+
+    /**
+     * 스코어보드 크롤링 결과로 진루정보/볼·스트라이크·아웃 카운트를 갱신한다.
+     * 게임센터가 출처인 현재 타자/투수 값은 건드리지 않는다.
+     */
+    public void updateLiveBaseState(
+            final Boolean firstBaseOccupied,
+            final Boolean secondBaseOccupied,
+            final Boolean thirdBaseOccupied,
+            final Integer balls,
+            final Integer strikes,
+            final Integer outs
+    ) {
+        this.firstBaseOccupied = firstBaseOccupied;
+        this.secondBaseOccupied = secondBaseOccupied;
+        this.thirdBaseOccupied = thirdBaseOccupied;
+        this.balls = balls;
+        this.strikes = strikes;
+        this.outs = outs;
+    }
+
+    /**
+     * 게임센터 크롤링 결과로 현재 이닝과 타자/투수를 갱신한다.
+     * 스코어보드가 출처인 진루정보/카운트 값은 건드리지 않는다.
+     */
+    public void updateLiveGameCenterState(
+            final String currentBatterTeam,
+            final String currentBatterName,
+            final String currentPitcherTeam,
+            final String currentPitcherName,
+            final Integer currentInning,
+            final InningHalf currentInningHalf
+    ) {
+        this.currentBatterTeam = currentBatterTeam;
+        this.currentBatterName = currentBatterName;
+        this.currentPitcherTeam = currentPitcherTeam;
+        this.currentPitcherName = currentPitcherName;
+        this.currentInning = currentInning;
+        this.currentInningHalf = currentInningHalf;
     }
 
     /**

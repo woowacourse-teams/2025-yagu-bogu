@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.yagubogu.game.domain.InningHalf;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -158,6 +159,24 @@ class KboGameCenterPageTest {
             assertThat(result.getHomeProbablePitcher()).isEqualTo("페덱");
             assertThat(result.getCurrentBatterName()).isNull();
             assertThat(result.getCurrentPitcherName()).isNull();
+        }
+
+        @Test
+        @DisplayName("extractGameDetail - 상태에서 현재 이닝과 초말을 추출한다")
+        void extractGameDetail_LiveStatus_ExtractsInningState() {
+            // Given
+            Locator gameElement = createMinimalGameElement("game-cont ing");
+            Locator status = mock(Locator.class);
+            when(status.count()).thenReturn(1);
+            when(status.textContent()).thenReturn("7회말");
+            when(gameElement.locator(".middle .staus")).thenReturn(status);
+
+            // When
+            GameCenterDetail result = gameCenterPage.extractGameDetail(gameElement, "20260621");
+
+            // Then
+            assertThat(result.getCurrentInning()).isEqualTo(7);
+            assertThat(result.getCurrentInningHalf()).isEqualTo(InningHalf.BOTTOM);
         }
 
         @Test

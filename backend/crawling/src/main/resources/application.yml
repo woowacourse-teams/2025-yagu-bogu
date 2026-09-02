@@ -38,7 +38,7 @@ kbo:
 
   scheduler:
     default-game-start-time: "18:30"
-    polling-interval: 1m
+    polling-interval: 30s
 
   retry:
     per-game:

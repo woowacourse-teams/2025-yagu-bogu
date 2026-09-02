@@ -5,11 +5,13 @@ import com.yagubogu.game.dto.GameResultParam;
 import com.yagubogu.game.dto.GameWithCheckInParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.exception.NotFoundException;
 import com.yagubogu.global.exception.UnprocessableEntityException;
 import com.yagubogu.member.domain.Member;
 import com.yagubogu.member.repository.MemberRepository;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -24,6 +26,7 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
+    private final Clock clock;
 
     public GameResponse findGamesByDate(
             final LocalDate date,
@@ -42,6 +45,13 @@ public class GameService {
         validateScoreBoard(game);
 
         return GameResultParam.from(game);
+    }
+
+    public LiveGamesResponse findLiveGames(final LocalDate date) {
+        LocalDate targetDate = date != null ? date : LocalDate.now(clock);
+        List<Game> games = gameRepository.findAllByDateWithTeamsOrderByStartAt(targetDate);
+
+        return LiveGamesResponse.from(games);
     }
 
     private static void validateScoreBoard(final Game game) {
@@ -69,7 +79,7 @@ public class GameService {
     }
 
     private void validateIsNotFuture(final LocalDate date) {
-        if (date.isAfter(LocalDate.now())) {
+        if (date.isAfter(LocalDate.now(clock))) {
             throw new UnprocessableEntityException("Cannot retrieve games for future dates");
         }
     }

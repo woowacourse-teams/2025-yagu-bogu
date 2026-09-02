@@ -76,6 +76,16 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     List<Game> findAllByDate(LocalDate date);
 
+    @Query("""
+            SELECT g
+            FROM Game g
+            JOIN FETCH g.homeTeam
+            JOIN FETCH g.awayTeam
+            WHERE g.date = :date
+            ORDER BY g.startAt, g.id
+            """)
+    List<Game> findAllByDateWithTeamsOrderByStartAt(@Param("date") LocalDate date);
+
     boolean existsByDateAndGameStateIn(LocalDate date, List<GameState> states);
 
     @Query("""

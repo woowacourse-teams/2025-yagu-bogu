@@ -6,9 +6,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,15 +40,16 @@ public class AdaptivePoller {
     }
 
     /**
-     * 1분마다 실행되는 메인 폴링 루프
+     * 설정된 경기 폴링 주기마다 실행되는 메인 폴링 루프
      *
      * 동작 흐름:
      * 1. 전역 백오프 체크 (API 장애 시 중단)
      * 2. 웨이크업 시각 체크 (불필요한 폴링 방지)
-     * 3. 스코어보드 크롤링 (전체 경기 한번에)
-     * 4. 각 경기별 업데이트 처리
+     * 3. 게임센터 크롤링 (현재 이닝/타자/투수)
+     * 4. 스코어보드 크롤링 (전체 경기 한번에)
+     * 5. 각 경기별 업데이트 처리
      */
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelayString = "${kbo.scheduler.polling-interval}")
     public void pollGameWhenReachDue() {
         Instant now = Instant.now(clock);
 
@@ -71,7 +70,9 @@ public class AdaptivePoller {
             return;
         }
 
-        Map<String, KboScoreboardGame> scoreboardGames = fetchScoreboard(today);
+        refreshGameCenter(today);
+
+        List<KboScoreboardGame> scoreboardGames = fetchScoreboard(today);
         if (scoreboardGames.isEmpty()) {
             log.debug("[POLLER] Skip: scoreboard empty");
             return;
@@ -81,8 +82,16 @@ public class AdaptivePoller {
         processGames(today, scoreboardGames, now);
     }
 
+    private void refreshGameCenter(final LocalDate date) {
+        try {
+            gameCenterSyncService.fetchGameCenter(date);
+        } catch (Exception e) {
+            log.warn("[POLLER] GameCenter refresh failed: date={}, message={}", date, e.getMessage());
+        }
+    }
+
     private void processGames(LocalDate today,
-                              Map<String, KboScoreboardGame> scoreboardGames,
+                              List<KboScoreboardGame> scoreboardGames,
                               Instant now) {
         List<Game> games = gameReadOnlyService.findAllByDateWithStadium(today);
 
@@ -109,10 +118,9 @@ public class AdaptivePoller {
      * 3. 업데이트 필요 시 DB 반영
      * 4. 다음 폴링 예약
      */
-    private void processGame(Game game, Map<String, KboScoreboardGame> scoreboardGames) {
+    private void processGame(Game game, List<KboScoreboardGame> scoreboardGames) {
         try {
-            KboScoreboardGame scoreboardGame = scoreboardGames.get(
-                    game.getGameCode());
+            KboScoreboardGame scoreboardGame = findMatch(game, scoreboardGames);
 
             if (scoreboardGame == null) {
                 handleMissingGame(game);
@@ -168,21 +176,60 @@ public class AdaptivePoller {
      *
      * 실패 시: 전역 백오프 적용 (API 차단 방지)
      */
-    private Map<String, KboScoreboardGame> fetchScoreboard(LocalDate date) {
+    private List<KboScoreboardGame> fetchScoreboard(LocalDate date) {
         try {
-            List<KboScoreboardGame> scoreboardResponses = kboScoreboardService.fetchScoreboardOnly(date);
-
-            return scoreboardResponses.stream()
-                    .filter(game -> game.getGameCode() != null && !game.getGameCode().isBlank())
-                    .collect(Collectors.toMap(
-                            KboScoreboardGame::getGameCode,
-                            game -> game
-                    ));
+            return kboScoreboardService.fetchScoreboardOnly(date);
         } catch (Exception e) {
             globalBackoff.applyBackoff();
             log.warn("[POLLER] Scoreboard fetch failed: {}", e.getMessage());
-            return Map.of();
+            return List.of();
         }
+    }
+
+    /**
+     * 스코어보드 목록에서 이 경기에 해당하는 항목을 찾는다.
+     *
+     * 스코어보드의 박스스코어 링크는 경기 종료 후에야 gameId를 포함하므로,
+     * 라이브 중인 경기는 gameCode 기준 매칭이 항상 실패한다. 그래서:
+     * 1. gameCode가 있으면 우선 매칭 (경기 종료 직후 등)
+     * 2. 없으면 자연키(날짜/구장/홈팀/원정팀/시작시각)로 매칭
+     * 3. 시작 시각이 변경된 경우(우천 순연 등)를 대비해, 시작 시각을 뺀 자연키로 유일하게
+     *    남는 항목이 있으면 그것으로 매칭
+     */
+    private KboScoreboardGame findMatch(Game game, List<KboScoreboardGame> scoreboardGames) {
+        String gameCode = game.getGameCode();
+        if (gameCode != null && !gameCode.isBlank()) {
+            for (KboScoreboardGame candidate : scoreboardGames) {
+                if (gameCode.equals(candidate.getGameCode())) {
+                    return candidate;
+                }
+            }
+        }
+
+        List<KboScoreboardGame> sameMatchup = scoreboardGames.stream()
+                .filter(candidate -> isSameMatchup(game, candidate))
+                .toList();
+
+        for (KboScoreboardGame candidate : sameMatchup) {
+            if (Objects.equals(game.getStartAt(), candidate.getStartTime())) {
+                return candidate;
+            }
+        }
+
+        if (sameMatchup.size() == 1) {
+            return sameMatchup.get(0);
+        }
+
+        return null;
+    }
+
+    private boolean isSameMatchup(Game game, KboScoreboardGame scoreboardGame) {
+        return Objects.equals(game.getDate(), scoreboardGame.getDate())
+                && Objects.equals(game.getStadium().getLocation(), scoreboardGame.getStadium())
+                && Objects.equals(game.getHomeTeam().getShortName(),
+                        scoreboardGame.getHomeTeamScoreboard().name())
+                && Objects.equals(game.getAwayTeam().getShortName(),
+                        scoreboardGame.getAwayTeamScoreboard().name());
     }
 
     private Game fetchFromGameCenter(Game game) {

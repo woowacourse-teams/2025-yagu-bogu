@@ -32,20 +32,22 @@ jobs:
 
       - name: Compose PR Notification Message
         id: message
+        env:
+          EVENT_JSON: ${{ toJson(github.event) }}
+          ACTION: ${{ github.event.action }}
+          MERGED: ${{ github.event.pull_request.merged }}
+          TITLE: ${{ github.event.pull_request.title }}
+          URL: ${{ github.event.pull_request.html_url }}
+          COMMITS: ${{ github.event.pull_request.commits }}
+          FILES: ${{ github.event.pull_request.changed_files }}
+          ADD: ${{ github.event.pull_request.additions }}
+          DEL: ${{ github.event.pull_request.deletions }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          NUMBER: ${{ github.event.number }}
+          ACTOR: ${{ github.actor }}
         run: |
-          ACTION="${{ github.event.action }}"
-          MERGED="${{ github.event.pull_request.merged }}"
-          TITLE="${{ github.event.pull_request.title }}"
-          URL="${{ github.event.pull_request.html_url }}"
-          COMMITS="${{ github.event.pull_request.commits }}"
-          FILES="${{ github.event.pull_request.changed_files }}"
-          ADD="${{ github.event.pull_request.additions }}"
-          DEL="${{ github.event.pull_request.deletions }}"
-          HEAD="${{ github.event.pull_request.head.ref }}"
-          BASE="${{ github.event.pull_request.base.ref }}"
-          NUMBER="${{ github.event.number }}"
-          ACTOR="${{ github.actor }}"
-          LABELS=$(jq -r '.pull_request.labels | map(.name) | join(", ")' <<< '${{ toJson(github.event) }}')
+          LABELS=$(jq -r '.pull_request.labels | map(.name) | join(", ")' <<< "$EVENT_JSON")
           if [[ -z "$LABELS" ]]; then
             LABEL_LINE=""
           else
@@ -79,19 +81,20 @@ jobs:
 
       - name: Send Discord Notification
         if: steps.meta.outputs.url != ''
+        env:
+          MENTION: ${{ steps.meta.outputs.mention }}
+          MSG_BODY: ${{ steps.message.outputs.msg_body }}
+          WEBHOOK_URL: ${{ steps.meta.outputs.url }}
         run: |
-          MENTION="${{ steps.meta.outputs.mention }}"
-          MSG_BODY="${{ steps.message.outputs.msg_body }}"
-          
           FINAL_CONTENT="${MENTION}
           ${MSG_BODY}"
-          
+
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
-          
+
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "$JSON_PAYLOAD" \
-               "${{ steps.meta.outputs.url }}"
+               "$WEBHOOK_URL"
 
   # dev 브랜치 머지 시 AN, BE 팀 모두에게 알림
   notify-dev-merge:
@@ -100,13 +103,14 @@ jobs:
     steps:
       - name: Compose Dev Merge Notification Message
         id: message
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          URL: ${{ github.event.pull_request.html_url }}
+          HEAD: ${{ github.event.pull_request.head.ref }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          NUMBER: ${{ github.event.number }}
+          ACTOR: ${{ github.actor }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
-          URL="${{ github.event.pull_request.html_url }}"
-          HEAD="${{ github.event.pull_request.head.ref }}"
-          BASE="${{ github.event.pull_request.base.ref }}"
-          NUMBER="${{ github.event.number }}"
-          ACTOR="${{ github.actor }}"
           EVENT_MSG="🎉 **dev** 브랜치에 새로운 코드가 머지되었습니다!"
           
           MENTION_BE="<@&1395631364199682048>"
@@ -120,15 +124,23 @@ jobs:
           echo "mention_an=$MENTION_AN" >> "$GITHUB_OUTPUT"
 
       - name: Send Notification to BE Team
+        env:
+          MENTION: ${{ steps.message.outputs.mention_be }}
+          MSG_BODY: ${{ steps.message.outputs.msg_body }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_BE }}
         run: |
-          FINAL_CONTENT="${{ steps.message.outputs.mention_be }}
-          ${{ steps.message.outputs.msg_body }}"
+          FINAL_CONTENT="${MENTION}
+          ${MSG_BODY}"
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
-          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_BE }}"
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "$WEBHOOK_URL"
 
       - name: Send Notification to AN Team
+        env:
+          MENTION: ${{ steps.message.outputs.mention_an }}
+          MSG_BODY: ${{ steps.message.outputs.msg_body }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_AN }}
         run: |
-          FINAL_CONTENT="${{ steps.message.outputs.mention_an }}
-          ${{ steps.message.outputs.msg_body }}"
+          FINAL_CONTENT="${MENTION}
+          ${MSG_BODY}"
           JSON_PAYLOAD=$(jq -n --arg content "$FINAL_CONTENT" '{content: $content}')
-          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "${{ secrets.DISCORD_WEBHOOK_AN }}"
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "$WEBHOOK_URL"

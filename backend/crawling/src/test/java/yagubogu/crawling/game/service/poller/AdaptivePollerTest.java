@@ -83,8 +83,42 @@ class AdaptivePollerTest {
 
         poller.pollGameWhenReachDue();
 
+        verify(gameCenterSyncService).fetchGameCenter(date);
         verify(scoreboardService).updateFromScoreboard(gameCode, fetched);
         verify(scheduleManager).scheduleNextPoll(1L);
+    }
+
+    @DisplayName("게임센터 갱신 실패가 스코어보드 수집을 막지 않는다")
+    @Test
+    void continueScoreboardPollingWhenGameCenterRefreshFails() {
+        GameReadOnlyService gameReadOnlyService = mock(GameReadOnlyService.class);
+        KboScoreboardService scoreboardService = mock(KboScoreboardService.class);
+        GameCenterSyncService gameCenterSyncService = mock(GameCenterSyncService.class);
+        GameScheduleManager scheduleManager = mock(GameScheduleManager.class);
+        BackoffStrategy backoffStrategy = mock(BackoffStrategy.class);
+        GlobalBackOffManager globalBackoff = mock(GlobalBackOffManager.class);
+        Clock clock = Clock.fixed(Instant.parse("2026-08-11T10:30:00Z"), ZoneId.of("Asia/Seoul"));
+        AdaptivePoller poller = new AdaptivePoller(
+                gameReadOnlyService,
+                scoreboardService,
+                gameCenterSyncService,
+                scheduleManager,
+                backoffStrategy,
+                globalBackoff,
+                clock
+        );
+        LocalDate date = LocalDate.of(2026, 8, 11);
+
+        when(globalBackoff.isActive(any())).thenReturn(false);
+        when(scheduleManager.shouldWake(any())).thenReturn(true);
+        when(gameReadOnlyService.existsByDateAndGameStateIn(any(), any())).thenReturn(true);
+        when(gameCenterSyncService.fetchGameCenter(date)).thenThrow(new RuntimeException("game center unavailable"));
+        when(scoreboardService.fetchScoreboardOnly(date)).thenReturn(List.of());
+
+        poller.pollGameWhenReachDue();
+
+        verify(gameCenterSyncService).fetchGameCenter(date);
+        verify(scoreboardService).fetchScoreboardOnly(date);
     }
 
     @DisplayName("상태가 경기전으로 같아도 시작 시각이 바뀌면 갱신한다")
