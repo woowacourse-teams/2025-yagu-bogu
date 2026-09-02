@@ -301,6 +301,42 @@ public class GameE2eTest extends E2eTestBase {
         assertThat(actualCanceledGame.liveState()).isNull();
     }
 
+    @DisplayName("date 파라미터를 주면 서버 오늘 날짜가 아니어도 해당 날짜의 경기를 반환한다")
+    @Test
+    void findLiveGames_withDateParam() {
+        // given
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        Team homeTeam = getTeamByCode("HT");
+        Team awayTeam = getTeamByCode("LT");
+        Stadium stadium = stadiumRepository.findByShortName("잠실구장").orElseThrow();
+
+        makeGame(today, "HT", "LT", "잠실구장");
+        Game yesterdayGame = gameFactory.save(builder -> builder
+                .homeTeam(homeTeam)
+                .awayTeam(awayTeam)
+                .stadium(stadium)
+                .date(yesterday));
+
+        Member member = makeMember(getTeamByCode("SS"));
+        String accessToken = authFactory.getAccessTokenByMemberId(member.getId(), Role.USER);
+
+        // when
+        LiveGamesResponse actual = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .queryParam("date", yesterday.toString())
+                .when().get("/api/v1/games/live")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(LiveGamesResponse.class);
+
+        // then
+        assertThat(actual.games()).hasSize(1);
+        assertThat(actual.games().getFirst().gameId()).isEqualTo(yesterdayGame.getId());
+    }
+
     @DisplayName("취소된 경기만 있는 날짜는 결과에서 제외된다")
     @Test
     void findGameDatesByYearMonth_excludesCanceled() {

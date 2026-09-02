@@ -12,6 +12,7 @@ import com.yagubogu.game.dto.StadiumByGameParam;
 import com.yagubogu.game.dto.TeamByGameParam;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.global.config.JpaAuditingConfig;
 import com.yagubogu.global.exception.NotFoundException;
@@ -165,6 +166,38 @@ class GameServiceTest {
 
         // then
         assertThat(scoreBoard).isEqualTo(expected);
+    }
+
+    @DisplayName("date가 없으면 서버 오늘 날짜의 경기를 조회한다")
+    @Test
+    void findLiveGames_whenDateIsNull() {
+        // given
+        Game todayGame = makeGame(TestFixture.getToday(), "HT", "LT", "잠실구장");
+        makeGame(TestFixture.getYesterday(), "WO", "HH", "고척돔");
+
+        // when
+        LiveGamesResponse response = gameService.findLiveGames(null);
+
+        // then
+        assertThat(response.games())
+                .extracting(LiveGamesResponse.LiveGameResponse::gameId)
+                .containsExactly(todayGame.getId());
+    }
+
+    @DisplayName("date가 있으면 서버 오늘 날짜가 아니어도 해당 날짜의 경기를 조회한다")
+    @Test
+    void findLiveGames_whenDateIsGiven() {
+        // given
+        makeGame(TestFixture.getToday(), "HT", "LT", "잠실구장");
+        Game yesterdayGame = makeGame(TestFixture.getYesterday(), "WO", "HH", "고척돔");
+
+        // when
+        LiveGamesResponse response = gameService.findLiveGames(TestFixture.getYesterday());
+
+        // then
+        assertThat(response.games())
+                .extracting(LiveGamesResponse.LiveGameResponse::gameId)
+                .containsExactly(yesterdayGame.getId());
     }
 
     @DisplayName("해당 월에 경기가 있는 날짜 목록을 반환한다")
