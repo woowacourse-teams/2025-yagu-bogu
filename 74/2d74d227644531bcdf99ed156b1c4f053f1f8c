@@ -1,0 +1,21 @@
+backend/app/src/test/java/com/yagubogu/game/GameE2eTest.java
+  s_6ecfaa5a5fc83c::t_83abd7bfc2161b 304-339
+backend/app/src/test/java/com/yagubogu/game/service/GameServiceTest.java
+  s_6ecfaa5a5fc83c::t_d97ba71cdd33bd 15,171-202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "742d74d227644531bcdf99ed156b1c4f053f1f8c",
+  "prompts": {},
+  "sessions": {
+    "s_6ecfaa5a5fc83c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736ef240-4e94-42a7-8016-4c1accc83b3f",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
