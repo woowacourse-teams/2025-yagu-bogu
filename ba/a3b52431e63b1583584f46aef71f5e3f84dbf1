@@ -1,15 +1,23 @@
 backend/app/src/main/java/com/yagubogu/game/controller/v1/GameController.java
   s_6ecfaa5a5fc83c::t_c2d31b5404c77a 44-48
+  s_6ecfaa5a5fc83c::t_b19997bd46b053 44-48
 backend/app/src/main/java/com/yagubogu/game/controller/v1/GameControllerInterface.java
   s_6ecfaa5a5fc83c::t_bc19024db1d1ed 47-48,54-55
+  s_6ecfaa5a5fc83c::t_b1d2d123b8b19c 47-48,54-55
 backend/app/src/main/java/com/yagubogu/game/service/GameService.java
   s_6ecfaa5a5fc83c::t_afa56626ae057c 50-52
+  s_6ecfaa5a5fc83c::t_db5c41993eba0c 50-52
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.7.0",
   "base_commit_sha": "baa3b52431e63b1583584f46aef71f5e3f84dbf1",
   "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
   "sessions": {
     "s_6ecfaa5a5fc83c": {
       "agent_id": {
