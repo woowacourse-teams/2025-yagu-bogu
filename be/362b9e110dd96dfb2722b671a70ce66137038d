@@ -1,13 +1,28 @@
 backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
   s_6ecfaa5a5fc83c::t_01af2192bde199 105-115,149-154
+  s_6ecfaa5a5fc83c::t_b7637fb5a00b0b 114
+  s_6ecfaa5a5fc83c::t_0b03e7d3396548 105-113,115
+  s_6ecfaa5a5fc83c::t_c5e1d52c4e5ec4 149-154
 backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
   s_6ecfaa5a5fc83c::t_6a37e3e5fea0f8 75,94,121,123,179,181,185,189-234
+  s_6ecfaa5a5fc83c::t_8a92bcc31ea803 121,123
+  s_6ecfaa5a5fc83c::t_2c7d68aca51f41 75
+  s_6ecfaa5a5fc83c::t_82d86e7dc6246c 94
+  s_6ecfaa5a5fc83c::t_cbdb6957b58be5 179,181,185,199-221,223,226-232
+  s_6ecfaa5a5fc83c::t_e29bf54fdac059 189-198
+  s_6ecfaa5a5fc83c::t_99308034e1e016 222,224-225,233
+  s_6ecfaa5a5fc83c::t_8a6d30bb74a913 234
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.7.0",
   "base_commit_sha": "be362b9e110dd96dfb2722b671a70ce66137038d",
   "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
   "sessions": {
     "s_6ecfaa5a5fc83c": {
       "agent_id": {
