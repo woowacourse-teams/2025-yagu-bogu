@@ -1,47 +1,34 @@
 package com.yagubogu.ui.livetalk.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
-import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
-import com.yagubogu.ui.livetalk.model.PlayerRole
 import com.yagubogu.ui.livetalk.model.toResource
 import com.yagubogu.ui.livetalk.model.toStringResource
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold
-import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
-import com.yagubogu.ui.theme.PretendardSemiBold12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.util.color
-import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.shimmerLoading
 import org.jetbrains.compose.resources.DrawableResource
@@ -123,8 +110,9 @@ fun LivetalkStadiumItem(
             )
         }
 
-        StadiumLiveScores(
+        LiveGameState(
             liveGameState = item.liveGameState,
+            modifier = Modifier.padding(horizontal = 12.dp),
         )
     }
 }
@@ -138,30 +126,6 @@ fun ShimmerStadiumItem(modifier: Modifier = Modifier) {
                 .height(142.dp)
                 .shimmerLoading(12.dp),
     )
-}
-
-@Composable
-private fun StadiumLiveScores(liveGameState: LiveGameStateUiModel) {
-    // TODO: 데이터 연동
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.height(IntrinsicSize.Min),
-    ) {
-        TeamItem(
-            livetalkTeamUiModel = liveGameState.awayTeam,
-            modifier = Modifier.weight(1.0f),
-        )
-
-        LiveGameState(
-            liveGameState = liveGameState,
-            modifier = Modifier.fillMaxHeight(),
-        )
-
-        TeamItem(
-            livetalkTeamUiModel = liveGameState.homeTeam,
-            modifier = Modifier.weight(1.0f),
-        )
-    }
 }
 
 @Composable
@@ -186,54 +150,6 @@ private fun IconWithText(
             text = text,
             style = PretendardMedium12.copy(color = Gray500),
         )
-    }
-}
-
-@Composable
-private fun TeamItem(
-    livetalkTeamUiModel: LivetalkTeamUiModel,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(livetalkTeamUiModel.team.mascot),
-            contentDescription = null,
-            modifier =
-                Modifier
-                    .clip(CircleShape)
-                    .size(52.dp)
-                    .background(livetalkTeamUiModel.team.color.copy(alpha = 0.2f))
-                    .padding(8.dp),
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = livetalkTeamUiModel.team.shortname,
-            style = PretendardSemiBold12,
-        )
-
-        if (livetalkTeamUiModel.currentPlayerName != null && livetalkTeamUiModel.currentPlayerRole != null) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text =
-                        when (livetalkTeamUiModel.currentPlayerRole) {
-                            PlayerRole.PITCHER -> "투"
-                            PlayerRole.BATTER -> "타"
-                        },
-                    style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
-                )
-                Text(
-                    text = livetalkTeamUiModel.currentPlayerName,
-                    style = PretendardMedium12,
-                )
-            }
-        }
     }
 }
 

@@ -2,39 +2,44 @@ package com.yagubogu.ui.livetalk.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.yagubogu.ui.common.component.DiamondShape
+import androidx.compose.ui.unit.sp
+import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
 import com.yagubogu.ui.livetalk.model.InningHalf
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
+import com.yagubogu.ui.livetalk.model.PlayerRole
+import com.yagubogu.ui.livetalk.model.PlayerUiModel
+import com.yagubogu.ui.livetalk.model.ScoreUiModel
+import com.yagubogu.ui.livetalk.model.TeamSide
 import com.yagubogu.ui.theme.EsamanruBold
-import com.yagubogu.ui.theme.Gray300
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.Gray700
-import com.yagubogu.ui.theme.Green
+import com.yagubogu.ui.theme.PretendardMedium
+import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardSemiBold
-import com.yagubogu.ui.theme.PretendardSemiBold12
 import com.yagubogu.ui.theme.Primary100
 import com.yagubogu.ui.theme.Primary600
-import com.yagubogu.ui.theme.Red
-import com.yagubogu.ui.theme.Yellow
 import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
+import com.yagubogu.ui.util.hhmmFormatter
+import kotlinx.datetime.format
 
 @Composable
 fun LiveGameState(
@@ -43,260 +48,254 @@ fun LiveGameState(
 ) {
     when (liveGameState) {
         is LiveGameStateUiModel.Live -> {
-            LiveGame(gameState = liveGameState, modifier = modifier)
+            GameStateWithPlayers(
+                awayTeam = liveGameState.awayTeam,
+                homeTeam = liveGameState.homeTeam,
+                score = liveGameState.score,
+                label = "${liveGameState.inning}회${
+                    when (liveGameState.inningHalf) {
+                        InningHalf.TOP -> "초"
+                        InningHalf.BOTTOM -> "말"
+                    }
+                }", // TODO: 문자열 리소스로 변경
+                bases = liveGameState.bases,
+                awayPlayer = liveGameState.awayPlayer,
+                homePlayer = liveGameState.homePlayer,
+                ballCount = liveGameState.ballCount,
+                modifier = modifier,
+            )
         }
 
         is LiveGameStateUiModel.Scheduled -> {
-            ScheduledGame(modifier = modifier)
+            GameStateWithPlayers(
+                awayTeam = liveGameState.awayTeam,
+                homeTeam = liveGameState.homeTeam,
+                score = null,
+                label = "경기예정", // TODO
+                bases = null,
+                awayPlayer = liveGameState.awayPlayer,
+                homePlayer = liveGameState.homePlayer,
+                ballCount = null,
+                modifier = modifier,
+            )
         }
 
         is LiveGameStateUiModel.Completed -> {
-            CompletedGame(
-                gameState = liveGameState,
+            GameStateWithScoreOnly(
+                awayTeam = liveGameState.awayTeam,
+                homeTeam = liveGameState.homeTeam,
+                score = liveGameState.score,
+                winner = liveGameState.winnerTeam,
+                label = "경기종료", // TODO
                 modifier = modifier,
             )
         }
 
         is LiveGameStateUiModel.Canceled -> {
-            CanceledGame(modifier = modifier)
+            GameStateWithScoreOnly(
+                awayTeam = liveGameState.awayTeam,
+                homeTeam = liveGameState.homeTeam,
+                score = null,
+                winner = null,
+                label = "경기취소", // TODO
+                modifier = modifier,
+            )
+        }
+
+        is LiveGameStateUiModel.Unknown -> {
+            GameStateWithScoreOnly(
+                awayTeam = liveGameState.awayTeam,
+                homeTeam = liveGameState.homeTeam,
+                score = null,
+                winner = null,
+                label = liveGameState.startAt.format(hhmmFormatter), // TODO
+                modifier = modifier,
+            )
         }
     }
 }
 
 @Composable
-private fun LiveGame(
-    gameState: LiveGameStateUiModel.Live,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.padding(top = 8.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = gameState.score.awayScore.toString(),
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                RunnerBases(
-                    bases = gameState.bases,
-                )
-                Text(
-                    text = "${gameState.inning}회${
-                        when (gameState.inningHalf) {
-                            InningHalf.TOP -> "초"
-                            InningHalf.BOTTOM -> "말"
-                        }
-                    }",
-                    style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
-                    modifier =
-                        Modifier
-                            .background(color = Primary100, shape = RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                )
-            }
-
-            Text(
-                text = gameState.score.homeScore.toString(),
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-        }
-
-        BallStrikeOutCount(
-            ballStrikeOutCount = gameState.ballCount,
-        )
-    }
-}
-
-@Composable
-private fun ScheduledGame(modifier: Modifier = Modifier) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.padding(top = 8.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "-",
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                RunnerBases(bases = null)
-                Text(
-                    text = "경기예정", // TODO: 문자열 리소스로 변경
-                    style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
-                    modifier =
-                        Modifier
-                            .background(color = Primary100, shape = RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                )
-            }
-
-            Text(
-                text = "-",
-                style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-            )
-        }
-
-        BallStrikeOutCount(ballStrikeOutCount = null)
-    }
-}
-
-@Composable
-private fun CompletedGame(
-    gameState: LiveGameStateUiModel.Completed,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Text(
-            text = gameState.score.awayScore.toString(),
-            style =
-                EsamanruBold.copy(
-                    fontSize = 28.dpToSp,
-                    color = if (gameState.winnerTeam == gameState.awayTeam) gameState.awayTeam.team.color else Gray400,
-                ),
-        )
-
-        Text(
-            text = "경기종료", // TODO
-            style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
-            modifier =
-                Modifier
-                    .background(color = Primary100, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-        )
-
-        Text(
-            text = gameState.score.homeScore.toString(),
-            style =
-                EsamanruBold.copy(
-                    fontSize = 28.dpToSp,
-                    color = if (gameState.winnerTeam == gameState.homeTeam) gameState.homeTeam.team.color else Gray400,
-                ),
-        )
-    }
-}
-
-@Composable
-private fun CanceledGame(modifier: Modifier = Modifier) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Text(
-            text = "-",
-            style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-        )
-
-        Text(
-            text = "경기취소", // TODO
-            style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
-            modifier =
-                Modifier
-                    .background(color = Primary100, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-        )
-
-        Text(
-            text = "-",
-            style = EsamanruBold.copy(fontSize = 28.dpToSp, color = Gray700),
-        )
-    }
-}
-
-@Composable
-private fun RunnerBases(
+private fun GameStateWithPlayers(
+    awayTeam: Team,
+    homeTeam: Team,
+    score: ScoreUiModel?,
+    label: String,
     bases: BasesUiModel?,
+    awayPlayer: PlayerUiModel,
+    homePlayer: PlayerUiModel,
+    ballCount: BallCountUiModel?,
     modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy((-6).dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier,
     ) {
-        Base(isOccupied = bases?.isSecondBaseOccupied ?: false)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+        TeamRow(
+            awayTeam = awayTeam,
+            homeTeam = homeTeam,
         ) {
-            Base(isOccupied = bases?.isThirdBaseOccupied ?: false)
-            Base(isOccupied = bases?.isFirstBaseOccupied ?: false)
+            ScoreRow(
+                score = score,
+                winner = null,
+                label = label,
+            ) {
+                RunnerBases(bases = bases)
+            }
         }
+
+        PlayerCountRow(
+            awayPlayer = awayPlayer,
+            homePlayer = homePlayer,
+            ballCount = ballCount,
+        )
     }
 }
 
 @Composable
-private fun Base(
-    isOccupied: Boolean,
+private fun GameStateWithScoreOnly(
+    awayTeam: Team,
+    homeTeam: Team,
+    score: ScoreUiModel?,
+    winner: Team?,
+    label: String,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier =
-            modifier
-                .size(14.dp)
-                .background(
-                    color = if (isOccupied) Yellow else Gray300,
-                    shape = DiamondShape,
+    TeamRow(
+        awayTeam = awayTeam,
+        homeTeam = homeTeam,
+        modifier = modifier,
+    ) {
+        ScoreRow(
+            score = score,
+            winner = winner,
+            label = label,
+        )
+    }
+}
+
+@Composable
+private fun TeamRow(
+    awayTeam: Team,
+    homeTeam: Team,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        TeamItem(team = awayTeam)
+        content()
+        TeamItem(team = homeTeam)
+    }
+}
+
+@Composable
+private fun ScoreRow(
+    score: ScoreUiModel?,
+    winner: Team?,
+    label: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {},
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.width(IntrinsicSize.Max),
+    ) {
+        ScoreText(
+            score = score?.awayScore,
+            color =
+                scoreColor(
+                    side = TeamSide.AWAY,
+                    winnerSide = score?.winnerSide,
+                    winner = winner,
                 ),
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1.0f),
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            content()
+
+            Text(
+                text = label,
+                style = PretendardSemiBold.copy(fontSize = 10.dpToSp, color = Primary600),
+                modifier =
+                    Modifier
+                        .background(color = Primary100, shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+            )
+        }
+
+        ScoreText(
+            score = score?.homeScore,
+            color =
+                scoreColor(
+                    side = TeamSide.HOME,
+                    winnerSide = score?.winnerSide,
+                    winner = winner,
+                ),
+            textAlign = TextAlign.Start,
+            modifier = Modifier.weight(1.0f),
+        )
+    }
+}
+
+@Composable
+private fun ScoreText(
+    score: Int?,
+    color: Color,
+    textAlign: TextAlign,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = score?.toString() ?: "-",
+        style = EsamanruBold.copy(fontSize = 28.dpToSp),
+        color = color,
+        textAlign = textAlign,
+        modifier = modifier,
     )
 }
 
+private fun scoreColor(
+    side: TeamSide,
+    winnerSide: TeamSide?,
+    winner: Team?,
+): Color =
+    when {
+        winnerSide == null || winner == null -> Gray700
+        side == winnerSide -> winner.color
+        else -> Gray400
+    }
+
 @Composable
-private fun BallStrikeOutCount(
-    ballStrikeOutCount: BallCountUiModel?,
+private fun PlayerCountRow(
+    awayPlayer: PlayerUiModel,
+    homePlayer: PlayerUiModel,
+    ballCount: BallCountUiModel?,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     ) {
-        CountRow(
-            label = "B",
-            count = ballStrikeOutCount?.ballCount ?: 0,
-            maxCount = 3,
-            color = Green,
-        )
-        CountRow(
-            label = "S",
-            count = ballStrikeOutCount?.strikeCount ?: 0,
-            maxCount = 2,
-            color = Yellow,
-        )
-        CountRow(
-            label = "O",
-            count = ballStrikeOutCount?.outCount ?: 0,
-            maxCount = 2,
-            color = Red,
-        )
+        PlayerInfo(player = awayPlayer)
+        BallStrikeOutCount(ballStrikeOutCount = ballCount)
+        PlayerInfo(player = homePlayer)
     }
 }
 
 @Composable
-private fun CountRow(
-    label: String,
-    count: Int,
-    maxCount: Int,
-    color: Color,
+private fun PlayerInfo(
+    player: PlayerUiModel,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -305,21 +304,17 @@ private fun CountRow(
         modifier = modifier,
     ) {
         Text(
-            text = label,
-            style = PretendardSemiBold12.copy(color = Gray500),
+            text =
+                when (player.role) {
+                    PlayerRole.PITCHER -> "투"
+                    PlayerRole.BATTER -> "타" // TODO
+                },
+            style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
         )
-
-        repeat(maxCount) { index: Int ->
-            Box(
-                modifier =
-                    Modifier
-                        .size(10.dp)
-                        .background(
-                            color = if (index < count) color else Gray300,
-                            shape = CircleShape,
-                        ),
-            )
-        }
+        Text(
+            text = player.name,
+            style = PretendardMedium12,
+        )
     }
 }
 
@@ -360,5 +355,13 @@ private fun LiveGameStateCompletedPreview() {
 private fun LiveGameStateCanceledPreview() {
     LiveGameState(
         liveGameState = LIVE_GAME_STATE_CANCELED,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LiveGameStateUnknownPreview() {
+    LiveGameState(
+        liveGameState = LIVE_GAME_STATE_UNKNOWN,
     )
 }

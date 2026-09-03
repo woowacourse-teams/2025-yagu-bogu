@@ -10,7 +10,7 @@ import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
-import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
+import com.yagubogu.ui.livetalk.model.PlayerUiModel
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import kotlinx.datetime.LocalDate
@@ -77,22 +77,61 @@ object GameUiMapper {
     }
 
     private fun LiveGamesResponse.LiveGameDto.toScheduledUiModel(): LiveGameStateUiModel =
-        LiveGameStateUiModel.Scheduled(
-            awayTeam = awayTeam.toUiModel(),
-            homeTeam = homeTeam.toUiModel(),
-            startAt = startAt,
-        )
+        when (
+            awayTeam.currentPlayer == null ||
+                homeTeam.currentPlayer == null ||
+                awayTeam.currentPlayerRole == null ||
+                homeTeam.currentPlayerRole == null
+        ) {
+            true -> {
+                this.toUnknownUiModel()
+            }
+
+            false -> {
+                LiveGameStateUiModel.Scheduled(
+                    awayTeam = Team.getByCode(awayTeam.code),
+                    homeTeam = Team.getByCode(homeTeam.code),
+                    awayPlayer =
+                        PlayerUiModel(
+                            name = awayTeam.currentPlayer,
+                            role = awayTeam.currentPlayerRole,
+                        ),
+                    homePlayer =
+                        PlayerUiModel(
+                            name = homeTeam.currentPlayer,
+                            role = homeTeam.currentPlayerRole,
+                        ),
+                    startAt = startAt,
+                )
+            }
+        }
 
     private fun LiveGamesResponse.LiveGameDto.toLiveUiModel(): LiveGameStateUiModel =
-        when (liveState == null) {
+        when (
+            liveState == null ||
+                awayTeam.currentPlayer == null ||
+                homeTeam.currentPlayer == null ||
+                awayTeam.currentPlayerRole == null ||
+                homeTeam.currentPlayerRole == null
+        ) {
             true -> {
-                this.toScheduledUiModel()
+                this.toUnknownUiModel()
             }
 
             false -> {
                 LiveGameStateUiModel.Live(
-                    awayTeam = awayTeam.toUiModel(),
-                    homeTeam = homeTeam.toUiModel(),
+                    awayTeam = Team.getByCode(awayTeam.code),
+                    homeTeam = Team.getByCode(homeTeam.code),
+                    awayPlayer =
+                        PlayerUiModel(
+                            name = awayTeam.currentPlayer,
+                            role = awayTeam.currentPlayerRole,
+                        ),
+                    homePlayer =
+                        PlayerUiModel(
+                            name = homeTeam.currentPlayer,
+                            role = homeTeam.currentPlayerRole,
+                        ),
                     score =
                         ScoreUiModel(
                             awayScore = awayTeam.score,
@@ -108,8 +147,8 @@ object GameUiMapper {
 
     private fun LiveGamesResponse.LiveGameDto.toCompletedUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Completed(
-            awayTeam = awayTeam.toUiModel(),
-            homeTeam = homeTeam.toUiModel(),
+            awayTeam = Team.getByCode(awayTeam.code),
+            homeTeam = Team.getByCode(homeTeam.code),
             score =
                 ScoreUiModel(
                     awayScore = awayTeam.score,
@@ -119,15 +158,15 @@ object GameUiMapper {
 
     private fun LiveGamesResponse.LiveGameDto.toCanceledUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Canceled(
-            awayTeam = awayTeam.toUiModel(),
-            homeTeam = homeTeam.toUiModel(),
+            awayTeam = Team.getByCode(awayTeam.code),
+            homeTeam = Team.getByCode(homeTeam.code),
         )
 
-    private fun LiveGamesResponse.LiveTeamDto.toUiModel(): LivetalkTeamUiModel =
-        LivetalkTeamUiModel(
-            team = Team.getByCode(code),
-            currentPlayerName = currentPlayer,
-            currentPlayerRole = currentPlayerRole,
+    private fun LiveGamesResponse.LiveGameDto.toUnknownUiModel(): LiveGameStateUiModel =
+        LiveGameStateUiModel.Unknown(
+            awayTeam = Team.getByCode(awayTeam.code),
+            homeTeam = Team.getByCode(homeTeam.code),
+            startAt = startAt,
         )
 
     private fun LiveGamesResponse.BasesDto.toUiModel(): BasesUiModel =

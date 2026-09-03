@@ -7,38 +7,40 @@ import com.yagubogu.ui.livetalk.model.Condition
 import com.yagubogu.ui.livetalk.model.InningHalf
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
-import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
 import com.yagubogu.ui.livetalk.model.PlayerRole
+import com.yagubogu.ui.livetalk.model.PlayerUiModel
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalTime
 
-private val LIVETALK_TEAM_AWAY =
-    LivetalkTeamUiModel(
-        team = Team.SS,
-        currentPlayerName = "김타자",
-        currentPlayerRole = PlayerRole.BATTER,
+private val PLAYER_BATTER =
+    PlayerUiModel(
+        name = "김타자",
+        role = PlayerRole.BATTER,
     )
 
-private val LIVETALK_TEAM_HOME =
-    LivetalkTeamUiModel(
-        team = Team.HT,
-        currentPlayerName = "김투수",
-        currentPlayerRole = PlayerRole.PITCHER,
+private val PLAYER_PITCHER =
+    PlayerUiModel(
+        name = "김투수투수",
+        role = PlayerRole.PITCHER,
     )
 
 val LIVE_GAME_STATE_SCHEDULED =
     LiveGameStateUiModel.Scheduled(
-        awayTeam = LIVETALK_TEAM_AWAY,
-        homeTeam = LIVETALK_TEAM_HOME,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        awayPlayer = PLAYER_BATTER,
+        homePlayer = PLAYER_PITCHER,
         startAt = LocalTime(18, 30),
     )
 
 val LIVE_GAME_STATE_LIVE =
     LiveGameStateUiModel.Live(
-        awayTeam = LIVETALK_TEAM_AWAY,
-        homeTeam = LIVETALK_TEAM_HOME,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        awayPlayer = PLAYER_BATTER,
+        homePlayer = PLAYER_PITCHER,
         score = ScoreUiModel(awayScore = 3, homeScore = 5),
         inning = 7,
         inningHalf = InningHalf.TOP,
@@ -77,15 +79,22 @@ val LIVE_GAME_STATE_LIVE_FULL =
 
 val LIVE_GAME_STATE_COMPLETED =
     LiveGameStateUiModel.Completed(
-        awayTeam = LIVETALK_TEAM_AWAY,
-        homeTeam = LIVETALK_TEAM_HOME,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
         score = ScoreUiModel(awayScore = 7, homeScore = 4),
     )
 
 val LIVE_GAME_STATE_CANCELED =
     LiveGameStateUiModel.Canceled(
-        awayTeam = LIVETALK_TEAM_AWAY,
-        homeTeam = LIVETALK_TEAM_HOME,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+    )
+
+val LIVE_GAME_STATE_UNKNOWN =
+    LiveGameStateUiModel.Unknown(
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        startAt = LocalTime(18, 30),
     )
 
 val LIVETALK_STADIUM_VERIFIED =
