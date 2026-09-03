@@ -1,0 +1,68 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/mapper/GameUiMapper.kt
+  s_3282d4001420fb::t_cd17ec6678620c 81-107,110-114
+  s_3282d4001420fb::t_71f1a36b9847fc 13,80,115-116,118,123-134,150-151,161-162,165-169
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_fd638edb5919f3::t_35da439a110932 120
+  s_fd638edb5919f3::t_8f3bc7738cbd2d 143
+  s_fd638edb5919f3::t_c9bae599c3f6fd 168-170
+  s_fd638edb5919f3::t_418cc365bafb8f 226
+  s_fd638edb5919f3::t_b6adfc0bfce72a 214,222-224,301,317
+  s_fd638edb5919f3::t_157417bc876569 142,225,231,249,251-254,256-260,265-268,270,272-288,292,303,308,310,318-319,340,351,356,359,364,367
+  s_3282d4001420fb::t_908092c382f305 209-212,221,236,238-239,299,315,328
+  s_fd638edb5919f3::t_8f7b751feefd55 51,220,298,314
+  s_fd638edb5919f3::t_4d6e6b7648935c 103-104,115
+  s_fd638edb5919f3::t_0589a35febf61a 147-149
+  s_fd638edb5919f3::t_d3736b88c1ded9 140
+  s_3282d4001420fb::t_29a90eb2dfb4fd 176,178-179,181-194,200-206,218,297,300,313
+  s_fd638edb5919f3::t_e58e19f846bba8 48-50
+  s_3282d4001420fb::t_f74184e29949c7 63,67-70,81-89,110-111,116-118,124-126,133-136,246,289,296,307,339
+  s_fd638edb5919f3::t_c9303ac6e96359 106,156,247
+  s_3282d4001420fb::t_73162ec4e4fb57 60-62
+  s_3282d4001420fb::t_ca37c2fd7f496d 90-91
+  s_fd638edb5919f3::t_0374791a048e4e 107-108
+  s_fd638edb5919f3::t_5f429a09ef7848 139
+  s_fd638edb5919f3::t_0a0e9f6f5c82a9 144
+  s_fd638edb5919f3::t_435b8610753869 146
+  s_fd638edb5919f3::t_606946a580a8dc 155
+  s_fd638edb5919f3::t_3d2fd6d8736e1b 157-159
+  s_3282d4001420fb::t_76cc6510c9b4b0 173-175
+  s_fd638edb5919f3::t_aaa4fbb7ea2475 215
+  s_3282d4001420fb::t_1fbc1245343d66 217
+  s_fd638edb5919f3::t_92dfe2f09d6310 227-228
+  s_fd638edb5919f3::t_04871b8e249e41 232-234
+  s_3282d4001420fb::t_52a56cb200de31 245
+  s_fd638edb5919f3::t_7f1e5189a4e44d 302
+  s_fd638edb5919f3::t_99ad0285183a8f 309
+  s_fd638edb5919f3::t_bec21f1e3aa2c8 320-322
+  s_3282d4001420fb::t_8a3ac859117028 329-330
+  s_fd638edb5919f3::t_e2f1327bf73bd5 341
+  s_fd638edb5919f3::t_7b501fecd90c40 357-358
+  s_fd638edb5919f3::t_dd7019973e96e5 360-363
+  s_fd638edb5919f3::t_d5aa15a42b9d60 365-366
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_3282d4001420fb::t_d9604cea3f37b9 29,126,128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6e2f2a2f9134f9b519b611a5833321b4da86c690",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    },
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
