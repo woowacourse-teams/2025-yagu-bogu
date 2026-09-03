@@ -336,14 +336,6 @@ private fun LiveGameStateLivePreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun LiveGameStateLiveFullPreview() {
-    LiveGameState(
-        liveGameState = LIVE_GAME_STATE_LIVE_FULL,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun LiveGameStateCompletedPreview() {
     LiveGameState(
         liveGameState = LIVE_GAME_STATE_COMPLETED,

@@ -58,25 +58,6 @@ val LIVE_GAME_STATE_LIVE =
             ),
     )
 
-val LIVE_GAME_STATE_LIVE_FULL =
-    LIVE_GAME_STATE_LIVE.copy(
-        score = ScoreUiModel(awayScore = 12, homeScore = 0),
-        inning = 9,
-        inningHalf = InningHalf.TOP,
-        bases =
-            BasesUiModel(
-                isFirstBaseOccupied = true,
-                isSecondBaseOccupied = true,
-                isThirdBaseOccupied = true,
-            ),
-        ballCount =
-            BallCountUiModel(
-                ballCount = 3,
-                strikeCount = 2,
-                outCount = 2,
-            ),
-    )
-
 val LIVE_GAME_STATE_COMPLETED =
     LiveGameStateUiModel.Completed(
         awayTeam = Team.HT,
