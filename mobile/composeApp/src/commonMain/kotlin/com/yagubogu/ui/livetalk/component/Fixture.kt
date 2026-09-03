@@ -1,13 +1,13 @@
 package com.yagubogu.ui.livetalk.component
 
+import com.yagubogu.domain.model.InningHalf
+import com.yagubogu.domain.model.PlayerRole
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
 import com.yagubogu.ui.livetalk.model.Condition
-import com.yagubogu.ui.livetalk.model.InningHalf
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
-import com.yagubogu.ui.livetalk.model.PlayerRole
 import com.yagubogu.ui.livetalk.model.PlayerUiModel
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
 import com.yagubogu.ui.livetalk.model.WeatherUiModel

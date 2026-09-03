@@ -1,7 +1,11 @@
 package com.yagubogu.ui.livetalk.model
 
 import androidx.compose.runtime.Immutable
+import com.yagubogu.domain.model.GameResult
+import com.yagubogu.domain.model.InningHalf
+import com.yagubogu.domain.model.PlayerRole
 import com.yagubogu.domain.model.Team
+import com.yagubogu.domain.model.TeamSide
 import kotlinx.datetime.LocalTime
 
 @Immutable
@@ -64,10 +68,10 @@ data class ScoreUiModel(
     val homeScore: Int,
 ) {
     val winnerSide: TeamSide? =
-        when {
-            awayScore > homeScore -> TeamSide.AWAY
-            awayScore < homeScore -> TeamSide.HOME
-            else -> null
+        when (GameResult.from(awayScore, homeScore)) {
+            GameResult.WIN -> TeamSide.AWAY
+            GameResult.LOSE -> TeamSide.HOME
+            GameResult.DRAW -> null
         }
 }
 
@@ -82,18 +86,3 @@ data class BallCountUiModel(
     val strikeCount: Int,
     val outCount: Int,
 )
-
-enum class InningHalf {
-    TOP,
-    BOTTOM,
-}
-
-enum class PlayerRole {
-    PITCHER,
-    BATTER,
-}
-
-enum class TeamSide {
-    AWAY,
-    HOME,
-}

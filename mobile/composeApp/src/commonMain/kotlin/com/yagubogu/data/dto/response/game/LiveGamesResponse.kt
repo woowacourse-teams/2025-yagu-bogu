@@ -1,7 +1,7 @@
 package com.yagubogu.data.dto.response.game
 
-import com.yagubogu.ui.livetalk.model.InningHalf
-import com.yagubogu.ui.livetalk.model.PlayerRole
+import com.yagubogu.domain.model.InningHalf
+import com.yagubogu.domain.model.PlayerRole
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
