@@ -1,0 +1,81 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_3282d4001420fb::t_d9604cea3f37b9 113,115
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/mapper/GameUiMapper.kt
+  s_3282d4001420fb::t_cd17ec6678620c 81-107,110-114
+  s_3282d4001420fb::t_71f1a36b9847fc 13,80,115-116,118,123-134,150-151,161-162,165-169
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_fd638edb5919f3::t_157417bc876569 51,108,126,142,148,155-159,169,173-176,178,182-184,193-194,200,204,206,215,218,221,225,231-233,245,249,251-254,256-260,265-268,270,272-288,292,295,300-302,306,310-311,313,316-318,321-322,329,341,346,351,358-359,362,366-367
+  s_3282d4001420fb::t_f74184e29949c7 63,67-70,81-85,116,179,186,220
+  s_fd638edb5919f3::t_0589a35febf61a 112,147,149
+  s_fd638edb5919f3::t_4d6e6b7648935c 103-104,115
+  s_3282d4001420fb::t_29a90eb2dfb4fd 117-118,187,190,201,303
+  s_fd638edb5919f3::t_35da439a110932 120
+  s_fd638edb5919f3::t_8f7b751feefd55 188
+  s_fd638edb5919f3::t_b6adfc0bfce72a 191,212,214,223-224,304,320
+  s_fd638edb5919f3::t_e2f1327bf73bd5 222
+  s_3282d4001420fb::t_8a3ac859117028 210-211
+  s_fd638edb5919f3::t_bec21f1e3aa2c8 202-203,305
+  s_3282d4001420fb::t_908092c382f305 135-136,189,209,298-299
+  s_3282d4001420fb::t_ca37c2fd7f496d 90-91
+  s_fd638edb5919f3::t_dd7019973e96e5 238-239
+  s_fd638edb5919f3::t_7f1e5189a4e44d 192
+  s_fd638edb5919f3::t_8f3bc7738cbd2d 143
+  s_fd638edb5919f3::t_435b8610753869 89,111
+  s_fd638edb5919f3::t_c9bae599c3f6fd 168,170
+  s_fd638edb5919f3::t_c9303ac6e96359 146,247
+  s_fd638edb5919f3::t_e58e19f846bba8 48-50
+  s_fd638edb5919f3::t_418cc365bafb8f 226
+  s_3282d4001420fb::t_52a56cb200de31 144
+  s_fd638edb5919f3::t_d3736b88c1ded9 106,140
+  s_3282d4001420fb::t_53ff28ceec66b0 60-62
+  s_fd638edb5919f3::t_6c3b01e3ffffcc 107
+  s_fd638edb5919f3::t_cdd73724c381f2 110
+  s_fd638edb5919f3::t_784e0f21712311 113-114
+  s_fd638edb5919f3::t_fae9369597b951 124-125
+  s_3282d4001420fb::t_36fb5bdd513ff8 133-134
+  s_fd638edb5919f3::t_328bfda438ea45 139
+  s_fd638edb5919f3::t_6cbc7617511615 181
+  s_fd638edb5919f3::t_fcb7fcdc1ed8d7 205
+  s_fd638edb5919f3::t_76f7787c3a08da 217
+  s_fd638edb5919f3::t_215c373d2d5a75 227-228
+  s_fd638edb5919f3::t_09e76abcff5468 234
+  s_fd638edb5919f3::t_ae82b22729186e 246
+  s_fd638edb5919f3::t_1b47473d2f91b1 289-291
+  s_fd638edb5919f3::t_6f9797d88c7213 293-294
+  s_fd638edb5919f3::t_088ccf1c143d9a 307-309
+  s_fd638edb5919f3::t_82c10fa46b8d31 312
+  s_fd638edb5919f3::t_1dd3a2f9c870b5 314-315
+  s_fd638edb5919f3::t_0b6b4d6fcca532 319
+  s_fd638edb5919f3::t_aac2dc916a08a8 323-324
+  s_fd638edb5919f3::t_951d8ab94b9151 328
+  s_fd638edb5919f3::t_ef439a0649f05c 330
+  s_fd638edb5919f3::t_5d70a62acb3979 339-340
+  s_fd638edb5919f3::t_9af903036bd62a 347
+  s_fd638edb5919f3::t_0e9a149e0d3122 356-357
+  s_fd638edb5919f3::t_439e97c586e7d0 360-361
+  s_fd638edb5919f3::t_d38be87aa456e8 363-365
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "fbcb9f8fb9a39e0e94880bd85f99fcf1f9d929b8",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    },
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
