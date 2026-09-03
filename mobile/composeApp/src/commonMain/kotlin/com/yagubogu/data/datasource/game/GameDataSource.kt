@@ -11,7 +11,7 @@ import kotlinx.datetime.YearMonth
 interface GameDataSource {
     suspend fun getGames(date: LocalDate): Result<GameResponse>
 
-    suspend fun getLiveGames(): Result<LiveGamesResponse>
+    suspend fun getLiveGames(date: LocalDate): Result<LiveGamesResponse>
 
     suspend fun getGameDates(yearMonth: YearMonth): Result<GameDatesResponse>
 

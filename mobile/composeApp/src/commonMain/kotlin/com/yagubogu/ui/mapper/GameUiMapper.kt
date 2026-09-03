@@ -12,6 +12,7 @@ import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkTeamUiModel
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
+import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import kotlinx.datetime.LocalDate
 
 fun GameWithCheckInDto.toAttendanceUiModel(date: LocalDate): PastGameUiModel =
@@ -32,6 +33,7 @@ object GameUiMapper {
     fun mapToLivetalkUiModels(
         games: List<GameWithCheckInDto>,
         liveGames: List<LiveGamesResponse.LiveGameDto>,
+        weathers: Map<Long, WeatherUiModel>,
     ): List<LivetalkStadiumUiModel> {
         val liveGameByGameId: Map<Long, LiveGamesResponse.LiveGameDto> =
             liveGames.associateBy { it.gameId }
@@ -42,6 +44,7 @@ object GameUiMapper {
             mapToLivetalkUiModel(
                 game = game,
                 liveGame = liveGame,
+                weather = weathers[game.stadium.id],
             )
         }
     }
@@ -49,6 +52,7 @@ object GameUiMapper {
     private fun mapToLivetalkUiModel(
         game: GameWithCheckInDto,
         liveGame: LiveGamesResponse.LiveGameDto,
+        weather: WeatherUiModel?,
     ): LivetalkStadiumUiModel =
         LivetalkStadiumUiModel(
             gameId = game.gameId,
@@ -57,6 +61,7 @@ object GameUiMapper {
             userCount = game.totalCheckIns,
             isVerified = game.isMyCheckIn,
             liveGameState = liveGame.toUiModel(),
+            weatherUiModel = weather,
         )
 
     private fun LiveGamesResponse.LiveGameDto.toUiModel(): LiveGameStateUiModel {

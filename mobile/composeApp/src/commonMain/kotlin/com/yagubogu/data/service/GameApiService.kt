@@ -18,7 +18,9 @@ interface GameApiService {
     ): GameResponse
 
     @GET("/api/v1/games/live")
-    suspend fun getLiveGames(): LiveGamesResponse
+    suspend fun getLiveGames(
+        @Query("date") date: String,
+    ): LiveGamesResponse
 
     @GET("/api/v1/games/dates")
     suspend fun getGameDates(

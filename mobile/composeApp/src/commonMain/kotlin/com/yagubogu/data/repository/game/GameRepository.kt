@@ -3,7 +3,6 @@ package com.yagubogu.data.repository.game
 import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameWithCheckInDto
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
-import com.yagubogu.data.dto.response.game.LiveGamesResponse
 import com.yagubogu.data.dto.response.game.LiveGamesResponse.LiveGameDto
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -11,7 +10,7 @@ import kotlinx.datetime.YearMonth
 interface GameRepository {
     suspend fun getGames(date: LocalDate): Result<List<GameWithCheckInDto>>
 
-    suspend fun getLiveGames(): Result<List<LiveGameDto>>
+    suspend fun getLiveGames(date: LocalDate): Result<List<LiveGameDto>>
 
     suspend fun getGameDates(yearMonth: YearMonth): Result<List<LocalDate>>
 

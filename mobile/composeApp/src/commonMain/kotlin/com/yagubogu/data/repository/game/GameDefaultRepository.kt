@@ -19,8 +19,8 @@ class GameDefaultRepository(
             gameResponse.games
         }
 
-    override suspend fun getLiveGames(): Result<List<LiveGameDto>> =
-        gameDataSource.getLiveGames().map { response: LiveGamesResponse ->
+    override suspend fun getLiveGames(date: LocalDate): Result<List<LiveGameDto>> =
+        gameDataSource.getLiveGames(date).map { response: LiveGamesResponse ->
             response.games
         }
 

@@ -18,9 +18,9 @@ class GameRemoteDataSource(
             gameApiService.getGames(date.toString())
         }
 
-    override suspend fun getLiveGames(): Result<LiveGamesResponse> =
+    override suspend fun getLiveGames(date: LocalDate): Result<LiveGamesResponse> =
         safeApiCall {
-            gameApiService.getLiveGames()
+            gameApiService.getLiveGames(date.toString())
         }
 
     override suspend fun getGameDates(yearMonth: YearMonth): Result<GameDatesResponse> =
