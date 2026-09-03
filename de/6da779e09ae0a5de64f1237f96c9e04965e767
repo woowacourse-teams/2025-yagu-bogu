@@ -1,0 +1,72 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/mapper/GameUiMapper.kt
+  s_3282d4001420fb::t_71f1a36b9847fc 13,80,115-116,118,123-134,150-151,161-162,165-169
+  s_3282d4001420fb::t_cd17ec6678620c 81-107,110-114
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_3282d4001420fb::t_d9604cea3f37b9 113,115
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/TeamItem.kt
+  s_3282d4001420fb::t_569b11dfb344c6 1-48
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_fd638edb5919f3::t_435b8610753869 106
+  s_fd638edb5919f3::t_9af903036bd62a 286
+  s_fd638edb5919f3::t_35da439a110932 113,151
+  s_3282d4001420fb::t_8a3ac859117028 170-171
+  s_fd638edb5919f3::t_5d70a62acb3979 123,168,279
+  s_fd638edb5919f3::t_fcb7fcdc1ed8d7 165
+  s_fd638edb5919f3::t_c9303ac6e96359 180,297-298
+  s_fd638edb5919f3::t_951d8ab94b9151 267
+  s_fd638edb5919f3::t_0589a35febf61a 142,181,183,192,273
+  s_3282d4001420fb::t_908092c382f305 127
+  s_3282d4001420fb::t_53ff28ceec66b0 63-64
+  s_fd638edb5919f3::t_6f9797d88c7213 214-215
+  s_fd638edb5919f3::t_d3736b88c1ded9 132,174
+  s_fd638edb5919f3::t_aac2dc916a08a8 235-236
+  s_fd638edb5919f3::t_ae82b22729186e 179
+  s_fd638edb5919f3::t_1b47473d2f91b1 210-212
+  s_fd638edb5919f3::t_088ccf1c143d9a 228-230
+  s_fd638edb5919f3::t_7f1e5189a4e44d 148
+  s_3282d4001420fb::t_ca37c2fd7f496d 111-112
+  s_3282d4001420fb::t_29a90eb2dfb4fd 224,238-246,252,254-255,258-262
+  s_fd638edb5919f3::t_ef439a0649f05c 269
+  s_fd638edb5919f3::t_e58e19f846bba8 41
+  s_fd638edb5919f3::t_c9bae599c3f6fd 200-201
+  s_3282d4001420fb::t_52a56cb200de31 136
+  s_fd638edb5919f3::t_f5cf8a87ffda77 42
+  s_fd638edb5919f3::t_157417bc876569 137,140,164,166,186,188,190-191,197-199,202-203,207,209,213,216-218,221-223,227,231-234,253,268,275,277,280,292,307-316,362,367
+  s_fd638edb5919f3::t_bec21f1e3aa2c8 162-163
+  s_3282d4001420fb::t_36fb5bdd513ff8 126
+  s_fd638edb5919f3::t_b6adfc0bfce72a 172,225,270-272,281-282
+  s_3282d4001420fb::t_f74184e29949c7 51-62,65-66,70-80,84-89,95-105,109-110,119-122,135,139,141,149-150,161
+  s_fd638edb5919f3::t_9a18a10db77cc6 133
+  s_3282d4001420fb::t_d16f3d9be39217 158-160
+  s_fd638edb5919f3::t_7b5e57fff073f2 167
+  s_fd638edb5919f3::t_cede816db0ac84 173
+  s_fd638edb5919f3::t_225a47aef40e61 274
+  s_fd638edb5919f3::t_794c2e13e0057f 276
+  s_fd638edb5919f3::t_414f7b0e03ee47 290-291
+  s_fd638edb5919f3::t_ff66d55bfabba9 360-361
+  s_fd638edb5919f3::t_1d77db929b6955 363-366
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "de6da779e09ae0a5de64f1237f96c9e04965e767",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    },
+    "s_fd638edb5919f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6855a4ae-6c08-4ecb-8608-d2b088bb9b92",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
