@@ -28,6 +28,7 @@ private val PLAYER_PITCHER =
 
 val LIVE_GAME_STATE_SCHEDULED =
     LiveGameStateUiModel.Scheduled(
+        gameId = 0L,
         awayTeam = Team.HT,
         homeTeam = Team.SS,
         awayPlayer = PLAYER_BATTER,
@@ -37,6 +38,7 @@ val LIVE_GAME_STATE_SCHEDULED =
 
 val LIVE_GAME_STATE_LIVE =
     LiveGameStateUiModel.Live(
+        gameId = 1L,
         awayTeam = Team.HT,
         homeTeam = Team.SS,
         awayPlayer = PLAYER_BATTER,
@@ -60,6 +62,7 @@ val LIVE_GAME_STATE_LIVE =
 
 val LIVE_GAME_STATE_COMPLETED =
     LiveGameStateUiModel.Completed(
+        gameId = 2L,
         awayTeam = Team.HT,
         homeTeam = Team.SS,
         score = ScoreUiModel(awayScore = 7, homeScore = 4),
@@ -67,12 +70,14 @@ val LIVE_GAME_STATE_COMPLETED =
 
 val LIVE_GAME_STATE_CANCELED =
     LiveGameStateUiModel.Canceled(
+        gameId = 3L,
         awayTeam = Team.HT,
         homeTeam = Team.SS,
     )
 
 val LIVE_GAME_STATE_UNKNOWN =
     LiveGameStateUiModel.Unknown(
+        gameId = 4L,
         awayTeam = Team.HT,
         homeTeam = Team.SS,
         startAt = LocalTime(18, 30),

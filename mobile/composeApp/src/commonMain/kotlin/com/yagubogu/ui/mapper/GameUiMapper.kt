@@ -8,6 +8,7 @@ import com.yagubogu.ui.attendance.model.GameState
 import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
+import com.yagubogu.ui.livetalk.model.GameCheckInUiModel
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.PlayerUiModel
@@ -30,41 +31,35 @@ fun GameWithCheckInDto.toAttendanceUiModel(date: LocalDate): PastGameUiModel =
 fun TeamByGameDto.toDomain(): Team = Team.getByCode(code)
 
 object GameUiMapper {
+    fun GameWithCheckInDto.toUiModel(): GameCheckInUiModel =
+        GameCheckInUiModel(
+            gameId = gameId,
+            stadiumId = stadium.id,
+            stadiumName = stadium.name,
+            userCount = totalCheckIns,
+            isVerified = isMyCheckIn,
+        )
+
     fun mapToLivetalkUiModels(
-        games: List<GameWithCheckInDto>,
-        liveGames: List<LiveGamesResponse.LiveGameDto>,
+        games: List<GameCheckInUiModel>,
+        liveGames: List<LiveGameStateUiModel>,
         weathers: Map<Long, WeatherUiModel>,
     ): List<LivetalkStadiumUiModel> {
-        val liveGameByGameId: Map<Long, LiveGamesResponse.LiveGameDto> =
+        val liveGameByGameId: Map<Long, LiveGameStateUiModel> =
             liveGames.associateBy { it.gameId }
 
-        return games.mapNotNull { game: GameWithCheckInDto ->
-            val liveGame: LiveGamesResponse.LiveGameDto =
+        return games.mapNotNull { game: GameCheckInUiModel ->
+            val liveGame: LiveGameStateUiModel =
                 liveGameByGameId[game.gameId] ?: return@mapNotNull null
             mapToLivetalkUiModel(
                 game = game,
                 liveGame = liveGame,
-                weather = weathers[game.stadium.id],
+                weather = weathers[game.stadiumId],
             )
         }
     }
 
-    private fun mapToLivetalkUiModel(
-        game: GameWithCheckInDto,
-        liveGame: LiveGamesResponse.LiveGameDto,
-        weather: WeatherUiModel?,
-    ): LivetalkStadiumUiModel =
-        LivetalkStadiumUiModel(
-            gameId = game.gameId,
-            stadiumId = game.stadium.id,
-            stadiumName = game.stadium.name,
-            userCount = game.totalCheckIns,
-            isVerified = game.isMyCheckIn,
-            liveGameState = liveGame.toUiModel(),
-            weatherUiModel = weather,
-        )
-
-    private fun LiveGamesResponse.LiveGameDto.toUiModel(): LiveGameStateUiModel {
+    fun LiveGamesResponse.LiveGameDto.toUiModel(): LiveGameStateUiModel {
         val gameState = GameState.from(gameState)
 
         return when (gameState) {
@@ -72,9 +67,24 @@ object GameUiMapper {
             GameState.LIVE -> this.toLiveUiModel()
             GameState.COMPLETED -> this.toCompletedUiModel()
             GameState.CANCELED -> this.toCanceledUiModel()
-            GameState.UNKNOWN -> this.toScheduledUiModel()
+            GameState.UNKNOWN -> this.toUnknownUiModel()
         }
     }
+
+    private fun mapToLivetalkUiModel(
+        game: GameCheckInUiModel,
+        liveGame: LiveGameStateUiModel,
+        weather: WeatherUiModel?,
+    ): LivetalkStadiumUiModel =
+        LivetalkStadiumUiModel(
+            gameId = game.gameId,
+            stadiumId = game.stadiumId,
+            stadiumName = game.stadiumName,
+            userCount = game.userCount,
+            isVerified = game.isVerified,
+            liveGameState = liveGame,
+            weatherUiModel = weather,
+        )
 
     private fun LiveGamesResponse.LiveGameDto.toScheduledUiModel(): LiveGameStateUiModel =
         when (
@@ -89,6 +99,7 @@ object GameUiMapper {
 
             false -> {
                 LiveGameStateUiModel.Scheduled(
+                    gameId = gameId,
                     awayTeam = Team.getByCode(awayTeam.code),
                     homeTeam = Team.getByCode(homeTeam.code),
                     awayPlayer =
@@ -120,6 +131,7 @@ object GameUiMapper {
 
             false -> {
                 LiveGameStateUiModel.Live(
+                    gameId = gameId,
                     awayTeam = Team.getByCode(awayTeam.code),
                     homeTeam = Team.getByCode(homeTeam.code),
                     awayPlayer =
@@ -147,6 +159,7 @@ object GameUiMapper {
 
     private fun LiveGamesResponse.LiveGameDto.toCompletedUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Completed(
+            gameId = gameId,
             awayTeam = Team.getByCode(awayTeam.code),
             homeTeam = Team.getByCode(homeTeam.code),
             score =
@@ -158,12 +171,14 @@ object GameUiMapper {
 
     private fun LiveGamesResponse.LiveGameDto.toCanceledUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Canceled(
+            gameId = gameId,
             awayTeam = Team.getByCode(awayTeam.code),
             homeTeam = Team.getByCode(homeTeam.code),
         )
 
     private fun LiveGamesResponse.LiveGameDto.toUnknownUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Unknown(
+            gameId = gameId,
             awayTeam = Team.getByCode(awayTeam.code),
             homeTeam = Team.getByCode(homeTeam.code),
             startAt = startAt,

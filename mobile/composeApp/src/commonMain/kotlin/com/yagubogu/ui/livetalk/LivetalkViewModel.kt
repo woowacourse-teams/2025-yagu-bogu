@@ -3,17 +3,17 @@ package com.yagubogu.ui.livetalk
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.dto.response.game.GameWithCheckInDto
-import com.yagubogu.data.dto.response.game.LiveGamesResponse.LiveGameDto
-import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
 import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
-import com.yagubogu.ui.attendance.model.GameState
+import com.yagubogu.ui.livetalk.model.GameCheckInUiModel
+import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import com.yagubogu.ui.mapper.GameUiMapper
+import com.yagubogu.ui.mapper.GameUiMapper.toUiModel
 import com.yagubogu.ui.mapper.toUiModel
+import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,12 +38,12 @@ class LivetalkViewModel(
 ) : ViewModel() {
     private val logger = Logger.withTag("LivetalkViewModel")
 
-    private val games = MutableStateFlow<List<GameWithCheckInDto>?>(null)
+    private val games = MutableStateFlow<List<GameCheckInUiModel>?>(null)
 
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val liveGames: StateFlow<List<LiveGameDto>?> =
+    private val liveGames: StateFlow<List<LiveGameStateUiModel>?> =
         selectedDate
             .flatMapLatest { date: LocalDate -> pollLiveGames(date) }
             .stateIn(
@@ -56,8 +56,8 @@ class LivetalkViewModel(
 
     val uiState: StateFlow<LivetalkUiState> =
         combine(games, liveGames, weathers) {
-            games: List<GameWithCheckInDto>?,
-            liveGames: List<LiveGameDto>?,
+            games: List<GameCheckInUiModel>?,
+            liveGames: List<LiveGameStateUiModel>?,
             weathers: Map<Long, WeatherUiModel>,
             ->
             if (games == null || liveGames == null) {
@@ -88,9 +88,10 @@ class LivetalkViewModel(
         viewModelScope.launch {
             gameRepository
                 .getGames(date)
-                .onSuccess { result: List<GameWithCheckInDto> ->
+                .mapList { it.toUiModel() }
+                .onSuccess { result: List<GameCheckInUiModel> ->
                     games.value = result
-                    fetchWeathers(result.map { it.stadium.id })
+                    fetchWeathers(result.map { it.stadiumId })
                 }.onFailure { exception: Throwable ->
                     logger.w(exception) { "경기 목록 API 호출 실패" }
                 }
@@ -103,26 +104,29 @@ class LivetalkViewModel(
         viewModelScope.launch {
             stadiumRepository
                 .getStadiumWeather(stadiumIds)
-                .onSuccess { response: StadiumWeatherResponse -> weathers.value = response.toUiModel() }
+                .map { it.toUiModel() }
+                .onSuccess { result: Map<Long, WeatherUiModel> -> weathers.value = result }
                 .onFailure { exception: Throwable ->
                     logger.w(exception) { "날씨 API 호출 실패" }
                 }
         }
     }
 
-    private fun pollLiveGames(date: LocalDate): Flow<List<LiveGameDto>> =
+    private fun pollLiveGames(date: LocalDate): Flow<List<LiveGameStateUiModel>> =
         flow {
             while (true) {
-                val result: List<LiveGameDto>? =
+                val result: List<LiveGameStateUiModel>? =
                     gameRepository
                         .getLiveGames(date)
-                        .onSuccess { liveGames: List<LiveGameDto> -> emit(liveGames) }
-                        .onFailure { exception: Throwable ->
+                        .mapList { it.toUiModel() }
+                        .onSuccess { liveGames: List<LiveGameStateUiModel> ->
+                            emit(liveGames)
+                        }.onFailure { exception: Throwable ->
                             logger.w(exception) { "실시간 경기 API 호출 실패" }
                         }.getOrNull()
 
                 if (result == null) {
-                    delay(ACTIVE_INTERVAL_MILLIS)
+                    delay(POLLING_INTERVAL_MILLIS)
                     continue
                 }
 
@@ -131,20 +135,19 @@ class LivetalkViewModel(
             }
         }
 
-    private fun nextPollingDelayMillis(liveGames: List<LiveGameDto>): Long? {
-        val gameStates: List<GameState> = liveGames.map { GameState.from(it.gameState) }
-        if (gameStates.any { it == GameState.LIVE || it == GameState.UNKNOWN }) {
-            return ACTIVE_INTERVAL_MILLIS
-        }
+    private fun nextPollingDelayMillis(liveGames: List<LiveGameStateUiModel>): Long? {
+        val hasOngoingGame: Boolean =
+            liveGames.any { it is LiveGameStateUiModel.Live || it is LiveGameStateUiModel.Unknown }
+        if (hasOngoingGame) return POLLING_INTERVAL_MILLIS
 
         val earliestStartAt: LocalTime =
             liveGames
-                .filter { GameState.from(it.gameState) == GameState.SCHEDULED }
+                .filterIsInstance<LiveGameStateUiModel.Scheduled>()
                 .minOfOrNull { it.startAt }
                 ?: return null
 
         val secondsUntilStart: Int = earliestStartAt.toSecondOfDay() - LocalTime.now(clock).toSecondOfDay()
-        return (secondsUntilStart * MILLIS_PER_SECOND).coerceAtLeast(ACTIVE_INTERVAL_MILLIS)
+        return (secondsUntilStart * MILLIS_PER_SECOND).coerceAtLeast(POLLING_INTERVAL_MILLIS)
     }
 
     private fun List<LivetalkStadiumUiModel>.sortedByVerification(): List<LivetalkStadiumUiModel> {
@@ -154,9 +157,8 @@ class LivetalkViewModel(
     }
 
     companion object {
-        private const val ACTIVE_INTERVAL_MILLIS = 15_000L
-
         private const val MILLIS_PER_SECOND = 1_000L
+        private const val POLLING_INTERVAL_MILLIS = 15_000L
         private const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
     }
 }

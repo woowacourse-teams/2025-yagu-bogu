@@ -10,10 +10,12 @@ import kotlinx.datetime.LocalTime
 
 @Immutable
 sealed interface LiveGameStateUiModel {
+    val gameId: Long
     val awayTeam: Team
     val homeTeam: Team
 
     data class Scheduled(
+        override val gameId: Long,
         override val awayTeam: Team,
         override val homeTeam: Team,
         val awayPlayer: PlayerUiModel,
@@ -22,6 +24,7 @@ sealed interface LiveGameStateUiModel {
     ) : LiveGameStateUiModel
 
     data class Live(
+        override val gameId: Long,
         override val awayTeam: Team,
         override val homeTeam: Team,
         val awayPlayer: PlayerUiModel,
@@ -34,6 +37,7 @@ sealed interface LiveGameStateUiModel {
     ) : LiveGameStateUiModel
 
     data class Completed(
+        override val gameId: Long,
         override val awayTeam: Team,
         override val homeTeam: Team,
         val score: ScoreUiModel,
@@ -47,11 +51,13 @@ sealed interface LiveGameStateUiModel {
     }
 
     data class Canceled(
+        override val gameId: Long,
         override val awayTeam: Team,
         override val homeTeam: Team,
     ) : LiveGameStateUiModel
 
     data class Unknown(
+        override val gameId: Long,
         override val awayTeam: Team,
         override val homeTeam: Team,
         val startAt: LocalTime,
