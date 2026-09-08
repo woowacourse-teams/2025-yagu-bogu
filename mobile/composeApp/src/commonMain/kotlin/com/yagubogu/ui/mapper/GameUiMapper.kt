@@ -43,10 +43,11 @@ object GameUiMapper {
     fun mapToLivetalkUiModels(
         games: List<GameCheckInUiModel>,
         liveGames: List<LiveGameStateUiModel>,
-        weathers: Map<Long, WeatherUiModel>,
+        weathers: List<WeatherUiModel>,
     ): List<LivetalkStadiumUiModel> {
         val liveGameByGameId: Map<Long, LiveGameStateUiModel> =
             liveGames.associateBy { it.gameId }
+        val weatherByStadiumId: Map<Long, WeatherUiModel> = weathers.associateBy { it.stadiumId }
 
         return games.mapNotNull { game: GameCheckInUiModel ->
             val liveGame: LiveGameStateUiModel =
@@ -54,7 +55,7 @@ object GameUiMapper {
             mapToLivetalkUiModel(
                 game = game,
                 liveGame = liveGame,
-                weather = weathers[game.stadiumId],
+                weather = weatherByStadiumId[game.stadiumId],
             )
         }
     }

@@ -5,11 +5,11 @@ import com.yagubogu.domain.model.PlayerRole
 import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
-import com.yagubogu.ui.livetalk.model.Condition
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.PlayerUiModel
 import com.yagubogu.ui.livetalk.model.ScoreUiModel
+import com.yagubogu.domain.model.WeatherCondition
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalTime
@@ -91,7 +91,7 @@ val LIVETALK_STADIUM_VERIFIED =
         userCount = 100,
         isVerified = true,
         liveGameState = LIVE_GAME_STATE_LIVE,
-        weatherUiModel = WeatherUiModel(9L, Condition.Clear, "12.3°C"),
+        weatherUiModel = WeatherUiModel(9L, WeatherCondition.CLEAR, "12.3°C"),
     )
 
 val LIVETALK_STADIUM_UNVERIFIED =
@@ -102,7 +102,7 @@ val LIVETALK_STADIUM_UNVERIFIED =
         userCount = 10,
         isVerified = false,
         liveGameState = LIVE_GAME_STATE_LIVE,
-        weatherUiModel = WeatherUiModel(8L, Condition.Clear, "12.3°C"),
+        weatherUiModel = WeatherUiModel(8L, WeatherCondition.CLEAR, "12.3°C"),
     )
 
 val LIVETALK_STADIUMS =

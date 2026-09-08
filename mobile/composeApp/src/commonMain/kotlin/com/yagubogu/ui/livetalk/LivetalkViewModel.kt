@@ -52,13 +52,13 @@ class LivetalkViewModel(
                 initialValue = null,
             )
 
-    private val weathers = MutableStateFlow<Map<Long, WeatherUiModel>>(emptyMap())
+    private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
 
     val uiState: StateFlow<LivetalkUiState> =
         combine(games, liveGames, weathers) {
             games: List<GameCheckInUiModel>?,
             liveGames: List<LiveGameStateUiModel>?,
-            weathers: Map<Long, WeatherUiModel>,
+            weathers: List<WeatherUiModel>,
             ->
             if (games == null || liveGames == null) {
                 LivetalkUiState(isLoading = true)
@@ -105,7 +105,7 @@ class LivetalkViewModel(
             stadiumRepository
                 .getStadiumWeather(stadiumIds)
                 .map { it.toUiModel() }
-                .onSuccess { result: Map<Long, WeatherUiModel> -> weathers.value = result }
+                .onSuccess { result: List<WeatherUiModel> -> weathers.value = result }
                 .onFailure { exception: Throwable ->
                     logger.w(exception) { "날씨 API 호출 실패" }
                 }
