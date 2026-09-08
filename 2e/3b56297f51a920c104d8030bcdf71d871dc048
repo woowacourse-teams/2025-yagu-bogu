@@ -1,0 +1,39 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LivetalkStadiumItem.kt
+  s_3282d4001420fb::t_079c60740b2e05 41-49,53-61
+  s_3282d4001420fb::t_52f43ee3b41473 103
+  s_3282d4001420fb::t_39c2cb4ae690af 140-154,186
+  s_3282d4001420fb::t_28407c940dc671 23
+  s_3282d4001420fb::t_df22fe0e56760c 35
+  s_3282d4001420fb::t_415fa95e820965 25
+  s_3282d4001420fb::t_0d902f07114551 155
+  s_3282d4001420fb::t_6946d3917abd90 183-185
+  s_3282d4001420fb::t_c935c86f6666ec 187-189
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/mapper/StadiumUiMapper.kt
+  s_3282d4001420fb::t_28407c940dc671 12
+  s_3282d4001420fb::t_cfff5e0e872c78 28-37
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/LivetalkViewModel.kt
+  s_3282d4001420fb::t_ce6f67eb1c0970 61
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/model/WeatherUiModel.kt
+  s_3282d4001420fb::t_5e98ba67f305e7 3
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/Fixture.kt
+  s_3282d4001420fb::t_78f8f0e0ccc6a6 94,105
+  s_3282d4001420fb::t_28407c940dc671 12
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/domain/model/WeatherCondition.kt
+  s_3282d4001420fb::t_bc7029db037d2b 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "2e3b56297f51a920c104d8030bcdf71d871dc048",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
