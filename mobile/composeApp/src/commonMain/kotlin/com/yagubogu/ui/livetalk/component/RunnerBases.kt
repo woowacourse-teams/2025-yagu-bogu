@@ -24,12 +24,12 @@ fun RunnerBases(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy((-6).dp),
+        verticalArrangement = Arrangement.spacedBy((-8).dp),
         modifier = modifier,
     ) {
         Base(isOccupied = bases?.isSecondBaseOccupied ?: false)
         Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Base(isOccupied = bases?.isThirdBaseOccupied ?: false)
             Base(isOccupied = bases?.isFirstBaseOccupied ?: false)
@@ -45,7 +45,7 @@ private fun Base(
     Box(
         modifier =
             modifier
-                .size(14.dp)
+                .size(20.dp)
                 .background(
                     color = if (isOccupied) Yellow else Gray300,
                     shape = DiamondShape,

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -17,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.yagubogu.domain.model.InningHalf
 import com.yagubogu.domain.model.PlayerRole
 import com.yagubogu.domain.model.Team
@@ -32,7 +32,6 @@ import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.Gray700
 import com.yagubogu.ui.theme.PretendardMedium
-import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.theme.Primary100
 import com.yagubogu.ui.theme.Primary600
@@ -40,6 +39,10 @@ import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.hhmmFormatter
 import kotlinx.datetime.format
+
+private val TEAM_ROW_HORIZONTAL_PADDING = 8.dp
+
+private val PLAYER_INFO_WIDTH = MASCOT_SIZE + TEAM_ROW_HORIZONTAL_PADDING * 2
 
 @Composable
 fun LiveGameState(
@@ -129,7 +132,7 @@ private fun GameStateWithPlayers(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
     ) {
         TeamRow(
@@ -185,7 +188,7 @@ private fun TeamRow(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(horizontal = TEAM_ROW_HORIZONTAL_PADDING),
     ) {
         TeamItem(team = awayTeam)
         content()
@@ -287,9 +290,15 @@ private fun PlayerCountRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth(),
     ) {
-        PlayerInfo(player = awayPlayer)
+        PlayerInfo(
+            player = awayPlayer,
+            modifier = Modifier.width(PLAYER_INFO_WIDTH),
+        )
         BallStrikeOutCount(ballStrikeOutCount = ballCount)
-        PlayerInfo(player = homePlayer)
+        PlayerInfo(
+            player = homePlayer,
+            modifier = Modifier.width(PLAYER_INFO_WIDTH),
+        )
     }
 }
 
@@ -299,7 +308,7 @@ private fun PlayerInfo(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
@@ -309,11 +318,12 @@ private fun PlayerInfo(
                     PlayerRole.PITCHER -> "투"
                     PlayerRole.BATTER -> "타" // TODO
                 },
-            style = PretendardMedium.copy(fontSize = 10.sp, color = Gray500),
+            style = PretendardMedium.copy(fontSize = 10.dpToSp, color = Gray500),
         )
+        Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = player.name,
-            style = PretendardMedium12,
+            style = PretendardMedium.copy(fontSize = 12.dpToSp),
         )
     }
 }

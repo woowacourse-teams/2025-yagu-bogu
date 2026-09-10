@@ -17,11 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.theme.PretendardSemiBold12
+import com.yagubogu.ui.theme.PretendardSemiBold
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.mascot
 import org.jetbrains.compose.resources.painterResource
+
+val MASCOT_SIZE = 60.dp
+private val MASCOT_PADDING = 8.dp
+private val MASCOT_NAME_SPACING = 4.dp
 
 @Composable
 fun TeamItem(
@@ -38,14 +43,14 @@ fun TeamItem(
             modifier =
                 Modifier
                     .clip(CircleShape)
-                    .size(52.dp)
+                    .size(MASCOT_SIZE)
                     .background(team.color.copy(alpha = 0.2f))
-                    .padding(8.dp),
+                    .padding(MASCOT_PADDING),
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(MASCOT_NAME_SPACING))
         Text(
             text = team.shortname,
-            style = PretendardSemiBold12,
+            style = PretendardSemiBold.copy(fontSize = 14.sp),
         )
     }
 }

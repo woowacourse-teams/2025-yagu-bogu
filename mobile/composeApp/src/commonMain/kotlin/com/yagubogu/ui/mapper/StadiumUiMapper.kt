@@ -7,9 +7,9 @@ import com.yagubogu.data.dto.response.stadium.StadiumsWithGamesResponse
 import com.yagubogu.domain.model.Coordinate
 import com.yagubogu.domain.model.Latitude
 import com.yagubogu.domain.model.Longitude
+import com.yagubogu.domain.model.WeatherCondition
 import com.yagubogu.ui.home.model.StadiumWithGame
 import com.yagubogu.ui.home.model.StadiumsWithGames
-import com.yagubogu.domain.model.WeatherCondition
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
 
 fun StadiumsWithGamesResponse.toUiModel(): StadiumsWithGames = StadiumsWithGames(values = stadiums.map { it.toUiModel() })

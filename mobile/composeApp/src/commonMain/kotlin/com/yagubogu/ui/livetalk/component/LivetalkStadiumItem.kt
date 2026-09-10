@@ -82,6 +82,7 @@ fun LivetalkStadiumItem(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -119,10 +120,7 @@ fun LivetalkStadiumItem(
             )
         }
 
-        LiveGameState(
-            liveGameState = item.liveGameState,
-            modifier = Modifier.padding(horizontal = 12.dp),
-        )
+        LiveGameState(liveGameState = item.liveGameState)
     }
 }
 
