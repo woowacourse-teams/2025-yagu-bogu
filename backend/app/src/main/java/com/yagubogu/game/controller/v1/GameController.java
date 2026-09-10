@@ -4,6 +4,7 @@ import com.yagubogu.auth.annotation.RequireRole;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import com.yagubogu.game.service.GameService;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -35,6 +36,16 @@ public class GameController implements GameControllerInterface {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") final YearMonth yearMonth
     ) {
         GameDatesResponse response = gameService.findGameDatesByYearMonth(yearMonth);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @RequireRole
+    public ResponseEntity<LiveGamesResponse> findLiveGames(
+            final MemberClaims memberClaims,
+            @RequestParam(required = false) final LocalDate date
+    ) {
+        LiveGamesResponse response = gameService.findLiveGames(date);
 
         return ResponseEntity.ok(response);
     }

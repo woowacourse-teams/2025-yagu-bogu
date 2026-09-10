@@ -57,6 +57,9 @@ public class GameCenterSyncService {
                     updatedCount++;
                 }
 
+                // 현재 이닝과 타자/투수는 재처리 대상이 아니라 games 테이블에 바로 반영
+                updateLiveGameCenterState(detail);
+
                 // 선발 예고 투수는 재처리 대상이 아니라 games 테이블에 바로 반영
                 updateProbablePitchers(detail);
             } catch (Exception e) {
@@ -66,6 +69,53 @@ public class GameCenterSyncService {
 
         log.info("[BRONZE] Processed {} games, {} data updates", gameDetails.size(), updatedCount);
         return updatedCount;
+    }
+
+    /**
+     * 크롤링한 현재 이닝과 타자/투수를 games 테이블에 직접 반영 (Bronze/ETL을 거치지 않음)
+     */
+    private void updateLiveGameCenterState(GameCenterDetail detail) {
+        if (detail.getCurrentBatterTeam() == null
+                && detail.getCurrentBatterName() == null
+                && detail.getCurrentPitcherTeam() == null
+                && detail.getCurrentPitcherName() == null
+                && detail.getCurrentInning() == null
+                && detail.getCurrentInningHalf() == null) {
+            return;
+        }
+        LocalDate date = parseDate(detail.getGameDate());
+        String stadiumLocation = detail.getStadiumName();
+        String homeTeamName = detail.getHomeTeamName();
+        String awayTeamName = detail.getAwayTeamName();
+        LocalTime startTime = parseTime(detail.getStartTime());
+
+        Team homeTeam = teamRepository.findByShortName(homeTeamName).orElse(null);
+        Team awayTeam = teamRepository.findByShortName(awayTeamName).orElse(null);
+        Stadium stadium = stadiumRepository.findByLocation(stadiumLocation).orElse(null);
+
+        if (homeTeam == null || awayTeam == null || stadium == null) {
+            log.debug("[LIVE_STATE] Team/Stadium not found, skip batter/pitcher update: stadium={}, home={}, away={}",
+                    stadiumLocation, homeTeamName, awayTeamName);
+            return;
+        }
+
+        gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
+                        startTime)
+                .ifPresentOrElse(
+                        game -> {
+                            game.updateLiveGameCenterState(
+                                    detail.getCurrentBatterTeam(),
+                                    detail.getCurrentBatterName(),
+                                    detail.getCurrentPitcherTeam(),
+                                    detail.getCurrentPitcherName(),
+                                    detail.getCurrentInning(),
+                                    detail.getCurrentInningHalf()
+                            );
+                            gameRepository.save(game);
+                        },
+                        () -> log.debug("[LIVE_STATE] Game not found, skip batter/pitcher update: gameCode={}",
+                                detail.getGameCode())
+                );
     }
 
     /**
@@ -96,12 +146,36 @@ public class GameCenterSyncService {
         gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(date, stadium, homeTeam, awayTeam,
                         startTime)
                 .ifPresentOrElse(
-                        game -> game.updateProbablePitchers(
-                                detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
-                        ),
+                        game -> {
+                            game.updateProbablePitchers(
+                                    detail.getHomeProbablePitcher(), detail.getAwayProbablePitcher()
+                            );
+                            gameRepository.save(game);
+                        },
                         () -> log.debug("[PROBABLE_PITCHER] Game not found, skip: gameCode={}",
                                 detail.getGameCode())
                 );
+    }
+
+    /**
+     * 스코어보드(ScoreBoard.aspx) 크롤링 결과로 진루정보/볼·스트라이크·아웃을 games 테이블에 직접 반영
+     * (Bronze/ETL을 거치지 않음)
+     */
+    public void updateLiveBaseState(
+            String gameCode,
+            Boolean firstBaseOccupied,
+            Boolean secondBaseOccupied,
+            Boolean thirdBaseOccupied,
+            Integer balls,
+            Integer strikes,
+            Integer outs
+    ) {
+        gameRepository.findByGameCode(gameCode).ifPresentOrElse(
+                game -> game.updateLiveBaseState(
+                        firstBaseOccupied, secondBaseOccupied, thirdBaseOccupied, balls, strikes, outs
+                ),
+                () -> log.debug("[LIVE_STATE] Game not found for gameCode={}, skip base state update", gameCode)
+        );
     }
 
     /**

@@ -3,6 +3,7 @@ package com.yagubogu.game.controller.v1;
 import com.yagubogu.auth.dto.MemberClaims;
 import com.yagubogu.game.dto.v1.GameDatesResponse;
 import com.yagubogu.game.dto.v1.GameResponse;
+import com.yagubogu.game.dto.v1.LiveGamesResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,5 +42,16 @@ public interface GameControllerInterface {
     ResponseEntity<GameDatesResponse> findGameDatesByYearMonth(
             @Parameter(hidden = true) MemberClaims memberClaims,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth
+    );
+
+    @Operation(summary = "현장톡 실시간 경기 목록 조회",
+            description = "지정한 날짜 전체 경기의 점수와 실시간 경기 상태를 조회합니다. date를 생략하면 서버 기준 오늘 날짜로 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "실시간 경기 목록 조회 성공")
+    })
+    @GetMapping("/live")
+    ResponseEntity<LiveGamesResponse> findLiveGames(
+            @Parameter(hidden = true) MemberClaims memberClaims,
+            @RequestParam(required = false) LocalDate date
     );
 }

@@ -4,12 +4,17 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.yagubogu.game.domain.InningHalf;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import yagubogu.crawling.game.config.KboCrawlerProperties;
 import yagubogu.crawling.game.dto.GameCenterDetail;
 
 @Slf4j
 public class KboGameCenterPage extends BaseKboPage {
+
+    private static final Pattern INNING_STATUS_PATTERN = Pattern.compile("(\\d+)회\\s*(초|말)");
 
     public KboGameCenterPage(Page page, KboCrawlerProperties properties) {
         super(page, properties);
@@ -168,12 +173,14 @@ public class KboGameCenterPage extends BaseKboPage {
 
         Locator statusElem = gameElement.locator(".middle .staus");
         if (statusElem.count() > 0) {
-            gameCenter.setStatus(statusElem.textContent().trim());
+            String status = statusElem.textContent().trim();
+            gameCenter.setStatus(status);
+            extractInningState(gameCenter, status);
         }
     }
 
     private void extractTeamInfo(Locator gameElement, GameCenterDetail gameCenter) {
-        InningHalf inningHalf = parseInningHalf(gameCenter.getStatus());
+        InningHalf inningHalf = gameCenter.getCurrentInningHalf();
         extractAwayTeamInfo(gameElement, gameCenter, inningHalf);
         extractHomeTeamInfo(gameElement, gameCenter, inningHalf);
     }
@@ -182,23 +189,16 @@ public class KboGameCenterPage extends BaseKboPage {
      * 이닝 초(원정팀 공격)/말(홈팀 공격) 여부.
      * .today-pitcher는 공격중인 팀에서는 타자, 수비중인 팀에서는 투수를 나타내므로
      * 어느 팀에 어떤 의미를 부여할지 이걸로 판별한다.
-     * status에 초/말이 없는 경우(경기예정/종료 등)는 UNKNOWN으로 두고 배정을 건너뛴다.
+     * status에 초/말이 없는 경우(경기예정/종료 등)는 배정을 건너뛴다.
      */
-    private enum InningHalf {
-        TOP, BOTTOM, UNKNOWN
-    }
+    private void extractInningState(GameCenterDetail gameCenter, String status) {
+        Matcher matcher = INNING_STATUS_PATTERN.matcher(status);
+        if (!matcher.find()) {
+            return;
+        }
 
-    private InningHalf parseInningHalf(String status) {
-        if (status == null) {
-            return InningHalf.UNKNOWN;
-        }
-        if (status.contains("초")) {
-            return InningHalf.TOP;
-        }
-        if (status.contains("말")) {
-            return InningHalf.BOTTOM;
-        }
-        return InningHalf.UNKNOWN;
+        gameCenter.setCurrentInning(Integer.parseInt(matcher.group(1)));
+        gameCenter.setCurrentInningHalf("초".equals(matcher.group(2)) ? InningHalf.TOP : InningHalf.BOTTOM);
     }
 
     private void extractAwayTeamInfo(Locator gameElement, GameCenterDetail gameCenter, InningHalf inningHalf) {

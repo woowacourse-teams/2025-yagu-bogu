@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yagubogu.game.service.BronzeGameService;
 import com.yagubogu.game.service.GameEtlService;
 import com.yagubogu.stadium.domain.Stadium;
@@ -35,6 +36,43 @@ import yagubogu.crawling.game.service.crawler.KboGameCenterCrawler.GameCenterSyn
 
 class KboScoreboardServiceTest {
 
+    @DisplayName("updateFromScoreboard - 진루정보/카운트를 GameCenterSyncService에 위임해 게임 라이브 상태로 반영한다")
+    @Test
+    void updateFromScoreboard_DelegatesLiveBaseStateToGameCenterSyncService() {
+        // given
+        String gameCode = "20260621SKNC0";
+        GameCenterSyncService gameCenterSyncService = mock(GameCenterSyncService.class);
+
+        KboScoreboardService service = new KboScoreboardService(
+                mock(KboScoreboardCrawler.class),
+                mock(KboScoreboardMapper.class),
+                mock(GameJdbcBatchUpsertRepository.class),
+                mock(TeamRepository.class),
+                mock(StadiumRepository.class),
+                mock(TransactionTemplate.class),
+                mock(TransactionTemplate.class),
+                mock(BronzeGameService.class),
+                mock(GameEtlService.class),
+                gameCenterSyncService,
+                createObjectMapper(),
+                mock(ApplicationEventPublisher.class)
+        );
+
+        KboScoreboardGame data = createScoreboardGame();
+        data.setFirstBaseOccupied(true);
+        data.setSecondBaseOccupied(true);
+        data.setThirdBaseOccupied(false);
+        data.setBalls(1);
+        data.setStrikes(2);
+        data.setOuts(0);
+
+        // when
+        service.updateFromScoreboard(gameCode, data);
+
+        // then
+        verify(gameCenterSyncService).updateLiveBaseState(gameCode, true, true, false, 1, 2, 0);
+    }
+
     @DisplayName("예정 경기의 gameCode는 GameCenter의 공식 g_id를 사용한다")
     @Test
     void fetchOfficialGameCodeFromGameCenterForScheduledGame() {
@@ -54,6 +92,7 @@ class KboScoreboardServiceTest {
                 null,
                 null
         );
+
         GameCenterDetail detail = new GameCenterDetail();
         detail.setGameCode(gameCode);
         detail.setGameSc("1");
@@ -116,5 +155,31 @@ class KboScoreboardServiceTest {
             return callback.doInTransaction(mock(TransactionStatus.class));
         });
         return template;
+    }
+
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
+    }
+
+    private KboScoreboardGame createScoreboardGame() {
+        KboScoreboardTeam awayTeam = new KboScoreboardTeam("SSG", 0, 0, 0, 0, List.of());
+        KboScoreboardTeam homeTeam = new KboScoreboardTeam("NC", 0, 0, 0, 0, List.of());
+
+        return new KboScoreboardGame(
+                LocalDate.of(2026, 6, 21),
+                "4회초",
+                "창원",
+                LocalTime.of(17, 0),
+                null,
+                awayTeam,
+                homeTeam,
+                1,
+                0,
+                null,
+                null,
+                null
+        );
     }
 }

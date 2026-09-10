@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.yagubogu.game.domain.Game;
 import com.yagubogu.game.domain.GameState;
+import com.yagubogu.game.domain.InningHalf;
 import com.yagubogu.game.repository.GameRepository;
 import com.yagubogu.game.service.BronzeGameService;
 import com.yagubogu.stadium.domain.Stadium;
@@ -74,6 +75,61 @@ class GameCenterSyncServiceTest {
         verifyNoInteractions(bronzeGameService);
     }
 
+    @DisplayName("saveToBronzeLayer - 현재 타자/투수를 games 테이블에 직접 반영한다")
+    @Test
+    void saveToBronzeLayer_UpdatesLiveBatterAndPitcher() {
+        // given
+        Team homeTeam = mock(Team.class);
+        Team awayTeam = mock(Team.class);
+        Stadium stadium = mock(Stadium.class);
+        Game game = mock(Game.class);
+
+        when(teamRepository.findByShortName("LG")).thenReturn(Optional.of(homeTeam));
+        when(teamRepository.findByShortName("두산")).thenReturn(Optional.of(awayTeam));
+        when(stadiumRepository.findByLocation("잠실")).thenReturn(Optional.of(stadium));
+        when(gameRepository.findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
+                LocalDate.of(2026, 6, 21), stadium, homeTeam, awayTeam, LocalTime.of(17, 0)
+        )).thenReturn(Optional.of(game));
+
+        GameCenterDetail detail = new GameCenterDetail();
+        detail.setGameCode("20260621OBLG0");
+        detail.setGameDate("20260621");
+        detail.setStadiumName("잠실");
+        detail.setHomeTeamName("LG");
+        detail.setAwayTeamName("두산");
+        detail.setStartTime("17:00");
+        detail.setStatus("2회초");
+        detail.setCurrentBatterTeam("away");
+        detail.setCurrentBatterName("오명진");
+        detail.setCurrentPitcherTeam("home");
+        detail.setCurrentPitcherName("웰스");
+        detail.setCurrentInning(2);
+        detail.setCurrentInningHalf(InningHalf.TOP);
+
+        // when
+        service.saveToBronzeLayer(List.of(detail));
+
+        // then
+        verify(game).updateLiveGameCenterState("away", "오명진", "home", "웰스", 2, InningHalf.TOP);
+    }
+
+    @DisplayName("saveToBronzeLayer - 팀/구장을 찾을 수 없으면 타자/투수 갱신을 건너뛴다")
+    @Test
+    void saveToBronzeLayer_NoMatchingTeam_SkipsLiveStateUpdate() {
+        // given
+        when(teamRepository.findByShortName(any())).thenReturn(Optional.empty());
+        when(stadiumRepository.findByLocation(any())).thenReturn(Optional.empty());
+
+        GameCenterDetail detail = gameDetail("2회초");
+        detail.setCurrentBatterName("오명진");
+
+        // when & then (예외 없이 정상 종료되어야 함)
+        service.saveToBronzeLayer(List.of(detail));
+
+        verify(gameRepository, never()).findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
+                any(), any(), any(), any(), any());
+    }
+
     @DisplayName("saveToBronzeLayer - 선발 예고 투수를 games 테이블에 직접 반영한다")
     @Test
     void saveToBronzeLayer_UpdatesProbablePitchers() {
@@ -112,6 +168,32 @@ class GameCenterSyncServiceTest {
 
         verify(gameRepository, never()).findByDateAndStadiumAndHomeTeamAndAwayTeamAndStartAt(
                 any(), any(), any(), any(), any());
+    }
+
+    @DisplayName("updateLiveBaseState - gameCode에 해당하는 Game의 진루정보/카운트를 갱신한다")
+    @Test
+    void updateLiveBaseState_UpdatesGame() {
+        // given
+        String gameCode = "20260621SKNC0";
+        Game game = mock(Game.class);
+        when(gameRepository.findByGameCode(gameCode)).thenReturn(Optional.of(game));
+
+        // when
+        service.updateLiveBaseState(gameCode, true, true, false, 1, 2, 0);
+
+        // then
+        verify(game).updateLiveBaseState(true, true, false, 1, 2, 0);
+    }
+
+    @DisplayName("updateLiveBaseState - gameCode에 해당하는 Game이 없으면 갱신을 건너뛴다")
+    @Test
+    void updateLiveBaseState_NoMatchingGame_Skips() {
+        // given
+        String gameCode = "20260621SKNC0";
+        when(gameRepository.findByGameCode(gameCode)).thenReturn(Optional.empty());
+
+        // when & then (예외 없이 정상 종료되어야 함)
+        service.updateLiveBaseState(gameCode, true, true, false, 1, 2, 0);
     }
 
     private GameCenterDetail gameDetail(final String status) {
