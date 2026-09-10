@@ -124,7 +124,9 @@ object GameUiMapper {
                 awayTeam.currentPlayer == null ||
                 homeTeam.currentPlayer == null ||
                 awayTeam.currentPlayerRole == null ||
-                homeTeam.currentPlayerRole == null
+                homeTeam.currentPlayerRole == null ||
+                awayTeam.score == null ||
+                homeTeam.score == null
         ) {
             true -> {
                 this.toUnknownUiModel()
@@ -159,16 +161,24 @@ object GameUiMapper {
         }
 
     private fun LiveGamesResponse.LiveGameDto.toCompletedUiModel(): LiveGameStateUiModel =
-        LiveGameStateUiModel.Completed(
-            gameId = gameId,
-            awayTeam = Team.getByCode(awayTeam.code),
-            homeTeam = Team.getByCode(homeTeam.code),
-            score =
-                ScoreUiModel(
-                    awayScore = awayTeam.score,
-                    homeScore = homeTeam.score,
-                ),
-        )
+        when (awayTeam.score == null || homeTeam.score == null) {
+            true -> {
+                this.toUnknownUiModel()
+            }
+
+            false -> {
+                LiveGameStateUiModel.Completed(
+                    gameId = gameId,
+                    awayTeam = Team.getByCode(awayTeam.code),
+                    homeTeam = Team.getByCode(homeTeam.code),
+                    score =
+                        ScoreUiModel(
+                            awayScore = awayTeam.score,
+                            homeScore = homeTeam.score,
+                        ),
+                )
+            }
+        }
 
     private fun LiveGamesResponse.LiveGameDto.toCanceledUiModel(): LiveGameStateUiModel =
         LiveGameStateUiModel.Canceled(

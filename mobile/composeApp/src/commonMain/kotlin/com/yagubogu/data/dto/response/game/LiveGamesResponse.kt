@@ -36,7 +36,7 @@ data class LiveGamesResponse(
         @SerialName("currentPlayerRole")
         val currentPlayerRole: PlayerRole?, // "BATTER" 또는 "PITCHER"
         @SerialName("score")
-        val score: Int, // 팀 점수
+        val score: Int?, // 팀 점수
     )
 
     @Serializable
