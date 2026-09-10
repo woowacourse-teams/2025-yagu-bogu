@@ -93,4 +93,5 @@ public class Member extends BaseEntity {
     public void updateBadge(final Badge badge) {
         this.representativeBadge = badge;
     }
+
 }
