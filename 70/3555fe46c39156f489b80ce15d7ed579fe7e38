@@ -1,0 +1,27 @@
+backend/app/src/main/java/com/yagubogu/reward/client/KakaoGiftOrderRequest.java
+  s_e696ba7f2ae00a::t_f4451ed36d73e0 17-20
+backend/app/src/main/java/com/yagubogu/reward/client/GiftOrderRequest.java
+  s_e696ba7f2ae00a::t_f4451ed36d73e0 3-4,7
+backend/app/src/test/java/com/yagubogu/reward/client/KakaoGiftOrderClientTest.java
+  s_e696ba7f2ae00a::t_f4451ed36d73e0 13,42-44,62-63
+backend/app/src/main/java/com/yagubogu/reward/service/GifticonIssuanceRequestService.java
+  s_e696ba7f2ae00a::t_f4451ed36d73e0 67
+backend/app/src/test/java/com/yagubogu/reward/service/GifticonIssuanceRequestServiceTest.java
+  s_e696ba7f2ae00a::t_f4451ed36d73e0 77-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "703555fe46c39156f489b80ce15d7ed579fe7e38",
+  "prompts": {},
+  "sessions": {
+    "s_e696ba7f2ae00a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa261-190d-7ae1-8e91-056d21f8d9a1",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

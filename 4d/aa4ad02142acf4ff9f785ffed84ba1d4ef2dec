@@ -1,0 +1,39 @@
+backend/app/src/main/java/com/yagubogu/game/domain/Game.java
+  s_0cdd50137f8ae3::t_ec5568c7cdd17d 78-83
+  s_0cdd50137f8ae3::t_0631b95f2aaba4 184-192
+backend/app/src/main/resources/db/migration/mysql/V21__add_game_probable_pitchers.sql
+  s_0cdd50137f8ae3::t_ce1d75758ac793 1-5
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/GameCenterDetail.java
+  s_0cdd50137f8ae3::t_7c157562ee3f1d 36-38
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboGameCenterPage.java
+  s_0cdd50137f8ae3::t_b5e6dc89ed277b 216-217,220-227,230-233
+  s_0cdd50137f8ae3::t_ed3643622010cd 195-196
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncServiceTest.java
+  s_0cdd50137f8ae3::t_7697c51895770c 4
+  s_0cdd50137f8ae3::t_e1dcf8887e619b 6,11,13,15-18,22,31-36,77-116
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
+  s_0cdd50137f8ae3::t_306d9262267d42 49,59-61,71-104
+  s_0cdd50137f8ae3::t_827e979e63c02a 105-106
+  s_0cdd50137f8ae3::t_4068b6b18c760d 3,6,8-11,18,29-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4daa4ad02142acf4ff9f785ffed84ba1d4ef2dec",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_0cdd50137f8ae3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fb5823d3-1040-4208-9bbf-b20a2add3ad8",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+.github/workflows/discord-notify.yml
+  s_ecd9a5ca68c61e::t_503ff11883b741 35-48,50
+  s_ecd9a5ca68c61e::t_3c5ae71902e42f 84-87,91,93,97
+  s_ecd9a5ca68c61e::t_022379b0668190 106-112
+  s_ecd9a5ca68c61e::t_5cd36b1aace66c 127-130,132-133,135,138-141,143-144,146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b3823eedb81e8c9931731782c9f187d32bd06724",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_ecd9a5ca68c61e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdc15227-bae1-4098-8e52-e49222312aa1",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

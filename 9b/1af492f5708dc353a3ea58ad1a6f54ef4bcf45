@@ -1,0 +1,174 @@
+backend/crawling/src/test/java/yagubogu/crawling/game/service/poller/AdaptivePollerTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-143
+.github/workflows/backend-main.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 188
+backend/app/src/main/java/com/yagubogu/game/repository/BronzeGameRepository.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 15-16,29-39,48-53
+  s_475d306ae6f4f4::t_c0736b563cc0a8 54
+backend/app/src/main/java/com/yagubogu/place/client/TourApiException.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-8
+backend/app/src/main/resources/application.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 81-91
+backend/app/src/test/java/com/yagubogu/place/service/PlaceSyncServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-127
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPageTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 253,403-405,415-417,493-495
+backend/app/src/test/java/com/yagubogu/game/domain/GameStateTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-48
+backend/app/src/main/java/com/yagubogu/game/domain/Game.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 124-159
+backend/app/src/main/java/com/yagubogu/place/dto/PlaceSyncResult.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-8
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/PlaceDetail.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-5
+backend/app/src/main/java/com/yagubogu/place/config/TourApiClientConfig.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-33
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlaceResponse.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-30
+backend/app/src/main/java/com/yagubogu/place/controller/v1/PlaceControllerInterface.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-36
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/PerformanceDetail.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-32
+backend/app/src/main/java/com/yagubogu/place/service/PlaceSyncService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-75
+backend/app/src/main/resources/db/migration/mysql/V17__add_victory_fairy_ranking_index.sql
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-2
+backend/app/src/test/java/com/yagubogu/place/service/PlaceStadiumSyncServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-229
+backend/app/src/test/java/com/yagubogu/support/base/E2eTestBase.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 69
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboScoardboardCrawler/KboScoreboardService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 36-37,47,63,115-116,118-127,131-133,136,138-139,172-177,226,304,308-314,316-320,322-335,339-346
+backend/app/src/main/java/com/yagubogu/game/service/BronzeGameService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 13-15,30,41-45,47,52-85,88,96,98-102,104-106,117-124,126-132,138,145,156
+backend/app/src/main/java/com/yagubogu/game/domain/GameState.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 6-7,18,36,40-66,75
+backend/app/src/main/java/com/yagubogu/place/client/TourApiClient.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-295
+backend/app/src/main/java/com/yagubogu/place/domain/Place.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-99
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/LodgingDetail.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-39
+backend/app/src/test/java/com/yagubogu/game/service/BronzeGameServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-98
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboScoardboardCrawler/KboScoreboardServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-120
+backend/app/src/test/java/com/yagubogu/place/config/TourApiPropertiesTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-53
+backend/app/src/test/java/com/yagubogu/admin/service/AdminCrawlingServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-44
+backend/crawling/src/test/java/yagubogu/crawling/game/scheduler/GameSchedulerTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-41
+backend/app/src/test/resources/application.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 67-76
+backend/app/docker-compose.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 12,42,47
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/KboScoreboardGame.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 12,37,51,65-82
+  s_475d306ae6f4f4::t_02fc98d2ceb282 83
+backend/app/src/main/resources/db/migration/mysql/V19__create_restaurants.sql
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-19
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 10,115,176,178,223,226,233,235-237,240-241,250-257
+  s_475d306ae6f4f4::t_92d89cf6e78705 258-259
+backend/app/src/test/java/com/yagubogu/place/client/TourApiClientTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-471
+backend/app/src/main/java/com/yagubogu/global/config/PipelineConfig.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 18,34,37
+backend/app/src/main/java/com/yagubogu/place/domain/PlaceCategory.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-27
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 53,66-71,74
+backend/app/src/main/java/com/yagubogu/game/domain/BronzeGame.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 15,37-39,72-73,81,94-108,119-147,153
+backend/app/src/main/java/com/yagubogu/place/config/TourApiProperties.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-39
+backend/app/src/main/resources/db/migration/mysql/V18__add_game_code_to_bronze_games.sql
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-3
+backend/app/src/main/java/com/yagubogu/place/controller/v1/PlaceController.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-26
+backend/app/Dockerfile
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 5-8,23
+backend/app/src/main/java/com/yagubogu/game/repository/GameRepository.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 34-40
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlaceDetailResponse.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-35
+backend/app/src/main/java/com/yagubogu/game/event/GameFinalizedEventHandler.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 31
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboScoreboardCrawlerTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 355-357
+backend/app/src/main/java/com/yagubogu/place/repository/PlaceRepository.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-13
+backend/crawling/Dockerfile.dev
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 5-8,20
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-74
+backend/app/src/main/java/com/yagubogu/place/service/PlaceQueryService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-98
+backend/app/src/main/java/com/yagubogu/game/service/GameEtlService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 33,51,61-81,84,121-126,138-150,157,164-166,194-197,206-224,295-296,302-303,305,307-309,319-320,330-336,338-339,349-351,362-363,385-424,501-502,507-525
+backend/crawling/Dockerfile.main
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 5-8,20
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPage.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 9-11,117,136,200-220
+  s_475d306ae6f4f4::t_9501a194a630d9 221-222
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlacesResponse.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-10
+backend/app/src/main/java/com/yagubogu/admin/service/AdminCrawlingService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 30,44,75
+backend/app/src/main/java/com/yagubogu/place/scheduler/PlacePollingScheduler.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-29
+backend/app/src/main/resources/db/migration/mysql/V20__generalize_restaurants_to_places.sql
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-13
+backend/app/src/main/java/com/yagubogu/place/dto/PlaceParam.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-13
+backend/app/src/main/java/com/yagubogu/admin/dto/AdminCrawlingGamesResponse.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 9
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/AttractionDetail.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-27
+backend/app/src/test/java/com/yagubogu/place/PlaceE2eTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-175
+backend/app/src/main/java/com/yagubogu/admin/controller/AdminController.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 8-9,16,32,53-64
+  s_475d306ae6f4f4::t_40478c78f0821e 65-66
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/FoodDetail.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-28
+backend/app/src/main/java/com/yagubogu/place/service/PlaceStadiumSyncService.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-125
+backend/app/src/main/resources/db/schema.sql
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 117
+backend/app/src/test/java/com/yagubogu/place/service/PlaceQueryServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-236
+backend/crawling/src/main/java/yagubogu/crawling/game/controller/KboCrawlerControllerInterface.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 44
+backend/app/docker-compose.db.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 11,17
+backend/crawling/src/main/java/yagubogu/crawling/game/scheduler/GameScheduler.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 42-44,57-77
+  s_475d306ae6f4f4::t_a0be2ac761f36a 78-79
+.github/workflows/backend-dev.yml
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 137
+backend/app/src/test/java/com/yagubogu/game/service/GameEtlServiceTest.java
+  s_475d306ae6f4f4::t_9cd7c5836c3e7c 1-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9b1af492f5708dc353a3ea58ad1a6f54ef4bcf45",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

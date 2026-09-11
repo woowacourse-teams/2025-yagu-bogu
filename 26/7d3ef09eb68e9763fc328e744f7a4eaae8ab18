@@ -1,0 +1,14 @@
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/GameCenterDetail.java
+  h_3dcfd613e97439 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "267d3ef09eb68e9763fc328e744f7a4eaae8ab18",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

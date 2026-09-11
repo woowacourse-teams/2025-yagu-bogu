@@ -1,0 +1,14 @@
+backend/app/src/main/resources/db/migration/mysql/V22__add_game_probable_pitchers.sql
+  h_3dcfd613e97439 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b50c28f1c0a192ce19dae35343d45a8bb4b0f722",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

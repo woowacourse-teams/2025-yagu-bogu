@@ -1,0 +1,179 @@
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncServiceTest.java
+  s_0cdd50137f8ae3::t_01c9ea136a69fe 3,8,29-76,93-104,117-118,121,127-136,138-151,154
+  s_0cdd50137f8ae3::t_1db35a834b207c 152-153
+  s_0cdd50137f8ae3::t_f51fe1a7a0d71f 155-157
+  s_0cdd50137f8ae3::t_b23424046d3afc 158-161
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboScoardboardCrawler/KboScoreboardServiceTest.java
+  s_0cdd50137f8ae3::t_998e41d309d28f 22,26-27,29-31,35,39,41,44,56,73,76,78-95,110,135
+  s_0cdd50137f8ae3::t_b7ab2465382bc8 96-98,107-109
+  s_0cdd50137f8ae3::t_7f1fcd76978fa6 111-113
+  s_0cdd50137f8ae3::t_ab15c60b2d2006 132-134
+  s_0cdd50137f8ae3::t_15d8826ffa6d15 136
+  s_0cdd50137f8ae3::t_f333d9cb89eef3 3-4,13-14,16-17,99-106,114-123,126,129-131,140-157
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
+  s_0cdd50137f8ae3::t_35e7c030ee2ec1 106-125
+  s_0cdd50137f8ae3::t_d3cbcc1d553fa6 105
+  s_0cdd50137f8ae3::t_b80c4538a8280d 67,135-140,143
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboScoardboardCrawler/KboScoreboardService.java
+  s_0cdd50137f8ae3::t_80da4955c280c3 281-288
+  s_0cdd50137f8ae3::t_8ae4e199b25529 36-37,47,63,115-116,118-127,131-133,136,138-139,172-177,229,322,326-332,334-338,340-353,357-364
+.github/workflows/backend-dev.yml
+  s_0cdd50137f8ae3::t_1edf15b1313406 137
+.github/workflows/backend-main.yml
+  s_0cdd50137f8ae3::t_a68c65d7242edc 188
+backend/app/Dockerfile
+  s_0cdd50137f8ae3::t_f515c96a305578 5-8,23
+backend/app/docker-compose.db.yml
+  s_0cdd50137f8ae3::t_f9ce720b7203bb 11,17
+backend/app/docker-compose.yml
+  s_0cdd50137f8ae3::t_31c04891e595fd 12,42,47
+backend/app/src/main/java/com/yagubogu/admin/controller/AdminController.java
+  s_0cdd50137f8ae3::t_243b4f732d9f14 8-9,16,32,53-66
+backend/app/src/main/java/com/yagubogu/admin/dto/AdminCrawlingGamesResponse.java
+  s_0cdd50137f8ae3::t_f0aca455f6a98f 9
+backend/app/src/main/java/com/yagubogu/admin/service/AdminCrawlingService.java
+  s_0cdd50137f8ae3::t_9ace4a5086587a 30,44,75
+backend/app/src/main/java/com/yagubogu/game/domain/BronzeGame.java
+  s_0cdd50137f8ae3::t_414aa300be425c 15,37-39,72-73,81,94-108,119-147,153
+backend/app/src/main/java/com/yagubogu/game/domain/Game.java
+  s_0cdd50137f8ae3::t_8dc12eadf48a9f 155-190
+backend/app/src/main/java/com/yagubogu/game/domain/GameState.java
+  s_0cdd50137f8ae3::t_7eaa74a1cbb0f7 6-7,18,36,40-66,75
+backend/app/src/main/java/com/yagubogu/game/event/GameFinalizedEventHandler.java
+  s_0cdd50137f8ae3::t_2456238e524624 31
+backend/app/src/main/java/com/yagubogu/game/repository/BronzeGameRepository.java
+  s_0cdd50137f8ae3::t_a75db318deb2a5 15-16,29-39,48-54
+backend/app/src/main/java/com/yagubogu/game/repository/GameRepository.java
+  s_0cdd50137f8ae3::t_c6d8971190bddc 34-40
+backend/app/src/main/java/com/yagubogu/game/service/BronzeGameService.java
+  s_0cdd50137f8ae3::t_0669d9c1f0f706 13-15,30,41-45,47,52-85,88,96,98-102,104-106,117-124,126-132,138,145,156
+backend/app/src/main/java/com/yagubogu/game/service/GameEtlService.java
+  s_0cdd50137f8ae3::t_87db5f93049785 33,51,61-81,84,121-126,138-150,157,164-166,194-197,206-224,295-296,302-303,305,307-309,319-320,330-336,338-339,349-351,362-363,385-424,501-502,507-525
+backend/app/src/main/java/com/yagubogu/global/config/PipelineConfig.java
+  s_0cdd50137f8ae3::t_601e408ef24185 18,34,37
+backend/app/src/main/java/com/yagubogu/place/client/TourApiClient.java
+  s_0cdd50137f8ae3::t_a5d339c04e0594 1-295
+backend/app/src/main/java/com/yagubogu/place/client/TourApiException.java
+  s_0cdd50137f8ae3::t_2e130b5aa7e04c 1-8
+backend/app/src/main/java/com/yagubogu/place/config/TourApiClientConfig.java
+  s_0cdd50137f8ae3::t_0cf01adb949831 1-33
+backend/app/src/main/java/com/yagubogu/place/config/TourApiProperties.java
+  s_0cdd50137f8ae3::t_b6067f43611e90 1-39
+backend/app/src/main/java/com/yagubogu/place/controller/v1/PlaceController.java
+  s_0cdd50137f8ae3::t_ef0c7d804a8cf8 1-26
+backend/app/src/main/java/com/yagubogu/place/controller/v1/PlaceControllerInterface.java
+  s_0cdd50137f8ae3::t_276f978dcd4d16 1-36
+backend/app/src/main/java/com/yagubogu/place/domain/Place.java
+  s_0cdd50137f8ae3::t_545c308ec01507 1-99
+backend/app/src/main/java/com/yagubogu/place/domain/PlaceCategory.java
+  s_0cdd50137f8ae3::t_feab79cb1c95cf 1-27
+backend/app/src/main/java/com/yagubogu/place/dto/PlaceParam.java
+  s_0cdd50137f8ae3::t_28c3522a829cb6 1-13
+backend/app/src/main/java/com/yagubogu/place/dto/PlaceSyncResult.java
+  s_0cdd50137f8ae3::t_b7afa7a2afbdad 1-8
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlaceDetailResponse.java
+  s_0cdd50137f8ae3::t_582c8f49282a8d 1-35
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlaceResponse.java
+  s_0cdd50137f8ae3::t_4ec777e567b757 1-30
+backend/app/src/main/java/com/yagubogu/place/dto/v1/PlacesResponse.java
+  s_0cdd50137f8ae3::t_561cd4d5e4526b 1-10
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/AttractionDetail.java
+  s_0cdd50137f8ae3::t_0730bbc486cf83 1-27
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/FoodDetail.java
+  s_0cdd50137f8ae3::t_dd405bc61853e4 1-28
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/LodgingDetail.java
+  s_0cdd50137f8ae3::t_e01f82990d9036 1-39
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/PerformanceDetail.java
+  s_0cdd50137f8ae3::t_19670c21b4dd61 1-32
+backend/app/src/main/java/com/yagubogu/place/dto/v1/detail/PlaceDetail.java
+  s_0cdd50137f8ae3::t_faf8c97372fdd3 1-5
+backend/app/src/main/java/com/yagubogu/place/repository/PlaceRepository.java
+  s_0cdd50137f8ae3::t_a2414d4d1ff4bf 1-13
+backend/app/src/main/java/com/yagubogu/place/scheduler/PlacePollingScheduler.java
+  s_0cdd50137f8ae3::t_b76f07d11f7072 1-29
+backend/app/src/main/java/com/yagubogu/place/service/PlaceQueryService.java
+  s_0cdd50137f8ae3::t_438f20b675ccc2 1-98
+backend/app/src/main/java/com/yagubogu/place/service/PlaceStadiumSyncService.java
+  s_0cdd50137f8ae3::t_c4f24abc5ce37a 1-125
+backend/app/src/main/java/com/yagubogu/place/service/PlaceSyncService.java
+  s_0cdd50137f8ae3::t_64973e7e3f9fa6 1-75
+backend/app/src/main/resources/application.yml
+  s_0cdd50137f8ae3::t_1c40a2f5f5559d 81-91
+backend/app/src/main/resources/db/migration/mysql/V17__add_victory_fairy_ranking_index.sql
+  s_0cdd50137f8ae3::t_d504aeaa0a478a 1-2
+backend/app/src/main/resources/db/migration/mysql/V18__add_game_code_to_bronze_games.sql
+  s_0cdd50137f8ae3::t_848c746cc15ab1 1-3
+backend/app/src/main/resources/db/migration/mysql/V19__create_restaurants.sql
+  s_0cdd50137f8ae3::t_41b65d3d36cc7a 1-19
+backend/app/src/main/resources/db/migration/mysql/V20__generalize_restaurants_to_places.sql
+  s_0cdd50137f8ae3::t_160614ba194c05 1-13
+backend/app/src/main/resources/db/schema.sql
+  s_0cdd50137f8ae3::t_fc928292611750 117
+backend/app/src/test/java/com/yagubogu/admin/service/AdminCrawlingServiceTest.java
+  s_0cdd50137f8ae3::t_5b7bfbd0b11515 1-44
+backend/app/src/test/java/com/yagubogu/game/domain/GameStateTest.java
+  s_0cdd50137f8ae3::t_99daf618455944 1-48
+backend/app/src/test/java/com/yagubogu/game/service/BronzeGameServiceTest.java
+  s_0cdd50137f8ae3::t_d264c57a42c226 1-98
+backend/app/src/test/java/com/yagubogu/game/service/GameEtlServiceTest.java
+  s_0cdd50137f8ae3::t_d5e2d45f58e351 1-178
+backend/app/src/test/java/com/yagubogu/place/PlaceE2eTest.java
+  s_0cdd50137f8ae3::t_b51829d454e503 1-175
+backend/app/src/test/java/com/yagubogu/place/client/TourApiClientTest.java
+  s_0cdd50137f8ae3::t_fffeba82c12d37 1-471
+backend/app/src/test/java/com/yagubogu/place/config/TourApiPropertiesTest.java
+  s_0cdd50137f8ae3::t_abd923b9e0d16d 1-53
+backend/app/src/test/java/com/yagubogu/place/service/PlaceQueryServiceTest.java
+  s_0cdd50137f8ae3::t_11052237f2c3d0 1-236
+backend/app/src/test/java/com/yagubogu/place/service/PlaceStadiumSyncServiceTest.java
+  s_0cdd50137f8ae3::t_b8909ae26c4c15 1-229
+backend/app/src/test/java/com/yagubogu/place/service/PlaceSyncServiceTest.java
+  s_0cdd50137f8ae3::t_3375fe0f8c6e14 1-127
+backend/app/src/test/java/com/yagubogu/support/base/E2eTestBase.java
+  s_0cdd50137f8ae3::t_d03958ad360b85 69
+backend/app/src/test/resources/application.yml
+  s_0cdd50137f8ae3::t_3d8f74511e5cbf 67-76
+backend/crawling/Dockerfile.dev
+  s_0cdd50137f8ae3::t_e453c4d2d1092d 5-8,20
+backend/crawling/Dockerfile.main
+  s_0cdd50137f8ae3::t_8edc76f6395fe4 5-8,20
+backend/crawling/src/main/java/yagubogu/crawling/game/controller/KboCrawlerControllerInterface.java
+  s_0cdd50137f8ae3::t_ae794fe0bde7fb 44
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/KboScoreboardGame.java
+  s_0cdd50137f8ae3::t_02c6be58a4994c 12,37,51,65-83
+backend/crawling/src/main/java/yagubogu/crawling/game/scheduler/GameScheduler.java
+  s_0cdd50137f8ae3::t_3b32c760ad5d9e 42-44,57-79
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPage.java
+  s_0cdd50137f8ae3::t_a442c19bf2f761 9-11,117,136,200-222
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_0cdd50137f8ae3::t_18125fed56a75b 10,115,176,178,223,226,233,235-237,240-241,250-259
+backend/crawling/src/test/java/yagubogu/crawling/game/scheduler/GameSchedulerTest.java
+  s_0cdd50137f8ae3::t_55d884c942f168 1-41
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboScoreboardCrawlerTest.java
+  s_0cdd50137f8ae3::t_ab44e931c1b3bb 355-357
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/page/KboScoreboardPageTest.java
+  s_0cdd50137f8ae3::t_157b7acd520ee0 253,403-405,415-417,493-495
+backend/crawling/src/test/java/yagubogu/crawling/game/service/poller/AdaptivePollerTest.java
+  s_0cdd50137f8ae3::t_22543c3f4990a8 1-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4edb6391924fb17f9642998de3f8223155ca3bc8",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_0cdd50137f8ae3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fb5823d3-1040-4208-9bbf-b20a2add3ad8",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+backend/docs/prediction-prd.md
+  s_e696ba7f2ae00a::t_b441f160c6fae2 55,57,62-63,112-113,116,256-257,264-270,274-281,283,306-308,311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f508d4d27b21dafb16255029437cceaa6a0de0a9",
+  "prompts": {},
+  "sessions": {
+    "s_e696ba7f2ae00a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa261-190d-7ae1-8e91-056d21f8d9a1",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

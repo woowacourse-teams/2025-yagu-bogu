@@ -1,0 +1,21 @@
+backend/app/src/main/java/com/yagubogu/reward/domain/GifticonIssuance.java
+  s_a6aceb99661642::t_3a172fd78d1083 77-79
+backend/app/src/test/java/com/yagubogu/reward/domain/GifticonIssuanceTest.java
+  s_a6aceb99661642::t_3a172fd78d1083 33-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "81bcfe09c8e8f6d386804e7cc5da64c6bbd924c5",
+  "prompts": {},
+  "sessions": {
+    "s_a6aceb99661642": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa264-7cc2-7a63-a00f-a6200a30d079",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

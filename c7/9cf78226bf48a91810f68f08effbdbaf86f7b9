@@ -1,0 +1,51 @@
+backend/app/src/main/java/com/yagubogu/game/dto/v1/LiveGamesResponse.java
+  s_351af5c42e2551::t_d3cda294da16de 61-63
+  s_351af5c42e2551::t_38e87c8c059307 1-60,64-119
+backend/app/src/main/java/com/yagubogu/game/dto/GameResultParam.java
+  s_351af5c42e2551::t_89ebf7742ae4d0 11,19
+backend/app/src/test/java/com/yagubogu/game/service/GameServiceTest.java
+  s_351af5c42e2551::t_2f59aef2bc6c0c 153
+backend/app/src/test/java/com/yagubogu/game/GameE2eTest.java
+  s_351af5c42e2551::t_d3cda294da16de 198-210,231,255-261
+  s_351af5c42e2551::t_9bb33efd7c3b0a 7,13,39,168,170,172-197,211-215,221,224,228,232-254
+backend/app/src/main/java/com/yagubogu/game/repository/GameRepository.java
+  s_351af5c42e2551::t_78e1d74158da04 87
+  s_351af5c42e2551::t_38e87c8c059307 79-86,88
+backend/app/src/main/java/com/yagubogu/game/controller/v1/GameControllerInterface.java
+  s_351af5c42e2551::t_38e87c8c059307 6,47,49,51-53
+backend/app/src/main/java/com/yagubogu/game/service/GameService.java
+  s_351af5c42e2551::t_78e1d74158da04 49
+  s_351af5c42e2551::t_38e87c8c059307 8,48,50-51
+  s_475d306ae6f4f4::t_0a109a6f1fc87c 52-53
+backend/app/src/main/java/com/yagubogu/game/controller/v1/GameController.java
+  s_351af5c42e2551::t_38e87c8c059307 7,44-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c79cf78226bf48a91810f68f08effbdbaf86f7b9",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_351af5c42e2551": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d8c-8ad9-78a2-aa38-8dcf25f62f92",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null
+    },
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

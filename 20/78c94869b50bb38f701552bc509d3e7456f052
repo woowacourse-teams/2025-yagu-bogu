@@ -1,0 +1,52 @@
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/page/KboGameCenterPage.java
+  s_351af5c42e2551::t_759d7e2cbcb5c3 7-9,17-18,176-178,183,192,194-197,199-201
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncServiceTest.java
+  s_351af5c42e2551::t_00fa32f8fa5b7e 13,106-107,113
+backend/crawling/src/main/java/yagubogu/crawling/game/dto/GameCenterDetail.java
+  s_351af5c42e2551::t_35ee435b82889b 3,47-48
+backend/app/src/main/java/com/yagubogu/game/domain/Game.java
+  s_351af5c42e2551::t_35ee435b82889b 101-107,247,251-253,259-260
+  s_351af5c42e2551::t_d3cda294da16de 244
+backend/app/src/main/java/com/yagubogu/game/domain/InningHalf.java
+  s_351af5c42e2551::t_35ee435b82889b 1-6
+backend/crawling/src/test/java/yagubogu/crawling/game/service/crawler/page/KboGameCenterPageTest.java
+  s_351af5c42e2551::t_00fa32f8fa5b7e 10,165-179
+  s_475d306ae6f4f4::t_d5114ff9fd1a6e 164
+  s_351af5c42e2551::t_af7f1743a9f3a0 180-181
+backend/crawling/src/main/java/yagubogu/crawling/game/service/crawler/KboGameCenterCrawler/GameCenterSyncService.java
+  s_351af5c42e2551::t_35ee435b82889b 75,105,109-111
+  s_475d306ae6f4f4::t_d5114ff9fd1a6e 60-61,77,81-83
+backend/app/src/test/java/com/yagubogu/game/domain/GameTest.java
+  s_351af5c42e2551::t_00fa32f8fa5b7e 21,39,41,47,54-55
+backend/app/src/main/resources/db/migration/mysql/V22__add_game_live_state.sql
+  s_475d306ae6f4f4::t_ce00884a60bb07 1,8-9,15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "2078c94869b50bb38f701552bc509d3e7456f052",
+  "prompts": {},
+  "humans": {
+    "h_3dcfd613e97439": {
+      "author": "Mint <audwl03071@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_351af5c42e2551": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d8c-8ad9-78a2-aa38-8dcf25f62f92",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null
+    },
+    "s_475d306ae6f4f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04d7e-67bf-7433-80df-bbbcdfe85f94",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+backend/app/src/main/resources/application.yml
+  s_1251cf9cc5d83d::t_38a40a15c6d127 79-80
+backend/app/src/main/java/com/yagubogu/reward/schedule/GifticonReconciliationScheduler.java
+  s_1251cf9cc5d83d::t_38a40a15c6d127 1-27
+backend/app/src/test/resources/application.yml
+  s_1251cf9cc5d83d::t_38a40a15c6d127 38-39
+backend/app/src/test/java/com/yagubogu/reward/schedule/GifticonReconciliationSchedulerTest.java
+  s_1251cf9cc5d83d::t_38a40a15c6d127 1-29
+backend/app/.env.example
+  s_1251cf9cc5d83d::t_38a40a15c6d127 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d84ea2a9f2636fa05e56686b597fc07b91c6031b",
+  "prompts": {},
+  "sessions": {
+    "s_1251cf9cc5d83d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa1f8-f910-7a22-97a2-210e0f5af573",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}

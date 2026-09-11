@@ -1,0 +1,28 @@
+backend/crawling/src/main/resources/application.yml
+  s_a99caf4f2401d3::t_7a28731638e9ec 41
+backend/crawling/src/test/java/yagubogu/crawling/game/service/poller/PollingIntervalTest.java
+  s_a99caf4f2401d3::t_dadf94d2acde30 23
+  s_a99caf4f2401d3::t_7a28731638e9ec 1-22,24-41
+backend/crawling/src/main/java/yagubogu/crawling/game/config/CrawlerSchedulerProperties.java
+  s_a99caf4f2401d3::t_7fdd9c28d53279 12
+  s_a99caf4f2401d3::t_7a28731638e9ec 18
+backend/crawling/src/main/java/yagubogu/crawling/game/service/poller/AdaptivePoller.java
+  s_a99caf4f2401d3::t_7a28731638e9ec 45
+  s_a99caf4f2401d3::t_dadf94d2acde30 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3f88f954b594bed383736560daafe704ff6a5a06",
+  "prompts": {},
+  "sessions": {
+    "s_a99caf4f2401d3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04cb1-e063-7042-ac21-c68e83268962",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Mint <audwl03071@gmail.com>"
+    }
+  }
+}
