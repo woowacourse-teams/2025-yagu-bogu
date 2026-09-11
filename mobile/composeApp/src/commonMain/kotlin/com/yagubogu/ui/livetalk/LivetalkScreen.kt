@@ -5,14 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yagubogu.ui.common.AdUnitIds
 import com.yagubogu.ui.common.component.BannerAd
 import com.yagubogu.ui.common.component.BannerAdType
+import com.yagubogu.ui.common.component.ToggleSwitch
 import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
 import com.yagubogu.ui.livetalk.component.ShimmerStadiumItem
@@ -34,8 +38,10 @@ import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.theme.Gray050
 import com.yagubogu.ui.theme.Gray400
+import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.util.BackPressHandler
+import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -43,9 +49,12 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.ic_refresh
 import yagubogu.composeapp.generated.resources.img_baseball_fly_error
+import yagubogu.composeapp.generated.resources.livetalk_auto_update
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_description
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_illustration_description
+import yagubogu.composeapp.generated.resources.livetalk_refresh_description
 import yagubogu.composeapp.generated.resources.livetalk_weather_source_info_text
 
 private const val BANNER_AD_INDEX = 3
@@ -77,6 +86,8 @@ fun LivetalkScreen(
         else -> {
             LivetalkScreen(
                 uiState = uiState,
+                onAutoUpdateToggle = viewModel::toggleAutoUpdateState,
+                onRefreshClick = viewModel::refreshLiveGames,
                 onItemClick = { item: LivetalkStadiumUiModel ->
                     onLivetalkItemClick(item.gameId, item.isVerified)
                 },
@@ -106,6 +117,8 @@ private fun ShimmerLivetalkScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun LivetalkScreen(
     uiState: LivetalkUiState,
+    onAutoUpdateToggle: (Boolean) -> Unit,
+    onRefreshClick: () -> Unit,
     onItemClick: (LivetalkStadiumUiModel) -> Unit,
     modifier: Modifier = Modifier,
     scrollToTopEvent: SharedFlow<Unit> = MutableSharedFlow(),
@@ -119,54 +132,60 @@ private fun LivetalkScreen(
         }
     }
 
-    LazyColumn(
-        state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding =
-            PaddingValues(
-                top = 8.dp,
-                bottom = 20.dp,
-                start = 20.dp,
-                end = 20.dp,
-            ),
+    Column(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Gray050),
+                .background(Gray050)
+                .padding(horizontal = 20.dp),
     ) {
-        items(
-            count = uiState.stadiums.size + if (showBannerAd) 1 else 0,
-            key = { index: Int ->
+        LiveUpdateRow(
+            isAutoUpdateOn = uiState.isAutoUpdateOn,
+            onAutoUpdateToggle = onAutoUpdateToggle,
+            onRefreshClick = onRefreshClick,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        )
+
+        LazyColumn(
+            state = lazyListState,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 4.dp, bottom = 20.dp),
+        ) {
+            items(
+                count = uiState.stadiums.size + if (showBannerAd) 1 else 0,
+                key = { index: Int ->
+                    if (showBannerAd && index == BANNER_AD_INDEX) {
+                        "livetalk_banner_ad"
+                    } else {
+                        val itemIndex =
+                            if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
+                        uiState.stadiums[itemIndex].gameId
+                    }
+                },
+            ) { index: Int ->
                 if (showBannerAd && index == BANNER_AD_INDEX) {
-                    "livetalk_banner_ad"
+                    BannerAd(
+                        adUnitId = AdUnitIds.livetalkBanner,
+                        bannerAdType = BannerAdType.LARGE_BANNER,
+                    )
                 } else {
                     val itemIndex =
                         if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                    uiState.stadiums[itemIndex].gameId
+                    LivetalkStadiumItem(item = uiState.stadiums[itemIndex], onClick = onItemClick)
                 }
-            },
-        ) { index: Int ->
-            if (showBannerAd && index == BANNER_AD_INDEX) {
-                BannerAd(
-                    adUnitId = AdUnitIds.livetalkBanner,
-                    bannerAdType = BannerAdType.LARGE_BANNER,
-                )
-            } else {
-                val itemIndex = if (showBannerAd && index > BANNER_AD_INDEX) index - 1 else index
-                LivetalkStadiumItem(item = uiState.stadiums[itemIndex], onClick = onItemClick)
             }
-        }
-        if (uiState.isWeatherLoaded) {
-            item {
-                Text(
-                    text = stringResource(Res.string.livetalk_weather_source_info_text),
-                    style = PretendardMedium.copy(fontSize = 12.sp, color = Gray400),
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                    textAlign = TextAlign.Start,
-                )
+            if (uiState.isWeatherLoaded) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.livetalk_weather_source_info_text),
+                        style = PretendardMedium.copy(fontSize = 12.sp, color = Gray400),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp),
+                        textAlign = TextAlign.Start,
+                    )
+                }
             }
         }
     }
@@ -198,6 +217,43 @@ private fun EmptyLivetalkScreen(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+private fun LiveUpdateRow(
+    isAutoUpdateOn: Boolean,
+    onAutoUpdateToggle: (Boolean) -> Unit,
+    onRefreshClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(Res.string.livetalk_auto_update),
+                style = PretendardMedium.copy(fontSize = 14.sp, color = Gray500),
+            )
+            ToggleSwitch(
+                isOn = isAutoUpdateOn,
+                onClick = onAutoUpdateToggle,
+            )
+        }
+        Icon(
+            painter = painterResource(Res.drawable.ic_refresh),
+            contentDescription = stringResource(Res.string.livetalk_refresh_description),
+            tint = Gray500,
+            modifier =
+                Modifier
+                    .size(20.dp)
+                    .noRippleClickable { onRefreshClick() },
+        )
+    }
+}
+
 @Preview("현장톡 화면")
 @Composable
 private fun LivetalkScreenPreview() {
@@ -205,9 +261,12 @@ private fun LivetalkScreenPreview() {
         uiState =
             LivetalkUiState(
                 isLoading = false,
+                isAutoUpdateOn = true,
                 stadiums = LIVETALK_STADIUMS.toImmutableList(),
                 isWeatherLoaded = true,
             ),
+        onAutoUpdateToggle = {},
+        onRefreshClick = {},
         onItemClick = {},
     )
 }

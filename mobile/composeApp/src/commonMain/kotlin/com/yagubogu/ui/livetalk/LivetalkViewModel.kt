@@ -19,13 +19,16 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -42,29 +45,54 @@ class LivetalkViewModel(
 
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
 
+    private val isAutoUpdateOn = MutableStateFlow(true)
+
+    private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    /**
+     * 자동 업데이트가 켜져 있으면 [pollLiveGames]로 반복 조회하고, 꺼져 있으면 [fetchLiveGames]로 한 번만 조회합니다.
+     *
+     * 날짜·자동 업데이트 여부·수동 새로고침 중 무엇이 바뀌든 진행 중인 조회를 버리고
+     * 새로 시작하므로, 새로고침을 누르면 다음 주기를 기다리지 않고 즉시 갱신됩니다.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     private val liveGames: StateFlow<List<LiveGameStateUiModel>?> =
-        selectedDate
-            .flatMapLatest { date: LocalDate -> pollLiveGames(date) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MILLIS),
-                initialValue = null,
-            )
+        combine(
+            selectedDate,
+            isAutoUpdateOn,
+            // 첫 수집 때도 흘려보내야 combine이 시작된다
+            refreshRequests.onStart { emit(Unit) },
+        ) { date: LocalDate, isAutoUpdateOn: Boolean, _: Unit ->
+            date to isAutoUpdateOn
+        }.flatMapLatest { (date: LocalDate, isAutoUpdateOn: Boolean) ->
+            if (isAutoUpdateOn) {
+                pollLiveGames(date)
+            } else {
+                flow {
+                    fetchLiveGames(date)?.let { emit(it) }
+                }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MILLIS),
+            initialValue = null,
+        )
 
     private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
 
     val uiState: StateFlow<LivetalkUiState> =
-        combine(games, liveGames, weathers) {
+        combine(games, liveGames, weathers, isAutoUpdateOn) {
             games: List<GameCheckInUiModel>?,
             liveGames: List<LiveGameStateUiModel>?,
             weathers: List<WeatherUiModel>,
+            isAutoUpdateOn: Boolean,
             ->
             if (games == null || liveGames == null) {
-                LivetalkUiState(isLoading = true)
+                LivetalkUiState(isLoading = true, isAutoUpdateOn = isAutoUpdateOn)
             } else {
                 LivetalkUiState(
                     isLoading = false,
+                    isAutoUpdateOn = isAutoUpdateOn,
                     stadiums =
                         GameUiMapper
                             .mapToLivetalkUiModels(
@@ -98,6 +126,14 @@ class LivetalkViewModel(
         }
     }
 
+    fun toggleAutoUpdateState(isOn: Boolean) {
+        isAutoUpdateOn.update { isOn }
+    }
+
+    fun refreshLiveGames() {
+        refreshRequests.tryEmit(Unit)
+    }
+
     private fun fetchWeathers(stadiumIds: List<Long>) {
         if (stadiumIds.isEmpty()) return
 
@@ -112,23 +148,24 @@ class LivetalkViewModel(
         }
     }
 
+    private suspend fun fetchLiveGames(date: LocalDate): List<LiveGameStateUiModel>? =
+        gameRepository
+            .getLiveGames(date)
+            .mapList { it.toUiModel() }
+            .onFailure { exception: Throwable ->
+                logger.w(exception) { "실시간 경기 API 호출 실패" }
+            }.getOrNull()
+
     private fun pollLiveGames(date: LocalDate): Flow<List<LiveGameStateUiModel>> =
         flow {
             while (true) {
-                val result: List<LiveGameStateUiModel>? =
-                    gameRepository
-                        .getLiveGames(date)
-                        .mapList { it.toUiModel() }
-                        .onSuccess { liveGames: List<LiveGameStateUiModel> ->
-                            emit(liveGames)
-                        }.onFailure { exception: Throwable ->
-                            logger.w(exception) { "실시간 경기 API 호출 실패" }
-                        }.getOrNull()
+                val result: List<LiveGameStateUiModel>? = fetchLiveGames(date)
 
                 if (result == null) {
                     delay(POLLING_INTERVAL_MILLIS)
                     continue
                 }
+                emit(result)
 
                 val nextDelay: Long = nextPollingDelayMillis(result) ?: return@flow
                 delay(nextDelay)
@@ -146,7 +183,8 @@ class LivetalkViewModel(
                 .minOfOrNull { it.startAt }
                 ?: return null
 
-        val secondsUntilStart: Int = earliestStartAt.toSecondOfDay() - LocalTime.now(clock).toSecondOfDay()
+        val secondsUntilStart: Int =
+            earliestStartAt.toSecondOfDay() - LocalTime.now(clock).toSecondOfDay()
         return (secondsUntilStart * MILLIS_PER_SECOND).coerceAtLeast(POLLING_INTERVAL_MILLIS)
     }
 
