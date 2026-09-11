@@ -1,13 +1,11 @@
 package com.yagubogu.ui.livetalk.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,43 +16,54 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yagubogu.ui.livetalk.model.Condition
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.domain.model.WeatherCondition
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
-import com.yagubogu.ui.livetalk.model.toResource
-import com.yagubogu.ui.livetalk.model.toStringResource
-import com.yagubogu.ui.theme.EsamanruMedium
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardBold
-import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
-import com.yagubogu.ui.theme.dpToSp
-import com.yagubogu.ui.util.color
-import com.yagubogu.ui.util.mascot
 import com.yagubogu.ui.util.noRippleClickable
 import com.yagubogu.ui.util.shimmerLoading
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.ic_arrow_right
 import yagubogu.composeapp.generated.resources.ic_users
+import yagubogu.composeapp.generated.resources.ic_weather_clear
+import yagubogu.composeapp.generated.resources.ic_weather_cloudy
+import yagubogu.composeapp.generated.resources.ic_weather_heavy_rain
+import yagubogu.composeapp.generated.resources.ic_weather_light_rain
+import yagubogu.composeapp.generated.resources.ic_weather_partly_cloudy
+import yagubogu.composeapp.generated.resources.ic_weather_rain_snow
+import yagubogu.composeapp.generated.resources.ic_weather_snow
+import yagubogu.composeapp.generated.resources.ic_weather_strong_wind
+import yagubogu.composeapp.generated.resources.ic_weather_thunderstorm
 import yagubogu.composeapp.generated.resources.livetalk_stadium_select_arrow_description
 import yagubogu.composeapp.generated.resources.livetalk_user_icon_description
 import yagubogu.composeapp.generated.resources.livetalk_weather_icon_description
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_clear
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_cloudy
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_heavy_rain
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_light_rain
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_partly_cloudy
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_rain_snow
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_snow
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_strong_wind
+import yagubogu.composeapp.generated.resources.livetalk_weather_type_thunderstorm
 
 @Composable
 fun LivetalkStadiumItem(
-    item: LivetalkStadiumItem,
-    onClick: (LivetalkStadiumItem) -> Unit,
+    item: LivetalkStadiumUiModel,
+    onClick: (LivetalkStadiumUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -63,20 +72,21 @@ fun LivetalkStadiumItem(
                 .fillMaxWidth()
                 .background(color = White, RoundedCornerShape(12.dp))
                 .border(
-                    1.dp,
-                    if (item.isVerified) Primary500 else Gray100,
-                    RoundedCornerShape(12.dp),
+                    width = 1.dp,
+                    color = if (item.isVerified) Primary500 else Gray100,
+                    shape = RoundedCornerShape(12.dp),
                 ).noRippleClickable { onClick(item) }
                 .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1.0f),
             ) {
                 Text(
                     text = item.stadiumName,
@@ -91,17 +101,7 @@ fun LivetalkStadiumItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (item.weatherUiModel != null) {
-                        val weatherStatusText =
-                            stringResource(item.weatherUiModel.condition.toStringResource())
-                        IconWithText(
-                            icon = item.weatherUiModel.condition.toResource(),
-                            iconDescription =
-                                stringResource(
-                                    Res.string.livetalk_weather_icon_description,
-                                    weatherStatusText,
-                                ),
-                            text = item.weatherUiModel.temperatureText,
-                        )
+                        WeatherIconWithText(weather = item.weatherUiModel)
                     }
 
                     IconWithText(
@@ -119,28 +119,8 @@ fun LivetalkStadiumItem(
                 modifier = Modifier.size(20.dp),
             )
         }
-        Spacer(modifier = Modifier.height(20.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TeamItem(
-                name = item.awayTeam.shortname,
-                mascot = item.awayTeam.mascot,
-                teamColor = item.awayTeam.color,
-                modifier = Modifier.weight(1.0f),
-            )
-            Text(
-                text = "vs",
-                style = PretendardMedium.copy(fontSize = 20.dpToSp, color = Gray500),
-            )
-            TeamItem(
-                name = item.homeTeam.shortname,
-                mascot = item.homeTeam.mascot,
-                teamColor = item.homeTeam.color,
-                modifier = Modifier.weight(1.0f),
-            )
-        }
+        LiveGameState(liveGameState = item.liveGameState)
     }
 }
 
@@ -152,6 +132,22 @@ fun ShimmerStadiumItem(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .height(142.dp)
                 .shimmerLoading(12.dp),
+    )
+}
+
+@Composable
+private fun WeatherIconWithText(weather: WeatherUiModel) {
+    val icon: DrawableResource = weather.condition.toResource() ?: return
+    val conditionResource: StringResource = weather.condition.toStringResource() ?: return
+
+    IconWithText(
+        icon = icon,
+        iconDescription =
+            stringResource(
+                Res.string.livetalk_weather_icon_description,
+                stringResource(conditionResource),
+            ),
+        text = weather.temperatureText,
     )
 }
 
@@ -180,35 +176,39 @@ private fun IconWithText(
     }
 }
 
-@Composable
-private fun TeamItem(
-    name: String,
-    mascot: DrawableResource,
-    teamColor: Color,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(mascot),
-            contentDescription = null,
-            modifier = Modifier.size(40.dp),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = name,
-            style = EsamanruMedium.copy(fontSize = 14.sp, color = teamColor),
-        )
+private fun WeatherCondition.toResource(): DrawableResource? =
+    when (this) {
+        WeatherCondition.CLEAR -> Res.drawable.ic_weather_clear
+        WeatherCondition.CLOUDY -> Res.drawable.ic_weather_cloudy
+        WeatherCondition.HEAVY_RAIN -> Res.drawable.ic_weather_heavy_rain
+        WeatherCondition.LIGHT_RAIN -> Res.drawable.ic_weather_light_rain
+        WeatherCondition.PARTLY_CLOUDY -> Res.drawable.ic_weather_partly_cloudy
+        WeatherCondition.RAIN_SNOW -> Res.drawable.ic_weather_rain_snow
+        WeatherCondition.SNOW -> Res.drawable.ic_weather_snow
+        WeatherCondition.STRONG_WIND -> Res.drawable.ic_weather_strong_wind
+        WeatherCondition.THUNDERSTORM -> Res.drawable.ic_weather_thunderstorm
+        WeatherCondition.UNKNOWN -> null
     }
-}
+
+private fun WeatherCondition.toStringResource(): StringResource? =
+    when (this) {
+        WeatherCondition.CLEAR -> Res.string.livetalk_weather_type_clear
+        WeatherCondition.CLOUDY -> Res.string.livetalk_weather_type_cloudy
+        WeatherCondition.HEAVY_RAIN -> Res.string.livetalk_weather_type_heavy_rain
+        WeatherCondition.LIGHT_RAIN -> Res.string.livetalk_weather_type_light_rain
+        WeatherCondition.PARTLY_CLOUDY -> Res.string.livetalk_weather_type_partly_cloudy
+        WeatherCondition.RAIN_SNOW -> Res.string.livetalk_weather_type_rain_snow
+        WeatherCondition.SNOW -> Res.string.livetalk_weather_type_snow
+        WeatherCondition.STRONG_WIND -> Res.string.livetalk_weather_type_strong_wind
+        WeatherCondition.THUNDERSTORM -> Res.string.livetalk_weather_type_thunderstorm
+        WeatherCondition.UNKNOWN -> null
+    }
 
 @Preview
 @Composable
 private fun LivetalkStadiumItemVerifiedPreview() {
     LivetalkStadiumItem(
-        item = LIVETALK_STADIUM_ITEM_VERIFIED,
+        item = LIVETALK_STADIUM_VERIFIED,
         onClick = {},
     )
 }
@@ -217,15 +217,7 @@ private fun LivetalkStadiumItemVerifiedPreview() {
 @Composable
 private fun LivetalkStadiumItemUnVerifiedPreview() {
     LivetalkStadiumItem(
-        item =
-            LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(
-                weatherUiModel =
-                    WeatherUiModel(
-                        1,
-                        Condition.Clear,
-                        "12.3°C",
-                    ),
-            ),
+        item = LIVETALK_STADIUM_UNVERIFIED,
         onClick = {},
     )
 }

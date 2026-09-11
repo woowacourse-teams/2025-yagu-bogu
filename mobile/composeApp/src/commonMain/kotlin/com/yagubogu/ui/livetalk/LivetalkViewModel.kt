@@ -3,80 +3,291 @@ package com.yagubogu.ui.livetalk
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import com.yagubogu.data.dto.response.stadium.StadiumWeatherResponse
 import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.domain.model.Team
+import com.yagubogu.ui.livetalk.model.GameSummary
+import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
+import com.yagubogu.ui.livetalk.model.LiveGamesSnapshot
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
+import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
-import com.yagubogu.ui.mapper.toLivetalkUiModel
+import com.yagubogu.ui.mapper.GameUiMapper
+import com.yagubogu.ui.mapper.GameUiMapper.toUiModel
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
+import com.yagubogu.ui.util.throttle
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 class LivetalkViewModel(
     private val gameRepository: GameRepository,
     private val stadiumRepository: StadiumRepository,
+    private val memberRepository: MemberRepository,
     private val clock: Clock,
 ) : ViewModel() {
     private val logger = Logger.withTag("LivetalkViewModel")
 
-    private val _stadiumItems = MutableStateFlow<List<LivetalkStadiumItem>?>(null)
-    val stadiumItems: StateFlow<List<LivetalkStadiumItem>?> = _stadiumItems.asStateFlow()
+    private val selectedDate = MutableStateFlow(LocalDate.now(clock))
+    private val games = MutableStateFlow<List<GameSummary>?>(null)
+    private val isAutoUpdateOn = MutableStateFlow(true)
+    private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val myTeam = MutableStateFlow<Team?>(null)
 
-    private val _isWeatherLoaded = MutableStateFlow(false)
-    val isWeatherLoaded: StateFlow<Boolean> = _isWeatherLoaded.asStateFlow()
+    /**
+     * 자동 업데이트가 켜져 있으면 [pollLiveGames]로 반복 조회하고, 꺼져 있으면 [fetchLiveGames]로 한 번만 조회한다.
+     *
+     * 날짜·자동 업데이트 여부·수동 새로고침 중 무엇이 바뀌든 진행 중인 조회를 버리고 새로 시작하므로,
+     * 새로고침을 누르면 다음 주기를 기다리지 않고 즉시 갱신된다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val liveGames: StateFlow<LiveGamesSnapshot?> =
+        combine(
+            selectedDate,
+            isAutoUpdateOn,
+            // 첫 수집 때도 흘려보내야 combine이 시작된다
+            refreshRequests
+                .onStart { emit(Unit) }
+                .throttle(REFRESH_THROTTLE_MILLIS),
+        ) { date: LocalDate, isAutoUpdateOn: Boolean, _: Unit ->
+            date to isAutoUpdateOn
+        }.flatMapLatest { (date: LocalDate, isAutoUpdateOn: Boolean) ->
+            if (isAutoUpdateOn) {
+                pollLiveGames(date)
+            } else {
+                flow {
+                    fetchLiveGames(date)?.let {
+                        emit(LiveGamesSnapshot(games = it, nextUpdateAt = null))
+                    }
+                }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MILLIS),
+            initialValue = null,
+        )
+
+    /**
+     * 다음 갱신까지 남은 초를 1초마다 내보낸다. 표시할 예정이 없으면 `null`
+     *
+     * 자동 업데이트가 꺼져 있으면 예정 시각과 무관하게 표시하지 않는다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val secondsUntilNextUpdate: Flow<Int?> =
+        combine(
+            isAutoUpdateOn,
+            liveGames,
+        ) { isAutoUpdateOn: Boolean, liveGames: LiveGamesSnapshot? ->
+            liveGames?.nextUpdateAt?.takeIf { isAutoUpdateOn }
+        }.flatMapLatest { nextUpdateAt: Instant? ->
+            if (nextUpdateAt == null) flowOf(null) else countdown(nextUpdateAt)
+        }
+
+    private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
+
+    private val stadiums: Flow<ImmutableList<LivetalkStadiumUiModel>?> =
+        combine(games, liveGames, weathers, myTeam) {
+            games: List<GameSummary>?,
+            liveGames: LiveGamesSnapshot?,
+            weathers: List<WeatherUiModel>,
+            myTeam: Team?,
+            ->
+            if (games == null || liveGames == null) {
+                null
+            } else {
+                GameUiMapper
+                    .mapToLivetalkUiModels(
+                        games = games,
+                        liveGames = liveGames.games,
+                        weathers = weathers,
+                    ).sortedByPriority(myTeam)
+                    .toImmutableList()
+            }
+        }
+
+    val uiState: StateFlow<LivetalkUiState> =
+        combine(stadiums, weathers, isAutoUpdateOn, secondsUntilNextUpdate) {
+            stadiums: ImmutableList<LivetalkStadiumUiModel>?,
+            weathers: List<WeatherUiModel>,
+            isAutoUpdateOn: Boolean,
+            secondsUntilNextUpdate: Int?,
+            ->
+            if (stadiums == null) {
+                LivetalkUiState(isLoading = true, isAutoUpdateOn = isAutoUpdateOn)
+            } else {
+                LivetalkUiState(
+                    isLoading = false,
+                    isAutoUpdateOn = isAutoUpdateOn,
+                    stadiums = stadiums,
+                    isWeatherLoaded = weathers.isNotEmpty(),
+                    secondsUntilNextUpdate = secondsUntilNextUpdate,
+                )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MILLIS),
+            initialValue = LivetalkUiState(isLoading = true),
+        )
 
     fun fetchGames(date: LocalDate = LocalDate.now(clock)) {
+        selectedDate.value = date
+        fetchMyTeam()
+
         viewModelScope.launch {
-            val previousWeather: Map<Long, WeatherUiModel?> =
-                _stadiumItems.value?.associate { it.stadiumId to it.weatherUiModel } ?: emptyMap()
-
-            val gamesResult: Result<List<LivetalkStadiumItem>> =
-                gameRepository.getGames(date).mapList { it.toLivetalkUiModel() }
-            gamesResult
-                .onSuccess { livetalkStadiumItems: List<LivetalkStadiumItem> ->
-                    val itemsWithPreviousWeather =
-                        livetalkStadiumItems.map { item ->
-                            item.copy(weatherUiModel = previousWeather[item.stadiumId])
-                        }
-                    _stadiumItems.value = sortStadiumsByVerification(itemsWithPreviousWeather)
-
-                    fetchWeather()
+            gameRepository
+                .getGames(date)
+                .mapList { it.toUiModel() }
+                .onSuccess { result: List<GameSummary> ->
+                    games.value = result
+                    fetchWeathers(result.map { it.stadiumId })
                 }.onFailure { exception: Throwable ->
-                    logger.w(exception) { "API 호출 실패" }
+                    logger.w(exception) { "경기 목록 API 호출 실패" }
                 }
         }
     }
 
-    private suspend fun fetchWeather() {
-        val ids = _stadiumItems.value?.map { it.stadiumId } ?: return
-        stadiumRepository
-            .getStadiumWeather(ids)
-            .onSuccess { stadiumWeatherResponse: StadiumWeatherResponse ->
-                val weatherUiModels: Map<Long, WeatherUiModel> = stadiumWeatherResponse.toUiModel()
-                if (weatherUiModels.isNotEmpty()) {
-                    _isWeatherLoaded.value = true
-                    _stadiumItems.value =
-                        _stadiumItems.value?.map { livetalkStadiumItem ->
-                            livetalkStadiumItem.copy(weatherUiModel = weatherUiModels[livetalkStadiumItem.stadiumId])
-                        }
-                }
-            }.onFailure {
-                logger.w(it) { "날씨 API 호출 실패" }
-            }
+    fun toggleAutoUpdateState(isOn: Boolean) {
+        isAutoUpdateOn.update { isOn }
     }
 
-    private fun sortStadiumsByVerification(livetalkStadiumItems: List<LivetalkStadiumItem>): List<LivetalkStadiumItem> {
-        val (verifiedItems, unverifiedItems) =
-            livetalkStadiumItems.partition { liveTalkStadiumItem: LivetalkStadiumItem ->
-                liveTalkStadiumItem.isVerified
+    fun refreshLiveGames() {
+        refreshRequests.tryEmit(Unit)
+    }
+
+    private fun fetchMyTeam() {
+        viewModelScope.launch {
+            memberRepository
+                .getFavoriteTeam()
+                .onSuccess { teamCode: String? ->
+                    myTeam.value =
+                        teamCode?.let {
+                            runCatching { Team.getByCode(it) }.getOrNull()
+                        }
+                }.onFailure { exception: Throwable ->
+                    logger.w(exception) { "응원팀 조회 실패" }
+                }
+        }
+    }
+
+    private fun fetchWeathers(stadiumIds: List<Long>) {
+        if (stadiumIds.isEmpty()) return
+
+        viewModelScope.launch {
+            stadiumRepository
+                .getStadiumWeather(stadiumIds)
+                .map { it.toUiModel() }
+                .onSuccess { result: List<WeatherUiModel> -> weathers.value = result }
+                .onFailure { exception: Throwable ->
+                    logger.w(exception) { "날씨 API 호출 실패" }
+                }
+        }
+    }
+
+    private suspend fun fetchLiveGames(date: LocalDate): List<LiveGameStateUiModel>? =
+        gameRepository
+            .getLiveGames(date)
+            .mapList { it.toUiModel() }
+            .onFailure { exception: Throwable ->
+                logger.w(exception) { "실시간 경기 API 호출 실패" }
+            }.getOrNull()
+
+    private fun pollLiveGames(date: LocalDate): Flow<LiveGamesSnapshot> =
+        flow {
+            while (true) {
+                val result: List<LiveGameStateUiModel>? = fetchLiveGames(date)
+
+                if (result == null) {
+                    delay(POLLING_INTERVAL_MILLIS)
+                    continue
+                }
+
+                val nextDelay: Long? = nextPollingDelayMillis(result)
+                emit(
+                    LiveGamesSnapshot(
+                        games = result,
+                        nextUpdateAt = nextDelay?.let { clock.now() + it.milliseconds },
+                    ),
+                )
+
+                if (nextDelay == null) return@flow
+                delay(nextDelay)
             }
-        return verifiedItems + unverifiedItems
+        }
+
+    private fun countdown(target: Instant): Flow<Int?> =
+        flow {
+            while (true) {
+                val remainingMillis: Long = (target - clock.now()).inWholeMilliseconds
+                when {
+                    remainingMillis <= 0L -> {
+                        emit(null)
+                        return@flow
+                    }
+
+                    remainingMillis > POLLING_INTERVAL_MILLIS -> {
+                        emit(null)
+                        delay(remainingMillis - POLLING_INTERVAL_MILLIS)
+                    }
+
+                    else -> {
+                        emit(((remainingMillis + MILLIS_PER_SECOND - 1) / MILLIS_PER_SECOND).toInt())
+                        delay(MILLIS_PER_SECOND)
+                    }
+                }
+            }
+        }
+
+    private fun nextPollingDelayMillis(liveGames: List<LiveGameStateUiModel>): Long? {
+        val hasOngoingGame: Boolean =
+            liveGames.any { it is LiveGameStateUiModel.Live || it is LiveGameStateUiModel.Unknown }
+        if (hasOngoingGame) return POLLING_INTERVAL_MILLIS
+
+        val earliestStartAt: LocalTime =
+            liveGames
+                .filterIsInstance<LiveGameStateUiModel.Scheduled>()
+                .minOfOrNull { it.startAt }
+                ?: return null
+
+        val secondsUntilStart: Int =
+            earliestStartAt.toSecondOfDay() - LocalTime.now(clock).toSecondOfDay()
+        return (secondsUntilStart * MILLIS_PER_SECOND).coerceAtLeast(POLLING_INTERVAL_MILLIS)
+    }
+
+    private fun List<LivetalkStadiumUiModel>.sortedByPriority(myTeam: Team?): List<LivetalkStadiumUiModel> =
+        sortedWith(
+            compareByDescending<LivetalkStadiumUiModel> { it.isVerified }
+                .thenByDescending { it.isMyTeamGame(myTeam) },
+        )
+
+    private fun LivetalkStadiumUiModel.isMyTeamGame(myTeam: Team?): Boolean =
+        myTeam != null && myTeam in listOf(liveGameState.awayTeam, liveGameState.homeTeam)
+
+    companion object {
+        private const val MILLIS_PER_SECOND = 1_000L
+        private const val POLLING_INTERVAL_MILLIS = 15_000L
+        private const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
+        private const val REFRESH_THROTTLE_MILLIS = 5_000L
     }
 }

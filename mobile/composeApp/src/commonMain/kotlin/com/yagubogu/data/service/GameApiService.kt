@@ -4,6 +4,7 @@ import com.yagubogu.data.dto.request.game.LikeBatchRequest
 import com.yagubogu.data.dto.response.game.GameDatesResponse
 import com.yagubogu.data.dto.response.game.GameResponse
 import com.yagubogu.data.dto.response.game.LikeCountsResponse
+import com.yagubogu.data.dto.response.game.LiveGamesResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
@@ -15,6 +16,11 @@ interface GameApiService {
     suspend fun getGames(
         @Query("date") date: String,
     ): GameResponse
+
+    @GET("/api/v1/games/live")
+    suspend fun getLiveGames(
+        @Query("date") date: String,
+    ): LiveGamesResponse
 
     @GET("/api/v1/games/dates")
     suspend fun getGameDates(

@@ -47,7 +47,9 @@ val TeamNc = Color(0xFF315288)
 val TeamKiwoom = Color(0xFF570514)
 
 // Special Colors
-val Red = Color(0xFFFF2C2C)
+val Red = Color(0xFFFF383C)
+val Yellow = Color(0xFFFFCC00)
+val Green = Color(0xFF34C759)
 
 val Rose = Color(0xFF8D192B)
 val Gold = Color(0xFFC9B037)
