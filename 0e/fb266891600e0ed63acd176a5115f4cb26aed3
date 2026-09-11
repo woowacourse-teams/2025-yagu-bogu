@@ -1,0 +1,26 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/LivetalkViewModel.kt
+  s_3282d4001420fb::t_8cecd44d2df822 12
+  s_3282d4001420fb::t_f447ae9add8ce8 66,81-83,92-100,102-106
+  s_3282d4001420fb::t_f0873957392dec 113,123
+  s_3282d4001420fb::t_1be3f0bd77000b 216,226-234
+  s_3282d4001420fb::t_c06e27de9a48e8 101
+  s_3282d4001420fb::t_5fed577d53ece5 107
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/model/LiveGamesSnapshot.kt
+  s_3282d4001420fb::t_7ada829b89554b 3,5-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "0efb266891600e0ed63acd176a5115f4cb26aed3",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jiyun Lee <02leejiyun@naver.com>"
+    }
+  }
+}
