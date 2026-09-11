@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.yagubogu.data.repository.game.GameRepository
+import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
+import com.yagubogu.domain.model.Team
 import com.yagubogu.ui.livetalk.model.GameCheckInUiModel
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
@@ -16,6 +18,7 @@ import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
 import com.yagubogu.ui.util.throttle
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -41,6 +44,7 @@ import kotlin.time.Instant
 class LivetalkViewModel(
     private val gameRepository: GameRepository,
     private val stadiumRepository: StadiumRepository,
+    private val memberRepository: MemberRepository,
     private val clock: Clock,
 ) : ViewModel() {
     private val logger = Logger.withTag("LivetalkViewModel")
@@ -50,6 +54,7 @@ class LivetalkViewModel(
     private val isAutoUpdateOn = MutableStateFlow(true)
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val nextUpdateAt = MutableStateFlow<Instant?>(null)
+    private val myTeam = MutableStateFlow<Team?>(null)
 
     /**
      * 다음 갱신까지 남은 초를 1초마다 내보낸다. 표시할 예정이 없으면 `null`
@@ -97,28 +102,40 @@ class LivetalkViewModel(
 
     private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
 
-    val uiState: StateFlow<LivetalkUiState> =
-        combine(games, liveGames, weathers, isAutoUpdateOn, secondsUntilNextUpdate) {
+    private val stadiums: Flow<ImmutableList<LivetalkStadiumUiModel>?> =
+        combine(games, liveGames, weathers, myTeam) {
             games: List<GameCheckInUiModel>?,
             liveGames: List<LiveGameStateUiModel>?,
+            weathers: List<WeatherUiModel>,
+            myTeam: Team?,
+            ->
+            if (games == null || liveGames == null) {
+                null
+            } else {
+                GameUiMapper
+                    .mapToLivetalkUiModels(
+                        games = games,
+                        liveGames = liveGames,
+                        weathers = weathers,
+                    ).sortedByPriority(myTeam)
+                    .toImmutableList()
+            }
+        }
+
+    val uiState: StateFlow<LivetalkUiState> =
+        combine(stadiums, weathers, isAutoUpdateOn, secondsUntilNextUpdate) {
+            stadiums: ImmutableList<LivetalkStadiumUiModel>?,
             weathers: List<WeatherUiModel>,
             isAutoUpdateOn: Boolean,
             secondsUntilNextUpdate: Int?,
             ->
-            if (games == null || liveGames == null) {
+            if (stadiums == null) {
                 LivetalkUiState(isLoading = true, isAutoUpdateOn = isAutoUpdateOn)
             } else {
                 LivetalkUiState(
                     isLoading = false,
                     isAutoUpdateOn = isAutoUpdateOn,
-                    stadiums =
-                        GameUiMapper
-                            .mapToLivetalkUiModels(
-                                games = games,
-                                liveGames = liveGames,
-                                weathers = weathers,
-                            ).sortedByVerification()
-                            .toImmutableList(),
+                    stadiums = stadiums,
                     isWeatherLoaded = weathers.isNotEmpty(),
                     secondsUntilNextUpdate = secondsUntilNextUpdate,
                 )
@@ -131,6 +148,7 @@ class LivetalkViewModel(
 
     fun fetchGames(date: LocalDate = LocalDate.now(clock)) {
         selectedDate.value = date
+        fetchMyTeam()
 
         viewModelScope.launch {
             gameRepository
@@ -151,6 +169,21 @@ class LivetalkViewModel(
 
     fun refreshLiveGames() {
         refreshRequests.tryEmit(Unit)
+    }
+
+    private fun fetchMyTeam() {
+        viewModelScope.launch {
+            memberRepository
+                .getFavoriteTeam()
+                .onSuccess { teamCode: String? ->
+                    myTeam.value =
+                        teamCode?.let {
+                            runCatching { Team.getByCode(it) }.getOrNull()
+                        }
+                }.onFailure { exception: Throwable ->
+                    logger.w(exception) { "응원팀 조회 실패" }
+                }
+        }
     }
 
     private fun fetchWeathers(stadiumIds: List<Long>) {
@@ -242,11 +275,14 @@ class LivetalkViewModel(
         return (secondsUntilStart * MILLIS_PER_SECOND).coerceAtLeast(POLLING_INTERVAL_MILLIS)
     }
 
-    private fun List<LivetalkStadiumUiModel>.sortedByVerification(): List<LivetalkStadiumUiModel> {
-        val (verifiedItems, unverifiedItems) =
-            partition { stadium: LivetalkStadiumUiModel -> stadium.isVerified }
-        return verifiedItems + unverifiedItems
-    }
+    private fun List<LivetalkStadiumUiModel>.sortedByPriority(myTeam: Team?): List<LivetalkStadiumUiModel> =
+        sortedWith(
+            compareByDescending<LivetalkStadiumUiModel> { it.isVerified }
+                .thenByDescending { it.isMyTeamGame(myTeam) },
+        )
+
+    private fun LivetalkStadiumUiModel.isMyTeamGame(myTeam: Team?): Boolean =
+        myTeam != null && myTeam in listOf(liveGameState.awayTeam, liveGameState.homeTeam)
 
     companion object {
         private const val MILLIS_PER_SECOND = 1_000L
