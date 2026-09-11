@@ -39,6 +39,18 @@ import com.yagubogu.ui.theme.dpToSp
 import com.yagubogu.ui.util.color
 import com.yagubogu.ui.util.hhmmFormatter
 import kotlinx.datetime.format
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import yagubogu.composeapp.generated.resources.Res
+import yagubogu.composeapp.generated.resources.livetalk_game_canceled
+import yagubogu.composeapp.generated.resources.livetalk_game_completed
+import yagubogu.composeapp.generated.resources.livetalk_game_scheduled
+import yagubogu.composeapp.generated.resources.livetalk_inning
+import yagubogu.composeapp.generated.resources.livetalk_inning_half_bottom
+import yagubogu.composeapp.generated.resources.livetalk_inning_half_top
+import yagubogu.composeapp.generated.resources.livetalk_player_role_batter
+import yagubogu.composeapp.generated.resources.livetalk_player_role_pitcher
+import yagubogu.composeapp.generated.resources.livetalk_score_empty
 
 private val TEAM_ROW_HORIZONTAL_PADDING = 8.dp
 
@@ -55,12 +67,12 @@ fun LiveGameState(
                 awayTeam = liveGameState.awayTeam,
                 homeTeam = liveGameState.homeTeam,
                 score = liveGameState.score,
-                label = "${liveGameState.inning}회${
-                    when (liveGameState.inningHalf) {
-                        InningHalf.TOP -> "초"
-                        InningHalf.BOTTOM -> "말"
-                    }
-                }", // TODO: 문자열 리소스로 변경
+                label =
+                    stringResource(
+                        Res.string.livetalk_inning,
+                        liveGameState.inning,
+                        stringResource(liveGameState.inningHalf.toStringResource()),
+                    ),
                 bases = liveGameState.bases,
                 awayPlayer = liveGameState.awayPlayer,
                 homePlayer = liveGameState.homePlayer,
@@ -74,7 +86,7 @@ fun LiveGameState(
                 awayTeam = liveGameState.awayTeam,
                 homeTeam = liveGameState.homeTeam,
                 score = null,
-                label = "경기예정", // TODO
+                label = stringResource(Res.string.livetalk_game_scheduled),
                 bases = null,
                 awayPlayer = liveGameState.awayPlayer,
                 homePlayer = liveGameState.homePlayer,
@@ -89,7 +101,7 @@ fun LiveGameState(
                 homeTeam = liveGameState.homeTeam,
                 score = liveGameState.score,
                 winner = liveGameState.winnerTeam,
-                label = "경기종료", // TODO
+                label = stringResource(Res.string.livetalk_game_completed),
                 modifier = modifier,
             )
         }
@@ -100,7 +112,7 @@ fun LiveGameState(
                 homeTeam = liveGameState.homeTeam,
                 score = null,
                 winner = null,
-                label = "경기취소", // TODO
+                label = stringResource(Res.string.livetalk_game_canceled),
                 modifier = modifier,
             )
         }
@@ -111,7 +123,7 @@ fun LiveGameState(
                 homeTeam = liveGameState.homeTeam,
                 score = null,
                 winner = null,
-                label = liveGameState.startAt.format(hhmmFormatter), // TODO
+                label = liveGameState.startAt.format(hhmmFormatter),
                 modifier = modifier,
             )
         }
@@ -259,13 +271,25 @@ private fun ScoreText(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = score?.toString() ?: "-",
+        text = score?.toString() ?: stringResource(Res.string.livetalk_score_empty),
         style = EsamanruBold.copy(fontSize = 28.dpToSp),
         color = color,
         textAlign = textAlign,
         modifier = modifier,
     )
 }
+
+private fun InningHalf.toStringResource(): StringResource =
+    when (this) {
+        InningHalf.TOP -> Res.string.livetalk_inning_half_top
+        InningHalf.BOTTOM -> Res.string.livetalk_inning_half_bottom
+    }
+
+private fun PlayerRole.toStringResource(): StringResource =
+    when (this) {
+        PlayerRole.PITCHER -> Res.string.livetalk_player_role_pitcher
+        PlayerRole.BATTER -> Res.string.livetalk_player_role_batter
+    }
 
 private fun scoreColor(
     side: TeamSide,
@@ -313,11 +337,7 @@ private fun PlayerInfo(
         modifier = modifier,
     ) {
         Text(
-            text =
-                when (player.role) {
-                    PlayerRole.PITCHER -> "투"
-                    PlayerRole.BATTER -> "타" // TODO
-                },
+            text = stringResource(player.role.toStringResource()),
             style = PretendardMedium.copy(fontSize = 10.dpToSp, color = Gray500),
         )
         Spacer(modifier = Modifier.width(4.dp))
