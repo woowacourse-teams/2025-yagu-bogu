@@ -1,8 +1,6 @@
 package com.yagubogu.ui.home.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,14 +23,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.common.component.HeartbeatAnimation
 import com.yagubogu.ui.common.component.ParallelogramShape
+import com.yagubogu.ui.common.component.RefreshIcon
 import com.yagubogu.ui.common.component.ShowMoreButton
 import com.yagubogu.ui.home.model.StadiumFanRateItem
 import com.yagubogu.ui.home.model.StadiumStatsUiModel
@@ -68,7 +61,6 @@ import yagubogu.composeapp.generated.resources.home_stadium_stats_refresh_time
 import yagubogu.composeapp.generated.resources.home_stadium_stats_title
 import yagubogu.composeapp.generated.resources.home_stadium_stats_tooltip
 import yagubogu.composeapp.generated.resources.ic_info
-import yagubogu.composeapp.generated.resources.ic_refresh
 
 @Composable
 fun StadiumFanRate(
@@ -130,7 +122,13 @@ fun StadiumFanRate(
                         ),
                     style = PretendardRegular.copy(fontSize = 14.sp, color = Gray400),
                 )
-                RefreshIcon(onRefresh = onRefresh)
+                RefreshIcon(
+                    color = Gray400,
+                    onRefresh = {
+                        onRefresh()
+                        AnalyticsLogger.logEvent("fan_rate_refresh")
+                    },
+                )
             }
         }
 
@@ -160,35 +158,6 @@ fun StadiumFanRate(
             )
         }
     }
-}
-
-@Composable
-private fun RefreshIcon(
-    onRefresh: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var rotation: Float by remember { mutableFloatStateOf(0f) }
-    val animatedRotation: Float by animateFloatAsState(
-        targetValue = rotation,
-        animationSpec = tween(durationMillis = 1_000),
-    )
-
-    Icon(
-        painter = painterResource(Res.drawable.ic_refresh),
-        contentDescription = null,
-        tint = Gray400,
-        modifier =
-            modifier
-                .padding(horizontal = 4.dp)
-                .size(20.dp)
-                .graphicsLayer {
-                    rotationZ = animatedRotation
-                }.noRippleClickable {
-                    rotation += 360f
-                    onRefresh()
-                    AnalyticsLogger.logEvent("fan_rate_refresh")
-                },
-    )
 }
 
 @Composable
@@ -229,7 +198,11 @@ private fun StadiumFanRateItem(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(Res.string.all_win_rate, item.awayTeamPercentage.formatOneDecimal()),
+                        text =
+                            stringResource(
+                                Res.string.all_win_rate,
+                                item.awayTeamPercentage.formatOneDecimal(),
+                            ),
                         style = PretendardMedium.copy(fontSize = 16.dpToSp, color = White),
                     )
                 }
@@ -251,7 +224,11 @@ private fun StadiumFanRateItem(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(Res.string.all_win_rate, item.homeTeamPercentage.formatOneDecimal()),
+                        text =
+                            stringResource(
+                                Res.string.all_win_rate,
+                                item.homeTeamPercentage.formatOneDecimal(),
+                            ),
                         style = PretendardMedium.copy(fontSize = 16.dpToSp, color = White),
                     )
                 }

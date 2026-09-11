@@ -45,14 +45,10 @@ class LivetalkViewModel(
 ) : ViewModel() {
     private val logger = Logger.withTag("LivetalkViewModel")
 
-    private val games = MutableStateFlow<List<GameCheckInUiModel>?>(null)
-
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
-
+    private val games = MutableStateFlow<List<GameCheckInUiModel>?>(null)
     private val isAutoUpdateOn = MutableStateFlow(true)
-
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
     private val nextUpdateAt = MutableStateFlow<Instant?>(null)
 
     /**

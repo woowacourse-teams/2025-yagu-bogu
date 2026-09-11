@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,9 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yagubogu.analytics.AnalyticsLogger
 import com.yagubogu.ui.common.AdUnitIds
 import com.yagubogu.ui.common.component.BannerAd
 import com.yagubogu.ui.common.component.BannerAdType
+import com.yagubogu.ui.common.component.RefreshIcon
 import com.yagubogu.ui.common.component.ToggleSwitch
 import com.yagubogu.ui.livetalk.component.LIVETALK_STADIUMS
 import com.yagubogu.ui.livetalk.component.LivetalkStadiumItem
@@ -41,7 +41,6 @@ import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
 import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.util.BackPressHandler
-import com.yagubogu.ui.util.noRippleClickable
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -49,13 +48,11 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import yagubogu.composeapp.generated.resources.Res
-import yagubogu.composeapp.generated.resources.ic_refresh
 import yagubogu.composeapp.generated.resources.img_baseball_fly_error
 import yagubogu.composeapp.generated.resources.livetalk_auto_update
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_description
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_illustration_description
 import yagubogu.composeapp.generated.resources.livetalk_next_update_seconds
-import yagubogu.composeapp.generated.resources.livetalk_refresh_description
 import yagubogu.composeapp.generated.resources.livetalk_weather_source_info_text
 
 private const val BANNER_AD_INDEX = 3
@@ -247,7 +244,7 @@ private fun LiveUpdateRow(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (secondsUntilNextUpdate != null) {
@@ -260,14 +257,12 @@ private fun LiveUpdateRow(
                     style = PretendardMedium.copy(fontSize = 14.sp, color = Gray500),
                 )
             }
-            Icon(
-                painter = painterResource(Res.drawable.ic_refresh),
-                contentDescription = stringResource(Res.string.livetalk_refresh_description),
-                tint = Gray500,
-                modifier =
-                    Modifier
-                        .size(20.dp)
-                        .noRippleClickable { onRefreshClick() },
+            RefreshIcon(
+                color = Gray500,
+                onRefresh = {
+                    onRefreshClick()
+                    AnalyticsLogger.logEvent("livetalk_refresh")
+                },
             )
         }
     }
