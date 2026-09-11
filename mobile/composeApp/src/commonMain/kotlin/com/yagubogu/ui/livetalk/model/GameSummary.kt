@@ -1,6 +1,6 @@
 package com.yagubogu.ui.livetalk.model
 
-data class GameCheckInUiModel(
+data class GameSummary(
     val gameId: Long,
     val stadiumId: Long,
     val stadiumName: String,

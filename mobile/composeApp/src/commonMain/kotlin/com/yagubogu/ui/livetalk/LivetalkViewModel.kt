@@ -7,8 +7,9 @@ import com.yagubogu.data.repository.game.GameRepository
 import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.livetalk.model.GameCheckInUiModel
+import com.yagubogu.ui.livetalk.model.GameSummary
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
+import com.yagubogu.ui.livetalk.model.LiveGamesSnapshot
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkUiState
 import com.yagubogu.ui.livetalk.model.WeatherUiModel
@@ -50,24 +51,10 @@ class LivetalkViewModel(
     private val logger = Logger.withTag("LivetalkViewModel")
 
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
-    private val games = MutableStateFlow<List<GameCheckInUiModel>?>(null)
+    private val games = MutableStateFlow<List<GameSummary>?>(null)
     private val isAutoUpdateOn = MutableStateFlow(true)
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    private val nextUpdateAt = MutableStateFlow<Instant?>(null)
     private val myTeam = MutableStateFlow<Team?>(null)
-
-    /**
-     * 다음 갱신까지 남은 초를 1초마다 내보낸다. 표시할 예정이 없으면 `null`
-     *
-     * 자동 업데이트가 꺼져 있으면 예정 시각과 무관하게 표시하지 않는다.
-     */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val secondsUntilNextUpdate: Flow<Int?> =
-        combine(isAutoUpdateOn, nextUpdateAt) { isAutoUpdateOn: Boolean, nextUpdateAt: Instant? ->
-            nextUpdateAt.takeIf { isAutoUpdateOn }
-        }.flatMapLatest { nextUpdateAt: Instant? ->
-            if (nextUpdateAt == null) flowOf(null) else countdown(nextUpdateAt)
-        }
 
     /**
      * 자동 업데이트가 켜져 있으면 [pollLiveGames]로 반복 조회하고, 꺼져 있으면 [fetchLiveGames]로 한 번만 조회한다.
@@ -76,7 +63,7 @@ class LivetalkViewModel(
      * 새로고침을 누르면 다음 주기를 기다리지 않고 즉시 갱신된다.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val liveGames: StateFlow<List<LiveGameStateUiModel>?> =
+    private val liveGames: StateFlow<LiveGamesSnapshot?> =
         combine(
             selectedDate,
             isAutoUpdateOn,
@@ -91,7 +78,9 @@ class LivetalkViewModel(
                 pollLiveGames(date)
             } else {
                 flow {
-                    fetchLiveGames(date)?.let { emit(it) }
+                    fetchLiveGames(date)?.let {
+                        emit(LiveGamesSnapshot(games = it, nextUpdateAt = null))
+                    }
                 }
             }
         }.stateIn(
@@ -100,12 +89,28 @@ class LivetalkViewModel(
             initialValue = null,
         )
 
+    /**
+     * 다음 갱신까지 남은 초를 1초마다 내보낸다. 표시할 예정이 없으면 `null`
+     *
+     * 자동 업데이트가 꺼져 있으면 예정 시각과 무관하게 표시하지 않는다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val secondsUntilNextUpdate: Flow<Int?> =
+        combine(
+            isAutoUpdateOn,
+            liveGames,
+        ) { isAutoUpdateOn: Boolean, liveGames: LiveGamesSnapshot? ->
+            liveGames?.nextUpdateAt?.takeIf { isAutoUpdateOn }
+        }.flatMapLatest { nextUpdateAt: Instant? ->
+            if (nextUpdateAt == null) flowOf(null) else countdown(nextUpdateAt)
+        }
+
     private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
 
     private val stadiums: Flow<ImmutableList<LivetalkStadiumUiModel>?> =
         combine(games, liveGames, weathers, myTeam) {
-            games: List<GameCheckInUiModel>?,
-            liveGames: List<LiveGameStateUiModel>?,
+            games: List<GameSummary>?,
+            liveGames: LiveGamesSnapshot?,
             weathers: List<WeatherUiModel>,
             myTeam: Team?,
             ->
@@ -115,7 +120,7 @@ class LivetalkViewModel(
                 GameUiMapper
                     .mapToLivetalkUiModels(
                         games = games,
-                        liveGames = liveGames,
+                        liveGames = liveGames.games,
                         weathers = weathers,
                     ).sortedByPriority(myTeam)
                     .toImmutableList()
@@ -154,7 +159,7 @@ class LivetalkViewModel(
             gameRepository
                 .getGames(date)
                 .mapList { it.toUiModel() }
-                .onSuccess { result: List<GameCheckInUiModel> ->
+                .onSuccess { result: List<GameSummary> ->
                     games.value = result
                     fetchWeathers(result.map { it.stadiumId })
                 }.onFailure { exception: Throwable ->
@@ -208,33 +213,28 @@ class LivetalkViewModel(
                 logger.w(exception) { "실시간 경기 API 호출 실패" }
             }.getOrNull()
 
-    private fun pollLiveGames(date: LocalDate): Flow<List<LiveGameStateUiModel>> =
+    private fun pollLiveGames(date: LocalDate): Flow<LiveGamesSnapshot> =
         flow {
             while (true) {
                 val result: List<LiveGameStateUiModel>? = fetchLiveGames(date)
 
                 if (result == null) {
-                    scheduleNextUpdate(POLLING_INTERVAL_MILLIS)
                     delay(POLLING_INTERVAL_MILLIS)
                     continue
                 }
-                emit(result)
 
-                val nextDelay: Long =
-                    nextPollingDelayMillis(result) ?: run {
-                        nextUpdateAt.update { null }
-                        return@flow
-                    }
-                scheduleNextUpdate(nextDelay)
+                val nextDelay: Long? = nextPollingDelayMillis(result)
+                emit(
+                    LiveGamesSnapshot(
+                        games = result,
+                        nextUpdateAt = nextDelay?.let { clock.now() + it.milliseconds },
+                    ),
+                )
+
+                if (nextDelay == null) return@flow
                 delay(nextDelay)
             }
         }
-
-    private fun scheduleNextUpdate(delayMillis: Long) {
-        nextUpdateAt.update {
-            clock.now() + delayMillis.milliseconds
-        }
-    }
 
     private fun countdown(target: Instant): Flow<Int?> =
         flow {

@@ -8,7 +8,7 @@ import com.yagubogu.ui.attendance.model.GameState
 import com.yagubogu.ui.attendance.model.PastGameUiModel
 import com.yagubogu.ui.livetalk.model.BallCountUiModel
 import com.yagubogu.ui.livetalk.model.BasesUiModel
-import com.yagubogu.ui.livetalk.model.GameCheckInUiModel
+import com.yagubogu.ui.livetalk.model.GameSummary
 import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
 import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
 import com.yagubogu.ui.livetalk.model.PlayerUiModel
@@ -31,8 +31,8 @@ fun GameWithCheckInDto.toAttendanceUiModel(date: LocalDate): PastGameUiModel =
 fun TeamByGameDto.toDomain(): Team = Team.getByCode(code)
 
 object GameUiMapper {
-    fun GameWithCheckInDto.toUiModel(): GameCheckInUiModel =
-        GameCheckInUiModel(
+    fun GameWithCheckInDto.toUiModel(): GameSummary =
+        GameSummary(
             gameId = gameId,
             stadiumId = stadium.id,
             stadiumName = stadium.name,
@@ -41,7 +41,7 @@ object GameUiMapper {
         )
 
     fun mapToLivetalkUiModels(
-        games: List<GameCheckInUiModel>,
+        games: List<GameSummary>,
         liveGames: List<LiveGameStateUiModel>,
         weathers: List<WeatherUiModel>,
     ): List<LivetalkStadiumUiModel> {
@@ -49,7 +49,7 @@ object GameUiMapper {
             liveGames.associateBy { it.gameId }
         val weatherByStadiumId: Map<Long, WeatherUiModel> = weathers.associateBy { it.stadiumId }
 
-        return games.mapNotNull { game: GameCheckInUiModel ->
+        return games.mapNotNull { game: GameSummary ->
             val liveGame: LiveGameStateUiModel =
                 liveGameByGameId[game.gameId] ?: return@mapNotNull null
             mapToLivetalkUiModel(
@@ -73,7 +73,7 @@ object GameUiMapper {
     }
 
     private fun mapToLivetalkUiModel(
-        game: GameCheckInUiModel,
+        game: GameSummary,
         liveGame: LiveGameStateUiModel,
         weather: WeatherUiModel?,
     ): LivetalkStadiumUiModel =
