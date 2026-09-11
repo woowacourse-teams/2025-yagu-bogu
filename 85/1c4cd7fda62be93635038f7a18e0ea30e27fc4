@@ -1,0 +1,28 @@
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/mapper/StadiumUiMapper.kt
+  s_3282d4001420fb::t_ccc1addb439b47 10
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/LiveGameState.kt
+  s_3282d4001420fb::t_2bcdd70a373e93 191,293-296,298-300
+  s_3282d4001420fb::t_50d8dfae7d4b1b 43-46
+  s_3282d4001420fb::t_8d4502e377445f 301
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/Fixture.kt
+  s_3282d4001420fb::t_ccc1addb439b47 6
+mobile/composeApp/src/commonMain/kotlin/com/yagubogu/ui/livetalk/component/TeamItem.kt
+  s_3282d4001420fb::t_ae427bf376802a 27-30
+  s_3282d4001420fb::t_50d505933e5cb7 46,48,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "851c4cd7fda62be93635038f7a18e0ea30e27fc4",
+  "prompts": {},
+  "sessions": {
+    "s_3282d4001420fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c0a3597-c9d7-450c-9538-79dc7e694499",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
