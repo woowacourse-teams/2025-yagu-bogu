@@ -210,6 +210,7 @@
     <string name="livetalk_weather_source_info_text">날씨 정보 제공: 기상청</string>
     <string name="livetalk_auto_update">자동 업데이트</string>
     <string name="livetalk_refresh_description">실시간 정보 새로고침</string>
+    <string name="livetalk_next_update_seconds">%1$d초 후</string>
 
     <string name="livetalk_send_btn_description">메시지 전송</string>
     <string name="livetalk_send_btn_locked_description">잠긴 메시지 전송</string>

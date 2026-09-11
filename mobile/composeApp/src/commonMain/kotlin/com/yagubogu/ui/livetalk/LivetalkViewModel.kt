@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -33,6 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 class LivetalkViewModel(
     private val gameRepository: GameRepository,
@@ -49,11 +52,26 @@ class LivetalkViewModel(
 
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
+    private val nextUpdateAt = MutableStateFlow<Instant?>(null)
+
     /**
-     * 자동 업데이트가 켜져 있으면 [pollLiveGames]로 반복 조회하고, 꺼져 있으면 [fetchLiveGames]로 한 번만 조회합니다.
+     * 다음 갱신까지 남은 초를 1초마다 내보낸다. 표시할 예정이 없으면 `null`
      *
-     * 날짜·자동 업데이트 여부·수동 새로고침 중 무엇이 바뀌든 진행 중인 조회를 버리고
-     * 새로 시작하므로, 새로고침을 누르면 다음 주기를 기다리지 않고 즉시 갱신됩니다.
+     * 자동 업데이트가 꺼져 있으면 예정 시각과 무관하게 표시하지 않는다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val secondsUntilNextUpdate: Flow<Int?> =
+        combine(isAutoUpdateOn, nextUpdateAt) { isAutoUpdateOn: Boolean, nextUpdateAt: Instant? ->
+            nextUpdateAt.takeIf { isAutoUpdateOn }
+        }.flatMapLatest { nextUpdateAt: Instant? ->
+            if (nextUpdateAt == null) flowOf(null) else countdown(nextUpdateAt)
+        }
+
+    /**
+     * 자동 업데이트가 켜져 있으면 [pollLiveGames]로 반복 조회하고, 꺼져 있으면 [fetchLiveGames]로 한 번만 조회한다.
+     *
+     * 날짜·자동 업데이트 여부·수동 새로고침 중 무엇이 바뀌든 진행 중인 조회를 버리고 새로 시작하므로,
+     * 새로고침을 누르면 다음 주기를 기다리지 않고 즉시 갱신된다.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private val liveGames: StateFlow<List<LiveGameStateUiModel>?> =
@@ -81,11 +99,12 @@ class LivetalkViewModel(
     private val weathers = MutableStateFlow<List<WeatherUiModel>>(emptyList())
 
     val uiState: StateFlow<LivetalkUiState> =
-        combine(games, liveGames, weathers, isAutoUpdateOn) {
+        combine(games, liveGames, weathers, isAutoUpdateOn, secondsUntilNextUpdate) {
             games: List<GameCheckInUiModel>?,
             liveGames: List<LiveGameStateUiModel>?,
             weathers: List<WeatherUiModel>,
             isAutoUpdateOn: Boolean,
+            secondsUntilNextUpdate: Int?,
             ->
             if (games == null || liveGames == null) {
                 LivetalkUiState(isLoading = true, isAutoUpdateOn = isAutoUpdateOn)
@@ -102,6 +121,7 @@ class LivetalkViewModel(
                             ).sortedByVerification()
                             .toImmutableList(),
                     isWeatherLoaded = weathers.isNotEmpty(),
+                    secondsUntilNextUpdate = secondsUntilNextUpdate,
                 )
             }
         }.stateIn(
@@ -162,13 +182,48 @@ class LivetalkViewModel(
                 val result: List<LiveGameStateUiModel>? = fetchLiveGames(date)
 
                 if (result == null) {
+                    scheduleNextUpdate(POLLING_INTERVAL_MILLIS)
                     delay(POLLING_INTERVAL_MILLIS)
                     continue
                 }
                 emit(result)
 
-                val nextDelay: Long = nextPollingDelayMillis(result) ?: return@flow
+                val nextDelay: Long =
+                    nextPollingDelayMillis(result) ?: run {
+                        nextUpdateAt.update { null }
+                        return@flow
+                    }
+                scheduleNextUpdate(nextDelay)
                 delay(nextDelay)
+            }
+        }
+
+    private fun scheduleNextUpdate(delayMillis: Long) {
+        nextUpdateAt.update {
+            clock.now() + delayMillis.milliseconds
+        }
+    }
+
+    private fun countdown(target: Instant): Flow<Int?> =
+        flow {
+            while (true) {
+                val remainingMillis: Long = (target - clock.now()).inWholeMilliseconds
+                when {
+                    remainingMillis <= 0L -> {
+                        emit(null)
+                        return@flow
+                    }
+
+                    remainingMillis > POLLING_INTERVAL_MILLIS -> {
+                        emit(null)
+                        delay(remainingMillis - POLLING_INTERVAL_MILLIS)
+                    }
+
+                    else -> {
+                        emit(((remainingMillis + MILLIS_PER_SECOND - 1) / MILLIS_PER_SECOND).toInt())
+                        delay(MILLIS_PER_SECOND)
+                    }
+                }
             }
         }
 

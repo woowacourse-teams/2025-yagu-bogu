@@ -54,6 +54,7 @@ import yagubogu.composeapp.generated.resources.img_baseball_fly_error
 import yagubogu.composeapp.generated.resources.livetalk_auto_update
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_description
 import yagubogu.composeapp.generated.resources.livetalk_empty_game_illustration_description
+import yagubogu.composeapp.generated.resources.livetalk_next_update_seconds
 import yagubogu.composeapp.generated.resources.livetalk_refresh_description
 import yagubogu.composeapp.generated.resources.livetalk_weather_source_info_text
 
@@ -141,6 +142,7 @@ private fun LivetalkScreen(
     ) {
         LiveUpdateRow(
             isAutoUpdateOn = uiState.isAutoUpdateOn,
+            secondsUntilNextUpdate = uiState.secondsUntilNextUpdate,
             onAutoUpdateToggle = onAutoUpdateToggle,
             onRefreshClick = onRefreshClick,
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -220,6 +222,7 @@ private fun EmptyLivetalkScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun LiveUpdateRow(
     isAutoUpdateOn: Boolean,
+    secondsUntilNextUpdate: Int?,
     onAutoUpdateToggle: (Boolean) -> Unit,
     onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -242,15 +245,31 @@ private fun LiveUpdateRow(
                 onClick = onAutoUpdateToggle,
             )
         }
-        Icon(
-            painter = painterResource(Res.drawable.ic_refresh),
-            contentDescription = stringResource(Res.string.livetalk_refresh_description),
-            tint = Gray500,
-            modifier =
-                Modifier
-                    .size(20.dp)
-                    .noRippleClickable { onRefreshClick() },
-        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (secondsUntilNextUpdate != null) {
+                Text(
+                    text =
+                        stringResource(
+                            Res.string.livetalk_next_update_seconds,
+                            secondsUntilNextUpdate,
+                        ),
+                    style = PretendardMedium.copy(fontSize = 14.sp, color = Gray500),
+                )
+            }
+            Icon(
+                painter = painterResource(Res.drawable.ic_refresh),
+                contentDescription = stringResource(Res.string.livetalk_refresh_description),
+                tint = Gray500,
+                modifier =
+                    Modifier
+                        .size(20.dp)
+                        .noRippleClickable { onRefreshClick() },
+            )
+        }
     }
 }
 
@@ -264,6 +283,25 @@ private fun LivetalkScreenPreview() {
                 isAutoUpdateOn = true,
                 stadiums = LIVETALK_STADIUMS.toImmutableList(),
                 isWeatherLoaded = true,
+                secondsUntilNextUpdate = 15,
+            ),
+        onAutoUpdateToggle = {},
+        onRefreshClick = {},
+        onItemClick = {},
+    )
+}
+
+@Preview("현장톡 화면 - 자동 업데이트 꺼짐")
+@Composable
+private fun LivetalkScreenAutoUpdateOffPreview() {
+    LivetalkScreen(
+        uiState =
+            LivetalkUiState(
+                isLoading = false,
+                isAutoUpdateOn = false,
+                stadiums = LIVETALK_STADIUMS.toImmutableList(),
+                isWeatherLoaded = true,
+                secondsUntilNextUpdate = null,
             ),
         onAutoUpdateToggle = {},
         onRefreshClick = {},
