@@ -15,6 +15,7 @@ import com.yagubogu.ui.mapper.GameUiMapper.toUiModel
 import com.yagubogu.ui.mapper.toUiModel
 import com.yagubogu.ui.util.mapList
 import com.yagubogu.ui.util.now
+import com.yagubogu.ui.util.throttle
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -79,7 +80,9 @@ class LivetalkViewModel(
             selectedDate,
             isAutoUpdateOn,
             // 첫 수집 때도 흘려보내야 combine이 시작된다
-            refreshRequests.onStart { emit(Unit) },
+            refreshRequests
+                .onStart { emit(Unit) }
+                .throttle(REFRESH_THROTTLE_MILLIS),
         ) { date: LocalDate, isAutoUpdateOn: Boolean, _: Unit ->
             date to isAutoUpdateOn
         }.flatMapLatest { (date: LocalDate, isAutoUpdateOn: Boolean) ->
@@ -253,5 +256,6 @@ class LivetalkViewModel(
         private const val MILLIS_PER_SECOND = 1_000L
         private const val POLLING_INTERVAL_MILLIS = 15_000L
         private const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
+        private const val REFRESH_THROTTLE_MILLIS = 5_000L
     }
 }
