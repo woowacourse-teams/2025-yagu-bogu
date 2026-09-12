@@ -34,7 +34,12 @@ class AuthDefaultRepository(
     override suspend fun logout(): Result<Unit> {
         val refreshToken: String =
             tokenManager.getRefreshToken()
-                ?: return Result.failure(Exception(ERROR_NO_REFRESH_TOKEN))
+                ?: run {
+                    // 이미 토큰이 없으면(다른 인증 요청의 리프레시 실패 등으로 미리 지워진 경우 포함)
+                    // 로컬 세션은 사실상 로그아웃된 상태이므로 실패로 취급하지 않는다.
+                    tokenManager.clearTokens()
+                    return Result.success(Unit)
+                }
 
         return authDataSource.logout(refreshToken).map {
             tokenManager.clearTokens()

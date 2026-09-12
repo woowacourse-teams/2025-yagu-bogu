@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -16,6 +18,12 @@ class TokenManager(
     private var cachedRefreshToken: String? = null
 
     private val mutex = Mutex()
+
+    /** access token 변경을 관찰한다. 로그인/로그아웃/토큰 갱신 시 emit된다. */
+    val accessTokenFlow: Flow<String?> =
+        dataStore.data.map { preferences ->
+            preferences[ACCESS_TOKEN_KEY]
+        }
 
     suspend fun getAccessToken(): String? =
         mutex.withLock {

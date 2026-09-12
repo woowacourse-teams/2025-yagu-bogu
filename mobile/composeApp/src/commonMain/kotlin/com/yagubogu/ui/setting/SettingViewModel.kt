@@ -8,6 +8,9 @@ import com.yagubogu.data.repository.member.MemberRepository
 import com.yagubogu.data.repository.member.NicknameUpdateError
 import com.yagubogu.data.repository.member.toNicknameUpdateError
 import com.yagubogu.data.repository.thirdparty.ThirdPartyRepository
+import com.yagubogu.data.repository.widget.WidgetDeviceRegistrar
+import com.yagubogu.data.repository.widget.WidgetDeviceRepository
+import com.yagubogu.data.repository.widget.WidgetSettingsRepository
 import com.yagubogu.ui.common.model.PresignedUrlItem
 import com.yagubogu.ui.mapper.text.toUiText
 import com.yagubogu.ui.mapper.toUiModel
@@ -30,6 +33,7 @@ import kotlinx.datetime.LocalDate
 import yagubogu.composeapp.generated.resources.Res
 import yagubogu.composeapp.generated.resources.image_processing_failed
 import yagubogu.composeapp.generated.resources.image_upload_failed
+import yagubogu.composeapp.generated.resources.setting_score_widget_change_failed
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
@@ -38,6 +42,9 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val thirdPartyRepository: ThirdPartyRepository,
     private val clock: Clock,
+    private val widgetSettingsRepository: WidgetSettingsRepository,
+    private val widgetDeviceRegistrar: WidgetDeviceRegistrar,
+    private val widgetDeviceRepository: WidgetDeviceRepository,
 ) : ViewModel() {
     private val logger = Logger.withTag("SettingViewModel")
 
@@ -51,6 +58,61 @@ class SettingViewModel(
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
     val settingEvent = _settingEvent.asSharedFlow()
+
+    private val _scoreWidgetNotification = MutableStateFlow(false)
+    val scoreWidgetNotification: StateFlow<Boolean> = _scoreWidgetNotification.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            widgetSettingsRepository
+                .refresh()
+                .onFailure { exception: Throwable ->
+                    logger.w(exception) { "위젯 사용 설정 서버 동기화 실패" }
+                }
+        }
+        viewModelScope.launch {
+            widgetSettingsRepository.enabled.collect { enabled ->
+                _scoreWidgetNotification.value = enabled
+            }
+        }
+    }
+
+    fun updateScoreWidgetNotification(enabled: Boolean) {
+        viewModelScope.launch {
+            if (!enabled) {
+                setScoreWidgetNotification(false)
+                return@launch
+            }
+            // 토글 ON은 "기기 등록 성공"을 선행 조건으로 보장한다.
+            // 등록이 실패하면 토글을 켜지 않아 토글-실제 수신 비일치를 막는다.
+            widgetDeviceRegistrar
+                .register()
+                .onSuccess {
+                    setScoreWidgetNotification(true)
+                }.onFailure { exception: Throwable ->
+                    logger.w(exception) { "토글 ON 이전 디바이스 등록 실패" }
+                    emitScoreWidgetNotificationChangeFailure()
+                }
+        }
+    }
+
+    private suspend fun setScoreWidgetNotification(enabled: Boolean) {
+        widgetSettingsRepository
+            .setEnabled(enabled)
+            .onFailure { exception: Throwable ->
+                if (exception is CancellationException) throw exception
+                logger.w(exception) { "위젯 사용 설정 변경 실패" }
+                emitScoreWidgetNotificationChangeFailure()
+            }
+    }
+
+    private suspend fun emitScoreWidgetNotificationChangeFailure() {
+        _settingEvent.emit(
+            SettingEvent.ScoreWidgetNotificationChangeFailure(
+                UiText.StringRes(Res.string.setting_score_widget_change_failed),
+            ),
+        )
+    }
 
     fun updateNickname(newNickname: String) {
         viewModelScope.launch {
@@ -70,6 +132,13 @@ class SettingViewModel(
 
     fun logout() {
         viewModelScope.launch {
+            // access token이 유효한 동안 서버 디바이스 등록을 먼저 해제한다 (best-effort).
+            widgetDeviceRepository
+                .deregisterDevice()
+                .onFailure { exception: Throwable ->
+                    logger.w(exception) { "로그아웃 시 디바이스 등록 해제 실패" }
+                }
+
             authRepository
                 .logout()
                 .onSuccess {

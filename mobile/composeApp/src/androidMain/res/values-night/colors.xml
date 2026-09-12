@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="score_widget_text">#FFF3F3F3</color>
+    <color name="score_widget_accent">#FFFF8A80</color>
+    <color name="score_widget_header">#FFFFFFFF</color>
+    <color name="score_widget_status">#FF2E7D32</color>
+    <color name="score_widget_detail">#FFC9C9C9</color>
+    <color name="score_widget_muted">#FFB5B5B5</color>
+</resources>

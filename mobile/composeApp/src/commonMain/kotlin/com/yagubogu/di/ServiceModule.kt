@@ -9,6 +9,7 @@ import com.yagubogu.data.service.StadiumApiService
 import com.yagubogu.data.service.StatsApiService
 import com.yagubogu.data.service.TalkApiService
 import com.yagubogu.data.service.ThirdPartyApiService
+import com.yagubogu.data.service.WidgetApiService
 import com.yagubogu.data.service.createAuthApiService
 import com.yagubogu.data.service.createCheckInApiService
 import com.yagubogu.data.service.createGameApiService
@@ -18,6 +19,7 @@ import com.yagubogu.data.service.createStadiumApiService
 import com.yagubogu.data.service.createStatsApiService
 import com.yagubogu.data.service.createTalkApiService
 import com.yagubogu.data.service.createThirdPartyApiService
+import com.yagubogu.data.service.createWidgetApiService
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.koin.dsl.module
 
@@ -40,4 +42,6 @@ val serviceModule =
         single<TalkApiService> { get<Ktorfit>().createTalkApiService() }
 
         single<ThirdPartyApiService> { get<Ktorfit>().createThirdPartyApiService() }
+
+        single<WidgetApiService> { get<Ktorfit>().createWidgetApiService() }
     }
