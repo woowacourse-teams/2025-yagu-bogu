@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,23 +20,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.yagubogu.ui.place.model.PlaceItem
 import com.yagubogu.ui.place.model.labelResource
 import com.yagubogu.ui.theme.Gray100
 import com.yagubogu.ui.theme.Gray400
 import com.yagubogu.ui.theme.Gray500
-import com.yagubogu.ui.theme.Gray600
 import com.yagubogu.ui.theme.Gray900
 import com.yagubogu.ui.theme.PretendardBold16
-import com.yagubogu.ui.theme.PretendardMedium
 import com.yagubogu.ui.theme.PretendardMedium12
 import com.yagubogu.ui.theme.PretendardRegular12
-import com.yagubogu.ui.theme.PretendardSemiBold12
-import com.yagubogu.ui.theme.Primary500
 import com.yagubogu.ui.theme.White
+import com.yagubogu.ui.util.categoryThumbnailColor
 import com.yagubogu.ui.util.rememberNoRippleInteractionSource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -94,26 +92,6 @@ fun PlaceRecommendationCard(
                     color = Gray500,
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "★",
-                    style = PretendardMedium.copy(fontSize = 12.sp),
-                    color = Primary500,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = item.rating,
-                    style = PretendardSemiBold12,
-                    color = Primary500,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "(${item.reviewCount})",
-                    style = PretendardRegular12,
-                    color = Gray600,
-                )
-            }
         }
         Icon(
             painter = painterResource(Res.drawable.ic_arrow_right),
@@ -133,30 +111,32 @@ private fun PlaceThumbnail(
         modifier =
             modifier
                 .size(80.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(item.thumbnailColor),
+                .clip(RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.42f)
-                    .align(Alignment.BottomCenter)
-                    .background(White.copy(alpha = 0.16f)),
-        )
-        Icon(
-            painter = painterResource(Res.drawable.ic_globe_location_pin),
-            contentDescription = null,
-            tint = White,
-            modifier = Modifier.size(34.dp),
-        )
-        Text(
-            text = item.thumbnailLabel,
-            style = PretendardMedium12,
-            color = White,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 9.dp),
-        )
+        if (item.imageUrl != null) {
+            AsyncImage(
+                model = item.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(item.category.categoryThumbnailColor),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_globe_location_pin),
+                    contentDescription = null,
+                    tint = White,
+                    modifier = Modifier.size(34.dp),
+                )
+            }
+        }
     }
 }
 

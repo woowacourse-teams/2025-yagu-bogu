@@ -12,6 +12,8 @@ import com.yagubogu.data.repository.location.LocationDefaultRepository
 import com.yagubogu.data.repository.location.LocationRepository
 import com.yagubogu.data.repository.member.MemberDefaultRepository
 import com.yagubogu.data.repository.member.MemberRepository
+import com.yagubogu.data.repository.place.PlaceDefaultRepository
+import com.yagubogu.data.repository.place.PlaceRepository
 import com.yagubogu.data.repository.stadium.StadiumDefaultRepository
 import com.yagubogu.data.repository.stadium.StadiumRepository
 import com.yagubogu.data.repository.stats.StatsDefaultRepository
@@ -31,6 +33,8 @@ val repositoryModule =
         singleOf(::AuthDefaultRepository) { bind<AuthRepository>() }
 
         singleOf(::MemberDefaultRepository) { bind<MemberRepository>() }
+
+        singleOf(::PlaceDefaultRepository) { bind<PlaceRepository>() }
 
         singleOf(::CheckInDefaultRepository) { bind<CheckInRepository>() }
 

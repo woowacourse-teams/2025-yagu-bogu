@@ -92,8 +92,8 @@ fun NavigationRoot(
                         onAttendanceHistoryItemClick = { item: AttendanceHistoryItem ->
                             rootNavigator.navigate(Route.AttendanceHistoryDetail(item))
                         },
-                        onPlaceItemClick = { placeId: Long, placeName: String ->
-                            rootNavigator.navigate(Route.PlaceDetail(placeId, placeName))
+                        onPlaceItemClick = { placeId: Long, placeName: String, distanceMeters: Int? ->
+                            rootNavigator.navigate(Route.PlaceDetail(placeId, placeName, distanceMeters))
                         },
                     )
                 }
@@ -191,7 +191,9 @@ fun NavigationRoot(
                 }
                 entry<Route.PlaceDetail> { key: Route.PlaceDetail ->
                     PlaceDetailScreen(
+                        placeId = key.placeId,
                         placeName = key.placeName,
+                        distanceMeters = key.distanceMeters,
                         onBackClick = { rootNavigator.goBack() },
                     )
                 }
