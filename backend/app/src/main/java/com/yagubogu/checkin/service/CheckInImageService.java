@@ -5,7 +5,7 @@ import com.yagubogu.global.exception.PayloadTooLargeException;
 import com.yagubogu.global.exception.UnsupportedMediaTypeException;
 import com.yagubogu.member.dto.v1.PreSignedUrlStartRequest;
 import com.yagubogu.member.dto.v1.PresignedUrlStartResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class CheckInImageService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -23,6 +22,14 @@ public class CheckInImageService {
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/jpg", "image/png");
     private final S3Properties s3Properties;
     private final S3Presigner s3Presigner;
+
+    public CheckInImageService(
+            final S3Properties s3Properties,
+            @Qualifier("checkInPresigner") final S3Presigner s3Presigner
+    ) {
+        this.s3Properties = s3Properties;
+        this.s3Presigner = s3Presigner;
+    }
 
     public PresignedUrlStartResponse issuePresignedUrl(PreSignedUrlStartRequest request) {
         if (request.contentLength() > MAX_FILE_SIZE) {
@@ -35,7 +42,7 @@ public class CheckInImageService {
         String key = PATH_PREFIX + UUID.randomUUID();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(s3Properties.bucket())
+                .bucket(s3Properties.checkInPrivateBucket())
                 .key(key)
                 .contentType(request.contentType())
                 .contentLength(request.contentLength())

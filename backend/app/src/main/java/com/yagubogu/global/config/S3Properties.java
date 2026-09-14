@@ -10,11 +10,14 @@ public record S3Properties(
         String endpoint,
         String region,
         String publicBaseUrl,
-        String defaultProfileImageUrl
+        String defaultProfileImageUrl,
+        String checkInPrivateBucket,
+        String checkInAccessKeyId,
+        String checkInSecretAccessKey
 ) {
 
     public String apiEndpoint() {
-        return removeTrailingBucketPath(endpoint);
+        return removeTrailingKnownBucketPath(endpoint);
     }
 
     public String objectUrl(final String key) {
@@ -26,35 +29,39 @@ public record S3Properties(
             return removeDuplicateTrailingBucketPath(publicBaseUrl);
         }
         String trimmedEndpoint = trimTrailingSlash(endpoint);
-        if (hasTrailingBucketPath(trimmedEndpoint)) {
+        if (hasTrailingBucketPath(trimmedEndpoint, bucket)) {
             return trimmedEndpoint;
         }
         return trimmedEndpoint + "/" + trimSlashes(bucket);
     }
 
-    private String removeTrailingBucketPath(final String value) {
+    private String removeTrailingKnownBucketPath(final String value) {
         String trimmedValue = trimTrailingSlash(value);
-        if (!hasTrailingBucketPath(trimmedValue)) {
-            return trimmedValue;
+        if (hasTrailingBucketPath(trimmedValue, bucket)) {
+            return trimmedValue.substring(0, trimmedValue.length() - bucketPath(bucket).length());
         }
-        return trimmedValue.substring(0, trimmedValue.length() - bucketPath().length());
+        if (hasTrailingBucketPath(trimmedValue, checkInPrivateBucket)) {
+            return trimmedValue.substring(0, trimmedValue.length() - bucketPath(checkInPrivateBucket).length());
+        }
+        return trimmedValue;
     }
 
     private String removeDuplicateTrailingBucketPath(final String value) {
         String trimmedValue = trimTrailingSlash(value);
-        String duplicateBucketPath = bucketPath() + bucketPath();
+        String bucketPath = bucketPath(bucket);
+        String duplicateBucketPath = bucketPath + bucketPath;
         if (!trimmedValue.endsWith(duplicateBucketPath)) {
             return trimmedValue;
         }
-        return trimmedValue.substring(0, trimmedValue.length() - bucketPath().length());
+        return trimmedValue.substring(0, trimmedValue.length() - bucketPath.length());
     }
 
-    private boolean hasTrailingBucketPath(final String value) {
-        return value != null && value.endsWith(bucketPath());
+    private boolean hasTrailingBucketPath(final String value, final String bucketName) {
+        return value != null && bucketName != null && !bucketName.isBlank() && value.endsWith(bucketPath(bucketName));
     }
 
-    private String bucketPath() {
-        return "/" + trimSlashes(bucket);
+    private String bucketPath(final String bucketName) {
+        return "/" + trimSlashes(bucketName);
     }
 
     private static String trimTrailingSlash(final String value) {

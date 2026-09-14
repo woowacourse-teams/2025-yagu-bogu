@@ -29,11 +29,28 @@ public class CheckInImage extends BaseEntity {
     @JoinColumn(name = "check_in_id", nullable = false)
     private CheckIn checkIn;
 
-    @Column(name = "image_url", nullable = false, length = 500)
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @Column(name = "image_key", length = 500)
+    private String imageKey;
 
     public CheckInImage(final CheckIn checkIn, final String imageUrl) {
         this.checkIn = checkIn;
         this.imageUrl = imageUrl;
+    }
+
+    private CheckInImage(final CheckIn checkIn, final String imageUrl, final String imageKey) {
+        this.checkIn = checkIn;
+        this.imageUrl = imageUrl;
+        this.imageKey = imageKey;
+    }
+
+    public static CheckInImage privateImage(final CheckIn checkIn, final String imageKey) {
+        return new CheckInImage(checkIn, null, imageKey);
+    }
+
+    public boolean hasImageKey() {
+        return imageKey != null && !imageKey.isBlank();
     }
 }

@@ -55,6 +55,7 @@ class ProfileImageServiceTest {
     private static final String TEST_REGION = "auto";
     private static final String TEST_PUBLIC_BASE_URL = "https://images.yagubogu.com";
     private static final String TEST_DEFAULT_PROFILE_IMAGE_URL = TEST_PUBLIC_BASE_URL + "/images/defaults/profile.png";
+    private static final String TEST_CHECK_IN_PRIVATE_BUCKET = "test-check-in-private-bucket";
 
     @Mock
     private MemberService memberService;
@@ -73,8 +74,17 @@ class ProfileImageServiceTest {
 
     @BeforeEach
     void setUp() {
-        s3Properties = new S3Properties(TEST_BUCKET, TEST_PRESIGN_EXPIRATION, TEST_ENDPOINT, TEST_REGION,
-                TEST_PUBLIC_BASE_URL, TEST_DEFAULT_PROFILE_IMAGE_URL);
+        s3Properties = new S3Properties(
+                TEST_BUCKET,
+                TEST_PRESIGN_EXPIRATION,
+                TEST_ENDPOINT,
+                TEST_REGION,
+                TEST_PUBLIC_BASE_URL,
+                TEST_DEFAULT_PROFILE_IMAGE_URL,
+                TEST_CHECK_IN_PRIVATE_BUCKET,
+                "test-check-in-access-key",
+                "test-check-in-secret-key"
+        );
         profileImageService = new ProfileImageService(s3Presigner, s3Client, s3Properties, memberService);
     }
 

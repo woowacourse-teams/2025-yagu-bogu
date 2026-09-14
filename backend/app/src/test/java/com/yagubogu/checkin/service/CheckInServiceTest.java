@@ -51,6 +51,8 @@ import com.yagubogu.support.member.MemberBuilder;
 import com.yagubogu.support.member.MemberFactory;
 import com.yagubogu.team.domain.Team;
 import com.yagubogu.team.repository.TeamRepository;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -64,6 +66,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 @Import({AuthTestConfig.class, JpaAuditingConfig.class})
 @DataJpaTest
@@ -71,6 +77,7 @@ class CheckInServiceTest {
 
     private CheckInService checkInService;
     private S3Client mockS3Client;
+    private S3Presigner mockS3Presigner;
     private S3Properties mockS3Properties;
 
     @Autowired
@@ -115,11 +122,20 @@ class CheckInServiceTest {
     private Stadium stadiumJamsil, stadiumGocheok, stadiumIncheon;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws MalformedURLException {
         mockS3Client = Mockito.mock(S3Client.class);
+        mockS3Presigner = Mockito.mock(S3Presigner.class);
+        PresignedGetObjectRequest mockPresignedGetObjectRequest = Mockito.mock(PresignedGetObjectRequest.class);
         mockS3Properties = Mockito.mock(S3Properties.class);
+        Mockito.when(mockS3Client.headObject(Mockito.any(HeadObjectRequest.class)))
+                .thenReturn(HeadObjectResponse.builder().build());
+        Mockito.when(mockS3Presigner.presignGetObject(Mockito.any(java.util.function.Consumer.class)))
+                .thenReturn(mockPresignedGetObjectRequest);
+        Mockito.when(mockPresignedGetObjectRequest.url())
+                .thenReturn(new URL("http://private.signed.test/images/check-ins/test-key"));
         Mockito.when(mockS3Properties.endpoint()).thenReturn("http://s3.test");
         Mockito.when(mockS3Properties.bucket()).thenReturn("test-bucket");
+        Mockito.when(mockS3Properties.checkInPrivateBucket()).thenReturn("test-check-in-private-bucket");
         Mockito.when(mockS3Properties.objectUrl(Mockito.anyString()))
                 .thenAnswer(invocation -> "http://s3.test/test-bucket/" + invocation.getArgument(0));
 
@@ -134,6 +150,7 @@ class CheckInServiceTest {
                 locationCheckInRankingRepository,
                 applicationEventPublisher,
                 mockS3Client,
+                mockS3Presigner,
                 mockS3Properties
         );
 
@@ -1261,7 +1278,7 @@ class CheckInServiceTest {
         assertThat(response.images()).isEmpty();
     }
 
-    @DisplayName("이미지 목록을 조회한다 - 이미지 있는 경우")
+    @DisplayName("이미지 목록을 조회한다 - 기존 public 이미지인 경우 저장된 URL을 반환한다")
     @Test
     void getImages_returnsImages() {
         // given
@@ -1281,6 +1298,24 @@ class CheckInServiceTest {
                         "http://s3.test/test-bucket/img1",
                         "http://s3.test/test-bucket/img2"
                 );
+    }
+
+    @DisplayName("이미지 목록을 조회한다 - private 이미지인 경우 signed URL을 반환한다")
+    @Test
+    void getImages_returnsSignedUrl_whenImageKeyExists() {
+        // given
+        Member member = memberFactory.save(b -> b.team(kia));
+        Game game = gameFactory.save(b -> b.stadium(stadiumJamsil).homeTeam(kia).awayTeam(kt).date(LocalDate.now()));
+        CheckIn checkIn = checkInFactory.save(b -> b.member(member).team(kia).game(game));
+        checkInImageRepository.save(CheckInImage.privateImage(checkIn, "images/check-ins/img1"));
+
+        // when
+        CheckInImagesResponse response = checkInService.getImages(member.getId(), checkIn.getId());
+
+        // then
+        assertThat(response.images()).hasSize(1);
+        assertThat(response.images().get(0).imageUrl())
+                .isEqualTo("http://private.signed.test/images/check-ins/test-key");
     }
 
     @DisplayName("예외: 다른 회원의 직관 기록 이미지는 조회할 수 없다")
@@ -1310,8 +1345,16 @@ class CheckInServiceTest {
 
         // then
         assertThat(result.imageId()).isNotNull();
-        assertThat(result.imageUrl()).isEqualTo("http://s3.test/test-bucket/images/check-ins/test-key");
+        assertThat(result.imageUrl()).isEqualTo("http://private.signed.test/images/check-ins/test-key");
         assertThat(checkInService.getImages(member.getId(), checkIn.getId()).images()).hasSize(1);
+
+        CheckInImage savedImage = checkInImageRepository.findByCheckInId(checkIn.getId()).get(0);
+        assertThat(savedImage.getImageKey()).isEqualTo("images/check-ins/test-key");
+        assertThat(savedImage.getImageUrl()).isNull();
+        Mockito.verify(mockS3Client).headObject(Mockito.argThat((HeadObjectRequest request) ->
+                request.bucket().equals("test-check-in-private-bucket")
+                        && request.key().equals("images/check-ins/test-key")
+        ));
     }
 
     @DisplayName("이미지를 여러 장 추가한다")
