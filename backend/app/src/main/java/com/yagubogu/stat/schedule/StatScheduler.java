@@ -1,6 +1,7 @@
 package com.yagubogu.stat.schedule;
 
 import com.yagubogu.game.event.GameFinalizedEvent;
+import com.yagubogu.stat.service.LocationCheckInRankingSyncService;
 import com.yagubogu.stat.service.StatSyncService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,22 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class StatScheduler {
 
     private final StatSyncService statSyncService;
+    private final LocationCheckInRankingSyncService locationCheckInRankingSyncService;
 
     @Scheduled(cron = "0 0 3 * * *")
     public void updateVictoryRanking() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         triggerRankingUpdate(yesterday, "daily scheduler");
+    }
+
+    @Scheduled(cron = "0 0 4 * * *")
+    public void syncLocationCheckInRanking() {
+        try {
+            int syncedCount = locationCheckInRankingSyncService.rebuildAll();
+            log.info("[STAT] Sync location check-in ranking completed: count={}", syncedCount);
+        } catch (RuntimeException e) {
+            log.error("[STAT] Failed to sync location check-in ranking", e);
+        }
     }
 
     @Async

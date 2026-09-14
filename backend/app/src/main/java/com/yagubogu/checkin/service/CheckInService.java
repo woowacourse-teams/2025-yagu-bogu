@@ -7,6 +7,7 @@ import com.yagubogu.checkin.domain.CheckInResultFilter;
 import com.yagubogu.checkin.domain.CheckInType;
 import com.yagubogu.checkin.dto.*;
 import com.yagubogu.checkin.dto.event.CheckInEvent;
+import com.yagubogu.checkin.dto.event.LocationCheckInCreatedEvent;
 import com.yagubogu.checkin.dto.event.StadiumVisitEvent;
 import com.yagubogu.checkin.dto.v1.*;
 import com.yagubogu.checkin.repository.CheckInImageRepository;
@@ -65,9 +66,11 @@ public class CheckInService {
 
         validateNotExistGameAndMember(game, member);
         saveCheckInSafely(game, member, team);
-        locationCheckInRankingRepository.upsertIncrement(member.getId(), game.getDate().getYear());
 
         applicationEventPublisher.publishEvent(new CheckInEvent(member));
+        applicationEventPublisher.publishEvent(
+                new LocationCheckInCreatedEvent(member.getId(), game.getDate().getYear())
+        );
         applicationEventPublisher.publishEvent(new StadiumVisitEvent(member, game.getStadium().getId()));
         applicationEventPublisher.publishEvent(new CheckInCreatedEvent());
     }
