@@ -82,6 +82,53 @@ public class CustomCheckInRepositoryImpl implements CustomCheckInRepository {
     }
 
     @Override
+    public StatCountsParam findStatCountsByMemberAndTeam(
+            final Member member,
+            final Team team,
+            final Integer year
+    ) {
+        NumberExpression<Integer> winExpr = new CaseBuilder().when(winCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> drawExpr = new CaseBuilder().when(drawCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+        NumberExpression<Integer> loseExpr = new CaseBuilder().when(loseCondition(CHECK_IN, GAME)).then(1).otherwise(0);
+
+        return jpaQueryFactory.select(
+                        Projections.constructor(
+                                StatCountsParam.class,
+                                winExpr.sum().coalesce(0),
+                                drawExpr.sum().coalesce(0),
+                                loseExpr.sum().coalesce(0)
+                        )).from(CHECK_IN)
+                .join(CHECK_IN.game, CustomCheckInRepositoryImpl.GAME).on(isComplete())
+                .where(
+                        CHECK_IN.member.eq(member),
+                        CHECK_IN.team.eq(team),
+                        isBetweenYear(year)
+                ).fetchOne();
+    }
+
+    @Override
+    public int countByMemberAndYearUntilCheckIn(
+            final Member member,
+            final int year,
+            final LocalDate gameDate,
+            final Long checkInId
+    ) {
+        Long result = jpaQueryFactory
+                .select(CHECK_IN.id.count())
+                .from(CHECK_IN)
+                .join(CHECK_IN.game, GAME)
+                .where(
+                        CHECK_IN.member.eq(member),
+                        isBetweenYear(GAME, year),
+                        GAME.date.lt(gameDate)
+                                .or(GAME.date.eq(gameDate).and(CHECK_IN.id.loe(checkInId)))
+                )
+                .fetchOne();
+
+        return result == null ? 0 : result.intValue();
+    }
+
+    @Override
     public int findWinCounts(final Member member, final Integer year) {
         return conditionCount(member, year, winCondition(QCheckIn.checkIn, QGame.game));
     }
