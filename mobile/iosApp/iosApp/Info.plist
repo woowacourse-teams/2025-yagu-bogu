@@ -17,6 +17,11 @@
 	</array>
 	<key>GADApplicationIdentifier</key>
 	<string>$(ADMOB_IOS_APP_ID)</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>더 나은 광고 경험을 위해 광고 식별자를 사용합니다.</string>
 	<key>SKAdNetworkItems</key>
