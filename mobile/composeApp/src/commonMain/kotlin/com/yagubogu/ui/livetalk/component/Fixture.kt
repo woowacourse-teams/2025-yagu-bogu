@@ -1,34 +1,114 @@
 package com.yagubogu.ui.livetalk.component
 
+import com.yagubogu.domain.model.InningHalf
+import com.yagubogu.domain.model.PlayerRole
 import com.yagubogu.domain.model.Team
-import com.yagubogu.ui.livetalk.model.LivetalkStadiumItem
+import com.yagubogu.domain.model.WeatherCondition
+import com.yagubogu.ui.livetalk.model.BallCountUiModel
+import com.yagubogu.ui.livetalk.model.BasesUiModel
+import com.yagubogu.ui.livetalk.model.LiveGameStateUiModel
+import com.yagubogu.ui.livetalk.model.LivetalkStadiumUiModel
+import com.yagubogu.ui.livetalk.model.PlayerUiModel
+import com.yagubogu.ui.livetalk.model.ScoreUiModel
+import com.yagubogu.ui.livetalk.model.WeatherUiModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.datetime.LocalTime
 
-val LIVETALK_STADIUM_ITEM_VERIFIED =
-    LivetalkStadiumItem(
+private val PLAYER_BATTER =
+    PlayerUiModel(
+        name = "김타자",
+        role = PlayerRole.BATTER,
+    )
+
+private val PLAYER_PITCHER =
+    PlayerUiModel(
+        name = "김투수투수",
+        role = PlayerRole.PITCHER,
+    )
+
+val LIVE_GAME_STATE_SCHEDULED =
+    LiveGameStateUiModel.Scheduled(
+        gameId = 0L,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        awayPlayer = PLAYER_BATTER,
+        homePlayer = PLAYER_PITCHER,
+        startAt = LocalTime(18, 30),
+    )
+
+val LIVE_GAME_STATE_LIVE =
+    LiveGameStateUiModel.Live(
+        gameId = 1L,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        awayPlayer = PLAYER_BATTER,
+        homePlayer = PLAYER_PITCHER,
+        score = ScoreUiModel(awayScore = 3, homeScore = 5),
+        inning = 7,
+        inningHalf = InningHalf.TOP,
+        bases =
+            BasesUiModel(
+                isFirstBaseOccupied = true,
+                isSecondBaseOccupied = false,
+                isThirdBaseOccupied = true,
+            ),
+        ballCount =
+            BallCountUiModel(
+                ballCount = 2,
+                strikeCount = 1,
+                outCount = 1,
+            ),
+    )
+
+val LIVE_GAME_STATE_COMPLETED =
+    LiveGameStateUiModel.Completed(
+        gameId = 2L,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        score = ScoreUiModel(awayScore = 7, homeScore = 4),
+    )
+
+val LIVE_GAME_STATE_CANCELED =
+    LiveGameStateUiModel.Canceled(
+        gameId = 3L,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+    )
+
+val LIVE_GAME_STATE_UNKNOWN =
+    LiveGameStateUiModel.Unknown(
+        gameId = 4L,
+        awayTeam = Team.HT,
+        homeTeam = Team.SS,
+        startAt = LocalTime(18, 30),
+    )
+
+val LIVETALK_STADIUM_VERIFIED =
+    LivetalkStadiumUiModel(
         gameId = 0L,
         stadiumId = 9L,
         stadiumName = "대전 한화생명 볼파크",
         userCount = 100,
-        awayTeam = Team.SS,
-        homeTeam = Team.HH,
         isVerified = true,
+        liveGameState = LIVE_GAME_STATE_LIVE,
+        weatherUiModel = WeatherUiModel(9L, WeatherCondition.CLEAR, "12.3°C"),
     )
 
-val LIVETALK_STADIUM_ITEM_UNVERIFIED =
-    LivetalkStadiumItem(
+val LIVETALK_STADIUM_UNVERIFIED =
+    LivetalkStadiumUiModel(
         gameId = 1L,
         stadiumId = 8L,
         stadiumName = "창원 NC 파크",
         userCount = 10,
-        awayTeam = Team.HT,
-        homeTeam = Team.NC,
         isVerified = false,
+        liveGameState = LIVE_GAME_STATE_LIVE,
+        weatherUiModel = WeatherUiModel(8L, WeatherCondition.CLEAR, "12.3°C"),
     )
 
-val LIVETALK_STADIUM_ITEMS =
-    listOf(
-        LIVETALK_STADIUM_ITEM_VERIFIED,
-        LIVETALK_STADIUM_ITEM_UNVERIFIED,
-        LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(gameId = 2L),
-        LIVETALK_STADIUM_ITEM_UNVERIFIED.copy(gameId = 3L),
+val LIVETALK_STADIUMS =
+    persistentListOf(
+        LIVETALK_STADIUM_VERIFIED,
+        LIVETALK_STADIUM_UNVERIFIED,
+        LIVETALK_STADIUM_UNVERIFIED.copy(gameId = 2L),
+        LIVETALK_STADIUM_UNVERIFIED.copy(gameId = 3L),
     )
